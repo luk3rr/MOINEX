@@ -46,7 +46,6 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
                                @Param("year") Integer  year);
 
     /**
-     * TODO: Implement tests
      * Get the transfers by wallet and month
      * @param walletId The id of the wallet
      * @param month The month
@@ -55,8 +54,8 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
      */
     @Query("SELECT t "
            + "FROM Transfer t "
-           + "WHERE t.senderWallet.id = :walletId "
-           + "OR t.receiverWallet.id = :walletId "
+           + "WHERE (t.senderWallet.id = :walletId "
+           + "       OR t.receiverWallet.id = :walletId) "
            + "AND strftime('%m', t.date) = printf('%02d', :month) "
            + "AND strftime('%Y', t.date) = printf('%04d', :year) "
            + "ORDER BY t.date DESC")
