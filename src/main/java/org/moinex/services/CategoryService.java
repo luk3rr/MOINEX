@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.moinex.entities.Category;
 import org.moinex.repositories.CategoryRepository;
+import org.moinex.repositories.CreditCardDebtRepository;
 import org.moinex.util.LoggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class CategoryService
 {
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CreditCardDebtRepository creditCardDebtRepository;
 
     private static final Logger m_logger = LoggerConfig.GetLogger();
 
@@ -68,6 +72,13 @@ public class CategoryService
     {
         Category category = categoryRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Category with ID " + id + " not found"));
+
+        if (CountTransactions(id) > 0)
+        {
+            throw new RuntimeException(
+                "Category " + category.GetName() +
+                " cannot be deleted because it has associated transactions");
+        }
 
         categoryRepository.delete(category);
 
@@ -179,6 +190,7 @@ public class CategoryService
      */
     public Long CountTransactions(Long categoryId)
     {
-        return categoryRepository.CountTransactions(categoryId);
+        return categoryRepository.CountTransactions(categoryId) +
+            creditCardDebtRepository.CountTransactions(categoryId);
     }
 }

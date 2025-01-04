@@ -49,4 +49,14 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
            + "WHERE ccd.creditCard.id = :creditCardId")
     Long
     GetDebtCountByCreditCard(@Param("creditCardId") Long creditCardId);
+
+    /**
+     * Get the number of associated transactions for a category
+     * @param categoryId Category ID
+     * @return Number of transactions
+     */
+    @Query(
+        "SELECT COUNT(ccd) FROM CreditCardDebt ccd WHERE ccd.category.id = :categoryId")
+    Long
+    CountTransactions(@Param("categoryId") Long categoryId);
 }
