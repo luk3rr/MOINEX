@@ -109,6 +109,8 @@ public final class Constants
     public static final String CRC_PANE_FXML    = UI_COMMON_PATH + ("credit_card_pane."
                                                                  + "fxml");
 
+    public static final String CALCULATOR_FXML = UI_COMMON_PATH + "calculator.fxml";
+
     // Icons
     public static final String HOME_EXPENSE_ICON = COMMON_ICONS_PATH + "expense.png";
     public static final String HOME_INCOME_ICON  = COMMON_ICONS_PATH + "income.png";

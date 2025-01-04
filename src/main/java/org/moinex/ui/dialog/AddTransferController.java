@@ -7,6 +7,7 @@
 package org.moinex.ui.dialog;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,12 +19,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.moinex.entities.Wallet;
+import org.moinex.services.CalculatorService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
+import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -59,9 +63,14 @@ public class AddTransferController
     @FXML
     private DatePicker transferDatePicker;
 
+    @Autowired
+    private ConfigurableApplicationContext springContext;
+
     private WalletService walletService;
 
     private WalletTransactionService walletTransactionService;
+
+    private CalculatorService calculatorService;
 
     private List<Wallet> wallets;
 
@@ -71,14 +80,17 @@ public class AddTransferController
      * Constructor
      * @param walletService WalletService
      * @param walletTransactionService WalletTransactionService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public AddTransferController(WalletService            walletService,
-                                 WalletTransactionService walletTransactionService)
+                                 WalletTransactionService walletTransactionService,
+                                 CalculatorService        calculatorService)
     {
         this.walletService            = walletService;
         this.walletTransactionService = walletTransactionService;
+        this.calculatorService        = calculatorService;
     }
 
     public void SetSenderWalletComboBox(Wallet wt)
@@ -214,6 +226,51 @@ public class AddTransferController
                                         "Error while creating transfer",
                                         e.getMessage());
             return;
+        }
+    }
+
+    @FXML
+    private void handleOpenCalculator()
+    {
+        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+                                    "Calculator",
+                                    springContext,
+                                    (CalculatorController controller)
+                                        -> {},
+                                    List.of(() -> { GetResultFromCalculator(); }));
+    }
+
+    private void GetResultFromCalculator()
+    {
+        // If the user saved the result, set it in the transferValueField
+        String result = calculatorService.GetResult();
+
+        if (result != null)
+        {
+            try
+            {
+                BigDecimal resultValue = new BigDecimal(result);
+
+                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
+                {
+                    WindowUtils.ShowErrorDialog("Error",
+                                                "Invalid value",
+                                                "The value must be positive");
+                    return;
+                }
+
+                // Round the result to 2 decimal places
+                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
+
+                transferValueField.setText(result);
+            }
+            catch (NumberFormatException e)
+            {
+                // Must be unreachable
+                WindowUtils.ShowErrorDialog("Error",
+                                            "Invalid value",
+                                            "The value must be a number");
+            }
         }
     }
 

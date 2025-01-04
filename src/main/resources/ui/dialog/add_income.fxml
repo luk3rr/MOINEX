@@ -64,6 +64,15 @@
                </image>
             </ImageView>
             <TextField fx:id="incomeValueField" promptText="\$ 0.00" HBox.hgrow="ALWAYS" />
+            <JFXButton minWidth="80.0" onAction="#handleOpenCalculator" stylesheets="@../../css/component/buttons.css">
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../icon/common/calculator.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
          </children>
       </HBox>
       <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">

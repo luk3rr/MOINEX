@@ -7,6 +7,7 @@
 package org.moinex.ui.dialog;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,14 +28,17 @@ import javafx.stage.Stage;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
+import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -67,6 +71,9 @@ public class AddIncomeController
     @FXML
     private DatePicker incomeDatePicker;
 
+    @Autowired
+    private ConfigurableApplicationContext springContext;
+
     private Popup suggestionsPopup;
 
     private ListView<WalletTransaction> suggestionListView;
@@ -76,6 +83,8 @@ public class AddIncomeController
     private WalletTransactionService walletTransactionService;
 
     private CategoryService categoryService;
+
+    private CalculatorService calculatorService;
 
     private List<Wallet> wallets;
 
@@ -90,16 +99,21 @@ public class AddIncomeController
     /**
      * Constructor
      * @param walletService WalletService
+     * @param walletTransactionService WalletTransactionService
+     * @param categoryService CategoryService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public AddIncomeController(WalletService            walletService,
                                WalletTransactionService walletTransactionService,
-                               CategoryService          categoryService)
+                               CategoryService          categoryService,
+                               CalculatorService        calculatorService)
     {
         this.walletService            = walletService;
         this.walletTransactionService = walletTransactionService;
         this.categoryService          = categoryService;
+        this.calculatorService        = calculatorService;
     }
 
     public void SetWalletComboBox(Wallet wt)
@@ -215,6 +229,51 @@ public class AddIncomeController
             WindowUtils.ShowErrorDialog("Error",
                                         "Error while creating income",
                                         e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleOpenCalculator()
+    {
+        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+                                    "Calculator",
+                                    springContext,
+                                    (CalculatorController controller)
+                                        -> {},
+                                    List.of(() -> { GetResultFromCalculator(); }));
+    }
+
+    private void GetResultFromCalculator()
+    {
+        // If the user saved the result, set it in the incomeValueField
+        String result = calculatorService.GetResult();
+
+        if (result != null)
+        {
+            try
+            {
+                BigDecimal resultValue = new BigDecimal(result);
+
+                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
+                {
+                    WindowUtils.ShowErrorDialog("Error",
+                                                "Invalid value",
+                                                "The value must be positive");
+                    return;
+                }
+
+                // Round the result to 2 decimal places
+                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
+
+                incomeValueField.setText(result);
+            }
+            catch (NumberFormatException e)
+            {
+                // Must be unreachable
+                WindowUtils.ShowErrorDialog("Error",
+                                            "Invalid value",
+                                            "The value must be a number");
+            }
         }
     }
 
