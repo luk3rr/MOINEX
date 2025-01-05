@@ -8,29 +8,30 @@ package org.moinex.entities.investment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import org.moinex.util.TickerType;
 
+/**
+ * Class that represents a ticker
+ */
 @Entity
 @Table(name = "ticker")
-public class Ticker
+public class Ticker extends Asset
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "symbol", nullable = false, unique = true)
-    private String symbol;
-
-    @Column(name = "current_quantity", nullable = false)
-    private Long currentQuantity;
-
-    @Column(name = "current_unit_value", nullable = false, scale = 2)
-    private BigDecimal currentUnitValue;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private TickerType type;
 
     @Column(name = "last_update", nullable = false)
     private String lastUpdate;
@@ -42,20 +43,23 @@ public class Ticker
 
     /**
      * Constructor for Ticker
+     * @param name The name of the ticker
      * @param symbol The symbol of the ticker
+     * @param type The type of the ticker
      * @param currentQuantity The current quantity of the ticker
      * @param currentUnitValue The current unit value of the ticker
      * @param lastUpdate The last update of the ticker
      */
-    public Ticker(String     symbol,
-                  Long       currentQuantity,
+    public Ticker(String     name,
+                  String     symbol,
+                  TickerType type,
+                  BigDecimal currentQuantity,
                   BigDecimal currentUnitValue,
                   String     lastUpdate)
     {
-        this.symbol           = symbol;
-        this.currentQuantity  = currentQuantity;
-        this.currentUnitValue = currentUnitValue;
-        this.lastUpdate       = lastUpdate;
+        super(name, symbol, currentQuantity, currentUnitValue);
+        this.type = type;
+        this.lastUpdate = lastUpdate;
     }
 
     public Long GetId()
@@ -63,19 +67,9 @@ public class Ticker
         return id;
     }
 
-    public String GetSymbol()
+    public TickerType GetType()
     {
-        return symbol;
-    }
-
-    public Long GetCurrentQuantity()
-    {
-        return currentQuantity;
-    }
-
-    public BigDecimal GetCurrentUnitValue()
-    {
-        return currentUnitValue;
+        return type;
     }
 
     public String GetLastUpdate()
@@ -83,19 +77,9 @@ public class Ticker
         return lastUpdate;
     }
 
-    public void SetSymbol(String symbol)
+    public void SetType(TickerType type)
     {
-        this.symbol = symbol;
-    }
-
-    public void SetCurrentQuantity(Long currentQuantity)
-    {
-        this.currentQuantity = currentQuantity;
-    }
-
-    public void SetCurrentUnitValue(BigDecimal currentUnitValue)
-    {
-        this.currentUnitValue = currentUnitValue;
+        this.type = type;
     }
 
     public void SetLastUpdate(String lastUpdate)
