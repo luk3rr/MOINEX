@@ -15,6 +15,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 
 /**
@@ -50,16 +52,16 @@ public class Ticker extends Asset
      * @param currentUnitValue The current unit value of the ticker
      * @param lastUpdate The last update of the ticker
      */
-    public Ticker(String     name,
-                  String     symbol,
-                  TickerType type,
-                  BigDecimal currentQuantity,
-                  BigDecimal currentUnitValue,
-                  String     lastUpdate)
+    public Ticker(String        name,
+                  String        symbol,
+                  TickerType    type,
+                  BigDecimal    currentQuantity,
+                  BigDecimal    currentUnitValue,
+                  LocalDateTime lastUpdate)
     {
         super(name, symbol, currentQuantity, currentUnitValue);
-        this.type = type;
-        this.lastUpdate = lastUpdate;
+        this.type       = type;
+        this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }
 
     public Long GetId()
@@ -72,9 +74,9 @@ public class Ticker extends Asset
         return type;
     }
 
-    public String GetLastUpdate()
+    public LocalDateTime GetLastUpdate()
     {
-        return lastUpdate;
+        return LocalDateTime.parse(lastUpdate, Constants.DB_DATE_FORMATTER);
     }
 
     public void SetType(TickerType type)
@@ -82,8 +84,8 @@ public class Ticker extends Asset
         this.type = type;
     }
 
-    public void SetLastUpdate(String lastUpdate)
+    public void SetLastUpdate(LocalDateTime lastUpdate)
     {
-        this.lastUpdate = lastUpdate;
+        this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }
 }
