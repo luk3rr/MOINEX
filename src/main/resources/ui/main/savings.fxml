@@ -12,6 +12,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
@@ -123,7 +124,7 @@
                      <children>
                         <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <AnchorPane prefHeight="200.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                              <AnchorPane prefHeight="120.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
                                  <children>
                                     <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
@@ -189,6 +190,69 @@
                               </AnchorPane>
                               <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
                                  <children>
+                                    <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <JFXButton onAction="#handleRegisterTicker" stylesheets="@../../css/component/buttons.css" text="Register Ticker">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/add.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleBuyTicker" stylesheets="@../../css/component/buttons.css" text="Buy Ticker">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/sign_in.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleSellTicker" stylesheets="@../../css/component/buttons.css" text="Sell Ticker">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/sign_out.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleAddDividend" stylesheets="@../../css/component/buttons.css" text="Add Dividend">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/income_black.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <Region HBox.hgrow="ALWAYS" />
+                                          <JFXButton onAction="#handleShowTransactions" stylesheets="@../../css/component/buttons.css" text="Show Transactions">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/list.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleUpdatePrices" stylesheets="@../../css/component/buttons.css" text="Update Prices">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/synchronize.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                 <children>
                                     <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
                                           <HBox spacing="10.0">
@@ -200,7 +264,7 @@
                                                          <children>
                                                             <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                                <children>
-                                                                  <JFXButton stylesheets="@../../css/component/buttons.css" text="Edit">
+                                                                  <JFXButton onAction="#handleEditTicker" stylesheets="@../../css/component/buttons.css" text="Edit">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -209,7 +273,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton stylesheets="@../../css/component/buttons.css" text="Delete">
+                                                                  <JFXButton onAction="#handleDeleteTicker" stylesheets="@../../css/component/buttons.css" text="Delete">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
