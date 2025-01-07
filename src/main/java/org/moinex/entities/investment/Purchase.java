@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "purchase")
@@ -36,9 +37,9 @@ public class Purchase extends Transaction
      * @param purchaseDate The purchase date
      */
     public Purchase(Ticker     ticker,
-                    Long       quantity,
+                    BigDecimal quantity,
                     BigDecimal unitPrice,
-                    String     purchaseDate)
+                    LocalDateTime purchaseDate)
     {
         super(ticker, quantity, unitPrice, purchaseDate);
     }

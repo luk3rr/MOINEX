@@ -11,6 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import org.moinex.util.Constants;
 
 /**
  * Base class for transactions in the investment domain
@@ -22,8 +24,8 @@ public abstract class Transaction
     @JoinColumn(name = "ticker_id", referencedColumnName = "id", nullable = true)
     private Ticker ticker;
 
-    @Column(name = "quantity", nullable = false)
-    private Long quantity;
+    @Column(name = "quantity", nullable = false, precision = 20, scale = 8)
+    private BigDecimal quantity;
 
     @Column(name = "unit_price", nullable = false, scale = 2)
     private BigDecimal unitPrice;
@@ -43,15 +45,15 @@ public abstract class Transaction
      * @param unitPrice The unit price of the transaction
      * @param transactionDate The transaction date
      */
-    public Transaction(Ticker     ticker,
-                       Long       quantity,
-                       BigDecimal unitPrice,
-                       String     transactionDate)
+    public Transaction(Ticker        ticker,
+                       BigDecimal    quantity,
+                       BigDecimal    unitPrice,
+                       LocalDateTime transactionDate)
     {
         this.ticker          = ticker;
         this.quantity        = quantity;
         this.unitPrice       = unitPrice;
-        this.transactionDate = transactionDate;
+        this.transactionDate = transactionDate.format(Constants.DB_DATE_FORMATTER);
     }
 
     public Ticker GetTicker()
@@ -64,12 +66,12 @@ public abstract class Transaction
         this.ticker = ticker;
     }
 
-    public Long GetQuantity()
+    public BigDecimal GetQuantity()
     {
         return quantity;
     }
 
-    public void SetQuantity(Long quantity)
+    public void SetQuantity(BigDecimal quantity)
     {
         this.quantity = quantity;
     }
@@ -84,13 +86,13 @@ public abstract class Transaction
         this.unitPrice = unitPrice;
     }
 
-    public String GetTransactionDate()
+    public LocalDateTime GetTransactionDate()
     {
-        return transactionDate;
+        return LocalDateTime.parse(transactionDate, Constants.DB_DATE_FORMATTER);
     }
 
-    public void SetTransactionDate(String transactionDate)
+    public void SetTransactionDate(LocalDateTime transactionDate)
     {
-        this.transactionDate = transactionDate;
+        this.transactionDate = transactionDate.format(Constants.DB_DATE_FORMATTER);
     }
 }
