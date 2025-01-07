@@ -229,6 +229,15 @@
                                              </graphic>
                                           </JFXButton>
                                           <Region HBox.hgrow="ALWAYS" />
+                                          <JFXButton onAction="#handleOpenTickerArchive" stylesheets="@../../css/component/buttons.css" text="Ticker Archive">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/archive.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
                                           <JFXButton onAction="#handleShowTransactions" stylesheets="@../../css/component/buttons.css" text="Show Transactions">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

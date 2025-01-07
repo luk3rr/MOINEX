@@ -38,6 +38,10 @@ public class SavingsController
     { }
 
     @FXML
+    private void handleOpenTickerArchive()
+    { }
+
+    @FXML
     private void handleShowTransactions()
     { }
 

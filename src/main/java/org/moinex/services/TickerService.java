@@ -72,4 +72,143 @@ public class TickerService
 
         return ticker.GetId();
     }
+
+    /**
+     * Deletes a ticker
+     * @param id The id of the ticker
+     * @throws RuntimeException If the ticker does not exist
+     * @throws RuntimeException If the ticker has transactions associated with it
+     */
+    @Transactional
+    public void DeleteTicker(Long id)
+    {
+        Ticker ticker = m_tickerRepository.findById(id).orElseThrow(
+            ()
+                -> new RuntimeException("Ticker with id " + id +
+                                        " not found and cannot be deleted"));
+
+        // Check if the ticker has transactions associated with it
+        if (GetTransactionCountByTicker(id) > 0)
+        {
+            throw new RuntimeException(
+                "Ticker with id " + id +
+                " has transactions associated with it and cannot be deleted. Remove "
+                + "the transactions first or archive the ticker");
+        }
+
+        m_tickerRepository.delete(ticker);
+
+        logger.info("Ticker with id " + id + " was permanently deleted");
+    }
+
+    /**
+     * Archives a ticker
+     * @param id The id of the ticker
+     * @throws RuntimeException If the ticker does not exist
+     * @note This method is used to archive a ticker, which means that the ticker
+     * will not be deleted from the database, but it will not used in the application
+     * anymore
+     */
+    @Transactional
+    public void ArchiveTicker(Long id)
+    {
+        Ticker ticker = m_tickerRepository.findById(id).orElseThrow(
+            ()
+                -> new RuntimeException("Ticker with id " + id +
+                                        " not found and cannot be archived"));
+
+        ticker.SetArchived(true);
+        m_tickerRepository.save(ticker);
+
+        logger.info("Ticker with id " + id + " was archived");
+    }
+
+    /**
+     * Unarchives a ticker
+     * @param id The id of the ticker
+     * @throws RuntimeException If the ticker does not exist
+     * @note This method is used to unarchive a ticker, which means that the ticker
+     * will be used in the application again
+     */
+    @Transactional
+    public void UnarchiveTicker(Long id)
+    {
+        Ticker ticker = m_tickerRepository.findById(id).orElseThrow(
+            ()
+                -> new RuntimeException("Ticker with id " + id +
+                                        " not found and cannot be unarchived"));
+
+        ticker.SetArchived(false);
+        m_tickerRepository.save(ticker);
+
+        logger.info("Ticker with id " + id + " was unarchived");
+    }
+
+    /**
+     * Get all tickers
+     * @return A list with all tickers
+     */
+    public List<Ticker> GetAllTickers()
+    {
+        return m_tickerRepository.findAllByOrderBySymbolAsc();
+    }
+
+    /**
+     * Get all non-archived tickers
+     * @return A list with all non-archived tickers
+     */
+    public List<Ticker> GetAllNonArchivedTickers()
+    {
+        return m_tickerRepository.findAllByArchivedFalseOrderBySymbolAsc();
+    }
+
+    /**
+     * Get all archived tickers
+     * @return A list with all archived tickers
+     */
+    public List<Ticker> GetAllArchivedTickers()
+    {
+        return m_tickerRepository.findAllByArchivedTrueOrderBySymbolAsc();
+    }
+
+    /**
+     * Get count of transactions associated with the ticker
+     * @param tickerId The id of the ticker
+     * @return The count of transactions associated with the ticker
+     */
+    public Long GetTransactionCountByTicker(Long tickerId)
+    {
+        return GetPurchaseCountByTicker(tickerId) + GetSaleCountByTicker(tickerId) +
+            GetDividendCountByTicker(tickerId);
+    }
+
+    /**
+     * Get count of purchases associated with the ticker
+     * @param tickerId The id of the ticker
+     * @return The count of purchases associated with the ticker
+     */
+    public Long GetPurchaseCountByTicker(Long tickerId)
+    {
+        return m_tickerRepository.GetPurchaseCountByTicker(tickerId);
+    }
+
+    /**
+     * Get count of sales associated with the ticker
+     * @param tickerId The id of the ticker
+     * @return The count of sales associated with the ticker
+     */
+    public Long GetSaleCountByTicker(Long tickerId)
+    {
+        return m_tickerRepository.GetSaleCountByTicker(tickerId);
+    }
+
+    /**
+     * Get count of dividends associated with the ticker
+     * @param tickerId The id of the ticker
+     * @return The count of dividends associated with the ticker
+     */
+    public Long GetDividendCountByTicker(Long tickerId)
+    {
+        return m_tickerRepository.GetDividendCountByTicker(tickerId);
+    }
 }

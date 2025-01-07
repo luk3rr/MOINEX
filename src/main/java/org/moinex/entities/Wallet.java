@@ -164,7 +164,7 @@ public class Wallet
      * Set the archived status of the wallet
      * @param archived The new archived status of the wallet
      */
-    public void SetArchived(boolean archived)
+    public void SetArchived(Boolean archived)
     {
         this.archived = archived;
     }
