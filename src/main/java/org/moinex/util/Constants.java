@@ -53,17 +53,20 @@ public final class Constants
     public static final String ADD_EXPENSE_FXML  = UI_DIALOG_PATH + "add_expense.fxml";
     public static final String ADD_CATEGORY_FXML = UI_DIALOG_PATH + ("add_category."
                                                                      + "fxml");
+
+    public static final String ADD_CREDIT_CARD_DEBT_FXML =
+        UI_DIALOG_PATH + "add_credit_card_debt.fxml";
+
     public static final String ADD_CREDIT_CARD_FXML =
         UI_DIALOG_PATH + "add_credit_card.fxml";
+
+    public static final String ADD_TICKER_FXML  = UI_DIALOG_PATH + "add_ticker.fxml";
 
     public static final String ARCHIVED_WALLETS_FXML =
         UI_DIALOG_PATH + "archived_wallets.fxml";
 
     public static final String ARCHIVED_CREDIT_CARDS_FXML =
         UI_DIALOG_PATH + "archived_credit_cards.fxml";
-
-    public static final String ADD_CREDIT_CARD_DEBT_FXML =
-        UI_DIALOG_PATH + "add_credit_card_debt.fxml";
 
     public static final String REMOVE_TRANSACTION_FXML =
         UI_DIALOG_PATH + "remove_transaction.fxml";

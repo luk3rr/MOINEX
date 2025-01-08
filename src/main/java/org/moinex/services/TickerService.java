@@ -69,13 +69,23 @@ public class TickerService
      * @param symbol The symbol of the ticker
      * @param type The type of the ticker
      * @param price The price of the ticker
+     * @param quantity The quantity of the ticker
      * @throws RuntimeException If the ticker already exists
      * @return The id of the registered ticker
      */
     @Transactional
     public Long
-    RegisterTicker(String name, String symbol, TickerType type, BigDecimal price)
+    RegisterTicker(String name, String symbol, TickerType type, BigDecimal price, BigDecimal quantity)
     {
+        // Remove leading and trailing whitespaces
+        name = name.strip();
+        symbol = symbol.strip();
+
+        if (name.isBlank() || symbol.isBlank())
+        {
+            throw new RuntimeException("Name and symbol must not be empty");
+        }
+
         if (m_tickerRepository.existsBySymbol(symbol))
         {
             logger.warning("Ticker with symbol " + symbol + " already exists");
@@ -84,10 +94,20 @@ public class TickerService
                                        " already exists");
         }
 
+        if (price.compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Price must be greater than zero");
+        }
+
+        if (quantity.compareTo(BigDecimal.ZERO) < 0)
+        {
+            throw new RuntimeException("Quantity must be greater than or equal to zero");
+        }
+
         Ticker ticker = new Ticker(name,
                                    symbol,
                                    type,
-                                   BigDecimal.valueOf(0.0),
+                                   quantity,
                                    price,
                                    LocalDateTime.now());
 

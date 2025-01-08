@@ -6,6 +6,7 @@
 
 package org.moinex.util;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import javafx.scene.Node;
@@ -60,12 +61,48 @@ public final class UIUtils
     }
 
     /**
-     * Format a number to a currency string
+     * Format a number to a currency string with dynamic precision
      * @param value The value to be formatted
      */
-    static public String FormatCurrency(Number value)
+    public static String FormatCurrency(Number value)
     {
-        return currencyFormat.format(value);
+        DecimalFormat dynamicFormat = new DecimalFormat(Constants.CURRENCY_FORMAT);
+
+        // Determine the number of fraction digits dynamically
+        Integer fractionDigits;
+        if (value instanceof BigDecimal)
+        {
+            BigDecimal bigDecimalValue = (BigDecimal)value;
+            fractionDigits             = DetermineFractionDigits(bigDecimalValue);
+        }
+        else
+        {
+            // Default to 2 fraction digits for other Number types
+            fractionDigits = 2;
+        }
+
+        dynamicFormat.setMinimumFractionDigits(fractionDigits);
+        dynamicFormat.setMaximumFractionDigits(fractionDigits);
+
+        return dynamicFormat.format(value);
+    }
+
+    /**
+     * Determines the number of fraction digits dynamically based on a BigDecimal value
+     * @param value The BigDecimal value
+     * @return Number of fraction digits
+     */
+    private static Integer DetermineFractionDigits(BigDecimal value)
+    {
+        if (value.compareTo(BigDecimal.ZERO) == 0)
+        {
+            return 2;
+        }
+
+        BigDecimal absValue = value.stripTrailingZeros().abs();
+        Integer    scale    = absValue.scale();
+
+        return scale <= 2 ? 2 : scale;
     }
 
     /**

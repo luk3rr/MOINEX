@@ -92,7 +92,8 @@ public class TickerServiceTest
         m_tickerService.RegisterTicker(m_ticker.GetName(),
                                        m_ticker.GetSymbol(),
                                        m_ticker.GetType(),
-                                       m_ticker.GetCurrentUnitValue());
+                                       m_ticker.GetCurrentUnitValue(),
+                                       m_ticker.GetCurrentQuantity());
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository).save(tickerCaptor.capture());
@@ -118,7 +119,96 @@ public class TickerServiceTest
                 -> m_tickerService.RegisterTicker(m_ticker.GetName(),
                                                   m_ticker.GetSymbol(),
                                                   m_ticker.GetType(),
-                                                  m_ticker.GetCurrentUnitValue()));
+                                                  m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        verify(m_tickerRepository, never()).save(any(Ticker.class));
+    }
+
+    @Test
+    @DisplayName(
+        "Test if exception is thrown when registering a ticker with an empty name")
+    public void
+    TestRegisterTickerEmptyName()
+    {
+        // Test with empty name
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker("",
+                                                  m_ticker.GetSymbol(),
+                                                  m_ticker.GetType(),
+                                                  m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetCurrentQuantity()));
+        // Test with blank name
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(" ",
+                                                  m_ticker.GetSymbol(),
+                                                  m_ticker.GetType(),
+                                                  m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        verify(m_tickerRepository, never()).save(any(Ticker.class));
+    }
+
+    @Test
+    @DisplayName(
+        "Test if exception is thrown when registering a ticker with an empty symbol")
+    public void
+    TestRegisterTickerEmptySymbol()
+    {
+        // Test with empty symbol
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
+                                                  "",
+                                                  m_ticker.GetType(),
+                                                  m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        // Test with blank symbol
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
+                                                  " ",
+                                                  m_ticker.GetType(),
+                                                  m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        verify(m_tickerRepository, never()).save(any(Ticker.class));
+    }
+
+    @Test
+    @DisplayName("Test if exception is thrown when registering a ticker with price " +
+                 "less than or equal to zero")
+    public void
+    TestRegisterTickerInvalidPrice()
+    {
+        when(m_tickerRepository.existsBySymbol(m_ticker.GetSymbol())).thenReturn(false);
+
+        // Test with price less than zero
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
+                                                  m_ticker.GetSymbol(),
+                                                  m_ticker.GetType(),
+                                                  new BigDecimal("-0.05"),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        // Test with price equal to zero
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
+                                                  m_ticker.GetSymbol(),
+                                                  m_ticker.GetType(),
+                                                  BigDecimal.ZERO,
+                                                  m_ticker.GetCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
