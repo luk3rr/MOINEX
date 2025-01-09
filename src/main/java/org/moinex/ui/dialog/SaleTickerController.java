@@ -1,5 +1,5 @@
 /*
- * Filename: BuyTicker.java
+ * Filename: SaleTickerController.java
  * Created on: January  9, 2025
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
@@ -24,10 +24,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Buy Ticker dialog
+ * Controller for the Sale Ticker dialog
  */
 @Controller
-public class BuyTickerController
+public class SaleTickerController
 {
     @FXML
     private Label tickerNameLabel;
@@ -42,7 +42,7 @@ public class BuyTickerController
     private Label totalPriceLabel;
 
     @FXML
-    private DatePicker buyDatePicker;
+    private DatePicker saleDatePicker;
 
     @Autowired
     private ConfigurableApplicationContext springContext;
@@ -57,7 +57,7 @@ public class BuyTickerController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BuyTickerController(TickerService tickerService)
+    public SaleTickerController(TickerService tickerService)
     {
         this.tickerService = tickerService;
     }
@@ -74,7 +74,7 @@ public class BuyTickerController
     private void initialize()
     {
         // Configure date picker
-        UIUtils.SetDatePickerFormat(buyDatePicker);
+        UIUtils.SetDatePickerFormat(saleDatePicker);
 
         // Configure listeners
         unitPriceField.textProperty().addListener(
@@ -96,7 +96,7 @@ public class BuyTickerController
     {
         String    unitPriceStr = unitPriceField.getText();
         String    quantityStr  = quantityField.getText();
-        LocalDate buyDate      = buyDatePicker.getValue();
+        LocalDate buyDate      = saleDatePicker.getValue();
 
         if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
             quantityStr == null || quantityStr.strip().isEmpty() || buyDate == null)
@@ -117,14 +117,14 @@ public class BuyTickerController
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
 
-            tickerService.AddPurchase(ticker.GetId(),
-                                      quantity,
-                                      unitPrice,
-                                      dateTimeWithCurrentHour);
+            tickerService.AddSale(ticker.GetId(),
+                                  quantity,
+                                  unitPrice,
+                                  dateTimeWithCurrentHour);
 
             WindowUtils.ShowSuccessDialog("Success",
-                                          "Purchase added",
-                                          "Purchase added successfully");
+                                          "Sale added",
+                                          "Sale added successfully");
 
             Stage stage = (Stage)tickerNameLabel.getScene().getWindow();
             stage.close();
@@ -138,7 +138,7 @@ public class BuyTickerController
         catch (RuntimeException e)
         {
             WindowUtils.ShowErrorDialog("Error",
-                                        "Error while buying ticker",
+                                        "Error while selling ticker",
                                         e.getMessage());
         }
     }

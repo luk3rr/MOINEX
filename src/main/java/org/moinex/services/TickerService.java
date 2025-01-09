@@ -256,6 +256,12 @@ public class TickerService
         oldTicker.SetAveragePrice(tk.GetAveragePrice());
         oldTicker.SetArchived(tk.IsArchived());
 
+        // If sold all holdings, reset average price
+        if (oldTicker.GetCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
+        {
+            ResetAveragePrice(oldTicker.GetId());
+        }
+
         m_tickerRepository.save(oldTicker);
 
         logger.info("Ticker with id " + tk.GetId() + " was updated");
@@ -362,6 +368,14 @@ public class TickerService
         // Update holdings quantity
         ticker.SetCurrentQuantity(ticker.GetCurrentQuantity().subtract(quantity));
 
+        // If sold all holdings, reset average price
+        if (ticker.GetCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
+        {
+            ResetAveragePrice(tickerId);
+        }
+
+        m_tickerRepository.save(ticker);
+
         logger.info("Sale with id " + sale.GetId() + " added to ticker " +
                     ticker.GetSymbol());
     }
@@ -416,6 +430,22 @@ public class TickerService
                     ticker.GetSymbol() + ". Wallet transaction with id " + id +
                     " created for the dividend and added to wallet " +
                     wallet.GetName());
+    }
+
+    public void ResetAveragePrice(Long tickerId)
+    {
+        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
+            ()
+                -> new RuntimeException("Ticker with id " + tickerId +
+                                        " not found and cannot reset average price"));
+
+        ticker.SetAveragePrice(BigDecimal.ZERO);
+        ticker.SetAveragePriceCount(BigDecimal.ZERO);
+
+        m_tickerRepository.save(ticker);
+
+        logger.info("Average price of ticker " + ticker.GetSymbol() +
+                    " was reset to zero");
     }
 
     /**

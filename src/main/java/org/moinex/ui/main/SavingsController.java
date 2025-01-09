@@ -25,6 +25,7 @@ import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
+import org.moinex.ui.dialog.SaleTickerController;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.UIUtils;
@@ -109,7 +110,25 @@ public class SavingsController
 
     @FXML
     private void handleSellTicker()
-    { }
+    {
+        Ticker selectedTicker =
+            stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No ticker selected",
+                                              "Please select a ticker to sell");
+            return;
+        }
+
+        WindowUtils.OpenModalWindow(Constants.SALE_TICKER_FXML,
+                                    "Sell Ticker",
+                                    springContext,
+                                    (SaleTickerController controller)
+                                        -> controller.SetTicker(selectedTicker),
+                                    List.of(() -> { UpdateTransactionTableView(); }));
+    }
 
     @FXML
     private void handleAddDividend()

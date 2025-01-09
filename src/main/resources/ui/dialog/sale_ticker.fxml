@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.BuyTickerController">
+<VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.SaleTickerController">
    <children>
       <HBox spacing="10.0">
          <children>
@@ -114,7 +114,7 @@
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <DatePicker fx:id="buyDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../css/component/data-picker.css" />
+                  <DatePicker fx:id="saleDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../css/component/data-picker.css" />
                </children>
             </VBox>
          </children>
