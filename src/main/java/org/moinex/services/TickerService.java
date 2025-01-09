@@ -7,6 +7,7 @@
 package org.moinex.services;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -241,7 +242,7 @@ public class TickerService
                 "Quantity must be greater than or equal to zero");
         }
 
-        if (tk.GetAverageUnitValue().compareTo(BigDecimal.ZERO) < 0)
+        if (tk.GetAveragePrice().compareTo(BigDecimal.ZERO) < 0)
         {
             throw new RuntimeException(
                 "Average unit price must be greater than or equal to zero");
@@ -252,7 +253,7 @@ public class TickerService
         oldTicker.SetType(tk.GetType());
         oldTicker.SetCurrentUnitValue(tk.GetCurrentUnitValue());
         oldTicker.SetCurrentQuantity(tk.GetCurrentQuantity());
-        oldTicker.SetAverageUnitValue(tk.GetAverageUnitValue());
+        oldTicker.SetAveragePrice(tk.GetAveragePrice());
         oldTicker.SetArchived(tk.IsArchived());
 
         m_tickerRepository.save(oldTicker);
@@ -297,6 +298,18 @@ public class TickerService
 
         // Update holdings quantity
         ticker.SetCurrentQuantity(ticker.GetCurrentQuantity().add(quantity));
+
+        // Update average price
+        BigDecimal updatedTotalValue =
+            ticker.GetAveragePrice().multiply(ticker.GetAveragePriceCount());
+
+        updatedTotalValue = updatedTotalValue.add(unitPrice.multiply(quantity));
+
+        ticker.SetAveragePrice(
+            updatedTotalValue.divide(ticker.GetAveragePriceCount().add(quantity),
+                                     RoundingMode.HALF_UP));
+
+        ticker.SetAveragePriceCount(ticker.GetAveragePriceCount().add(quantity));
 
         logger.info("Purchase with id " + purchase.GetId() + " added to ticker " +
                     ticker.GetSymbol());

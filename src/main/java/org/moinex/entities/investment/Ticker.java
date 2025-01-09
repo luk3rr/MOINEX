@@ -67,7 +67,7 @@ public class Ticker extends Asset
                   BigDecimal    averageUnitValue,
                   LocalDateTime lastUpdate)
     {
-        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, 1);
+        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, BigDecimal.ONE);
         this.id         = id;
         this.type       = type;
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
@@ -91,7 +91,7 @@ public class Ticker extends Asset
                   BigDecimal    averageUnitValue,
                   LocalDateTime lastUpdate)
     {
-        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, 1);
+        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, BigDecimal.ONE);
         this.type       = type;
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }

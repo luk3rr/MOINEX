@@ -365,7 +365,7 @@ public class SavingsController
         avgUnitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetAverageUnitValue())));
+                UIUtils.FormatCurrency(param.getValue().GetAveragePrice())));
 
         // Add the columns to the table view
         stocksFundsTabTickerTable.getColumns().add(idColumn);

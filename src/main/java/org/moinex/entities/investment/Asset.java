@@ -32,7 +32,7 @@ public abstract class Asset
     private BigDecimal averageUnitValue;
 
     @Column(name = "average_unit_value_count", nullable = false)
-    private Integer averageUnitValueCount;
+    private BigDecimal averageUnitValueCount;
 
     /**
      * Default constructor for JPA
@@ -53,13 +53,13 @@ public abstract class Asset
                  BigDecimal currentQuantity,
                  BigDecimal currentUnitValue,
                  BigDecimal averageUnitValue,
-                 Integer    averageUnitValueCount)
+                 BigDecimal averageUnitValueCount)
     {
-        this.name             = name;
-        this.symbol           = symbol;
-        this.currentQuantity  = currentQuantity;
-        this.currentUnitValue = currentUnitValue;
-        this.averageUnitValue = averageUnitValue;
+        this.name                  = name;
+        this.symbol                = symbol;
+        this.currentQuantity       = currentQuantity;
+        this.currentUnitValue      = currentUnitValue;
+        this.averageUnitValue      = averageUnitValue;
         this.averageUnitValueCount = averageUnitValueCount;
     }
 
@@ -83,12 +83,12 @@ public abstract class Asset
         return currentUnitValue;
     }
 
-    public BigDecimal GetAverageUnitValue()
+    public BigDecimal GetAveragePrice()
     {
         return averageUnitValue;
     }
 
-    public Integer GetAverageUnitValueCount()
+    public BigDecimal GetAveragePriceCount()
     {
         return averageUnitValueCount;
     }
@@ -113,12 +113,12 @@ public abstract class Asset
         this.currentUnitValue = currentUnitValue;
     }
 
-    public void SetAverageUnitValue(BigDecimal averageUnitValue)
+    public void SetAveragePrice(BigDecimal averageUnitValue)
     {
         this.averageUnitValue = averageUnitValue;
     }
 
-    public void SetAverageUnitValueCount(Integer averageUnitValueCount)
+    public void SetAveragePriceCount(BigDecimal averageUnitValueCount)
     {
         this.averageUnitValueCount = averageUnitValueCount;
     }

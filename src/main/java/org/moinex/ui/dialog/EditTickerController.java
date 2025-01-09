@@ -73,7 +73,7 @@ public class EditTickerController
         symbolField.setText(tk.GetSymbol());
         currentPriceField.setText(tk.GetCurrentUnitValue().toString());
         quantityField.setText(tk.GetCurrentQuantity().toString());
-        avgUnitPriceField.setText(tk.GetAverageUnitValue().toString());
+        avgUnitPriceField.setText(tk.GetAveragePrice().toString());
         typeComboBox.setValue(tk.GetType().toString());
 
         archivedCheckBox.setSelected(tk.IsArchived());
@@ -158,7 +158,7 @@ public class EditTickerController
                 tickerToUpdate.GetCurrentUnitValue().compareTo(currentPrice) == 0 &&
                 tickerToUpdate.GetType().equals(type) &&
                 tickerToUpdate.GetCurrentQuantity().compareTo(quantity) == 0 &&
-                tickerToUpdate.GetAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
+                tickerToUpdate.GetAveragePrice().compareTo(avgUnitPrice) == 0 &&
                 tickerToUpdate.IsArchived().equals(archived))
             {
                 WindowUtils.ShowInformationDialog("Info",
@@ -174,7 +174,7 @@ public class EditTickerController
                 tickerToUpdate.SetCurrentUnitValue(currentPrice);
                 tickerToUpdate.SetType(type);
                 tickerToUpdate.SetCurrentQuantity(quantity);
-                tickerToUpdate.SetAverageUnitValue(avgUnitPrice);
+                tickerToUpdate.SetAveragePrice(avgUnitPrice);
                 tickerToUpdate.SetArchived(archived);
 
                 tickerService.UpdateTicker(tickerToUpdate);
