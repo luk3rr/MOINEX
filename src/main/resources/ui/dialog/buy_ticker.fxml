@@ -13,24 +13,20 @@
 
 <VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.BuyTickerController">
    <children>
-      <HBox spacing="10.0">
+      <VBox alignment="CENTER">
          <children>
-            <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="Ticker">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="tickerNameLabel" text="ABC (ABC)" textAlignment="CENTER" wrapText="true">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
+            <Label text="Ticker">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+            <Label fx:id="tickerNameLabel" text="ABC (ABC)" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
          </children>
-      </HBox>
+      </VBox>
       <HBox spacing="10.0">
          <children>
             <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">

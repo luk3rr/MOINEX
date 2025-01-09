@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
+import org.moinex.ui.dialog.AddDividendController;
 import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
@@ -132,7 +133,26 @@ public class SavingsController
 
     @FXML
     private void handleAddDividend()
-    { }
+    {
+        Ticker selectedTicker =
+            stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null)
+        {
+            WindowUtils.ShowInformationDialog(
+                "Info",
+                "No ticker selected",
+                "Please select a ticker to add a dividend");
+            return;
+        }
+
+        WindowUtils.OpenModalWindow(Constants.ADD_DIVIDEND_FXML,
+                                    "Add Dividend",
+                                    springContext,
+                                    (AddDividendController controller)
+                                        -> controller.SetTicker(selectedTicker),
+                                    List.of(() -> { UpdateTransactionTableView(); }));
+    }
 
     @FXML
     private void handleOpenTickerArchive()
