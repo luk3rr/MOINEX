@@ -23,6 +23,7 @@ import javafx.util.StringConverter;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddTickerController;
+import org.moinex.ui.dialog.EditTickerController;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.UIUtils;
@@ -80,7 +81,7 @@ public class SavingsController
                                     springContext,
                                     (AddTickerController controller)
                                         -> {},
-                                    List.of(() -> {}));
+                                    List.of(() -> { UpdateTransactionTableView(); }));
     }
 
     @FXML
@@ -109,11 +110,70 @@ public class SavingsController
 
     @FXML
     private void handleEditTicker()
-    { }
+    {
+        Ticker selectedTicker =
+            stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No ticker selected",
+                                              "Please select a ticker to edit");
+            return;
+        }
+
+        WindowUtils.OpenModalWindow(Constants.EDIT_TICKER_FXML,
+                                    "Edit Ticker",
+                                    springContext,
+                                    (EditTickerController controller)
+                                        -> controller.SetTicker(selectedTicker),
+                                    List.of(() -> { UpdateTransactionTableView(); }));
+    }
 
     @FXML
     private void handleDeleteTicker()
-    { }
+    {
+        Ticker selectedTicker =
+            stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No ticker selected",
+                                              "Please select a ticker to delete");
+            return;
+        }
+
+        // Prevent the removal of a ticker with associated transactions
+        if (tickerService.GetTransactionCountByTicker(selectedTicker.GetId()) > 0)
+        {
+            WindowUtils.ShowErrorDialog(
+                "Error",
+                "Ticker has transactions",
+                "Cannot delete a ticker with associated transactions. Remove the "
+                    + "transactions first or archive the ticker.");
+            return;
+        }
+
+        if (WindowUtils.ShowConfirmationDialog(
+                "Confirmation",
+                "Delete ticker " + selectedTicker.GetName() + " (" +
+                    selectedTicker.GetSymbol() + ")",
+                "Are you sure you want to delete this ticker?"))
+        {
+            try
+            {
+                tickerService.DeleteTicker(selectedTicker.GetId());
+                UpdateTransactionTableView();
+            }
+            catch (RuntimeException e)
+            {
+                WindowUtils.ShowErrorDialog("Error",
+                                            "Error deleting ticker",
+                                            e.getMessage());
+            }
+        }
+    }
 
     /**
      * Update the transaction table view

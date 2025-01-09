@@ -90,6 +90,7 @@ public final class Constants
     public static final String EDIT_CREDIT_CARD_DEBT_FXML =
         UI_DIALOG_PATH + "edit_credit_card_debt.fxml";
     public static final String EDIT_GOAL_FXML = UI_DIALOG_PATH + "edit_goal.fxml";
+    public static final String EDIT_TICKER_FXML = UI_DIALOG_PATH + "edit_ticker.fxml";
 
     public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
         UI_DIALOG_PATH + "credit_card_invoice_payment.fxml";

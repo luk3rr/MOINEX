@@ -203,6 +203,64 @@ public class TickerService
     }
 
     /**
+     * Update a ticker
+     * @param tk The ticker to be updated
+     * @throws RuntimeException If the ticker does not exist
+     * @throws RuntimeException If the name or symbol is empty
+     * @throws RuntimeException If the price is less than or equal to zero
+     * @throws RuntimeException If the quantity is less than zero
+     * @throws RuntimeException If the average unit price is less than zero
+     */
+    @Transactional
+    public void UpdateTicker(Ticker tk)
+    {
+        Ticker oldTicker =
+            m_tickerRepository.findById(tk.GetId())
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Ticker with id " + tk.GetId() +
+                                                " not found and cannot be updated"));
+
+        // Remove leading and trailing whitespaces
+        tk.SetName(tk.GetName().strip());
+        tk.SetSymbol(tk.GetSymbol().strip());
+
+        if (tk.GetName().isBlank() || tk.GetSymbol().isBlank())
+        {
+            throw new RuntimeException("Name and symbol must not be empty");
+        }
+
+        if (tk.GetCurrentUnitValue().compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Price must be greater than zero");
+        }
+
+        if (tk.GetCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
+        {
+            throw new RuntimeException(
+                "Quantity must be greater than or equal to zero");
+        }
+
+        if (tk.GetAverageUnitValue().compareTo(BigDecimal.ZERO) < 0)
+        {
+            throw new RuntimeException(
+                "Average unit price must be greater than or equal to zero");
+        }
+
+        oldTicker.SetName(tk.GetName());
+        oldTicker.SetSymbol(tk.GetSymbol());
+        oldTicker.SetType(tk.GetType());
+        oldTicker.SetCurrentUnitValue(tk.GetCurrentUnitValue());
+        oldTicker.SetCurrentQuantity(tk.GetCurrentQuantity());
+        oldTicker.SetAverageUnitValue(tk.GetAverageUnitValue());
+        oldTicker.SetArchived(tk.IsArchived());
+
+        m_tickerRepository.save(oldTicker);
+
+        logger.info("Ticker with id " + tk.GetId() + " was updated");
+    }
+
+    /**
      * Add a purchase to a ticker
      * @param tickerId The id of the ticker
      * @param quantity The quantity of the purchase

@@ -1,6 +1,6 @@
 /*
- * Filename: AddTickerController.java
- * Created on: January  8, 2025
+ * Filename: EditTickerController.java
+ * Created on: January  9, 2025
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
@@ -8,9 +8,11 @@ package org.moinex.ui.dialog;
 
 import java.math.BigDecimal;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.util.TickerType;
 import org.moinex.util.WindowUtils;
@@ -19,10 +21,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Add Ticker dialog
+ * Controller for the Edit Ticker dialog
  */
 @Controller
-public class AddTickerController
+public class EditTickerController
 {
     @FXML
     private TextField nameField;
@@ -42,10 +44,15 @@ public class AddTickerController
     @FXML
     private ComboBox<String> typeComboBox;
 
+    @FXML
+    private CheckBox archivedCheckBox;
+
     @Autowired
     private ConfigurableApplicationContext springContext;
 
     private TickerService tickerService;
+
+    private Ticker tickerToUpdate;
 
     /**
      * Constructor
@@ -53,9 +60,23 @@ public class AddTickerController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddTickerController(TickerService tickerService)
+    public EditTickerController(TickerService tickerService)
     {
         this.tickerService = tickerService;
+    }
+
+    public void SetTicker(Ticker tk)
+    {
+        this.tickerToUpdate = tk;
+
+        nameField.setText(tk.GetName());
+        symbolField.setText(tk.GetSymbol());
+        currentPriceField.setText(tk.GetCurrentUnitValue().toString());
+        quantityField.setText(tk.GetCurrentQuantity().toString());
+        avgUnitPriceField.setText(tk.GetAverageUnitValue().toString());
+        typeComboBox.setValue(tk.GetType().toString());
+
+        archivedCheckBox.setSelected(tk.IsArchived());
     }
 
     @FXML
@@ -74,8 +95,10 @@ public class AddTickerController
     @FXML
     private void handleSave()
     {
-        String name            = nameField.getText();
-        String symbol          = symbolField.getText();
+        // Get name and symbol and remove leading and trailing whitespaces
+        String name   = nameField.getText().strip();
+        String symbol = symbolField.getText().strip();
+
         String currentPriceStr = currentPriceField.getText();
         String typeStr         = typeComboBox.getValue();
         String quantityStr     = quantityField.getText();
@@ -127,16 +150,39 @@ public class AddTickerController
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 
-            tickerService.RegisterTicker(name,
-                                         symbol,
-                                         type,
-                                         currentPrice,
-                                         avgUnitPrice,
-                                         quantity);
+            Boolean archived = archivedCheckBox.isSelected();
 
-            WindowUtils.ShowSuccessDialog("Success",
-                                          "Ticker added",
-                                          "Ticker added successfully.");
+            // Check if has any modification
+            if (tickerToUpdate.GetName().equals(name) &&
+                tickerToUpdate.GetSymbol().equals(symbol) &&
+                tickerToUpdate.GetCurrentUnitValue().compareTo(currentPrice) == 0 &&
+                tickerToUpdate.GetType().equals(type) &&
+                tickerToUpdate.GetCurrentQuantity().compareTo(quantity) == 0 &&
+                tickerToUpdate.GetAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
+                tickerToUpdate.IsArchived().equals(archived))
+            {
+                WindowUtils.ShowInformationDialog("Info",
+                                                  "No changes",
+                                                  "No changes were to the ticker");
+
+                return;
+            }
+            else // If there is any modification, update the ticker
+            {
+                tickerToUpdate.SetName(name);
+                tickerToUpdate.SetSymbol(symbol);
+                tickerToUpdate.SetCurrentUnitValue(currentPrice);
+                tickerToUpdate.SetType(type);
+                tickerToUpdate.SetCurrentQuantity(quantity);
+                tickerToUpdate.SetAverageUnitValue(avgUnitPrice);
+                tickerToUpdate.SetArchived(archived);
+
+                tickerService.UpdateTicker(tickerToUpdate);
+
+                WindowUtils.ShowSuccessDialog("Success",
+                                              "Ticker updated",
+                                              "The ticker updated successfully.");
+            }
 
             Stage stage = (Stage)nameField.getScene().getWindow();
             stage.close();
