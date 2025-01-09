@@ -61,10 +61,20 @@ public final class UIUtils
     }
 
     /**
+     * Format a number to a currency string
+     * @param value The value to be formatted
+     * @note Automatically formats to 2 fraction digits, rounding half up
+     */
+    public static String FormatCurrency(Number value)
+    {
+        return currencyFormat.format(value);
+    }
+
+    /**
      * Format a number to a currency string with dynamic precision
      * @param value The value to be formatted
      */
-    public static String FormatCurrency(Number value)
+    public static String FormatCurrencyDynamic(Number value)
     {
         DecimalFormat dynamicFormat = new DecimalFormat(Constants.CURRENCY_FORMAT);
 
