@@ -46,9 +46,10 @@ public class Bond extends Asset
                 String     symbol,
                 BigDecimal currentQuantity,
                 BigDecimal currentUnitValue,
+                BigDecimal averageUnitValue,
                 String     maturityDate)
     {
-        super(name, symbol, currentQuantity, currentUnitValue);
+        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, 1);
         this.maturityDate = maturityDate;
     }
 

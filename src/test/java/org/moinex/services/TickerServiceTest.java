@@ -76,6 +76,7 @@ public class TickerServiceTest
                               TickerType.STOCK,
                               BigDecimal.ZERO,
                               new BigDecimal("100"),
+                              new BigDecimal("100"),
                               LocalDateTime.now());
 
         m_wallet = new Wallet(1L, "Main Wallet", BigDecimal.ZERO);
@@ -93,6 +94,7 @@ public class TickerServiceTest
                                        m_ticker.GetSymbol(),
                                        m_ticker.GetType(),
                                        m_ticker.GetCurrentUnitValue(),
+                                       m_ticker.GetAverageUnitValue(),
                                        m_ticker.GetCurrentQuantity());
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
@@ -120,6 +122,7 @@ public class TickerServiceTest
                                                   m_ticker.GetSymbol(),
                                                   m_ticker.GetType(),
                                                   m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetAverageUnitValue(),
                                                   m_ticker.GetCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -139,6 +142,7 @@ public class TickerServiceTest
                                                   m_ticker.GetSymbol(),
                                                   m_ticker.GetType(),
                                                   m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetAverageUnitValue(),
                                                   m_ticker.GetCurrentQuantity()));
         // Test with blank name
         assertThrows(
@@ -148,6 +152,7 @@ public class TickerServiceTest
                                                   m_ticker.GetSymbol(),
                                                   m_ticker.GetType(),
                                                   m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetAverageUnitValue(),
                                                   m_ticker.GetCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -167,6 +172,7 @@ public class TickerServiceTest
                                                   "",
                                                   m_ticker.GetType(),
                                                   m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetAverageUnitValue(),
                                                   m_ticker.GetCurrentQuantity()));
 
         // Test with blank symbol
@@ -177,14 +183,15 @@ public class TickerServiceTest
                                                   " ",
                                                   m_ticker.GetType(),
                                                   m_ticker.GetCurrentUnitValue(),
+                                                  m_ticker.GetAverageUnitValue(),
                                                   m_ticker.GetCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
-    @DisplayName("Test if exception is thrown when registering a ticker with price " +
-                 "less than or equal to zero")
+    @DisplayName("Test if exception is thrown when registering a ticker with price "
+                 + "less than or equal to zero")
     public void
     TestRegisterTickerInvalidPrice()
     {
@@ -198,6 +205,7 @@ public class TickerServiceTest
                                                   m_ticker.GetSymbol(),
                                                   m_ticker.GetType(),
                                                   new BigDecimal("-0.05"),
+                                                  m_ticker.GetAverageUnitValue(),
                                                   m_ticker.GetCurrentQuantity()));
 
         // Test with price equal to zero
@@ -207,6 +215,41 @@ public class TickerServiceTest
                 -> m_tickerService.RegisterTicker(m_ticker.GetName(),
                                                   m_ticker.GetSymbol(),
                                                   m_ticker.GetType(),
+                                                  BigDecimal.ZERO,
+                                                  m_ticker.GetAverageUnitValue(),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        verify(m_tickerRepository, never()).save(any(Ticker.class));
+    }
+
+    @Test
+    @DisplayName(
+        "Test if exception is thrown when registering a ticker with average unit price "
+        + "less than or equal to zero")
+    public void
+    TestRegisterTickerInvalidAverageUnitPrice()
+    {
+        when(m_tickerRepository.existsBySymbol(m_ticker.GetSymbol())).thenReturn(false);
+
+        // Test with price less than zero
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
+                                                  m_ticker.GetSymbol(),
+                                                  m_ticker.GetType(),
+                                                  m_ticker.GetCurrentUnitValue(),
+                                                  new BigDecimal("-0.05"),
+                                                  m_ticker.GetCurrentQuantity()));
+
+        // Test with price equal to zero
+        assertThrows(
+            RuntimeException.class,
+            ()
+                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
+                                                  m_ticker.GetSymbol(),
+                                                  m_ticker.GetType(),
+                                                  m_ticker.GetCurrentUnitValue(),
                                                   BigDecimal.ZERO,
                                                   m_ticker.GetCurrentQuantity()));
 

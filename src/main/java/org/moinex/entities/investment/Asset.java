@@ -22,11 +22,17 @@ public abstract class Asset
     @Column(name = "symbol", nullable = false, unique = true)
     private String symbol;
 
-    @Column(name = "current_quantity", nullable = false, precision = 20, scale = 8)
+    @Column(name = "current_quantity", nullable = false)
     private BigDecimal currentQuantity;
 
-    @Column(name = "current_unit_value", nullable = false, scale = 2)
+    @Column(name = "current_unit_value", nullable = false)
     private BigDecimal currentUnitValue;
+
+    @Column(name = "average_unit_value", nullable = false)
+    private BigDecimal averageUnitValue;
+
+    @Column(name = "average_unit_value_count", nullable = false)
+    private Integer averageUnitValueCount;
 
     /**
      * Default constructor for JPA
@@ -39,16 +45,22 @@ public abstract class Asset
      * @param symbol The symbol of the asset
      * @param currentQuantity The current quantity of the asset
      * @param currentUnitValue The current unit value of the asset
+     * @param averageUnitValue The average unit value of the asset
+     * @param averageUnitValueCount The average unit value count of the asset
      */
     public Asset(String     name,
                  String     symbol,
                  BigDecimal currentQuantity,
-                 BigDecimal currentUnitValue)
+                 BigDecimal currentUnitValue,
+                 BigDecimal averageUnitValue,
+                 Integer    averageUnitValueCount)
     {
         this.name             = name;
         this.symbol           = symbol;
         this.currentQuantity  = currentQuantity;
         this.currentUnitValue = currentUnitValue;
+        this.averageUnitValue = averageUnitValue;
+        this.averageUnitValueCount = averageUnitValueCount;
     }
 
     public String GetName()
@@ -71,6 +83,16 @@ public abstract class Asset
         return currentUnitValue;
     }
 
+    public BigDecimal GetAverageUnitValue()
+    {
+        return averageUnitValue;
+    }
+
+    public Integer GetAverageUnitValueCount()
+    {
+        return averageUnitValueCount;
+    }
+
     public void SetName(String name)
     {
         this.name = name;
@@ -89,5 +111,15 @@ public abstract class Asset
     public void SetCurrentUnitValue(BigDecimal currentUnitValue)
     {
         this.currentUnitValue = currentUnitValue;
+    }
+
+    public void SetAverageUnitValue(BigDecimal averageUnitValue)
+    {
+        this.averageUnitValue = averageUnitValue;
+    }
+
+    public void SetAverageUnitValueCount(Integer averageUnitValueCount)
+    {
+        this.averageUnitValueCount = averageUnitValueCount;
     }
 }

@@ -69,16 +69,21 @@ public class TickerService
      * @param symbol The symbol of the ticker
      * @param type The type of the ticker
      * @param price The price of the ticker
+     * @param avgUnitPrice The average unit price of the ticker
      * @param quantity The quantity of the ticker
      * @throws RuntimeException If the ticker already exists
      * @return The id of the registered ticker
      */
     @Transactional
-    public Long
-    RegisterTicker(String name, String symbol, TickerType type, BigDecimal price, BigDecimal quantity)
+    public Long RegisterTicker(String     name,
+                               String     symbol,
+                               TickerType type,
+                               BigDecimal price,
+                               BigDecimal avgUnitPrice,
+                               BigDecimal quantity)
     {
         // Remove leading and trailing whitespaces
-        name = name.strip();
+        name   = name.strip();
         symbol = symbol.strip();
 
         if (name.isBlank() || symbol.isBlank())
@@ -101,7 +106,14 @@ public class TickerService
 
         if (quantity.compareTo(BigDecimal.ZERO) < 0)
         {
-            throw new RuntimeException("Quantity must be greater than or equal to zero");
+            throw new RuntimeException(
+                "Quantity must be greater than or equal to zero");
+        }
+
+        if (avgUnitPrice.compareTo(BigDecimal.ZERO) < 0)
+        {
+            throw new RuntimeException(
+                "Average unit price must be greater than or equal to zero");
         }
 
         Ticker ticker = new Ticker(name,
@@ -109,6 +121,7 @@ public class TickerService
                                    type,
                                    quantity,
                                    price,
+                                   avgUnitPrice,
                                    LocalDateTime.now());
 
         m_tickerRepository.save(ticker);

@@ -281,6 +281,13 @@ public class SavingsController
                 UIUtils.FormatCurrency(param.getValue().GetCurrentQuantity().multiply(
                     param.getValue().GetCurrentUnitValue()))));
 
+        TableColumn<Ticker, String> avgUnitColumn =
+            new TableColumn<>("Average Unit Price");
+        avgUnitColumn.setCellValueFactory(
+            param
+            -> new SimpleObjectProperty<>(
+                UIUtils.FormatCurrency(param.getValue().GetAverageUnitValue())));
+
         // Add the columns to the table view
         stocksFundsTabTickerTable.getColumns().add(idColumn);
         stocksFundsTabTickerTable.getColumns().add(nameColumn);
@@ -289,5 +296,6 @@ public class SavingsController
         stocksFundsTabTickerTable.getColumns().add(quantityColumn);
         stocksFundsTabTickerTable.getColumns().add(unitColumn);
         stocksFundsTabTickerTable.getColumns().add(totalColumn);
+        stocksFundsTabTickerTable.getColumns().add(avgUnitColumn);
     }
 }

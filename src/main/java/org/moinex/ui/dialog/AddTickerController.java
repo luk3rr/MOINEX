@@ -37,6 +37,9 @@ public class AddTickerController
     private TextField quantityField;
 
     @FXML
+    private TextField avgUnitPriceField;
+
+    @FXML
     private ComboBox<String> typeComboBox;
 
     @Autowired
@@ -76,6 +79,7 @@ public class AddTickerController
         String currentPriceStr = currentPriceField.getText();
         String typeStr         = typeComboBox.getValue();
         String quantityStr     = quantityField.getText();
+        String avgUnitPriceStr = avgUnitPriceField.getText();
 
         if (name == null || symbol == null || currentPriceStr == null ||
             typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
@@ -88,6 +92,18 @@ public class AddTickerController
             return;
         }
 
+        // If quantity is set, then avgUnitPrice must be set
+        if ((quantityStr == null || quantityStr.strip().isEmpty()) &&
+            (avgUnitPriceStr != null && !avgUnitPriceStr.strip().isEmpty()))
+        {
+            WindowUtils.ShowErrorDialog(
+                "Error",
+                "Invalid fields",
+                "Quantity must be set if average unit price is set or vice-versa.");
+
+            return;
+        }
+
         try
         {
             BigDecimal currentPrice = new BigDecimal(currentPriceStr);
@@ -95,17 +111,26 @@ public class AddTickerController
             TickerType type = TickerType.valueOf(typeStr);
 
             BigDecimal quantity;
+            BigDecimal avgUnitPrice;
 
-            if (quantityStr == null || quantityStr.strip().isEmpty())
+            if ((quantityStr == null || quantityStr.strip().isEmpty()) &&
+                (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()))
             {
-                quantity = BigDecimal.ZERO;
+                quantity     = BigDecimal.ZERO;
+                avgUnitPrice = BigDecimal.ZERO;
             }
             else
             {
-                quantity = new BigDecimal(quantityStr);
+                quantity     = new BigDecimal(quantityStr);
+                avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 
-            tickerService.RegisterTicker(name, symbol, type, currentPrice, quantity);
+            tickerService.RegisterTicker(name,
+                                         symbol,
+                                         type,
+                                         currentPrice,
+                                         avgUnitPrice,
+                                         quantity);
 
             WindowUtils.ShowSuccessDialog("Success",
                                           "Ticker added",

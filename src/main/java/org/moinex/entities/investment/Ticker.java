@@ -64,9 +64,10 @@ public class Ticker extends Asset
                   TickerType    type,
                   BigDecimal    currentQuantity,
                   BigDecimal    currentUnitValue,
+                  BigDecimal    averageUnitValue,
                   LocalDateTime lastUpdate)
     {
-        super(name, symbol, currentQuantity, currentUnitValue);
+        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, 1);
         this.id         = id;
         this.type       = type;
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
@@ -79,6 +80,7 @@ public class Ticker extends Asset
      * @param type The type of the ticker
      * @param currentQuantity The current quantity of the ticker
      * @param currentUnitValue The current unit value of the ticker
+     * @param averageUnitValue The average unit value of the ticker
      * @param lastUpdate The last update of the ticker
      */
     public Ticker(String        name,
@@ -86,9 +88,10 @@ public class Ticker extends Asset
                   TickerType    type,
                   BigDecimal    currentQuantity,
                   BigDecimal    currentUnitValue,
+                  BigDecimal    averageUnitValue,
                   LocalDateTime lastUpdate)
     {
-        super(name, symbol, currentQuantity, currentUnitValue);
+        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, 1);
         this.type       = type;
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }
