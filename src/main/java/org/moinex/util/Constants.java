@@ -60,7 +60,9 @@ public final class Constants
     public static final String ADD_CREDIT_CARD_FXML =
         UI_DIALOG_PATH + "add_credit_card.fxml";
 
-    public static final String ADD_TICKER_FXML  = UI_DIALOG_PATH + "add_ticker.fxml";
+    public static final String BUY_TICKER_FXML = UI_DIALOG_PATH + "buy_ticker.fxml";
+
+    public static final String ADD_TICKER_FXML = UI_DIALOG_PATH + "add_ticker.fxml";
 
     public static final String ARCHIVED_WALLETS_FXML =
         UI_DIALOG_PATH + "archived_wallets.fxml";
@@ -89,7 +91,7 @@ public final class Constants
         UI_DIALOG_PATH + "edit_credit_card.fxml";
     public static final String EDIT_CREDIT_CARD_DEBT_FXML =
         UI_DIALOG_PATH + "edit_credit_card_debt.fxml";
-    public static final String EDIT_GOAL_FXML = UI_DIALOG_PATH + "edit_goal.fxml";
+    public static final String EDIT_GOAL_FXML   = UI_DIALOG_PATH + "edit_goal.fxml";
     public static final String EDIT_TICKER_FXML = UI_DIALOG_PATH + "edit_ticker.fxml";
 
     public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =

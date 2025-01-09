@@ -201,34 +201,6 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleBuyTicker" stylesheets="@../../css/component/buttons.css" text="Buy Ticker">
-                                             <graphic>
-                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/sign_in.png" />
-                                                   </image>
-                                                </ImageView>
-                                             </graphic>
-                                          </JFXButton>
-                                          <JFXButton onAction="#handleSellTicker" stylesheets="@../../css/component/buttons.css" text="Sell Ticker">
-                                             <graphic>
-                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/sign_out.png" />
-                                                   </image>
-                                                </ImageView>
-                                             </graphic>
-                                          </JFXButton>
-                                          <JFXButton onAction="#handleAddDividend" stylesheets="@../../css/component/buttons.css" text="Add Dividend">
-                                             <graphic>
-                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/income_black.png" />
-                                                   </image>
-                                                </ImageView>
-                                             </graphic>
-                                          </JFXButton>
-                                          <Region HBox.hgrow="ALWAYS" />
                                           <JFXButton onAction="#handleOpenTickerArchive" stylesheets="@../../css/component/buttons.css" text="Ticker Archive">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -247,6 +219,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
+                                          <Region HBox.hgrow="ALWAYS" />
                                           <JFXButton onAction="#handleUpdatePrices" stylesheets="@../../css/component/buttons.css" text="Update Prices">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -287,6 +260,33 @@
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
                                                                               <Image url="@../../icon/common/remove.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleBuyTicker" stylesheets="@../../css/component/buttons.css" text="Buy Ticker">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/sign_in.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleSellTicker" stylesheets="@../../css/component/buttons.css" text="Sell Ticker">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/sign_out.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleAddDividend" stylesheets="@../../css/component/buttons.css" text="Add Dividend">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/income_black.png" />
                                                                            </image>
                                                                         </ImageView>
                                                                      </graphic>

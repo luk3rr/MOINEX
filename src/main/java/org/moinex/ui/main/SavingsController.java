@@ -23,6 +23,7 @@ import javafx.util.StringConverter;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddTickerController;
+import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
@@ -86,7 +87,25 @@ public class SavingsController
 
     @FXML
     private void handleBuyTicker()
-    { }
+    {
+        Ticker selectedTicker =
+            stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No ticker selected",
+                                              "Please select a ticker to buy");
+            return;
+        }
+
+        WindowUtils.OpenModalWindow(Constants.BUY_TICKER_FXML,
+                                    "Buy Ticker",
+                                    springContext,
+                                    (BuyTickerController controller)
+                                        -> controller.SetTicker(selectedTicker),
+                                    List.of(() -> { UpdateTransactionTableView(); }));
+    }
 
     @FXML
     private void handleSellTicker()
