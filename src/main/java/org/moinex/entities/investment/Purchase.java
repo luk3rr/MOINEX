@@ -30,6 +30,24 @@ public class Purchase extends Transaction
     public Purchase() { }
 
     /**
+     * Constructor for testing purposes
+     * @param id The id of the purchase
+     * @param ticker The ticker of the purchase
+     * @param quantity The quantity of the purchase
+     * @param unitPrice The unit price of the purchase
+     * @param walletTransaction The wallet transaction of the purchase
+     */
+    public Purchase(Long              id,
+                    Ticker            ticker,
+                    BigDecimal        quantity,
+                    BigDecimal        unitPrice,
+                    WalletTransaction walletTransaction)
+    {
+        super(ticker, quantity, unitPrice, walletTransaction);
+        this.id = id;
+    }
+
+    /**
      * Constructor for Purchase
      * @param ticker The ticker of the purchase
      * @param quantity The quantity of the purchase

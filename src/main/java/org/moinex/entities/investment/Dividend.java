@@ -41,6 +41,21 @@ public class Dividend
     public Dividend() { }
 
     /**
+     * Constructor for testing purposes
+     * @param id The id of the dividend
+     * @param ticker The ticker of the dividend
+     * @param walletTransaction The wallet transaction of the dividend
+     */
+    public Dividend(Long              id,
+                    Ticker            ticker,
+                    WalletTransaction walletTransaction)
+    {
+        this.id               = id;
+        this.ticker           = ticker;
+        this.walletTransaction = walletTransaction;
+    }
+
+    /**
      * Constructor for Dividend
      * @param ticker The ticker of the dividend
      * @param walletTransaction The wallet transaction of the dividend

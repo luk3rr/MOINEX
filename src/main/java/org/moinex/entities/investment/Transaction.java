@@ -73,6 +73,11 @@ public abstract class Transaction
         return quantity;
     }
 
+    public WalletTransaction GetWalletTransaction()
+    {
+        return walletTransaction;
+    }
+
     public void SetQuantity(BigDecimal quantity)
     {
         this.quantity = quantity;
@@ -86,5 +91,10 @@ public abstract class Transaction
     public void SetUnitPrice(BigDecimal unitPrice)
     {
         this.unitPrice = unitPrice;
+    }
+
+    public void SetWalletTransaction(WalletTransaction walletTransaction)
+    {
+        this.walletTransaction = walletTransaction;
     }
 }

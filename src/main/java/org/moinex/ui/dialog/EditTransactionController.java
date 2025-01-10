@@ -248,7 +248,7 @@ public class EditTransactionController
         catch (RuntimeException e)
         {
             WindowUtils.ShowErrorDialog("Error",
-                                        "Error while creating income",
+                                        "Error while updating transaction",
                                         e.getMessage());
         }
     }

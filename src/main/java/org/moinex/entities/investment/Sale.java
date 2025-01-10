@@ -30,6 +30,24 @@ public class Sale extends Transaction
     public Sale() { }
 
     /**
+     * Constructor for testing purposes
+     * @param id The id of the sale
+     * @param ticker The ticker of the sale
+     * @param quantity The quantity of the sale
+     * @param unitPrice The unit price of the sale
+     * @param walletTransaction The wallet transaction of the sale
+     */
+    public Sale(Long              id,
+                Ticker            ticker,
+                BigDecimal        quantity,
+                BigDecimal        unitPrice,
+                WalletTransaction walletTransaction)
+    {
+        super(ticker, quantity, unitPrice, walletTransaction);
+        this.id = id;
+    }
+
+    /**
      * Constructor for Sale
      * @param ticker The ticker of the sale
      * @param quantity The quantity of the sale

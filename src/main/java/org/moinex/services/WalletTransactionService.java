@@ -289,6 +289,9 @@ public class WalletTransactionService
     {
         if (oldTransaction.GetType().equals(newType))
         {
+            m_logger.info("Transaction with id " + oldTransaction.GetId() +
+                          " has the same type as before");
+
             return;
         }
 
@@ -337,6 +340,9 @@ public class WalletTransactionService
 
         oldTransaction.SetType(newType);
         m_walletTransactionRepository.save(oldTransaction);
+
+        m_logger.info("Transaction with id " + oldTransaction.GetId() +
+                      " type changed to " + newType.toString());
     }
 
     /**
@@ -353,6 +359,9 @@ public class WalletTransactionService
     {
         if (oldTransaction.GetWallet().GetId() == newWallet.GetId())
         {
+            m_logger.info("Transaction with id " + oldTransaction.GetId() +
+                          " has the same wallet as before");
+
             return;
         }
 
@@ -393,6 +402,9 @@ public class WalletTransactionService
 
         oldTransaction.SetWallet(newWallet);
         m_walletTransactionRepository.save(oldTransaction);
+
+        m_logger.info("Transaction with id " + oldTransaction.GetId() +
+                      " wallet changed to " + newWallet.GetName());
     }
 
     /**
@@ -400,7 +412,6 @@ public class WalletTransactionService
      * @param transaction The transaction to be updated
      * @param newAmount The new amount of the transaction
      * @throws RuntimeException If the transaction type does not exist
-     *
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
@@ -414,6 +425,9 @@ public class WalletTransactionService
         // Check if the new amount is the same as the old amount
         if (diff.compareTo(BigDecimal.ZERO) == 0)
         {
+            m_logger.info("Transaction with id " + oldTransaction.GetId() +
+                          " has the same amount as before");
+
             return;
         }
 
@@ -437,7 +451,14 @@ public class WalletTransactionService
             }
             else if (oldTransaction.GetType().equals(TransactionType.INCOME))
             {
-                wallet.SetBalance(wallet.GetBalance().add(diff));
+                if (oldAmount.compareTo(newAmount) > 0)
+                {
+                    wallet.SetBalance(wallet.GetBalance().subtract(diff));
+                }
+                else
+                {
+                    wallet.SetBalance(wallet.GetBalance().add(diff));
+                }
             }
             else
             {
@@ -446,11 +467,17 @@ public class WalletTransactionService
                 throw new RuntimeException("Transaction type not recognized");
             }
 
+            m_logger.info("Wallet with id " + wallet.GetId() + " balance changed to " +
+                          wallet.GetBalance());
+
             m_walletRepository.save(wallet);
         }
 
         oldTransaction.SetAmount(newAmount);
         m_walletTransactionRepository.save(oldTransaction);
+
+        m_logger.info("Transaction with id " + oldTransaction.GetId() +
+                      " amount changed to " + newAmount);
     }
 
     /**
@@ -467,6 +494,9 @@ public class WalletTransactionService
     {
         if (transaction.GetStatus().equals(newStatus))
         {
+            m_logger.info("Transaction with id " + transaction.GetId() +
+                          " has the same status as before");
+
             return;
         }
 
@@ -532,7 +562,14 @@ public class WalletTransactionService
 
         transaction.SetStatus(newStatus);
         m_walletRepository.save(wallet);
+
+        m_logger.info("Wallet with id " + wallet.GetId() + " balance changed to " +
+                      wallet.GetBalance());
+
         m_walletTransactionRepository.save(transaction);
+
+        m_logger.info("Transaction with id " + transaction.GetId() +
+                      " status changed to " + newStatus.toString());
     }
 
     /**

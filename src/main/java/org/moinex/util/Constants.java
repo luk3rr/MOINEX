@@ -96,14 +96,20 @@ public final class Constants
         UI_DIALOG_PATH + "edit_credit_card.fxml";
     public static final String EDIT_CREDIT_CARD_DEBT_FXML =
         UI_DIALOG_PATH + "edit_credit_card_debt.fxml";
+
     public static final String EDIT_GOAL_FXML   = UI_DIALOG_PATH + "edit_goal.fxml";
     public static final String EDIT_TICKER_FXML = UI_DIALOG_PATH + "edit_ticker.fxml";
+    public static final String EDIT_PURCHASE_FXML = UI_DIALOG_PATH + "edit_purchase.fxml";
+    public static final String EDIT_SALE_FXML = UI_DIALOG_PATH + "edit_sale.fxml";
+    public static final String EDIT_DIVIDEND_FXML = UI_DIALOG_PATH + "edit_dividend.fxml";
 
     public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
         UI_DIALOG_PATH + "credit_card_invoice_payment.fxml";
 
     public static final String RECURRING_TRANSACTIONS_FXML =
         UI_DIALOG_PATH + "recurring_transaction.fxml";
+    public static final String INVESTMENT_TRANSACTIONS_FXML =
+        UI_DIALOG_PATH + "investment_transactions.fxml";
     public static final String ADD_RECURRING_TRANSACTION_FXML =
         UI_DIALOG_PATH + "add_recurring_transaction.fxml";
     public static final String EDIT_RECURRING_TRANSACTION_FXML =

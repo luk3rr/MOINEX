@@ -27,6 +27,7 @@ import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.ArchivedTickersController;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
+import org.moinex.ui.dialog.InvestmentTransactionsController;
 import org.moinex.ui.dialog.SaleTickerController;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
@@ -168,7 +169,14 @@ public class SavingsController
 
     @FXML
     private void handleShowTransactions()
-    { }
+    {
+        WindowUtils.OpenModalWindow(Constants.INVESTMENT_TRANSACTIONS_FXML,
+                                    "Investment Transactions",
+                                    springContext,
+                                    (InvestmentTransactionsController controller)
+                                        -> {},
+                                    List.of(() -> { UpdateTransactionTableView(); }));
+    }
 
     @FXML
     private void handleUpdatePrices()

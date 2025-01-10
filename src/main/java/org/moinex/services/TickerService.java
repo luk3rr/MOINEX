@@ -8,14 +8,11 @@ package org.moinex.services;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
 import org.moinex.entities.Category;
-import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
-import org.moinex.entities.WalletType;
 import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.Purchase;
 import org.moinex.entities.investment.Sale;
@@ -24,11 +21,7 @@ import org.moinex.repositories.DividendRepository;
 import org.moinex.repositories.PurchaseRepository;
 import org.moinex.repositories.SaleRepository;
 import org.moinex.repositories.TickerRepository;
-import org.moinex.repositories.TransferRepository;
 import org.moinex.repositories.WalletRepository;
-import org.moinex.repositories.WalletTransactionRepository;
-import org.moinex.repositories.WalletTypeRepository;
-import org.moinex.util.Constants;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
 import org.moinex.util.TransactionStatus;
@@ -461,6 +454,128 @@ public class TickerService
                     walletId);
     }
 
+    /**
+     * Update a purchase
+     * @param purchase The purchase to be updated
+     * @throws RuntimeException If the purchase does not exist
+     * @throws RuntimeException If the ticker does not exist
+     * @throws RuntimeException If the quantity is less than or equal to zero
+     * @throws RuntimeException If the unit price is less than or equal to zero
+     */
+    @Transactional
+    public void UpdatePurchase(Purchase purchase)
+    {
+        Purchase oldPurchase =
+            m_purchaseRepository.findById(purchase.GetId())
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Purchase with id " + purchase.GetId() +
+                                                " not found and cannot be updated"));
+
+        m_tickerRepository.findById(purchase.GetTicker().GetId())
+            .orElseThrow(()
+                             -> new RuntimeException(
+                                 "Ticker with id " + purchase.GetTicker().GetId() +
+                                 " not found and cannot update purchase"));
+
+        if (purchase.GetQuantity().compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Quantity must be greater than zero");
+        }
+
+        if (purchase.GetUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Unit price must be greater than zero");
+        }
+
+        oldPurchase.SetQuantity(purchase.GetQuantity());
+        oldPurchase.SetUnitPrice(purchase.GetUnitPrice());
+
+        purchase.GetWalletTransaction().SetAmount(
+            purchase.GetUnitPrice().multiply(purchase.GetQuantity()));
+
+        m_walletTransactionService.UpdateTransaction(purchase.GetWalletTransaction());
+
+        m_purchaseRepository.save(oldPurchase);
+
+        logger.info("Purchase with id " + purchase.GetId() + " was updated");
+    }
+
+    /**
+     * Update a sale
+     * @param sale The sale to be updated
+     * @throws RuntimeException If the sale does not exist
+     * @throws RuntimeException If the ticker does not exist
+     * @throws RuntimeException If the quantity is less than or equal to zero
+     * @throws RuntimeException If the unit price is less than or equal to zero
+     */
+    @Transactional
+    public void UpdateSale(Sale sale)
+    {
+        Sale oldSale = m_saleRepository.findById(sale.GetId())
+                           .orElseThrow(()
+                                            -> new RuntimeException(
+                                                "Sale with id " + sale.GetId() +
+                                                " not found and cannot be updated"));
+
+        m_tickerRepository.findById(sale.GetTicker().GetId())
+            .orElseThrow(()
+                             -> new RuntimeException(
+                                 "Ticker with id " + sale.GetTicker().GetId() +
+                                 " not found and cannot update sale"));
+
+        if (sale.GetQuantity().compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Quantity must be greater than zero");
+        }
+
+        if (sale.GetUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Unit price must be greater than zero");
+        }
+
+        oldSale.SetQuantity(sale.GetQuantity());
+        oldSale.SetUnitPrice(sale.GetUnitPrice());
+
+        sale.GetWalletTransaction().SetAmount(
+            sale.GetUnitPrice().multiply(sale.GetQuantity()));
+
+        m_walletTransactionService.UpdateTransaction(sale.GetWalletTransaction());
+
+        m_saleRepository.save(oldSale);
+
+        logger.info("Sale with id " + sale.GetId() + " was updated");
+    }
+
+    /**
+     * Update a dividend
+     * @param dividend The dividend to be updated
+     * @throws RuntimeException If the dividend does not exist
+     * @throws RuntimeException If the ticker does not exist
+     */
+    @Transactional
+    public void UpdateDividend(Dividend dividend)
+    {
+        Dividend oldDividend =
+            m_dividendRepository.findById(dividend.GetId())
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Dividend with id " + dividend.GetId() +
+                                                " not found and cannot be updated"));
+
+        m_tickerRepository.findById(dividend.GetTicker().GetId())
+            .orElseThrow(()
+                             -> new RuntimeException(
+                                 "Ticker with id " + dividend.GetTicker().GetId() +
+                                 " not found and cannot update dividend"));
+
+        m_walletTransactionService.UpdateTransaction(dividend.GetWalletTransaction());
+
+        m_dividendRepository.save(oldDividend);
+
+        logger.info("Dividend with id " + dividend.GetId() + " was updated");
+    }
+
     public void ResetAveragePrice(Long tickerId)
     {
         Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
@@ -543,5 +658,32 @@ public class TickerService
     public Long GetDividendCountByTicker(Long tickerId)
     {
         return m_tickerRepository.GetDividendCountByTicker(tickerId);
+    }
+
+    /**
+     * Get all purchases
+     * @return A list with all purchases
+     */
+    public List<Purchase> GetAllPurchases()
+    {
+        return m_purchaseRepository.findAll();
+    }
+
+    /**
+     * Get all sales
+     * @return A list with all sales
+     */
+    public List<Sale> GetAllSales()
+    {
+        return m_saleRepository.findAll();
+    }
+
+    /**
+     * Get all dividends
+     * @return A list with all dividends
+     */
+    public List<Dividend> GetAllDividends()
+    {
+        return m_dividendRepository.findAll();
     }
 }
