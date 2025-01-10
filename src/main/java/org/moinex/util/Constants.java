@@ -72,6 +72,9 @@ public final class Constants
     public static final String ARCHIVED_CREDIT_CARDS_FXML =
         UI_DIALOG_PATH + "archived_credit_cards.fxml";
 
+    public static final String ARCHIVED_TICKERS_FXML =
+        UI_DIALOG_PATH + "archived_tickers.fxml";
+
     public static final String REMOVE_TRANSACTION_FXML =
         UI_DIALOG_PATH + "remove_transaction.fxml";
     public static final String REMOVE_CATEGORY_FXML =

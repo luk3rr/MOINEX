@@ -24,6 +24,7 @@ import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddDividendController;
 import org.moinex.ui.dialog.AddTickerController;
+import org.moinex.ui.dialog.ArchivedTickersController;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
 import org.moinex.ui.dialog.SaleTickerController;
@@ -156,7 +157,14 @@ public class SavingsController
 
     @FXML
     private void handleOpenTickerArchive()
-    { }
+    {
+        WindowUtils.OpenModalWindow(Constants.ARCHIVED_TICKERS_FXML,
+                                    "Ticker Archive",
+                                    springContext,
+                                    (ArchivedTickersController controller)
+                                        -> {},
+                                    List.of(() -> { UpdateTransactionTableView(); }));
+    }
 
     @FXML
     private void handleShowTransactions()
@@ -275,13 +283,15 @@ public class SavingsController
                     String totalValue = t.GetCurrentQuantity()
                                             .multiply(t.GetCurrentUnitValue())
                                             .toString();
+                    String avgPrice = t.GetAveragePrice().toString();
 
                     return name.contains(similarTextOrId) ||
                         symbol.contains(similarTextOrId) ||
                         type.contains(similarTextOrId) ||
                         quantity.contains(similarTextOrId) ||
                         unitValue.contains(similarTextOrId) ||
-                        totalValue.contains(similarTextOrId);
+                        totalValue.contains(similarTextOrId) ||
+                        avgPrice.contains(similarTextOrId);
                 })
                 .forEach(stocksFundsTabTickerTable.getItems()::add);
         }
