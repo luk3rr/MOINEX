@@ -13,7 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import org.moinex.entities.WalletTransaction;
 
 @Entity
 @Table(name = "sale")
@@ -34,14 +34,14 @@ public class Sale extends Transaction
      * @param ticker The ticker of the sale
      * @param quantity The quantity of the sale
      * @param unitPrice The unit price of the sale
-     * @param saleDate The sale date
+     * @param walletTransaction The wallet transaction of the sale
      */
-    public Sale(Ticker     ticker,
-                BigDecimal quantity,
-                BigDecimal unitPrice,
-                LocalDateTime saleDate)
+    public Sale(Ticker            ticker,
+                BigDecimal        quantity,
+                BigDecimal        unitPrice,
+                WalletTransaction walletTransaction)
     {
-        super(ticker, quantity, unitPrice, saleDate);
+        super(ticker, quantity, unitPrice, walletTransaction);
     }
 
     public Long GetId()

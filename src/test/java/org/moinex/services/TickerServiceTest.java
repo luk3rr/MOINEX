@@ -225,13 +225,13 @@ public class TickerServiceTest
     @Test
     @DisplayName(
         "Test if exception is thrown when registering a ticker with average unit price "
-        + "less than or equal to zero")
+        + "less than zero")
     public void
     TestRegisterTickerInvalidAverageUnitPrice()
     {
         when(m_tickerRepository.existsBySymbol(m_ticker.GetSymbol())).thenReturn(false);
 
-        // Test with price less than zero
+        // Test with average unit price less than zero
         assertThrows(
             RuntimeException.class,
             ()
@@ -240,17 +240,6 @@ public class TickerServiceTest
                                                   m_ticker.GetType(),
                                                   m_ticker.GetCurrentUnitValue(),
                                                   new BigDecimal("-0.05"),
-                                                  m_ticker.GetCurrentQuantity()));
-
-        // Test with price equal to zero
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker.GetName(),
-                                                  m_ticker.GetSymbol(),
-                                                  m_ticker.GetType(),
-                                                  m_ticker.GetCurrentUnitValue(),
-                                                  BigDecimal.ZERO,
                                                   m_ticker.GetCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -421,10 +410,27 @@ public class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
+        when(m_walletTransactionService
+                 .AddExpense(anyLong(), any(), any(), any(), any(), any()))
+            .thenReturn(100L);
+
+        when(m_walletTransactionService.GetTransactionById(100L))
+            .thenReturn(new WalletTransaction(m_wallet,
+                                              m_category,
+                                              TransactionType.EXPENSE,
+                                              TransactionStatus.CONFIRMED,
+                                              LocalDateTime.now(),
+                                              new BigDecimal("50"),
+                                              "Purchase"));
+
         m_tickerService.AddPurchase(1L,
+                                    1L,
                                     new BigDecimal("10"),
                                     new BigDecimal("150"),
-                                    LocalDateTime.now());
+                                    m_category,
+                                    LocalDateTime.now(),
+                                    "Purchase",
+                                    TransactionStatus.CONFIRMED);
 
         // Capture the purchase object that was saved and check its values
         ArgumentCaptor<Purchase> purchaseCaptor =
@@ -446,9 +452,13 @@ public class TickerServiceTest
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddPurchase(1L,
+                                        1L,
                                         new BigDecimal("10"),
                                         new BigDecimal("150"),
-                                        LocalDateTime.now());
+                                        m_category,
+                                        LocalDateTime.now(),
+                                        "Purchase",
+                                        TransactionStatus.CONFIRMED);
         });
 
         // Verify that the purchase was not saved
@@ -465,9 +475,13 @@ public class TickerServiceTest
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddPurchase(1L,
+                                        1L,
                                         BigDecimal.ZERO,
                                         new BigDecimal("150"),
-                                        LocalDateTime.now());
+                                        m_category,
+                                        LocalDateTime.now(),
+                                        "Purchase",
+                                        TransactionStatus.CONFIRMED);
         });
 
         // Verify that the purchase was not saved
@@ -484,9 +498,13 @@ public class TickerServiceTest
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddPurchase(1L,
+                                        1L,
                                         new BigDecimal("10"),
                                         BigDecimal.ZERO,
-                                        LocalDateTime.now());
+                                        m_category,
+                                        LocalDateTime.now(),
+                                        "Purchase",
+                                        TransactionStatus.CONFIRMED);
         });
 
         // Verify that the purchase was not saved
@@ -498,12 +516,30 @@ public class TickerServiceTest
     public void TestAddSale()
     {
         m_ticker.SetCurrentQuantity(new BigDecimal("20"));
+
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
+        when(m_walletTransactionService
+                 .AddIncome(anyLong(), any(), any(), any(), any(), any()))
+            .thenReturn(100L);
+
+        when(m_walletTransactionService.GetTransactionById(100L))
+            .thenReturn(new WalletTransaction(m_wallet,
+                                              m_category,
+                                              TransactionType.INCOME,
+                                              TransactionStatus.CONFIRMED,
+                                              LocalDateTime.now(),
+                                              new BigDecimal("50"),
+                                              "Sale"));
+
         m_tickerService.AddSale(1L,
+                                1L,
                                 new BigDecimal("10"),
                                 new BigDecimal("200"),
-                                LocalDateTime.now());
+                                m_category,
+                                LocalDateTime.now(),
+                                "Sale",
+                                TransactionStatus.CONFIRMED);
 
         // Capture the sale object that was saved and check its values
         ArgumentCaptor<Sale> saleCapptor = ArgumentCaptor.forClass(Sale.class);
@@ -522,9 +558,13 @@ public class TickerServiceTest
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddSale(1L,
+                                    1L,
                                     new BigDecimal("10"),
                                     new BigDecimal("200"),
-                                    LocalDateTime.now());
+                                    m_category,
+                                    LocalDateTime.now(),
+                                    "Sale",
+                                    TransactionStatus.CONFIRMED);
         });
 
         // Verify that the sale was not saved
@@ -542,9 +582,13 @@ public class TickerServiceTest
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddSale(1L,
+                                    1L,
                                     new BigDecimal("10"),
                                     new BigDecimal("200"),
-                                    LocalDateTime.now());
+                                    m_category,
+                                    LocalDateTime.now(),
+                                    "Sale",
+                                    TransactionStatus.CONFIRMED);
         });
 
         // Verify that the sale was not saved
@@ -562,9 +606,13 @@ public class TickerServiceTest
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddSale(1L,
+                                    1L,
                                     new BigDecimal("5"),
                                     BigDecimal.ZERO,
-                                    LocalDateTime.now());
+                                    m_category,
+                                    LocalDateTime.now(),
+                                    "Sale",
+                                    TransactionStatus.CONFIRMED);
         });
 
         // Verify that the sale was not saved
@@ -576,7 +624,6 @@ public class TickerServiceTest
     public void TestAddDividend()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
-        when(m_walletRepository.findById(1L)).thenReturn(Optional.of(m_wallet));
 
         when(m_walletTransactionService
                  .AddIncome(anyLong(), any(), any(), any(), any(), any()))
@@ -629,40 +676,12 @@ public class TickerServiceTest
     }
 
     @Test
-    @DisplayName(
-        "Test if adding a dividend to a non-existent wallet throws an exception")
-    public void
-    TestAddDividendWalletNotFound()
-    {
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
-        when(m_walletRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddDividend(1L,
-                                        1L,
-                                        m_category,
-                                        new BigDecimal("50"),
-                                        LocalDateTime.now(),
-                                        "Dividend Payment",
-                                        TransactionStatus.CONFIRMED);
-        });
-
-        // Verify that the dividend was not saved
-        verify(m_dividendRepository, never()).save(any(Dividend.class));
-
-        // Verify that the wallet transaction was not created
-        verify(m_walletTransactionService, never())
-            .AddIncome(anyLong(), any(), any(), any(), any(), any());
-    }
-
-    @Test
     @DisplayName("Test if adding a dividend with amount less than or equal to zero "
                  + "throws an exception")
     public void
     TestAddDividendInvalidAmount()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
-        when(m_walletRepository.findById(1L)).thenReturn(Optional.of(m_wallet));
 
         assertThrows(RuntimeException.class, () -> {
             m_tickerService.AddDividend(1L,

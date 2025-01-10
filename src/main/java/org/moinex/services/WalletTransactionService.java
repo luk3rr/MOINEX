@@ -7,6 +7,7 @@
 package org.moinex.services;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
@@ -79,6 +80,9 @@ public class WalletTransactionService
             throw new RuntimeException("Amount to transfer must be greater than zero");
         }
 
+        // Round the amount to two decimal places
+        amount = amount.setScale(2, RoundingMode.HALF_UP);
+
         Wallet senderWallet = m_walletRepository.findById(senderId).orElseThrow(
             ()
                 -> new RuntimeException(
@@ -141,6 +145,9 @@ public class WalletTransactionService
             throw new RuntimeException("Amount must be greater than zero");
         }
 
+        // Round the amount to two decimal places
+        amount = amount.setScale(2, RoundingMode.HALF_UP);
+
         WalletTransaction wt = new WalletTransaction(wallet,
                                                      category,
                                                      TransactionType.INCOME,
@@ -190,6 +197,9 @@ public class WalletTransactionService
         {
             throw new RuntimeException("Amount must be greater than zero");
         }
+
+        // Round the amount to two decimal places
+        amount = amount.setScale(2, RoundingMode.HALF_UP);
 
         WalletTransaction wt = new WalletTransaction(wallet,
                                                      category,
@@ -243,6 +253,10 @@ public class WalletTransactionService
         {
             throw new RuntimeException("Amount must be greater than or equal to zero");
         }
+
+        // Round the amount to two decimal places
+        transaction.SetAmount(
+            transaction.GetAmount().setScale(2, RoundingMode.HALF_UP));
 
         // Complex update of the transaction
         ChangeTransactionWallet(oldTransaction, transaction.GetWallet());

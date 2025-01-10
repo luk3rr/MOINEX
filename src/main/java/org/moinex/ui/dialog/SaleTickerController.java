@@ -10,13 +10,30 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import org.moinex.entities.Category;
+import org.moinex.entities.Wallet;
+import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Ticker;
+import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
+import org.moinex.services.WalletService;
+import org.moinex.services.WalletTransactionService;
+import org.moinex.util.Constants;
+import org.moinex.util.TransactionStatus;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +50,18 @@ public class SaleTickerController
     private Label tickerNameLabel;
 
     @FXML
+    private ComboBox<String> walletComboBox;
+
+    @FXML
+    private Label walletAfterBalanceValueLabel;
+
+    @FXML
+    private Label walletCurrentBalanceValueLabel;
+
+    @FXML
+    private TextField descriptionField;
+
+    @FXML
     private TextField unitPriceField;
 
     @FXML
@@ -42,24 +71,69 @@ public class SaleTickerController
     private Label totalPriceLabel;
 
     @FXML
+    private ComboBox<String> statusComboBox;
+
+    @FXML
+    private ComboBox<String> categoryComboBox;
+
+    @FXML
     private DatePicker saleDatePicker;
 
     @Autowired
     private ConfigurableApplicationContext springContext;
 
+    private Popup suggestionsPopup;
+
+    private ListView<WalletTransaction> suggestionListView;
+
+    private WalletService walletService;
+
+    private WalletTransactionService walletTransactionService;
+
+    private CategoryService categoryService;
+
     private TickerService tickerService;
+
+    private List<Wallet> wallets;
+
+    private List<Category> categories;
+
+    private List<WalletTransaction> suggestions;
+
+    private ChangeListener<String> descriptionFieldListener;
 
     private Ticker ticker;
 
     /**
      * Constructor
+     * @param walletService Wallet service
+     * @param walletTransactionService Wallet transaction service
+     * @param categoryService Category service
      * @param tickerService Ticker service
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public SaleTickerController(TickerService tickerService)
+    public SaleTickerController(WalletService            walletService,
+                                WalletTransactionService walletTransactionService,
+                                CategoryService          categoryService,
+                                TickerService            tickerService)
     {
-        this.tickerService = tickerService;
+        this.walletService            = walletService;
+        this.walletTransactionService = walletTransactionService;
+        this.categoryService          = categoryService;
+        this.tickerService            = tickerService;
+    }
+
+    public void SetWalletComboBox(Wallet wt)
+    {
+        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        {
+            return;
+        }
+
+        walletComboBox.setValue(wt.GetName());
+
+        UpdateWalletBalance();
     }
 
     public void SetTicker(Ticker ticker)
@@ -73,15 +147,30 @@ public class SaleTickerController
     @FXML
     private void initialize()
     {
+        LoadWallets();
+        LoadCategories();
+        LoadSuggestions();
+
         // Configure date picker
         UIUtils.SetDatePickerFormat(saleDatePicker);
 
-        // Configure listeners
-        unitPriceField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { UpdateTotalPrice(); });
+        // For each element in enum TransactionStatus, add its name to the
+        // statusComboBox
+        statusComboBox.getItems().addAll(
+            Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
 
-        quantityField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { UpdateTotalPrice(); });
+        // Reset all labels
+        UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+        UIUtils.ResetLabel(walletCurrentBalanceValueLabel);
+
+        walletComboBox.setOnAction(e -> {
+            UpdateWalletBalance();
+            WalletAfterBalance();
+        });
+
+        ConfigureSuggestionsListView();
+        ConfigureSuggestionsPopup();
+        ConfigureListeners();
     }
 
     @FXML
@@ -94,12 +183,19 @@ public class SaleTickerController
     @FXML
     private void handleSave()
     {
-        String    unitPriceStr = unitPriceField.getText();
-        String    quantityStr  = quantityField.getText();
-        LocalDate buyDate      = saleDatePicker.getValue();
+        String    walletName     = walletComboBox.getValue();
+        String    description    = descriptionField.getText();
+        String    statusString   = statusComboBox.getValue();
+        String    categoryString = categoryComboBox.getValue();
+        String    unitPriceStr   = unitPriceField.getText();
+        String    quantityStr    = quantityField.getText();
+        LocalDate buyDate        = saleDatePicker.getValue();
 
-        if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
-            quantityStr == null || quantityStr.strip().isEmpty() || buyDate == null)
+        if (walletName == null || walletName.strip().isEmpty() || description == null ||
+            description.strip().isEmpty() || statusString == null ||
+            categoryString == null || unitPriceStr == null ||
+            unitPriceStr.strip().isEmpty() || quantityStr == null ||
+            quantityStr.strip().isEmpty() || buyDate == null)
         {
             WindowUtils.ShowErrorDialog("Error",
                                         "Empty fields",
@@ -114,13 +210,29 @@ public class SaleTickerController
 
             BigDecimal quantity = new BigDecimal(quantityStr);
 
+            Wallet wallet = wallets.stream()
+                                .filter(w -> w.GetName().equals(walletName))
+                                .findFirst()
+                                .get();
+
+            Category category = categories.stream()
+                                    .filter(c -> c.GetName().equals(categoryString))
+                                    .findFirst()
+                                    .get();
+
+            TransactionStatus status = TransactionStatus.valueOf(statusString);
+
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
 
             tickerService.AddSale(ticker.GetId(),
+                                  wallet.GetId(),
                                   quantity,
                                   unitPrice,
-                                  dateTimeWithCurrentHour);
+                                  category,
+                                  dateTimeWithCurrentHour,
+                                  description,
+                                  status);
 
             WindowUtils.ShowSuccessDialog("Success",
                                           "Sale added",
@@ -176,5 +288,311 @@ public class SaleTickerController
 
             totalPriceLabel.setText(UIUtils.FormatCurrency(totalPrice));
         }
+    }
+
+    private void UpdateWalletBalance()
+    {
+        String walletName = walletComboBox.getValue();
+
+        if (walletName == null)
+        {
+            return;
+        }
+
+        Wallet wallet = wallets.stream()
+                            .filter(w -> w.GetName().equals(walletName))
+                            .findFirst()
+                            .get();
+
+        if (wallet.GetBalance().compareTo(BigDecimal.ZERO) < 0)
+        {
+            UIUtils.SetLabelStyle(walletCurrentBalanceValueLabel,
+                                  Constants.NEGATIVE_BALANCE_STYLE);
+        }
+        else
+        {
+            UIUtils.SetLabelStyle(walletCurrentBalanceValueLabel,
+                                  Constants.NEUTRAL_BALANCE_STYLE);
+        }
+
+        walletCurrentBalanceValueLabel.setText(
+            UIUtils.FormatCurrency(wallet.GetBalance()));
+    }
+
+    private void WalletAfterBalance()
+    {
+        String unitPriceStr = unitPriceField.getText();
+        String quantityStr  = quantityField.getText();
+        String walletName   = walletComboBox.getValue();
+
+        if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
+            quantityStr == null || quantityStr.strip().isEmpty() || walletName == null)
+        {
+            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            return;
+        }
+
+        try
+        {
+            BigDecimal buyValue =
+                new BigDecimal(unitPriceStr).multiply(new BigDecimal(quantityStr));
+
+            if (buyValue.compareTo(BigDecimal.ZERO) < 0)
+            {
+                UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+                return;
+            }
+
+            Wallet wallet = wallets.stream()
+                                .filter(w -> w.GetName().equals(walletName))
+                                .findFirst()
+                                .get();
+
+            BigDecimal walletAfterBalanceValue = wallet.GetBalance().add(buyValue);
+
+            // Episilon is used to avoid floating point arithmetic errors
+            if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
+            {
+                // Remove old style and add negative style
+                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                                      Constants.NEGATIVE_BALANCE_STYLE);
+            }
+            else
+            {
+                // Remove old style and add neutral style
+                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                                      Constants.NEUTRAL_BALANCE_STYLE);
+            }
+
+            walletAfterBalanceValueLabel.setText(
+                UIUtils.FormatCurrency(walletAfterBalanceValue));
+        }
+        catch (NumberFormatException e)
+        {
+            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+        }
+    }
+
+    private void LoadWallets()
+    {
+        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+
+        walletComboBox.getItems().addAll(
+            wallets.stream().map(Wallet::GetName).toList());
+    }
+
+    private void LoadCategories()
+    {
+        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+
+        categoryComboBox.getItems().addAll(
+            categories.stream().map(Category::GetName).toList());
+
+        // If there are no categories, add a tooltip to the categoryComboBox
+        // to inform the user that a category is needed
+        if (categories.size() == 0)
+        {
+            UIUtils.AddTooltipToNode(
+                categoryComboBox,
+                "You need to add a category before adding an dividend");
+        }
+    }
+
+    private void LoadSuggestions()
+    {
+        suggestions = walletTransactionService.GetIncomeSuggestions();
+    }
+
+    private void ConfigureListeners()
+    {
+        // Store the listener in a variable to be able to disable and enable it
+        // when needed
+        descriptionFieldListener = (observable, oldValue, newValue) ->
+        {
+            if (newValue.strip().isEmpty())
+            {
+                suggestionsPopup.hide();
+                return;
+            }
+
+            suggestionListView.getItems().clear();
+
+            // Filter the suggestions list to show only the transactions that
+            // contain similar descriptions to the one typed by the user
+            List<WalletTransaction> filteredSuggestions =
+                suggestions.stream()
+                    .filter(tx
+                            -> tx.GetDescription().toLowerCase().contains(
+                                newValue.toLowerCase()))
+                    .toList();
+
+            if (filteredSuggestions.size() > Constants.SUGGESTIONS_MAX_ITEMS)
+            {
+                filteredSuggestions =
+                    filteredSuggestions.subList(0, Constants.SUGGESTIONS_MAX_ITEMS);
+            }
+
+            suggestionListView.getItems().addAll(filteredSuggestions);
+
+            if (!filteredSuggestions.isEmpty())
+            {
+                AdjustPopupWidth();
+                AdjustPopupHeight();
+
+                suggestionsPopup.show(
+                    descriptionField,
+                    descriptionField.localToScene(0, 0).getX() +
+                        descriptionField.getScene().getWindow().getX() +
+                        descriptionField.getScene().getX(),
+                    descriptionField.localToScene(0, 0).getY() +
+                        descriptionField.getScene().getWindow().getY() +
+                        descriptionField.getScene().getY() +
+                        descriptionField.getHeight());
+            }
+            else
+            {
+                suggestionsPopup.hide();
+            }
+        };
+
+        descriptionField.textProperty().addListener(descriptionFieldListener);
+
+        // Update wallet after balance when the value field changes
+        unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
+            {
+                unitPriceField.setText(oldValue);
+            }
+            else
+            {
+                UpdateTotalPrice();
+                WalletAfterBalance();
+            }
+        });
+
+        quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
+            {
+                quantityField.setText(oldValue);
+            }
+            else
+            {
+                UpdateTotalPrice();
+                WalletAfterBalance();
+            }
+        });
+
+        unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
+            UpdateTotalPrice();
+            WalletAfterBalance();
+        });
+
+        quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
+            UpdateTotalPrice();
+            WalletAfterBalance();
+        });
+    }
+
+    private void ConfigureSuggestionsListView()
+    {
+        suggestionListView = new ListView<>();
+
+        // Set the cell factory to display the description, amount, wallet and
+        // category of the transaction
+        // Format:
+        //    Description
+        //    Amount | Wallet | Category
+        suggestionListView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(WalletTransaction item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (empty || item == null)
+                {
+                    setText(null);
+                }
+                else
+                {
+                    VBox cellContent = new VBox();
+                    cellContent.setSpacing(2);
+
+                    Label descriptionLabel = new Label(item.GetDescription());
+
+                    String infoString = UIUtils.FormatCurrency(item.GetAmount()) +
+                                        " | " + item.GetWallet().GetName() + " | " +
+                                        item.GetCategory().GetName();
+
+                    Label infoLabel = new Label(infoString);
+
+                    cellContent.getChildren().addAll(descriptionLabel, infoLabel);
+
+                    setGraphic(cellContent);
+                }
+            }
+        });
+
+        suggestionListView.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        suggestionListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
+
+        // Add a listener to the ListView to fill the fields with the selected
+        suggestionListView.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (newValue != null)
+                {
+                    FillFieldsWithTransaction(newValue);
+                    suggestionsPopup.hide();
+                }
+            });
+    }
+
+    private void ConfigureSuggestionsPopup()
+    {
+        if (suggestionsPopup == null)
+        {
+            ConfigureSuggestionsListView();
+        }
+
+        suggestionsPopup = new Popup();
+        suggestionsPopup.setAutoHide(true);
+        suggestionsPopup.setHideOnEscape(true);
+        suggestionsPopup.getContent().add(suggestionListView);
+    }
+
+    private void AdjustPopupWidth()
+    {
+        suggestionListView.setPrefWidth(descriptionField.getWidth());
+    }
+
+    private void AdjustPopupHeight()
+    {
+        Integer itemCount = suggestionListView.getItems().size();
+
+        Double cellHeight = 45.0;
+
+        itemCount = Math.min(itemCount, Constants.SUGGESTIONS_MAX_ITEMS);
+
+        Double totalHeight = itemCount * cellHeight;
+
+        suggestionListView.setPrefHeight(totalHeight);
+    }
+
+    private void FillFieldsWithTransaction(WalletTransaction wt)
+    {
+        walletComboBox.setValue(wt.GetWallet().GetName());
+
+        // Deactivate the listener to avoid the event of changing the text of
+        // the descriptionField from being triggered. After changing the text,
+        // the listener is activated again
+        descriptionField.textProperty().removeListener(descriptionFieldListener);
+
+        descriptionField.setText(wt.GetDescription());
+
+        descriptionField.textProperty().addListener(descriptionFieldListener);
+
+        statusComboBox.setValue(wt.GetStatus().name());
+        categoryComboBox.setValue(wt.GetCategory().GetName());
+
+        UpdateWalletBalance();
+        WalletAfterBalance();
     }
 }

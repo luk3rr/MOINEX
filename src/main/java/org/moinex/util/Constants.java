@@ -63,8 +63,8 @@ public final class Constants
     public static final String BUY_TICKER_FXML   = UI_DIALOG_PATH + "buy_ticker.fxml";
     public static final String SALE_TICKER_FXML  = UI_DIALOG_PATH + "sale_ticker.fxml";
     public static final String ADD_TICKER_FXML   = UI_DIALOG_PATH + "add_ticker.fxml";
-    public static final String ADD_DIVIDEND_FXML = UI_DIALOG_PATH + ("add_dividend." +
-                                                                     "fxml");
+    public static final String ADD_DIVIDEND_FXML = UI_DIALOG_PATH + ("add_dividend."
+                                                                     + "fxml");
 
     public static final String ARCHIVED_WALLETS_FXML =
         UI_DIALOG_PATH + "archived_wallets.fxml";
@@ -279,6 +279,10 @@ public final class Constants
     // Regex
     public static final String DIGITS_ONLY_REGEX    = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
+
+    public static final Integer INVESTMENT_CALCULATION_PRECISION = 18;
+    public static final String  INVESTMENT_VALUE_REGEX =
+        "\\d*\\.?\\d{0," + INVESTMENT_CALCULATION_PRECISION + "}";
 
     /**
      * Get a regex that matches digits up to n

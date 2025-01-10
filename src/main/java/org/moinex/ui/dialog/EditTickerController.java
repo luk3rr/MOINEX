@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
+import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,7 @@ public class EditTickerController
     private void initialize()
     {
         ConfigureTypeComboBox();
+        ConfigureListeners();
     }
 
     @FXML
@@ -207,5 +209,31 @@ public class EditTickerController
         {
             typeComboBox.getItems().add(type.toString());
         }
+    }
+
+    private void ConfigureListeners()
+    {
+        currentPriceField.textProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
+                {
+                    currentPriceField.setText(oldValue);
+                }
+            });
+
+        quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
+            {
+                quantityField.setText(oldValue);
+            }
+        });
+
+        avgUnitPriceField.textProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
+                {
+                    avgUnitPriceField.setText(oldValue);
+                }
+            });
     }
 }

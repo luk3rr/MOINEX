@@ -278,10 +278,14 @@ public class TickerService
      * @throws RuntimeException If the unit price is less than or equal to zero
      */
     @Transactional
-    public void AddPurchase(Long          tickerId,
-                            BigDecimal    quantity,
-                            BigDecimal    unitPrice,
-                            LocalDateTime purchaseDate)
+    public void AddPurchase(Long              tickerId,
+                            Long              walletId,
+                            BigDecimal        quantity,
+                            BigDecimal        unitPrice,
+                            Category          category,
+                            LocalDateTime     date,
+                            String            description,
+                            TransactionStatus status)
     {
         Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
             ()
@@ -298,7 +302,21 @@ public class TickerService
             throw new RuntimeException("Unit price must be greater than zero");
         }
 
-        Purchase purchase = new Purchase(ticker, quantity, unitPrice, purchaseDate);
+        BigDecimal amount = unitPrice.multiply(quantity);
+
+        // Create a wallet transaction for the dividend
+        Long id = m_walletTransactionService.AddExpense(walletId,
+                                                        category,
+                                                        date,
+                                                        amount,
+                                                        description,
+                                                        status);
+
+        WalletTransaction walletTransaction =
+            m_walletTransactionService.GetTransactionById(id);
+
+        Purchase purchase =
+            new Purchase(ticker, quantity, unitPrice, walletTransaction);
 
         m_purchaseRepository.save(purchase);
 
@@ -318,7 +336,9 @@ public class TickerService
         ticker.SetAveragePriceCount(ticker.GetAveragePriceCount().add(quantity));
 
         logger.info("Purchase with id " + purchase.GetId() + " added to ticker " +
-                    ticker.GetSymbol());
+                    ticker.GetSymbol() + ". Wallet transaction with id " + id +
+                    " created for the purchase and added to wallet with id " +
+                    walletId);
     }
 
     /**
@@ -333,10 +353,14 @@ public class TickerService
      * @throws RuntimeException If the quantity is greater than the current quantity
      */
     @Transactional
-    public void AddSale(Long          tickerId,
-                        BigDecimal    quantity,
-                        BigDecimal    unitPrice,
-                        LocalDateTime saleDate)
+    public void AddSale(Long              tickerId,
+                        Long              walletId,
+                        BigDecimal        quantity,
+                        BigDecimal        unitPrice,
+                        Category          category,
+                        LocalDateTime     date,
+                        String            description,
+                        TransactionStatus status)
     {
         Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
             ()
@@ -361,7 +385,16 @@ public class TickerService
                 + "quantity");
         }
 
-        Sale sale = new Sale(ticker, quantity, unitPrice, saleDate);
+        BigDecimal amount = unitPrice.multiply(quantity);
+
+        // Create a wallet transaction for the sale
+        Long id = m_walletTransactionService
+                      .AddIncome(walletId, category, date, amount, description, status);
+
+        WalletTransaction walletTransaction =
+            m_walletTransactionService.GetTransactionById(id);
+
+        Sale sale = new Sale(ticker, quantity, unitPrice, walletTransaction);
 
         m_saleRepository.save(sale);
 
@@ -377,7 +410,8 @@ public class TickerService
         m_tickerRepository.save(ticker);
 
         logger.info("Sale with id " + sale.GetId() + " added to ticker " +
-                    ticker.GetSymbol());
+                    ticker.GetSymbol() + ". Wallet transaction with id " + id +
+                    " created for the sale and added to wallet with id " + walletId);
     }
 
     /**
@@ -404,11 +438,6 @@ public class TickerService
                 -> new RuntimeException("Ticker with id " + tickerId +
                                         " not found and cannot add dividend"));
 
-        Wallet wallet = m_walletRepository.findById(walletId).orElseThrow(
-            ()
-                -> new RuntimeException("Wallet with id " + walletId +
-                                        " not found and cannot add dividend"));
-
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Amount must be greater than zero");
@@ -428,8 +457,8 @@ public class TickerService
 
         logger.info("Dividend with id " + dividend.GetId() + " added to ticker " +
                     ticker.GetSymbol() + ". Wallet transaction with id " + id +
-                    " created for the dividend and added to wallet " +
-                    wallet.GetName());
+                    " created for the dividend and added to wallet with id " +
+                    walletId);
     }
 
     public void ResetAveragePrice(Long tickerId)

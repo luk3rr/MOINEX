@@ -390,13 +390,13 @@ public class SavingsController
         unitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetCurrentUnitValue())));
+                UIUtils.FormatCurrencyDynamic(param.getValue().GetCurrentUnitValue())));
 
         TableColumn<Ticker, String> totalColumn = new TableColumn<>("Total Value");
         totalColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetCurrentQuantity().multiply(
+            -> new SimpleObjectProperty<>(UIUtils.FormatCurrencyDynamic(
+                param.getValue().GetCurrentQuantity().multiply(
                     param.getValue().GetCurrentUnitValue()))));
 
         TableColumn<Ticker, String> avgUnitColumn =
@@ -404,7 +404,7 @@ public class SavingsController
         avgUnitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetAveragePrice())));
+                UIUtils.FormatCurrencyDynamic(param.getValue().GetAveragePrice())));
 
         // Add the columns to the table view
         stocksFundsTabTickerTable.getColumns().add(idColumn);
