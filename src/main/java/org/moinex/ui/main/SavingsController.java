@@ -6,8 +6,10 @@
 
 package org.moinex.ui.main;
 
+import com.jfoenix.controls.JFXButton;
 import java.math.BigDecimal;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,6 +21,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
@@ -52,8 +56,16 @@ public class SavingsController
     @FXML
     private ComboBox<TickerType> stocksFundsTabTickerTypeComboBox;
 
+    @FXML
+    private JFXButton updatePricesButton;
+
+    @FXML
+    private ImageView updatePricesButtonIcon;
+
     @Autowired
     private ConfigurableApplicationContext springContext;
+
+    Boolean isUpdatingPrices = false;
 
     private TickerService tickerService;
 
@@ -74,6 +86,15 @@ public class SavingsController
         ConfigureTableView();
         PopulateTickerTypeComboBox();
         UpdateTransactionTableView();
+
+        if (isUpdatingPrices)
+        {
+            SetOffUpdatePricesButton();
+        }
+        else
+        {
+            SetOnUpdatePricesButton();
+        }
 
         ConfigureListeners();
     }
@@ -181,40 +202,53 @@ public class SavingsController
     @FXML
     private void handleUpdatePrices()
     {
-        try
-        {
-            List<Ticker> failed = tickerService.UpdateAllTickersPriceFromAPI();
+        Platform.runLater(this::SetOffUpdatePricesButton);
 
-            if (!failed.isEmpty())
-            {
-                StringBuilder failedTickers = new StringBuilder();
-                failed.forEach(t -> failedTickers.append(t.GetSymbol()).append("\n"));
-
-                WindowUtils.ShowInformationDialog(
-                    "Info",
-                    "Finished updating prices with errors",
-                    "Successfully updated tickers:\n" +
-                        failed.stream()
-                            .map(Ticker::GetSymbol)
-                            .reduce((a, b) -> a + ", " + b)
-                            .orElse("") +
-                        "\n\nFailed to update tickers:\n" + failedTickers.toString());
-            }
-            else
-            {
-                WindowUtils.ShowSuccessDialog("Success",
-                                              "Finished updating prices",
-                                              "All tickers were successfully updated");
-            }
-
-            UpdateTransactionTableView();
-        }
-        catch (RuntimeException e)
-        {
-            WindowUtils.ShowErrorDialog("Error",
-                                        "Error updating prices",
-                                        e.getMessage());
-        }
+        tickerService
+            .UpdateTickersPriceFromAPIAsync(stocksFundsTabTickerTable.getItems())
+            .thenAccept(failed -> {
+                Platform.runLater(() -> {
+                    if (failed.isEmpty())
+                    {
+                        WindowUtils.ShowSuccessDialog(
+                            "Success",
+                            "Finished updating prices",
+                            "All tickers were successfully updated");
+                    }
+                    else if (failed.size() ==
+                             stocksFundsTabTickerTable.getItems().size())
+                    {
+                        WindowUtils.ShowInformationDialog(
+                            "Info",
+                            "Finished updating prices with errors",
+                            "Failed to update all tickers");
+                    }
+                    else
+                    {
+                        WindowUtils.ShowInformationDialog(
+                            "Info",
+                            "Finished updating prices with errors",
+                            "Failed to update tickers:\n" +
+                                failed.stream()
+                                    .map(Ticker::GetSymbol)
+                                    .reduce((a, b) -> a + ", " + b)
+                                    .orElse(""));
+                    }
+                });
+            })
+            .exceptionally(e -> {
+                Platform.runLater(() -> {
+                    WindowUtils.ShowErrorDialog("Error",
+                                                "Error updating prices",
+                                                e.getMessage());
+                    SetOnUpdatePricesButton();
+                });
+                return null;
+            })
+            .whenComplete((v, e) -> Platform.runLater(() -> {
+                SetOnUpdatePricesButton();
+                UpdateTransactionTableView();
+            }));
     }
 
     @FXML
@@ -468,5 +502,27 @@ public class SavingsController
         stocksFundsTabTickerTable.getColumns().add(unitColumn);
         stocksFundsTabTickerTable.getColumns().add(totalColumn);
         stocksFundsTabTickerTable.getColumns().add(avgUnitColumn);
+    }
+
+    private void SetOffUpdatePricesButton()
+    {
+        updatePricesButtonIcon.setImage(
+            new Image(getClass().getResource(Constants.LOADING_GIF).toExternalForm()));
+        updatePricesButton.setDisable(true);
+        updatePricesButton.setText("Updating...");
+
+        isUpdatingPrices = true;
+    }
+
+    private void SetOnUpdatePricesButton()
+    {
+        updatePricesButton.setDisable(false);
+        updatePricesButtonIcon.setImage(new Image(
+            getClass()
+                .getResource(Constants.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)
+                .toExternalForm()));
+        updatePricesButton.setText("Update Prices");
+
+        isUpdatingPrices = false;
     }
 }

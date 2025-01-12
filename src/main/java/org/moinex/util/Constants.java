@@ -32,6 +32,7 @@ public final class Constants
     public static final String SIDEBAR_ICONS_PATH      = "/icon/sidebar/";
     public static final String CRC_OPERATOR_ICONS_PATH = "/icon/crc_operator/";
     public static final String COMMON_ICONS_PATH       = "/icon/common/";
+    public static final String GIF_PATH                = "/icon/gif/";
 
     public static final String UI_MAIN_PATH   = "/ui/main/";
     public static final String UI_DIALOG_PATH = "/ui/dialog/";
@@ -144,11 +145,16 @@ public final class Constants
     public static final String DEFAULT_ICON      = COMMON_ICONS_PATH + "default.png";
     public static final String TROPHY_ICON       = COMMON_ICONS_PATH + "trophy.png";
 
-    // CSS
-    public static final String MAIN_STYLE_SHEET   = CSS_SCENE_PATH + "main.css";
-    public static final String HOME_STYLE_SHEET   = CSS_SCENE_PATH + "home.css";
-    public static final String WALLET_STYLE_SHEET = CSS_SCENE_PATH + "wallet.css";
-    public static final String CREDIT_CARD_STYLE_SHEET =
+    // GIFs
+    public static final String LOADING_GIF = GIF_PATH + "loading.gif";
+    public static final String SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON =
+        COMMON_ICONS_PATH + "synchronize.png";
+
+        // CSS
+        public static final String MAIN_STYLE_SHEET   = CSS_SCENE_PATH + "main.css";
+    public static final String     HOME_STYLE_SHEET   = CSS_SCENE_PATH + "home.css";
+    public static final String     WALLET_STYLE_SHEET = CSS_SCENE_PATH + "wallet.css";
+    public static final String     CREDIT_CARD_STYLE_SHEET =
         CSS_SCENE_PATH + "credit-card.css";
     public static final String TRANSACTION_STYLE_SHEET =
         CSS_SCENE_PATH + "transaction.css";

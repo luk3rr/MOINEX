@@ -15,10 +15,18 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Dividend;
@@ -38,8 +46,6 @@ import org.moinex.util.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 
 /**
  * This class is responsible for managing tickers
@@ -64,6 +70,8 @@ public class TickerService
 
     @Autowired
     private WalletTransactionService m_walletTransactionService;
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static final Logger logger = LoggerConfig.GetLogger();
 
@@ -273,86 +281,102 @@ public class TickerService
     }
 
     /**
-     *
+     * Update tickers price from API asynchronously
+     * @param tickers The list of tickers to update
+     * @return A completable future with a list with tickers that failed to update
      */
-    @Transactional
-    public void UpdateTickerPriceFromAPI(Long tickerId)
-        throws IOException, InterruptedException
+    public CompletableFuture<List<Ticker>>
+    UpdateTickersPriceFromAPIAsync(List<Ticker> tickers)
     {
-        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
-            ()
-                -> new RuntimeException("Ticker with id " + tickerId +
-                                        " not found and cannot update price"));
-
-        BigDecimal price = BigDecimal.ZERO;
-
-        InputStream scriptInputStream =
-            TickerService.class.getResourceAsStream(Constants.GET_STOCK_PRICE_SCRIPT);
-
-        if (scriptInputStream == null)
-        {
-            throw new RuntimeException("Python script not found");
-        }
-
-        Path tempFile =
-            Paths.get(System.getProperty("java.io.tmpdir"), "get_stock_price.py");
-        Files.copy(scriptInputStream,
-                   tempFile,
-                   java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-
-        String[] command = new String[] { Constants.PYTHON_INTERPRETER,
-                                          tempFile.toString(),
-                                          ticker.GetSymbol() };
-
-        // Run request
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-        Process        process        = processBuilder.start();
-
-        // Read output
-        BufferedReader reader =
-            new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        String line = reader.readLine();
-        if (line != null)
-        {
-            price = new BigDecimal(line);
-        }
-
-        int exitCode = process.waitFor();
-        if (exitCode != 0)
-        {
-            throw new RuntimeException("Error executing Python script. Exit code: " +
-                                       exitCode);
-        }
-
-        ticker.SetCurrentUnitValue(price);
-        m_tickerRepository.save(ticker);
-
-        logger.info("Price of ticker " + ticker.GetSymbol() + " updated to " + price);
+        return CompletableFuture.supplyAsync(() -> {
+            try
+            {
+                return UpdateTickersPriceFromAPI(tickers);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Error updating tickers: " + e.getMessage(),
+                                           e);
+            }
+        }, executorService);
     }
 
     /**
-     *
+     * Update tickers price from API
+     * @param tickers The list of tickers to update
+     * @return A list with tickers that failed to update
      */
     @Transactional
-    public List<Ticker> UpdateAllTickersPriceFromAPI()
+    public List<Ticker> UpdateTickersPriceFromAPI(List<Ticker> tickers)
     {
-        List<Ticker> tickers = m_tickerRepository.findAll();
-        List<Ticker> failed  = List.of();
-
-        for (Ticker ticker : tickers)
+        if (tickers.isEmpty())
         {
-            try
-            {
-                UpdateTickerPriceFromAPI(ticker.GetId());
-            }
-            catch (IOException | InterruptedException | RuntimeException e)
-            {
-                logger.warning("Failed to update price of ticker " +
-                               ticker.GetSymbol() + " from API: " + e.getMessage());
+            throw new IllegalArgumentException("No tickers to update");
+        }
 
-                failed.add(ticker);
+        List<Ticker> failed = new ArrayList<>();
+        String[]     symbols =
+            tickers.stream().map(Ticker::GetSymbol).toArray(String[] ::new);
+
+        try (InputStream scriptInputStream = TickerService.class.getResourceAsStream(
+                 Constants.GET_STOCK_PRICE_SCRIPT))
+        {
+            if (scriptInputStream == null)
+            {
+                throw new RuntimeException("Python script not found");
             }
+
+            Path tempFile = Files.createTempFile("get_stock_price", ".py");
+            Files.copy(scriptInputStream,
+                       tempFile,
+                       StandardCopyOption.REPLACE_EXISTING);
+
+            String[] command = { Constants.PYTHON_INTERPRETER,
+                                 tempFile.toString(),
+                                 String.join(" ", symbols) };
+
+            logger.info("Running Python script as: " + String.join(" ", command));
+
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            Process        process        = processBuilder.start();
+
+            try (BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(process.getInputStream())))
+            {
+                String output   = reader.lines().collect(Collectors.joining());
+                int    exitCode = process.waitFor();
+
+                if (exitCode != 0)
+                {
+                    throw new RuntimeException(
+                        "Error executing Python script. Exit code: " + exitCode);
+                }
+
+                JSONObject jsonObject = new JSONObject(output);
+                logger.info("API response: " + jsonObject.toString());
+
+                tickers.forEach(ticker -> {
+                    try
+                    {
+                        JSONObject tickerData =
+                            jsonObject.getJSONObject(ticker.GetSymbol());
+                        BigDecimal price = tickerData.getBigDecimal("price");
+                        ticker.SetCurrentUnitValue(price);
+                        ticker.SetLastUpdate(LocalDateTime.now());
+                        m_tickerRepository.save(ticker);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.warning("Failed to update ticker " + ticker.GetSymbol() +
+                                       ": " + e.getMessage());
+                        failed.add(ticker);
+                    }
+                });
+            }
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException("Error updating tickers: " + e.getMessage(), e);
         }
 
         return failed;

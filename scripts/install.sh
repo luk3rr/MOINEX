@@ -16,11 +16,20 @@ MOINEX_DIR="$HOME/.moinex"
 DOT_LOCAL_DIR="$HOME/.local"
 
 # Instala dependências pip
-if pip install -r requirements.txt; then
-    print_success ">> Dependências Python instaladas"
+if grep -qi arch /etc/os-release; then
+    if pip install --break-system-packages -r requirements.txt; then
+        print_success ">> Dependências Python instaladas"
+    else
+        print_error "Erro ao instalar as dependências Python"
+        exit 1
+    fi
 else
-    print_error "Erro ao instalar as dependências Python"
-    exit 1
+    if pip install -r requirements.txt; then
+        print_success ">> Dependências Python instaladas"
+    else
+        print_error "Erro ao instalar as dependências Python"
+        exit 1
+    fi
 fi
 
 # Criar diretórios
