@@ -180,7 +180,42 @@ public class SavingsController
 
     @FXML
     private void handleUpdatePrices()
-    { }
+    {
+        try
+        {
+            List<Ticker> failed = tickerService.UpdateAllTickersPriceFromAPI();
+
+            if (!failed.isEmpty())
+            {
+                StringBuilder failedTickers = new StringBuilder();
+                failed.forEach(t -> failedTickers.append(t.GetSymbol()).append("\n"));
+
+                WindowUtils.ShowInformationDialog(
+                    "Info",
+                    "Finished updating prices with errors",
+                    "Successfully updated tickers:\n" +
+                        failed.stream()
+                            .map(Ticker::GetSymbol)
+                            .reduce((a, b) -> a + ", " + b)
+                            .orElse("") +
+                        "\n\nFailed to update tickers:\n" + failedTickers.toString());
+            }
+            else
+            {
+                WindowUtils.ShowSuccessDialog("Success",
+                                              "Finished updating prices",
+                                              "All tickers were successfully updated");
+            }
+
+            UpdateTransactionTableView();
+        }
+        catch (RuntimeException e)
+        {
+            WindowUtils.ShowErrorDialog("Error",
+                                        "Error updating prices",
+                                        e.getMessage());
+        }
+    }
 
     @FXML
     private void handleEditTicker()

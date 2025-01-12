@@ -15,6 +15,14 @@ print_error() {
 MOINEX_DIR="$HOME/.moinex"
 DOT_LOCAL_DIR="$HOME/.local"
 
+# Instala dependências pip
+if pip install -r requirements.txt; then
+    print_success ">> Dependências Python instaladas"
+else
+    print_error "Erro ao instalar as dependências Python"
+    exit 1
+fi
+
 # Criar diretórios
 if mkdir -p "$MOINEX_DIR/bin"; then
     print_success ">> Diretório $MOINEX_DIR/bin criado"

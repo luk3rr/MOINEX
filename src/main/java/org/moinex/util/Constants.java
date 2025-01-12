@@ -20,6 +20,13 @@ public final class Constants
         System.getProperty("user.home") + "/.local/state/moinex/moinex.log";
     public static final String APP_NAME = "Moinex";
 
+    public static final String SCRIPT_PATH = "/scripts/";
+
+    public static final String PYTHON_INTERPRETER = "python3";
+
+    public static final String GET_STOCK_PRICE_SCRIPT =
+        SCRIPT_PATH + "get_stock_price.py";
+
     // Paths
     public static final String WALLET_TYPE_ICONS_PATH  = "/icon/wallet_type/";
     public static final String SIDEBAR_ICONS_PATH      = "/icon/sidebar/";
@@ -99,9 +106,11 @@ public final class Constants
 
     public static final String EDIT_GOAL_FXML   = UI_DIALOG_PATH + "edit_goal.fxml";
     public static final String EDIT_TICKER_FXML = UI_DIALOG_PATH + "edit_ticker.fxml";
-    public static final String EDIT_PURCHASE_FXML = UI_DIALOG_PATH + "edit_purchase.fxml";
+    public static final String EDIT_PURCHASE_FXML =
+        UI_DIALOG_PATH + "edit_purchase.fxml";
     public static final String EDIT_SALE_FXML = UI_DIALOG_PATH + "edit_sale.fxml";
-    public static final String EDIT_DIVIDEND_FXML = UI_DIALOG_PATH + "edit_dividend.fxml";
+    public static final String EDIT_DIVIDEND_FXML =
+        UI_DIALOG_PATH + "edit_dividend.fxml";
 
     public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
         UI_DIALOG_PATH + "credit_card_invoice_payment.fxml";

@@ -6,10 +6,18 @@
 
 package org.moinex.services;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
@@ -23,12 +31,15 @@ import org.moinex.repositories.SaleRepository;
 import org.moinex.repositories.TickerRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.repositories.WalletTransactionRepository;
+import org.moinex.util.Constants;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
 import org.moinex.util.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import yahoofinance.Stock;
+import yahoofinance.YahooFinance;
 
 /**
  * This class is responsible for managing tickers
@@ -259,6 +270,92 @@ public class TickerService
         m_tickerRepository.save(oldTicker);
 
         logger.info("Ticker with id " + tk.GetId() + " was updated");
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    public void UpdateTickerPriceFromAPI(Long tickerId)
+        throws IOException, InterruptedException
+    {
+        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
+            ()
+                -> new RuntimeException("Ticker with id " + tickerId +
+                                        " not found and cannot update price"));
+
+        BigDecimal price = BigDecimal.ZERO;
+
+        InputStream scriptInputStream =
+            TickerService.class.getResourceAsStream(Constants.GET_STOCK_PRICE_SCRIPT);
+
+        if (scriptInputStream == null)
+        {
+            throw new RuntimeException("Python script not found");
+        }
+
+        Path tempFile =
+            Paths.get(System.getProperty("java.io.tmpdir"), "get_stock_price.py");
+        Files.copy(scriptInputStream,
+                   tempFile,
+                   java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+        String[] command = new String[] { Constants.PYTHON_INTERPRETER,
+                                          tempFile.toString(),
+                                          ticker.GetSymbol() };
+
+        // Run request
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        Process        process        = processBuilder.start();
+
+        // Read output
+        BufferedReader reader =
+            new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line = reader.readLine();
+        if (line != null)
+        {
+            price = new BigDecimal(line);
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0)
+        {
+            throw new RuntimeException("Error executing Python script. Exit code: " +
+                                       exitCode);
+        }
+
+        ticker.SetCurrentUnitValue(price);
+        m_tickerRepository.save(ticker);
+
+        logger.info("Price of ticker " + ticker.GetSymbol() + " updated to " + price);
+    }
+
+    /**
+     *
+     */
+    @Transactional
+    public List<Ticker> UpdateAllTickersPriceFromAPI()
+    {
+        List<Ticker> tickers = m_tickerRepository.findAll();
+        List<Ticker> failed  = List.of();
+
+        for (Ticker ticker : tickers)
+        {
+            try
+            {
+                UpdateTickerPriceFromAPI(ticker.GetId());
+            }
+            catch (IOException | InterruptedException | RuntimeException e)
+            {
+                logger.warning("Failed to update price of ticker " +
+                               ticker.GetSymbol() + " from API: " + e.getMessage());
+
+                failed.add(ticker);
+            }
+        }
+
+        return failed;
     }
 
     /**
