@@ -18,11 +18,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.Purchase;
 import org.moinex.entities.investment.Sale;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
+import org.moinex.util.TransactionStatus;
+import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +132,35 @@ public class InvestmentTransactionsController
 
     @FXML
     private void handleDelete()
-    { }
+    {
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+
+        if (selectedTab == null)
+        {
+            return;
+        }
+
+        if (selectedTab == tabPane.getTabs().get(0))
+        {
+            Purchase selectedPurchase =
+                purchaseTableView.getSelectionModel().getSelectedItem();
+
+            DeletePurchase(selectedPurchase);
+        }
+        else if (selectedTab == tabPane.getTabs().get(1))
+        {
+            Sale selectedSale = saleTableView.getSelectionModel().getSelectedItem();
+
+            DeleteSale(selectedSale);
+        }
+        else if (selectedTab == tabPane.getTabs().get(2))
+        {
+            Dividend selectedDividend =
+                dividendTableView.getSelectionModel().getSelectedItem();
+
+            DeleteDividend(selectedDividend);
+        }
+    }
 
     @FXML
     private void handleCancel()
@@ -565,7 +596,7 @@ public class InvestmentTransactionsController
         {
             WindowUtils.ShowInformationDialog("Info",
                                               "No purchase selected",
-                                              "Please select a purchase to edit.");
+                                              "Please select a purchase to edit");
 
             return;
         }
@@ -587,7 +618,7 @@ public class InvestmentTransactionsController
         {
             WindowUtils.ShowInformationDialog("Info",
                                               "No sale selected",
-                                              "Please select a sale to edit.");
+                                              "Please select a sale to edit");
 
             return;
         }
@@ -609,7 +640,7 @@ public class InvestmentTransactionsController
         {
             WindowUtils.ShowInformationDialog("Info",
                                               "No dividend selected",
-                                              "Please select a dividend to edit.");
+                                              "Please select a dividend to edit");
 
             return;
         }
@@ -623,5 +654,124 @@ public class InvestmentTransactionsController
                                         LoadDividendsFromDatabase();
                                         UpdateDividendTableView();
                                     }));
+    }
+
+    private void DeletePurchase(Purchase purchase)
+    {
+        if (purchase == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No purchase selected",
+                                              "Please select a purchase to delete");
+            return;
+        }
+
+        String message = DeleteMessage(purchase.GetWalletTransaction());
+
+        if (WindowUtils.ShowConfirmationDialog(
+                "Confirm deletion",
+                "Are you sure you want to delete the purchase?",
+                message))
+        {
+            tickerService.DeletePurchase(purchase.GetId());
+            LoadPurchasesFromDatabase();
+            UpdatePurchaseTableView();
+        }
+    }
+
+    private void DeleteSale(Sale sale)
+    {
+        if (sale == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No sale selected",
+                                              "Please select a sale to delete");
+            return;
+        }
+
+        String message = DeleteMessage(sale.GetWalletTransaction());
+
+        if (WindowUtils.ShowConfirmationDialog(
+                "Delete sale",
+                "Are you sure you want to delete the sale?",
+                message))
+        {
+            tickerService.DeleteSale(sale.GetId());
+            LoadSalesFromDatabase();
+            UpdateSaleTableView();
+        }
+    }
+
+    private void DeleteDividend(Dividend dividend)
+    {
+        if (dividend == null)
+        {
+            WindowUtils.ShowInformationDialog("Info",
+                                              "No dividend selected",
+                                              "Please select a dividend to delete");
+            return;
+        }
+
+        String message = DeleteMessage(dividend.GetWalletTransaction());
+
+        if (WindowUtils.ShowConfirmationDialog(
+                "Delete dividend",
+                "Are you sure you want to delete the dividend?",
+                message))
+        {
+            tickerService.DeleteDividend(dividend.GetId());
+            LoadDividendsFromDatabase();
+            UpdateDividendTableView();
+        }
+    }
+
+    private String DeleteMessage(WalletTransaction wt)
+    {
+        // Create a message to show to the user
+        StringBuilder message = new StringBuilder();
+        message.append("Description: ")
+            .append(wt.GetDescription())
+            .append("\n")
+            .append("Amount: ")
+            .append(UIUtils.FormatCurrency(wt.GetAmount()))
+            .append("\n")
+            .append("Date: ")
+            .append(wt.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+            .append("\n")
+            .append("Status: ")
+            .append(wt.GetStatus().toString())
+            .append("\n")
+            .append("Wallet: ")
+            .append(wt.GetWallet().GetName())
+            .append("\n")
+            .append("Wallet balance: ")
+            .append(UIUtils.FormatCurrency(wt.GetWallet().GetBalance()))
+            .append("\n")
+            .append("Wallet balance after deletion: ");
+
+        if (wt.GetStatus().equals(TransactionStatus.CONFIRMED))
+        {
+            if (wt.GetType().equals(TransactionType.EXPENSE))
+            {
+                message
+                    .append(UIUtils.FormatCurrency(
+                        wt.GetWallet().GetBalance().add(wt.GetAmount())))
+                    .append("\n");
+            }
+            else
+            {
+                message
+                    .append(UIUtils.FormatCurrency(
+                        wt.GetWallet().GetBalance().subtract(wt.GetAmount())))
+                    .append("\n");
+            }
+        }
+        else
+        {
+            message.append(UIUtils.FormatCurrency(wt.GetWallet().GetBalance()))
+                .append("\n");
+        }
+
+        return message.toString();
     }
 }

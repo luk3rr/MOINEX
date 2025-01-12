@@ -22,6 +22,7 @@ import org.moinex.repositories.PurchaseRepository;
 import org.moinex.repositories.SaleRepository;
 import org.moinex.repositories.TickerRepository;
 import org.moinex.repositories.WalletRepository;
+import org.moinex.repositories.WalletTransactionRepository;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
 import org.moinex.util.TransactionStatus;
@@ -452,6 +453,79 @@ public class TickerService
                     ticker.GetSymbol() + ". Wallet transaction with id " + id +
                     " created for the dividend and added to wallet with id " +
                     walletId);
+    }
+
+    /**
+     * Delete a purchase
+     * @param purchaseId The id of the purchase
+     * @throws RuntimeException If the purchase does not exist
+     */
+    @Transactional
+    public void DeletePurchase(Long purchaseId)
+    {
+        Purchase purchase =
+            m_purchaseRepository.findById(purchaseId)
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Purchase with id " + purchaseId +
+                                                " not found and cannot be deleted"));
+
+        // Delete purchase before deleting wallet transaction to avoid
+        // foreign key constraint violation
+        m_purchaseRepository.delete(purchase);
+
+        m_walletTransactionService.DeleteTransaction(
+            purchase.GetWalletTransaction().GetId());
+
+        logger.info("Purchase with id " + purchaseId + " was deleted");
+    }
+
+    /**
+     * Delete a sale
+     * @param saleId The id of the sale
+     * @throws RuntimeException If the sale does not exist
+     */
+    @Transactional
+    public void DeleteSale(Long saleId)
+    {
+        Sale sale = m_saleRepository.findById(saleId).orElseThrow(
+            ()
+                -> new RuntimeException("Sale with id " + saleId +
+                                        " not found and cannot be deleted"));
+
+        // Delete sale before deleting wallet transaction to avoid
+        // foreign key constraint violation
+        m_saleRepository.delete(sale);
+
+        m_walletTransactionService.DeleteTransaction(
+            sale.GetWalletTransaction().GetId());
+
+        logger.info("Sale with id " + saleId + " was deleted");
+    }
+
+    /**
+     * Delete a dividend
+     * @param dividendId The id of the dividend
+     * @throws RuntimeException If the dividend does not exist
+     */
+    @Transactional
+    public void DeleteDividend(Long dividendId)
+    {
+        Dividend dividend =
+            m_dividendRepository.findById(dividendId)
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Dividend with id " + dividendId +
+                                                " not found and cannot be deleted"));
+
+        // Delete dividend before deleting wallet transaction to avoid
+        // foreign key constraint violation
+        m_dividendRepository.delete(dividend);
+
+        m_walletTransactionService.DeleteTransaction(
+            dividend.GetWalletTransaction().GetId());
+
+        logger.info("Dividend with id " + dividendId + " was deleted");
     }
 
     /**
