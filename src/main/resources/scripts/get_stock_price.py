@@ -6,7 +6,7 @@
 
 import sys
 import json
-from yahoofinancials import YahooFinancials
+import yfinance as yf
 import requests
 
 DEFAULT_CURRENCY = "BRL"
@@ -35,14 +35,20 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 symbols = sys.argv[1:]
-result = {}
 
 # Get the stock price
-yahoo_financials = YahooFinancials(symbols)
-prices = yahoo_financials.get_current_price()
-currencies = yahoo_financials.get_currency()
+tickers = yf.Tickers(" ".join(symbols))
+prices = {
+    symbol: ticker.history().iloc[-1]["Close"]
+    for symbol, ticker in tickers.tickers.items()
+}
+currencies = {
+    symbol: ticker.info["currency"] for symbol, ticker in tickers.tickers.items()
+}
 
 conversion_rates = {DEFAULT_CURRENCY: 1}
+
+result = {}
 
 for symbol in symbols:
     try:
@@ -56,7 +62,7 @@ for symbol in symbols:
             if currency not in conversion_rates:
                 conversion_rates[currency] = get_conversion_rate(currency)
 
-        result[symbol] = {"price": price * conversion_rates.get(currency, 1)}
+        result[symbol] = {"price": price * conversion_rates[currency]}
 
     except Exception as e:
         result[symbol] = {"error": str(e)}

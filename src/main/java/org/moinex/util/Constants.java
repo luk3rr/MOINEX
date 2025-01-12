@@ -22,7 +22,7 @@ public final class Constants
 
     public static final String SCRIPT_PATH = "/scripts/";
 
-    public static final String PYTHON_INTERPRETER = "python3";
+    public static final String PYTHON_INTERPRETER = "/usr/bin/python3";
 
     public static final String GET_STOCK_PRICE_SCRIPT =
         SCRIPT_PATH + "get_stock_price.py";

@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
@@ -331,9 +331,12 @@ public class TickerService
                        tempFile,
                        StandardCopyOption.REPLACE_EXISTING);
 
-            String[] command = { Constants.PYTHON_INTERPRETER,
-                                 tempFile.toString(),
-                                 String.join(" ", symbols) };
+            List<String> commandList = new ArrayList<>();
+            commandList.add(Constants.PYTHON_INTERPRETER);
+            commandList.add(tempFile.toString());
+            commandList.addAll(Arrays.asList(symbols));
+
+            String[] command = commandList.toArray(new String[0]);
 
             logger.info("Running Python script as: " + String.join(" ", command));
 
