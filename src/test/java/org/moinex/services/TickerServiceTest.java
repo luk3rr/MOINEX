@@ -35,6 +35,7 @@ import org.moinex.repositories.PurchaseRepository;
 import org.moinex.repositories.SaleRepository;
 import org.moinex.repositories.TickerRepository;
 import org.moinex.repositories.WalletRepository;
+import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
@@ -148,7 +149,7 @@ public class TickerServiceTest
         assertEquals(m_ticker.GetName(), savedTicker.GetName());
         assertEquals(m_ticker.GetSymbol(), savedTicker.GetSymbol());
         assertEquals(m_ticker.GetType(), savedTicker.GetType());
-        assertEquals(m_ticker.GetCurrentUnitValue(), savedTicker.GetCurrentUnitValue());
+        assertEquals(0, m_ticker.GetCurrentUnitValue().compareTo(savedTicker.GetCurrentUnitValue()));
     }
 
     @Test
@@ -938,7 +939,7 @@ public class TickerServiceTest
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(newPrice, tickerCaptor.getValue().GetCurrentUnitValue());
+        assertEquals(0, newPrice.compareTo(tickerCaptor.getValue().GetCurrentUnitValue()));
     }
 
     @Test
@@ -1049,7 +1050,7 @@ public class TickerServiceTest
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(newPrice, tickerCaptor.getValue().GetAveragePrice());
+        assertEquals(0, newPrice.compareTo(tickerCaptor.getValue().GetAveragePrice()));
     }
 
     @Test

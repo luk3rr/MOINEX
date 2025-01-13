@@ -6,6 +6,8 @@
 
 package org.moinex.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -150,11 +152,11 @@ public final class Constants
     public static final String SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON =
         COMMON_ICONS_PATH + "synchronize.png";
 
-        // CSS
-        public static final String MAIN_STYLE_SHEET   = CSS_SCENE_PATH + "main.css";
-    public static final String     HOME_STYLE_SHEET   = CSS_SCENE_PATH + "home.css";
-    public static final String     WALLET_STYLE_SHEET = CSS_SCENE_PATH + "wallet.css";
-    public static final String     CREDIT_CARD_STYLE_SHEET =
+    // CSS
+    public static final String MAIN_STYLE_SHEET   = CSS_SCENE_PATH + "main.css";
+    public static final String HOME_STYLE_SHEET   = CSS_SCENE_PATH + "home.css";
+    public static final String WALLET_STYLE_SHEET = CSS_SCENE_PATH + "wallet.css";
+    public static final String CREDIT_CARD_STYLE_SHEET =
         CSS_SCENE_PATH + "credit-card.css";
     public static final String TRANSACTION_STYLE_SHEET =
         CSS_SCENE_PATH + "transaction.css";
@@ -346,6 +348,26 @@ public final class Constants
                                                 LocalDate targetDate)
     {
         return ChronoUnit.DAYS.between(beginDate, targetDate);
+    }
+
+    /**
+     * Round price according to the ticker type
+     * @param price The price to be rounded
+     * @param tickerType The ticker type
+     */
+    public static BigDecimal RoundPrice(BigDecimal price, TickerType tickerType)
+    {
+        // Stocks and funds have two decimal places
+        // Cryptocurrencies have MAX allowed by settings
+        if (tickerType.equals(TickerType.STOCK) || tickerType.equals(TickerType.FUND))
+        {
+            return price.setScale(2, RoundingMode.HALF_UP);
+        }
+        else
+        {
+            return price.setScale(INVESTMENT_CALCULATION_PRECISION,
+                                  RoundingMode.HALF_UP);
+        }
     }
 
     // Prevent instantiation

@@ -14,13 +14,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +36,6 @@ import org.moinex.repositories.PurchaseRepository;
 import org.moinex.repositories.SaleRepository;
 import org.moinex.repositories.TickerRepository;
 import org.moinex.repositories.WalletRepository;
-import org.moinex.repositories.WalletTransactionRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
@@ -129,6 +126,9 @@ public class TickerService
             throw new RuntimeException(
                 "Average unit price must be greater than or equal to zero");
         }
+
+        price        = Constants.RoundPrice(price, type);
+        avgUnitPrice = Constants.RoundPrice(avgUnitPrice, type);
 
         Ticker ticker = new Ticker(name,
                                    symbol,
@@ -261,6 +261,10 @@ public class TickerService
                 "Average unit price must be greater than or equal to zero");
         }
 
+        tk.SetCurrentUnitValue(
+            Constants.RoundPrice(tk.GetCurrentUnitValue(), tk.GetType()));
+        tk.SetAveragePrice(Constants.RoundPrice(tk.GetAveragePrice(), tk.GetType()));
+
         oldTicker.SetName(tk.GetName());
         oldTicker.SetSymbol(tk.GetSymbol());
         oldTicker.SetType(tk.GetType());
@@ -364,6 +368,9 @@ public class TickerService
                         JSONObject tickerData =
                             jsonObject.getJSONObject(ticker.GetSymbol());
                         BigDecimal price = tickerData.getBigDecimal("price");
+
+                        price = Constants.RoundPrice(price, ticker.GetType());
+
                         ticker.SetCurrentUnitValue(price);
                         ticker.SetLastUpdate(LocalDateTime.now());
                         m_tickerRepository.save(ticker);
@@ -449,6 +456,7 @@ public class TickerService
 
         ticker.SetAveragePrice(
             updatedTotalValue.divide(ticker.GetAveragePriceCount().add(quantity),
+                                     2,
                                      RoundingMode.HALF_UP));
 
         ticker.SetAveragePriceCount(ticker.GetAveragePriceCount().add(quantity));

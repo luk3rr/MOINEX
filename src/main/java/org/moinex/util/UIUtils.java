@@ -104,7 +104,10 @@ public final class UIUtils
      */
     private static Integer DetermineFractionDigits(BigDecimal value)
     {
-        if (value.compareTo(BigDecimal.ZERO) == 0)
+        // For values greater than 1, always display 2 decimal places
+        // For values less than 1, display the necessary decimal places
+        // This is especially useful for cryptocurrency values
+        if (value.compareTo(BigDecimal.ONE) >= 0)
         {
             return 2;
         }

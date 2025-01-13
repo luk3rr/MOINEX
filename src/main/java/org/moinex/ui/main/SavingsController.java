@@ -23,7 +23,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 import javafx.util.StringConverter;
+import org.moinex.entities.investment.Dividend;
+import org.moinex.entities.investment.Purchase;
+import org.moinex.entities.investment.Sale;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddDividendController;
@@ -48,6 +52,18 @@ import org.springframework.stereotype.Controller;
 public class SavingsController
 {
     @FXML
+    private Text stocksFundsTabNetCapitalInvestedField;
+
+    @FXML
+    private Text stocksFundsTabCurrentValueField;
+
+    @FXML
+    private Text stocksFundsTabProfitLossField;
+
+    @FXML
+    private Text stocksFundsTabDividendsReceivedField;
+
+    @FXML
     private TableView<Ticker> stocksFundsTabTickerTable;
 
     @FXML
@@ -69,6 +85,19 @@ public class SavingsController
 
     private TickerService tickerService;
 
+    private List<Ticker> tickers;
+
+    private List<Purchase> purchases;
+
+    private List<Sale> sales;
+
+    private List<Dividend> dividends;
+
+    private BigDecimal netCapitalInvested;
+    private BigDecimal currentValue;
+    private BigDecimal profitLoss;
+    private BigDecimal dividendsReceived;
+
     /**
      * Constructor
      * @param tickerService The ticker service
@@ -86,6 +115,7 @@ public class SavingsController
         ConfigureTableView();
         PopulateTickerTypeComboBox();
         UpdateTransactionTableView();
+        UpdateIndicators();
 
         if (isUpdatingPrices)
         {
@@ -107,7 +137,10 @@ public class SavingsController
                                     springContext,
                                     (AddTickerController controller)
                                         -> {},
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -129,7 +162,10 @@ public class SavingsController
                                     springContext,
                                     (BuyTickerController controller)
                                         -> controller.SetTicker(selectedTicker),
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -151,7 +187,10 @@ public class SavingsController
                                     springContext,
                                     (SaleTickerController controller)
                                         -> controller.SetTicker(selectedTicker),
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -174,7 +213,10 @@ public class SavingsController
                                     springContext,
                                     (AddDividendController controller)
                                         -> controller.SetTicker(selectedTicker),
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -185,7 +227,10 @@ public class SavingsController
                                     springContext,
                                     (ArchivedTickersController controller)
                                         -> {},
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -196,7 +241,10 @@ public class SavingsController
                                     springContext,
                                     (InvestmentTransactionsController controller)
                                         -> {},
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -248,6 +296,7 @@ public class SavingsController
             .whenComplete((v, e) -> Platform.runLater(() -> {
                 SetOnUpdatePricesButton();
                 UpdateTransactionTableView();
+                UpdateIndicators();
             }));
     }
 
@@ -270,7 +319,10 @@ public class SavingsController
                                     springContext,
                                     (EditTickerController controller)
                                         -> controller.SetTicker(selectedTicker),
-                                    List.of(() -> { UpdateTransactionTableView(); }));
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdateIndicators();
+                                    }));
     }
 
     @FXML
@@ -316,6 +368,107 @@ public class SavingsController
                                             e.getMessage());
             }
         }
+    }
+
+    /**
+     * Load the tickers from the database
+     */
+    private void LoadTickersFromDatabase()
+    {
+        tickers = tickerService.GetAllNonArchivedTickers();
+    }
+
+    /**
+     * Load the purchases from the database
+     */
+    private void LoadPurchasesFromDatabase()
+    {
+        purchases = tickerService.GetAllPurchases();
+    }
+
+    /**
+     * Load the sales from the database
+     */
+    private void LoadSalesFromDatabase()
+    {
+        sales = tickerService.GetAllSales();
+    }
+
+    /**
+     * Load the dividends from the database
+     */
+    private void LoadDividendsFromDatabase()
+    {
+        dividends = tickerService.GetAllDividends();
+    }
+
+    /**
+     * Update the net capital invested field
+     */
+    private void UpdateNetCapitalInvestedField()
+    {
+        // Calculate the net capital invested
+        // Net capital invested = sum of (average price * current quantity) for all
+        // tickers
+        netCapitalInvested =
+            tickers.stream()
+                .map(t -> t.GetAveragePrice().multiply(t.GetCurrentQuantity()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        stocksFundsTabNetCapitalInvestedField.setText(
+            UIUtils.FormatCurrency(netCapitalInvested));
+    }
+
+    /**
+     * Update the current value field
+     */
+    private void UpdateCurrentValueField()
+    {
+        currentValue =
+            tickers.stream()
+                .map(t -> t.GetCurrentQuantity().multiply(t.GetCurrentUnitValue()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        stocksFundsTabCurrentValueField.setText(UIUtils.FormatCurrency(currentValue));
+    }
+
+    /**
+     * Update the profit/loss field
+     */
+    private void UpdateProfitLossField()
+    {
+        profitLoss = currentValue.subtract(netCapitalInvested);
+
+        stocksFundsTabProfitLossField.setText(UIUtils.FormatCurrency(profitLoss));
+    }
+
+    /**
+     * Update the dividends received field
+     */
+    private void UpdateDividendsReceivedField()
+    {
+        dividendsReceived = dividends.stream()
+                                .map(d -> d.GetWalletTransaction().GetAmount())
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        stocksFundsTabDividendsReceivedField.setText(
+            UIUtils.FormatCurrency(dividendsReceived));
+    }
+
+    /**
+     * Update the indicators
+     */
+    private void UpdateIndicators()
+    {
+        LoadTickersFromDatabase();
+        LoadPurchasesFromDatabase();
+        LoadSalesFromDatabase();
+        LoadDividendsFromDatabase();
+
+        UpdateNetCapitalInvestedField();
+        UpdateCurrentValueField();
+        UpdateProfitLossField();
+        UpdateDividendsReceivedField();
     }
 
     /**

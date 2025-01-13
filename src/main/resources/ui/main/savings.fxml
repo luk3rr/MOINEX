@@ -130,12 +130,12 @@
                                        <children>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Invested Amount" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Net Capital Invested" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
                                                 </Text>
-                                                <Text fx:id="stocksFundsTabInvestedAmountField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
+                                                <Text fx:id="stocksFundsTabNetCapitalInvestedField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
@@ -144,12 +144,12 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Current Amount" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Current Value" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
                                                 </Text>
-                                                <Text fx:id="stocksFundsTabCurrentAmountField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
+                                                <Text fx:id="stocksFundsTabCurrentValueField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
                                                    <font>
                                                       <Font size="17.0" />
                                                    </font>
