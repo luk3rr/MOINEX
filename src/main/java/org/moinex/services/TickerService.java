@@ -512,7 +512,11 @@ public class TickerService
         WalletTransaction walletTransaction =
             m_walletTransactionService.GetTransactionById(id);
 
-        Sale sale = new Sale(ticker, quantity, unitPrice, walletTransaction);
+        Sale sale = new Sale(ticker,
+                             quantity,
+                             unitPrice,
+                             walletTransaction,
+                             ticker.GetAveragePrice());
 
         m_saleRepository.save(sale);
 

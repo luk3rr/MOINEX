@@ -114,7 +114,8 @@ public class TickerServiceTest
                           m_ticker,
                           new BigDecimal("1"),
                           new BigDecimal("50"),
-                          m_saleTransaction);
+                          m_saleTransaction,
+                          new BigDecimal("50"));
 
         m_dividendTransaction = new WalletTransaction(m_wallet,
                                                       m_category,

@@ -24,6 +24,9 @@ public class Sale extends Transaction
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "average_cost", nullable = false)
+    private BigDecimal averageCost;
+
     /**
      * Default constructor for JPA
      */
@@ -36,15 +39,18 @@ public class Sale extends Transaction
      * @param quantity The quantity of the sale
      * @param unitPrice The unit price of the sale
      * @param walletTransaction The wallet transaction of the sale
+     * @param averageCost The average cost of the sale at the moment of the transaction
      */
     public Sale(Long              id,
                 Ticker            ticker,
                 BigDecimal        quantity,
                 BigDecimal        unitPrice,
-                WalletTransaction walletTransaction)
+                WalletTransaction walletTransaction,
+                BigDecimal        averageCost)
     {
         super(ticker, quantity, unitPrice, walletTransaction);
-        this.id = id;
+        this.id          = id;
+        this.averageCost = averageCost;
     }
 
     /**
@@ -53,17 +59,30 @@ public class Sale extends Transaction
      * @param quantity The quantity of the sale
      * @param unitPrice The unit price of the sale
      * @param walletTransaction The wallet transaction of the sale
+     * @param averageCost The average cost of the sale at the moment of the transaction
      */
     public Sale(Ticker            ticker,
                 BigDecimal        quantity,
                 BigDecimal        unitPrice,
-                WalletTransaction walletTransaction)
+                WalletTransaction walletTransaction,
+                BigDecimal        averageCost)
     {
         super(ticker, quantity, unitPrice, walletTransaction);
+        this.averageCost = averageCost;
     }
 
     public Long GetId()
     {
         return id;
+    }
+
+    public BigDecimal GetAverageCost()
+    {
+        return averageCost;
+    }
+
+    public void SetAverageCost(BigDecimal averageCost)
+    {
+        this.averageCost = averageCost;
     }
 }
