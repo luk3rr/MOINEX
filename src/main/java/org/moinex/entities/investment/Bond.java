@@ -8,11 +8,17 @@ package org.moinex.entities.investment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+
+import org.moinex.util.BondType;
+import org.moinex.util.InterestIndex;
+import org.moinex.util.InterestType;
 
 /**
  * Class that represents a bond
@@ -24,10 +30,28 @@ public class Bond extends Asset
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private BondType type;
+
+    @Column(name = "interest_index", nullable = false)
+    private InterestIndex interestIndex;
+
+    @Column(name = "interest_type", nullable = false)
+    private InterestType interestType;
+
+    @Column(name = "interest_rate", nullable = false)
+    private BigDecimal interestRate;
+
     @Column(name = "maturity_date", nullable = true)
     private String maturityDate;
+
+    @Column(name             = "archived",
+            nullable         = false,
+            columnDefinition = "boolean default false")
+    private Boolean archived = false; // Default value is false
 
     /**
      * Default constructor for JPA
