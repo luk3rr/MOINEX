@@ -36,7 +36,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @return The count of purchases associated with the ticker
      */
     @Query("SELECT COUNT(p) "
-           + "FROM Purchase p "
+           + "FROM TickerPurchase p "
            + "WHERE p.ticker.id = :tickerId")
 
     Long
@@ -48,7 +48,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @return The count of sales associated with the ticker
      */
     @Query("SELECT COUNT(s) "
-           + "FROM Sale s "
+           + "FROM TickerSale s "
            + "WHERE s.ticker.id = :tickerId")
     Long
     GetSaleCountByTicker(@Param("tickerId") Long tickerId);

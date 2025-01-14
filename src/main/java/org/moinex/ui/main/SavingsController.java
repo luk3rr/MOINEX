@@ -26,8 +26,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import org.moinex.entities.investment.Dividend;
-import org.moinex.entities.investment.Purchase;
-import org.moinex.entities.investment.Sale;
+import org.moinex.entities.investment.TickerPurchase;
+import org.moinex.entities.investment.TickerSale;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddDividendController;
@@ -87,9 +87,9 @@ public class SavingsController
 
     private List<Ticker> tickers;
 
-    private List<Purchase> purchases;
+    private List<TickerPurchase> purchases;
 
-    private List<Sale> sales;
+    private List<TickerSale> sales;
 
     private List<Dividend> dividends;
 

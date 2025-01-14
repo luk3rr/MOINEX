@@ -19,10 +19,6 @@ import org.moinex.entities.WalletTransaction;
 @MappedSuperclass
 public abstract class Transaction
 {
-    @ManyToOne
-    @JoinColumn(name = "ticker_id", referencedColumnName = "id", nullable = true)
-    private Ticker ticker;
-
     @Column(name = "quantity", nullable = false, precision = 20, scale = 8)
     private BigDecimal quantity;
 
@@ -42,30 +38,17 @@ public abstract class Transaction
 
     /**
      * Constructor for Transaction
-     * @param ticker The ticker of the transaction
      * @param quantity The quantity of the transaction
      * @param unitPrice The unit price of the transaction
      * @param walletTransaction The wallet transaction of the transaction
      */
-    public Transaction(Ticker            ticker,
-                       BigDecimal        quantity,
+    public Transaction(BigDecimal        quantity,
                        BigDecimal        unitPrice,
                        WalletTransaction walletTransaction)
     {
-        this.ticker            = ticker;
         this.quantity          = quantity;
         this.unitPrice         = unitPrice;
         this.walletTransaction = walletTransaction;
-    }
-
-    public Ticker GetTicker()
-    {
-        return ticker;
-    }
-
-    public void SetTicker(Ticker ticker)
-    {
-        this.ticker = ticker;
     }
 
     public BigDecimal GetQuantity()

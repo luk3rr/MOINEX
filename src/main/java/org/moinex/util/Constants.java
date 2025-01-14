@@ -109,9 +109,10 @@ public final class Constants
 
     public static final String EDIT_GOAL_FXML   = UI_DIALOG_PATH + "edit_goal.fxml";
     public static final String EDIT_TICKER_FXML = UI_DIALOG_PATH + "edit_ticker.fxml";
-    public static final String EDIT_PURCHASE_FXML =
-        UI_DIALOG_PATH + "edit_purchase.fxml";
-    public static final String EDIT_SALE_FXML = UI_DIALOG_PATH + "edit_sale.fxml";
+    public static final String EDIT_TICKER_PURCHASE_FXML =
+        UI_DIALOG_PATH + "edit_ticker_purchase.fxml";
+    public static final String EDIT_TICKER_SALE_FXML =
+        UI_DIALOG_PATH + "edit_ticker_sale.fxml";
     public static final String EDIT_DIVIDEND_FXML =
         UI_DIALOG_PATH + "edit_dividend.fxml";
 

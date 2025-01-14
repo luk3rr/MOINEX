@@ -27,15 +27,14 @@ import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Dividend;
-import org.moinex.entities.investment.Purchase;
-import org.moinex.entities.investment.Sale;
 import org.moinex.entities.investment.Ticker;
+import org.moinex.entities.investment.TickerPurchase;
+import org.moinex.entities.investment.TickerSale;
 import org.moinex.repositories.DividendRepository;
-import org.moinex.repositories.PurchaseRepository;
-import org.moinex.repositories.SaleRepository;
+import org.moinex.repositories.TickerPurchaseRepository;
 import org.moinex.repositories.TickerRepository;
+import org.moinex.repositories.TickerSaleRepository;
 import org.moinex.repositories.WalletRepository;
-import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
@@ -47,10 +46,10 @@ public class TickerServiceTest
     private TickerRepository m_tickerRepository;
 
     @Mock
-    private PurchaseRepository m_purchaseRepository;
+    private TickerPurchaseRepository m_tickerPurchaseRepository;
 
     @Mock
-    private SaleRepository m_saleRepository;
+    private TickerSaleRepository m_tickerSaleRepository;
 
     @Mock
     private DividendRepository m_dividendRepository;
@@ -69,8 +68,8 @@ public class TickerServiceTest
     private WalletTransaction m_purchaseTransaction;
     private WalletTransaction m_saleTransaction;
     private WalletTransaction m_dividendTransaction;
-    private Purchase          m_purchase;
-    private Sale              m_sale;
+    private TickerPurchase    m_purchase;
+    private TickerSale        m_sale;
     private Dividend          m_dividend;
     private Category          m_category;
 
@@ -96,12 +95,12 @@ public class TickerServiceTest
                                                       TransactionStatus.CONFIRMED,
                                                       LocalDateTime.now(),
                                                       new BigDecimal("50"),
-                                                      "Purchase");
-        m_purchase            = new Purchase(1L,
-                                  m_ticker,
-                                  new BigDecimal("1"),
-                                  new BigDecimal("50"),
-                                  m_purchaseTransaction);
+                                                      "TickerPurchase");
+        m_purchase            = new TickerPurchase(1L,
+                                        m_ticker,
+                                        new BigDecimal("1"),
+                                        new BigDecimal("50"),
+                                        m_purchaseTransaction);
 
         m_saleTransaction = new WalletTransaction(m_wallet,
                                                   m_category,
@@ -109,14 +108,14 @@ public class TickerServiceTest
                                                   TransactionStatus.CONFIRMED,
                                                   LocalDateTime.now(),
                                                   new BigDecimal("50"),
-                                                  "Sale");
+                                                  "TickerSale");
 
-        m_sale = new Sale(1L,
-                          m_ticker,
-                          new BigDecimal("1"),
-                          new BigDecimal("50"),
-                          m_saleTransaction,
-                          new BigDecimal("50"));
+        m_sale = new TickerSale(1L,
+                                m_ticker,
+                                new BigDecimal("1"),
+                                new BigDecimal("50"),
+                                m_saleTransaction,
+                                new BigDecimal("50"));
 
         m_dividendTransaction = new WalletTransaction(m_wallet,
                                                       m_category,
@@ -149,7 +148,9 @@ public class TickerServiceTest
         assertEquals(m_ticker.GetName(), savedTicker.GetName());
         assertEquals(m_ticker.GetSymbol(), savedTicker.GetSymbol());
         assertEquals(m_ticker.GetType(), savedTicker.GetType());
-        assertEquals(0, m_ticker.GetCurrentUnitValue().compareTo(savedTicker.GetCurrentUnitValue()));
+        assertEquals(0,
+                     m_ticker.GetCurrentUnitValue().compareTo(
+                         savedTicker.GetCurrentUnitValue()));
     }
 
     @Test
@@ -466,7 +467,7 @@ public class TickerServiceTest
                                               TransactionStatus.CONFIRMED,
                                               LocalDateTime.now(),
                                               new BigDecimal("50"),
-                                              "Purchase"));
+                                              "TickerPurchase"));
 
         m_tickerService.AddPurchase(1L,
                                     1L,
@@ -474,14 +475,14 @@ public class TickerServiceTest
                                     new BigDecimal("150"),
                                     m_category,
                                     LocalDateTime.now(),
-                                    "Purchase",
+                                    "TickerPurchase",
                                     TransactionStatus.CONFIRMED);
 
         // Capture the purchase object that was saved and check its values
-        ArgumentCaptor<Purchase> purchaseCaptor =
-            ArgumentCaptor.forClass(Purchase.class);
+        ArgumentCaptor<TickerPurchase> purchaseCaptor =
+            ArgumentCaptor.forClass(TickerPurchase.class);
 
-        verify(m_purchaseRepository).save(purchaseCaptor.capture());
+        verify(m_tickerPurchaseRepository).save(purchaseCaptor.capture());
 
         assertEquals(m_ticker, purchaseCaptor.getValue().GetTicker());
         assertEquals(new BigDecimal("10"), purchaseCaptor.getValue().GetQuantity());
@@ -502,12 +503,12 @@ public class TickerServiceTest
                                         new BigDecimal("150"),
                                         m_category,
                                         LocalDateTime.now(),
-                                        "Purchase",
+                                        "TickerPurchase",
                                         TransactionStatus.CONFIRMED);
         });
 
         // Verify that the purchase was not saved
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
@@ -525,12 +526,12 @@ public class TickerServiceTest
                                         new BigDecimal("150"),
                                         m_category,
                                         LocalDateTime.now(),
-                                        "Purchase",
+                                        "TickerPurchase",
                                         TransactionStatus.CONFIRMED);
         });
 
         // Verify that the purchase was not saved
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
@@ -548,12 +549,12 @@ public class TickerServiceTest
                                         BigDecimal.ZERO,
                                         m_category,
                                         LocalDateTime.now(),
-                                        "Purchase",
+                                        "TickerPurchase",
                                         TransactionStatus.CONFIRMED);
         });
 
         // Verify that the purchase was not saved
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
@@ -575,7 +576,7 @@ public class TickerServiceTest
                                               TransactionStatus.CONFIRMED,
                                               LocalDateTime.now(),
                                               new BigDecimal("50"),
-                                              "Sale"));
+                                              "TickerSale"));
 
         m_tickerService.AddSale(1L,
                                 1L,
@@ -583,13 +584,14 @@ public class TickerServiceTest
                                 new BigDecimal("200"),
                                 m_category,
                                 LocalDateTime.now(),
-                                "Sale",
+                                "TickerSale",
                                 TransactionStatus.CONFIRMED);
 
         // Capture the sale object that was saved and check its values
-        ArgumentCaptor<Sale> saleCapptor = ArgumentCaptor.forClass(Sale.class);
+        ArgumentCaptor<TickerSale> saleCapptor =
+            ArgumentCaptor.forClass(TickerSale.class);
 
-        verify(m_saleRepository).save(saleCapptor.capture());
+        verify(m_tickerSaleRepository).save(saleCapptor.capture());
 
         assertEquals(m_ticker, saleCapptor.getValue().GetTicker());
         assertEquals(new BigDecimal("10"), saleCapptor.getValue().GetQuantity());
@@ -608,12 +610,12 @@ public class TickerServiceTest
                                     new BigDecimal("200"),
                                     m_category,
                                     LocalDateTime.now(),
-                                    "Sale",
+                                    "TickerSale",
                                     TransactionStatus.CONFIRMED);
         });
 
         // Verify that the sale was not saved
-        verify(m_saleRepository, never()).save(any(Sale.class));
+        verify(m_tickerSaleRepository, never()).save(any(TickerSale.class));
     }
 
     @Test
@@ -632,12 +634,12 @@ public class TickerServiceTest
                                     new BigDecimal("200"),
                                     m_category,
                                     LocalDateTime.now(),
-                                    "Sale",
+                                    "TickerSale",
                                     TransactionStatus.CONFIRMED);
         });
 
         // Verify that the sale was not saved
-        verify(m_saleRepository, never()).save(any(Sale.class));
+        verify(m_tickerSaleRepository, never()).save(any(TickerSale.class));
     }
 
     @Test
@@ -656,12 +658,12 @@ public class TickerServiceTest
                                     BigDecimal.ZERO,
                                     m_category,
                                     LocalDateTime.now(),
-                                    "Sale",
+                                    "TickerSale",
                                     TransactionStatus.CONFIRMED);
         });
 
         // Verify that the sale was not saved
-        verify(m_saleRepository, never()).save(any(Sale.class));
+        verify(m_tickerSaleRepository, never()).save(any(TickerSale.class));
     }
 
     @Test
@@ -939,7 +941,8 @@ public class TickerServiceTest
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(0, newPrice.compareTo(tickerCaptor.getValue().GetCurrentUnitValue()));
+        assertEquals(0,
+                     newPrice.compareTo(tickerCaptor.getValue().GetCurrentUnitValue()));
     }
 
     @Test
@@ -1106,7 +1109,8 @@ public class TickerServiceTest
     @DisplayName("Test if purchase quantity is updated successfully")
     public void TestUpdatePurchaseQuantity()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.of(m_purchase));
+        when(m_tickerPurchaseRepository.findById(1L))
+            .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
         BigDecimal oldQuantity = m_purchase.GetQuantity();
@@ -1129,9 +1133,9 @@ public class TickerServiceTest
 
         m_tickerService.UpdatePurchase(m_purchase);
 
-        ArgumentCaptor<Purchase> purchaseCaptor =
-            ArgumentCaptor.forClass(Purchase.class);
-        verify(m_purchaseRepository).save(purchaseCaptor.capture());
+        ArgumentCaptor<TickerPurchase> purchaseCaptor =
+            ArgumentCaptor.forClass(TickerPurchase.class);
+        verify(m_tickerPurchaseRepository).save(purchaseCaptor.capture());
 
         assertEquals(newQuantity, purchaseCaptor.getValue().GetQuantity());
         assertEquals(expectedAmountAfterUpdate,
@@ -1142,12 +1146,12 @@ public class TickerServiceTest
     @DisplayName("Test if exception is thrown when updating a non-existent purchase")
     public void TestUpdatePurchaseNotFound()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.empty());
+        when(m_tickerPurchaseRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
                      () -> { m_tickerService.UpdatePurchase(m_purchase); });
 
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
@@ -1156,7 +1160,8 @@ public class TickerServiceTest
     public void
     TestUpdatePurchaseQuantityLessThanZero()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.of(m_purchase));
+        when(m_tickerPurchaseRepository.findById(1L))
+            .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
         m_purchase.SetQuantity(new BigDecimal("-0.05"));
@@ -1164,7 +1169,7 @@ public class TickerServiceTest
         assertThrows(RuntimeException.class,
                      () -> { m_tickerService.UpdatePurchase(m_purchase); });
 
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
@@ -1173,7 +1178,8 @@ public class TickerServiceTest
     public void
     TestUpdatePurchaseQuantityEqualToZero()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.of(m_purchase));
+        when(m_tickerPurchaseRepository.findById(1L))
+            .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
         m_purchase.SetQuantity(BigDecimal.ZERO);
@@ -1181,14 +1187,15 @@ public class TickerServiceTest
         assertThrows(RuntimeException.class,
                      () -> { m_tickerService.UpdatePurchase(m_purchase); });
 
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
     @DisplayName("Test if purchase unit price is updated successfully")
     public void TestUpdatePurchaseUnitPrice()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.of(m_purchase));
+        when(m_tickerPurchaseRepository.findById(1L))
+            .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
         BigDecimal oldUnitPrice = m_purchase.GetUnitPrice();
@@ -1211,11 +1218,11 @@ public class TickerServiceTest
 
         m_tickerService.UpdatePurchase(m_purchase);
 
-        verify(m_purchaseRepository).save(m_purchase);
+        verify(m_tickerPurchaseRepository).save(m_purchase);
 
-        ArgumentCaptor<Purchase> purchaseCaptor =
-            ArgumentCaptor.forClass(Purchase.class);
-        verify(m_purchaseRepository).save(purchaseCaptor.capture());
+        ArgumentCaptor<TickerPurchase> purchaseCaptor =
+            ArgumentCaptor.forClass(TickerPurchase.class);
+        verify(m_tickerPurchaseRepository).save(purchaseCaptor.capture());
 
         assertEquals(newUnitPrice, purchaseCaptor.getValue().GetUnitPrice());
         assertEquals(expectedAmountAfterUpdate,
@@ -1228,7 +1235,8 @@ public class TickerServiceTest
     public void
     TestUpdatePurchaseUnitPriceLessThanZero()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.of(m_purchase));
+        when(m_tickerPurchaseRepository.findById(1L))
+            .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
         m_purchase.SetUnitPrice(new BigDecimal("-0.05"));
@@ -1236,7 +1244,7 @@ public class TickerServiceTest
         assertThrows(RuntimeException.class,
                      () -> { m_tickerService.UpdatePurchase(m_purchase); });
 
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
@@ -1245,7 +1253,8 @@ public class TickerServiceTest
     public void
     TestUpdatePurchaseUnitPriceEqualToZero()
     {
-        when(m_purchaseRepository.findById(1L)).thenReturn(Optional.of(m_purchase));
+        when(m_tickerPurchaseRepository.findById(1L))
+            .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker));
 
         m_purchase.SetUnitPrice(BigDecimal.ZERO);
@@ -1253,7 +1262,7 @@ public class TickerServiceTest
         assertThrows(RuntimeException.class,
                      () -> { m_tickerService.UpdatePurchase(m_purchase); });
 
-        verify(m_purchaseRepository, never()).save(any(Purchase.class));
+        verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test

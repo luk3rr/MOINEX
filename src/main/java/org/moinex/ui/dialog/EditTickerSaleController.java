@@ -1,5 +1,5 @@
 /*
- * Filename: EditPurchaseController.java
+ * Filename: EditTickerSaleController.java
  * Created on: January 11, 2025
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
@@ -20,7 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
-import org.moinex.entities.investment.Purchase;
+import org.moinex.entities.investment.TickerSale;
 import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
 import org.moinex.services.WalletService;
@@ -33,10 +33,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Edit Purchase dialog
+ * Controller for the Edit Ticker Sale dialog
  */
 @Controller
-public class EditPurchaseController
+public class EditTickerSaleController
 {
     @FXML
     private Label tickerNameLabel;
@@ -69,7 +69,7 @@ public class EditPurchaseController
     private ComboBox<String> categoryComboBox;
 
     @FXML
-    private DatePicker buyDatePicker;
+    private DatePicker saleDatePicker;
 
     @Autowired
     private ConfigurableApplicationContext springContext;
@@ -84,7 +84,7 @@ public class EditPurchaseController
 
     private List<Category> categories;
 
-    private Purchase purchase;
+    private TickerSale sale;
 
     /**
      * Constructor
@@ -94,9 +94,9 @@ public class EditPurchaseController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditPurchaseController(WalletService   walletService,
-                                  CategoryService categoryService,
-                                  TickerService   tickerService)
+    public EditTickerSaleController(WalletService   walletService,
+                                    CategoryService categoryService,
+                                    TickerService   tickerService)
     {
         this.walletService   = walletService;
         this.categoryService = categoryService;
@@ -115,25 +115,25 @@ public class EditPurchaseController
         UpdateWalletBalance();
     }
 
-    public void SetPurchase(Purchase p)
+    public void SetSale(TickerSale s)
     {
-        this.purchase = p;
+        this.sale = s;
 
-        tickerNameLabel.setText(p.GetTicker().GetName() + " (" +
-                                p.GetTicker().GetSymbol() + ")");
-        unitPriceField.setText(p.GetTicker().GetCurrentUnitValue().toString());
+        tickerNameLabel.setText(s.GetTicker().GetName() + " (" +
+                                s.GetTicker().GetSymbol() + ")");
+        unitPriceField.setText(s.GetTicker().GetCurrentUnitValue().toString());
 
-        SetWalletComboBox(p.GetWalletTransaction().GetWallet());
+        SetWalletComboBox(s.GetWalletTransaction().GetWallet());
 
-        descriptionField.setText(p.GetWalletTransaction().GetDescription());
-        unitPriceField.setText(p.GetUnitPrice().toString());
-        quantityField.setText(p.GetQuantity().toString());
-        statusComboBox.setValue(p.GetWalletTransaction().GetStatus().name());
-        categoryComboBox.setValue(p.GetWalletTransaction().GetCategory().GetName());
-        buyDatePicker.setValue(p.GetWalletTransaction().GetDate().toLocalDate());
+        descriptionField.setText(s.GetWalletTransaction().GetDescription());
+        unitPriceField.setText(s.GetUnitPrice().toString());
+        quantityField.setText(s.GetQuantity().toString());
+        statusComboBox.setValue(s.GetWalletTransaction().GetStatus().name());
+        categoryComboBox.setValue(s.GetWalletTransaction().GetCategory().GetName());
+        saleDatePicker.setValue(s.GetWalletTransaction().GetDate().toLocalDate());
 
         totalPriceLabel.setText(
-            UIUtils.FormatCurrency(p.GetWalletTransaction().GetAmount()));
+            UIUtils.FormatCurrency(s.GetWalletTransaction().GetAmount()));
     }
 
     @FXML
@@ -143,7 +143,7 @@ public class EditPurchaseController
         LoadCategories();
 
         // Configure date picker
-        UIUtils.SetDatePickerFormat(buyDatePicker);
+        UIUtils.SetDatePickerFormat(saleDatePicker);
 
         // For each element in enum TransactionStatus, add its name to the
         // statusComboBox
@@ -178,13 +178,13 @@ public class EditPurchaseController
         String    categoryString = categoryComboBox.getValue();
         String    unitPriceStr   = unitPriceField.getText();
         String    quantityStr    = quantityField.getText();
-        LocalDate buyDate        = buyDatePicker.getValue();
+        LocalDate saleDate       = saleDatePicker.getValue();
 
         if (walletName == null || walletName.strip().isEmpty() || description == null ||
             description.strip().isEmpty() || statusString == null ||
             categoryString == null || unitPriceStr == null ||
             unitPriceStr.strip().isEmpty() || quantityStr == null ||
-            quantityStr.strip().isEmpty() || buyDate == null)
+            quantityStr.strip().isEmpty() || saleDate == null)
         {
             WindowUtils.ShowErrorDialog("Error",
                                         "Empty fields",
@@ -212,38 +212,36 @@ public class EditPurchaseController
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             // Check if has any modification
-            if (purchase.GetWalletTransaction().GetWallet().GetId() == wallet.GetId() &&
-                purchase.GetWalletTransaction().GetDescription().equals(description) &&
-                purchase.GetWalletTransaction().GetStatus().equals(status) &&
-                purchase.GetWalletTransaction().GetCategory().GetId() ==
-                    category.GetId() &&
-                purchase.GetUnitPrice().compareTo(unitPrice) == 0 &&
-                purchase.GetQuantity().compareTo(quantity) == 0 &&
-                purchase.GetWalletTransaction().GetDate().toLocalDate().equals(buyDate))
+            if (sale.GetWalletTransaction().GetWallet().GetId() == wallet.GetId() &&
+                sale.GetWalletTransaction().GetDescription().equals(description) &&
+                sale.GetWalletTransaction().GetStatus().equals(status) &&
+                sale.GetWalletTransaction().GetCategory().GetId() == category.GetId() &&
+                sale.GetUnitPrice().compareTo(unitPrice) == 0 &&
+                sale.GetQuantity().compareTo(quantity) == 0 &&
+                sale.GetWalletTransaction().GetDate().toLocalDate().equals(saleDate))
             {
-                WindowUtils.ShowInformationDialog(
-                    "Information",
-                    "No changes",
-                    "No changes were made to the purchase.");
+                WindowUtils.ShowInformationDialog("Info",
+                                                  "No changes",
+                                                  "No changes were made to the sale");
             }
             else // If there is any modification, update the transaction
             {
                 LocalTime     currentTime             = LocalTime.now();
-                LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
+                LocalDateTime dateTimeWithCurrentHour = saleDate.atTime(currentTime);
 
-                purchase.GetWalletTransaction().SetWallet(wallet);
-                purchase.GetWalletTransaction().SetDescription(description);
-                purchase.GetWalletTransaction().SetStatus(status);
-                purchase.GetWalletTransaction().SetCategory(category);
-                purchase.SetUnitPrice(unitPrice);
-                purchase.SetQuantity(quantity);
-                purchase.GetWalletTransaction().SetDate(dateTimeWithCurrentHour);
+                sale.GetWalletTransaction().SetWallet(wallet);
+                sale.GetWalletTransaction().SetDescription(description);
+                sale.GetWalletTransaction().SetStatus(status);
+                sale.GetWalletTransaction().SetCategory(category);
+                sale.SetUnitPrice(unitPrice);
+                sale.SetQuantity(quantity);
+                sale.GetWalletTransaction().SetDate(dateTimeWithCurrentHour);
 
-                tickerService.UpdatePurchase(purchase);
+                tickerService.UpdateSale(sale);
 
                 WindowUtils.ShowSuccessDialog("Success",
-                                              "Purchase updated",
-                                              "Purchase updated successfully");
+                                              "TickerSale updated",
+                                              "TickerSale updated successfully");
             }
 
             Stage stage = (Stage)tickerNameLabel.getScene().getWindow();
@@ -258,7 +256,7 @@ public class EditPurchaseController
         catch (RuntimeException e)
         {
             WindowUtils.ShowErrorDialog("Error",
-                                        "Error while updating purchase",
+                                        "Error while updating sale",
                                         e.getMessage());
         }
     }
@@ -342,10 +340,10 @@ public class EditPurchaseController
 
         try
         {
-            BigDecimal buyValue =
+            BigDecimal saleValue =
                 new BigDecimal(unitPriceStr).multiply(new BigDecimal(quantityStr));
 
-            if (buyValue.compareTo(BigDecimal.ZERO) < 0)
+            if (saleValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 UIUtils.ResetLabel(walletAfterBalanceValueLabel);
                 return;
@@ -358,21 +356,21 @@ public class EditPurchaseController
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
-            if (purchase.GetWalletTransaction().GetStatus().equals(
+            if (sale.GetWalletTransaction().GetStatus().equals(
                     TransactionStatus.CONFIRMED))
             {
                 // If the transaction is confirmed, the balance will be updated
                 // based on the difference between the new and the old value
                 BigDecimal diff =
-                    buyValue.subtract(purchase.GetWalletTransaction().GetAmount());
+                    saleValue.subtract(sale.GetWalletTransaction().GetAmount());
 
-                walletAfterBalanceValue = wallet.GetBalance().subtract(diff);
+                walletAfterBalanceValue = wallet.GetBalance().add(diff);
             }
             else
             {
                 // If the transaction is not confirmed, the balance will be
                 // updated based on the new value
-                walletAfterBalanceValue = wallet.GetBalance().subtract(buyValue);
+                walletAfterBalanceValue = wallet.GetBalance().add(saleValue);
             }
 
             // Episilon is used to avoid floating point arithmetic errors

@@ -28,12 +28,12 @@ import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Dividend;
-import org.moinex.entities.investment.Purchase;
-import org.moinex.entities.investment.Sale;
+import org.moinex.entities.investment.TickerPurchase;
+import org.moinex.entities.investment.TickerSale;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.repositories.DividendRepository;
-import org.moinex.repositories.PurchaseRepository;
-import org.moinex.repositories.SaleRepository;
+import org.moinex.repositories.TickerPurchaseRepository;
+import org.moinex.repositories.TickerSaleRepository;
 import org.moinex.repositories.TickerRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.util.Constants;
@@ -54,10 +54,10 @@ public class TickerService
     private TickerRepository m_tickerRepository;
 
     @Autowired
-    private PurchaseRepository m_purchaseRepository;
+    private TickerPurchaseRepository m_tickerPurchaseRepository;
 
     @Autowired
-    private SaleRepository m_saleRepository;
+    private TickerSaleRepository m_tickerSaleRepository;
 
     @Autowired
     private DividendRepository m_dividendRepository;
@@ -440,10 +440,10 @@ public class TickerService
         WalletTransaction walletTransaction =
             m_walletTransactionService.GetTransactionById(id);
 
-        Purchase purchase =
-            new Purchase(ticker, quantity, unitPrice, walletTransaction);
+        TickerPurchase purchase =
+            new TickerPurchase(ticker, quantity, unitPrice, walletTransaction);
 
-        m_purchaseRepository.save(purchase);
+        m_tickerPurchaseRepository.save(purchase);
 
         // Update holdings quantity
         ticker.SetCurrentQuantity(ticker.GetCurrentQuantity().add(quantity));
@@ -461,7 +461,7 @@ public class TickerService
 
         ticker.SetAveragePriceCount(ticker.GetAveragePriceCount().add(quantity));
 
-        logger.info("Purchase with id " + purchase.GetId() + " added to ticker " +
+        logger.info("TickerPurchase with id " + purchase.GetId() + " added to ticker " +
                     ticker.GetSymbol() + ". Wallet transaction with id " + id +
                     " created for the purchase and added to wallet with id " +
                     walletId);
@@ -520,13 +520,13 @@ public class TickerService
         WalletTransaction walletTransaction =
             m_walletTransactionService.GetTransactionById(id);
 
-        Sale sale = new Sale(ticker,
+        TickerSale sale = new TickerSale(ticker,
                              quantity,
                              unitPrice,
                              walletTransaction,
                              ticker.GetAveragePrice());
 
-        m_saleRepository.save(sale);
+        m_tickerSaleRepository.save(sale);
 
         // Update holdings quantity
         ticker.SetCurrentQuantity(ticker.GetCurrentQuantity().subtract(quantity));
@@ -539,7 +539,7 @@ public class TickerService
 
         m_tickerRepository.save(ticker);
 
-        logger.info("Sale with id " + sale.GetId() + " added to ticker " +
+        logger.info("TickerSale with id " + sale.GetId() + " added to ticker " +
                     ticker.GetSymbol() + ". Wallet transaction with id " + id +
                     " created for the sale and added to wallet with id " + walletId);
     }
@@ -599,21 +599,21 @@ public class TickerService
     @Transactional
     public void DeletePurchase(Long purchaseId)
     {
-        Purchase purchase =
-            m_purchaseRepository.findById(purchaseId)
+        TickerPurchase purchase =
+            m_tickerPurchaseRepository.findById(purchaseId)
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Purchase with id " + purchaseId +
+                        -> new RuntimeException("TickerPurchase with id " + purchaseId +
                                                 " not found and cannot be deleted"));
 
         // Delete purchase before deleting wallet transaction to avoid
         // foreign key constraint violation
-        m_purchaseRepository.delete(purchase);
+        m_tickerPurchaseRepository.delete(purchase);
 
         m_walletTransactionService.DeleteTransaction(
             purchase.GetWalletTransaction().GetId());
 
-        logger.info("Purchase with id " + purchaseId + " was deleted");
+        logger.info("TickerPurchase with id " + purchaseId + " was deleted");
     }
 
     /**
@@ -624,19 +624,19 @@ public class TickerService
     @Transactional
     public void DeleteSale(Long saleId)
     {
-        Sale sale = m_saleRepository.findById(saleId).orElseThrow(
+        TickerSale sale = m_tickerSaleRepository.findById(saleId).orElseThrow(
             ()
-                -> new RuntimeException("Sale with id " + saleId +
+                -> new RuntimeException("TickerSale with id " + saleId +
                                         " not found and cannot be deleted"));
 
         // Delete sale before deleting wallet transaction to avoid
         // foreign key constraint violation
-        m_saleRepository.delete(sale);
+        m_tickerSaleRepository.delete(sale);
 
         m_walletTransactionService.DeleteTransaction(
             sale.GetWalletTransaction().GetId());
 
-        logger.info("Sale with id " + saleId + " was deleted");
+        logger.info("TickerSale with id " + saleId + " was deleted");
     }
 
     /**
@@ -673,13 +673,13 @@ public class TickerService
      * @throws RuntimeException If the unit price is less than or equal to zero
      */
     @Transactional
-    public void UpdatePurchase(Purchase purchase)
+    public void UpdatePurchase(TickerPurchase purchase)
     {
-        Purchase oldPurchase =
-            m_purchaseRepository.findById(purchase.GetId())
+        TickerPurchase oldPurchase =
+            m_tickerPurchaseRepository.findById(purchase.GetId())
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Purchase with id " + purchase.GetId() +
+                        -> new RuntimeException("TickerPurchase with id " + purchase.GetId() +
                                                 " not found and cannot be updated"));
 
         m_tickerRepository.findById(purchase.GetTicker().GetId())
@@ -706,9 +706,9 @@ public class TickerService
 
         m_walletTransactionService.UpdateTransaction(purchase.GetWalletTransaction());
 
-        m_purchaseRepository.save(oldPurchase);
+        m_tickerPurchaseRepository.save(oldPurchase);
 
-        logger.info("Purchase with id " + purchase.GetId() + " was updated");
+        logger.info("TickerPurchase with id " + purchase.GetId() + " was updated");
     }
 
     /**
@@ -720,12 +720,12 @@ public class TickerService
      * @throws RuntimeException If the unit price is less than or equal to zero
      */
     @Transactional
-    public void UpdateSale(Sale sale)
+    public void UpdateSale(TickerSale sale)
     {
-        Sale oldSale = m_saleRepository.findById(sale.GetId())
+        TickerSale oldSale = m_tickerSaleRepository.findById(sale.GetId())
                            .orElseThrow(()
                                             -> new RuntimeException(
-                                                "Sale with id " + sale.GetId() +
+                                                "TickerSale with id " + sale.GetId() +
                                                 " not found and cannot be updated"));
 
         m_tickerRepository.findById(sale.GetTicker().GetId())
@@ -752,9 +752,9 @@ public class TickerService
 
         m_walletTransactionService.UpdateTransaction(sale.GetWalletTransaction());
 
-        m_saleRepository.save(oldSale);
+        m_tickerSaleRepository.save(oldSale);
 
-        logger.info("Sale with id " + sale.GetId() + " was updated");
+        logger.info("TickerSale with id " + sale.GetId() + " was updated");
     }
 
     /**
@@ -874,18 +874,18 @@ public class TickerService
      * Get all purchases
      * @return A list with all purchases
      */
-    public List<Purchase> GetAllPurchases()
+    public List<TickerPurchase> GetAllPurchases()
     {
-        return m_purchaseRepository.findAll();
+        return m_tickerPurchaseRepository.findAll();
     }
 
     /**
      * Get all sales
      * @return A list with all sales
      */
-    public List<Sale> GetAllSales()
+    public List<TickerSale> GetAllSales()
     {
-        return m_saleRepository.findAll();
+        return m_tickerSaleRepository.findAll();
     }
 
     /**

@@ -20,8 +20,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Dividend;
-import org.moinex.entities.investment.Purchase;
-import org.moinex.entities.investment.Sale;
+import org.moinex.entities.investment.TickerPurchase;
+import org.moinex.entities.investment.TickerSale;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.TransactionStatus;
@@ -39,10 +39,10 @@ import org.springframework.stereotype.Controller;
 public class InvestmentTransactionsController
 {
     @FXML
-    private TableView<Purchase> purchaseTableView;
+    private TableView<TickerPurchase> purchaseTableView;
 
     @FXML
-    private TableView<Sale> saleTableView;
+    private TableView<TickerSale> saleTableView;
 
     @FXML
     private TableView<Dividend> dividendTableView;
@@ -56,9 +56,9 @@ public class InvestmentTransactionsController
     @Autowired
     private ConfigurableApplicationContext springContext;
 
-    private List<Purchase> purchases;
+    private List<TickerPurchase> purchases;
 
-    private List<Sale> sales;
+    private List<TickerSale> sales;
 
     private List<Dividend> dividends;
 
@@ -110,14 +110,15 @@ public class InvestmentTransactionsController
 
         if (selectedTab == tabPane.getTabs().get(0))
         {
-            Purchase selectedPurchase =
+            TickerPurchase selectedPurchase =
                 purchaseTableView.getSelectionModel().getSelectedItem();
 
             EditPurchase(selectedPurchase);
         }
         else if (selectedTab == tabPane.getTabs().get(1))
         {
-            Sale selectedSale = saleTableView.getSelectionModel().getSelectedItem();
+            TickerSale selectedSale =
+                saleTableView.getSelectionModel().getSelectedItem();
 
             EditSale(selectedSale);
         }
@@ -142,14 +143,15 @@ public class InvestmentTransactionsController
 
         if (selectedTab == tabPane.getTabs().get(0))
         {
-            Purchase selectedPurchase =
+            TickerPurchase selectedPurchase =
                 purchaseTableView.getSelectionModel().getSelectedItem();
 
             DeletePurchase(selectedPurchase);
         }
         else if (selectedTab == tabPane.getTabs().get(1))
         {
-            Sale selectedSale = saleTableView.getSelectionModel().getSelectedItem();
+            TickerSale selectedSale =
+                saleTableView.getSelectionModel().getSelectedItem();
 
             DeleteSale(selectedSale);
         }
@@ -335,13 +337,13 @@ public class InvestmentTransactionsController
      */
     private void ConfigurePurchaseTableView()
     {
-        TableColumn<Purchase, Long> idColumn = new TableColumn<>("ID");
+        TableColumn<TickerPurchase, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
             param -> new SimpleObjectProperty<>(param.getValue().GetId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
-            return new TableCell<Purchase, Long>() {
+            return new TableCell<TickerPurchase, Long>() {
                 @Override
                 protected void updateItem(Long item, boolean empty)
                 {
@@ -361,49 +363,55 @@ public class InvestmentTransactionsController
             };
         });
 
-        TableColumn<Purchase, String> tickerNameColumn = new TableColumn<>("Ticker");
+        TableColumn<TickerPurchase, String> tickerNameColumn =
+            new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(param.getValue().GetTicker().GetName() + " (" +
                                         param.getValue().GetTicker().GetSymbol() +
                                         ")"));
 
-        TableColumn<Purchase, String> tickerTypeColumn = new TableColumn<>("Type");
+        TableColumn<TickerPurchase, String> tickerTypeColumn =
+            new TableColumn<>("Type");
         tickerTypeColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(param.getValue().GetTicker().GetType().name()));
 
-        TableColumn<Purchase, String> dateColumn = new TableColumn<>("Date");
+        TableColumn<TickerPurchase, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
                 param.getValue().GetWalletTransaction().GetDate().format(
                     Constants.DATE_FORMATTER_WITH_TIME)));
 
-        TableColumn<Purchase, String> quantityColumn = new TableColumn<>("Quantity");
+        TableColumn<TickerPurchase, String> quantityColumn =
+            new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(param.getValue().GetQuantity().toString()));
 
-        TableColumn<Purchase, String> unitPriceColumn = new TableColumn<>("Unit Price");
+        TableColumn<TickerPurchase, String> unitPriceColumn =
+            new TableColumn<>("Unit Price");
         unitPriceColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
                 UIUtils.FormatCurrency(param.getValue().GetUnitPrice())));
 
-        TableColumn<Purchase, String> amountColumn = new TableColumn<>("Total Amount");
+        TableColumn<TickerPurchase, String> amountColumn =
+            new TableColumn<>("Total Amount");
         amountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(UIUtils.FormatCurrency(
                 param.getValue().GetWalletTransaction().GetAmount())));
 
-        TableColumn<Purchase, String> walletNameColumn = new TableColumn<>("Wallet");
+        TableColumn<TickerPurchase, String> walletNameColumn =
+            new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
                 param.getValue().GetWalletTransaction().GetWallet().GetName()));
 
-        TableColumn<Purchase, String> statusColumn = new TableColumn<>("Status");
+        TableColumn<TickerPurchase, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
@@ -426,13 +434,13 @@ public class InvestmentTransactionsController
      */
     private void ConfigureSaleTableView()
     {
-        TableColumn<Sale, Long> idColumn = new TableColumn<>("ID");
+        TableColumn<TickerSale, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
             param -> new SimpleObjectProperty<>(param.getValue().GetId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
-            return new TableCell<Sale, Long>() {
+            return new TableCell<TickerSale, Long>() {
                 @Override
                 protected void updateItem(Long item, boolean empty)
                 {
@@ -452,49 +460,51 @@ public class InvestmentTransactionsController
             };
         });
 
-        TableColumn<Sale, String> tickerNameColumn = new TableColumn<>("Ticker");
+        TableColumn<TickerSale, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(param.getValue().GetTicker().GetName() + " (" +
                                         param.getValue().GetTicker().GetSymbol() +
                                         ")"));
 
-        TableColumn<Sale, String> tickerTypeColumn = new TableColumn<>("Type");
+        TableColumn<TickerSale, String> tickerTypeColumn = new TableColumn<>("Type");
         tickerTypeColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(param.getValue().GetTicker().GetType().name()));
 
-        TableColumn<Sale, String> dateColumn = new TableColumn<>("Date");
+        TableColumn<TickerSale, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
                 param.getValue().GetWalletTransaction().GetDate().format(
                     Constants.DATE_FORMATTER_WITH_TIME)));
 
-        TableColumn<Sale, String> quantityColumn = new TableColumn<>("Quantity");
+        TableColumn<TickerSale, String> quantityColumn = new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(param.getValue().GetQuantity().toString()));
 
-        TableColumn<Sale, String> unitPriceColumn = new TableColumn<>("Unit Price");
+        TableColumn<TickerSale, String> unitPriceColumn =
+            new TableColumn<>("Unit Price");
         unitPriceColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
                 UIUtils.FormatCurrency(param.getValue().GetUnitPrice())));
 
-        TableColumn<Sale, String> amountColumn = new TableColumn<>("Total Amount");
+        TableColumn<TickerSale, String> amountColumn =
+            new TableColumn<>("Total Amount");
         amountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(UIUtils.FormatCurrency(
                 param.getValue().GetWalletTransaction().GetAmount())));
 
-        TableColumn<Sale, String> walletNameColumn = new TableColumn<>("Wallet");
+        TableColumn<TickerSale, String> walletNameColumn = new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
                 param.getValue().GetWalletTransaction().GetWallet().GetName()));
 
-        TableColumn<Sale, String> statusColumn = new TableColumn<>("Status");
+        TableColumn<TickerSale, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
@@ -590,7 +600,7 @@ public class InvestmentTransactionsController
         dividendTableView.getColumns().add(statusColumn);
     }
 
-    private void EditPurchase(Purchase purchase)
+    private void EditPurchase(TickerPurchase purchase)
     {
         if (purchase == null)
         {
@@ -601,10 +611,10 @@ public class InvestmentTransactionsController
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_PURCHASE_FXML,
-                                    "Edit purchase",
+        WindowUtils.OpenModalWindow(Constants.EDIT_TICKER_PURCHASE_FXML,
+                                    "Edit ticker purchase",
                                     springContext,
-                                    (EditPurchaseController controller)
+                                    (EditTickerPurchaseController controller)
                                         -> controller.SetPurchase(purchase),
                                     List.of(() -> {
                                         LoadPurchasesFromDatabase();
@@ -612,7 +622,7 @@ public class InvestmentTransactionsController
                                     }));
     }
 
-    private void EditSale(Sale sale)
+    private void EditSale(TickerSale sale)
     {
         if (sale == null)
         {
@@ -623,10 +633,10 @@ public class InvestmentTransactionsController
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_SALE_FXML,
-                                    "Edit sale",
+        WindowUtils.OpenModalWindow(Constants.EDIT_TICKER_SALE_FXML,
+                                    "Edit ticker sale",
                                     springContext,
-                                    (EditSaleController controller)
+                                    (EditTickerSaleController controller)
                                         -> controller.SetSale(sale),
                                     List.of(() -> {
                                         LoadSalesFromDatabase();
@@ -656,7 +666,7 @@ public class InvestmentTransactionsController
                                     }));
     }
 
-    private void DeletePurchase(Purchase purchase)
+    private void DeletePurchase(TickerPurchase purchase)
     {
         if (purchase == null)
         {
@@ -679,7 +689,7 @@ public class InvestmentTransactionsController
         }
     }
 
-    private void DeleteSale(Sale sale)
+    private void DeleteSale(TickerSale sale)
     {
         if (sale == null)
         {
