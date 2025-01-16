@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane minWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsController">
+<AnchorPane maxHeight="800.0" minWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsController">
    <children>
       <TabPane layoutX="59.0" layoutY="71.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -27,7 +27,7 @@
                      <children>
                         <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <AnchorPane prefHeight="200.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
                                     <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
@@ -91,22 +91,293 @@
                                     </HBox>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                              <AnchorPane VBox.vgrow="ALWAYS">
                                  <children>
-                                    <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <HBox spacing="10.0" VBox.vgrow="ALWAYS">
+                                          <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <VBox HBox.hgrow="ALWAYS">
-                                                   <children>
-                                                      <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="Portfolio" />
-                                                      <AnchorPane fx:id="overviewTabBottonPaneChart" VBox.vgrow="ALWAYS" />
-                                                   </children>
-                                                </VBox>
+                                                <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="Portfolio" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <padding>
+                                                      <Insets left="10.0" top="10.0" />
+                                                   </padding>
+                                                </Label>
                                              </children>
-                                          </HBox>
+                                          </AnchorPane>
+                                          <VBox spacing="10.0">
+                                             <children>
+                                                <AnchorPane prefWidth="300.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <children>
+                                                            <Label fx:id="overviewTabBottonPaneTitle111" styleClass="title" text="Brazilian Market Indicators" />
+                                                            <AnchorPane fx:id="overviewTabBottonPaneChart111" VBox.vgrow="ALWAYS">
+                                                               <children>
+                                                                  <VBox fx:id="body11" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                     <children>
+                                                                        <HBox fx:id="openingBalance11" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="openingBalanceDescription11" text="Selic" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="openingBalanceSign11" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="openingBalanceValue11" text="0.00 %">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="incomes11" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="incomesDescription11" text="IPCA mm/yyyy" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="incomesSign11" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="incomesValue11" text="0.00 %">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="expenses11" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="expensesDescription11" text="IPCA 12 months" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="expensesSign11" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="expensesValue11" text="0.00 %">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                     </children>
+                                                                     <padding>
+                                                                        <Insets left="5.0" right="5.0" />
+                                                                     </padding>
+                                                                  </VBox>
+                                                               </children>
+                                                            </AnchorPane>
+                                                         </children>
+                                                      </VBox>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <children>
+                                                            <Label fx:id="overviewTabBottonPaneTitle1111" styleClass="title" text="Market Quotes" />
+                                                            <AnchorPane fx:id="overviewTabBottonPaneChart1111" VBox.vgrow="ALWAYS">
+                                                               <children>
+                                                                  <VBox fx:id="body111" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                     <children>
+                                                                        <HBox fx:id="openingBalance111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="openingBalanceDescription111" text="Dolar" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="openingBalanceSign111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="openingBalanceValue111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="incomes111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="incomesDescription111" text="Euro" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="incomesSign111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="incomesValue111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="debitedTransfers1111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="debitedTransfersDescription1111" text="Ibovespa" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="debitedTransfersSign1111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="debitedTransfersValue1111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="expenses111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="expensesDescription111" text="Bitcoin" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="expensesSign111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="expensesValue111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="creditedTransfers111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="creditedTransfersDescription111" text="Ethereum" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="creditedTransfersSign111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="creditedTransfersValue111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                     </children>
+                                                                     <padding>
+                                                                        <Insets left="5.0" right="5.0" />
+                                                                     </padding>
+                                                                  </VBox>
+                                                               </children>
+                                                            </AnchorPane>
+                                                         </children>
+                                                      </VBox>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                                                   <children>
+                                                      <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <children>
+                                                            <Label fx:id="overviewTabBottonPaneTitle11111" styleClass="title" text="Commodities" />
+                                                            <AnchorPane fx:id="overviewTabBottonPaneChart11111" VBox.vgrow="ALWAYS">
+                                                               <children>
+                                                                  <VBox fx:id="body1111" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                     <children>
+                                                                        <HBox fx:id="openingBalance1111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="openingBalanceDescription1111" text="Gold" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="openingBalanceSign1111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="openingBalanceValue1111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="incomes1111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="incomesDescription1111" text="Soybean" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="incomesSign1111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="incomesValue1111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="debitedTransfers11111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="debitedTransfersDescription11111" text="Coffee" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="debitedTransfersSign11111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="debitedTransfersValue11111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="expenses1111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="expensesDescription1111" text="Wheat" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="expensesSign1111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="expensesValue1111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox fx:id="creditedTransfers1111" alignment="CENTER_LEFT">
+                                                                           <children>
+                                                                              <Label fx:id="creditedTransfersDescription1111" text="Oil Brent" />
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="creditedTransfersSign1111" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="creditedTransfersValue1111" text="\$ 0.00">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                        </HBox>
+                                                                     </children>
+                                                                     <padding>
+                                                                        <Insets left="5.0" right="5.0" />
+                                                                     </padding>
+                                                                  </VBox>
+                                                               </children>
+                                                            </AnchorPane>
+                                                         </children>
+                                                      </VBox>
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                          </VBox>
                                        </children>
-                                    </VBox>
+                                    </HBox>
                                  </children>
                               </AnchorPane>
                            </children>
