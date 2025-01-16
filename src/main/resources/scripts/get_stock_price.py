@@ -55,7 +55,7 @@ def main():
         symbol: ticker.info["currency"] for symbol, ticker in tickers.tickers.items()
     }
 
-    conversion_rates = {DEFAULT_CURRENCY: 1}
+    conversion_rates = {DEFAULT_CURRENCY: 1.0}
 
     result = {}
 
