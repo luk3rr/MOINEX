@@ -26,8 +26,10 @@ public final class Constants
 
     public static final String PYTHON_INTERPRETER = "/usr/bin/python3";
 
-    public static final String GET_STOCK_PRICE_SCRIPT =
-        SCRIPT_PATH + "get_stock_price.py";
+    public static final String GET_STOCK_PRICE_SCRIPT = "get_stock_price.py";
+
+    public static final String GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT =
+        "get_brazilian_market_indicators.py";
 
     // Paths
     public static final String WALLET_TYPE_ICONS_PATH  = "/icon/wallet_type/";
@@ -310,6 +312,20 @@ public final class Constants
     public static final Integer INVESTMENT_CALCULATION_PRECISION = 18;
     public static final String  INVESTMENT_VALUE_REGEX =
         "\\d*\\.?\\d{0," + INVESTMENT_CALCULATION_PRECISION + "}";
+
+    // Yahoo Finance API constants
+    public static final String IBOVESPA_TICKER = "^BVSP";
+    public static final String DOLLAR_TICKER   = "USDBRL=X";
+    public static final String EURO_TICKER     = "EURBRL=X";
+
+    public static final String GOLD_TICKER           = "GC=F";
+    public static final String SOYBEAN_TICKER        = "ZS=F";
+    public static final String COFFEE_ARABICA_TICKER = "KC=F";
+    public static final String WHEAT_TICKER          = "ZW=F";
+    public static final String OIL_BRENT_TICKER      = "BZ=F";
+
+    public static final String BITCOIN_TICKER  = "BTC-USD";
+    public static final String ETHEREUM_TICKER = "ETH-USD";
 
     /**
      * Get a regex that matches digits up to n

@@ -24,16 +24,28 @@ def get_conversion_rate(
     @param to_currency: The currency to convert to
     @return: The conversion rate from the source currency to the target currency
     """
+    # Case the source or target currency is 'USX', convert to dollar (USD) first
+    # USX is a virtual currency that represents cents of dollar
+    if from_currency == "USX":
+        base_rate = get_conversion_rate("USD", to_currency)
+        return base_rate / 100
+    elif to_currency == "USX":
+        base_rate = get_conversion_rate(from_currency, "USD")
+        return base_rate * 100
+
+    # Get the exchange rates from the API
     url = f"{EXCHANGE_API_URL_BASE}/{from_currency}"
     response = requests.get(url)
 
     if response.status_code == 200:
         data = response.json()
-        # Check if the currency is in the response
+
         if to_currency in data["rates"]:
             return data["rates"][to_currency]
         else:
-            raise ValueError(f"Currency {to_currency} not found in the response")
+            raise ValueError(
+                f"Currency {to_currency} or {from_currency} not found in the response"
+            )
     else:
         raise Exception("Failed to get the conversion rate")
 

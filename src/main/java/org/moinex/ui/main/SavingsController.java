@@ -7,6 +7,7 @@
 package org.moinex.ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.List;
 import javafx.application.Platform;
@@ -17,6 +18,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -25,10 +27,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
+import org.json.JSONObject;
+import org.moinex.entities.investment.BrazilianMarketIndicators;
 import org.moinex.entities.investment.Dividend;
+import org.moinex.entities.investment.MarketQuotesAndCommodities;
+import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
-import org.moinex.entities.investment.Ticker;
+import org.moinex.services.MarketService;
 import org.moinex.services.TickerService;
 import org.moinex.ui.dialog.AddDividendController;
 import org.moinex.ui.dialog.AddTickerController;
@@ -37,6 +43,7 @@ import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
 import org.moinex.ui.dialog.InvestmentTransactionsController;
 import org.moinex.ui.dialog.SaleTickerController;
+import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.UIUtils;
@@ -73,17 +80,61 @@ public class SavingsController
     private ComboBox<TickerType> stocksFundsTabTickerTypeComboBox;
 
     @FXML
-    private JFXButton updatePricesButton;
+    private JFXButton updatePortfolioPricesButton;
 
     @FXML
     private ImageView updatePricesButtonIcon;
 
+    @FXML
+    private Label overviewTabSelicValueField;
+
+    @FXML
+    private Label overviewTabIPCALastMonthValueField;
+
+    @FXML
+    private Label overviewTabIPCALastMonthDescriptionField;
+
+    @FXML
+    private Label overviewTabIPCA12MonthsValueField;
+
+    @FXML
+    private Label overviewTabDollarValueField;
+
+    @FXML
+    private Label overviewTabEuroValueField;
+
+    @FXML
+    private Label overviewTabIbovespaValueField;
+
+    @FXML
+    private Label overviewTabBitcoinValueField;
+
+    @FXML
+    private Label overviewTabEthereumValueField;
+
+    @FXML
+    private Label overviewTabGoldValueField;
+
+    @FXML
+    private Label overviewTabSoybeanValueField;
+
+    @FXML
+    private Label overviewTabCoffeeValueField;
+
+    @FXML
+    private Label overviewTabWheatValueField;
+
+    @FXML
+    private Label overviewTabOilBrentValueField;
+
     @Autowired
     private ConfigurableApplicationContext springContext;
 
-    Boolean isUpdatingPrices = false;
+    Boolean isUpdatingPortfolioPrices = false;
 
     private TickerService tickerService;
+
+    private MarketService marketService;
 
     private List<Ticker> tickers;
 
@@ -93,6 +144,10 @@ public class SavingsController
 
     private List<Dividend> dividends;
 
+    private BrazilianMarketIndicators brazilianMarketIndicators;
+
+    private MarketQuotesAndCommodities marketQuotesAndCommodities;
+
     private BigDecimal netCapitalInvested;
     private BigDecimal currentValue;
     private BigDecimal profitLoss;
@@ -101,29 +156,37 @@ public class SavingsController
     /**
      * Constructor
      * @param tickerService The ticker service
+     * @param marketService The market service
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public SavingsController(TickerService tickerService)
+    public SavingsController(TickerService tickerService, MarketService marketService)
     {
         this.tickerService = tickerService;
+        this.marketService = marketService;
     }
 
     @FXML
     private void initialize()
     {
+        LoadBrazilianMarketIndicatorsFromDatabase();
+        LoadMarketQuotesAndCommoditiesFromDatabase();
+
         ConfigureTableView();
         PopulateTickerTypeComboBox();
-        UpdateTransactionTableView();
-        UpdateIndicators();
 
-        if (isUpdatingPrices)
+        UpdateTransactionTableView();
+        UpdatePortfolioIndicators();
+        UpdateBrazilianMarketIndicators();
+        UpdateMarketQuotesAndCommodities();
+
+        if (isUpdatingPortfolioPrices)
         {
-            SetOffUpdatePricesButton();
+            SetOffUpdatePortfolioPricesButton();
         }
         else
         {
-            SetOnUpdatePricesButton();
+            SetOnUpdatePortfolioPricesButton();
         }
 
         ConfigureListeners();
@@ -139,7 +202,7 @@ public class SavingsController
                                         -> {},
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
@@ -164,7 +227,7 @@ public class SavingsController
                                         -> controller.SetTicker(selectedTicker),
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
@@ -189,7 +252,7 @@ public class SavingsController
                                         -> controller.SetTicker(selectedTicker),
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
@@ -215,7 +278,7 @@ public class SavingsController
                                         -> controller.SetTicker(selectedTicker),
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
@@ -229,7 +292,7 @@ public class SavingsController
                                         -> {},
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
@@ -243,14 +306,14 @@ public class SavingsController
                                         -> {},
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
     @FXML
-    private void handleUpdatePrices()
+    private void handleUpdatePortfolioPrices()
     {
-        Platform.runLater(this::SetOffUpdatePricesButton);
+        Platform.runLater(this::SetOffUpdatePortfolioPricesButton);
 
         tickerService
             .UpdateTickersPriceFromAPIAsync(stocksFundsTabTickerTable.getItems())
@@ -289,14 +352,14 @@ public class SavingsController
                     WindowUtils.ShowErrorDialog("Error",
                                                 "Error updating prices",
                                                 e.getMessage());
-                    SetOnUpdatePricesButton();
+                    SetOnUpdatePortfolioPricesButton();
                 });
                 return null;
             })
             .whenComplete((v, e) -> Platform.runLater(() -> {
-                SetOnUpdatePricesButton();
+                SetOnUpdatePortfolioPricesButton();
                 UpdateTransactionTableView();
-                UpdateIndicators();
+                UpdatePortfolioIndicators();
             }));
     }
 
@@ -321,7 +384,7 @@ public class SavingsController
                                         -> controller.SetTicker(selectedTicker),
                                     List.of(() -> {
                                         UpdateTransactionTableView();
-                                        UpdateIndicators();
+                                        UpdatePortfolioIndicators();
                                     }));
     }
 
@@ -403,6 +466,64 @@ public class SavingsController
     }
 
     /**
+     * Load the Brazilian market indicators from the database
+     */
+    private void LoadBrazilianMarketIndicatorsFromDatabase()
+    {
+        try
+        {
+            brazilianMarketIndicators = marketService.GetBrazilianMarketIndicators();
+        }
+        catch (RuntimeException e)
+        {
+            // If the indicators are not found in the database, update them from the
+            // API
+            marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync()
+                .thenAccept(brazilianMarketIndicators -> {
+                    this.brazilianMarketIndicators = brazilianMarketIndicators;
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        WindowUtils.ShowErrorDialog(
+                            "Error",
+                            "Error updating Brazilian market indicators",
+                            ex.getMessage());
+                    });
+                    return null;
+                });
+        }
+    }
+
+    /**
+     * Load the market quotes and commodities from the database
+     */
+    private void LoadMarketQuotesAndCommoditiesFromDatabase()
+    {
+        try
+        {
+            marketQuotesAndCommodities = marketService.GetMarketQuotesAndCommodities();
+        }
+        catch (RuntimeException e)
+        {
+            // If the market quotes and commodities are not found in the database,
+            // update them from the API
+            marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync()
+                .thenAccept(marketQuotesAndCommodities -> {
+                    this.marketQuotesAndCommodities = marketQuotesAndCommodities;
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        WindowUtils.ShowErrorDialog(
+                            "Error",
+                            "Error updating market quotes and commodities",
+                            ex.getMessage());
+                    });
+                    return null;
+                });
+        }
+    }
+
+    /**
      * Update the net capital invested field
      */
     private void UpdateNetCapitalInvestedField()
@@ -456,9 +577,9 @@ public class SavingsController
     }
 
     /**
-     * Update the indicators
+     * Update the portfolio indicators
      */
-    private void UpdateIndicators()
+    private void UpdatePortfolioIndicators()
     {
         LoadTickersFromDatabase();
         LoadPurchasesFromDatabase();
@@ -657,25 +778,81 @@ public class SavingsController
         stocksFundsTabTickerTable.getColumns().add(avgUnitColumn);
     }
 
-    private void SetOffUpdatePricesButton()
+    private void SetOffUpdatePortfolioPricesButton()
     {
         updatePricesButtonIcon.setImage(
             new Image(getClass().getResource(Constants.LOADING_GIF).toExternalForm()));
-        updatePricesButton.setDisable(true);
-        updatePricesButton.setText("Updating...");
+        updatePortfolioPricesButton.setDisable(true);
+        updatePortfolioPricesButton.setText("Updating...");
 
-        isUpdatingPrices = true;
+        isUpdatingPortfolioPrices = true;
     }
 
-    private void SetOnUpdatePricesButton()
+    private void SetOnUpdatePortfolioPricesButton()
     {
-        updatePricesButton.setDisable(false);
+        updatePortfolioPricesButton.setDisable(false);
         updatePricesButtonIcon.setImage(new Image(
             getClass()
                 .getResource(Constants.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)
                 .toExternalForm()));
-        updatePricesButton.setText("Update Prices");
+        updatePortfolioPricesButton.setText("Update Prices");
 
-        isUpdatingPrices = false;
+        isUpdatingPortfolioPrices = false;
+    }
+
+    /**
+     * Update the Brazilian market indicators
+     */
+    private void UpdateBrazilianMarketIndicators()
+    {
+        overviewTabSelicValueField.setText(
+            UIUtils.FormatPercentage(brazilianMarketIndicators.GetSelicTarget()));
+
+        overviewTabIPCALastMonthValueField.setText(
+            UIUtils.FormatPercentage(brazilianMarketIndicators.GetIpcaLastMonth()));
+
+        overviewTabIPCALastMonthDescriptionField.setText(
+            "IPCA " + brazilianMarketIndicators.GetIpcaLastMonthReference());
+
+        overviewTabIPCA12MonthsValueField.setText(
+            UIUtils.FormatPercentage(brazilianMarketIndicators.GetIpca12Months()));
+    }
+
+    private void UpdateMarketQuotesAndCommodities()
+    {
+        if (marketQuotesAndCommodities == null)
+        {
+            return;
+        }
+
+        overviewTabDollarValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetDollar()));
+
+        overviewTabEuroValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetEuro()));
+
+        overviewTabIbovespaValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetIbovespa()));
+
+        overviewTabBitcoinValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetBitcoin()));
+
+        overviewTabEthereumValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetEthereum()));
+
+        overviewTabGoldValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetGold()));
+
+        overviewTabSoybeanValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetSoybean()));
+
+        overviewTabCoffeeValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetCoffee()));
+
+        overviewTabWheatValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetWheat()));
+
+        overviewTabOilBrentValueField.setText(
+            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetOilBrent()));
     }
 }

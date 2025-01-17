@@ -28,14 +28,15 @@ import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Dividend;
+import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
-import org.moinex.entities.investment.Ticker;
 import org.moinex.repositories.DividendRepository;
 import org.moinex.repositories.TickerPurchaseRepository;
-import org.moinex.repositories.TickerSaleRepository;
 import org.moinex.repositories.TickerRepository;
+import org.moinex.repositories.TickerSaleRepository;
 import org.moinex.repositories.WalletRepository;
+import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
@@ -67,8 +68,6 @@ public class TickerService
 
     @Autowired
     private WalletTransactionService m_walletTransactionService;
-
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static final Logger logger = LoggerConfig.GetLogger();
 
@@ -289,107 +288,42 @@ public class TickerService
      * @param tickers The list of tickers to update
      * @return A completable future with a list with tickers that failed to update
      */
+    @Transactional
     public CompletableFuture<List<Ticker>>
     UpdateTickersPriceFromAPIAsync(List<Ticker> tickers)
-    {
-        return CompletableFuture.supplyAsync(() -> {
-            try
-            {
-                return UpdateTickersPriceFromAPI(tickers);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException("Error updating tickers: " + e.getMessage(),
-                                           e);
-            }
-        }, executorService);
-    }
-
-    /**
-     * Update tickers price from API
-     * @param tickers The list of tickers to update
-     * @return A list with tickers that failed to update
-     */
-    @Transactional
-    public List<Ticker> UpdateTickersPriceFromAPI(List<Ticker> tickers)
     {
         if (tickers.isEmpty())
         {
             throw new IllegalArgumentException("No tickers to update");
         }
 
-        List<Ticker> failed = new ArrayList<>();
-        String[]     symbols =
+        String[] symbols =
             tickers.stream().map(Ticker::GetSymbol).toArray(String[] ::new);
 
-        try (InputStream scriptInputStream = TickerService.class.getResourceAsStream(
-                 Constants.GET_STOCK_PRICE_SCRIPT))
-        {
-            if (scriptInputStream == null)
-            {
-                throw new RuntimeException("Python script not found");
-            }
-
-            Path tempFile = Files.createTempFile("get_stock_price", ".py");
-            Files.copy(scriptInputStream,
-                       tempFile,
-                       StandardCopyOption.REPLACE_EXISTING);
-
-            List<String> commandList = new ArrayList<>();
-            commandList.add(Constants.PYTHON_INTERPRETER);
-            commandList.add(tempFile.toString());
-            commandList.addAll(Arrays.asList(symbols));
-
-            String[] command = commandList.toArray(new String[0]);
-
-            logger.info("Running Python script as: " + String.join(" ", command));
-
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            Process        process        = processBuilder.start();
-
-            try (BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(process.getInputStream())))
-            {
-                String output   = reader.lines().collect(Collectors.joining());
-                int    exitCode = process.waitFor();
-
-                if (exitCode != 0)
+        return APIUtils.FetchStockPricesAsync(symbols).thenApply(jsonObject -> {
+            List<Ticker> failed = new ArrayList<>();
+            tickers.forEach(ticker -> {
+                try
                 {
-                    throw new RuntimeException(
-                        "Error executing Python script. Exit code: " + exitCode);
+                    JSONObject tickerData =
+                        jsonObject.getJSONObject(ticker.GetSymbol());
+                    BigDecimal price = tickerData.getBigDecimal("price");
+
+                    price = Constants.RoundPrice(price, ticker.GetType());
+
+                    ticker.SetCurrentUnitValue(price);
+                    ticker.SetLastUpdate(LocalDateTime.now());
+                    m_tickerRepository.save(ticker);
                 }
-
-                JSONObject jsonObject = new JSONObject(output);
-                logger.info("API response: " + jsonObject.toString());
-
-                tickers.forEach(ticker -> {
-                    try
-                    {
-                        JSONObject tickerData =
-                            jsonObject.getJSONObject(ticker.GetSymbol());
-                        BigDecimal price = tickerData.getBigDecimal("price");
-
-                        price = Constants.RoundPrice(price, ticker.GetType());
-
-                        ticker.SetCurrentUnitValue(price);
-                        ticker.SetLastUpdate(LocalDateTime.now());
-                        m_tickerRepository.save(ticker);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.warning("Failed to update ticker " + ticker.GetSymbol() +
-                                       ": " + e.getMessage());
-                        failed.add(ticker);
-                    }
-                });
-            }
-        }
-        catch (IOException | InterruptedException e)
-        {
-            throw new RuntimeException("Error updating tickers: " + e.getMessage(), e);
-        }
-
-        return failed;
+                catch (Exception e)
+                {
+                    logger.warning("Failed to update ticker " + ticker.GetSymbol() +
+                                   ": " + e.getMessage());
+                    failed.add(ticker);
+                }
+            });
+            return failed;
+        });
     }
 
     /**
@@ -521,10 +455,10 @@ public class TickerService
             m_walletTransactionService.GetTransactionById(id);
 
         TickerSale sale = new TickerSale(ticker,
-                             quantity,
-                             unitPrice,
-                             walletTransaction,
-                             ticker.GetAveragePrice());
+                                         quantity,
+                                         unitPrice,
+                                         walletTransaction,
+                                         ticker.GetAveragePrice());
 
         m_tickerSaleRepository.save(sale);
 
@@ -677,10 +611,10 @@ public class TickerService
     {
         TickerPurchase oldPurchase =
             m_tickerPurchaseRepository.findById(purchase.GetId())
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("TickerPurchase with id " + purchase.GetId() +
-                                                " not found and cannot be updated"));
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "TickerPurchase with id " + purchase.GetId() +
+                                     " not found and cannot be updated"));
 
         m_tickerRepository.findById(purchase.GetTicker().GetId())
             .orElseThrow(()
@@ -722,10 +656,11 @@ public class TickerService
     @Transactional
     public void UpdateSale(TickerSale sale)
     {
-        TickerSale oldSale = m_tickerSaleRepository.findById(sale.GetId())
-                           .orElseThrow(()
-                                            -> new RuntimeException(
-                                                "TickerSale with id " + sale.GetId() +
+        TickerSale oldSale =
+            m_tickerSaleRepository.findById(sale.GetId())
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("TickerSale with id " + sale.GetId() +
                                                 " not found and cannot be updated"));
 
         m_tickerRepository.findById(sale.GetTicker().GetId())

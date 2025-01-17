@@ -19,11 +19,16 @@ public class InicializationService
     @Autowired
     private RecurringTransactionService recurringTransactionService;
 
+    @Autowired
+    private MarketService marketService;
+
     public InicializationService() { }
 
     @PostConstruct
     public void Initialize()
     {
         recurringTransactionService.ProcessRecurringTransactions();
+        marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync();
+        marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync();
     }
 }

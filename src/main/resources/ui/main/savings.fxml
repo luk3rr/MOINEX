@@ -115,48 +115,48 @@
                                                                <children>
                                                                   <VBox fx:id="body11" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                      <children>
-                                                                        <HBox fx:id="openingBalance11" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
-                                                                              <Label fx:id="openingBalanceDescription11" text="Selic" />
+                                                                              <Label text="Selic" />
                                                                               <Region HBox.hgrow="ALWAYS" />
                                                                               <Label fx:id="openingBalanceSign11" minWidth="10.0" text=" ">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="openingBalanceValue11" text="0.00 %">
+                                                                              <Label fx:id="overviewTabSelicValueField" text="0.00 %">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
                                                                         </HBox>
-                                                                        <HBox fx:id="incomes11" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
-                                                                              <Label fx:id="incomesDescription11" text="IPCA mm/yyyy" />
+                                                                              <Label fx:id="overviewTabIPCALastMonthDescriptionField" text="IPCA mm/yyyy" />
                                                                               <Region HBox.hgrow="ALWAYS" />
                                                                               <Label fx:id="incomesSign11" minWidth="10.0" text=" ">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="incomesValue11" text="0.00 %">
+                                                                              <Label fx:id="overviewTabIPCALastMonthValueField" text="0.00 %">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
                                                                         </HBox>
-                                                                        <HBox fx:id="expenses11" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
-                                                                              <Label fx:id="expensesDescription11" text="IPCA 12 months" />
+                                                                              <Label fx:id="overviewTabIPCA12MonthsDescriptionField" text="IPCA 12 Months" />
                                                                               <Region HBox.hgrow="ALWAYS" />
                                                                               <Label fx:id="expensesSign11" minWidth="10.0" text=" ">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="expensesValue11" text="0.00 %">
+                                                                              <Label fx:id="overviewTabIPCA12MonthsValueField" text="0.00 %">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -183,23 +183,23 @@
                                                                <children>
                                                                   <VBox fx:id="body111" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                      <children>
-                                                                        <HBox fx:id="openingBalance111" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
-                                                                              <Label fx:id="openingBalanceDescription111" text="Dolar" />
+                                                                              <Label fx:id="openingBalanceDescription111" text="Dollar" />
                                                                               <Region HBox.hgrow="ALWAYS" />
                                                                               <Label fx:id="openingBalanceSign111" minWidth="10.0" text=" ">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="openingBalanceValue111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabDollarValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
                                                                         </HBox>
-                                                                        <HBox fx:id="incomes111" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
                                                                               <Label fx:id="incomesDescription111" text="Euro" />
                                                                               <Region HBox.hgrow="ALWAYS" />
@@ -208,14 +208,14 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="incomesValue111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabEuroValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
                                                                         </HBox>
-                                                                        <HBox fx:id="debitedTransfers1111" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
                                                                               <Label fx:id="debitedTransfersDescription1111" text="Ibovespa" />
                                                                               <Region HBox.hgrow="ALWAYS" />
@@ -224,14 +224,14 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="debitedTransfersValue1111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabIbovespaValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
                                                                         </HBox>
-                                                                        <HBox fx:id="expenses111" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
                                                                               <Label fx:id="expensesDescription111" text="Bitcoin" />
                                                                               <Region HBox.hgrow="ALWAYS" />
@@ -240,14 +240,14 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="expensesValue111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabBitcoinValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
                                                                         </HBox>
-                                                                        <HBox fx:id="creditedTransfers111" alignment="CENTER_LEFT">
+                                                                        <HBox alignment="CENTER_LEFT">
                                                                            <children>
                                                                               <Label fx:id="creditedTransfersDescription111" text="Ethereum" />
                                                                               <Region HBox.hgrow="ALWAYS" />
@@ -256,7 +256,7 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="creditedTransfersValue111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabEthereumValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -292,7 +292,7 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="openingBalanceValue1111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabGoldValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -308,7 +308,7 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="incomesValue1111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabSoybeanValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -324,7 +324,7 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="debitedTransfersValue11111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabCoffeeValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -340,7 +340,7 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="expensesValue1111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabWheatValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -356,7 +356,7 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="creditedTransfersValue1111" text="\$ 0.00">
+                                                                              <Label fx:id="overviewTabOilBrentValueField" text="\$ 0.00">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
@@ -491,7 +491,7 @@
                                              </graphic>
                                           </JFXButton>
                                           <Region HBox.hgrow="ALWAYS" />
-                                          <JFXButton fx:id="updatePricesButton" onAction="#handleUpdatePrices" stylesheets="@../../css/component/buttons.css" text="Update Prices">
+                                          <JFXButton fx:id="updatePortfolioPricesButton" onAction="#handleUpdatePortfolioPrices" stylesheets="@../../css/component/buttons.css" text="Update Prices">
                                              <graphic>
                                                 <ImageView fx:id="updatePricesButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
