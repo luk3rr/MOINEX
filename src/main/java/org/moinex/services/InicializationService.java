@@ -7,6 +7,8 @@
 package org.moinex.services;
 
 import jakarta.annotation.PostConstruct;
+import javafx.application.Platform;
+import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +30,26 @@ public class InicializationService
     public void Initialize()
     {
         recurringTransactionService.ProcessRecurringTransactions();
-        marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync();
-        marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync();
+        marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync().exceptionally(
+            ex -> {
+                Platform.runLater(() -> {
+                    WindowUtils.ShowErrorDialog(
+                        "Error",
+                        "Error updating market quotes and commodities (init service)",
+                        ex.getMessage());
+                });
+                return null;
+            });
+
+        marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync().exceptionally(
+            ex -> {
+                Platform.runLater(() -> {
+                    WindowUtils.ShowErrorDialog(
+                        "Error",
+                        "Error updating market quotes and commodities (init service)",
+                        ex.getMessage());
+                });
+                return null;
+            });
     }
 }

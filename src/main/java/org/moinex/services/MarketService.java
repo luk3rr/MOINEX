@@ -110,8 +110,11 @@ public class MarketService
     {
         if (isBrazilianMarketIndicatorsUpdating)
         {
-            throw new RuntimeException(
-                "Brazilian market indicators are already being updated");
+            CompletableFuture<BrazilianMarketIndicators> failedFuture =
+                new CompletableFuture<>();
+            failedFuture.completeExceptionally(new RuntimeException(
+                "Brazilian market indicators are already being updated"));
+            return failedFuture;
         }
 
         isBrazilianMarketIndicatorsUpdating = true;
@@ -192,8 +195,11 @@ public class MarketService
     {
         if (isMarketQuotesAndCommoditiesUpdating)
         {
-            throw new RuntimeException(
-                "Market quotes and commodities are already being updated");
+            CompletableFuture<MarketQuotesAndCommodities> failedFuture =
+                new CompletableFuture<>();
+            failedFuture.completeExceptionally(new RuntimeException(
+                "Market quotes and commodities are already being updated"));
+            return failedFuture;
         }
 
         isMarketQuotesAndCommoditiesUpdating = true;

@@ -10,6 +10,10 @@ import com.jfoenix.controls.JFXButton;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -45,6 +49,7 @@ import org.moinex.ui.dialog.InvestmentTransactionsController;
 import org.moinex.ui.dialog.SaleTickerController;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
+import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -58,6 +63,8 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class SavingsController
 {
+    private static final Logger logger = LoggerConfig.GetLogger();
+
     @FXML
     private Text stocksFundsTabNetCapitalInvestedField;
 
@@ -130,7 +137,22 @@ public class SavingsController
     @Autowired
     private ConfigurableApplicationContext springContext;
 
-    Boolean isUpdatingPortfolioPrices = false;
+    private Boolean isUpdatingPortfolioPrices = false;
+
+    private final ScheduledExecutorService scheduler =
+        Executors.newScheduledThreadPool(1);
+
+    private Integer scheduleDelayInSeconds = 30;
+
+    private Integer scheduledUpdatingMarketQuotesRetries = 0;
+
+    private Boolean scheduledUpdatingMarketQuotes = false;
+
+    private Integer scheduledUpdatingBrazilianIndicatorsRetries = 0;
+
+    private Boolean scheduledUpdatingBrazilianIndicators = false;
+
+    private final Integer maxRetries = 3;
 
     private TickerService tickerService;
 
@@ -481,14 +503,10 @@ public class SavingsController
             marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync()
                 .thenAccept(brazilianMarketIndicators -> {
                     this.brazilianMarketIndicators = brazilianMarketIndicators;
+                    scheduledUpdatingBrazilianIndicatorsRetries = 0;
                 })
                 .exceptionally(ex -> {
-                    Platform.runLater(() -> {
-                        WindowUtils.ShowErrorDialog(
-                            "Error",
-                            "Error updating Brazilian market indicators",
-                            ex.getMessage());
-                    });
+                    ScheduleRetryForUpdatingBrazilianIndicators();
                     return null;
                 });
         }
@@ -509,15 +527,11 @@ public class SavingsController
             // update them from the API
             marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync()
                 .thenAccept(marketQuotesAndCommodities -> {
-                    this.marketQuotesAndCommodities = marketQuotesAndCommodities;
+                    this.marketQuotesAndCommodities      = marketQuotesAndCommodities;
+                    scheduledUpdatingMarketQuotesRetries = 0;
                 })
                 .exceptionally(ex -> {
-                    Platform.runLater(() -> {
-                        WindowUtils.ShowErrorDialog(
-                            "Error",
-                            "Error updating market quotes and commodities",
-                            ex.getMessage());
-                    });
+                    ScheduleRetryForUpdatingMarketQuotes();
                     return null;
                 });
         }
@@ -854,5 +868,58 @@ public class SavingsController
 
         overviewTabOilBrentValueField.setText(
             UIUtils.FormatCurrency(marketQuotesAndCommodities.GetOilBrent()));
+    }
+
+    /**
+     * Schedules a retry for updating market quotes and commodities after a delay
+     */
+    private synchronized void ScheduleRetryForUpdatingMarketQuotes()
+    {
+        if (scheduledUpdatingMarketQuotesRetries >= maxRetries)
+        {
+            logger.warning("Max retries reached for updating market quotes");
+            return;
+        }
+
+        if (scheduledUpdatingMarketQuotes)
+        {
+            logger.warning("Already scheduled to update market quotes");
+            return;
+        }
+
+        scheduledUpdatingMarketQuotes = true;
+        scheduledUpdatingMarketQuotesRetries++;
+
+        scheduler.schedule(() -> {
+            LoadMarketQuotesAndCommoditiesFromDatabase();
+            scheduledUpdatingMarketQuotes = false;
+        }, scheduleDelayInSeconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Schedules a retry for updating Brazilian market indicators after a delay
+     */
+    private synchronized void ScheduleRetryForUpdatingBrazilianIndicators()
+    {
+        if (scheduledUpdatingBrazilianIndicatorsRetries >= maxRetries)
+        {
+            logger.warning(
+                "Max retries reached for updating Brazilian market indicators");
+            return;
+        }
+
+        if (scheduledUpdatingBrazilianIndicators)
+        {
+            logger.warning("Already scheduled to update Brazilian market indicators");
+            return;
+        }
+
+        scheduledUpdatingBrazilianIndicators = true;
+        scheduledUpdatingBrazilianIndicatorsRetries++;
+
+        scheduler.schedule(() -> {
+            LoadBrazilianMarketIndicatorsFromDatabase();
+            scheduledUpdatingBrazilianIndicators = false;
+        }, scheduleDelayInSeconds, TimeUnit.SECONDS);
     }
 }

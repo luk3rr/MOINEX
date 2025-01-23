@@ -294,7 +294,10 @@ public class TickerService
     {
         if (tickers.isEmpty())
         {
-            throw new IllegalArgumentException("No tickers to update");
+            CompletableFuture<List<Ticker>> failedFuture = new CompletableFuture<>();
+            failedFuture.completeExceptionally(
+                new RuntimeException("No tickers to update"));
+            return failedFuture;
         }
 
         String[] symbols =
