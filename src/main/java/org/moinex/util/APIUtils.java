@@ -18,21 +18,127 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.services.InicializationService;
-import org.moinex.services.TickerService;
 
 public class APIUtils
 {
     private static final ExecutorService executorService =
         Executors.newCachedThreadPool();
 
+    private static final List<Process> runningProcesses = new ArrayList<>();
+
+    private static Boolean shuttingDown = false;
+
     private static final Logger logger = LoggerConfig.GetLogger();
 
     // Prevent instantiation
     private APIUtils() { }
+
+    /**
+     * Shutdown the executor service
+     */
+    public static synchronized void ShutdownExecutor()
+    {
+        if (shuttingDown)
+        {
+            return;
+        }
+
+        shuttingDown = true;
+
+        logger.info("Shutting down executor service");
+
+        ShutdownProcesses();
+
+        executorService.shutdown();
+
+        try
+        {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS))
+            {
+                logger.warning("Forcing shutdown of executor service...");
+                executorService.shutdownNow();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            logger.warning("Shutdown interrupted. Forcing shutdown...");
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Shutdown all running processes
+     */
+    private static synchronized void ShutdownProcesses()
+    {
+        logger.info("Shutting down running processes");
+
+        for (Process process : runningProcesses)
+        {
+            try
+            {
+                // Primeiro, tentamos destruir o processo de forma normal
+                process.destroy();
+                if (!process.waitFor(5, TimeUnit.SECONDS))
+                {
+                    // Se o processo não terminar dentro do limite de tempo, forçamos a
+                    // destruição
+                    logger.warning(
+                        "Process did not terminate in time. Forcing shutdown...");
+                    process.destroyForcibly();
+                }
+                logger.info("Process terminated: " + process.toString());
+            }
+            catch (InterruptedException e)
+            {
+                // Se a espera pelo processo for interrompida, forçamos imediatamente
+                logger.warning("Process interrupted. Forcing shutdown...");
+                process.destroyForcibly();
+            }
+            catch (Exception e)
+            {
+                logger.warning("Error during process shutdown: " + e.getMessage());
+            }
+        }
+
+        logger.info("All processes terminated");
+
+        runningProcesses.clear();
+    }
+
+    /**
+     * Register a process to be managed by the APIUtils class
+     * @param process The process to register
+     */
+    private static synchronized void RegisterProcess(Process process)
+    {
+        if (shuttingDown)
+        {
+            throw new RuntimeException("Application is shutting down");
+        }
+
+        runningProcesses.add(process);
+    }
+
+    /**
+     * Remove a process from the list of running processes
+     * @param process The process to remove
+     */
+    private static synchronized void RemoveProcess(Process process)
+    {
+        if (shuttingDown)
+        {
+            throw new RuntimeException("Application is shutting down");
+        }
+
+        runningProcesses.remove(process);
+    }
 
     /**
      * Fetch stock prices asynchronously from an external API
@@ -94,6 +200,11 @@ public class APIUtils
                 throw new RuntimeException("Python " + script + " script not found");
             }
 
+            if (shuttingDown)
+            {
+                throw new RuntimeException("Application is shutting down");
+            }
+
             // Script name without extension
             String scriptName = script.substring(0, script.lastIndexOf('.'));
             Path   tempFile   = Files.createTempFile(scriptName, ".py");
@@ -113,6 +224,7 @@ public class APIUtils
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             Process        process        = processBuilder.start();
+            RegisterProcess(process);
 
             try (BufferedReader reader = new BufferedReader(
                      new InputStreamReader(process.getInputStream())))
@@ -132,6 +244,13 @@ public class APIUtils
                 logger.info("Output: " + jsonObject.toString());
 
                 return jsonObject;
+            }
+            finally
+            {
+                synchronized (runningProcesses)
+                {
+                    RemoveProcess(process);
+                }
             }
         }
         catch (Exception e)

@@ -7,12 +7,13 @@
 package org.moinex.app;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
+import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -78,7 +79,10 @@ public class JavaFXApp extends Application
     @Override
     public void stop() throws Exception
     {
+        APIUtils.ShutdownExecutor();
+
         springContext.close();
         super.stop();
+        Platform.exit();
     }
 }

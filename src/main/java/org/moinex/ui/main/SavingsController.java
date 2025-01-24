@@ -502,11 +502,14 @@ public class SavingsController
             // API
             marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync()
                 .thenAccept(brazilianMarketIndicators -> {
-                    this.brazilianMarketIndicators = brazilianMarketIndicators;
-                    scheduledUpdatingBrazilianIndicatorsRetries = 0;
+                    Platform.runLater(() -> {
+                        this.brazilianMarketIndicators = brazilianMarketIndicators;
+                        scheduledUpdatingBrazilianIndicatorsRetries = 0;
+                    });
                 })
                 .exceptionally(ex -> {
-                    ScheduleRetryForUpdatingBrazilianIndicators();
+                    Platform.runLater(
+                        () -> { ScheduleRetryForUpdatingBrazilianIndicators(); });
                     return null;
                 });
         }
@@ -527,11 +530,14 @@ public class SavingsController
             // update them from the API
             marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync()
                 .thenAccept(marketQuotesAndCommodities -> {
-                    this.marketQuotesAndCommodities      = marketQuotesAndCommodities;
-                    scheduledUpdatingMarketQuotesRetries = 0;
+                    Platform.runLater(() -> {
+                        this.marketQuotesAndCommodities = marketQuotesAndCommodities;
+                        scheduledUpdatingMarketQuotesRetries = 0;
+                    });
                 })
                 .exceptionally(ex -> {
-                    ScheduleRetryForUpdatingMarketQuotes();
+                    Platform.runLater(
+                        () -> { ScheduleRetryForUpdatingMarketQuotes(); });
                     return null;
                 });
         }

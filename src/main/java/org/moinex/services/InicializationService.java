@@ -31,25 +31,9 @@ public class InicializationService
     {
         recurringTransactionService.ProcessRecurringTransactions();
         marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync().exceptionally(
-            ex -> {
-                Platform.runLater(() -> {
-                    WindowUtils.ShowErrorDialog(
-                        "Error",
-                        "Error updating market quotes and commodities (init service)",
-                        ex.getMessage());
-                });
-                return null;
-            });
+            ex -> { return null; });
 
         marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync().exceptionally(
-            ex -> {
-                Platform.runLater(() -> {
-                    WindowUtils.ShowErrorDialog(
-                        "Error",
-                        "Error updating market quotes and commodities (init service)",
-                        ex.getMessage());
-                });
-                return null;
-            });
+            ex -> { return null; });
     }
 }
