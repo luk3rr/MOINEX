@@ -28,6 +28,7 @@ def download_data(url: str) -> dict:
     :return: Dados obtidos
     """
     response = requests.get(url)
+
     if response.status_code == 200:
         data = response.json()
         return data
@@ -64,18 +65,19 @@ def get_ipca_12_months(ipca_series: list) -> dict:
 def main():
     data = {}
 
-    # One year of data is enough for our purposes
+    # Two year of data is enough for our purposes.
+    # Ensure that there is enough data to calculate the IPCA accumulated
     today = datetime.today().strftime("%d/%m/%Y")
-    one_year_ago = (datetime.today() - timedelta(days=1 * 365)).strftime("%d/%m/%Y")
+    two_year_ago = (datetime.today() - timedelta(days=2 * 365)).strftime("%d/%m/%Y")
 
     selic_series = download_data(
         BACEN_API_SERIES_WITH_FILTER_URL.format(
-            SELIC_TARGET_SERIES, one_year_ago, today
+            SELIC_TARGET_SERIES, two_year_ago, today
         )
     )
 
     ipca_series = download_data(
-        BACEN_API_SERIES_WITH_FILTER_URL.format(IPCA_SERIES, one_year_ago, today)
+        BACEN_API_SERIES_WITH_FILTER_URL.format(IPCA_SERIES, two_year_ago, today)
     )
 
     data["selic_target"] = selic_series[-1]

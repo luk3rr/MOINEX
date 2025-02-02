@@ -77,6 +77,8 @@ public final class Constants
     public static final String ADD_TICKER_FXML   = UI_DIALOG_PATH + "add_ticker.fxml";
     public static final String ADD_DIVIDEND_FXML = UI_DIALOG_PATH + ("add_dividend."
                                                                      + "fxml");
+    public static final String ADD_CRYPTO_EXCHANGE_FXML =
+        UI_DIALOG_PATH + "add_crypto_exchange.fxml";
 
     public static final String ARCHIVED_WALLETS_FXML =
         UI_DIALOG_PATH + "archived_wallets.fxml";
@@ -117,6 +119,8 @@ public final class Constants
         UI_DIALOG_PATH + "edit_ticker_sale.fxml";
     public static final String EDIT_DIVIDEND_FXML =
         UI_DIALOG_PATH + "edit_dividend.fxml";
+    public static final String EDIT_CRYPTO_EXCHANGE_FXML =
+        UI_DIALOG_PATH + "edit_crypto_exchange.fxml";
 
     public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
         UI_DIALOG_PATH + "credit_card_invoice_payment.fxml";
@@ -309,7 +313,7 @@ public final class Constants
     public static final String DIGITS_ONLY_REGEX    = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
 
-    public static final Integer INVESTMENT_CALCULATION_PRECISION = 18;
+    public static final Integer INVESTMENT_CALCULATION_PRECISION = 8;
     public static final String  INVESTMENT_VALUE_REGEX =
         "\\d*\\.?\\d{0," + INVESTMENT_CALCULATION_PRECISION + "}";
 

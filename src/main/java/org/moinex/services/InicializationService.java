@@ -7,8 +7,8 @@
 package org.moinex.services;
 
 import jakarta.annotation.PostConstruct;
-import javafx.application.Platform;
-import org.moinex.util.WindowUtils;
+import java.util.logging.Logger;
+import org.moinex.util.LoggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +24,8 @@ public class InicializationService
     @Autowired
     private MarketService marketService;
 
+    private static final Logger logger = LoggerConfig.GetLogger();
+
     public InicializationService() { }
 
     @PostConstruct
@@ -31,9 +33,15 @@ public class InicializationService
     {
         recurringTransactionService.ProcessRecurringTransactions();
         marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync().exceptionally(
-            ex -> { return null; });
+            ex -> {
+                logger.severe(ex.getMessage());
+                return null;
+            });
 
         marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync().exceptionally(
-            ex -> { return null; });
+            ex -> {
+                logger.severe(ex.getMessage());
+                return null;
+            });
     }
 }

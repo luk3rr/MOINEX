@@ -149,16 +149,7 @@ public class APIUtils
     public static CompletableFuture<JSONObject> FetchStockPricesAsync(String[] symbols)
     {
         return CompletableFuture.supplyAsync(() -> {
-            try
-            {
-                return RunPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException("Error fetching stock prices: " +
-                                               e.getMessage(),
-                                           e);
-            }
+            return RunPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols);
         }, executorService);
     }
 
@@ -170,17 +161,8 @@ public class APIUtils
     public static CompletableFuture<JSONObject> FetchBrazilianMarketIndicatorsAsync()
     {
         return CompletableFuture.supplyAsync(() -> {
-            try
-            {
-                return RunPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
-                                       new String[0]);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(
-                    "Error fetching brazilian market indicators: " + e.getMessage(),
-                    e);
-            }
+            return RunPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
+                                   new String[0]);
         }, executorService);
     }
 

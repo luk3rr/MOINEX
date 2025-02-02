@@ -409,7 +409,7 @@ public class WalletTransactionService
 
     /**
      * Change the amount of a transaction
-     * @param transaction The transaction to be updated
+     * @param oldTransaction The transaction to be updated
      * @param newAmount The new amount of the transaction
      * @throws RuntimeException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances

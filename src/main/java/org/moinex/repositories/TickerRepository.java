@@ -8,6 +8,7 @@ package org.moinex.repositories;
 
 import java.util.List;
 import org.moinex.entities.investment.Ticker;
+import org.moinex.util.TickerType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -65,6 +66,17 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
     GetDividendCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
+     * Get count of crypto exchanges associated with the ticker
+     * @param tickerId The id of the ticker
+     * @return The count of crypto exchanges associated with the ticker
+     */
+    @Query("SELECT COUNT(e) "
+           + "FROM CryptoExchange e "
+           + "WHERE e.soldCrypto.id = :tickerId OR e.receivedCrypto.id = :tickerId")
+    Long
+    GetCryptoExchangeCountByTicker(@Param("tickerId") Long tickerId);
+
+    /**
      * Findall tickers and order them by symbol in ascending order
      * @return A list of tickers ordered by symbol in ascending order
      */
@@ -84,4 +96,11 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      *     order
      */
     public List<Ticker> findAllByArchivedTrueOrderBySymbolAsc();
+
+
+    /**
+     * Get all non-archived tickers of a specific type
+     * @param type The type of the tickers
+     */
+    public List<Ticker> findAllByTypeAndArchivedFalseOrderBySymbolAsc(TickerType type);
 }

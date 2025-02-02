@@ -562,6 +562,15 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
+                                                                  <JFXButton onAction="#handleAddCryptoExchange" stylesheets="@../../css/component/buttons.css" text="Exchange Cryptos">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/trade.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
                                                                </children>
                                                             </HBox>
                                                          </children>

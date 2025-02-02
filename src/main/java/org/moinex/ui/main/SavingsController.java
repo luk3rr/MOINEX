@@ -7,7 +7,6 @@
 package org.moinex.ui.main;
 
 import com.jfoenix.controls.JFXButton;
-import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -31,7 +30,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
-import org.json.JSONObject;
 import org.moinex.entities.investment.BrazilianMarketIndicators;
 import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.MarketQuotesAndCommodities;
@@ -45,9 +43,9 @@ import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.ArchivedTickersController;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
+import org.moinex.ui.dialog.AddCryptoExchangeController;
 import org.moinex.ui.dialog.InvestmentTransactionsController;
 import org.moinex.ui.dialog.SaleTickerController;
-import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
@@ -305,6 +303,21 @@ public class SavingsController
     }
 
     @FXML
+    private void handleAddCryptoExchange()
+    {
+
+        WindowUtils.OpenModalWindow(Constants.ADD_CRYPTO_EXCHANGE_FXML,
+                                    "Add Crypto Exchange",
+                                    springContext,
+                                    (AddCryptoExchangeController controller)
+                                        -> {},
+                                    List.of(() -> {
+                                        UpdateTransactionTableView();
+                                        UpdatePortfolioIndicators();
+                                    }));
+    }
+
+    @FXML
     private void handleOpenTickerArchive()
     {
         WindowUtils.OpenModalWindow(Constants.ARCHIVED_TICKERS_FXML,
@@ -495,6 +508,7 @@ public class SavingsController
         try
         {
             brazilianMarketIndicators = marketService.GetBrazilianMarketIndicators();
+            logger.info("Loaded Brazilian market indicators from the database");
         }
         catch (RuntimeException e)
         {
@@ -506,10 +520,13 @@ public class SavingsController
                         this.brazilianMarketIndicators = brazilianMarketIndicators;
                         scheduledUpdatingBrazilianIndicatorsRetries = 0;
                     });
+
+                    logger.info("Updated Brazilian market indicators from the API");
                 })
                 .exceptionally(ex -> {
                     Platform.runLater(
                         () -> { ScheduleRetryForUpdatingBrazilianIndicators(); });
+                    logger.severe(ex.getMessage());
                     return null;
                 });
         }
@@ -523,6 +540,7 @@ public class SavingsController
         try
         {
             marketQuotesAndCommodities = marketService.GetMarketQuotesAndCommodities();
+            logger.info("Loaded market quotes and commodities from the database");
         }
         catch (RuntimeException e)
         {
@@ -534,10 +552,13 @@ public class SavingsController
                         this.marketQuotesAndCommodities = marketQuotesAndCommodities;
                         scheduledUpdatingMarketQuotesRetries = 0;
                     });
+
+                    logger.info("Updated market quotes and commodities from the API");
                 })
                 .exceptionally(ex -> {
                     Platform.runLater(
                         () -> { ScheduleRetryForUpdatingMarketQuotes(); });
+                    logger.severe(ex.getMessage());
                     return null;
                 });
         }
@@ -825,6 +846,11 @@ public class SavingsController
      */
     private void UpdateBrazilianMarketIndicators()
     {
+        if (brazilianMarketIndicators == null)
+        {
+            return;
+        }
+
         overviewTabSelicValueField.setText(
             UIUtils.FormatPercentage(brazilianMarketIndicators.GetSelicTarget()));
 
@@ -896,6 +922,8 @@ public class SavingsController
         scheduledUpdatingMarketQuotes = true;
         scheduledUpdatingMarketQuotesRetries++;
 
+        logger.info("Scheduling retry for updating market quotes");
+
         scheduler.schedule(() -> {
             LoadMarketQuotesAndCommoditiesFromDatabase();
             scheduledUpdatingMarketQuotes = false;
@@ -922,6 +950,8 @@ public class SavingsController
 
         scheduledUpdatingBrazilianIndicators = true;
         scheduledUpdatingBrazilianIndicatorsRetries++;
+
+        logger.info("Scheduling retry for updating Brazilian market indicators");
 
         scheduler.schedule(() -> {
             LoadBrazilianMarketIndicatorsFromDatabase();

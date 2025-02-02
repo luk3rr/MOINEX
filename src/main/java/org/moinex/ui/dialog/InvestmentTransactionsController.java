@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,6 +20,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
@@ -48,6 +50,9 @@ public class InvestmentTransactionsController
     private TableView<Dividend> dividendTableView;
 
     @FXML
+    private TableView<CryptoExchange> cryptoExchangeTableView;
+
+    @FXML
     private TextField searchField;
 
     @FXML
@@ -61,6 +66,8 @@ public class InvestmentTransactionsController
     private List<TickerSale> sales;
 
     private List<Dividend> dividends;
+
+    private List<CryptoExchange> cryptoExchanges;
 
     private TickerService tickerService;
 
@@ -81,20 +88,24 @@ public class InvestmentTransactionsController
         LoadPurchasesFromDatabase();
         LoadSalesFromDatabase();
         LoadDividendsFromDatabase();
+        LoadCryptoExchangesFromDatabase();
 
         ConfigurePurchaseTableView();
         ConfigureSaleTableView();
         ConfigureDividendTableView();
+        ConfigureCryptoExchangeTableView();
 
         UpdatePurchaseTableView();
         UpdateSaleTableView();
         UpdateDividendTableView();
+        UpdateCryptoExchangeTableView();
 
         // Add listener to the search field
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             UpdatePurchaseTableView();
             UpdateSaleTableView();
             UpdateDividendTableView();
+            UpdateCryptoExchangeTableView();
         });
     }
 
@@ -129,6 +140,13 @@ public class InvestmentTransactionsController
 
             EditDividend(selectedDividend);
         }
+        else if (selectedTab == tabPane.getTabs().get(3))
+        {
+            CryptoExchange selectedCryptoExchange =
+                cryptoExchangeTableView.getSelectionModel().getSelectedItem();
+
+            EditCryptoExchange(selectedCryptoExchange);
+        }
     }
 
     @FXML
@@ -162,6 +180,13 @@ public class InvestmentTransactionsController
 
             DeleteDividend(selectedDividend);
         }
+        else if (selectedTab == tabPane.getTabs().get(3))
+        {
+            CryptoExchange selectedCryptoExchange =
+                cryptoExchangeTableView.getSelectionModel().getSelectedItem();
+
+            DeleteCryptoExchange(selectedCryptoExchange);
+        }
     }
 
     @FXML
@@ -193,6 +218,14 @@ public class InvestmentTransactionsController
     private void LoadDividendsFromDatabase()
     {
         dividends = tickerService.GetAllDividends();
+    }
+
+    /**
+     * Loads the crypto exchanges from the database
+     */
+    private void LoadCryptoExchangesFromDatabase()
+    {
+        cryptoExchanges = tickerService.GetAllCryptoExchanges();
     }
 
     /**
@@ -330,6 +363,47 @@ public class InvestmentTransactionsController
         }
 
         saleTableView.refresh();
+    }
+
+    /**
+     * Updates the crypto exchange table view
+     */
+    private void UpdateCryptoExchangeTableView()
+    {
+        String similarTextOrId = searchField.getText().toLowerCase();
+
+        cryptoExchangeTableView.getItems().clear();
+
+        // Populate the table view
+        if (similarTextOrId.isEmpty())
+        {
+            cryptoExchangeTableView.getItems().setAll(cryptoExchanges);
+        }
+        else
+        {
+            cryptoExchanges.stream()
+                .filter(ce -> {
+                    String id           = ce.GetId().toString();
+                    String sourceCrypto = ce.GetSoldCrypto().GetName().toLowerCase();
+                    String targetCrypto = ce.GetReceivedCrypto().GetName().toLowerCase();
+                    String date =
+                        ce.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME);
+                    String sourceQuantity = ce.GetSoldQuantity().toString();
+                    String targetQuantity = ce.GetReceivedQuantity().toString();
+                    String description    = ce.GetDescription().toLowerCase();
+
+                    return id.contains(similarTextOrId) ||
+                        sourceCrypto.contains(similarTextOrId) ||
+                        targetCrypto.contains(similarTextOrId) ||
+                        date.contains(similarTextOrId) ||
+                        sourceQuantity.contains(similarTextOrId) ||
+                        targetQuantity.contains(similarTextOrId) ||
+                        description.contains(similarTextOrId);
+                })
+                .forEach(cryptoExchangeTableView.getItems()::add);
+        }
+
+        cryptoExchangeTableView.refresh();
     }
 
     /**
@@ -600,6 +674,84 @@ public class InvestmentTransactionsController
         dividendTableView.getColumns().add(statusColumn);
     }
 
+    /**
+     * Configure the table view columns
+     */
+    private void ConfigureCryptoExchangeTableView()
+    {
+        TableColumn<CryptoExchange, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> {
+            return new TableCell<CryptoExchange, Long>() {
+                @Override
+                protected void updateItem(Long item, boolean empty)
+                {
+                    super.updateItem(item, empty);
+                    if (item == null || empty)
+                    {
+                        setText(null);
+                    }
+                    else
+                    {
+                        setText(item.toString());
+                        setAlignment(Pos.CENTER);
+                        setStyle("-fx-padding: 0;"); // set padding to zero to
+                                                     // ensure the text is centered
+                    }
+                }
+            };
+        });
+
+        TableColumn<CryptoExchange, String> soldCryptoNameColumn =
+            new TableColumn<>("Sold");
+        soldCryptoNameColumn.setCellValueFactory(
+            param
+            -> new SimpleStringProperty(
+                param.getValue().GetSoldCrypto().GetName() + " (" +
+                param.getValue().GetSoldCrypto().GetSymbol() + ")"));
+
+        TableColumn<CryptoExchange, String> receivedCryptoNameColumn =
+            new TableColumn<>("Received");
+        receivedCryptoNameColumn.setCellValueFactory(
+            param
+            -> new SimpleStringProperty(
+                param.getValue().GetReceivedCrypto().GetName() + " (" +
+                param.getValue().GetReceivedCrypto().GetSymbol() + ")"));
+
+        TableColumn<CryptoExchange, BigDecimal> quantitySoldColumn =
+            new TableColumn<>("Quantity Sold");
+        quantitySoldColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().GetSoldQuantity()));
+
+        TableColumn<CryptoExchange, BigDecimal> quantityReceivedColumn =
+            new TableColumn<>("Quantity Received");
+        quantityReceivedColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().GetReceivedQuantity()));
+
+        TableColumn<CryptoExchange, String> dateColumn = new TableColumn<>("Date");
+        dateColumn.setCellValueFactory(
+            param
+            -> new SimpleStringProperty(
+                param.getValue().GetDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
+
+        TableColumn<CryptoExchange, String> descriptionColumn =
+            new TableColumn<>("Description");
+        descriptionColumn.setCellValueFactory(
+            param -> new SimpleStringProperty(param.getValue().GetDescription()));
+
+        // Add the columns to the table view
+        cryptoExchangeTableView.getColumns().add(idColumn);
+        cryptoExchangeTableView.getColumns().add(soldCryptoNameColumn);
+        cryptoExchangeTableView.getColumns().add(receivedCryptoNameColumn);
+        cryptoExchangeTableView.getColumns().add(quantitySoldColumn);
+        cryptoExchangeTableView.getColumns().add(quantityReceivedColumn);
+        cryptoExchangeTableView.getColumns().add(dateColumn);
+        cryptoExchangeTableView.getColumns().add(descriptionColumn);
+    }
+
     private void EditPurchase(TickerPurchase purchase)
     {
         if (purchase == null)
@@ -663,6 +815,29 @@ public class InvestmentTransactionsController
                                     List.of(() -> {
                                         LoadDividendsFromDatabase();
                                         UpdateDividendTableView();
+                                    }));
+    }
+
+    private void EditCryptoExchange(CryptoExchange cryptoExchange)
+    {
+        if (cryptoExchange == null)
+        {
+            WindowUtils.ShowInformationDialog(
+                "Info",
+                "No crypto exchange selected",
+                "Please select a crypto exchange to edit");
+
+            return;
+        }
+
+        WindowUtils.OpenModalWindow(Constants.EDIT_CRYPTO_EXCHANGE_FXML,
+                                    "Edit crypto exchange",
+                                    springContext,
+                                    (EditCryptoExchangeController controller)
+                                        -> controller.SetCryptoExchange(cryptoExchange),
+                                    List.of(() -> {
+                                        LoadCryptoExchangesFromDatabase();
+                                        UpdateCryptoExchangeTableView();
                                     }));
     }
 
@@ -732,6 +907,63 @@ public class InvestmentTransactionsController
             tickerService.DeleteDividend(dividend.GetId());
             LoadDividendsFromDatabase();
             UpdateDividendTableView();
+        }
+    }
+
+    private void DeleteCryptoExchange(CryptoExchange cryptoExchange)
+    {
+        if (cryptoExchange == null)
+        {
+            WindowUtils.ShowInformationDialog(
+                "Info",
+                "No crypto exchange selected",
+                "Please select a crypto exchange to delete");
+            return;
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append("ID: ")
+            .append(cryptoExchange.GetId())
+            .append("\n")
+            .append("Source crypto: ")
+            .append(cryptoExchange.GetSoldCrypto().GetName())
+            .append(" (")
+            .append(cryptoExchange.GetSoldCrypto().GetSymbol())
+            .append(")\n")
+            .append("Target crypto: ")
+            .append(cryptoExchange.GetReceivedCrypto().GetName())
+            .append(" (")
+            .append(cryptoExchange.GetReceivedCrypto().GetSymbol())
+            .append(")\n")
+            .append("Source quantity: ")
+            .append(cryptoExchange.GetSoldQuantity())
+            .append("\n")
+            .append("Source quantity after deletion: ")
+            .append(cryptoExchange.GetSoldCrypto().GetCurrentQuantity().add(
+                cryptoExchange.GetSoldQuantity()))
+            .append("\n")
+            .append("Target quantity: ")
+            .append(cryptoExchange.GetReceivedQuantity())
+            .append("\n")
+            .append("Target quantity after deletion: ")
+            .append(cryptoExchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
+                cryptoExchange.GetReceivedQuantity()))
+            .append("\n")
+            .append("Date: ")
+            .append(cryptoExchange.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+            .append("\n")
+            .append("Description: ")
+            .append(cryptoExchange.GetDescription())
+            .append("\n");
+
+        if (WindowUtils.ShowConfirmationDialog(
+                "Delete crypto exchange",
+                "Are you sure you want to delete the crypto exchange?",
+                message.toString()))
+        {
+            tickerService.DeleteCryptoExchange(cryptoExchange.GetId());
+            LoadCryptoExchangesFromDatabase();
+            UpdateCryptoExchangeTableView();
         }
     }
 

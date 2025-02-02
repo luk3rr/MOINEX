@@ -6,31 +6,22 @@
 
 package org.moinex.services;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
+import org.moinex.repositories.CryptoExchangeRepository;
 import org.moinex.repositories.DividendRepository;
 import org.moinex.repositories.TickerPurchaseRepository;
 import org.moinex.repositories.TickerRepository;
@@ -62,6 +53,9 @@ public class TickerService
 
     @Autowired
     private DividendRepository m_dividendRepository;
+
+    @Autowired
+    private CryptoExchangeRepository m_cryptoExchangeRepository;
 
     @Autowired
     private WalletRepository m_walletRepository;
@@ -529,6 +523,97 @@ public class TickerService
     }
 
     /**
+     * Exchange crypto between two tickers
+     * @param sourceTickerId The id of the sold ticker
+     * @param targetTickerId The id of the target ticker
+     * @param soldQuantity The quantity of the sold ticker
+     * @param receivedQuantity The quantity of the target ticker
+     * @param date The date of the exchange
+     * @param description The description of the exchange
+     * @throws RuntimeException If the sold ticker does not exist
+     * @throws RuntimeException If the target ticker does not exist
+     * @throws RuntimeException If the quantities are less than or equal to zero
+     * @throws RuntimeException If the sold quantity is greater than the current
+     *    quantity
+     */
+    @Transactional
+    public void AddCryptoExchange(Long          sourceTickerId,
+                                  Long          targetTickerId,
+                                  BigDecimal    soldQuantity,
+                                  BigDecimal    receivedQuantity,
+                                  LocalDateTime date,
+                                  String        description)
+    {
+        if (sourceTickerId.equals(targetTickerId))
+        {
+            throw new RuntimeException("Source and target tickers must be different");
+        }
+
+        Ticker soldCrypto =
+            m_tickerRepository.findById(sourceTickerId)
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Ticker with id " + sourceTickerId +
+                                     " not found and cannot exchange crypto"));
+
+        Ticker receivedCrypto =
+            m_tickerRepository.findById(targetTickerId)
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Ticker with id " + targetTickerId +
+                                     " not found and cannot exchange crypto"));
+
+        if (soldCrypto.GetType() != TickerType.CRYPTOCURRENCY ||
+            receivedCrypto.GetType() != TickerType.CRYPTOCURRENCY)
+        {
+            throw new RuntimeException(
+                "Both tickers must be of type CRYPTO to exchange crypto");
+        }
+
+        if (soldQuantity.compareTo(BigDecimal.ZERO) <= 0 ||
+            receivedQuantity.compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Quantity must be greater than zero");
+        }
+
+        // Check if the quantity is greater than the current quantity
+        if (soldQuantity.compareTo(soldCrypto.GetCurrentQuantity()) > 0)
+        {
+            throw new RuntimeException(
+                "Source quantity must be less than or equal to the current "
+                + "quantity");
+        }
+
+        CryptoExchange exchange = new CryptoExchange(soldCrypto,
+                                                     receivedCrypto,
+                                                     soldQuantity,
+                                                     receivedQuantity,
+                                                     date,
+                                                     description);
+
+        m_cryptoExchangeRepository.save(exchange);
+
+        // Update holdings quantity
+        soldCrypto.SetCurrentQuantity(
+            soldCrypto.GetCurrentQuantity().subtract(soldQuantity));
+        receivedCrypto.SetCurrentQuantity(
+            receivedCrypto.GetCurrentQuantity().add(receivedQuantity));
+
+        // If sold all holdings, reset average price
+        if (soldCrypto.GetCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
+        {
+            ResetAveragePrice(sourceTickerId);
+        }
+
+        m_tickerRepository.save(soldCrypto);
+        m_tickerRepository.save(receivedCrypto);
+
+        logger.info("CryptoExchange with id " + exchange.GetId() +
+                    " added to tickers " + soldCrypto.GetSymbol() + " and " +
+                    receivedCrypto.GetSymbol());
+    }
+
+    /**
      * Delete a purchase
      * @param purchaseId The id of the purchase
      * @throws RuntimeException If the purchase does not exist
@@ -599,6 +684,38 @@ public class TickerService
             dividend.GetWalletTransaction().GetId());
 
         logger.info("Dividend with id " + dividendId + " was deleted");
+    }
+
+    /**
+     * Delete a crypto exchange
+     * @param exchangeId The id of the crypto exchange
+     * @throws RuntimeException If the crypto exchange does not exist
+     */
+    @Transactional
+    public void DeleteCryptoExchange(Long exchangeId)
+    {
+        CryptoExchange exchange =
+            m_cryptoExchangeRepository.findById(exchangeId)
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("CryptoExchange with id " + exchangeId +
+                                                " not found and cannot be deleted"));
+
+        // Adjust holdings quantity
+        exchange.GetSoldCrypto().SetCurrentQuantity(
+            exchange.GetSoldCrypto().GetCurrentQuantity().add(
+                exchange.GetSoldQuantity()));
+
+        exchange.GetReceivedCrypto().SetCurrentQuantity(
+            exchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
+                exchange.GetReceivedQuantity()));
+
+        m_tickerRepository.save(exchange.GetSoldCrypto());
+        m_tickerRepository.save(exchange.GetReceivedCrypto());
+
+        m_cryptoExchangeRepository.delete(exchange);
+
+        logger.info("CryptoExchange with id " + exchangeId + " was deleted");
     }
 
     /**
@@ -724,6 +841,155 @@ public class TickerService
         logger.info("Dividend with id " + dividend.GetId() + " was updated");
     }
 
+    /**
+     * Update a crypto exchange
+     * @param exchange The crypto exchange to be updated
+     * @throws RuntimeException If the crypto exchange does not exist
+     * @throws RuntimeException If the tickers do not exist
+     * @throws RuntimeException If the quantities are less than or equal to zero
+     */
+    @Transactional
+    public void UpdateCryptoExchange(CryptoExchange exchange)
+    {
+        // Print ids
+        System.out.println("Exchange ID: " + exchange.GetId());
+        System.out.println("Sold ID: " + exchange.GetSoldCrypto().GetId());
+        System.out.println("Received ID: " + exchange.GetReceivedCrypto().GetId());
+
+        CryptoExchange oldExchange =
+            m_cryptoExchangeRepository.findById(exchange.GetId())
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "CryptoExchange with id " + exchange.GetId() +
+                                     " not found and cannot be updated"));
+
+        m_tickerRepository.findById(exchange.GetSoldCrypto().GetId())
+            .orElseThrow(()
+                             -> new RuntimeException(
+                                 "Source ticker with id " +
+                                 exchange.GetSoldCrypto().GetId() +
+                                 " not found and cannot update crypto exchange"));
+
+        m_tickerRepository.findById(exchange.GetReceivedCrypto().GetId())
+            .orElseThrow(()
+                             -> new RuntimeException(
+                                 "Target ticker with id " +
+                                 exchange.GetReceivedCrypto().GetId() +
+                                 " not found and cannot update crypto exchange"));
+
+        if (exchange.GetSoldCrypto().GetId() == exchange.GetReceivedCrypto().GetId())
+        {
+            throw new RuntimeException("Source and target tickers must be different");
+        }
+
+        if (exchange.GetSoldQuantity().compareTo(BigDecimal.ZERO) <= 0 ||
+            exchange.GetReceivedQuantity().compareTo(BigDecimal.ZERO) <= 0)
+        {
+            throw new RuntimeException("Quantity must be greater than zero");
+        }
+
+        // Complex update operations
+        ChangeSoldCrypto(oldExchange, exchange.GetSoldCrypto());
+        ChangeReceivedCrypto(oldExchange, exchange.GetReceivedCrypto());
+        ChangeSoldQuantity(oldExchange, exchange.GetSoldQuantity());
+        ChangeReceivedQuantity(oldExchange, exchange.GetReceivedQuantity());
+
+        // Trivial update operations
+        oldExchange.SetDate(exchange.GetDate());
+        oldExchange.SetDescription(exchange.GetDescription());
+
+        m_cryptoExchangeRepository.save(oldExchange);
+
+        logger.info("CryptoExchange with id " + exchange.GetId() + " was updated");
+    }
+
+    /**
+     * Change the quantity of sold ticker of a crypto exchange
+     * @param oldExchange The crypto exchange to be updated
+     * @param soldQuantity The new sold quantity
+     */
+    public void ChangeSoldQuantity(CryptoExchange oldExchange, BigDecimal soldQuantity)
+    {
+        // Adjust holdings quantity
+        oldExchange.GetSoldCrypto().SetCurrentQuantity(
+            oldExchange.GetSoldCrypto().GetCurrentQuantity().add(
+                oldExchange.GetSoldQuantity().subtract(soldQuantity)));
+
+        m_tickerRepository.save(oldExchange.GetSoldCrypto());
+
+        oldExchange.SetSoldQuantity(soldQuantity);
+    }
+
+    /**
+     * Change the quantity of received crypto of a crypto exchange
+     * @param oldExchange The crypto exchange to be updated
+     * @param receivedQuantity The new target quantity
+     */
+    public void ChangeReceivedQuantity(CryptoExchange oldExchange,
+                                       BigDecimal     receivedQuantity)
+    {
+        // Adjust holdings quantity
+        oldExchange.GetReceivedCrypto().SetCurrentQuantity(
+            oldExchange.GetReceivedCrypto().GetCurrentQuantity().add(
+                oldExchange.GetReceivedQuantity().subtract(receivedQuantity)));
+
+        m_tickerRepository.save(oldExchange.GetReceivedCrypto());
+
+        oldExchange.SetReceivedQuantity(receivedQuantity);
+    }
+
+    /**
+     * Change the sold ticker of a crypto exchange
+     * @param exchange The crypto exchange
+     * @param soldCrypto The new sold ticker
+     */
+    private void ChangeSoldCrypto(CryptoExchange oldExchange, Ticker soldCrypto)
+    {
+        if (oldExchange.GetSoldCrypto().GetId() == soldCrypto.GetId())
+        {
+            return;
+        }
+
+        // Adjust holdings quantity
+        oldExchange.GetSoldCrypto().SetCurrentQuantity(
+            oldExchange.GetSoldCrypto().GetCurrentQuantity().add(
+                oldExchange.GetSoldQuantity()));
+
+        soldCrypto.SetCurrentQuantity(
+            soldCrypto.GetCurrentQuantity().subtract(oldExchange.GetSoldQuantity()));
+
+        m_tickerRepository.save(oldExchange.GetSoldCrypto());
+        m_tickerRepository.save(soldCrypto);
+
+        oldExchange.SetSoldCrypto(soldCrypto);
+    }
+
+    /**
+     * Change the received ticker of a crypto exchange
+     * @param exchange The crypto exchange
+     * @param receivedCrypto The new target ticker
+     */
+    private void ChangeReceivedCrypto(CryptoExchange oldExchange, Ticker receivedCrypto)
+    {
+        if (oldExchange.GetReceivedCrypto().GetId() == receivedCrypto.GetId())
+        {
+            return;
+        }
+
+        // Adjust holdings quantity
+        oldExchange.GetReceivedCrypto().SetCurrentQuantity(
+            oldExchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
+                oldExchange.GetReceivedQuantity()));
+
+        receivedCrypto.SetCurrentQuantity(
+            receivedCrypto.GetCurrentQuantity().add(oldExchange.GetReceivedQuantity()));
+
+        m_tickerRepository.save(oldExchange.GetReceivedCrypto());
+        m_tickerRepository.save(receivedCrypto);
+
+        oldExchange.SetReceivedCrypto(receivedCrypto);
+    }
+
     public void ResetAveragePrice(Long tickerId)
     {
         Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
@@ -768,6 +1034,15 @@ public class TickerService
     }
 
     /**
+     * Get all non-archived tickers of a specific type
+     * @param type The type of the tickers
+     */
+    public List<Ticker> GetAllNonArchivedTickersByType(TickerType type)
+    {
+        return m_tickerRepository.findAllByTypeAndArchivedFalseOrderBySymbolAsc(type);
+    }
+
+    /**
      * Get count of transactions associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of transactions associated with the ticker
@@ -775,7 +1050,8 @@ public class TickerService
     public Long GetTransactionCountByTicker(Long tickerId)
     {
         return GetPurchaseCountByTicker(tickerId) + GetSaleCountByTicker(tickerId) +
-            GetDividendCountByTicker(tickerId);
+            GetDividendCountByTicker(tickerId) +
+            GetCryptoExchangeCountByTicker(tickerId);
     }
 
     /**
@@ -809,6 +1085,16 @@ public class TickerService
     }
 
     /**
+     * Get count of crypto exchanges associated with the ticker
+     * @param tickerId The id of the ticker
+     * @return The count of crypto exchanges associated with the ticker
+     */
+    public Long GetCryptoExchangeCountByTicker(Long tickerId)
+    {
+        return m_tickerRepository.GetCryptoExchangeCountByTicker(tickerId);
+    }
+
+    /**
      * Get all purchases
      * @return A list with all purchases
      */
@@ -833,5 +1119,14 @@ public class TickerService
     public List<Dividend> GetAllDividends()
     {
         return m_dividendRepository.findAll();
+    }
+
+    /**
+     * Get all crypto exchanges
+     * @return A list with all crypto exchanges
+     */
+    public List<CryptoExchange> GetAllCryptoExchanges()
+    {
+        return m_cryptoExchangeRepository.findAll();
     }
 }
