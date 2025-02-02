@@ -930,7 +930,7 @@ public class TickerService
     {
         // Adjust holdings quantity
         oldExchange.GetReceivedCrypto().SetCurrentQuantity(
-            oldExchange.GetReceivedCrypto().GetCurrentQuantity().add(
+            oldExchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
                 oldExchange.GetReceivedQuantity().subtract(receivedQuantity)));
 
         m_tickerRepository.save(oldExchange.GetReceivedCrypto());
