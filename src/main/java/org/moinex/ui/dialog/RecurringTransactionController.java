@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import org.moinex.entities.RecurringTransaction;
 import org.moinex.services.RecurringTransactionService;
 import org.moinex.util.Constants;
+import org.moinex.util.RecurringTransactionStatus;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -301,10 +302,38 @@ public class RecurringTransactionController
 
         TableColumn<RecurringTransaction, String> nextDueDateColumn =
             new TableColumn<>("Next Due Date");
-        nextDueDateColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(param.getValue().GetNextDueDate().format(
-                Constants.DATE_FORMATTER_NO_TIME)));
+        nextDueDateColumn.setCellValueFactory(param -> {
+            if (param.getValue().GetStatus().equals(
+                    RecurringTransactionStatus.INACTIVE))
+            {
+                return new SimpleStringProperty("-");
+            }
+            else
+            {
+                return new SimpleStringProperty(
+                    param.getValue().GetNextDueDate().format(
+                        Constants.DATE_FORMATTER_NO_TIME));
+            }
+        });
+
+        nextDueDateColumn.setCellFactory(
+            column -> new TableCell<RecurringTransaction, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty)
+                {
+                    super.updateItem(item, empty);
+                    if (item == null || empty)
+                    {
+                        setText(null);
+                    }
+                    else
+                    {
+                        setText(item.toString());
+                        setAlignment(Pos.CENTER);
+                        setStyle("-fx-padding: 0;");
+                    }
+                }
+            });
 
         TableColumn<RecurringTransaction, String> expectedRemainingAmountColumn =
             new TableColumn<>("Expected Remaining Amount");

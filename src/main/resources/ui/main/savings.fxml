@@ -170,6 +170,29 @@
                                                                   </VBox>
                                                                </children>
                                                             </AnchorPane>
+                                                            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                               <children>
+                                                                  <Region HBox.hgrow="ALWAYS" />
+                                                                  <Label fx:id="creditedTransfersSign11121" minWidth="10.0" text=" ">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="13.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <Label fx:id="overviewTabEthereumValueField11" text="Last update">
+                                                                     <font>
+                                                                        <Font name="System Italic" size="10.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <Label fx:id="overviewTabBrazilianMarketIndicatorsLastUpdate" text="DD/MM/YYYY">
+                                                                     <font>
+                                                                        <Font name="System Italic" size="10.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                               </children>
+                                                               <padding>
+                                                                  <Insets top="5.0" />
+                                                               </padding>
+                                                            </HBox>
                                                          </children>
                                                       </VBox>
                                                    </children>
@@ -262,6 +285,29 @@
                                                                                  </font>
                                                                               </Label>
                                                                            </children>
+                                                                        </HBox>
+                                                                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                           <children>
+                                                                              <Region HBox.hgrow="ALWAYS" />
+                                                                              <Label fx:id="creditedTransfersSign1112" minWidth="10.0" text=" ">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="13.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="overviewTabEthereumValueField1" text="Last update">
+                                                                                 <font>
+                                                                                    <Font name="System Italic" size="10.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <Label fx:id="overviewTabMarketQuotesLastUpdate" text="DD/MM/YYYY">
+                                                                                 <font>
+                                                                                    <Font name="System Italic" size="10.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                           </children>
+                                                                           <padding>
+                                                                              <Insets top="5.0" />
+                                                                           </padding>
                                                                         </HBox>
                                                                      </children>
                                                                      <padding>
@@ -370,6 +416,29 @@
                                                                   </VBox>
                                                                </children>
                                                             </AnchorPane>
+                                                            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                               <children>
+                                                                  <Region HBox.hgrow="ALWAYS" />
+                                                                  <Label fx:id="creditedTransfersSign11122" minWidth="10.0" text=" ">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="13.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <Label fx:id="overviewTabEthereumValueField11" text="Last update">
+                                                                     <font>
+                                                                        <Font name="System Italic" size="10.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <Label fx:id="overviewTabCommoditiesLastUpdate" text="DD/MM/YYYY">
+                                                                     <font>
+                                                                        <Font name="System Italic" size="10.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                               </children>
+                                                               <padding>
+                                                                  <Insets top="5.0" />
+                                                               </padding>
+                                                            </HBox>
                                                          </children>
                                                       </VBox>
                                                    </children>

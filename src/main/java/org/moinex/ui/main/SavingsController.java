@@ -38,12 +38,12 @@ import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
 import org.moinex.services.MarketService;
 import org.moinex.services.TickerService;
+import org.moinex.ui.dialog.AddCryptoExchangeController;
 import org.moinex.ui.dialog.AddDividendController;
 import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.ArchivedTickersController;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
-import org.moinex.ui.dialog.AddCryptoExchangeController;
 import org.moinex.ui.dialog.InvestmentTransactionsController;
 import org.moinex.ui.dialog.SaleTickerController;
 import org.moinex.util.Constants;
@@ -131,6 +131,15 @@ public class SavingsController
 
     @FXML
     private Label overviewTabOilBrentValueField;
+
+    @FXML
+    private Label overviewTabBrazilianMarketIndicatorsLastUpdate;
+
+    @FXML
+    private Label overviewTabMarketQuotesLastUpdate;
+
+    @FXML
+    private Label overviewTabCommoditiesLastUpdate;
 
     @Autowired
     private ConfigurableApplicationContext springContext;
@@ -862,6 +871,10 @@ public class SavingsController
 
         overviewTabIPCA12MonthsValueField.setText(
             UIUtils.FormatPercentage(brazilianMarketIndicators.GetIpca12Months()));
+
+        overviewTabBrazilianMarketIndicatorsLastUpdate.setText(
+            brazilianMarketIndicators.GetLastUpdate().format(
+                Constants.DATE_FORMATTER_NO_TIME));
     }
 
     private void UpdateMarketQuotesAndCommodities()
@@ -900,6 +913,14 @@ public class SavingsController
 
         overviewTabOilBrentValueField.setText(
             UIUtils.FormatCurrency(marketQuotesAndCommodities.GetOilBrent()));
+
+        overviewTabMarketQuotesLastUpdate.setText(
+            marketQuotesAndCommodities.GetLastUpdate().format(
+                Constants.DATE_FORMATTER_NO_TIME));
+
+        overviewTabCommoditiesLastUpdate.setText(
+            marketQuotesAndCommodities.GetLastUpdate().format(
+                Constants.DATE_FORMATTER_NO_TIME));
     }
 
     /**

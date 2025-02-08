@@ -288,6 +288,7 @@ public final class Constants
     public static final String DATE_FORMAT_NO_TIME       = "yyyy-MM-dd";
     public static final String SHORT_DATE_FORMAT_NO_TIME = "yy-MM-dd";
     public static final String DATE_FORMAT_WITH_TIME     = "yyyy-MM-dd HH:mm:ss";
+    public static final String DB_MONTH_YEAR_FORMAT      = "yyyy-MM";
 
     public static final DateTimeFormatter DB_DATE_FORMATTER =
         DateTimeFormatter.ofPattern(DB_DATE_FORMAT);
@@ -300,6 +301,9 @@ public final class Constants
 
     public static final DateTimeFormatter DATE_FORMATTER_WITH_TIME =
         DateTimeFormatter.ofPattern(DATE_FORMAT_WITH_TIME);
+
+    public static final DateTimeFormatter DB_MONTH_YEAR_FORMATTER =
+        DateTimeFormatter.ofPattern(DB_MONTH_YEAR_FORMAT);
 
     // Define the pattern for positive and negative currency values
     public static final String CURRENCY_FORMAT = "$ #,##0.00; - $ #,##0.00";

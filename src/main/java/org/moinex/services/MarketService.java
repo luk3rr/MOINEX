@@ -7,7 +7,11 @@
 package org.moinex.services;
 
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.json.JSONObject;
@@ -147,22 +151,14 @@ public class MarketService
                     bmi.SetIpcaLastMonth(ipcaLastMonth.getBigDecimal("valor"));
 
                     // Extract the date in the format DD/MM/YYYY
-                    // and convert it to MM/YYYY
-                    String   date      = ipcaLastMonth.getString("data");
-                    String[] dateParts = date.split("/");
+                    // and convert it to a YearMonth object
+                    String date = ipcaLastMonth.getString("data");
 
-                    if (dateParts.length == 3)
-                    {
-                        String formattedDate =
-                            String.format("%s/%s", dateParts[1], dateParts[2]);
+                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate localDate = LocalDate.parse(date, inputFormatter);
+                    YearMonth dateDateTime = YearMonth.from(localDate);
 
-                        bmi.SetIpcaLastMonthReference(formattedDate);
-                    }
-                    else
-                    {
-                        // If the date is not in the expected format
-                        bmi.SetIpcaLastMonthReference("N/A");
-                    }
+                    bmi.SetIpcaLastMonthReference(dateDateTime);
 
                     bmi.SetLastUpdate(LocalDateTime.now());
 

@@ -14,6 +14,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+
 import org.moinex.util.Constants;
 
 @Entity
@@ -67,9 +69,14 @@ public class BrazilianMarketIndicators
      * Get the reference of the IPCA of the last month
      * @return The reference of the IPCA of the last month
      */
-    public String GetIpcaLastMonthReference()
+    public YearMonth GetIpcaLastMonthReference()
     {
-        return ipcaLastMonthReference;
+        if (ipcaLastMonthReference == null)
+        {
+            return null;
+        }
+
+        return YearMonth.parse(ipcaLastMonthReference, Constants.DB_MONTH_YEAR_FORMATTER);
     }
 
     /**
@@ -85,9 +92,14 @@ public class BrazilianMarketIndicators
      * Get the last update of the Brazilian market indicators
      * @return The last update of the Brazilian market indicators
      */
-    public String GetLastUpdate()
+    public LocalDateTime GetLastUpdate()
     {
-        return lastUpdate;
+        if (lastUpdate == null)
+        {
+            return null;
+        }
+
+        return LocalDateTime.parse(lastUpdate, Constants.DB_DATE_FORMATTER);
     }
 
     /**
@@ -112,9 +124,15 @@ public class BrazilianMarketIndicators
      * Set the reference of the IPCA of the last month
      * @param ipcaLastMonthReference The reference of the IPCA of the last month
      */
-    public void SetIpcaLastMonthReference(String ipcaLastMonthReference)
+    public void SetIpcaLastMonthReference(YearMonth ipcaLastMonthReference)
     {
-        this.ipcaLastMonthReference = ipcaLastMonthReference;
+        if (ipcaLastMonthReference == null)
+        {
+            this.ipcaLastMonthReference = null;
+            return;
+        }
+
+        this.ipcaLastMonthReference = ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
     }
 
     /**
@@ -132,6 +150,12 @@ public class BrazilianMarketIndicators
      */
     public void SetLastUpdate(LocalDateTime lastUpdate)
     {
+        if (lastUpdate == null)
+        {
+            this.lastUpdate = null;
+            return;
+        }
+
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }
 }
