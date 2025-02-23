@@ -21,6 +21,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
@@ -497,6 +499,15 @@ public class AddExpenseController
 
         suggestionListView.setPrefWidth(Region.USE_COMPUTED_SIZE);
         suggestionListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
+
+        // By default, the SPACE key is used to select an item in the ListView.
+        // This behavior is not desired in this case, so the event is consumed
+        suggestionListView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE)
+            {
+                event.consume(); // Do not propagate the event
+            }
+        });
 
         // Add a listener to the ListView to fill the fields with the selected
         suggestionListView.getSelectionModel().selectedItemProperty().addListener(
