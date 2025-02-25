@@ -1199,29 +1199,31 @@ public class CreditCardService
 
         Integer installments = oldDebt.GetInstallments();
 
-        // Calculate the installment value
-        // If the division is not exact, the first installment absorbs the remainder
-        BigDecimal installmentValue =
-            newAmount.divide(new BigDecimal(installments), 2, RoundingMode.HALF_UP);
+        // Divide the value exactly, with full precision
+        BigDecimal exactInstallmentValue =
+            newAmount.divide(new BigDecimal(installments), 2, RoundingMode.FLOOR);
 
-        BigDecimal totalCalculated = installmentValue.multiply(
-            new BigDecimal(installments)); // Total without remainder
-
-        BigDecimal remainder = newAmount.subtract(totalCalculated);
-
-        // First installment absorbs the remainder
-        BigDecimal firstInstallment = installmentValue.add(remainder);
+        // Calculate the remainder
+        BigDecimal remainder = newAmount.subtract(
+            exactInstallmentValue.multiply(new BigDecimal(installments)));
 
         // Update payments
         for (Integer i = 0; i < oldDebt.GetInstallments(); i++)
         {
             CreditCardPayment payment = payments.get(i);
 
+            // If there is a remainder, add it to the first installment
+            BigDecimal currentInstallmentValue = exactInstallmentValue;
+            if (remainder.compareTo(BigDecimal.ZERO) > 0 && i == 0)
+            {
+                currentInstallmentValue = currentInstallmentValue.add(remainder);
+            }
+
             // If the payment was made with a wallet, add the amount difference back to
             // the wallet balance
             if (payment.GetWallet() != null)
             {
-                BigDecimal diff = installmentValue.subtract(payment.GetAmount());
+                BigDecimal diff = currentInstallmentValue.subtract(payment.GetAmount());
 
                 payment.GetWallet().SetBalance(
                     payment.GetWallet().GetBalance().add(diff));
@@ -1236,14 +1238,14 @@ public class CreditCardService
                 m_walletRepository.save(payment.GetWallet());
             }
 
-            payment.SetAmount(i == 0 ? firstInstallment : installmentValue);
+            payment.SetAmount(currentInstallmentValue);
             m_creditCardPaymentRepository.save(payment);
 
             m_logger.info("Payment number " + payment.GetInstallment() +
                           " of debt with id " + oldDebt.GetId() +
                           " on credit card with id " +
                           oldDebt.GetCreditCard().GetId() + " updated with value " +
-                          (i == 0 ? firstInstallment : installmentValue));
+                          currentInstallmentValue);
         }
 
         // Update the total amount
