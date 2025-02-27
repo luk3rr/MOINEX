@@ -9,13 +9,17 @@ package org.moinex.ui.dialog;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.moinex.entities.RecurringTransaction;
 import org.moinex.services.RecurringTransactionService;
 import org.moinex.util.Constants;
@@ -34,6 +38,9 @@ public class RecurringTransactionController
 {
     @FXML
     private TableView<RecurringTransaction> recurringTransactionTableView;
+
+    @FXML
+    private ComboBox<RecurringTransactionStatus> statusComboBox;
 
     @FXML
     private TextField searchField;
@@ -62,7 +69,14 @@ public class RecurringTransactionController
 
         ConfigureTableView();
 
+        PopulateRecurringTransactionStatusComboBox();
+
+        // Set default value for the status combo box (null = All)
+        statusComboBox.setValue(null);
+
         UpdateRecurringTransactionTableView();
+
+        statusComboBox.setOnAction(event -> { UpdateRecurringTransactionTableView(); });
 
         // Add listener to the search field
         searchField.textProperty().addListener(
@@ -159,23 +173,32 @@ public class RecurringTransactionController
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
+        // Get selected transaction status from combo box
+        RecurringTransactionStatus selectedStatus = statusComboBox.getValue();
+
         recurringTransactionTableView.getItems().clear();
 
         // Populate the table view
         if (similarTextOrId.isEmpty())
         {
-            recurringTransactionTableView.getItems().setAll(recurringTransactions);
+            recurringTransactions.stream()
+                .filter(rt
+                        -> selectedStatus == null ||
+                               rt.GetStatus().equals(selectedStatus))
+                .forEach(recurringTransactionTableView.getItems()::add);
         }
         else
         {
             recurringTransactions.stream()
+                .filter(rt
+                        -> selectedStatus == null ||
+                               rt.GetStatus().equals(selectedStatus))
                 .filter(rt -> {
                     String description = rt.GetDescription().toLowerCase();
                     String id          = rt.GetId().toString();
                     String category    = rt.GetCategory().GetName().toLowerCase();
                     String wallet      = rt.GetWallet().GetName().toLowerCase();
                     String type        = rt.GetType().name().toLowerCase();
-                    String status      = rt.GetStatus().name().toLowerCase();
                     String frequency   = rt.GetFrequency().name().toLowerCase();
                     String amount      = UIUtils.FormatCurrency(rt.GetAmount());
 
@@ -184,7 +207,6 @@ public class RecurringTransactionController
                         category.contains(similarTextOrId) ||
                         wallet.contains(similarTextOrId) ||
                         type.contains(similarTextOrId) ||
-                        status.contains(similarTextOrId) ||
                         frequency.contains(similarTextOrId) ||
                         amount.contains(similarTextOrId);
                 })
@@ -369,5 +391,38 @@ public class RecurringTransactionController
         recurringTransactionTableView.getColumns().add(endDateColumn);
         recurringTransactionTableView.getColumns().add(nextDueDateColumn);
         recurringTransactionTableView.getColumns().add(expectedRemainingAmountColumn);
+    }
+
+    /**
+     * Populate the transaction type combo box with the available transaction types
+     */
+    private void PopulateRecurringTransactionStatusComboBox()
+    {
+        // Make a copy of the list to add the 'All' option
+        // Add 'All' option to the transaction type combo box
+        // All is the first element in the list and is represented by a null value
+        ObservableList<RecurringTransactionStatus> transactionTypesWithNull =
+            FXCollections.observableArrayList(RecurringTransactionStatus.values());
+        transactionTypesWithNull.add(0, null);
+
+        statusComboBox.setItems(transactionTypesWithNull);
+
+        statusComboBox.setConverter(new StringConverter<RecurringTransactionStatus>() {
+            @Override
+            public String toString(RecurringTransactionStatus transactionType)
+            {
+                return transactionType != null ? transactionType.toString()
+                                               : "ALL"; // Show "All" instead of null
+            }
+
+            @Override
+            public RecurringTransactionStatus fromString(String string)
+            {
+                return string.equals("ALL")
+                    ? null
+                    : RecurringTransactionStatus.valueOf(
+                          string); // Return null if "All" is selected
+            }
+        });
     }
 }
