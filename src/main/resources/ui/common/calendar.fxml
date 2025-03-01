@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import java.net.URL?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -12,7 +13,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.CalendarController">
    <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -48,16 +48,11 @@
                   </graphic>
                </JFXButton>
                <Region prefWidth="20.0" />
-               <Text fx:id="year" strokeType="OUTSIDE" strokeWidth="0.0" text="####">
+               <Label fx:id="currentMonth" text="MM/YY">
                   <font>
-                     <Font size="22.0" />
+                     <Font name="System Bold" size="15.0" />
                   </font>
-               </Text>
-               <Text fx:id="month" strokeType="OUTSIDE" strokeWidth="0.0" text="####">
-                  <font>
-                     <Font size="22.0" />
-                  </font>
-               </Text>
+               </Label>
                <Region prefWidth="20.0" />
                <JFXButton onAction="#handleForwardOneMonth">
                   <graphic>

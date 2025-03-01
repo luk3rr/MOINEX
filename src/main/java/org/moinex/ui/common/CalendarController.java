@@ -8,6 +8,7 @@ package org.moinex.ui.common;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -25,11 +27,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.moinex.entities.CalendarEvent;
 import org.moinex.services.CalendarService;
+import org.moinex.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -40,10 +41,7 @@ import org.springframework.stereotype.Controller;
 public class CalendarController
 {
     @FXML
-    private Text year;
-
-    @FXML
-    private Text month;
+    private Label currentMonth;
 
     @FXML
     private GridPane calendar;
@@ -99,21 +97,27 @@ public class CalendarController
     private void handleAddEvent()
     { }
 
+    /**
+     * Load the calendar events from the database
+     */
     private void LoadCalendarEventsFromDatabase()
     {
         calendarEvents = calendarService.GetAllEvents();
     }
 
+    /**
+     * Draw the calendar grid
+     */
     private void DrawCalendar()
     {
-        year.setText(String.valueOf(dateFocus.getYear()));
-        month.setText(String.valueOf(dateFocus.getMonth()));
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
+        currentMonth.setText(dateFocus.format(formatter));
 
         Integer monthMaxDate = dateFocus.getMonth().maxLength();
 
         if (!dateFocus.isLeapYear() && dateFocus.getMonth() == Month.FEBRUARY)
         {
-            monthMaxDate = 28;
+            monthMaxDate = Constants.NON_LEAP_YEAR_FEBRUARY_DAYS;
         }
 
         Integer dateOffset =
@@ -121,14 +125,16 @@ public class CalendarController
                 .getDayOfWeek()
                 .getValue();
 
-        if (dateOffset == 7)
+        // Adjust the date offset to start from Sunday at first line of the calendar
+        if (dateOffset == Constants.WEEK_DAYS)
         {
             dateOffset = 0;
         }
 
         Integer currentDate    = 1;
         Integer totalGridCells = dateOffset + monthMaxDate;
-        Integer totalRows      = (int)Math.ceil(totalGridCells / 7.0);
+        Integer totalRows =
+            (int)Math.ceil(totalGridCells / Constants.WEEK_DAYS.doubleValue());
 
         Map<Integer, List<CalendarEvent>> calendarEventMap =
             GetCalendarEventsMonth(dateFocus);
@@ -138,38 +144,41 @@ public class CalendarController
         Double calendarWidth  = calendar.getPrefWidth();
         Double calendarHeight = calendar.getPrefHeight();
 
-        String[] weekDays = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-
-        for (Integer j = 0; j < 7; j++)
+        // Create the weekday labels
+        for (Integer j = 0; j < Constants.WEEKDAY_ABREVIATIONS.length; j++)
         {
-            Text dayLabel = new Text(weekDays[j]);
-            dayLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+            Text dayLabel = new Text(Constants.WEEKDAY_ABREVIATIONS[j]);
+            dayLabel.setFont(Constants.CALENDAR_WEEKDAY_FONT_CONFIG);
 
             StackPane dayContainer = new StackPane(dayLabel);
-            dayContainer.setPrefWidth(calendarWidth / 7);
+            dayContainer.setPrefWidth(calendarWidth / Constants.WEEK_DAYS);
             dayContainer.setPrefHeight(calendarHeight / (totalRows + 1));
             GridPane.setHalignment(dayLabel, HPos.CENTER);
             GridPane.setValignment(dayLabel, VPos.CENTER);
             calendar.add(dayContainer, j, 0);
         }
 
+        // Create the calendar cells for each day of the month
         for (Integer i = 0; i < totalRows; i++)
         {
-            for (Integer j = 0; j < 7; j++)
+            for (Integer j = 0; j < Constants.WEEK_DAYS; j++)
             {
                 VBox cell = new VBox();
-                cell.setMinSize(calendarWidth / 7, calendarHeight / (totalRows + 1));
+                cell.setMinSize(calendarWidth / Constants.WEEK_DAYS,
+                                calendarHeight / (totalRows + 1));
                 cell.setAlignment(Pos.TOP_CENTER);
 
                 // Define the border style for the cell
-                Double borderWidth         = 0.5;
-                Double externalBorderWidth = 2.0;
-
-                Double top = (i == 0) ? externalBorderWidth : borderWidth;
-                Double bottom =
-                    (i == totalRows - 1) ? externalBorderWidth : borderWidth;
-                Double left  = (j == 0) ? externalBorderWidth : borderWidth;
-                Double right = (j == 6) ? externalBorderWidth : borderWidth;
+                Double top    = (i == 0) ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                         : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double bottom = (i == totalRows - 1)
+                                    ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                    : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double left   = (j == 0) ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                         : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double right  = (j == Constants.WEEK_DAYS - 1)
+                                    ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                    : Constants.CALENDAR_CELL_BORDER_WIDTH;
 
                 String borderStyle = String.format(
                     "-fx-border-color: black; "
@@ -185,7 +194,7 @@ public class CalendarController
                     (i > 0 && currentDate <= monthMaxDate))
                 {
                     Text dateText = new Text(String.valueOf(currentDate));
-                    dateText.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+                    dateText.setFont(Constants.CALENDAR_DATE_FONT_CONFIG);
 
                     // Create the event indicators for the cell
                     HBox eventIndicators = new HBox(3);
@@ -218,6 +227,7 @@ public class CalendarController
 
                     cell.getChildren().addAll(dateText, spacer, eventIndicators);
 
+                    // Highlight the current date
                     if (today.getYear() == dateFocus.getYear() &&
                         today.getMonth() == dateFocus.getMonth() &&
                         today.getDayOfMonth() == currentDate)
@@ -234,6 +244,11 @@ public class CalendarController
         }
     }
 
+    /**
+     * Create a map of calendar events by date
+     * @param calendarEvents The list of calendar events
+     * @return A map of calendar events by date
+     */
     private Map<Integer, List<CalendarEvent>>
     CreateCalendarMap(List<CalendarEvent> calendarEvents)
     {
@@ -259,6 +274,11 @@ public class CalendarController
         return calendarEventMap;
     }
 
+    /**
+     * Get the calendar events for the month
+     * @param dateFocus The date to focus on
+     * @return A map of calendar events by date
+     */
     private Map<Integer, List<CalendarEvent>>
     GetCalendarEventsMonth(LocalDate dateFocus)
     {

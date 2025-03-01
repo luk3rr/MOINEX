@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 /**
  * Constants used in the application
@@ -246,7 +248,6 @@ public final class Constants
     public static final Integer XYBAR_CHART_MONTHS         = 12;
     public static final Integer XYBAR_CHART_FUTURE_MONTHS  = 6;
     public static final Integer MONTH_RESUME_FUTURE_MONTHS = 6;
-    public static final Integer YEAR_RESUME_FUTURE_YEARS   = 2;
 
     public static final Integer CRC_XYBAR_CHART_MAX_MONTHS = 25;
     public static final Integer XYBAR_CHART_TICKS          = 6;
@@ -262,6 +263,23 @@ public final class Constants
     public static final Double  TOOLTIP_ANIMATION_DELAY        = 0.5; // s
 
     public static final Integer HOME_ITEM_NODE_NAME_MAX_LENGTH = 100;
+
+    // Calendar config
+    public static final Integer YEAR_RESUME_FUTURE_YEARS    = 2;
+    public static final Integer NON_LEAP_YEAR_FEBRUARY_DAYS = 28;
+    public static final Integer WEEK_DAYS                   = 7;
+
+    public static final String[] WEEKDAY_ABREVIATIONS = { "Sun", "Mon", "Tue", "Wed",
+                                                          "Thu", "Fri", "Sat" };
+
+    public static final Font CALENDAR_WEEKDAY_FONT_CONFIG =
+        Font.font("Arial", FontWeight.BOLD, 14);
+
+    public static final Font CALENDAR_DATE_FONT_CONFIG =
+        Font.font("Arial", FontWeight.BOLD, 14);
+
+    public static final Double CALENDAR_CELL_BORDER_WIDTH          = 0.5;
+    public static final Double CALENDAR_CELL_EXTERNAL_BORDER_WIDTH = 2.0;
 
     // Circular progress bar on the goal pane
     public static final Double GOAL_PANE_PROGRESS_BAR_RADIUS = 80.0;
