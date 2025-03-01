@@ -21,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.moinex.ui.common.CalculatorController;
+import org.moinex.ui.common.CalendarController;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,7 +157,12 @@ public class MainController
     @FXML
     private void handleOpenCalendar()
     {
-        // TODO: Implement calendar
+        WindowUtils.OpenPopupWindow(Constants.CALENDAR_FXML,
+                                    "Calendar",
+                                    springContext,
+                                    (CalendarController controller)
+                                        -> {},
+                                    List.of(() -> {}));
     }
 
     /**

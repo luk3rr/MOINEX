@@ -35,6 +35,10 @@ public class CalculatorController
 
     public CalculatorController() { }
 
+    /**
+     * Constructor for CalculatorController
+     * @param calculatorService The service for the calculator
+     */
     @Autowired
     public CalculatorController(CalculatorService calculatorService)
     {

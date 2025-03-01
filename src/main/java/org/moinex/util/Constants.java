@@ -146,6 +146,7 @@ public final class Constants
                                                                  + "fxml");
 
     public static final String CALCULATOR_FXML = UI_COMMON_PATH + "calculator.fxml";
+    public static final String CALENDAR_FXML   = UI_COMMON_PATH + "calendar.fxml";
 
     // Icons
     public static final String HOME_EXPENSE_ICON = COMMON_ICONS_PATH + "expense.png";

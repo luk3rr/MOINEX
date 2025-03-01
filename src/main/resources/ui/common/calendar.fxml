@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import java.net.URL?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.CalendarController">
+   <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <children>
+         <GridPane fx:id="calendar" alignment="CENTER" gridLinesVisible="true" minHeight="600.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+           <columnConstraints>
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+           </columnConstraints>
+           <rowConstraints>
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+           </rowConstraints>
+         </GridPane>
+         <HBox alignment="CENTER" prefHeight="44.0" prefWidth="419.0" spacing="5.0">
+            <children>
+               <JFXButton onAction="#handleBackOneMonth">
+                  <graphic>
+                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../../icon/common/arrow_left.png" />
+                        </image>
+                     </ImageView>
+                  </graphic>
+               </JFXButton>
+               <Region prefWidth="20.0" />
+               <Text fx:id="year" strokeType="OUTSIDE" strokeWidth="0.0" text="####">
+                  <font>
+                     <Font size="22.0" />
+                  </font>
+               </Text>
+               <Text fx:id="month" strokeType="OUTSIDE" strokeWidth="0.0" text="####">
+                  <font>
+                     <Font size="22.0" />
+                  </font>
+               </Text>
+               <Region prefWidth="20.0" />
+               <JFXButton onAction="#handleForwardOneMonth">
+                  <graphic>
+                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../../icon/common/arrow_right.png" />
+                        </image>
+                     </ImageView>
+                  </graphic>
+               </JFXButton>
+            </children>
+         </HBox>
+         <HBox alignment="CENTER" prefHeight="44.0" prefWidth="419.0" spacing="5.0">
+            <children>
+               <JFXButton onAction="#handleAddEvent" text="Add Event">
+                  <graphic>
+                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../../icon/common/add.png" />
+                        </image>
+                     </ImageView>
+                  </graphic>
+               </JFXButton>
+            </children>
+         </HBox>
+      </children>
+   </VBox>
+   <stylesheets>
+      <URL value="@../css/common/common-styles.css" />
+      <URL value="@../css/component/anchor-pane.css" />
+   </stylesheets>
+
+</AnchorPane>
