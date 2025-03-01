@@ -150,7 +150,39 @@
                   </VBox>
                </children>
             </VBox>
-               <AnchorPane fx:id="contentArea" HBox.hgrow="ALWAYS" />
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                     <AnchorPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
+                  <HBox fx:id="footbarArea" alignment="CENTER_RIGHT" maxHeight="10.0" prefHeight="10.0" spacing="10.0">
+                     <children>
+                        <JFXButton onAction="#handleOpenCalendar" text="Calendar">
+                           <font>
+                              <Font size="9.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../icon/common/calendar.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </JFXButton>
+                        <JFXButton onAction="#handleOpenCalculator" text="Calculator">
+                           <font>
+                              <Font size="9.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../icon/common/calculator.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </JFXButton>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
          </children>
       </HBox>
    </children>

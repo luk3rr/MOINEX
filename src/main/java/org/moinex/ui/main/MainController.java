@@ -7,6 +7,7 @@
 package org.moinex.ui.main;
 
 import java.io.IOException;
+import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -16,9 +17,12 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
+import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -34,6 +38,9 @@ public class MainController
 
     @FXML
     private AnchorPane rootPane;
+
+    @FXML
+    private HBox footbarArea;
 
     @FXML
     private Button menuButton;
@@ -85,6 +92,9 @@ public class MainController
         rootPane.getStylesheets().add(
             getClass().getResource(Constants.MAIN_STYLE_SHEET).toExternalForm());
 
+        footbarArea.getStylesheets().add(
+            getClass().getResource(Constants.MAIN_STYLE_SHEET).toExternalForm());
+
         menuButton.setOnAction(event -> ToggleMenu());
 
         homeButton.setOnAction(event -> {
@@ -130,6 +140,23 @@ public class MainController
         // Load start page
         LoadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET);
         UpdateSelectedButton(homeButton);
+    }
+
+    @FXML
+    private void handleOpenCalculator()
+    {
+        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+                                    "Calculator",
+                                    springContext,
+                                    (CalculatorController controller)
+                                        -> {},
+                                    List.of(() -> {}));
+    }
+
+    @FXML
+    private void handleOpenCalendar()
+    {
+        // TODO: Implement calendar
     }
 
     /**
