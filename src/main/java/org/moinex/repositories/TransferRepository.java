@@ -75,4 +75,22 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
            + "OR t.receiverWallet.id = :walletId")
     Long
     GetTransferCountByWallet(@Param("walletId") Long walletId);
+
+    /**
+     * Get suggestions. Suggestions are transfers with distinct descriptions
+     * and most recent date
+     * @return A list with the suggestions
+     */
+    @Query("SELECT t "
+           + "FROM Transfer t "
+           + "WHERE t.senderWallet.archived = false AND "
+           + "t.receiverWallet.archived = false AND "
+           + "t.date = (SELECT MAX(t2.date) "
+           + "                 FROM Transfer t2 "
+           + "                 WHERE t2.senderWallet.archived = false AND "
+           + "                       t2.receiverWallet.archived = false AND "
+           + "                       t2.description = t.description) "
+           + "ORDER BY t.date DESC")
+    List<Transfer>
+    FindSuggestions();
 }

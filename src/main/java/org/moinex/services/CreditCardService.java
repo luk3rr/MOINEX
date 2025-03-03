@@ -948,6 +948,11 @@ public class CreditCardService
         return m_creditCardDebtRepository.GetDebtCountByCreditCard(id);
     }
 
+    public List<CreditCardDebt> GetCreditCardDebtSuggestions()
+    {
+        return m_creditCardDebtRepository.FindSuggestions();
+    }
+
     /**
      * Basic checks for credit card creation or update
      * @param name The name of the credit card

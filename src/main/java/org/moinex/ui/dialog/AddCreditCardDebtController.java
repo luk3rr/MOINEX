@@ -12,14 +12,23 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
+import org.moinex.entities.CreditCardDebt;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
@@ -67,6 +76,14 @@ public class AddCreditCardDebtController
     @Autowired
     private ConfigurableApplicationContext springContext;
 
+    private Popup suggestionsPopup;
+
+    private ListView<CreditCardDebt> suggestionListView;
+
+    private List<CreditCardDebt> suggestions;
+
+    private ChangeListener<String> descriptionFieldListener;
+
     private List<Category> categories;
 
     private List<CreditCard> creditCards;
@@ -80,7 +97,7 @@ public class AddCreditCardDebtController
     @Autowired
     public AddCreditCardDebtController(CategoryService   categoryService,
                                        CreditCardService creditCardService,
-                                        CalculatorService calculatorService)
+                                       CalculatorService calculatorService)
     {
         this.categoryService   = categoryService;
         this.creditCardService = creditCardService;
@@ -102,12 +119,13 @@ public class AddCreditCardDebtController
     @FXML
     private void initialize()
     {
-        ConfigureInvoiceComboBox();
-        PopulateInvoiceComboBox();
-
         LoadCategories();
         LoadCreditCards();
+        LoadSuggestions();
 
+        ConfigureInvoiceComboBox();
+
+        PopulateInvoiceComboBox();
         PopulateCategoryComboBox();
         PopulateCreditCardComboBox();
 
@@ -116,35 +134,9 @@ public class AddCreditCardDebtController
         UIUtils.ResetLabel(crcAvailableLimitLabel);
         UIUtils.ResetLabel(crcLimitAvailableAfterDebtLabel);
 
-        crcComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            UpdateCreditCardLimitLabels();
-            UpdateAvailableLimitAfterDebtLabel();
-        });
-
-        valueField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-            {
-                valueField.setText(oldValue);
-            }
-            else
-            {
-                UpdateAvailableLimitAfterDebtLabel();
-                UpdateMsgLabel();
-            }
-        });
-
-        installmentsField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.GetDigitsRegexUpTo(
-                        Constants.INSTALLMENTS_FIELD_MAX_DIGITS)))
-                {
-                    installmentsField.setText(oldValue);
-                }
-                else
-                {
-                    UpdateMsgLabel();
-                }
-            });
+        ConfigureSuggestionsListView();
+        ConfigureSuggestionsPopup();
+        ConfigureListeners();
     }
 
     @FXML
@@ -219,7 +211,8 @@ public class AddCreditCardDebtController
     }
 
     @FXML
-    private void handleOpenCalculator(){
+    private void handleOpenCalculator()
+    {
 
         WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
                                     "Calculator",
@@ -271,6 +264,11 @@ public class AddCreditCardDebtController
     private void LoadCreditCards()
     {
         creditCards = creditCardService.GetAllNonArchivedCreditCardsOrderedByName();
+    }
+
+    private void LoadSuggestions()
+    {
+        suggestions = creditCardService.GetCreditCardDebtSuggestions();
     }
 
     private void UpdateCreditCardLimitLabels()
@@ -461,5 +459,204 @@ public class AddCreditCardDebtController
                                        DateTimeFormatter.ofPattern("MMMM yyyy"));
             }
         });
+    }
+
+    private void ConfigureListeners()
+    {
+        crcComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            UpdateCreditCardLimitLabels();
+            UpdateAvailableLimitAfterDebtLabel();
+        });
+
+        valueField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
+            {
+                valueField.setText(oldValue);
+            }
+            else
+            {
+                UpdateAvailableLimitAfterDebtLabel();
+                UpdateMsgLabel();
+            }
+        });
+
+        installmentsField.textProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (!newValue.matches(Constants.GetDigitsRegexUpTo(
+                        Constants.INSTALLMENTS_FIELD_MAX_DIGITS)))
+                {
+                    installmentsField.setText(oldValue);
+                }
+                else
+                {
+                    UpdateMsgLabel();
+                }
+            });
+
+        // Store the listener in a variable to be able to disable and enable it
+        // when needed
+        descriptionFieldListener = (observable, oldValue, newValue) ->
+        {
+            if (newValue.strip().isEmpty())
+            {
+                suggestionsPopup.hide();
+                return;
+            }
+
+            suggestionListView.getItems().clear();
+
+            // Filter the suggestions list to show only the transfers that
+            // contain similar descriptions to the one typed by the user
+            List<CreditCardDebt> filteredSuggestions =
+                suggestions.stream()
+                    .filter(tx
+                            -> tx.GetDescription().toLowerCase().contains(
+                                newValue.toLowerCase()))
+                    .toList();
+
+            if (filteredSuggestions.size() > Constants.SUGGESTIONS_MAX_ITEMS)
+            {
+                filteredSuggestions =
+                    filteredSuggestions.subList(0, Constants.SUGGESTIONS_MAX_ITEMS);
+            }
+
+            suggestionListView.getItems().addAll(filteredSuggestions);
+
+            if (!filteredSuggestions.isEmpty())
+            {
+                AdjustPopupWidth();
+                AdjustPopupHeight();
+
+                suggestionsPopup.show(
+                    descriptionField,
+                    descriptionField.localToScene(0, 0).getX() +
+                        descriptionField.getScene().getWindow().getX() +
+                        descriptionField.getScene().getX(),
+                    descriptionField.localToScene(0, 0).getY() +
+                        descriptionField.getScene().getWindow().getY() +
+                        descriptionField.getScene().getY() +
+                        descriptionField.getHeight());
+            }
+            else
+            {
+                suggestionsPopup.hide();
+            }
+        };
+
+        descriptionField.textProperty().addListener(descriptionFieldListener);
+    }
+
+    private void ConfigureSuggestionsPopup()
+    {
+        if (suggestionsPopup == null)
+        {
+            ConfigureSuggestionsListView();
+        }
+
+        suggestionsPopup = new Popup();
+        suggestionsPopup.setAutoHide(true);
+        suggestionsPopup.setHideOnEscape(true);
+        suggestionsPopup.getContent().add(suggestionListView);
+    }
+
+    private void AdjustPopupWidth()
+    {
+        suggestionListView.setPrefWidth(descriptionField.getWidth());
+    }
+
+    private void AdjustPopupHeight()
+    {
+        Integer itemCount = suggestionListView.getItems().size();
+
+        Double cellHeight = 45.0;
+
+        itemCount = Math.min(itemCount, Constants.SUGGESTIONS_MAX_ITEMS);
+
+        Double totalHeight = itemCount * cellHeight;
+
+        suggestionListView.setPrefHeight(totalHeight);
+    }
+
+    private void ConfigureSuggestionsListView()
+    {
+        suggestionListView = new ListView<>();
+
+        // Set the cell factory to display the description, amount, wallet and
+        // category of the transaction
+        // Format:
+        //    Description
+        //    Amount | CreditCard | Category | Installments
+        suggestionListView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(CreditCardDebt item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (empty || item == null)
+                {
+                    setText(null);
+                }
+                else
+                {
+                    VBox cellContent = new VBox();
+                    cellContent.setSpacing(2);
+
+                    Label descriptionLabel = new Label(item.GetDescription());
+
+                    String infoString = UIUtils.FormatCurrency(item.GetTotalAmount()) +
+                                        " | " + item.GetCreditCard().GetName() +
+                                        " | " + item.GetCategory().GetName() + " | " +
+                                        item.GetInstallments() + "x";
+
+                    Label infoLabel = new Label(infoString);
+
+                    cellContent.getChildren().addAll(descriptionLabel, infoLabel);
+
+                    setGraphic(cellContent);
+                }
+            }
+        });
+
+        suggestionListView.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        suggestionListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
+
+        // By default, the SPACE key is used to select an item in the ListView.
+        // This behavior is not desired in this case, so the event is consumed
+        suggestionListView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE)
+            {
+                event.consume(); // Do not propagate the event
+            }
+        });
+
+        // Add a listener to the ListView to fill the fields with the selected
+        suggestionListView.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (newValue != null)
+                {
+                    FillFieldsWithTransaction(newValue);
+                    suggestionsPopup.hide();
+                }
+            });
+    }
+
+    private void FillFieldsWithTransaction(CreditCardDebt ccd)
+    {
+        crcComboBox.setValue(ccd.GetCreditCard().GetName());
+
+        // Deactivate the listener to avoid the event of changing the text of
+        // the descriptionField from being triggered. After changing the text,
+        // the listener is activated again
+        descriptionField.textProperty().removeListener(descriptionFieldListener);
+
+        descriptionField.setText(ccd.GetDescription());
+
+        descriptionField.textProperty().addListener(descriptionFieldListener);
+
+        valueField.setText(ccd.GetTotalAmount().toString());
+        installmentsField.setText(ccd.GetInstallments().toString());
+        categoryComboBox.setValue(ccd.GetCategory().GetName());
+
+        UpdateAvailableLimitAfterDebtLabel();
+        UpdateMsgLabel();
     }
 }

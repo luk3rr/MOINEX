@@ -7,6 +7,8 @@
 package org.moinex.repositories;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 import org.moinex.entities.CreditCardDebt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,4 +61,20 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
         "SELECT COUNT(ccd) FROM CreditCardDebt ccd WHERE ccd.category.id = :categoryId")
     Long
     CountTransactions(@Param("categoryId") Long categoryId);
+
+    /**
+     * Get suggestions. Suggestions are debts with distinct descriptions
+     * and most recent date
+     * @return A list with the suggestions
+     */
+    @Query("SELECT ccd "
+           + "FROM CreditCardDebt ccd "
+           + "WHERE ccd.creditCard.archived = false AND "
+           + "ccd.date = (SELECT MAX(ccd2.date) "
+           + "                 FROM CreditCardDebt ccd2 "
+           + "                 WHERE ccd2.creditCard.archived = false AND "
+           + "                 ccd2.description = ccd.description) "
+           + "ORDER BY ccd.date DESC")
+    List<CreditCardDebt>
+    FindSuggestions();
 }

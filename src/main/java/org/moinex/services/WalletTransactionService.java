@@ -1072,4 +1072,14 @@ public class WalletTransactionService
     {
         return m_walletTransactionRepository.FindSuggestions(TransactionType.EXPENSE);
     }
+
+    /**
+     * Get transfer suggestions. Suggestions are transactions with distinct descriptions
+     * and most recent date
+     * @return A list with the suggestions
+     */
+    public List<Transfer> GetTransferSuggestions()
+    {
+        return m_transferRepository.FindSuggestions();
+    }
 }

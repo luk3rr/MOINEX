@@ -434,9 +434,9 @@ public interface WalletTransactionRepository
            + "wt.category.archived = false AND "
            + "wt.date = (SELECT MAX(wt2.date) "
            + "                  FROM WalletTransaction wt2 "
-           + "                  WHERE wt2.description = wt.description AND "
-           + "                        wt2.wallet.archived = false AND "
-           + "                        wt2.category.archived = false) "
+           + "                  WHERE wt2.wallet.archived = false AND "
+           + "                        wt2.category.archived = false AND "
+           + "                        wt2.description = wt.description) "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
     FindSuggestions(@Param("transactionType") TransactionType transactionType);
