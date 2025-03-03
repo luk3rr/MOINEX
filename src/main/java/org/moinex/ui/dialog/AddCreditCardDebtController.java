@@ -20,12 +20,15 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
+import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
+import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -61,6 +64,9 @@ public class AddCreditCardDebtController
     @FXML
     private TextField installmentsField;
 
+    @Autowired
+    private ConfigurableApplicationContext springContext;
+
     private List<Category> categories;
 
     private List<CreditCard> creditCards;
@@ -69,12 +75,16 @@ public class AddCreditCardDebtController
 
     private CreditCardService creditCardService;
 
+    private CalculatorService calculatorService;
+
     @Autowired
     public AddCreditCardDebtController(CategoryService   categoryService,
-                                       CreditCardService creditCardService)
+                                       CreditCardService creditCardService,
+                                        CalculatorService calculatorService)
     {
         this.categoryService   = categoryService;
         this.creditCardService = creditCardService;
+        this.calculatorService = calculatorService;
     }
 
     public void SetCreditCard(CreditCard crc)
@@ -206,6 +216,51 @@ public class AddCreditCardDebtController
     {
         Stage stage = (Stage)crcComboBox.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void handleOpenCalculator(){
+
+        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+                                    "Calculator",
+                                    springContext,
+                                    (CalculatorController controller)
+                                        -> {},
+                                    List.of(() -> { GetResultFromCalculator(); }));
+    }
+
+    private void GetResultFromCalculator()
+    {
+        // If the user saved the result, set it in the incomeValueField
+        String result = calculatorService.GetResult();
+
+        if (result != null)
+        {
+            try
+            {
+                BigDecimal resultValue = new BigDecimal(result);
+
+                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
+                {
+                    WindowUtils.ShowErrorDialog("Error",
+                                                "Invalid value",
+                                                "The value must be positive");
+                    return;
+                }
+
+                // Round the result to 2 decimal places
+                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
+
+                valueField.setText(result);
+            }
+            catch (NumberFormatException e)
+            {
+                // Must be unreachable
+                WindowUtils.ShowErrorDialog("Error",
+                                            "Invalid value",
+                                            "The value must be a number");
+            }
+        }
     }
 
     private void LoadCategories()
