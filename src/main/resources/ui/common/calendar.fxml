@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -15,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.CalendarController">
-   <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
          <GridPane fx:id="calendar" alignment="CENTER" gridLinesVisible="true" minHeight="600.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
            <columnConstraints>
@@ -67,7 +68,7 @@
          </HBox>
          <HBox alignment="CENTER" prefHeight="44.0" prefWidth="419.0" spacing="5.0">
             <children>
-               <JFXButton onAction="#handleAddEvent" text="Add Event">
+               <JFXButton onAction="#handleAddEvent" stylesheets="@../../css/component/buttons.css" text="Add Event">
                   <graphic>
                      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                         <image>
@@ -79,6 +80,9 @@
             </children>
          </HBox>
       </children>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
    </VBox>
    <stylesheets>
       <URL value="@../css/common/common-styles.css" />

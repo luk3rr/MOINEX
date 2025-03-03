@@ -30,8 +30,11 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import org.moinex.entities.CalendarEvent;
 import org.moinex.services.CalendarService;
+import org.moinex.ui.dialog.AddCalendarEventController;
 import org.moinex.util.Constants;
+import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -45,6 +48,9 @@ public class CalendarController
 
     @FXML
     private GridPane calendar;
+
+    @Autowired
+    private ConfigurableApplicationContext springContext;
 
     private LocalDate dateFocus;
 
@@ -95,7 +101,14 @@ public class CalendarController
 
     @FXML
     private void handleAddEvent()
-    { }
+    {
+        WindowUtils.OpenModalWindow(Constants.ADD_CALENDAR_EVENT_FXML,
+                                    "Add Calendar Event",
+                                    springContext,
+                                    (AddCalendarEventController controller)
+                                        -> {},
+                                    List.of(() -> { DrawCalendar(); }));
+    }
 
     /**
      * Load the calendar events from the database

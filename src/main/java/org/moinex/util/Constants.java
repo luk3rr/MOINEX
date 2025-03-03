@@ -138,6 +138,9 @@ public final class Constants
 
     public static final String ADD_GOAL_FXML = UI_DIALOG_PATH + "add_goal.fxml";
 
+    public static final String ADD_CALENDAR_EVENT_FXML =
+        UI_DIALOG_PATH + "add_calendar_event.fxml";
+
     public static final String WALLET_FULL_PANE_FXML =
         UI_COMMON_PATH + "wallet_full_pane.fxml";
     public static final String GOAL_FULL_PANE_FXML =
