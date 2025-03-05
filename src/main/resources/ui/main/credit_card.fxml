@@ -37,7 +37,7 @@
                                        <children>
                                           <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <JFXButton fx:id="AddDebtButton" onAction="#handleAddDebt" stylesheets="@../../css/component/buttons.css" text="New debt">
+                                                <JFXButton fx:id="AddDebtButton" onAction="#handleAddDebt" stylesheets="@../../css/component/buttons.css" text="Add debt">
                                                    <graphic>
                                                       <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>
@@ -46,7 +46,7 @@
                                                       </ImageView>
                                                    </graphic>
                                                 </JFXButton>
-                                                <JFXButton fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" stylesheets="@../../css/component/buttons.css" text="New Credit Card">
+                                                <JFXButton fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" stylesheets="@../../css/component/buttons.css" text="Add Credit Card">
                                                    <graphic>
                                                       <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>

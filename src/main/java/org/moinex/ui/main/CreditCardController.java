@@ -241,7 +241,7 @@ public class CreditCardController
             .append(debt.getDescription())
             .append("\n")
             .append("Amount: ")
-            .append(UIUtils.formatCurrency(debt.getTotalAmount()))
+            .append(UIUtils.formatCurrency(debt.getAmount()))
             .append("\n")
             .append("Register date: ")
             .append(debt.getDate().format(Constants.DATE_FORMATTER_NO_TIME))

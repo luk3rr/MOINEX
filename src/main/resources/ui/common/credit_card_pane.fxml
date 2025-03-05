@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" minHeight="250.0" minWidth="300.0" stylesheets="@../../css/scene/pane.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.CreditCardPaneController">
+<AnchorPane fx:id="root" minHeight="250.0" minWidth="400.0" stylesheets="@../../css/scene/pane.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.CreditCardPaneController">
    <children>
       <VBox fx:id="rootVBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -26,7 +26,7 @@
                      <image>
                         <Image url="@../../icon/common/default.png" />
                      </image></ImageView>
-                  <VBox alignment="CENTER" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                  <VBox alignment="CENTER" prefWidth="300.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label fx:id="crcName" text="Name" />
                         <Label fx:id="crcOperator" text="Type" textFill="#433d3d">
@@ -40,6 +40,7 @@
                         <MenuButton fx:id="addButton" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleAddDebt" text="Add Debt" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleAddCredit" text="Add Credit" />
                           </items>
                            <graphic>
                               <ImageView fx:id="addButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -54,6 +55,7 @@
                             <MenuItem mnemonicParsing="false" onAction="#handleEditCreditCard" text="Edit" />
                               <MenuItem mnemonicParsing="false" onAction="#handleArchiveCreditCard" text="Archive" />
                               <MenuItem mnemonicParsing="false" onAction="#handleDeleteCreditCard" text="Delete" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleShowRebates" text="Show rebates" />
                           </items>
                            <graphic>
                               <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -75,24 +77,30 @@
                   <Insets left="5.0" right="5.0" />
                </padding>
                <children>
-                  <HBox prefHeight="50.0">
+                  <HBox alignment="CENTER" prefHeight="50.0">
                      <children>
-                        <VBox alignment="CENTER_LEFT" prefWidth="90.0">
+                        <VBox alignment="CENTER_LEFT" prefWidth="90.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label text="Limit" VBox.vgrow="ALWAYS" />
-                              <Label fx:id="limitLabel" text="\$ 0.00" />
+                              <Label fx:id="limitLabel" text="\$ 0.00" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
-                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                            <children>
                               <Label text="Pending" />
                               <Label fx:id="pendingPaymentsLabel" text="\$ 0.00" />
                            </children>
                         </VBox>
-                        <VBox alignment="CENTER_RIGHT" prefWidth="90.0">
+                        <VBox alignment="CENTER_RIGHT" prefWidth="90.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Limit available" />
-                              <Label fx:id="limitAvailableLabel" text="\$ 0.00" />
+                              <Label text="Free" VBox.vgrow="ALWAYS" />
+                              <Label fx:id="availableLimitLabel" text="\$ 0.00" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" prefWidth="90.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label text="Rebate" />
+                              <Label fx:id="availableRebateLabel" text="\$ 0.00" />
                            </children>
                         </VBox>
                      </children>
@@ -143,12 +151,16 @@
                                     <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                                        <children>
                                           <Label text="Invoice" />
-                                          <Label fx:id="invoiceStatus" text="Open" />
+                                          <Label fx:id="invoiceStatusLabel" text="Open" />
                                        </children>
                                     </VBox>
                                     <VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Label fx:id="invoiceTotal" text="\$ 0.00" />
+                                          <HBox alignment="CENTER_RIGHT" spacing="5.0">
+                                             <children>
+                                                <Label fx:id="invoiceMonthLabel" text="\$ 0.00" />
+                                             </children>
+                                          </HBox>
                                           <JFXButton alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="Register payment" textAlignment="RIGHT">
                                              <graphic>
                                                 <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
@@ -178,7 +190,7 @@
                                        </graphic>
                                     </JFXButton>
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Label fx:id="invoiceMonth" alignment="CENTER" prefWidth="60.0" text="MM/YY" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                    <Label fx:id="invoiceMonthNavigatorBarLabel" alignment="CENTER" prefWidth="60.0" text="MM/YY" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                        <font>
                                           <Font name="System Bold" size="13.0" />
                                        </font>

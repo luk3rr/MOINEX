@@ -8,7 +8,6 @@ package org.moinex.repositories;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.moinex.entities.CreditCardDebt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,7 +22,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
      * @param creditCardName The name of the credit card
      * @return The total debt of the credit card
      */
-    @Query("SELECT coalesce(sum(ccd.totalAmount), 0) FROM CreditCardDebt ccd "
+    @Query("SELECT coalesce(sum(ccd.amount), 0) FROM CreditCardDebt ccd "
            + "WHERE ccd.creditCard.id = :creditCardId")
     BigDecimal
     getTotalDebt(@Param("creditCardId") Long creditCardId);

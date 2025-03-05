@@ -7,24 +7,28 @@
 package org.moinex.ui.dialog;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardPayment;
 import org.moinex.entities.Wallet;
+import org.moinex.services.CalculatorService;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
+import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -44,17 +48,31 @@ public class CreditCardInvoicePaymentController
     private Label crcInvoiceMonthLabel;
 
     @FXML
+    private Label crcAvailableRebateLabel;
+
+    @FXML
     private Label walletAfterBalanceLabel;
 
     @FXML
     private Label walletCurrentBalanceLabel;
 
     @FXML
+    private Label totalToPayLabel;
+
+    @FXML
     private ComboBox<String> walletComboBox;
+
+    @FXML
+    private TextField useRebateValueField;
+
+    @Autowired
+    private ConfigurableApplicationContext springContext;
 
     private WalletService walletService;
 
     private CreditCardService creditCardService;
+
+    private CalculatorService calculatorService;
 
     private List<Wallet> wallets;
 
@@ -66,14 +84,17 @@ public class CreditCardInvoicePaymentController
      * Constructor
      * @param walletService WalletService
      * @param creditCardService CreditCardService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public CreditCardInvoicePaymentController(WalletService     walletService,
-                                              CreditCardService creditCardService)
+                                              CreditCardService creditCardService,
+                                              CalculatorService calculatorService)
     {
         this.walletService     = walletService;
         this.creditCardService = creditCardService;
+        this.calculatorService = calculatorService;
     }
 
     public void setCreditCard(CreditCard crc, YearMonth invoiceDate)
@@ -94,9 +115,23 @@ public class CreditCardInvoicePaymentController
 
         crcInvoiceDueLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
+        totalToPayLabel.setText(UIUtils.formatCurrency(invoiceAmount));
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
         crcInvoiceMonthLabel.setText(invoiceDate.format(formatter));
+
+        crcAvailableRebateLabel.setText(
+            UIUtils.formatCurrency(crc.getAvailableRebate()));
+
+        if (crc.getAvailableRebate().compareTo(BigDecimal.ZERO) > 0)
+        {
+            crcAvailableRebateLabel.setStyle("-fx-text-fill: green;");
+        }
+        else
+        {
+            crcAvailableRebateLabel.setStyle("-fx-text-fill: black;");
+        }
 
         if (crc.getDefaultBillingWallet() != null)
         {
@@ -122,6 +157,19 @@ public class CreditCardInvoicePaymentController
             updateWalletBalance();
             walletAfterBalance();
         });
+
+        // Update wallet after balance when the value field changes
+        useRebateValueField.textProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
+                {
+                    useRebateValueField.setText(oldValue);
+                }
+                else
+                {
+                    walletAfterBalance();
+                }
+            });
     }
 
     @FXML
@@ -153,6 +201,10 @@ public class CreditCardInvoicePaymentController
                 .map(CreditCardPayment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        BigDecimal rebateValue = useRebateValueField.getText().isEmpty()
+                                     ? BigDecimal.ZERO
+                                     : new BigDecimal(useRebateValueField.getText());
+
         if (invoiceAmount.compareTo(BigDecimal.ZERO) == 0)
         {
             WindowUtils.showInformationDialog("Information",
@@ -171,7 +223,8 @@ public class CreditCardInvoicePaymentController
                 creditCardService.payInvoice(creditCard.getId(),
                                              wallet.getId(),
                                              invoiceDate.getMonthValue(),
-                                             invoiceDate.getYear());
+                                             invoiceDate.getYear(),
+                                             rebateValue);
 
                 WindowUtils.showSuccessDialog("Success",
                                               "Invoice paid",
@@ -190,6 +243,51 @@ public class CreditCardInvoicePaymentController
 
         Stage stage = (Stage)crcNameLabel.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void handleOpenCalculator()
+    {
+        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
+                                    "Calculator",
+                                    springContext,
+                                    (CalculatorController controller)
+                                        -> {},
+                                    List.of(() -> { getResultFromCalculator(); }));
+    }
+
+    private void getResultFromCalculator()
+    {
+        // If the user saved the result, set it in the incomeValueField
+        String result = calculatorService.getResult();
+
+        if (result != null)
+        {
+            try
+            {
+                BigDecimal resultValue = new BigDecimal(result);
+
+                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
+                {
+                    WindowUtils.showErrorDialog("Error",
+                                                "Invalid value",
+                                                "The value must be positive");
+                    return;
+                }
+
+                // Round the result to 2 decimal places
+                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
+
+                useRebateValueField.setText(result);
+            }
+            catch (NumberFormatException e)
+            {
+                // Must be unreachable
+                WindowUtils.showErrorDialog("Error",
+                                            "Invalid value",
+                                            "The value must be a number");
+            }
+        }
     }
 
     private void updateWalletBalance()
@@ -230,6 +328,10 @@ public class CreditCardInvoicePaymentController
             return;
         }
 
+        BigDecimal rebateValue = useRebateValueField.getText().isEmpty()
+                                     ? BigDecimal.ZERO
+                                     : new BigDecimal(useRebateValueField.getText());
+
         BigDecimal invoiceAmount =
             creditCardService
                 .getPendingCreditCardPayments(creditCard.getId(),
@@ -237,7 +339,15 @@ public class CreditCardInvoicePaymentController
                                               invoiceDate.getYear())
                 .stream()
                 .map(CreditCardPayment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .subtract(rebateValue);
+
+        if (invoiceAmount.compareTo(BigDecimal.ZERO) < 0)
+        {
+            invoiceAmount = BigDecimal.ZERO;
+        }
+
+        totalToPayLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
         try
         {

@@ -86,7 +86,7 @@ public class CreditCardDebtRepositoryTest
         CreditCardDebt creditCardDebt = CreditCardDebt.builder()
                                             .creditCard(m_creditCard)
                                             .installments(1)
-                                            .totalAmount(totalAmount)
+                                            .amount(totalAmount)
                                             .date(date)
                                             .category(createCategory("category"))
                                             .build();

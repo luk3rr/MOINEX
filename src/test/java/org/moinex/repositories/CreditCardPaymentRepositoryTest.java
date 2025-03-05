@@ -93,7 +93,7 @@ public class CreditCardPaymentRepositoryTest
     {
         CreditCardDebt creditCardDebt = CreditCardDebt.builder()
                                             .installments(1)
-                                            .totalAmount(totalAmount)
+                                            .amount(totalAmount)
                                             .creditCard(creditCard)
                                             .date(LocalDateTime.now().plusDays(5))
                                             .category(createCategory("category"))

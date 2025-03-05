@@ -1,5 +1,5 @@
 /*
- * Filename: AddCreditCardDebtController.java
+ * Filename: AddCreditCardCreditController.java
  * Created on: October 25, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
@@ -8,13 +8,14 @@ package org.moinex.ui.dialog;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -25,16 +26,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
-import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
-import org.moinex.entities.CreditCardDebt;
+import org.moinex.entities.CreditCardCredit;
 import org.moinex.services.CalculatorService;
-import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
+import org.moinex.util.CreditCardCreditType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,28 +42,10 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @NoArgsConstructor
-public class AddCreditCardDebtController
+public class AddCreditCardCreditController
 {
     @FXML
     private ComboBox<String> crcComboBox;
-
-    @FXML
-    private ComboBox<String> categoryComboBox;
-
-    @FXML
-    private ComboBox<YearMonth> invoiceComboBox;
-
-    @FXML
-    private Label crcLimitLabel;
-
-    @FXML
-    private Label crcAvailableLimitLabel;
-
-    @FXML
-    private Label crcLimitAvailableAfterDebtLabel;
-
-    @FXML
-    private Label msgLabel;
 
     @FXML
     private TextField descriptionField;
@@ -73,35 +54,32 @@ public class AddCreditCardDebtController
     private TextField valueField;
 
     @FXML
-    private TextField installmentsField;
+    private DatePicker datePicker;
+
+    @FXML
+    private ComboBox<CreditCardCreditType> creditTypeComboBox;
 
     @Autowired
     private ConfigurableApplicationContext springContext;
 
     private Popup suggestionsPopup;
 
-    private ListView<CreditCardDebt> suggestionListView;
+    private ListView<CreditCardCredit> suggestionListView;
 
-    private List<CreditCardDebt> suggestions;
+    private List<CreditCardCredit> suggestions;
 
     private ChangeListener<String> descriptionFieldListener;
 
-    private List<Category> categories;
-
     private List<CreditCard> creditCards;
-
-    private CategoryService categoryService;
 
     private CreditCardService creditCardService;
 
     private CalculatorService calculatorService;
 
     @Autowired
-    public AddCreditCardDebtController(CategoryService   categoryService,
-                                       CreditCardService creditCardService,
-                                       CalculatorService calculatorService)
+    public AddCreditCardCreditController(CreditCardService creditCardService,
+                                         CalculatorService calculatorService)
     {
-        this.categoryService   = categoryService;
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
     }
@@ -114,27 +92,19 @@ public class AddCreditCardDebtController
         }
 
         crcComboBox.setValue(crc.getName());
-
-        updateCreditCardLimitLabels();
     }
 
     @FXML
     private void initialize()
     {
-        loadCategoriesFromDatabase();
         loadCreditCardsFromDatabase();
         loadSuggestionsFromDatabase();
 
-        configureInvoiceComboBox();
+        // Configure date picker
+        UIUtils.setDatePickerFormat(datePicker);
 
-        populateInvoiceComboBox();
-        populateCategoryComboBox();
+        populateCreditCardCreditTypeComboBox();
         populateCreditCardCombobox();
-
-        // Reset all labels
-        UIUtils.resetLabel(crcLimitLabel);
-        UIUtils.resetLabel(crcAvailableLimitLabel);
-        UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
 
         configureSuggestionsListView();
         configureSuggestionsPopup();
@@ -144,16 +114,15 @@ public class AddCreditCardDebtController
     @FXML
     private void handleSave()
     {
-        String    crcName         = crcComboBox.getValue();
-        String    categoryName    = categoryComboBox.getValue();
-        YearMonth invoiceMonth    = invoiceComboBox.getValue();
-        String    description     = descriptionField.getText().strip();
-        String    valueStr        = valueField.getText();
-        String    installmentsStr = installmentsField.getText();
+        String               crcName     = crcComboBox.getValue();
+        String               description = descriptionField.getText().strip();
+        String               valueStr    = valueField.getText();
+        CreditCardCreditType creditType  = creditTypeComboBox.getValue();
+        LocalDate            date        = datePicker.getValue();
 
-        if (crcName == null || crcName.isEmpty() || categoryName == null ||
-            categoryName.isEmpty() || description.isEmpty() || valueStr.isEmpty() ||
-            invoiceMonth == null)
+        if (crcName == null || crcName.isEmpty() || creditType == null ||
+            date == null || description.isEmpty() || valueStr.isEmpty())
+
         {
             WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
@@ -163,32 +132,25 @@ public class AddCreditCardDebtController
 
         try
         {
-            BigDecimal debtValue = new BigDecimal(valueStr);
-
-            Integer installments =
-                installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
+            BigDecimal creditValue = new BigDecimal(valueStr);
 
             CreditCard crc = creditCards.stream()
                                  .filter(c -> c.getName().equals(crcName))
                                  .findFirst()
                                  .get();
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryName))
-                                    .findFirst()
-                                    .get();
+            LocalTime     currentTime             = LocalTime.now();
+            LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);
 
-            creditCardService.addDebt(crc.getId(),
-                                      category,
-                                      LocalDateTime.now(), // register date
-                                      invoiceMonth,
-                                      debtValue,
-                                      installments,
-                                      description);
+            creditCardService.addCredit(crc.getId(),
+                                        dateTimeWithCurrentHour,
+                                        creditValue,
+                                        creditType,
+                                        description);
 
             WindowUtils.showSuccessDialog("Success",
-                                          "Debt created",
-                                          "Debt created successfully");
+                                          "Credit created",
+                                          "Credit created successfully");
 
             Stage stage = (Stage)crcComboBox.getScene().getWindow();
             stage.close();
@@ -197,7 +159,7 @@ public class AddCreditCardDebtController
         {
             WindowUtils.showErrorDialog("Error",
                                         "Invalid expense value",
-                                        "Debt value must be a number");
+                                        "Credit value must be a number");
         }
         catch (RuntimeException e)
         {
@@ -258,11 +220,6 @@ public class AddCreditCardDebtController
         }
     }
 
-    private void loadCategoriesFromDatabase()
-    {
-        categories = categoryService.getNonArchivedCategoriesOrderedByName();
-    }
-
     private void loadCreditCardsFromDatabase()
     {
         creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByName();
@@ -270,172 +227,12 @@ public class AddCreditCardDebtController
 
     private void loadSuggestionsFromDatabase()
     {
-        suggestions = creditCardService.getCreditCardDebtSuggestions();
+        suggestions = creditCardService.getCreditCardCreditSuggestions();
     }
 
-    private void updateCreditCardLimitLabels()
+    private void populateCreditCardCreditTypeComboBox()
     {
-        CreditCard crc = creditCards.stream()
-                             .filter(c -> c.getName().equals(crcComboBox.getValue()))
-                             .findFirst()
-                             .orElse(null);
-
-        if (crc == null)
-        {
-            return;
-        }
-
-        crcLimitLabel.setText(UIUtils.formatCurrency(crc.getMaxDebt()));
-
-        BigDecimal availableLimit = creditCardService.getAvailableCredit(crc.getId());
-
-        crcAvailableLimitLabel.setText(UIUtils.formatCurrency(availableLimit));
-    }
-
-    private void updateAvailableLimitAfterDebtLabel()
-    {
-        CreditCard crc = creditCards.stream()
-                             .filter(c -> c.getName().equals(crcComboBox.getValue()))
-                             .findFirst()
-                             .orElse(null);
-
-        if (crc == null)
-        {
-            return;
-        }
-
-        String value = valueField.getText();
-
-        if (value.isEmpty())
-        {
-            UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
-            return;
-        }
-
-        try
-        {
-            BigDecimal debtValue = new BigDecimal(valueField.getText());
-
-            if (debtValue.compareTo(BigDecimal.ZERO) <= 0)
-            {
-                UIUtils.resetLabel(msgLabel);
-                return;
-            }
-
-            BigDecimal availableLimitAfterDebt =
-                creditCardService.getAvailableCredit(crc.getId()).subtract(debtValue);
-
-            // Set the style according to the balance value after the expense
-            if (availableLimitAfterDebt.compareTo(BigDecimal.ZERO) < 0)
-            {
-                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel,
-                                      Constants.NEGATIVE_BALANCE_STYLE);
-            }
-            else
-            {
-                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel,
-                                      Constants.NEUTRAL_BALANCE_STYLE);
-            }
-
-            crcLimitAvailableAfterDebtLabel.setText(
-                UIUtils.formatCurrency(availableLimitAfterDebt));
-        }
-        catch (NumberFormatException e)
-        {
-            UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
-        }
-    }
-
-    private void updateMsgLabel()
-    {
-        Integer installments = installmentsField.getText().isEmpty()
-                                   ? 1
-                                   : Integer.parseInt(installmentsField.getText());
-
-        if (installments < 1)
-        {
-            msgLabel.setText("Invalid number of installments");
-            return;
-        }
-
-        String valueStr = valueField.getText();
-
-        if (valueStr.isEmpty())
-        {
-            UIUtils.resetLabel(msgLabel);
-            return;
-        }
-
-        try
-        {
-            BigDecimal debtValue = new BigDecimal(valueField.getText());
-
-            if (debtValue.compareTo(BigDecimal.ZERO) <= 0)
-            {
-                UIUtils.resetLabel(msgLabel);
-                return;
-            }
-
-            // Show mensage according to the value of each installment
-            BigDecimal exactInstallmentValue =
-                debtValue.divide(new BigDecimal(installments), 2, RoundingMode.FLOOR);
-
-            BigDecimal remainder = debtValue.subtract(
-                exactInstallmentValue.multiply(new BigDecimal(installments)));
-
-            Boolean exactDivision = remainder.compareTo(BigDecimal.ZERO) == 0;
-
-            if (exactDivision)
-            {
-                String msgBase = "Repeat for %d months of %s";
-                msgLabel.setText(
-                    String.format(msgBase,
-                                  installments,
-                                  UIUtils.formatCurrency(exactInstallmentValue)));
-            }
-            else
-            {
-                String msgBase =
-                    "Repeat for %d months.\nFirst month of %s and the last "
-                    + "%s of %s";
-
-                remainder = remainder.setScale(2, RoundingMode.HALF_UP);
-
-                msgLabel.setText(String.format(msgBase,
-                                               installments,
-                                               exactInstallmentValue.add(remainder),
-                                               installments - 1,
-                                               exactInstallmentValue));
-            }
-        }
-        catch (NumberFormatException e)
-        {
-            msgLabel.setText("Invalid debt value");
-        }
-    }
-
-    private void populateInvoiceComboBox()
-    {
-        YearMonth currentYearMonth = YearMonth.now();
-        YearMonth startYearMonth   = currentYearMonth.minusMonths(12);
-        YearMonth endYearMonth     = currentYearMonth.plusMonths(13);
-
-        // Show the last 12 months and the next 12 months as options to invoice
-        // date
-        for (YearMonth yearMonth = startYearMonth; yearMonth.isBefore(endYearMonth);
-             yearMonth           = yearMonth.plusMonths(1))
-        {
-            invoiceComboBox.getItems().add(yearMonth);
-        }
-
-        // Set default as next month
-        invoiceComboBox.setValue(currentYearMonth.plusMonths(1));
-    }
-
-    private void populateCategoryComboBox()
-    {
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+        creditTypeComboBox.getItems().addAll(CreditCardCreditType.values());
     }
 
     private void populateCreditCardCombobox()
@@ -444,56 +241,14 @@ public class AddCreditCardDebtController
             creditCards.stream().map(CreditCard::getName).toList());
     }
 
-    private void configureInvoiceComboBox()
-    {
-        // Set the format to display the month and year
-        invoiceComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(YearMonth yearMonth)
-            {
-                return yearMonth.format(DateTimeFormatter.ofPattern("yyyy MMMM"));
-            }
-
-            @Override
-            public YearMonth fromString(String string)
-            {
-                return YearMonth.parse(string,
-                                       DateTimeFormatter.ofPattern("MMMM yyyy"));
-            }
-        });
-    }
-
     private void configureListeners()
     {
-        crcComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            updateCreditCardLimitLabels();
-            updateAvailableLimitAfterDebtLabel();
-        });
-
         valueField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
             {
                 valueField.setText(oldValue);
             }
-            else
-            {
-                updateAvailableLimitAfterDebtLabel();
-                updateMsgLabel();
-            }
         });
-
-        installmentsField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.getDigitsRegexUpTo(
-                        Constants.INSTALLMENTS_FIELD_MAX_DIGITS)))
-                {
-                    installmentsField.setText(oldValue);
-                }
-                else
-                {
-                    updateMsgLabel();
-                }
-            });
 
         // Store the listener in a variable to be able to disable and enable it
         // when needed
@@ -509,7 +264,7 @@ public class AddCreditCardDebtController
 
             // Filter the suggestions list to show only the transfers that
             // contain similar descriptions to the one typed by the user
-            List<CreditCardDebt> filteredSuggestions =
+            List<CreditCardCredit> filteredSuggestions =
                 suggestions.stream()
                     .filter(tx
                             -> tx.getDescription().toLowerCase().contains(
@@ -587,10 +342,10 @@ public class AddCreditCardDebtController
         // category of the transaction
         // Format:
         //    Description
-        //    Amount | CreditCard | Category | Installments
+        //    Amount | CreditCard | Rebate Type
         suggestionListView.setCellFactory(param -> new ListCell<>() {
             @Override
-            protected void updateItem(CreditCardDebt item, boolean empty)
+            protected void updateItem(CreditCardCredit item, boolean empty)
             {
                 super.updateItem(item, empty);
                 if (empty || item == null)
@@ -606,8 +361,7 @@ public class AddCreditCardDebtController
 
                     String infoString = UIUtils.formatCurrency(item.getAmount()) +
                                         " | " + item.getCreditCard().getName() +
-                                        " | " + item.getCategory().getName() + " | " +
-                                        item.getInstallments() + "x";
+                                        " | " + item.getType();
 
                     Label infoLabel = new Label(infoString);
 
@@ -641,7 +395,7 @@ public class AddCreditCardDebtController
             });
     }
 
-    private void fillFieldsWithTransaction(CreditCardDebt ccd)
+    private void fillFieldsWithTransaction(CreditCardCredit ccd)
     {
         crcComboBox.setValue(ccd.getCreditCard().getName());
 
@@ -655,10 +409,7 @@ public class AddCreditCardDebtController
         descriptionField.textProperty().addListener(descriptionFieldListener);
 
         valueField.setText(ccd.getAmount().toString());
-        installmentsField.setText(ccd.getInstallments().toString());
-        categoryComboBox.setValue(ccd.getCategory().getName());
 
-        updateAvailableLimitAfterDebtLabel();
-        updateMsgLabel();
+        creditTypeComboBox.setValue(ccd.getType());
     }
 }

@@ -105,7 +105,7 @@ public class EditCreditCardDebtController
         crcLimitAvailableAfterDebtLabel.setText(UIUtils.formatCurrency(availableLimit));
 
         descriptionField.setText(crcDebt.getDescription());
-        valueField.setText(crcDebt.getTotalAmount().toString());
+        valueField.setText(crcDebt.getAmount().toString());
         installmentsField.setText(crcDebt.getInstallments().toString());
 
         categoryComboBox.setValue(crcDebt.getCategory().getName());
@@ -214,7 +214,7 @@ public class EditCreditCardDebtController
             // Check if has any modification
             if (debtToUpdate.getCreditCard().getId() == crc.getId() &&
                 debtToUpdate.getCategory().getId() == category.getId() &&
-                debtValue.compareTo(debtToUpdate.getTotalAmount()) == 0 &&
+                debtValue.compareTo(debtToUpdate.getAmount()) == 0 &&
                 debtToUpdate.getInstallments() == installments &&
                 debtToUpdate.getDescription().equals(description) &&
                 invoice.equals(invoiceMonth))
@@ -228,7 +228,7 @@ public class EditCreditCardDebtController
                 debtToUpdate.setCreditCard(crc);
                 debtToUpdate.setCategory(category);
                 debtToUpdate.setDescription(description);
-                debtToUpdate.setTotalAmount(debtValue);
+                debtToUpdate.setAmount(debtValue);
                 debtToUpdate.setInstallments(installments);
 
                 creditCardService.updateCreditCardDebt(debtToUpdate, invoiceMonth);
@@ -319,7 +319,7 @@ public class EditCreditCardDebtController
                 return;
             }
 
-            BigDecimal diff = debtValue.subtract(debtToUpdate.getTotalAmount());
+            BigDecimal diff = debtValue.subtract(debtToUpdate.getAmount());
 
             BigDecimal availableLimitAfterDebt =
                 creditCardService.getAvailableCredit(crc.getId()).subtract(diff);

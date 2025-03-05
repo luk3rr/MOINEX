@@ -67,6 +67,10 @@ public class CreditCard
     @Column(name = "max_debt", nullable = false, scale = 2)
     private BigDecimal maxDebt;
 
+    @Builder.Default
+    @Column(name = "available_rebate", nullable = false, scale = 2)
+    private BigDecimal availableRebate = BigDecimal.ZERO;
+
     @Column(name = "last_four_digits", nullable = true, length = 4)
     private String lastFourDigits;
 

@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.CreditCard;
 import org.moinex.services.CreditCardService;
+import org.moinex.ui.dialog.AddCreditCardCreditController;
 import org.moinex.ui.dialog.AddCreditCardDebtController;
 import org.moinex.ui.dialog.CreditCardInvoicePaymentController;
 import org.moinex.ui.dialog.EditCreditCardController;
@@ -63,7 +64,10 @@ public class CreditCardPaneController
     private Label pendingPaymentsLabel;
 
     @FXML
-    private Label limitAvailableLabel;
+    private Label availableLimitLabel;
+
+    @FXML
+    private Label availableRebateLabel;
 
     @FXML
     private Label closureDayLabel;
@@ -75,13 +79,13 @@ public class CreditCardPaneController
     private Label dueDateLabel;
 
     @FXML
-    private Label invoiceStatus;
+    private Label invoiceStatusLabel;
 
     @FXML
-    private Label invoiceTotal;
+    private Label invoiceMonthLabel;
 
     @FXML
-    private Label invoiceMonth;
+    private Label invoiceCreditLabel;
 
     @FXML
     private Label limitProgressLabel;
@@ -91,6 +95,9 @@ public class CreditCardPaneController
 
     @FXML
     private JFXButton nextButton;
+
+    @FXML
+    private Label invoiceMonthNavigatorBarLabel;
 
     @FXML
     private ProgressBar limitProgressBar;
@@ -132,6 +139,18 @@ public class CreditCardPaneController
             "Add Credit Card Debt",
             springContext,
             (AddCreditCardDebtController controller)
+                -> { controller.setCreditCard(creditCard); },
+            List.of(() -> creditCardController.updateDisplay()));
+    }
+
+    @FXML
+    private void handleAddCredit()
+    {
+        WindowUtils.openModalWindow(
+            Constants.ADD_CREDIT_CARD_CREDIT_FXML,
+            "Add Credit Card Credit",
+            springContext,
+            (AddCreditCardCreditController controller)
                 -> { controller.setCreditCard(creditCard); },
             List.of(() -> creditCardController.updateDisplay()));
     }
@@ -219,6 +238,10 @@ public class CreditCardPaneController
     }
 
     @FXML
+    private void handleShowRebates()
+    { }
+
+    @FXML
     private void handlePrevMonth()
     {
         currentDisplayedMonth = currentDisplayedMonth.minusMonths(1);
@@ -275,11 +298,25 @@ public class CreditCardPaneController
         BigDecimal limitAvailable =
             creditCardService.getAvailableCredit(creditCard.getId());
 
+        BigDecimal rebate = creditCard.getAvailableRebate();
+
         limitLabel.setText(UIUtils.formatCurrency(limit));
+
+        availableRebateLabel.setText(UIUtils.formatCurrency(rebate));
+
+        // If rebate > 0, then set text color to green
+        if (rebate.compareTo(BigDecimal.ZERO) > 0)
+        {
+            availableRebateLabel.setStyle("-fx-text-fill: green");
+        }
+        else
+        {
+            availableRebateLabel.setStyle("-fx-text-fill: black");
+        }
 
         pendingPaymentsLabel.setText(UIUtils.formatCurrency(pendingPayments));
 
-        limitAvailableLabel.setText(UIUtils.formatCurrency(limitAvailable));
+        availableLimitLabel.setText(UIUtils.formatCurrency(limitAvailable));
 
         // Set percentage of the usage of the limit
         BigDecimal limitProgress =
@@ -318,14 +355,16 @@ public class CreditCardPaneController
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
-        invoiceMonth.setText(currentDisplayedMonth.format(formatter));
+        invoiceMonthNavigatorBarLabel.setText(currentDisplayedMonth.format(formatter));
 
-        invoiceTotal.setText(UIUtils.formatCurrency(
+        BigDecimal totalDebts =
             creditCardService.getInvoiceAmount(creditCard.getId(),
                                                currentDisplayedMonth.getMonthValue(),
-                                               currentDisplayedMonth.getYear())));
+                                               currentDisplayedMonth.getYear());
 
-        invoiceStatus.setText(
+        invoiceMonthLabel.setText(UIUtils.formatCurrency(totalDebts));
+
+        invoiceStatusLabel.setText(
             creditCardService
                 .getInvoiceStatus(creditCard.getId(),
                                   currentDisplayedMonth.getMonthValue(),
@@ -342,13 +381,14 @@ public class CreditCardPaneController
         crcOperator.setText("");
         limitLabel.setText("");
         pendingPaymentsLabel.setText("");
-        limitAvailableLabel.setText("");
+        availableLimitLabel.setText("");
+        availableRebateLabel.setText("");
         closureDayLabel.setText("");
         nextInvoiceLabel.setText("");
         dueDateLabel.setText("");
-        invoiceStatus.setText("");
-        invoiceTotal.setText("");
-        invoiceMonth.setText("");
+        invoiceStatusLabel.setText("");
+        invoiceMonthLabel.setText("");
+        invoiceMonthNavigatorBarLabel.setText("");
         crcOperatorIcon.setImage(new Image(Constants.DEFAULT_ICON));
     }
 }
