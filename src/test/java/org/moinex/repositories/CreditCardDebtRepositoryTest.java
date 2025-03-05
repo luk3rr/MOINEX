@@ -50,126 +50,129 @@ public class CreditCardDebtRepositoryTest
     private CreditCardOperator m_crcOperator;
 
     private CreditCard
-    CreateCreditCard(String name, CreditCardOperator operator, BigDecimal maxDebt)
+    createCreditCard(String name, CreditCardOperator operator, BigDecimal maxDebt)
     {
-        CreditCard creditCard = new CreditCard();
-        creditCard.SetName(name);
-        creditCard.SetMaxDebt(maxDebt);
-        creditCard.SetBillingDueDay(10);
-        creditCard.SetClosingDay(5);
-        creditCard.SetOperator(operator);
+        CreditCard creditCard = CreditCard.builder()
+                                    .name(name)
+                                    .maxDebt(maxDebt)
+                                    .billingDueDay(10)
+                                    .closingDay(5)
+                                    .operator(operator)
+                                    .build();
+
         m_creditCardRepository.save(creditCard);
         return creditCard;
     }
 
-    private CreditCardOperator CreateCreditCardOperator(String name)
+    private CreditCardOperator createCreditCardOperator(String name)
     {
-        CreditCardOperator creditCardOperator = new CreditCardOperator();
-        creditCardOperator.SetName(name);
-        creditCardOperator.SetIcon("");
+        CreditCardOperator creditCardOperator =
+            CreditCardOperator.builder().name(name).icon("").build();
         m_creditCardOperatorRepository.save(creditCardOperator);
         return creditCardOperator;
     }
 
-    private Category CreateCategory(String name)
+    private Category createCategory(String name)
     {
-        Category category = new Category(name);
+        Category category = Category.builder().name(name).build();
         m_categoryRepository.save(category);
         return category;
     }
 
-    private CreditCardDebt CreateCreditCardDebt(CreditCard    m_creditCard,
+    private CreditCardDebt createCreditCardDebt(CreditCard    m_creditCard,
                                                 BigDecimal    totalAmount,
                                                 LocalDateTime date)
     {
-        CreditCardDebt creditCardDebt = new CreditCardDebt();
-        creditCardDebt.SetCreditCard(m_creditCard);
-        creditCardDebt.SetInstallments(1);
-        creditCardDebt.SetTotalAmount(totalAmount);
-        creditCardDebt.SetDate(date);
-        creditCardDebt.SetCategory(CreateCategory("category"));
+        CreditCardDebt creditCardDebt = CreditCardDebt.builder()
+                                            .creditCard(m_creditCard)
+                                            .installments(1)
+                                            .totalAmount(totalAmount)
+                                            .date(date)
+                                            .category(createCategory("category"))
+                                            .build();
+
         m_creditCardDebtRepository.save(creditCardDebt);
         return creditCardDebt;
     }
 
     @BeforeEach
-    public void SetUp()
+    public void setUp()
     {
         // Initialize the credit card
-        m_crcOperator = CreateCreditCardOperator("Operator");
+        m_crcOperator = createCreditCardOperator("Operator");
         m_creditCard =
-            CreateCreditCard("CreditCard", m_crcOperator, new BigDecimal("1000.0"));
+            createCreditCard("CreditCard", m_crcOperator, new BigDecimal("1000.0"));
     }
 
     @Test
-    public void TestNoDebt()
+    public void testNoDebt()
     {
         // No debt yet
         assertEquals(
             0.0,
-            m_creditCardDebtRepository.GetTotalDebt(m_creditCard.GetId()).doubleValue(),
+            m_creditCardDebtRepository.getTotalDebt(m_creditCard.getId()).doubleValue(),
             Constants.EPSILON,
             "Total debt must be 0.0");
     }
 
     @Test
-    public void TestSingleDebt()
+    public void testSingleDebt()
     {
-        CreateCreditCardDebt(m_creditCard,
+        createCreditCardDebt(m_creditCard,
                              new BigDecimal("1000.0"),
                              LocalDateTime.now().plusDays(10));
 
         assertEquals(
             1000.0,
-            m_creditCardDebtRepository.GetTotalDebt(m_creditCard.GetId()).doubleValue(),
+            m_creditCardDebtRepository.getTotalDebt(m_creditCard.getId()).doubleValue(),
             Constants.EPSILON,
             "Total debt must be 1000.0");
     }
 
     @Test
-    public void TestMultipleDebts()
+    public void testMultipleDebts()
     {
-        CreateCreditCardDebt(m_creditCard,
+        createCreditCardDebt(m_creditCard,
                              new BigDecimal("1000.0"),
                              LocalDateTime.now().plusDays(10));
 
-        CreateCreditCardDebt(m_creditCard,
+        createCreditCardDebt(m_creditCard,
                              new BigDecimal("500.0"),
                              LocalDateTime.now().plusDays(5));
 
         assertEquals(
             1500.0,
-            m_creditCardDebtRepository.GetTotalDebt(m_creditCard.GetId()).doubleValue(),
+            m_creditCardDebtRepository.getTotalDebt(m_creditCard.getId()).doubleValue(),
             Constants.EPSILON,
             "Total debt must be 1500.0");
     }
 
     @Test
-    public void TestDebtsForMultipleCreditCards()
+    public void testDebtsForMultipleCreditCards()
     {
         CreditCard creditCard1 =
-            CreateCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));
+            createCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));
 
         CreditCard creditCard2 =
-            CreateCreditCard("CreditCard2", m_crcOperator, new BigDecimal("2000.0"));
+            createCreditCard("CreditCard2", m_crcOperator, new BigDecimal("2000.0"));
 
-        CreateCreditCardDebt(creditCard1,
+        createCreditCardDebt(creditCard1,
                              new BigDecimal("1000.0"),
                              LocalDateTime.now().plusDays(10));
 
-        CreateCreditCardDebt(creditCard2,
+        createCreditCardDebt(creditCard2,
                              new BigDecimal("500.0"),
                              LocalDateTime.now().plusDays(5));
 
         assertEquals(
             1000.0,
-            m_creditCardDebtRepository.GetTotalDebt(creditCard1.GetId()).doubleValue(),
+            m_creditCardDebtRepository.getTotalDebt(creditCard1.getId()).doubleValue(),
             Constants.EPSILON,
             "Total debt for CreditCard1 must be 1000.0");
 
         assertEquals(
             500.0,
-            m_creditCardDebtRepository.GetTotalDebt(creditCard2.GetId()).doubleValue(),
+            m_creditCardDebtRepository.getTotalDebt(creditCard2.getId()).doubleValue(),
             Constants.EPSILON,
             "Total debt for CreditCard2 must be 500.0");
     }

@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardDebt;
@@ -41,6 +42,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@NoArgsConstructor
 public class AddCreditCardDebtController
 {
     @FXML
@@ -104,39 +106,39 @@ public class AddCreditCardDebtController
         this.calculatorService = calculatorService;
     }
 
-    public void SetCreditCard(CreditCard crc)
+    public void setCreditCard(CreditCard crc)
     {
-        if (creditCards.stream().noneMatch(c -> c.GetId() == crc.GetId()))
+        if (creditCards.stream().noneMatch(c -> c.getId() == crc.getId()))
         {
             return;
         }
 
-        crcComboBox.setValue(crc.GetName());
+        crcComboBox.setValue(crc.getName());
 
-        UpdateCreditCardLimitLabels();
+        updateCreditCardLimitLabels();
     }
 
     @FXML
     private void initialize()
     {
-        LoadCategories();
-        LoadCreditCards();
-        LoadSuggestions();
+        loadCategoriesFromDatabase();
+        loadCreditCardsFromDatabase();
+        loadSuggestionsFromDatabase();
 
-        ConfigureInvoiceComboBox();
+        configureInvoiceComboBox();
 
-        PopulateInvoiceComboBox();
-        PopulateCategoryComboBox();
-        PopulateCreditCardComboBox();
+        populateInvoiceComboBox();
+        populateCategoryComboBox();
+        populateCreditCardCombobox();
 
         // Reset all labels
-        UIUtils.ResetLabel(crcLimitLabel);
-        UIUtils.ResetLabel(crcAvailableLimitLabel);
-        UIUtils.ResetLabel(crcLimitAvailableAfterDebtLabel);
+        UIUtils.resetLabel(crcLimitLabel);
+        UIUtils.resetLabel(crcAvailableLimitLabel);
+        UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
 
-        ConfigureSuggestionsListView();
-        ConfigureSuggestionsPopup();
-        ConfigureListeners();
+        configureSuggestionsListView();
+        configureSuggestionsPopup();
+        configureListeners();
     }
 
     @FXML
@@ -153,7 +155,7 @@ public class AddCreditCardDebtController
             categoryName.isEmpty() || description.isEmpty() || valueStr.isEmpty() ||
             invoiceMonth == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields");
             return;
@@ -167,24 +169,24 @@ public class AddCreditCardDebtController
                 installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
             CreditCard crc = creditCards.stream()
-                                 .filter(c -> c.GetName().equals(crcName))
+                                 .filter(c -> c.getName().equals(crcName))
                                  .findFirst()
                                  .get();
 
             Category category = categories.stream()
-                                    .filter(c -> c.GetName().equals(categoryName))
+                                    .filter(c -> c.getName().equals(categoryName))
                                     .findFirst()
                                     .get();
 
-            creditCardService.RegisterDebt(crc.GetId(),
-                                           category,
-                                           LocalDateTime.now(), // register date
-                                           invoiceMonth,
-                                           debtValue,
-                                           installments,
-                                           description);
+            creditCardService.addDebt(crc.getId(),
+                                      category,
+                                      LocalDateTime.now(), // register date
+                                      invoiceMonth,
+                                      debtValue,
+                                      installments,
+                                      description);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Debt created",
                                           "Debt created successfully");
 
@@ -193,13 +195,13 @@ public class AddCreditCardDebtController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid expense value",
                                         "Debt value must be a number");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error", "Error creating debt", e.getMessage());
+            WindowUtils.showErrorDialog("Error", "Error creating debt", e.getMessage());
         }
     }
 
@@ -214,18 +216,18 @@ public class AddCreditCardDebtController
     private void handleOpenCalculator()
     {
 
-        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
                                     "Calculator",
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { GetResultFromCalculator(); }));
+                                    List.of(() -> { getResultFromCalculator(); }));
     }
 
-    private void GetResultFromCalculator()
+    private void getResultFromCalculator()
     {
         // If the user saved the result, set it in the incomeValueField
-        String result = calculatorService.GetResult();
+        String result = calculatorService.getResult();
 
         if (result != null)
         {
@@ -235,7 +237,7 @@ public class AddCreditCardDebtController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.ShowErrorDialog("Error",
+                    WindowUtils.showErrorDialog("Error",
                                                 "Invalid value",
                                                 "The value must be positive");
                     return;
@@ -249,32 +251,32 @@ public class AddCreditCardDebtController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Invalid value",
                                             "The value must be a number");
             }
         }
     }
 
-    private void LoadCategories()
+    private void loadCategoriesFromDatabase()
     {
-        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
     }
 
-    private void LoadCreditCards()
+    private void loadCreditCardsFromDatabase()
     {
-        creditCards = creditCardService.GetAllNonArchivedCreditCardsOrderedByName();
+        creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByName();
     }
 
-    private void LoadSuggestions()
+    private void loadSuggestionsFromDatabase()
     {
-        suggestions = creditCardService.GetCreditCardDebtSuggestions();
+        suggestions = creditCardService.getCreditCardDebtSuggestions();
     }
 
-    private void UpdateCreditCardLimitLabels()
+    private void updateCreditCardLimitLabels()
     {
         CreditCard crc = creditCards.stream()
-                             .filter(c -> c.GetName().equals(crcComboBox.getValue()))
+                             .filter(c -> c.getName().equals(crcComboBox.getValue()))
                              .findFirst()
                              .orElse(null);
 
@@ -283,17 +285,17 @@ public class AddCreditCardDebtController
             return;
         }
 
-        crcLimitLabel.setText(UIUtils.FormatCurrency(crc.GetMaxDebt()));
+        crcLimitLabel.setText(UIUtils.formatCurrency(crc.getMaxDebt()));
 
-        BigDecimal availableLimit = creditCardService.GetAvailableCredit(crc.GetId());
+        BigDecimal availableLimit = creditCardService.getAvailableCredit(crc.getId());
 
-        crcAvailableLimitLabel.setText(UIUtils.FormatCurrency(availableLimit));
+        crcAvailableLimitLabel.setText(UIUtils.formatCurrency(availableLimit));
     }
 
-    private void UpdateAvailableLimitAfterDebtLabel()
+    private void updateAvailableLimitAfterDebtLabel()
     {
         CreditCard crc = creditCards.stream()
-                             .filter(c -> c.GetName().equals(crcComboBox.getValue()))
+                             .filter(c -> c.getName().equals(crcComboBox.getValue()))
                              .findFirst()
                              .orElse(null);
 
@@ -306,7 +308,7 @@ public class AddCreditCardDebtController
 
         if (value.isEmpty())
         {
-            UIUtils.ResetLabel(crcLimitAvailableAfterDebtLabel);
+            UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
             return;
         }
 
@@ -316,35 +318,35 @@ public class AddCreditCardDebtController
 
             if (debtValue.compareTo(BigDecimal.ZERO) <= 0)
             {
-                UIUtils.ResetLabel(msgLabel);
+                UIUtils.resetLabel(msgLabel);
                 return;
             }
 
             BigDecimal availableLimitAfterDebt =
-                creditCardService.GetAvailableCredit(crc.GetId()).subtract(debtValue);
+                creditCardService.getAvailableCredit(crc.getId()).subtract(debtValue);
 
             // Set the style according to the balance value after the expense
             if (availableLimitAfterDebt.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.SetLabelStyle(crcLimitAvailableAfterDebtLabel,
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
-                UIUtils.SetLabelStyle(crcLimitAvailableAfterDebtLabel,
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             crcLimitAvailableAfterDebtLabel.setText(
-                UIUtils.FormatCurrency(availableLimitAfterDebt));
+                UIUtils.formatCurrency(availableLimitAfterDebt));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(crcLimitAvailableAfterDebtLabel);
+            UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
         }
     }
 
-    private void UpdateMsgLabel()
+    private void updateMsgLabel()
     {
         Integer installments = installmentsField.getText().isEmpty()
                                    ? 1
@@ -360,7 +362,7 @@ public class AddCreditCardDebtController
 
         if (valueStr.isEmpty())
         {
-            UIUtils.ResetLabel(msgLabel);
+            UIUtils.resetLabel(msgLabel);
             return;
         }
 
@@ -370,7 +372,7 @@ public class AddCreditCardDebtController
 
             if (debtValue.compareTo(BigDecimal.ZERO) <= 0)
             {
-                UIUtils.ResetLabel(msgLabel);
+                UIUtils.resetLabel(msgLabel);
                 return;
             }
 
@@ -389,7 +391,7 @@ public class AddCreditCardDebtController
                 msgLabel.setText(
                     String.format(msgBase,
                                   installments,
-                                  UIUtils.FormatCurrency(exactInstallmentValue)));
+                                  UIUtils.formatCurrency(exactInstallmentValue)));
             }
             else
             {
@@ -412,7 +414,7 @@ public class AddCreditCardDebtController
         }
     }
 
-    private void PopulateInvoiceComboBox()
+    private void populateInvoiceComboBox()
     {
         YearMonth currentYearMonth = YearMonth.now();
         YearMonth startYearMonth   = currentYearMonth.minusMonths(12);
@@ -430,19 +432,19 @@ public class AddCreditCardDebtController
         invoiceComboBox.setValue(currentYearMonth.plusMonths(1));
     }
 
-    private void PopulateCategoryComboBox()
+    private void populateCategoryComboBox()
     {
         categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::GetName).toList());
+            categories.stream().map(Category::getName).toList());
     }
 
-    private void PopulateCreditCardComboBox()
+    private void populateCreditCardCombobox()
     {
         crcComboBox.getItems().addAll(
-            creditCards.stream().map(CreditCard::GetName).toList());
+            creditCards.stream().map(CreditCard::getName).toList());
     }
 
-    private void ConfigureInvoiceComboBox()
+    private void configureInvoiceComboBox()
     {
         // Set the format to display the month and year
         invoiceComboBox.setConverter(new StringConverter<>() {
@@ -461,11 +463,11 @@ public class AddCreditCardDebtController
         });
     }
 
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         crcComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            UpdateCreditCardLimitLabels();
-            UpdateAvailableLimitAfterDebtLabel();
+            updateCreditCardLimitLabels();
+            updateAvailableLimitAfterDebtLabel();
         });
 
         valueField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -475,21 +477,21 @@ public class AddCreditCardDebtController
             }
             else
             {
-                UpdateAvailableLimitAfterDebtLabel();
-                UpdateMsgLabel();
+                updateAvailableLimitAfterDebtLabel();
+                updateMsgLabel();
             }
         });
 
         installmentsField.textProperty().addListener(
             (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.GetDigitsRegexUpTo(
+                if (!newValue.matches(Constants.getDigitsRegexUpTo(
                         Constants.INSTALLMENTS_FIELD_MAX_DIGITS)))
                 {
                     installmentsField.setText(oldValue);
                 }
                 else
                 {
-                    UpdateMsgLabel();
+                    updateMsgLabel();
                 }
             });
 
@@ -510,7 +512,7 @@ public class AddCreditCardDebtController
             List<CreditCardDebt> filteredSuggestions =
                 suggestions.stream()
                     .filter(tx
-                            -> tx.GetDescription().toLowerCase().contains(
+                            -> tx.getDescription().toLowerCase().contains(
                                 newValue.toLowerCase()))
                     .toList();
 
@@ -524,8 +526,8 @@ public class AddCreditCardDebtController
 
             if (!filteredSuggestions.isEmpty())
             {
-                AdjustPopupWidth();
-                AdjustPopupHeight();
+                adjustPopupWidth();
+                adjustPopupHeight();
 
                 suggestionsPopup.show(
                     descriptionField,
@@ -546,11 +548,11 @@ public class AddCreditCardDebtController
         descriptionField.textProperty().addListener(descriptionFieldListener);
     }
 
-    private void ConfigureSuggestionsPopup()
+    private void configureSuggestionsPopup()
     {
         if (suggestionsPopup == null)
         {
-            ConfigureSuggestionsListView();
+            configureSuggestionsListView();
         }
 
         suggestionsPopup = new Popup();
@@ -559,12 +561,12 @@ public class AddCreditCardDebtController
         suggestionsPopup.getContent().add(suggestionListView);
     }
 
-    private void AdjustPopupWidth()
+    private void adjustPopupWidth()
     {
         suggestionListView.setPrefWidth(descriptionField.getWidth());
     }
 
-    private void AdjustPopupHeight()
+    private void adjustPopupHeight()
     {
         Integer itemCount = suggestionListView.getItems().size();
 
@@ -577,7 +579,7 @@ public class AddCreditCardDebtController
         suggestionListView.setPrefHeight(totalHeight);
     }
 
-    private void ConfigureSuggestionsListView()
+    private void configureSuggestionsListView()
     {
         suggestionListView = new ListView<>();
 
@@ -600,12 +602,12 @@ public class AddCreditCardDebtController
                     VBox cellContent = new VBox();
                     cellContent.setSpacing(2);
 
-                    Label descriptionLabel = new Label(item.GetDescription());
+                    Label descriptionLabel = new Label(item.getDescription());
 
-                    String infoString = UIUtils.FormatCurrency(item.GetTotalAmount()) +
-                                        " | " + item.GetCreditCard().GetName() +
-                                        " | " + item.GetCategory().GetName() + " | " +
-                                        item.GetInstallments() + "x";
+                    String infoString = UIUtils.formatCurrency(item.getTotalAmount()) +
+                                        " | " + item.getCreditCard().getName() +
+                                        " | " + item.getCategory().getName() + " | " +
+                                        item.getInstallments() + "x";
 
                     Label infoLabel = new Label(infoString);
 
@@ -633,30 +635,30 @@ public class AddCreditCardDebtController
             (observable, oldValue, newValue) -> {
                 if (newValue != null)
                 {
-                    FillFieldsWithTransaction(newValue);
+                    fillFieldsWithTransaction(newValue);
                     suggestionsPopup.hide();
                 }
             });
     }
 
-    private void FillFieldsWithTransaction(CreditCardDebt ccd)
+    private void fillFieldsWithTransaction(CreditCardDebt ccd)
     {
-        crcComboBox.setValue(ccd.GetCreditCard().GetName());
+        crcComboBox.setValue(ccd.getCreditCard().getName());
 
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
         descriptionField.textProperty().removeListener(descriptionFieldListener);
 
-        descriptionField.setText(ccd.GetDescription());
+        descriptionField.setText(ccd.getDescription());
 
         descriptionField.textProperty().addListener(descriptionFieldListener);
 
-        valueField.setText(ccd.GetTotalAmount().toString());
-        installmentsField.setText(ccd.GetInstallments().toString());
-        categoryComboBox.setValue(ccd.GetCategory().GetName());
+        valueField.setText(ccd.getTotalAmount().toString());
+        installmentsField.setText(ccd.getInstallments().toString());
+        categoryComboBox.setValue(ccd.getCategory().getName());
 
-        UpdateAvailableLimitAfterDebtLabel();
-        UpdateMsgLabel();
+        updateAvailableLimitAfterDebtLabel();
+        updateMsgLabel();
     }
 }

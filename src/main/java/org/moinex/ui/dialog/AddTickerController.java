@@ -11,18 +11,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Add Ticker dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddTickerController
 {
     @FXML
@@ -43,9 +44,6 @@ public class AddTickerController
     @FXML
     private ComboBox<String> typeComboBox;
 
-    @Autowired
-    private ConfigurableApplicationContext springContext;
-
     private TickerService tickerService;
 
     /**
@@ -62,8 +60,8 @@ public class AddTickerController
     @FXML
     private void initialize()
     {
-        ConfigureTypeComboBox();
-        ConfigureListeners();
+        configureTypeComboBox();
+        configureListeners();
     }
 
     @FXML
@@ -87,7 +85,7 @@ public class AddTickerController
             typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
             currentPriceStr.strip().isEmpty())
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all required fields");
 
@@ -100,7 +98,7 @@ public class AddTickerController
             (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()) &&
                 !(quantityStr == null || quantityStr.strip().isEmpty()))
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "Invalid fields",
                 "Quantity must be set if average unit price is set or vice-versa");
@@ -129,14 +127,10 @@ public class AddTickerController
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 
-            tickerService.RegisterTicker(name,
-                                         symbol,
-                                         type,
-                                         currentPrice,
-                                         avgUnitPrice,
-                                         quantity);
+            tickerService
+                .addTicker(name, symbol, type, currentPrice, avgUnitPrice, quantity);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Ticker added",
                                           "Ticker added successfully.");
 
@@ -145,19 +139,19 @@ public class AddTickerController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid number",
                                         "Invalid price or quantity");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while adding ticker",
                                         e.getMessage());
         }
     }
 
-    private void ConfigureTypeComboBox()
+    private void configureTypeComboBox()
     {
         for (TickerType type : TickerType.values())
         {
@@ -165,7 +159,7 @@ public class AddTickerController
         }
     }
 
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         currentPriceField.textProperty().addListener(
             (observable, oldValue, newValue) -> {

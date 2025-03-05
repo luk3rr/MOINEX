@@ -14,6 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
+
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardPayment;
 import org.moinex.entities.Wallet;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Credit card invoice payment dialog
  */
 @Controller
+@NoArgsConstructor
 public class CreditCardInvoicePaymentController
 {
     @FXML
@@ -59,8 +62,6 @@ public class CreditCardInvoicePaymentController
 
     private YearMonth invoiceDate;
 
-    public CreditCardInvoicePaymentController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -75,51 +76,51 @@ public class CreditCardInvoicePaymentController
         this.creditCardService = creditCardService;
     }
 
-    public void SetCreditCard(CreditCard crc, YearMonth invoiceDate)
+    public void setCreditCard(CreditCard crc, YearMonth invoiceDate)
     {
         this.creditCard  = crc;
         this.invoiceDate = invoiceDate;
 
-        crcNameLabel.setText(crc.GetName());
+        crcNameLabel.setText(crc.getName());
 
         BigDecimal invoiceAmount =
             creditCardService
-                .GetPendingCreditCardPayments(crc.GetId(),
+                .getPendingCreditCardPayments(crc.getId(),
                                               invoiceDate.getMonthValue(),
                                               invoiceDate.getYear())
                 .stream()
-                .map(CreditCardPayment::GetAmount)
+                .map(CreditCardPayment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        crcInvoiceDueLabel.setText(UIUtils.FormatCurrency(invoiceAmount));
+        crcInvoiceDueLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
         crcInvoiceMonthLabel.setText(invoiceDate.format(formatter));
 
-        if (crc.GetDefaultBillingWallet() != null)
+        if (crc.getDefaultBillingWallet() != null)
         {
-            walletComboBox.setValue(crc.GetDefaultBillingWallet().GetName());
-            UpdateWalletBalance();
-            WalletAfterBalance();
+            walletComboBox.setValue(crc.getDefaultBillingWallet().getName());
+            updateWalletBalance();
+            walletAfterBalance();
         }
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
+        loadWalletsFromDatabase();
 
         // Reset all labels
-        UIUtils.ResetLabel(walletAfterBalanceLabel);
-        UIUtils.ResetLabel(walletCurrentBalanceLabel);
-        UIUtils.ResetLabel(crcNameLabel);
-        UIUtils.ResetLabel(crcInvoiceDueLabel);
-        UIUtils.ResetLabel(crcInvoiceMonthLabel);
+        UIUtils.resetLabel(walletAfterBalanceLabel);
+        UIUtils.resetLabel(walletCurrentBalanceLabel);
+        UIUtils.resetLabel(crcNameLabel);
+        UIUtils.resetLabel(crcInvoiceDueLabel);
+        UIUtils.resetLabel(crcInvoiceMonthLabel);
 
         walletComboBox.setOnAction(e -> {
-            UpdateWalletBalance();
-            WalletAfterBalance();
+            updateWalletBalance();
+            walletAfterBalance();
         });
     }
 
@@ -137,7 +138,7 @@ public class CreditCardInvoicePaymentController
 
         if (walletName == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Wallet not selected",
                                         "Please select a wallet");
             return;
@@ -145,16 +146,16 @@ public class CreditCardInvoicePaymentController
 
         BigDecimal invoiceAmount =
             creditCardService
-                .GetPendingCreditCardPayments(creditCard.GetId(),
+                .getPendingCreditCardPayments(creditCard.getId(),
                                               invoiceDate.getMonthValue(),
                                               invoiceDate.getYear())
                 .stream()
-                .map(CreditCardPayment::GetAmount)
+                .map(CreditCardPayment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (invoiceAmount.compareTo(BigDecimal.ZERO) == 0)
         {
-            WindowUtils.ShowInformationDialog("Information",
+            WindowUtils.showInformationDialog("Information",
                                               "Invoice already paid",
                                               "This invoice has already been paid");
         }
@@ -163,16 +164,16 @@ public class CreditCardInvoicePaymentController
             try
             {
                 Wallet wallet = wallets.stream()
-                                    .filter(w -> w.GetName().equals(walletName))
+                                    .filter(w -> w.getName().equals(walletName))
                                     .findFirst()
                                     .get();
 
-                creditCardService.PayInvoice(creditCard.GetId(),
-                                             wallet.GetId(),
+                creditCardService.payInvoice(creditCard.getId(),
+                                             wallet.getId(),
                                              invoiceDate.getMonthValue(),
                                              invoiceDate.getYear());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Invoice paid",
                                               "Invoice was successfully paid");
 
@@ -181,7 +182,7 @@ public class CreditCardInvoicePaymentController
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error paying invoice",
                                             e.getMessage());
             }
@@ -191,7 +192,7 @@ public class CreditCardInvoicePaymentController
         stage.close();
     }
 
-    private void UpdateWalletBalance()
+    private void updateWalletBalance()
     {
         String walletName = walletComboBox.getValue();
 
@@ -201,81 +202,81 @@ public class CreditCardInvoicePaymentController
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
-        if (wallet.GetBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
-            UIUtils.SetLabelStyle(walletCurrentBalanceLabel,
+            UIUtils.setLabelStyle(walletCurrentBalanceLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(walletCurrentBalanceLabel,
+            UIUtils.setLabelStyle(walletCurrentBalanceLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
-        walletCurrentBalanceLabel.setText(UIUtils.FormatCurrency(wallet.GetBalance()));
+        walletCurrentBalanceLabel.setText(UIUtils.formatCurrency(wallet.getBalance()));
     }
 
-    private void WalletAfterBalance()
+    private void walletAfterBalance()
     {
         String walletName = walletComboBox.getValue();
 
         if (walletName == null)
         {
-            UIUtils.ResetLabel(walletAfterBalanceLabel);
+            UIUtils.resetLabel(walletAfterBalanceLabel);
             return;
         }
 
         BigDecimal invoiceAmount =
             creditCardService
-                .GetPendingCreditCardPayments(creditCard.GetId(),
+                .getPendingCreditCardPayments(creditCard.getId(),
                                               invoiceDate.getMonthValue(),
                                               invoiceDate.getYear())
                 .stream()
-                .map(CreditCardPayment::GetAmount)
+                .map(CreditCardPayment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         try
         {
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             BigDecimal walletAfterBalanceValue =
-                wallet.GetBalance().subtract(invoiceAmount);
+                wallet.getBalance().subtract(invoiceAmount);
 
             // Set the style according to the balance value after the expense
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(walletAfterBalanceLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(walletAfterBalanceLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             walletAfterBalanceLabel.setText(
-                UIUtils.FormatCurrency(walletAfterBalanceValue));
+                UIUtils.formatCurrency(walletAfterBalanceValue));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(walletAfterBalanceLabel);
+            UIUtils.resetLabel(walletAfterBalanceLabel);
         }
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 }

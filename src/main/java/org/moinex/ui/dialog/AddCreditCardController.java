@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.CreditCardOperator;
 import org.moinex.entities.Wallet;
 import org.moinex.services.CreditCardService;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Credit Card dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddCreditCardController
 {
     @FXML
@@ -56,8 +58,6 @@ public class AddCreditCardController
 
     private List<Wallet> wallets;
 
-    public AddCreditCardController() { }
-
     /**
      * Constructor
      * @param creditCardService The credit card service
@@ -75,7 +75,7 @@ public class AddCreditCardController
     @FXML
     private void initialize()
     {
-        PopulateComboBoxes();
+        populateComboBoxes();
 
         // Ensure that the limit field only accepts numbers and has a maximum of 4
         // digits
@@ -120,7 +120,7 @@ public class AddCreditCardController
             crcLastFourDigitsStr.isEmpty() || crcOperatorName == null ||
             crcClosingDayStr == null || crcDueDayStr == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all required fields.");
 
@@ -129,7 +129,7 @@ public class AddCreditCardController
 
         CreditCardOperator crcOperator =
             operators.stream()
-                .filter(op -> op.GetName().equals(crcOperatorName))
+                .filter(op -> op.getName().equals(crcOperatorName))
                 .findFirst()
                 .get();
 
@@ -144,21 +144,21 @@ public class AddCreditCardController
                 crcDefaultBillingWalletName != null &&
                         !crcDefaultBillingWalletName.isEmpty()
                     ? wallets.stream()
-                          .filter(w -> w.GetName().equals(crcDefaultBillingWalletName))
+                          .filter(w -> w.getName().equals(crcDefaultBillingWalletName))
                           .findFirst()
                           .get()
-                          .GetId()
+                          .getId()
                     : null;
 
-            creditCardService.CreateCreditCard(crcName,
-                                               crcDueDay,
-                                               crcClosingDay,
-                                               crcLimit,
-                                               crcLastFourDigitsStr,
-                                               crcOperator.GetId(),
-                                               crcDefaultBillingWalletId);
+            creditCardService.addCreditCard(crcName,
+                                            crcDueDay,
+                                            crcClosingDay,
+                                            crcLimit,
+                                            crcLastFourDigitsStr,
+                                            crcOperator.getId(),
+                                            crcDefaultBillingWalletId);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Credit card created",
                                           "The credit card was successfully created");
 
@@ -167,29 +167,29 @@ public class AddCreditCardController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid limit",
                                         "Please enter a valid limit");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error creating credit card",
                                         e.getMessage());
         }
     }
 
-    private void LoadCreditCardOperators()
+    private void loadCreditCardOperators()
     {
-        operators = creditCardService.GetAllCreditCardOperatorsOrderedByName();
+        operators = creditCardService.getAllCreditCardOperatorsOrderedByName();
     }
 
-    private void LoadWallets()
+    private void loadWallets()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
-    private void PopulateComboBoxes()
+    private void populateComboBoxes()
     {
         for (int i = 1; i <= Constants.MAX_BILLING_DUE_DAY; i++)
         {
@@ -197,18 +197,18 @@ public class AddCreditCardController
             dueDayComboBox.getItems().add(String.valueOf(i));
         }
 
-        LoadCreditCardOperators();
+        loadCreditCardOperators();
 
         for (CreditCardOperator operator : operators)
         {
-            operatorComboBox.getItems().add(operator.GetName());
+            operatorComboBox.getItems().add(operator.getName());
         }
 
-        LoadWallets();
+        loadWallets();
 
         for (Wallet wallet : wallets)
         {
-            defaultBillingWalletComboBox.getItems().add(wallet.GetName());
+            defaultBillingWalletComboBox.getItems().add(wallet.getName());
         }
 
         // Add blank option to the default billing wallet combo box

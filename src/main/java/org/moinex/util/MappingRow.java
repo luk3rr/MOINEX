@@ -33,12 +33,12 @@ public class MappingRow
      * Get the CSV column name
      * @return CSV column name
      */
-    public String GetCsvColumn()
+    public String getCSVColumn()
     {
         return csvColumn.get();
     }
 
-    public StringProperty CsvColumnProperty()
+    public StringProperty csvColumnProperty()
     {
         return csvColumn;
     }
@@ -47,17 +47,17 @@ public class MappingRow
      * Get the selected DB column
      * @return selected DB column
      */
-    public String GetSelectedDbColumn()
+    public String getSelectedDBColumn()
     {
         return selectedDbColumn.get();
     }
 
-    public void SetSelectedDbColumn(String selectedDbColumn)
+    public void setSelectedDBColumn(String selectedDbColumn)
     {
         this.selectedDbColumn.set(selectedDbColumn);
     }
 
-    public StringProperty SelectedDbColumnProperty()
+    public StringProperty selectedDBColumnProperty()
     {
         return selectedDbColumn;
     }
@@ -66,7 +66,7 @@ public class MappingRow
      * Get the DB column options for the ComboBox
      * @return List of DB column options
      */
-    public List<String> GetDbColumnOptions()
+    public List<String> getDBColumnOptions()
     {
         return dbColumnOptions;
     }

@@ -15,7 +15,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.BondType;
 import org.moinex.util.InterestIndex;
 import org.moinex.util.InterestType;
@@ -25,70 +30,38 @@ import org.moinex.util.InterestType;
  */
 @Entity
 @Table(name = "bond")
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public class Bond extends Asset
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private BondType type;
 
-    @Column(name = "interest_index", nullable = false)
+    // TODO: Fix nullable. It should be false when the investment feature is implemented
+    @Column(name = "interest_index", nullable = true)
     private InterestIndex interestIndex;
 
-    @Column(name = "interest_type", nullable = false)
+    @Column(name = "interest_type", nullable = true)
     private InterestType interestType;
 
-    @Column(name = "interest_rate", nullable = false)
+    @Column(name = "interest_rate", nullable = true)
     private BigDecimal interestRate;
 
     @Column(name = "maturity_date", nullable = true)
     private String maturityDate;
 
+    @Builder.Default
     @Column(name             = "archived",
             nullable         = false,
             columnDefinition = "boolean default false")
     private Boolean archived = false; // Default value is false
-
-    /**
-     * Default constructor for JPA
-     */
-    public Bond() { }
-
-    /**
-     * Constructor for Bond
-     * @param name The name of the bond
-     * @param symbol The symbol of the bond
-     * @param currentQuantity The current quantity of the bond
-     * @param currentUnitValue The current unit value of the bond
-     * @param maturityDate The maturity date of the bond
-     */
-    public Bond(String     name,
-                String     symbol,
-                BigDecimal currentQuantity,
-                BigDecimal currentUnitValue,
-                BigDecimal averageUnitValue,
-                String     maturityDate)
-    {
-        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, BigDecimal.ONE);
-        this.maturityDate = maturityDate;
-    }
-
-    public Long GetId()
-    {
-        return id;
-    }
-
-    public String GetMaturityDate()
-    {
-        return maturityDate;
-    }
-
-    public void SetMaturityDate(String maturityDate)
-    {
-        this.maturityDate = maturityDate;
-    }
 }

@@ -17,6 +17,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
 /**
@@ -24,11 +29,16 @@ import org.moinex.util.Constants;
  */
 @Entity
 @Table(name = "transfer")
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public class Transfer
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
@@ -52,19 +62,18 @@ public class Transfer
     @Column(name = "description", nullable = true)
     private String description;
 
-    /**
-     * Default constructor for JPA
-     */
-    public Transfer() { }
+    public static abstract class TransferBuilder<C extends   Transfer, B
+                                                     extends TransferBuilder<C, B>>
+    {
+        public B date(LocalDateTime date)
+        {
+            this.date = date.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
+    }
 
     /**
      * Constructor for testing purposes
-     * @param id The id of the transfer
-     * @param senderWallet The wallet that sends the money
-     * @param receiverWallet The wallet that receives the money
-     * @param date The date of the transfer
-     * @param amount The amount transferred
-     * @param description A description of the transfer
      */
     public Transfer(Long          id,
                     Wallet        senderWallet,
@@ -81,123 +90,13 @@ public class Transfer
         this.description    = description;
     }
 
-    /**
-     * Constructor for Transfer
-     * @param senderWallet The wallet that sends the money
-     * @param receiverWallet The wallet that receives the money
-     * @param date The date of the transfer
-     * @param amount The amount transferred
-     * @param description A description of the transfer
-     */
-    public Transfer(Wallet        senderWallet,
-                    Wallet        receiverWallet,
-                    LocalDateTime date,
-                    BigDecimal    amount,
-                    String        description)
-    {
-        this.senderWallet   = senderWallet;
-        this.receiverWallet = receiverWallet;
-        this.date           = date.format(Constants.DB_DATE_FORMATTER);
-        this.amount         = amount;
-        this.description    = description;
-    }
-
-    /**
-     * Get the transfer id
-     * @return The transfer id
-     */
-    public Long GetId()
-    {
-        return id;
-    }
-
-    /**
-     * Get the wallet that sends the money
-     * @return The wallet that sends the money
-     */
-    public Wallet GetSenderWallet()
-    {
-        return senderWallet;
-    }
-
-    /**
-     * Get the wallet that receives the money
-     * @return The wallet that receives the money
-     */
-    public Wallet GetReceiverWallet()
-    {
-        return receiverWallet;
-    }
-
-    /**
-     * Get the date of the transfer
-     * @return The date of the transfer
-     */
-    public LocalDateTime GetDate()
+    public LocalDateTime getDate()
     {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    /**
-     * Get the description of the transfer
-     * @return The description of the transfer
-     */
-    public String GetDescription()
-    {
-        return description;
-    }
-
-    /**
-     * Get the amount transferred
-     * @return The amount transferred
-     */
-    public BigDecimal GetAmount()
-    {
-        return amount;
-    }
-
-    /**
-     * Set the sender wallet
-     * @param senderWallet The sender wallet
-     */
-    public void SetSenderWallet(Wallet senderWallet)
-    {
-        this.senderWallet = senderWallet;
-    }
-
-    /**
-     * Set the receiver wallet
-     * @param receiverWallet The receiver wallet
-     */
-    public void SetReceiverWallet(Wallet receiverWallet)
-    {
-        this.receiverWallet = receiverWallet;
-    }
-
-    /**
-     * Set the date of the transfer
-     * @param date The date of the transfer
-     */
-    public void SetDate(LocalDateTime date)
+    public void setDate(LocalDateTime date)
     {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
-    }
-
-    /**
-     * Set the description of the transfer
-     * @param description The description of the transfer
-     */
-    public void SetDescription(String description)
-    {
-        this.description = description;
-    }
-
-    /**
-     * Set the amount transferred
-     * @param amount The amount transferred
-     */
-    public void SetAmount(BigDecimal amount)
-    {
-        this.amount = amount;
     }
 }

@@ -16,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.services.CategoryService;
 import org.moinex.util.Constants;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Remove category dialog
  */
 @Controller
+@NoArgsConstructor
 public class ManageCategoryController
 {
     @FXML
@@ -43,6 +45,12 @@ public class ManageCategoryController
 
     private CategoryService categoryService;
 
+    /**
+     * Constructor
+     * @param categoryService The category service
+     * @note This constructor is used for dependency injection
+     */
+    @Autowired
     public ManageCategoryController(CategoryService categoryService)
     {
         this.categoryService = categoryService;
@@ -51,28 +59,28 @@ public class ManageCategoryController
     @FXML
     public void initialize()
     {
-        LoadCategoryFromDatabase();
+        loadCategoryFromDatabase();
 
-        ConfigureTableView();
+        configureTableView();
 
-        UpdateCategoryTableView();
+        updateCategoryTableView();
 
         // Add listener to the search field
         searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> UpdateCategoryTableView());
+            (observable, oldValue, newValue) -> updateCategoryTableView());
     }
 
     @FXML
     private void handleCreate()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_CATEGORY_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_CATEGORY_FXML,
                                     "Add Category",
                                     springContext,
                                     (AddCategoryController controller)
                                         -> {},
                                     List.of(() -> {
-                                        LoadCategoryFromDatabase();
-                                        UpdateCategoryTableView();
+                                        loadCategoryFromDatabase();
+                                        updateCategoryTableView();
                                     }));
     }
 
@@ -84,20 +92,20 @@ public class ManageCategoryController
 
         if (selectedCategory == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "No category selected",
                                         "Please select a category to edit");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_CATEGORY_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_CATEGORY_FXML,
                                     "Edit Category",
                                     springContext,
                                     (EditCategoryController controller)
-                                        -> controller.SetCategory(selectedCategory),
+                                        -> controller.setCategory(selectedCategory),
                                     List.of(() -> {
-                                        LoadCategoryFromDatabase();
-                                        UpdateCategoryTableView();
+                                        loadCategoryFromDatabase();
+                                        updateCategoryTableView();
                                     }));
     }
 
@@ -109,16 +117,16 @@ public class ManageCategoryController
 
         if (selectedCategory == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "No category selected",
                                         "Please select a category to remove");
             return;
         }
 
         // Prevent the removal of categories with associated transactions
-        if (categoryService.CountTransactions(selectedCategory.GetId()) > 0)
+        if (categoryService.getCountTransactions(selectedCategory.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Category has transactions",
                                         "Cannot remove a category with transactions");
             // TODO: Implement a way to change the category of the transactions
@@ -126,14 +134,14 @@ public class ManageCategoryController
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Remove category " + selectedCategory.GetName(),
+                "Remove category " + selectedCategory.getName(),
                 "Are you sure you want to remove this category?"))
         {
-            categoryService.DeleteCategory(selectedCategory.GetId());
-            LoadCategoryFromDatabase();
-            UpdateCategoryTableView();
+            categoryService.deleteCategory(selectedCategory.getId());
+            loadCategoryFromDatabase();
+            updateCategoryTableView();
         }
     }
 
@@ -147,15 +155,15 @@ public class ManageCategoryController
     /**
      * Loads the categories from the database
      */
-    private void LoadCategoryFromDatabase()
+    private void loadCategoryFromDatabase()
     {
-        categories = categoryService.GetCategories();
+        categories = categoryService.getCategories();
     }
 
     /**
      * Updates the category table view
      */
-    private void UpdateCategoryTableView()
+    private void updateCategoryTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -170,9 +178,9 @@ public class ManageCategoryController
         {
             categories.stream()
                 .filter(c -> {
-                    String name     = c.GetName().toLowerCase();
-                    String id       = c.GetId().toString();
-                    String archived = c.IsArchived() ? "yes" : "no";
+                    String name     = c.getName().toLowerCase();
+                    String id       = c.getId().toString();
+                    String archived = c.getIsArchived() ? "yes" : "no";
 
                     return name.contains(similarTextOrId) ||
                         id.contains(similarTextOrId) ||
@@ -187,11 +195,11 @@ public class ManageCategoryController
     /**
      * Configures the table view columns
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<Category, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(column -> new TableCell<Category, Long>() {
             @Override
@@ -213,14 +221,14 @@ public class ManageCategoryController
 
         TableColumn<Category, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetName()));
+            param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<Category, Long> numOfTransactionsColumn =
             new TableColumn<>("Associated Transactions");
         numOfTransactionsColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                categoryService.CountTransactions(param.getValue().GetId())));
+                categoryService.getCountTransactions(param.getValue().getId())));
 
         numOfTransactionsColumn.setCellFactory(
             column -> new TableCell<Category, Long>() {
@@ -244,7 +252,8 @@ public class ManageCategoryController
         TableColumn<Category, String> archivedColumn = new TableColumn<>("Archived");
         archivedColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().IsArchived() ? "Yes" : "No"));
+            -> new SimpleStringProperty(param.getValue().getIsArchived() ? "Yes"
+                                                                         : "No"));
 
         archivedColumn.setCellFactory(column -> new TableCell<Category, String>() {
             @Override

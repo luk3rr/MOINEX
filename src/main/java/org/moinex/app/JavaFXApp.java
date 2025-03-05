@@ -79,7 +79,7 @@ public class JavaFXApp extends Application
     @Override
     public void stop() throws Exception
     {
-        APIUtils.ShutdownExecutor();
+        APIUtils.shutdownExecutor();
 
         springContext.close();
         super.stop();

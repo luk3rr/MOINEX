@@ -14,15 +14,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.moinex.entities.WalletTransaction;
 
 @Entity
 @Table(name = "dividend")
+@Getter
+@Setter
+@NoArgsConstructor
+@Builder
 public class Dividend
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne
@@ -36,58 +46,12 @@ public class Dividend
     private WalletTransaction walletTransaction;
 
     /**
-     * Default constructor for JPA
-     */
-    public Dividend() { }
-
-    /**
      * Constructor for testing purposes
-     * @param id The id of the dividend
-     * @param ticker The ticker of the dividend
-     * @param walletTransaction The wallet transaction of the dividend
      */
-    public Dividend(Long              id,
-                    Ticker            ticker,
-                    WalletTransaction walletTransaction)
+    public Dividend(Long id, Ticker ticker, WalletTransaction walletTransaction)
     {
-        this.id               = id;
-        this.ticker           = ticker;
-        this.walletTransaction = walletTransaction;
-    }
-
-    /**
-     * Constructor for Dividend
-     * @param ticker The ticker of the dividend
-     * @param walletTransaction The wallet transaction of the dividend
-     */
-    public Dividend(Ticker ticker, WalletTransaction walletTransaction)
-    {
+        this.id                = id;
         this.ticker            = ticker;
-        this.walletTransaction = walletTransaction;
-    }
-
-    public Long GetId()
-    {
-        return id;
-    }
-
-    public Ticker GetTicker()
-    {
-        return ticker;
-    }
-
-    public WalletTransaction GetWalletTransaction()
-    {
-        return walletTransaction;
-    }
-
-    public void SetTicker(Ticker ticker)
-    {
-        this.ticker = ticker;
-    }
-
-    public void SetWalletTransaction(WalletTransaction walletTransaction)
-    {
         this.walletTransaction = walletTransaction;
     }
 }

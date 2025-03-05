@@ -18,6 +18,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.CreditCard;
 import org.moinex.services.CreditCardService;
 import org.moinex.ui.dialog.AddCreditCardDebtController;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("prototype") // Each instance of this controller is unique
+@NoArgsConstructor
 public class CreditCardPaneController
 {
     @FXML
@@ -105,8 +107,6 @@ public class CreditCardPaneController
 
     private CreditCard creditCard;
 
-    public CreditCardPaneController() { }
-
     /**
      * Constructor
      * @param creditCardService CreditCardService
@@ -127,50 +127,50 @@ public class CreditCardPaneController
     @FXML
     private void handleAddDebt()
     {
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.ADD_CREDIT_CARD_DEBT_FXML,
             "Add Credit Card Debt",
             springContext,
             (AddCreditCardDebtController controller)
-                -> { controller.SetCreditCard(creditCard); },
-            List.of(() -> creditCardController.UpdateDisplay()));
+                -> { controller.setCreditCard(creditCard); },
+            List.of(() -> creditCardController.updateDisplay()));
     }
 
     @FXML
     private void handleEditCreditCard()
     {
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.EDIT_CREDIT_CARD_FXML,
             "Edit Credit Card",
             springContext,
             (EditCreditCardController controller)
-                -> { controller.SetCreditCard(creditCard); },
-            List.of(() -> creditCardController.UpdateDisplay()));
+                -> { controller.setCreditCard(creditCard); },
+            List.of(() -> creditCardController.updateDisplay()));
     }
 
     @FXML
     private void handleArchiveCreditCard()
     {
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Archive credit card " + creditCard.GetName(),
+                "Archive credit card " + creditCard.getName(),
                 "Are you sure you want to archive this credit card?"))
         {
             try
             {
-                creditCardService.ArchiveCreditCard(creditCard.GetId());
+                creditCardService.archiveCreditCard(creditCard.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Credit card archived",
-                                              "Credit card " + creditCard.GetName() +
+                                              "Credit card " + creditCard.getName() +
                                                   " has been archived");
 
                 // Update credit card display in the main window
-                creditCardController.UpdateDisplay();
+                creditCardController.updateDisplay();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error archiving credit card",
                                             e.getMessage());
                 return;
@@ -182,35 +182,35 @@ public class CreditCardPaneController
     private void handleDeleteCreditCard()
     {
         // Prevent the removal of a credit card with associated debts
-        if (creditCardService.GetDebtCountByCreditCard(creditCard.GetId()) > 0)
+        if (creditCardService.getDebtCountByCreditCard(creditCard.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Credit card has debts",
                 "Cannot delete a credit card with associated debts");
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Delete credit card " + creditCard.GetName(),
+                "Delete credit card " + creditCard.getName(),
                 "Are you sure you want to remove this credit card?"))
         {
             try
             {
-                creditCardService.DeleteCreditCard(creditCard.GetId());
+                creditCardService.deleteCreditCard(creditCard.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Credit card deleted",
-                                              "Credit card " + creditCard.GetName() +
+                                              "Credit card " + creditCard.getName() +
                                                   " has been deleted");
 
                 // Update credit card display in the main window
-                creditCardController.UpdateDisplay();
+                creditCardController.updateDisplay();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error removing credit card",
                                             e.getMessage());
                 return;
@@ -222,28 +222,28 @@ public class CreditCardPaneController
     private void handlePrevMonth()
     {
         currentDisplayedMonth = currentDisplayedMonth.minusMonths(1);
-        UpdateInvoiceInfo();
+        updateInvoiceInfo();
     }
 
     @FXML
     private void handleNextMonth()
     {
         currentDisplayedMonth = currentDisplayedMonth.plusMonths(1);
-        UpdateInvoiceInfo();
+        updateInvoiceInfo();
     }
 
     @FXML
     private void handleRegisterPayment()
     {
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.CREDIT_CARD_INVOICE_PAYMENT_FXML,
             "Register Payment",
             springContext,
             (CreditCardInvoicePaymentController controller)
-                -> { controller.SetCreditCard(creditCard, currentDisplayedMonth); },
+                -> { controller.setCreditCard(creditCard, currentDisplayedMonth); },
             // Update the display after the payment is registered with the current month
             List.of(
-                () -> { creditCardController.UpdateDisplay(currentDisplayedMonth); }));
+                () -> { creditCardController.updateDisplay(currentDisplayedMonth); }));
     }
 
     /**
@@ -251,35 +251,35 @@ public class CreditCardPaneController
      * @param creditCard Credit Card to load
      * @return The updated VBox
      */
-    public VBox UpdateCreditCardPane(CreditCard crc, YearMonth month)
+    public VBox updateCreditCardPane(CreditCard crc, YearMonth month)
     {
         // If the crc is null, do not update the pane
         if (crc == null)
         {
-            SetDefaultValues();
+            setDefaultValues();
             return rootVBox;
         }
 
         this.creditCard            = crc;
         this.currentDisplayedMonth = month;
 
-        crcName.setText(creditCard.GetName());
-        crcOperator.setText(creditCard.GetOperator().GetName());
+        crcName.setText(creditCard.getName());
+        crcOperator.setText(creditCard.getOperator().getName());
         crcOperatorIcon.setImage(new Image(Constants.CRC_OPERATOR_ICONS_PATH +
-                                           creditCard.GetOperator().GetIcon()));
+                                           creditCard.getOperator().getIcon()));
 
-        BigDecimal limit = creditCard.GetMaxDebt();
+        BigDecimal limit = creditCard.getMaxDebt();
         BigDecimal pendingPayments =
-            creditCardService.GetTotalPendingPayments(creditCard.GetId());
+            creditCardService.getTotalPendingPayments(creditCard.getId());
 
         BigDecimal limitAvailable =
-            creditCardService.GetAvailableCredit(creditCard.GetId());
+            creditCardService.getAvailableCredit(creditCard.getId());
 
-        limitLabel.setText(UIUtils.FormatCurrency(limit));
+        limitLabel.setText(UIUtils.formatCurrency(limit));
 
-        pendingPaymentsLabel.setText(UIUtils.FormatCurrency(pendingPayments));
+        pendingPaymentsLabel.setText(UIUtils.formatCurrency(pendingPayments));
 
-        limitAvailableLabel.setText(UIUtils.FormatCurrency(limitAvailable));
+        limitAvailableLabel.setText(UIUtils.formatCurrency(limitAvailable));
 
         // Set percentage of the usage of the limit
         BigDecimal limitProgress =
@@ -289,24 +289,27 @@ public class CreditCardPaneController
 
         limitProgressBar.setProgress(limitProgress.doubleValue());
         limitProgressLabel.setText(
-            UIUtils.FormatPercentage(limitProgress.doubleValue() * 100));
+            UIUtils.formatPercentage(limitProgress.doubleValue() * 100));
 
-        dueDateLabel.setText(creditCard.GetBillingDueDay().toString());
+        dueDateLabel.setText(creditCard.getBillingDueDay().toString());
 
-        closureDayLabel.setText(creditCard.GetClosingDay().toString());
+        closureDayLabel.setText(creditCard.getClosingDay().toString());
 
         // Fromat LocalDateTime to MM/YYYY
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
         nextInvoiceLabel.setText(
-            creditCardService.GetNextInvoiceDate(creditCard.GetId()).format(formatter));
+            creditCardService.getNextInvoiceDate(creditCard.getId()).format(formatter));
 
-        UpdateInvoiceInfo();
+        updateInvoiceInfo();
 
         return rootVBox;
     }
 
-    public void UpdateInvoiceInfo()
+    /**
+     * Update the invoice information
+     */
+    public void updateInvoiceInfo()
     {
         if (creditCard == null)
         {
@@ -317,20 +320,23 @@ public class CreditCardPaneController
 
         invoiceMonth.setText(currentDisplayedMonth.format(formatter));
 
-        invoiceTotal.setText(UIUtils.FormatCurrency(
-            creditCardService.GetInvoiceAmount(creditCard.GetId(),
+        invoiceTotal.setText(UIUtils.formatCurrency(
+            creditCardService.getInvoiceAmount(creditCard.getId(),
                                                currentDisplayedMonth.getMonthValue(),
                                                currentDisplayedMonth.getYear())));
 
         invoiceStatus.setText(
             creditCardService
-                .GetInvoiceStatus(creditCard.GetId(),
+                .getInvoiceStatus(creditCard.getId(),
                                   currentDisplayedMonth.getMonthValue(),
                                   currentDisplayedMonth.getYear())
                 .toString());
     }
 
-    private void SetDefaultValues()
+    /**
+     * Set the default values for the credit card pane
+     */
+    private void setDefaultValues()
     {
         crcName.setText("");
         crcOperator.setText("");

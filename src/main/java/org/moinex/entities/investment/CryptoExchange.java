@@ -16,6 +16,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
 /**
@@ -23,11 +28,16 @@ import org.moinex.util.Constants;
  */
 @Entity
 @Table(name = "crypto_exchange")
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public class CryptoExchange
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne
@@ -52,20 +62,18 @@ public class CryptoExchange
     @Column(name = "description", nullable = true)
     private String description;
 
-    /**
-     * Default constructor for JPA
-     */
-    public CryptoExchange() { }
+    public static abstract class CryptoExchangeBuilder<
+        C extends CryptoExchange, B extends CryptoExchangeBuilder<C, B>>
+    {
+        public B date(LocalDateTime date)
+        {
+            this.date = date.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
+    }
 
     /**
      * Constructor for testing purposes
-     * @param id The id of the exchange
-     * @param soldCrypto The source crypto of the exchange
-     * @param receivedCrypto The target crypto of the exchange
-     * @param soldQuantity The source quantity of the exchange
-     * @param receivedQuantity The target quantity of the exchange
-     * @param date The date of the exchange
-     * @param description A description of the exchange
      */
     public CryptoExchange(Long          id,
                           Ticker        soldCrypto,
@@ -84,91 +92,13 @@ public class CryptoExchange
         this.description      = description;
     }
 
-    /**
-     * Constructor for testing purposes
-     * @param soldCrypto The source crypto of the exchange
-     * @param receivedCrypto The target crypto of the exchange
-     * @param soldQuantity The source quantity of the exchange
-     * @param receivedQuantity The target quantity of the exchange
-     * @param date The date of the exchange
-     */
-    public CryptoExchange(Ticker        soldCrypto,
-                          Ticker        receivedCrypto,
-                          BigDecimal    soldQuantity,
-                          BigDecimal    receivedQuantity,
-                          LocalDateTime date,
-                          String        description)
-    {
-        this.soldCrypto       = soldCrypto;
-        this.receivedCrypto   = receivedCrypto;
-        this.soldQuantity     = soldQuantity;
-        this.receivedQuantity = receivedQuantity;
-        this.date             = date.format(Constants.DB_DATE_FORMATTER);
-        this.description      = description;
-    }
-
-    public Long GetId()
-    {
-        return id;
-    }
-
-    public Ticker GetSoldCrypto()
-    {
-        return soldCrypto;
-    }
-
-    public Ticker GetReceivedCrypto()
-    {
-        return receivedCrypto;
-    }
-
-    public BigDecimal GetSoldQuantity()
-    {
-        return soldQuantity;
-    }
-
-    public BigDecimal GetReceivedQuantity()
-    {
-        return receivedQuantity;
-    }
-
-    public LocalDateTime GetDate()
+    public LocalDateTime getDate()
     {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public String GetDescription()
-    {
-        return description;
-    }
-
-    public void SetSoldCrypto(Ticker soldCrypto)
-    {
-        this.soldCrypto = soldCrypto;
-    }
-
-    public void SetReceivedCrypto(Ticker receivedCrypto)
-    {
-        this.receivedCrypto = receivedCrypto;
-    }
-
-    public void SetSoldQuantity(BigDecimal soldQuantity)
-    {
-        this.soldQuantity = soldQuantity;
-    }
-
-    public void SetReceivedQuantity(BigDecimal receivedQuantity)
-    {
-        this.receivedQuantity = receivedQuantity;
-    }
-
-    public void SetDate(LocalDateTime date)
+    public void setDate(LocalDateTime date)
     {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
-    }
-
-    public void SetDescription(String description)
-    {
-        this.description = description;
     }
 }

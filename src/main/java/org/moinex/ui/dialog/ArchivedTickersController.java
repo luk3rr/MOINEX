@@ -17,16 +17,19 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Archived Tickers dialog
  */
 @Controller
+@NoArgsConstructor
 public class ArchivedTickersController
 {
     @FXML
@@ -44,6 +47,7 @@ public class ArchivedTickersController
      * @param TickerService tickerService
      * @note This constructor is used for dependency injection
      */
+    @Autowired
     public ArchivedTickersController(TickerService tickerService)
 
     {
@@ -53,15 +57,15 @@ public class ArchivedTickersController
     @FXML
     public void initialize()
     {
-        LoadArchivedTickersFromDatabase();
+        loadArchivedTickersFromDatabase();
 
-        ConfigureTableView();
+        configureTableView();
 
-        UpdateTickerTableView();
+        updateTickerTableView();
 
         // Add listener to the search field
         searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> UpdateTickerTableView());
+            (observable, oldValue, newValue) -> updateTickerTableView());
     }
 
     @FXML
@@ -71,35 +75,35 @@ public class ArchivedTickersController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "No ticker selected",
                                         "Please select a ticker to unarchive");
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Unarchive ticker " + selectedTicker.GetName() + " ( " +
-                    selectedTicker.GetSymbol() + ")",
+                "Unarchive ticker " + selectedTicker.getName() + " ( " +
+                    selectedTicker.getSymbol() + ")",
                 "Are you sure you want to unarchive this ticker?"))
         {
             try
             {
-                tickerService.UnarchiveTicker(selectedTicker.GetId());
+                tickerService.unarchiveTicker(selectedTicker.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Ticker unarchived",
-                                              "Ticker " + selectedTicker.GetName() +
-                                                  " ( " + selectedTicker.GetSymbol() +
+                                              "Ticker " + selectedTicker.getName() +
+                                                  " ( " + selectedTicker.getSymbol() +
                                                   ") has been unarchived");
 
                 // Remove this ticker from the list and update the table view
                 archivedTickers.remove(selectedTicker);
-                UpdateTickerTableView();
+                updateTickerTableView();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving ticker",
                                             e.getMessage());
                 return;
@@ -114,45 +118,45 @@ public class ArchivedTickersController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "No ticker selected",
                                         "Please select a ticker to delete");
             return;
         }
 
         // Prevent the removal of a ticker with associated transactions
-        if (tickerService.GetTransactionCountByTicker(selectedTicker.GetId()) > 0)
+        if (tickerService.getTransactionCountByTicker(selectedTicker.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Ticker has transactions",
                 "Cannot delete a ticker with associated transactions");
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Remove ticker " + selectedTicker.GetName() + " ( " +
-                    selectedTicker.GetSymbol() + ")",
+                "Remove ticker " + selectedTicker.getName() + " ( " +
+                    selectedTicker.getSymbol() + ")",
                 "Are you sure you want to remove this ticker?"))
         {
             try
             {
-                tickerService.DeleteTicker(selectedTicker.GetId());
+                tickerService.deleteTicker(selectedTicker.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Ticker deleted",
-                                              "Ticker " + selectedTicker.GetName() +
-                                                  " (" + selectedTicker.GetSymbol() +
+                                              "Ticker " + selectedTicker.getName() +
+                                                  " (" + selectedTicker.getSymbol() +
                                                   ") has been deleted");
 
                 // Remove this ticker from the list and update the table view
                 archivedTickers.remove(selectedTicker);
-                UpdateTickerTableView();
+                updateTickerTableView();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error removing ticker",
                                             e.getMessage());
                 return;
@@ -170,15 +174,15 @@ public class ArchivedTickersController
     /**
      * Loads the archived tickers from the database
      */
-    private void LoadArchivedTickersFromDatabase()
+    private void loadArchivedTickersFromDatabase()
     {
-        archivedTickers = tickerService.GetAllArchivedTickers();
+        archivedTickers = tickerService.getAllArchivedTickers();
     }
 
     /**
      * Updates the archived tickers table view
      */
-    private void UpdateTickerTableView()
+    private void updateTickerTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -193,15 +197,15 @@ public class ArchivedTickersController
         {
             archivedTickers.stream()
                 .filter(t -> {
-                    String name       = t.GetName().toLowerCase();
-                    String symbol     = t.GetSymbol().toLowerCase();
-                    String type       = t.GetType().toString().toLowerCase();
-                    String quantity   = t.GetCurrentQuantity().toString();
-                    String unitValue  = t.GetCurrentUnitValue().toString();
-                    String totalValue = t.GetCurrentQuantity()
-                                            .multiply(t.GetCurrentUnitValue())
+                    String name       = t.getName().toLowerCase();
+                    String symbol     = t.getSymbol().toLowerCase();
+                    String type       = t.getType().toString().toLowerCase();
+                    String quantity   = t.getCurrentQuantity().toString();
+                    String unitValue  = t.getCurrentUnitValue().toString();
+                    String totalValue = t.getCurrentQuantity()
+                                            .multiply(t.getCurrentUnitValue())
                                             .toString();
-                    String avgPrice = t.GetAveragePrice().toString();
+                    String avgPrice = t.getAverageUnitValue().toString();
 
                     return name.contains(similarTextOrId) ||
                         symbol.contains(similarTextOrId) ||
@@ -220,11 +224,11 @@ public class ArchivedTickersController
     /**
      * Configure the table view columns
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -250,40 +254,40 @@ public class ArchivedTickersController
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetName()));
+            param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<Ticker, String> SymbolColumn = new TableColumn<>("Symbol");
         SymbolColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetSymbol()));
+            param -> new SimpleStringProperty(param.getValue().getSymbol()));
 
         TableColumn<Ticker, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetType().toString()));
+            param -> new SimpleStringProperty(param.getValue().getType().toString()));
 
         TableColumn<Ticker, BigDecimal> quantityColumn =
             new TableColumn<>("Quantity Owned");
         quantityColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetCurrentQuantity()));
+            param -> new SimpleObjectProperty<>(param.getValue().getCurrentQuantity()));
 
         TableColumn<Ticker, String> unitColumn = new TableColumn<>("Unit Price");
         unitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrencyDynamic(param.getValue().GetCurrentUnitValue())));
+                UIUtils.formatCurrencyDynamic(param.getValue().getCurrentUnitValue())));
 
         TableColumn<Ticker, String> totalColumn = new TableColumn<>("Total Value");
         totalColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(UIUtils.FormatCurrencyDynamic(
-                param.getValue().GetCurrentQuantity().multiply(
-                    param.getValue().GetCurrentUnitValue()))));
+            -> new SimpleObjectProperty<>(UIUtils.formatCurrencyDynamic(
+                param.getValue().getCurrentQuantity().multiply(
+                    param.getValue().getCurrentUnitValue()))));
 
         TableColumn<Ticker, String> avgUnitColumn =
             new TableColumn<>("Average Unit Price");
         avgUnitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrencyDynamic(param.getValue().GetAveragePrice())));
+                UIUtils.formatCurrencyDynamic(param.getValue().getAverageUnitValue())));
 
         // Add the columns to the table view
         tickerTableView.getColumns().add(idColumn);

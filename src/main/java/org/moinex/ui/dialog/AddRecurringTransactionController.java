@@ -16,6 +16,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.services.CategoryService;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Recurring Transaction dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddRecurringTransactionController
 {
     @FXML
@@ -72,8 +74,6 @@ public class AddRecurringTransactionController
 
     private List<Category> categories;
 
-    public AddRecurringTransactionController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -95,12 +95,12 @@ public class AddRecurringTransactionController
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadCategories();
+        loadWalletsFromDatabase();
+        loadCategoriesFromDatabase();
 
         // Configure date picker
-        UIUtils.SetDatePickerFormat(startDatePicker);
-        UIUtils.SetDatePickerFormat(endDatePicker);
+        UIUtils.setDatePickerFormat(startDatePicker);
+        UIUtils.setDatePickerFormat(endDatePicker);
 
         // For each element in enum RecurringTransactionStatus, add its name to the
         // typeComboBox
@@ -114,11 +114,11 @@ public class AddRecurringTransactionController
                 .map(Enum::name)
                 .toList());
 
-        startDatePicker.setOnAction(e -> { UpdateInfoLabel(); });
+        startDatePicker.setOnAction(e -> { updateInfoLabel(); });
 
-        endDatePicker.setOnAction(e -> { UpdateInfoLabel(); });
+        endDatePicker.setOnAction(e -> { updateInfoLabel(); });
 
-        frequencyComboBox.setOnAction(e -> { UpdateInfoLabel(); });
+        frequencyComboBox.setOnAction(e -> { updateInfoLabel(); });
 
         // Check if the value field is a valid monetary value
         valueField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -162,7 +162,7 @@ public class AddRecurringTransactionController
             valueString.strip().isEmpty() || typeString == null ||
             categoryString == null || startDate == null || frequencyString == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill the required fields.");
             return;
@@ -173,12 +173,12 @@ public class AddRecurringTransactionController
             BigDecimal transactionAmount = new BigDecimal(valueString);
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             Category category = categories.stream()
-                                    .filter(c -> c.GetName().equals(categoryString))
+                                    .filter(c -> c.getName().equals(categoryString))
                                     .findFirst()
                                     .get();
 
@@ -189,29 +189,27 @@ public class AddRecurringTransactionController
 
             if (endDate == null)
             {
-                recurringTransactionService.CreateRecurringTransaction(
-                    wallet.GetId(),
-                    category,
-                    type,
-                    transactionAmount,
-                    startDate,
-                    description,
-                    frequency);
+                recurringTransactionService.addRecurringTransaction(wallet.getId(),
+                                                                    category,
+                                                                    type,
+                                                                    transactionAmount,
+                                                                    startDate,
+                                                                    description,
+                                                                    frequency);
             }
             else
             {
-                recurringTransactionService.CreateRecurringTransaction(
-                    wallet.GetId(),
-                    category,
-                    type,
-                    transactionAmount,
-                    startDate,
-                    endDate,
-                    description,
-                    frequency);
+                recurringTransactionService.addRecurringTransaction(wallet.getId(),
+                                                                    category,
+                                                                    type,
+                                                                    transactionAmount,
+                                                                    startDate,
+                                                                    endDate,
+                                                                    description,
+                                                                    frequency);
             }
 
-            WindowUtils.ShowSuccessDialog(
+            WindowUtils.showSuccessDialog(
                 "Success",
                 "Recurring transaction created",
                 "Recurring transaction created successfully.");
@@ -221,19 +219,19 @@ public class AddRecurringTransactionController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid transaction value",
                                         "Transaction value must be a number.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while creating recurring transaction",
                                         e.getMessage());
         }
     }
 
-    private void UpdateInfoLabel()
+    private void updateInfoLabel()
     {
         LocalDate startDate       = startDatePicker.getValue();
         LocalDate endDate         = endDatePicker.getValue();
@@ -256,7 +254,7 @@ public class AddRecurringTransactionController
 
                     msg +=
                         "\nLast transaction: " +
-                        recurringTransactionService.GetLastTransactionDate(startDate,
+                        recurringTransactionService.getLastTransactionDate(startDate,
                                                                            endDate,
                                                                            frequency);
                 }
@@ -274,26 +272,26 @@ public class AddRecurringTransactionController
         infoLabel.setText(msg);
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
-    private void LoadCategories()
+    private void loadCategoriesFromDatabase()
     {
-        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
 
         categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::GetName).toList());
+            categories.stream().map(Category::getName).toList());
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
         if (categories.size() == 0)
         {
-            UIUtils.AddTooltipToNode(
+            UIUtils.addTooltipToNode(
                 categoryComboBox,
                 "You need to add a category before adding an transaction");
         }

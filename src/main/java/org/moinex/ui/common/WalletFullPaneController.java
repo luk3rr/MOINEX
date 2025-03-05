@@ -16,6 +16,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import lombok.NoArgsConstructor;
+
 import org.moinex.entities.CreditCardPayment;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
@@ -47,6 +49,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("prototype") // Each instance of this controller is unique
+@NoArgsConstructor
 public class WalletFullPaneController
 {
     @FXML
@@ -131,8 +134,6 @@ public class WalletFullPaneController
 
     private List<Transfer> transfers;
 
-    public WalletFullPaneController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -154,7 +155,7 @@ public class WalletFullPaneController
      * Load wallet information from the database
      * @param wtName Wallet name to find in the database
      */
-    public void LoadWalletInfo()
+    public void loadWalletInfo()
     {
         if (wallet == null)
         {
@@ -164,37 +165,37 @@ public class WalletFullPaneController
         }
 
         // Reload wallet from the database
-        wallet = walletService.GetWalletById(wallet.GetId());
+        wallet = walletService.getWalletById(wallet.getId());
 
         LocalDate now = LocalDate.now();
 
         transactions =
-            walletTransactionService.GetNonArchivedTransactionsByWalletAndMonth(
-                wallet.GetId(),
+            walletTransactionService.getNonArchivedTransactionsByWalletAndMonth(
+                wallet.getId(),
                 now.getMonthValue(),
                 now.getYear());
 
         transfers =
-            walletTransactionService.GetTransfersByWalletAndMonth(wallet.GetId(),
+            walletTransactionService.getTransfersByWalletAndMonth(wallet.getId(),
                                                                   now.getMonthValue(),
                                                                   now.getYear());
 
-        crcPaidAmount = creditCardService.GetPaidPaymentsByMonth(wallet.GetId(),
+        crcPaidAmount = creditCardService.getPaidPaymentsByMonth(wallet.getId(),
                                                                  now.getMonthValue(),
                                                                  now.getYear());
 
         List<CreditCardPayment> payments =
-            creditCardService.GetCreditCardPayments(now.getMonthValue(), now.getYear());
+            creditCardService.getCreditCardPayments(now.getMonthValue(), now.getYear());
 
         // Filter payments that are related to the wallet and are not paid
         crcPendingAmount = payments.stream()
                                .filter(p
-                                       -> p.GetCreditCardDebt()
-                                                  .GetCreditCard()
-                                                  .GetDefaultBillingWallet()
-                                                  .GetId() == wallet.GetId())
-                               .filter(p -> p.GetWallet() == null)
-                               .map(CreditCardPayment::GetAmount)
+                                       -> p.getCreditCardDebt()
+                                                  .getCreditCard()
+                                                  .getDefaultBillingWallet()
+                                                  .getId() == wallet.getId())
+                               .filter(p -> p.getWallet() == null)
+                               .map(CreditCardPayment::getAmount)
                                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -203,42 +204,42 @@ public class WalletFullPaneController
      * @param wtName Wallet name to find in the database
      * @return The updated VBox
      */
-    public VBox UpdateWalletPane(Wallet wt)
+    public VBox updateWalletPane(Wallet wt)
     {
         // If the wallet is null, do not update the pane
         if (wt == null)
         {
-            SetDefaultValues();
+            setDefaultValues();
             return rootVBox;
         }
 
         wallet = wt;
-        LoadWalletInfo();
+        loadWalletInfo();
 
-        walletName.setText(wallet.GetName());
-        walletType.setText(wallet.GetType().GetName());
+        walletName.setText(wallet.getName());
+        walletType.setText(wallet.getType().getName());
         walletIcon.setImage(
-            new Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.GetType().GetIcon()));
+            new Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.getType().getIcon()));
 
         BigDecimal confirmedIncomesSum =
             transactions.stream()
-                .filter(t -> t.GetType().equals(TransactionType.INCOME))
-                .filter(t -> t.GetStatus().equals(TransactionStatus.CONFIRMED))
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType().equals(TransactionType.INCOME))
+                .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal pendingIncomesSum =
             transactions.stream()
-                .filter(t -> t.GetType().equals(TransactionType.INCOME))
-                .filter(t -> t.GetStatus().equals(TransactionStatus.PENDING))
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType().equals(TransactionType.INCOME))
+                .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal confirmedExpensesSum =
             transactions.stream()
-                .filter(t -> t.GetType().equals(TransactionType.EXPENSE))
-                .filter(t -> t.GetStatus().equals(TransactionStatus.CONFIRMED))
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Consider the paid amount of the credit card
@@ -246,9 +247,9 @@ public class WalletFullPaneController
 
         BigDecimal pendingExpensesSum =
             transactions.stream()
-                .filter(t -> t.GetType().equals(TransactionType.EXPENSE))
-                .filter(t -> t.GetStatus().equals(TransactionStatus.PENDING))
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Consider the pending amount of the credit card
@@ -256,38 +257,38 @@ public class WalletFullPaneController
 
         BigDecimal creditedTransfersSum =
             transfers.stream()
-                .filter(t -> t.GetReceiverWallet().GetId() == wallet.GetId())
-                .map(Transfer::GetAmount)
+                .filter(t -> t.getReceiverWallet().getId() == wallet.getId())
+                .map(Transfer::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal debitedTransfersSum =
             transfers.stream()
-                .filter(t -> t.GetSenderWallet().GetId() == wallet.GetId())
-                .map(Transfer::GetAmount)
+                .filter(t -> t.getSenderWallet().getId() == wallet.getId())
+                .map(Transfer::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal openingBalance = wallet.GetBalance()
+        BigDecimal openingBalance = wallet.getBalance()
                                         .subtract(confirmedIncomesSum)
                                         .add(confirmedExpensesSum)
                                         .subtract(creditedTransfersSum)
                                         .add(debitedTransfersSum);
 
         BigDecimal foreseenBalance =
-            wallet.GetBalance().add(pendingIncomesSum).subtract(pendingExpensesSum);
+            wallet.getBalance().add(pendingIncomesSum).subtract(pendingExpensesSum);
 
-        SetLabelValue(openingBalanceSign, openingBalanceValue, openingBalance);
-        SetLabelValue(incomesSign, incomesValue, confirmedIncomesSum);
-        SetLabelValue(expensesSign, expensesValue, confirmedExpensesSum);
-        SetLabelValue(creditedTransfersSign,
+        setLabelValue(openingBalanceSign, openingBalanceValue, openingBalance);
+        setLabelValue(incomesSign, incomesValue, confirmedIncomesSum);
+        setLabelValue(expensesSign, expensesValue, confirmedExpensesSum);
+        setLabelValue(creditedTransfersSign,
                       creditedTransfersValue,
                       creditedTransfersSum);
-        SetLabelValue(debitedTransfersSign, debitedTransfersValue, debitedTransfersSum);
-        SetLabelValue(currentBalanceSign, currentBalanceValue, wallet.GetBalance());
-        SetLabelValue(foreseenBalanceSign, foreseenBalanceValue, foreseenBalance);
+        setLabelValue(debitedTransfersSign, debitedTransfersValue, debitedTransfersSum);
+        setLabelValue(currentBalanceSign, currentBalanceValue, wallet.getBalance());
+        setLabelValue(foreseenBalanceSign, foreseenBalanceValue, foreseenBalance);
 
         // If wallet type is Goal, remove the option to change the wallet type to
         // prevent changing the wallet type of a Goal wallet
-        if (wallet.GetType().GetName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
+        if (wallet.getType().getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
         {
             menuButton.getItems().remove(changeWalletTypeMenuItem);
         }
@@ -302,82 +303,82 @@ public class WalletFullPaneController
     @FXML
     private void handleAddIncome()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_INCOME_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_INCOME_FXML,
                                     "Add new income",
                                     springContext,
                                     (AddIncomeController controller)
-                                        -> { controller.SetWalletComboBox(wallet); },
-                                    List.of(() -> walletController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(wallet); },
+                                    List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleAddExpense()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_EXPENSE_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_EXPENSE_FXML,
                                     "Add new expense",
                                     springContext,
                                     (AddExpenseController controller)
-                                        -> { controller.SetWalletComboBox(wallet); },
-                                    List.of(() -> walletController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(wallet); },
+                                    List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleAddTransfer()
     {
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.ADD_TRANSFER_FXML,
             "Add new transfer",
             springContext,
             (AddTransferController controller)
-                -> { controller.SetSenderWalletComboBox(wallet); },
-            List.of(() -> walletController.UpdateDisplay()));
+                -> { controller.setSenderWalletComboBox(wallet); },
+            List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleRenameWallet()
     {
-        WindowUtils.OpenModalWindow(Constants.RENAME_WALLET_FXML,
+        WindowUtils.openModalWindow(Constants.RENAME_WALLET_FXML,
                                     "Rename wallet",
                                     springContext,
                                     (RenameWalletController controller)
-                                        -> { controller.SetWalletComboBox(wallet); },
-                                    List.of(() -> walletController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(wallet); },
+                                    List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleChangeWalletType()
     {
-        WindowUtils.OpenModalWindow(Constants.CHANGE_WALLET_TYPE_FXML,
+        WindowUtils.openModalWindow(Constants.CHANGE_WALLET_TYPE_FXML,
                                     "Change wallet type",
                                     springContext,
                                     (ChangeWalletTypeController controller)
-                                        -> { controller.SetWalletComboBox(wallet); },
-                                    List.of(() -> walletController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(wallet); },
+                                    List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleChangeWalletBalance()
     {
-        WindowUtils.OpenModalWindow(Constants.CHANGE_WALLET_BALANCE_FXML,
+        WindowUtils.openModalWindow(Constants.CHANGE_WALLET_BALANCE_FXML,
                                     "Change wallet balance",
                                     springContext,
                                     (ChangeWalletBalanceController controller)
-                                        -> { controller.SetWalletComboBox(wallet); },
-                                    List.of(() -> walletController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(wallet); },
+                                    List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleArchiveWallet()
     {
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Archive wallet " + wallet.GetName(),
+                "Archive wallet " + wallet.getName(),
                 "Are you sure you want to archive this wallet?"))
         {
-            walletService.ArchiveWallet(wallet.GetId());
+            walletService.archiveWallet(wallet.getId());
 
             // Update wallet display in the main window
-            walletController.UpdateDisplay();
+            walletController.updateDisplay();
         }
     }
 
@@ -385,9 +386,9 @@ public class WalletFullPaneController
     private void handleDeleteWallet()
     {
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.GetTransactionCountByWallet(wallet.GetId()) > 0)
+        if (walletTransactionService.getTransactionCountByWallet(wallet.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Wallet has transactions",
                 "Cannot delete a wallet with associated transactions. "
@@ -395,26 +396,26 @@ public class WalletFullPaneController
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Delete wallet " + wallet.GetName(),
+                "Delete wallet " + wallet.getName(),
                 "Are you sure you want to remove this wallet?"))
         {
             try
             {
-                walletService.DeleteWallet(wallet.GetId());
+                walletService.deleteWallet(wallet.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Wallet deleted",
-                                              "Wallet " + wallet.GetName() +
+                                              "Wallet " + wallet.getName() +
                                                   " has been deleted");
 
                 // Update wallet display in the main window
-                walletController.UpdateDisplay();
+                walletController.updateDisplay();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error removing wallet",
                                             e.getMessage());
                 return;
@@ -422,19 +423,19 @@ public class WalletFullPaneController
         }
     }
 
-    private void SetDefaultValues()
+    private void setDefaultValues()
     {
         walletName.setText("");
         walletType.setText("");
         walletIcon.setImage(null);
 
-        SetLabelValue(openingBalanceSign, openingBalanceValue, BigDecimal.ZERO);
-        SetLabelValue(incomesSign, incomesValue, BigDecimal.ZERO);
-        SetLabelValue(expensesSign, expensesValue, BigDecimal.ZERO);
-        SetLabelValue(creditedTransfersSign, creditedTransfersValue, BigDecimal.ZERO);
-        SetLabelValue(debitedTransfersSign, debitedTransfersValue, BigDecimal.ZERO);
-        SetLabelValue(currentBalanceSign, currentBalanceValue, BigDecimal.ZERO);
-        SetLabelValue(foreseenBalanceSign, foreseenBalanceValue, BigDecimal.ZERO);
+        setLabelValue(openingBalanceSign, openingBalanceValue, BigDecimal.ZERO);
+        setLabelValue(incomesSign, incomesValue, BigDecimal.ZERO);
+        setLabelValue(expensesSign, expensesValue, BigDecimal.ZERO);
+        setLabelValue(creditedTransfersSign, creditedTransfersValue, BigDecimal.ZERO);
+        setLabelValue(debitedTransfersSign, debitedTransfersValue, BigDecimal.ZERO);
+        setLabelValue(currentBalanceSign, currentBalanceValue, BigDecimal.ZERO);
+        setLabelValue(foreseenBalanceSign, foreseenBalanceValue, BigDecimal.ZERO);
     }
 
     /**
@@ -443,21 +444,21 @@ public class WalletFullPaneController
      * @param valueLabel Label to set the value
      * @param value Value to set
      */
-    private void SetLabelValue(Label signLabel, Label valueLabel, BigDecimal value)
+    private void setLabelValue(Label signLabel, Label valueLabel, BigDecimal value)
     {
         if (value.compareTo(BigDecimal.ZERO) < 0)
         {
             signLabel.setText("-");
-            valueLabel.setText(UIUtils.FormatCurrency(value.abs()));
-            UIUtils.SetLabelStyle(signLabel, Constants.NEGATIVE_BALANCE_STYLE);
-            UIUtils.SetLabelStyle(valueLabel, Constants.NEGATIVE_BALANCE_STYLE);
+            valueLabel.setText(UIUtils.formatCurrency(value.abs()));
+            UIUtils.setLabelStyle(signLabel, Constants.NEGATIVE_BALANCE_STYLE);
+            UIUtils.setLabelStyle(valueLabel, Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
             signLabel.setText(" ");
-            valueLabel.setText(UIUtils.FormatCurrency(value));
-            UIUtils.SetLabelStyle(signLabel, Constants.NEUTRAL_BALANCE_STYLE);
-            UIUtils.SetLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE);
+            valueLabel.setText(UIUtils.formatCurrency(value));
+            UIUtils.setLabelStyle(signLabel, Constants.NEUTRAL_BALANCE_STYLE);
+            UIUtils.setLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE);
         }
     }
 }

@@ -38,6 +38,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCardPayment;
 import org.moinex.entities.WalletTransaction;
@@ -66,10 +67,9 @@ import org.springframework.stereotype.Controller;
  * TODO: Load information from the database only when necessary
  */
 @Controller
+@NoArgsConstructor
 public class TransactionController
 {
-    private static final Logger logger = LoggerConfig.GetLogger();
-
     @FXML
     private AnchorPane monthResumeView;
 
@@ -114,6 +114,8 @@ public class TransactionController
 
     private CategoryService categoryService;
 
+    private static final Logger logger = LoggerConfig.getLogger();
+
     /**
      * Constructor
      * @param walletTransactionService WalletTransactionService
@@ -134,15 +136,15 @@ public class TransactionController
     @FXML
     private void initialize()
     {
-        ConfigureTableView();
+        configureTableView();
 
-        PopulateMonthResumeComboBox();
-        PopulateYearComboBox();
-        PopulateTransactionTypeComboBox();
+        populateMonthResumeComboBox();
+        populateYearComboBox();
+        populateTransactionTypeComboBox();
 
         // Format the date pickers
-        UIUtils.SetDatePickerFormat(transactionsStartDatePicker);
-        UIUtils.SetDatePickerFormat(transactionsEndDatePicker);
+        UIUtils.setDatePickerFormat(transactionsStartDatePicker);
+        UIUtils.setDatePickerFormat(transactionsEndDatePicker);
 
         LocalDateTime currentDate = LocalDateTime.now();
 
@@ -166,61 +168,61 @@ public class TransactionController
         transactionsEndDatePicker.setValue(lastDayOfMonth.toLocalDate());
 
         // Update the resumes
-        UpdateMonthResume();
-        UpdateYearResume();
-        UpdateMoneyFlow();
-        UpdateTransactionTableView();
+        updateMonthResume();
+        updateYearResume();
+        updateMoneyFlow();
+        updateTransactionTableView();
 
         // Add a listener to handle user selection
-        monthResumeComboBox.setOnAction(event -> { UpdateMonthResume(); });
+        monthResumeComboBox.setOnAction(event -> { updateMonthResume(); });
 
-        yearResumeComboBox.setOnAction(event -> { UpdateYearResume(); });
+        yearResumeComboBox.setOnAction(event -> { updateYearResume(); });
 
-        moneyFlowComboBox.setOnAction(event -> { UpdateMoneyFlow(); });
+        moneyFlowComboBox.setOnAction(event -> { updateMoneyFlow(); });
 
         transactionsTypeComboBox.setOnAction(
-            event -> { UpdateTransactionTableView(); });
+            event -> { updateTransactionTableView(); });
 
         transactionsStartDatePicker.setOnAction(
-            event -> { UpdateTransactionTableView(); });
+            event -> { updateTransactionTableView(); });
 
         transactionsEndDatePicker.setOnAction(
-            event -> { UpdateTransactionTableView(); });
+            event -> { updateTransactionTableView(); });
 
         // Add listener to the search field
         transactionsSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { UpdateTransactionTableView(); });
+            (observable, oldValue, newValue) -> { updateTransactionTableView(); });
     }
 
     @FXML
     private void handleAddIncome()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_INCOME_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_INCOME_FXML,
                                     "Add new income",
                                     springContext,
                                     (AddIncomeController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateMonthResume();
-                                        UpdateYearResume();
-                                        UpdateTransactionTableView();
-                                        UpdateMoneyFlow();
+                                        updateMonthResume();
+                                        updateYearResume();
+                                        updateTransactionTableView();
+                                        updateMoneyFlow();
                                     }));
     }
 
     @FXML
     private void handleAddExpense()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_EXPENSE_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_EXPENSE_FXML,
                                     "Add new expense",
                                     springContext,
                                     (AddExpenseController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateMonthResume();
-                                        UpdateYearResume();
-                                        UpdateTransactionTableView();
-                                        UpdateMoneyFlow();
+                                        updateMonthResume();
+                                        updateYearResume();
+                                        updateTransactionTableView();
+                                        updateMoneyFlow();
                                     }));
     }
 
@@ -232,24 +234,24 @@ public class TransactionController
 
         if (selectedTransaction == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No transaction selected",
                                               "Please select a transaction to edit.");
 
             return;
         }
 
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.EDIT_TRANSACTION_FXML,
             "Edit transaction",
             springContext,
             (EditTransactionController controller)
-                -> controller.SetTransaction(selectedTransaction),
+                -> controller.setTransaction(selectedTransaction),
             List.of(() -> {
-                UpdateMonthResume();
-                UpdateYearResume();
-                UpdateTransactionTableView();
-                UpdateMoneyFlow();
+                updateMonthResume();
+                updateYearResume();
+                updateTransactionTableView();
+                updateMoneyFlow();
             }));
     }
 
@@ -261,7 +263,7 @@ public class TransactionController
 
         if (selectedTransaction == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No transaction selected",
                                               "Please select a transaction to remove.");
 
@@ -271,104 +273,104 @@ public class TransactionController
         // Create a message to show to the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(selectedTransaction.GetDescription())
+            .append(selectedTransaction.getDescription())
             .append("\n")
             .append("Amount: ")
-            .append(UIUtils.FormatCurrency(selectedTransaction.GetAmount()))
+            .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
             .append("\n")
             .append("Date: ")
-            .append(selectedTransaction.GetDate().format(
+            .append(selectedTransaction.getDate().format(
                 Constants.DATE_FORMATTER_WITH_TIME))
             .append("\n")
             .append("Status: ")
-            .append(selectedTransaction.GetStatus().toString())
+            .append(selectedTransaction.getStatus().toString())
             .append("\n")
             .append("Wallet: ")
-            .append(selectedTransaction.GetWallet().GetName())
+            .append(selectedTransaction.getWallet().getName())
             .append("\n")
             .append("Wallet balance: ")
             .append(
-                UIUtils.FormatCurrency(selectedTransaction.GetWallet().GetBalance()))
+                UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
             .append("\n")
             .append("Wallet balance after deletion: ");
 
-        if (selectedTransaction.GetStatus().equals(TransactionStatus.CONFIRMED))
+        if (selectedTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
-            if (selectedTransaction.GetType().equals(TransactionType.EXPENSE))
+            if (selectedTransaction.getType().equals(TransactionType.EXPENSE))
             {
                 message
-                    .append(UIUtils.FormatCurrency(
-                        selectedTransaction.GetWallet().GetBalance().add(
-                            selectedTransaction.GetAmount())))
+                    .append(UIUtils.formatCurrency(
+                        selectedTransaction.getWallet().getBalance().add(
+                            selectedTransaction.getAmount())))
                     .append("\n");
             }
             else
             {
                 message
-                    .append(UIUtils.FormatCurrency(
-                        selectedTransaction.GetWallet().GetBalance().subtract(
-                            selectedTransaction.GetAmount())))
+                    .append(UIUtils.formatCurrency(
+                        selectedTransaction.getWallet().getBalance().subtract(
+                            selectedTransaction.getAmount())))
                     .append("\n");
             }
         }
         else
         {
             message
-                .append(UIUtils.FormatCurrency(
-                    selectedTransaction.GetWallet().GetBalance()))
+                .append(UIUtils.formatCurrency(
+                    selectedTransaction.getWallet().getBalance()))
                 .append("\n");
         }
 
         // Confirm deletion
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirm Deletion",
                 "Are you sure you want to remove this " +
-                    selectedTransaction.GetType().toString().toLowerCase() + "?",
+                    selectedTransaction.getType().toString().toLowerCase() + "?",
                 message.toString()))
         {
-            walletTransactionService.DeleteTransaction(selectedTransaction.GetId());
+            walletTransactionService.deleteTransaction(selectedTransaction.getId());
 
-            UpdateMonthResume();
-            UpdateYearResume();
-            UpdateTransactionTableView();
-            UpdateMoneyFlow();
+            updateMonthResume();
+            updateYearResume();
+            updateTransactionTableView();
+            updateMoneyFlow();
         }
     }
 
     @FXML
     private void handleRecurringTransactions()
     {
-        WindowUtils.OpenModalWindow(Constants.RECURRING_TRANSACTIONS_FXML,
+        WindowUtils.openModalWindow(Constants.RECURRING_TRANSACTIONS_FXML,
                                     "Recurring transactions",
                                     springContext,
                                     (RecurringTransactionController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateMonthResume();
-                                        UpdateYearResume();
-                                        UpdateTransactionTableView();
-                                        UpdateMoneyFlow();
+                                        updateMonthResume();
+                                        updateYearResume();
+                                        updateTransactionTableView();
+                                        updateMoneyFlow();
                                     }));
     }
 
     @FXML
     private void handleManageCategories()
     {
-        WindowUtils.OpenModalWindow(Constants.MANAGE_CATEGORY_FXML,
+        WindowUtils.openModalWindow(Constants.MANAGE_CATEGORY_FXML,
                                     "Manage categories",
                                     springContext,
                                     (ManageCategoryController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdateMoneyFlow();
+                                        updateTransactionTableView();
+                                        updateMoneyFlow();
                                     }));
     }
 
     /**
      * Update the transaction table view
      */
-    private void UpdateTransactionTableView()
+    private void updateTransactionTableView()
     {
         // Get the search text
         String similarTextOrId = transactionsSearchField.getText().toLowerCase();
@@ -387,29 +389,29 @@ public class TransactionController
         if (similarTextOrId.isEmpty())
         {
             walletTransactionService
-                .GetNonArchivedTransactionsBetweenDates(startDate, endDate)
+                .getNonArchivedTransactionsBetweenDates(startDate, endDate)
                 .stream()
                 .filter(t
                         -> selectedTransactionType == null ||
-                               t.GetType().equals(selectedTransactionType))
+                               t.getType().equals(selectedTransactionType))
                 .forEach(transactionsTableView.getItems()::add);
         }
         else
         {
             walletTransactionService
-                .GetNonArchivedTransactionsBetweenDates(startDate, endDate)
+                .getNonArchivedTransactionsBetweenDates(startDate, endDate)
                 .stream()
                 .filter(t
                         -> selectedTransactionType == null ||
-                               t.GetType().equals(selectedTransactionType))
+                               t.getType().equals(selectedTransactionType))
                 .filter(t -> {
-                    String description = t.GetDescription().toLowerCase();
-                    String id          = t.GetId().toString();
-                    String category    = t.GetCategory().GetName().toLowerCase();
-                    String wallet      = t.GetWallet().GetName().toLowerCase();
-                    String amount      = t.GetAmount().toString();
-                    String type        = t.GetType().toString().toLowerCase();
-                    String status      = t.GetStatus().toString().toLowerCase();
+                    String description = t.getDescription().toLowerCase();
+                    String id          = t.getId().toString();
+                    String category    = t.getCategory().getName().toLowerCase();
+                    String wallet      = t.getWallet().getName().toLowerCase();
+                    String amount      = t.getAmount().toString();
+                    String type        = t.getType().toString().toLowerCase();
+                    String status      = t.getStatus().toString().toLowerCase();
 
                     return description.contains(similarTextOrId) ||
                         id.contains(similarTextOrId) ||
@@ -428,7 +430,7 @@ public class TransactionController
     /**
      * Update the money flow bar chart
      */
-    private void UpdateMoneyFlow()
+    private void updateMoneyFlow()
     {
         // Get the selected transaction type
         TransactionType selectedTransactionType = moneyFlowComboBox.getValue();
@@ -452,7 +454,7 @@ public class TransactionController
         DateTimeFormatter formatter   = DateTimeFormatter.ofPattern("MMM/yy");
 
         List<Category> categories =
-            categoryService.GetNonArchivedCategoriesOrderedByName();
+            categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
 
         // Loop through the last few months
@@ -465,7 +467,7 @@ public class TransactionController
 
             // Get confirmed transactions for the month
             List<WalletTransaction> transactions =
-                walletTransactionService.GetNonArchivedConfirmedTransactionsByMonth(
+                walletTransactionService.getNonArchivedConfirmedTransactionsByMonth(
                     date.getMonthValue(),
                     date.getYear());
 
@@ -474,7 +476,7 @@ public class TransactionController
             // Otherwise, create an empty list
             List<CreditCardPayment> creditCardPayments =
                 selectedTransactionType.equals(TransactionType.EXPENSE)
-                    ? creditCardService.GetAllPaidPaymentsByMonth(date.getMonthValue(),
+                    ? creditCardService.getAllPaidPaymentsByMonth(date.getMonthValue(),
                                                                   date.getYear())
                     : new ArrayList<>();
 
@@ -483,17 +485,17 @@ public class TransactionController
             {
                 BigDecimal totalWalletTransaction =
                     transactions.stream()
-                        .filter(t -> t.GetType().equals(selectedTransactionType))
-                        .filter(t -> t.GetCategory().GetId() == category.GetId())
-                        .map(WalletTransaction::GetAmount)
+                        .filter(t -> t.getType().equals(selectedTransactionType))
+                        .filter(t -> t.getCategory().getId() == category.getId())
+                        .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal totalCreditCardPayment =
                     creditCardPayments.stream()
                         .filter(p
-                                -> p.GetCreditCardDebt().GetCategory().GetId() ==
-                                       category.GetId())
-                        .map(CreditCardPayment::GetAmount)
+                                -> p.getCreditCardDebt().getCategory().getId() ==
+                                       category.getId())
+                        .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal total = totalWalletTransaction.add(totalCreditCardPayment);
@@ -511,7 +513,7 @@ public class TransactionController
         for (Category category : categories)
         {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName(category.GetName());
+            series.setName(category.getName());
 
             // Loop through the months in the order they were added
             for (YearMonth yearMonth : monthlyTotals.keySet())
@@ -554,7 +556,7 @@ public class TransactionController
                               .orElse(0.0);
 
         // Set the Y-axis properties only if maxTotal is greater than 0
-        Animation.SetDynamicYAxisBounds(numberAxis, maxTotal);
+        Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
         for (XYChart.Series<String, Number> series : moneyFlowStackedBarChart.getData())
         {
@@ -574,14 +576,14 @@ public class TransactionController
                 Double percentage = (monthTotal > 0) ? (value / monthTotal) * 100 : 0;
 
                 // Add tooltip with value and percentage
-                UIUtils.AddTooltipToXYChartNode(
+                UIUtils.addTooltipToXYChartNode(
                     data.getNode(),
-                    series.getName() + ": " + UIUtils.FormatCurrency(value) + " (" +
-                        UIUtils.FormatPercentage(percentage) +
-                        ")\nTotal: " + UIUtils.FormatCurrency(monthTotal));
+                    series.getName() + ": " + UIUtils.formatCurrency(value) + " (" +
+                        UIUtils.formatPercentage(percentage) +
+                        ")\nTotal: " + UIUtils.formatCurrency(monthTotal));
 
                 // Animate the data after setting up the tooltip
-                Animation.StackedXYChartAnimation(Collections.singletonList(data),
+                Animation.stackedXYChartAnimation(Collections.singletonList(data),
                                                   Collections.singletonList(value));
             }
         }
@@ -590,7 +592,7 @@ public class TransactionController
     /**
      * Update the year resume view
      */
-    private void UpdateYearResume()
+    private void updateYearResume()
     {
         Year selectedYear = yearResumeComboBox.getValue();
 
@@ -605,7 +607,7 @@ public class TransactionController
                 getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
-            resumePaneController.UpdateResumePane(selectedYear.getValue());
+            resumePaneController.updateResumePane(selectedYear.getValue());
 
             AnchorPane.setTopAnchor(newContent, 0.0);
             AnchorPane.setBottomAnchor(newContent, 0.0);
@@ -624,7 +626,7 @@ public class TransactionController
     /**
      * Update the month resume view
      */
-    private void UpdateMonthResume()
+    private void updateMonthResume()
     {
         YearMonth selectedYearMonth = monthResumeComboBox.getValue();
 
@@ -639,7 +641,7 @@ public class TransactionController
                 getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
-            resumePaneController.UpdateResumePane(selectedYearMonth.getMonthValue(),
+            resumePaneController.updateResumePane(selectedYearMonth.getMonthValue(),
                                                   selectedYearMonth.getYear());
 
             AnchorPane.setTopAnchor(newContent, 0.0);
@@ -660,11 +662,11 @@ public class TransactionController
      * Populate the year combo box with the years between the oldest transaction
      * date and the current date
      */
-    private void PopulateYearComboBox()
+    private void populateYearComboBox()
     {
         LocalDateTime oldestWalletTransaction =
-            walletTransactionService.GetOldestTransactionDate();
-        LocalDateTime oldestCreditCard = creditCardService.GetEarliestPaymentDate();
+            walletTransactionService.getOldestTransactionDate();
+        LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
 
         LocalDateTime oldest = oldestCreditCard.isBefore(oldestWalletTransaction)
                                    ? oldestCreditCard
@@ -712,7 +714,7 @@ public class TransactionController
     /**
      * Populate the transaction type combo box with the available transaction types
      */
-    private void PopulateTransactionTypeComboBox()
+    private void populateTransactionTypeComboBox()
     {
         ObservableList<TransactionType> transactionTypes =
             FXCollections.observableArrayList(TransactionType.values());
@@ -767,12 +769,12 @@ public class TransactionController
      * Populate the month resume combo box with the months between the oldest
      * transaction date and the current date
      */
-    private void PopulateMonthResumeComboBox()
+    private void populateMonthResumeComboBox()
     {
         LocalDateTime oldestWalletTransaction =
-            walletTransactionService.GetOldestTransactionDate();
+            walletTransactionService.getOldestTransactionDate();
 
-        LocalDateTime oldestCreditCard = creditCardService.GetEarliestPaymentDate();
+        LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
 
         LocalDateTime oldest = oldestCreditCard.isBefore(oldestWalletTransaction)
                                    ? oldestCreditCard
@@ -820,11 +822,11 @@ public class TransactionController
     /**
      * Configure the table view columns
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -852,39 +854,39 @@ public class TransactionController
             new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetCategory().GetName()));
+            -> new SimpleStringProperty(param.getValue().getCategory().getName()));
 
         TableColumn<WalletTransaction, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetType().name()));
+            param -> new SimpleStringProperty(param.getValue().getType().name()));
 
         TableColumn<WalletTransaction, String> statusColumn =
             new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetStatus().name()));
+            param -> new SimpleStringProperty(param.getValue().getStatus().name()));
 
         TableColumn<WalletTransaction, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
+                param.getValue().getDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
 
         TableColumn<WalletTransaction, String> amountColumn =
             new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetAmount())));
+                UIUtils.formatCurrency(param.getValue().getAmount())));
 
         TableColumn<WalletTransaction, String> descriptionColumn =
             new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetDescription()));
+            param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         TableColumn<WalletTransaction, String> walletNameColumn =
             new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetWallet().GetName()));
+            param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
 
         transactionsTableView.getColumns().add(idColumn);
         transactionsTableView.getColumns().add(descriptionColumn);

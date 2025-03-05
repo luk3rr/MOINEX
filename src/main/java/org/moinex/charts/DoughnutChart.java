@@ -56,7 +56,7 @@ public class DoughnutChart extends PieChart
             Node node = data.getNode();
 
             double  percentage = (data.getPieValue() / seriesTotal) * 100;
-            Tooltip tooltip    = new Tooltip(UIUtils.FormatPercentage(percentage));
+            Tooltip tooltip    = new Tooltip(UIUtils.formatPercentage(percentage));
 
             // Set the tooltip behavior
             tooltip.showDelayProperty().setValue(Duration.ZERO);
@@ -94,7 +94,7 @@ public class DoughnutChart extends PieChart
         addInnerCircleIfNotPresent();
         updateInnerCircleLayout();
 
-        setCenterLabelTextStyle(UIUtils.FormatCurrency(seriesTotal),
+        setCenterLabelTextStyle(UIUtils.formatCurrency(seriesTotal),
                                 "-fx-font-size: 16px; -fx-font-weight: bold;");
     }
 

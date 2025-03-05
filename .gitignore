@@ -28,3 +28,4 @@ buildNumber.properties
 # log files
 *.log*
 *.idea
+.factorypath

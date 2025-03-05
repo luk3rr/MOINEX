@@ -67,58 +67,58 @@ public class WalletServiceTest
         return wallet;
     }
 
-    private WalletType CreateWalletType(Long id, String name)
+    private WalletType createWalletType(Long id, String name)
     {
         WalletType walletType = new WalletType(id, name);
         return walletType;
     }
 
     @BeforeAll
-    public static void SetUp()
+    public static void setUp()
     {
         MockitoAnnotations.openMocks(WalletServiceTest.class);
     }
 
     @BeforeEach
-    public void BeforeEach()
+    public void beforeEach()
     {
         m_wallet1 = CreateWallet(1L, "Wallet1", new BigDecimal("1000"));
         m_wallet2 = CreateWallet(2L, "Wallet2", new BigDecimal("2000"));
 
-        m_walletType1 = CreateWalletType(1L, "Type1");
-        m_walletType2 = CreateWalletType(2L, "Type2");
+        m_walletType1 = createWalletType(1L, "Type1");
+        m_walletType2 = createWalletType(2L, "Type2");
     }
 
     @Test
     @DisplayName("Test if the wallet is created successfully")
-    public void TestCreateWallet()
+    public void testCreateWallet()
     {
-        when(m_walletRepository.existsByName(m_wallet1.GetName())).thenReturn(false);
+        when(m_walletRepository.existsByName(m_wallet1.getName())).thenReturn(false);
 
-        m_walletService.CreateWallet(m_wallet1.GetName(), m_wallet1.GetBalance());
+        m_walletService.addWallet(m_wallet1.getName(), m_wallet1.getBalance());
 
         // Capture the wallet object that was saved and check if the values are correct
         ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
 
         verify(m_walletRepository).save(walletCaptor.capture());
 
-        assertEquals(m_wallet1.GetName(), walletCaptor.getValue().GetName());
+        assertEquals(m_wallet1.getName(), walletCaptor.getValue().getName());
 
-        assertEquals(m_wallet1.GetBalance().doubleValue(),
-                     walletCaptor.getValue().GetBalance().doubleValue(),
+        assertEquals(m_wallet1.getBalance().doubleValue(),
+                     walletCaptor.getValue().getBalance().doubleValue(),
                      Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the wallet is not created when the name is already in use")
-    public void TestCreateWalletAlreadyExists()
+    public void testCreateWalletAlreadyExists()
     {
-        when(m_walletRepository.existsByName(m_wallet1.GetName())).thenReturn(true);
+        when(m_walletRepository.existsByName(m_wallet1.getName())).thenReturn(true);
 
         assertThrows(RuntimeException.class,
                      ()
-                         -> m_walletService.CreateWallet(m_wallet1.GetName(),
-                                                         m_wallet1.GetBalance()));
+                         -> m_walletService.addWallet(m_wallet1.getName(),
+                                                      m_wallet1.getBalance()));
 
         // Verify that the wallet was not saved
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -126,12 +126,12 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet is deleted successfully")
-    public void TestDeleteWallet()
+    public void testDeleteWallet()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
-        m_walletService.DeleteWallet(m_wallet1.GetId());
+        m_walletService.deleteWallet(m_wallet1.getId());
 
         // Verify that the wallet was deleted
         verify(m_walletRepository).delete(m_wallet1);
@@ -139,13 +139,13 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet is not deleted when it does not exist")
-    public void TestDeleteWalletDoesNotExist()
+    public void testDeleteWalletDoesNotExist()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> m_walletService.DeleteWallet(m_wallet1.GetId()));
+                     () -> m_walletService.deleteWallet(m_wallet1.getId()));
 
         // Verify that the wallet was not deleted
         verify(m_walletRepository, never()).delete(any(Wallet.class));
@@ -153,31 +153,31 @@ public class WalletServiceTest
 
     @DisplayName("Test if the wallet is archived successfully")
     @Test
-    public void TestArchiveWallet()
+    public void testArchiveWallet()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
         when(m_walletRepository.save(any(Wallet.class))).thenReturn(m_wallet1);
 
-        m_walletService.ArchiveWallet(m_wallet1.GetId());
+        m_walletService.archiveWallet(m_wallet1.getId());
 
         // Check if the wallet was archived
         verify(m_walletRepository).save(m_wallet1);
-        assertTrue(m_wallet1.IsArchived());
+        assertTrue(m_wallet1.getIsArchived());
     }
 
     @Test
     @DisplayName(
         "Test if exception is thrown when trying to archive a non-existent wallet")
     public void
-    TestArchiveWalletDoesNotExist()
+    testArchiveWalletDoesNotExist()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> m_walletService.ArchiveWallet(m_wallet1.GetId()));
+                     () -> m_walletService.archiveWallet(m_wallet1.getId()));
 
         // Verify that the wallet was not archived
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -185,34 +185,34 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet has been renamed successfully")
-    public void TestRenameWallet()
+    public void testRenameWallet()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
         when(m_walletRepository.save(any(Wallet.class))).thenReturn(m_wallet1);
 
         String newName = "NewWalletName";
 
-        m_walletService.RenameWallet(m_wallet1.GetId(), newName);
+        m_walletService.renameWallet(m_wallet1.getId(), newName);
 
         // Check if the wallet was renamed
         verify(m_walletRepository).save(m_wallet1);
-        assertEquals(newName, m_wallet1.GetName());
+        assertEquals(newName, m_wallet1.getName());
     }
 
     @Test
     @DisplayName(
         "Test if exception is thrown when trying to rename a non-existent wallet")
     public void
-    TestRenameWalletDoesNotExist()
+    testRenameWalletDoesNotExist()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(
             RuntimeException.class,
-            () -> m_walletService.RenameWallet(m_wallet1.GetId(), "NewWalletName"));
+            () -> m_walletService.renameWallet(m_wallet1.getId(), "NewWalletName"));
 
         // Verify that the wallet was not renamed
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -222,16 +222,16 @@ public class WalletServiceTest
     @DisplayName("Test if exception is thrown when trying to rename a wallet to an "
                  + "already existing name")
     public void
-    TestRenameWalletAlreadyExists()
+    testRenameWalletAlreadyExists()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
-        when(m_walletRepository.existsByName(m_wallet2.GetName())).thenReturn(true);
+        when(m_walletRepository.existsByName(m_wallet2.getName())).thenReturn(true);
 
         assertThrows(
             RuntimeException.class,
-            () -> m_walletService.RenameWallet(m_wallet1.GetId(), m_wallet2.GetName()));
+            () -> m_walletService.renameWallet(m_wallet1.getId(), m_wallet2.getName()));
 
         // Verify that the wallet was not renamed
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -239,37 +239,37 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet type is changed successfully")
-    public void TestChangeWalletType()
+    public void testChangeWalletType()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
-        when(m_walletTypeRepository.existsById(m_walletType2.GetId())).thenReturn(true);
+        when(m_walletTypeRepository.existsById(m_walletType2.getId())).thenReturn(true);
 
         when(m_walletRepository.save(any(Wallet.class))).thenReturn(m_wallet1);
 
         // Define the wallet type of the wallet to be changed
-        m_wallet1.SetType(m_walletType1);
+        m_wallet1.setType(m_walletType1);
 
-        m_walletService.ChangeWalletType(m_wallet1.GetId(), m_walletType2);
+        m_walletService.changeWalletType(m_wallet1.getId(), m_walletType2);
 
         // Check if the wallet type was updated
         verify(m_walletRepository).save(m_wallet1);
-        assertEquals(m_walletType2.GetId(), m_wallet1.GetType().GetId());
+        assertEquals(m_walletType2.getId(), m_wallet1.getType().getId());
     }
 
     @Test
     @DisplayName("Test if exception is thrown when trying to change the wallet type of "
                  + "a non-existent wallet")
     public void
-    TestChangeWalletTypeWalletDoesNotExist()
+    testChangeWalletTypeWalletDoesNotExist()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(
             RuntimeException.class,
-            () -> m_walletService.ChangeWalletType(m_wallet1.GetId(), m_walletType2));
+            () -> m_walletService.changeWalletType(m_wallet1.getId(), m_walletType2));
 
         // Verify that the wallet type was not updated
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -279,20 +279,20 @@ public class WalletServiceTest
     @DisplayName("Test if exception is thrown when trying to change the wallet type to "
                  + "a non-existent type")
     public void
-    TestChangeWalletTypeDoesNotExist()
+    testChangeWalletTypeDoesNotExist()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
-        when(m_walletTypeRepository.existsById(m_walletType2.GetId()))
+        when(m_walletTypeRepository.existsById(m_walletType2.getId()))
             .thenReturn(false);
 
         assertThrows(
             RuntimeException.class,
-            () -> m_walletService.ChangeWalletType(m_wallet1.GetId(), m_walletType2));
+            () -> m_walletService.changeWalletType(m_wallet1.getId(), m_walletType2));
 
         assertThrows(RuntimeException.class,
-                     () -> m_walletService.ChangeWalletType(m_wallet1.GetId(), null));
+                     () -> m_walletService.changeWalletType(m_wallet1.getId(), null));
 
         // Verify that the wallet type was not updated
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -302,21 +302,21 @@ public class WalletServiceTest
     @DisplayName("Test if exception is thrown when trying to change the wallet type of "
                  + "a wallet to the same type")
     public void
-    TestChangeWalletTypeSameType()
+    testChangeWalletTypeSameType()
     {
         // Define the wallet type of the wallet to be changed
-        m_wallet1.SetType(m_walletType1);
+        m_wallet1.setType(m_walletType1);
 
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
 
-        when(m_walletTypeRepository.existsById(m_wallet1.GetType().GetId()))
+        when(m_walletTypeRepository.existsById(m_wallet1.getType().getId()))
             .thenReturn(true);
 
         assertThrows(RuntimeException.class,
                      ()
-                         -> m_walletService.ChangeWalletType(m_wallet1.GetId(),
-                                                             m_wallet1.GetType()));
+                         -> m_walletService.changeWalletType(m_wallet1.getId(),
+                                                             m_wallet1.getType()));
 
         // Verify that the wallet type was not updated
         verify(m_walletRepository, never()).save(any(Wallet.class));
@@ -324,20 +324,20 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet balance is updated successfully")
-    public void TestUpdateWalletBalance()
+    public void testUpdateWalletBalance()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
         when(m_walletRepository.save(any(Wallet.class))).thenReturn(m_wallet1);
 
         BigDecimal newBalance = new BigDecimal("2000.0");
 
-        m_walletService.UpdateWalletBalance(m_wallet1.GetId(), newBalance);
+        m_walletService.updateWalletBalance(m_wallet1.getId(), newBalance);
 
         // Check if the wallet balance was updated
         verify(m_walletRepository).save(m_wallet1);
         assertEquals(newBalance.doubleValue(),
-                     m_wallet1.GetBalance().doubleValue(),
+                     m_wallet1.getBalance().doubleValue(),
                      Constants.EPSILON);
     }
 
@@ -345,15 +345,16 @@ public class WalletServiceTest
     @DisplayName("Test if exception is thrown when trying to update the balance of a "
                  + "non-existent wallet")
     public void
-    TestUpdateWalletBalanceDoesNotExist()
+    testUpdateWalletBalanceDoesNotExist()
     {
-        when(m_walletRepository.findById(m_wallet1.GetId()))
+        when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(
             RuntimeException.class,
-            () -> m_walletService.UpdateWalletBalance(m_wallet1.GetId(),
-                                                      new BigDecimal("1000.0")));
+            ()
+                -> m_walletService.updateWalletBalance(m_wallet1.getId(),
+                                                       new BigDecimal("1000.0")));
 
         // Verify that the wallet balance was not updated
         verify(m_walletRepository, never()).save(any(Wallet.class));

@@ -37,12 +37,12 @@ public final class UIUtils
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
-    static public void AddTooltipToXYChartNode(Node node, String text)
+    static public void addTooltipToXYChartNode(Node node, String text)
     {
         node.setOnMouseEntered(event -> { node.setStyle("-fx-opacity: 0.7;"); });
         node.setOnMouseExited(event -> { node.setStyle("-fx-opacity: 1;"); });
 
-        AddTooltipToNode(node, text);
+        addTooltipToNode(node, text);
     }
 
     /**
@@ -50,7 +50,7 @@ public final class UIUtils
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
-    static public void AddTooltipToNode(Node node, String text)
+    static public void addTooltipToNode(Node node, String text)
     {
         Tooltip tooltip = new Tooltip(text);
         tooltip.getStyleClass().add(Constants.TOOLTIP_STYLE);
@@ -65,7 +65,7 @@ public final class UIUtils
      * @param value The value to be formatted
      * @note Automatically formats to 2 fraction digits, rounding half up
      */
-    public static String FormatCurrency(Number value)
+    public static String formatCurrency(Number value)
     {
         return currencyFormat.format(value);
     }
@@ -74,7 +74,7 @@ public final class UIUtils
      * Format a number to a currency string with dynamic precision
      * @param value The value to be formatted
      */
-    public static String FormatCurrencyDynamic(Number value)
+    public static String formatCurrencyDynamic(Number value)
     {
         DecimalFormat dynamicFormat = new DecimalFormat(Constants.CURRENCY_FORMAT);
 
@@ -83,7 +83,7 @@ public final class UIUtils
         if (value instanceof BigDecimal)
         {
             BigDecimal bigDecimalValue = (BigDecimal)value;
-            fractionDigits             = DetermineFractionDigits(bigDecimalValue);
+            fractionDigits             = determineFractionDigits(bigDecimalValue);
         }
         else
         {
@@ -102,7 +102,7 @@ public final class UIUtils
      * @param value The BigDecimal value
      * @return Number of fraction digits
      */
-    private static Integer DetermineFractionDigits(BigDecimal value)
+    private static Integer determineFractionDigits(BigDecimal value)
     {
         // For values greater than 1, always display 2 decimal places
         // For values less than 1, display the necessary decimal places
@@ -122,7 +122,7 @@ public final class UIUtils
      * Format a number to percentage string
      * @param value The value to be formatted
      */
-    static public String FormatPercentage(Number value)
+    static public String formatPercentage(Number value)
     {
         return percentageFormat.format(value) + " %";
     }
@@ -131,7 +131,7 @@ public final class UIUtils
      * Format the date picker to display the date in a specific format
      * @param datePicker The date picker to format
      */
-    static public void SetDatePickerFormat(DatePicker datePicker)
+    static public void setDatePickerFormat(DatePicker datePicker)
     {
         // Set how the date is displayed in the date picker
         datePicker.setConverter(new StringConverter<LocalDate>() {
@@ -155,7 +155,7 @@ public final class UIUtils
      * @param lastFourDigits The last four digits of the credit card number
      * @return Formatted credit card number string
      */
-    static public String FormatCreditCardNumber(String lastFourDigits)
+    static public String formatCreditCardNumber(String lastFourDigits)
     {
         if (lastFourDigits.length() != 4)
         {
@@ -170,10 +170,10 @@ public final class UIUtils
      * Reset the text of a label to "-"
      * @param label The label to reset
      */
-    static public void ResetLabel(Label label)
+    static public void resetLabel(Label label)
     {
         label.setText("-");
-        SetLabelStyle(label, Constants.NEUTRAL_BALANCE_STYLE);
+        setLabelStyle(label, Constants.NEUTRAL_BALANCE_STYLE);
     }
 
     /**
@@ -181,7 +181,7 @@ public final class UIUtils
      * @param label The label to set the style
      * @param style The style to set
      */
-    static public void SetLabelStyle(Label label, String style)
+    static public void setLabelStyle(Label label, String style)
     {
         label.getStyleClass().removeAll(Constants.NEGATIVE_BALANCE_STYLE,
                                         Constants.POSITIVE_BALANCE_STYLE,

@@ -25,12 +25,12 @@ public enum CalendarEventType
         this.colorHex    = colorHex;
     }
 
-    public String GetDescription()
+    public String getDescription()
     {
         return description;
     }
 
-    public String GetColorHex()
+    public String getColorHex()
     {
         return colorHex;
     }

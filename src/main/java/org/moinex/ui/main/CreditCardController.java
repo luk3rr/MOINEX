@@ -41,6 +41,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardDebt;
@@ -61,11 +62,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controller for the Credit Card screen
+ */
 @Controller
+@NoArgsConstructor
 public class CreditCardController
 {
-    private static final Logger logger = LoggerConfig.GetLogger();
-
     @FXML
     private VBox totalDebtsInfoVBox;
 
@@ -109,11 +112,14 @@ public class CreditCardController
 
     private Integer crcPaneCurrentPage = 0;
 
+    private static final Logger logger = LoggerConfig.getLogger();
+
     /**
      * Constructor
      * @param creditCardService CreditCardService
      * @param categoryService CategoryService
      */
+    @Autowired
     public CreditCardController(CreditCardService creditCardService,
                                 CategoryService   categoryService)
     {
@@ -124,12 +130,12 @@ public class CreditCardController
     @FXML
     private void initialize()
     {
-        LoadCreditCards();
+        loadCreditCardsFromDatabase();
 
-        PopulateDebtsListMonthFilterComboBox();
-        PopulateYearFilterComboBox();
-        ConfigureTableView();
-        ConfigureListeners();
+        populateDebtsListMonthFilterComboBox();
+        populateYearFilterComboBox();
+        configureTableView();
+        configureListeners();
 
         // Select the default values
         LocalDateTime now = LocalDateTime.now();
@@ -141,36 +147,36 @@ public class CreditCardController
         // Select the default values
         debtsListMonthFilterComboBox.setValue(currentYearMonth);
 
-        debtsListMonthFilterComboBox.setOnAction(event -> { UpdateDebtsTableView(); });
+        debtsListMonthFilterComboBox.setOnAction(event -> { updateDebtsTableView(); });
 
-        UpdateTotalDebtsInfo();
-        UpdateDisplayCards();
-        UpdateMoneyFlow();
-        UpdateDebtsTableView();
+        updateTotalDebtsInfo();
+        updateDisplayCards();
+        updateMoneyFlow();
+        updateDebtsTableView();
 
-        SetButtonsActions();
+        setButtonsActions();
     }
 
     @FXML
     private void handleAddDebt()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_CREDIT_CARD_DEBT_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_CREDIT_CARD_DEBT_FXML,
                                     "Add Credit Card Debt",
                                     springContext,
                                     (AddCreditCardDebtController controller)
                                         -> {},
-                                    List.of(() -> { UpdateDisplay(); }));
+                                    List.of(() -> { updateDisplay(); }));
     }
 
     @FXML
     private void handleAddCreditCard()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_CREDIT_CARD_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_CREDIT_CARD_FXML,
                                     "Add Credit Card",
                                     springContext,
                                     (AddCreditCardController controller)
                                         -> {},
-                                    List.of(() -> { UpdateDisplayCards(); }));
+                                    List.of(() -> { updateDisplayCards(); }));
     }
 
     @FXML
@@ -181,22 +187,22 @@ public class CreditCardController
 
         if (selectedPayment == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No payment selected",
                                               "Please select a payment to edit.");
 
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_CREDIT_CARD_DEBT_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_CREDIT_CARD_DEBT_FXML,
                                     "Edit Credit Card Debt",
                                     springContext,
                                     (EditCreditCardDebtController controller)
                                         -> {
-                                        controller.SetCreditCardDebt(
-                                            selectedPayment.GetCreditCardDebt());
+                                        controller.setCreditCardDebt(
+                                            selectedPayment.getCreditCardDebt());
                                     },
-                                    List.of(() -> { UpdateDisplay(); }));
+                                    List.of(() -> { updateDisplay(); }));
     }
 
     @FXML
@@ -207,7 +213,7 @@ public class CreditCardController
 
         if (selectedPayment == null)
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "No payment selected",
                 "Please select a payment to delete the associated debt.");
@@ -215,48 +221,48 @@ public class CreditCardController
             return;
         }
 
-        CreditCardDebt debt = selectedPayment.GetCreditCardDebt();
+        CreditCardDebt debt = selectedPayment.getCreditCardDebt();
 
         List<CreditCardPayment> payments =
-            creditCardService.GetPaymentsByDebtId(debt.GetId());
+            creditCardService.getPaymentsByDebtId(debt.getId());
 
         // Get the amount paid for the debt
         BigDecimal refundAmount = payments.stream()
-                                      .filter(p -> p.GetWallet() != null)
-                                      .map(CreditCardPayment::GetAmount)
+                                      .filter(p -> p.getWallet() != null)
+                                      .map(CreditCardPayment::getAmount)
                                       .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Long installmentsPaid =
-            payments.stream().filter(p -> p.GetWallet() != null).count();
+            payments.stream().filter(p -> p.getWallet() != null).count();
 
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(debt.GetDescription())
+            .append(debt.getDescription())
             .append("\n")
             .append("Amount: ")
-            .append(UIUtils.FormatCurrency(debt.GetTotalAmount()))
+            .append(UIUtils.formatCurrency(debt.getTotalAmount()))
             .append("\n")
             .append("Register date: ")
-            .append(debt.GetDate().format(Constants.DATE_FORMATTER_NO_TIME))
+            .append(debt.getDate().format(Constants.DATE_FORMATTER_NO_TIME))
             .append("\n")
             .append("Installments: ")
-            .append(debt.GetInstallments())
+            .append(debt.getInstallments())
             .append("\n")
             .append("Installments paid: ")
             .append(installmentsPaid)
             .append("\n")
             .append("Category: ")
-            .append(debt.GetCategory().GetName())
+            .append(debt.getCategory().getName())
             .append("\n")
             .append("Credit card: ")
-            .append(debt.GetCreditCard().GetName())
+            .append(debt.getCreditCard().getName())
             .append("\n");
 
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0)
         {
             message.append("Refund amount: ")
-                .append(UIUtils.FormatCurrency(refundAmount))
+                .append(UIUtils.formatCurrency(refundAmount))
                 .append("\n");
         }
         else
@@ -265,25 +271,25 @@ public class CreditCardController
         }
 
         // Confirm deletion
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Delete debt",
                 "Are you sure you want to delete the debt?",
                 message.toString()))
         {
-            creditCardService.DeleteDebt(debt.GetId());
-            UpdateDisplay();
+            creditCardService.deleteDebt(debt.getId());
+            updateDisplay();
         }
     }
 
     @FXML
     private void handleViewArchivedCreditCards()
     {
-        WindowUtils.OpenModalWindow(Constants.ARCHIVED_CREDIT_CARDS_FXML,
+        WindowUtils.openModalWindow(Constants.ARCHIVED_CREDIT_CARDS_FXML,
                                     "Archived Credit Cards",
                                     springContext,
                                     (ArchivedCreditCardsController controller)
                                         -> {},
-                                    List.of(() -> { UpdateDisplay(); }));
+                                    List.of(() -> { updateDisplay(); }));
     }
 
     @FXML
@@ -294,7 +300,7 @@ public class CreditCardController
         // Set previous month as current month
         debtsListMonthFilterComboBox.setValue(nowMonth);
 
-        UpdateDebtsTableView();
+        updateDebtsTableView();
     }
 
     @FXML
@@ -305,7 +311,7 @@ public class CreditCardController
         // Set next month as current month
         debtsListMonthFilterComboBox.setValue(newMonth);
 
-        UpdateDebtsTableView();
+        updateDebtsTableView();
     }
 
     /**
@@ -315,14 +321,14 @@ public class CreditCardController
      * @note: This method can be called by other controllers to update the screen when
      * there is a change
      */
-    public void UpdateDisplay(YearMonth yearMonth)
+    public void updateDisplay(YearMonth yearMonth)
     {
-        LoadCreditCards();
+        loadCreditCardsFromDatabase();
 
-        UpdateDebtsTableView();
-        UpdateTotalDebtsInfo();
-        UpdateMoneyFlow();
-        UpdateDisplayCards(yearMonth);
+        updateDebtsTableView();
+        updateTotalDebtsInfo();
+        updateMoneyFlow();
+        updateDisplayCards(yearMonth);
     }
 
     /**
@@ -330,29 +336,29 @@ public class CreditCardController
      * @note: This method can be called by other controllers to update the screen when
      * there is a change
      */
-    public void UpdateDisplay()
+    public void updateDisplay()
     {
-        LoadCreditCards();
+        loadCreditCardsFromDatabase();
 
-        UpdateDebtsTableView();
-        UpdateTotalDebtsInfo();
-        UpdateMoneyFlow();
-        UpdateDisplayCards();
+        updateDebtsTableView();
+        updateTotalDebtsInfo();
+        updateMoneyFlow();
+        updateDisplayCards();
     }
 
     /**
      * Load credit cards from database
      */
-    private void LoadCreditCards()
+    private void loadCreditCardsFromDatabase()
     {
         creditCards = creditCardService
-                          .GetAllNonArchivedCreditCardsOrderedByTransactionCountDesc();
+                          .getAllNonArchivedCreditCardsOrderedByTransactionCountDesc();
     }
 
     /**
      * Update the debts table view
      */
-    private void UpdateDebtsTableView()
+    private void updateDebtsTableView()
     {
         YearMonth selectedMonth = debtsListMonthFilterComboBox.getValue();
 
@@ -367,7 +373,7 @@ public class CreditCardController
         if (similarTextOrId.isEmpty())
         {
             creditCardService
-                .GetCreditCardPayments(selectedMonth.getMonthValue(),
+                .getCreditCardPayments(selectedMonth.getMonthValue(),
                                        selectedMonth.getYear())
                 .stream()
                 .forEach(debtsTableView.getItems()::add);
@@ -375,18 +381,18 @@ public class CreditCardController
         else
         {
             creditCardService
-                .GetCreditCardPayments(selectedMonth.getMonthValue(),
+                .getCreditCardPayments(selectedMonth.getMonthValue(),
                                        selectedMonth.getYear())
                 .stream()
                 .filter(p -> {
                     String description =
-                        p.GetCreditCardDebt().GetDescription().toLowerCase();
-                    String id = String.valueOf(p.GetCreditCardDebt().GetId());
+                        p.getCreditCardDebt().getDescription().toLowerCase();
+                    String id = String.valueOf(p.getCreditCardDebt().getId());
                     String category =
-                        p.GetCreditCardDebt().GetCategory().GetName().toLowerCase();
+                        p.getCreditCardDebt().getCategory().getName().toLowerCase();
                     String cardName =
-                        p.GetCreditCardDebt().GetCreditCard().GetName().toLowerCase();
-                    String value = p.GetAmount().toString();
+                        p.getCreditCardDebt().getCreditCard().getName().toLowerCase();
+                    String value = p.getAmount().toString();
 
                     return description.contains(similarTextOrId) ||
                         id.contains(similarTextOrId) ||
@@ -403,20 +409,20 @@ public class CreditCardController
     /**
      * Update the display of the total debts information
      */
-    private void UpdateTotalDebtsInfo()
+    private void updateTotalDebtsInfo()
     {
         // Get the selected year from the year filter combo box
         Year selectedYear = totalDebtsYearFilterComboBox.getValue();
 
         BigDecimal totalDebts =
-            creditCardService.GetTotalDebtAmount(selectedYear.getValue());
+            creditCardService.getTotalDebtAmount(selectedYear.getValue());
 
-        BigDecimal totalPendingPayments = creditCardService.GetTotalPendingPayments();
+        BigDecimal totalPendingPayments = creditCardService.getTotalPendingPayments();
 
-        Label totalTotalDebtsLabel = new Label(UIUtils.FormatCurrency(totalDebts));
+        Label totalTotalDebtsLabel = new Label(UIUtils.formatCurrency(totalDebts));
 
         Label totalPendingPaymentsLabel = new Label(
-            "Pending payments: " + UIUtils.FormatCurrency(totalPendingPayments));
+            "Pending payments: " + UIUtils.formatCurrency(totalPendingPayments));
 
         totalTotalDebtsLabel.getStyleClass().add(
             Constants.TOTAL_BALANCE_VALUE_LABEL_STYLE);
@@ -432,15 +438,15 @@ public class CreditCardController
     /**
      * Update the display of the credit cards
      */
-    private void UpdateDisplayCards()
+    private void updateDisplayCards()
     {
-        UpdateDisplayCards(YearMonth.now());
+        updateDisplayCards(YearMonth.now());
     }
 
     /**
      * Update the display of the credit cards
      */
-    private void UpdateDisplayCards(YearMonth defaultMonth)
+    private void updateDisplayCards(YearMonth defaultMonth)
     {
         crcPane1.getChildren().clear();
 
@@ -463,7 +469,7 @@ public class CreditCardController
 
                 CreditCardPaneController crcPaneController = loader.getController();
 
-                crcPaneController.UpdateCreditCardPane(crc, defaultMonth);
+                crcPaneController.updateCreditCardPane(crc, defaultMonth);
 
                 AnchorPane.setTopAnchor(newContent, 0.0);
                 AnchorPane.setBottomAnchor(newContent, 0.0);
@@ -487,7 +493,7 @@ public class CreditCardController
     /**
      * Update money flow chart
      */
-    private void UpdateMoneyFlow()
+    private void updateMoneyFlow()
     {
         CategoryAxis categoryAxis = new CategoryAxis();
         NumberAxis   numberAxis   = new NumberAxis();
@@ -507,7 +513,7 @@ public class CreditCardController
         LocalDateTime     currentDate = LocalDateTime.now();
         DateTimeFormatter formatter   = DateTimeFormatter.ofPattern("MMM/yy");
 
-        List<Category> categories = categoryService.GetCategories();
+        List<Category> categories = categoryService.getCategories();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
 
         // Loop through the months
@@ -523,7 +529,7 @@ public class CreditCardController
 
             // Get confirmed transactions for the month
             List<CreditCardPayment> payments =
-                creditCardService.GetCreditCardPayments(date.getMonthValue(),
+                creditCardService.getCreditCardPayments(date.getMonthValue(),
                                                         date.getYear());
 
             // Calculate total for each category
@@ -532,9 +538,9 @@ public class CreditCardController
                 BigDecimal total =
                     payments.stream()
                         .filter(t
-                                -> t.GetCreditCardDebt().GetCategory().GetId() ==
-                                       category.GetId())
-                        .map(CreditCardPayment::GetAmount)
+                                -> t.getCreditCardDebt().getCategory().getId() ==
+                                       category.getId())
+                        .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 monthlyTotals.putIfAbsent(yearMonth, new LinkedHashMap<>());
@@ -546,7 +552,7 @@ public class CreditCardController
         for (Category category : categories)
         {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName(category.GetName());
+            series.setName(category.getName());
 
             // Loop through the months in the order they were added
             for (YearMonth yearMonth : monthlyTotals.keySet())
@@ -579,7 +585,7 @@ public class CreditCardController
                               .orElse(0.0);
 
         // Set the maximum total as the upper bound of the y-axis
-        Animation.SetDynamicYAxisBounds(numberAxis, maxTotal);
+        Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
         for (XYChart.Series<String, Number> series : debtsFlowStackedBarChart.getData())
         {
@@ -593,20 +599,20 @@ public class CreditCardController
                         .stream()
                         .mapToDouble(Double::doubleValue)
                         .sum();
-                //
+
                 // Calculate the percentage
                 Double value      = (Double)data.getYValue();
                 Double percentage = (monthTotal > 0) ? (value / monthTotal) * 100 : 0;
 
                 // Add tooltip with value and percentage
-                UIUtils.AddTooltipToXYChartNode(
+                UIUtils.addTooltipToXYChartNode(
                     data.getNode(),
-                    series.getName() + ": " + UIUtils.FormatCurrency(value) + " (" +
-                        UIUtils.FormatPercentage(percentage) +
-                        ")\nTotal: " + UIUtils.FormatCurrency(monthTotal));
+                    series.getName() + ": " + UIUtils.formatCurrency(value) + " (" +
+                        UIUtils.formatPercentage(percentage) +
+                        ")\nTotal: " + UIUtils.formatCurrency(monthTotal));
 
                 // Animate the data after setting up the tooltip
-                Animation.StackedXYChartAnimation(Collections.singletonList(data),
+                Animation.stackedXYChartAnimation(Collections.singletonList(data),
                                                   Collections.singletonList(value));
             }
         }
@@ -615,14 +621,14 @@ public class CreditCardController
     /**
      * Populate the debts list month filter combo box
      */
-    private void PopulateDebtsListMonthFilterComboBox()
+    private void populateDebtsListMonthFilterComboBox()
     {
         debtsListMonthFilterComboBox.getItems().clear();
 
         // Get the oldest and newest debt date
-        LocalDateTime oldestDebtDate = creditCardService.GetEarliestPaymentDate();
+        LocalDateTime oldestDebtDate = creditCardService.getEarliestPaymentDate();
 
-        LocalDateTime newestDebtDate = creditCardService.GetLatestPaymentDate();
+        LocalDateTime newestDebtDate = creditCardService.getLatestPaymentDate();
 
         // Generate a list of YearMonth objects from the oldest transaction date to the
         // newest transaction date
@@ -666,9 +672,9 @@ public class CreditCardController
     /**
      * Populate the year filter combo box
      */
-    private void PopulateYearFilterComboBox()
+    private void populateYearFilterComboBox()
     {
-        LocalDateTime oldestDebtDate = creditCardService.GetEarliestPaymentDate();
+        LocalDateTime oldestDebtDate = creditCardService.getEarliestPaymentDate();
 
         LocalDate youngest =
             LocalDate.now().plusYears(Constants.YEAR_RESUME_FUTURE_YEARS);
@@ -712,13 +718,13 @@ public class CreditCardController
     /**
      * Set the actions for the buttons
      */
-    private void SetButtonsActions()
+    private void setButtonsActions()
     {
         crcPrevButton.setOnAction(event -> {
             if (crcPaneCurrentPage > 0)
             {
                 crcPaneCurrentPage--;
-                UpdateDisplayCards();
+                updateDisplayCards();
             }
         });
 
@@ -726,7 +732,7 @@ public class CreditCardController
             if (crcPaneCurrentPage < creditCards.size() - 1)
             {
                 crcPaneCurrentPage++;
-                UpdateDisplayCards();
+                updateDisplayCards();
             }
         });
     }
@@ -734,10 +740,10 @@ public class CreditCardController
     /**
      * Configure the listeners
      */
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         totalDebtsYearFilterComboBox.valueProperty().addListener(
-            (observable, oldValue, newYear) -> { UpdateTotalDebtsInfo(); });
+            (observable, oldValue, newYear) -> { updateTotalDebtsInfo(); });
 
         debtsListMonthFilterComboBox.valueProperty().addListener(
             (observable, oldValue, newMonth) -> {
@@ -749,22 +755,22 @@ public class CreditCardController
                     invoiceMonth.setText(newMonth.format(formatter));
                 }
 
-                UpdateDebtsTableView();
+                updateDebtsTableView();
             });
 
         debtSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { UpdateDebtsTableView(); });
+            (observable, oldValue, newValue) -> { updateDebtsTableView(); });
     }
 
     /**
      * Configure the table view columns
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<CreditCardPayment, Long> idColumn = new TableColumn<>("Debt ID");
         idColumn.setCellValueFactory(param
                                      -> new SimpleObjectProperty<>(
-                                         param.getValue().GetCreditCardDebt().GetId()));
+                                         param.getValue().getCreditCardDebt().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -793,22 +799,22 @@ public class CreditCardController
         descriptionColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetCreditCardDebt().GetDescription()));
+                param.getValue().getCreditCardDebt().getDescription()));
 
         TableColumn<CreditCardPayment, String> amountColumn =
             new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetAmount())));
+                UIUtils.formatCurrency(param.getValue().getAmount())));
 
         TableColumn<CreditCardPayment, String> installmentColumn =
             new TableColumn<>("Installment");
         installmentColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(param.getValue().GetInstallment().toString() +
-                                          "/" +
-                                          param.getValue().GetTotalInstallments()));
+            -> new SimpleObjectProperty<>(
+                param.getValue().getInstallment().toString() + "/" +
+                param.getValue().getCreditCardDebt().getInstallments()));
 
         // Align the installment column to the center
         installmentColumn.setCellFactory(column -> {
@@ -837,27 +843,27 @@ public class CreditCardController
         crcColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetCreditCardDebt().GetCreditCard().GetName()));
+                param.getValue().getCreditCardDebt().getCreditCard().getName()));
 
         TableColumn<CreditCardPayment, String> categoryColumn =
             new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetCreditCardDebt().GetCategory().GetName()));
+                param.getValue().getCreditCardDebt().getCategory().getName()));
 
         TableColumn<CreditCardPayment, String> dateColumn =
             new TableColumn<>("Invoice date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetDate().format(Constants.DATE_FORMATTER_NO_TIME)));
+                param.getValue().getDate().format(Constants.DATE_FORMATTER_NO_TIME)));
 
         TableColumn<CreditCardPayment, String> statusColumn =
             new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetWallet() == null ? "Pending"
+            -> new SimpleStringProperty(param.getValue().getWallet() == null ? "Pending"
                                                                              : "Paid"));
 
         debtsTableView.getColumns().add(idColumn);

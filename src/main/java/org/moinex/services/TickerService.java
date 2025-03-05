@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
@@ -40,32 +41,31 @@ import org.springframework.transaction.annotation.Transactional;
  * This class is responsible for managing tickers
  */
 @Service
+@NoArgsConstructor
 public class TickerService
 {
     @Autowired
-    private TickerRepository m_tickerRepository;
+    private TickerRepository tickerRepository;
 
     @Autowired
-    private TickerPurchaseRepository m_tickerPurchaseRepository;
+    private TickerPurchaseRepository tickerPurchaseRepository;
 
     @Autowired
-    private TickerSaleRepository m_tickerSaleRepository;
+    private TickerSaleRepository tickerSaleRepository;
 
     @Autowired
-    private DividendRepository m_dividendRepository;
+    private DividendRepository dividendRepository;
 
     @Autowired
-    private CryptoExchangeRepository m_cryptoExchangeRepository;
+    private CryptoExchangeRepository cryptoExchangeRepository;
 
     @Autowired
-    private WalletRepository m_walletRepository;
+    private WalletRepository walletRepository;
 
     @Autowired
-    private WalletTransactionService m_walletTransactionService;
+    private WalletTransactionService walletTransactionService;
 
-    private static final Logger logger = LoggerConfig.GetLogger();
-
-    public TickerService() { }
+    private static final Logger logger = LoggerConfig.getLogger();
 
     /**
      * Registers a new ticker
@@ -79,12 +79,12 @@ public class TickerService
      * @return The id of the registered ticker
      */
     @Transactional
-    public Long RegisterTicker(String     name,
-                               String     symbol,
-                               TickerType type,
-                               BigDecimal price,
-                               BigDecimal avgUnitPrice,
-                               BigDecimal quantity)
+    public Long addTicker(String     name,
+                          String     symbol,
+                          TickerType type,
+                          BigDecimal price,
+                          BigDecimal avgUnitPrice,
+                          BigDecimal quantity)
     {
         // Remove leading and trailing whitespaces
         name   = name.strip();
@@ -95,7 +95,7 @@ public class TickerService
             throw new RuntimeException("Name and symbol must not be empty");
         }
 
-        if (m_tickerRepository.existsBySymbol(symbol))
+        if (tickerRepository.existsBySymbol(symbol))
         {
             logger.warning("Ticker with symbol " + symbol + " already exists");
 
@@ -120,22 +120,24 @@ public class TickerService
                 "Average unit price must be greater than or equal to zero");
         }
 
-        price        = Constants.RoundPrice(price, type);
-        avgUnitPrice = Constants.RoundPrice(avgUnitPrice, type);
+        price        = Constants.roundPrice(price, type);
+        avgUnitPrice = Constants.roundPrice(avgUnitPrice, type);
 
-        Ticker ticker = new Ticker(name,
-                                   symbol,
-                                   type,
-                                   quantity,
-                                   price,
-                                   avgUnitPrice,
-                                   LocalDateTime.now());
+        Ticker ticker = Ticker.builder()
+                            .name(name)
+                            .symbol(symbol)
+                            .type(type)
+                            .currentUnitValue(price)
+                            .averageUnitValue(avgUnitPrice)
+                            .currentQuantity(quantity)
+                            .lastUpdate(LocalDateTime.now())
+                            .build();
 
-        m_tickerRepository.save(ticker);
+        tickerRepository.save(ticker);
 
         logger.info("Ticker " + symbol + " registered successfully");
 
-        return ticker.GetId();
+        return ticker.getId();
     }
 
     /**
@@ -145,15 +147,15 @@ public class TickerService
      * @throws RuntimeException If the ticker has transactions associated with it
      */
     @Transactional
-    public void DeleteTicker(Long id)
+    public void deleteTicker(Long id)
     {
-        Ticker ticker = m_tickerRepository.findById(id).orElseThrow(
+        Ticker ticker = tickerRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + id +
                                         " not found and cannot be deleted"));
 
         // Check if the ticker has transactions associated with it
-        if (GetTransactionCountByTicker(id) > 0)
+        if (getTransactionCountByTicker(id) > 0)
         {
             throw new RuntimeException(
                 "Ticker with id " + id +
@@ -161,7 +163,7 @@ public class TickerService
                 + "the transactions first or archive the ticker");
         }
 
-        m_tickerRepository.delete(ticker);
+        tickerRepository.delete(ticker);
 
         logger.info("Ticker with id " + id + " was permanently deleted");
     }
@@ -175,15 +177,15 @@ public class TickerService
      * anymore
      */
     @Transactional
-    public void ArchiveTicker(Long id)
+    public void archiveTicker(Long id)
     {
-        Ticker ticker = m_tickerRepository.findById(id).orElseThrow(
+        Ticker ticker = tickerRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + id +
                                         " not found and cannot be archived"));
 
-        ticker.SetArchived(true);
-        m_tickerRepository.save(ticker);
+        ticker.setIsArchived(true);
+        tickerRepository.save(ticker);
 
         logger.info("Ticker with id " + id + " was archived");
     }
@@ -196,15 +198,15 @@ public class TickerService
      * will be used in the application again
      */
     @Transactional
-    public void UnarchiveTicker(Long id)
+    public void unarchiveTicker(Long id)
     {
-        Ticker ticker = m_tickerRepository.findById(id).orElseThrow(
+        Ticker ticker = tickerRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + id +
                                         " not found and cannot be unarchived"));
 
-        ticker.SetArchived(false);
-        m_tickerRepository.save(ticker);
+        ticker.setIsArchived(false);
+        tickerRepository.save(ticker);
 
         logger.info("Ticker with id " + id + " was unarchived");
     }
@@ -219,62 +221,63 @@ public class TickerService
      * @throws RuntimeException If the average unit price is less than zero
      */
     @Transactional
-    public void UpdateTicker(Ticker tk)
+    public void updateTicker(Ticker tk)
     {
         Ticker oldTicker =
-            m_tickerRepository.findById(tk.GetId())
+            tickerRepository.findById(tk.getId())
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Ticker with id " + tk.GetId() +
+                        -> new RuntimeException("Ticker with id " + tk.getId() +
                                                 " not found and cannot be updated"));
 
         // Remove leading and trailing whitespaces
-        tk.SetName(tk.GetName().strip());
-        tk.SetSymbol(tk.GetSymbol().strip());
+        tk.setName(tk.getName().strip());
+        tk.setSymbol(tk.getSymbol().strip());
 
-        if (tk.GetName().isBlank() || tk.GetSymbol().isBlank())
+        if (tk.getName().isBlank() || tk.getSymbol().isBlank())
         {
             throw new RuntimeException("Name and symbol must not be empty");
         }
 
-        if (tk.GetCurrentUnitValue().compareTo(BigDecimal.ZERO) <= 0)
+        if (tk.getCurrentUnitValue().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Price must be greater than zero");
         }
 
-        if (tk.GetCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
+        if (tk.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
             throw new RuntimeException(
                 "Quantity must be greater than or equal to zero");
         }
 
-        if (tk.GetAveragePrice().compareTo(BigDecimal.ZERO) < 0)
+        if (tk.getAverageUnitValue().compareTo(BigDecimal.ZERO) < 0)
         {
             throw new RuntimeException(
                 "Average unit price must be greater than or equal to zero");
         }
 
-        tk.SetCurrentUnitValue(
-            Constants.RoundPrice(tk.GetCurrentUnitValue(), tk.GetType()));
-        tk.SetAveragePrice(Constants.RoundPrice(tk.GetAveragePrice(), tk.GetType()));
+        tk.setCurrentUnitValue(
+            Constants.roundPrice(tk.getCurrentUnitValue(), tk.getType()));
+        tk.setAverageUnitValue(
+            Constants.roundPrice(tk.getAverageUnitValue(), tk.getType()));
 
-        oldTicker.SetName(tk.GetName());
-        oldTicker.SetSymbol(tk.GetSymbol());
-        oldTicker.SetType(tk.GetType());
-        oldTicker.SetCurrentUnitValue(tk.GetCurrentUnitValue());
-        oldTicker.SetCurrentQuantity(tk.GetCurrentQuantity());
-        oldTicker.SetAveragePrice(tk.GetAveragePrice());
-        oldTicker.SetArchived(tk.IsArchived());
+        oldTicker.setName(tk.getName());
+        oldTicker.setSymbol(tk.getSymbol());
+        oldTicker.setType(tk.getType());
+        oldTicker.setCurrentUnitValue(tk.getCurrentUnitValue());
+        oldTicker.setCurrentQuantity(tk.getCurrentQuantity());
+        oldTicker.setAverageUnitValue(tk.getAverageUnitValue());
+        oldTicker.setIsArchived(tk.getIsArchived());
 
         // If sold all holdings, reset average price
-        if (oldTicker.GetCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
+        if (oldTicker.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
         {
-            ResetAveragePrice(oldTicker.GetId());
+            resetAveragePrice(oldTicker.getId());
         }
 
-        m_tickerRepository.save(oldTicker);
+        tickerRepository.save(oldTicker);
 
-        logger.info("Ticker with id " + tk.GetId() + " was updated");
+        logger.info("Ticker with id " + tk.getId() + " was updated");
     }
 
     /**
@@ -284,7 +287,7 @@ public class TickerService
      */
     @Transactional
     public CompletableFuture<List<Ticker>>
-    UpdateTickersPriceFromAPIAsync(List<Ticker> tickers)
+    updateTickersPriceFromApiAsync(List<Ticker> tickers)
     {
         if (tickers.isEmpty())
         {
@@ -295,26 +298,26 @@ public class TickerService
         }
 
         String[] symbols =
-            tickers.stream().map(Ticker::GetSymbol).toArray(String[] ::new);
+            tickers.stream().map(Ticker::getSymbol).toArray(String[] ::new);
 
-        return APIUtils.FetchStockPricesAsync(symbols).thenApply(jsonObject -> {
-            List<Ticker> failed = new ArrayList<>();
+        return APIUtils.fetchStockPricesAsync(symbols).thenApply(jsonObject -> {
+                List<Ticker> failed = new ArrayList<>();
             tickers.forEach(ticker -> {
                 try
                 {
                     JSONObject tickerData =
-                        jsonObject.getJSONObject(ticker.GetSymbol());
+                        jsonObject.getJSONObject(ticker.getSymbol());
                     BigDecimal price = tickerData.getBigDecimal("price");
 
-                    price = Constants.RoundPrice(price, ticker.GetType());
+                    price = Constants.roundPrice(price, ticker.getType());
 
-                    ticker.SetCurrentUnitValue(price);
-                    ticker.SetLastUpdate(LocalDateTime.now());
-                    m_tickerRepository.save(ticker);
+                    ticker.setCurrentUnitValue(price);
+                    ticker.setLastUpdate(LocalDateTime.now());
+                    tickerRepository.save(ticker);
                 }
                 catch (Exception e)
                 {
-                    logger.warning("Failed to update ticker " + ticker.GetSymbol() +
+                    logger.warning("Failed to update ticker " + ticker.getSymbol() +
                                    ": " + e.getMessage());
                     failed.add(ticker);
                 }
@@ -334,7 +337,7 @@ public class TickerService
      * @throws RuntimeException If the unit price is less than or equal to zero
      */
     @Transactional
-    public void AddPurchase(Long              tickerId,
+    public void addPurchase(Long              tickerId,
                             Long              walletId,
                             BigDecimal        quantity,
                             BigDecimal        unitPrice,
@@ -343,7 +346,7 @@ public class TickerService
                             String            description,
                             TransactionStatus status)
     {
-        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
+        Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + tickerId +
                                         " not found and cannot add purchase"));
@@ -361,39 +364,44 @@ public class TickerService
         BigDecimal amount = unitPrice.multiply(quantity);
 
         // Create a wallet transaction for the dividend
-        Long id = m_walletTransactionService.AddExpense(walletId,
-                                                        category,
-                                                        date,
-                                                        amount,
-                                                        description,
-                                                        status);
+        Long id = walletTransactionService.addExpense(walletId,
+                                                      category,
+                                                      date,
+                                                      amount,
+                                                      description,
+                                                      status);
 
         WalletTransaction walletTransaction =
-            m_walletTransactionService.GetTransactionById(id);
+            walletTransactionService.getTransactionById(id);
 
-        TickerPurchase purchase =
-            new TickerPurchase(ticker, quantity, unitPrice, walletTransaction);
+        TickerPurchase purchase = TickerPurchase.builder()
+                                      .ticker(ticker)
+                                      .quantity(quantity)
+                                      .unitPrice(unitPrice)
+                                      .walletTransaction(walletTransaction)
+                                      .build();
 
-        m_tickerPurchaseRepository.save(purchase);
+        tickerPurchaseRepository.save(purchase);
 
         // Update holdings quantity
-        ticker.SetCurrentQuantity(ticker.GetCurrentQuantity().add(quantity));
+        ticker.setCurrentQuantity(ticker.getCurrentQuantity().add(quantity));
 
         // Update average price
         BigDecimal updatedTotalValue =
-            ticker.GetAveragePrice().multiply(ticker.GetAveragePriceCount());
+            ticker.getAverageUnitValue().multiply(ticker.getAverageUnitValueCount());
 
         updatedTotalValue = updatedTotalValue.add(unitPrice.multiply(quantity));
 
-        ticker.SetAveragePrice(
-            updatedTotalValue.divide(ticker.GetAveragePriceCount().add(quantity),
+        ticker.setAverageUnitValue(
+            updatedTotalValue.divide(ticker.getAverageUnitValueCount().add(quantity),
                                      2,
                                      RoundingMode.HALF_UP));
 
-        ticker.SetAveragePriceCount(ticker.GetAveragePriceCount().add(quantity));
+        ticker.setAverageUnitValueCount(
+            ticker.getAverageUnitValueCount().add(quantity));
 
-        logger.info("TickerPurchase with id " + purchase.GetId() + " added to ticker " +
-                    ticker.GetSymbol() + ". Wallet transaction with id " + id +
+        logger.info("TickerPurchase with id " + purchase.getId() + " added to ticker " +
+                    ticker.getSymbol() + ". Wallet transaction with id " + id +
                     " created for the purchase and added to wallet with id " +
                     walletId);
     }
@@ -410,7 +418,7 @@ public class TickerService
      * @throws RuntimeException If the quantity is greater than the current quantity
      */
     @Transactional
-    public void AddSale(Long              tickerId,
+    public void addSale(Long              tickerId,
                         Long              walletId,
                         BigDecimal        quantity,
                         BigDecimal        unitPrice,
@@ -419,7 +427,7 @@ public class TickerService
                         String            description,
                         TransactionStatus status)
     {
-        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
+        Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + tickerId +
                                         " not found and cannot add sale"));
@@ -435,7 +443,7 @@ public class TickerService
         }
 
         // Check if the quantity is greater than the current quantity
-        if (quantity.compareTo(ticker.GetCurrentQuantity()) > 0)
+        if (quantity.compareTo(ticker.getCurrentQuantity()) > 0)
         {
             throw new RuntimeException(
                 "Quantity must be less than or equal to the current "
@@ -445,33 +453,35 @@ public class TickerService
         BigDecimal amount = unitPrice.multiply(quantity);
 
         // Create a wallet transaction for the sale
-        Long id = m_walletTransactionService
-                      .AddIncome(walletId, category, date, amount, description, status);
+        Long id = walletTransactionService
+                      .addIncome(walletId, category, date, amount, description, status);
 
         WalletTransaction walletTransaction =
-            m_walletTransactionService.GetTransactionById(id);
+            walletTransactionService.getTransactionById(id);
 
-        TickerSale sale = new TickerSale(ticker,
-                                         quantity,
-                                         unitPrice,
-                                         walletTransaction,
-                                         ticker.GetAveragePrice());
+        TickerSale sale = TickerSale.builder()
+                              .ticker(ticker)
+                              .quantity(quantity)
+                              .unitPrice(unitPrice)
+                              .walletTransaction(walletTransaction)
+                              .averageCost(ticker.getAverageUnitValue())
+                              .build();
 
-        m_tickerSaleRepository.save(sale);
+        tickerSaleRepository.save(sale);
 
         // Update holdings quantity
-        ticker.SetCurrentQuantity(ticker.GetCurrentQuantity().subtract(quantity));
+        ticker.setCurrentQuantity(ticker.getCurrentQuantity().subtract(quantity));
 
         // If sold all holdings, reset average price
-        if (ticker.GetCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
+        if (ticker.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
         {
-            ResetAveragePrice(tickerId);
+            resetAveragePrice(tickerId);
         }
 
-        m_tickerRepository.save(ticker);
+        tickerRepository.save(ticker);
 
-        logger.info("TickerSale with id " + sale.GetId() + " added to ticker " +
-                    ticker.GetSymbol() + ". Wallet transaction with id " + id +
+        logger.info("TickerSale with id " + sale.getId() + " added to ticker " +
+                    ticker.getSymbol() + ". Wallet transaction with id " + id +
                     " created for the sale and added to wallet with id " + walletId);
     }
 
@@ -486,7 +496,7 @@ public class TickerService
      * @throws RuntimeException If the wallet transaction does not exist
      */
     @Transactional
-    public void AddDividend(Long              tickerId,
+    public void addDividend(Long              tickerId,
                             Long              walletId,
                             Category          category,
                             BigDecimal        amount,
@@ -494,7 +504,7 @@ public class TickerService
                             String            description,
                             TransactionStatus status)
     {
-        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
+        Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + tickerId +
                                         " not found and cannot add dividend"));
@@ -505,19 +515,22 @@ public class TickerService
         }
 
         // Create a wallet transaction for the dividend
-        Long id = m_walletTransactionService
-                      .AddIncome(walletId, category, date, amount, description, status);
+        Long id = walletTransactionService
+                      .addIncome(walletId, category, date, amount, description, status);
 
         WalletTransaction walletTransaction =
-            m_walletTransactionService.GetTransactionById(id);
+            walletTransactionService.getTransactionById(id);
 
         // Create a dividend
-        Dividend dividend = new Dividend(ticker, walletTransaction);
+        Dividend dividend = Dividend.builder()
+                                .ticker(ticker)
+                                .walletTransaction(walletTransaction)
+                                .build();
 
-        m_dividendRepository.save(dividend);
+        dividendRepository.save(dividend);
 
-        logger.info("Dividend with id " + dividend.GetId() + " added to ticker " +
-                    ticker.GetSymbol() + ". Wallet transaction with id " + id +
+        logger.info("Dividend with id " + dividend.getId() + " added to ticker " +
+                    ticker.getSymbol() + ". Wallet transaction with id " + id +
                     " created for the dividend and added to wallet with id " +
                     walletId);
     }
@@ -537,7 +550,7 @@ public class TickerService
      *    quantity
      */
     @Transactional
-    public void AddCryptoExchange(Long          sourceTickerId,
+    public void addCryptoExchange(Long          sourceTickerId,
                                   Long          targetTickerId,
                                   BigDecimal    soldQuantity,
                                   BigDecimal    receivedQuantity,
@@ -550,21 +563,21 @@ public class TickerService
         }
 
         Ticker soldCrypto =
-            m_tickerRepository.findById(sourceTickerId)
+            tickerRepository.findById(sourceTickerId)
                 .orElseThrow(()
                                  -> new RuntimeException(
                                      "Ticker with id " + sourceTickerId +
                                      " not found and cannot exchange crypto"));
 
         Ticker receivedCrypto =
-            m_tickerRepository.findById(targetTickerId)
+            tickerRepository.findById(targetTickerId)
                 .orElseThrow(()
                                  -> new RuntimeException(
                                      "Ticker with id " + targetTickerId +
                                      " not found and cannot exchange crypto"));
 
-        if (soldCrypto.GetType() != TickerType.CRYPTOCURRENCY ||
-            receivedCrypto.GetType() != TickerType.CRYPTOCURRENCY)
+        if (soldCrypto.getType() != TickerType.CRYPTOCURRENCY ||
+            receivedCrypto.getType() != TickerType.CRYPTOCURRENCY)
         {
             throw new RuntimeException(
                 "Both tickers must be of type CRYPTO to exchange crypto");
@@ -577,40 +590,42 @@ public class TickerService
         }
 
         // Check if the quantity is greater than the current quantity
-        if (soldQuantity.compareTo(soldCrypto.GetCurrentQuantity()) > 0)
+        if (soldQuantity.compareTo(soldCrypto.getCurrentQuantity()) > 0)
         {
             throw new RuntimeException(
                 "Source quantity must be less than or equal to the current "
                 + "quantity");
         }
 
-        CryptoExchange exchange = new CryptoExchange(soldCrypto,
-                                                     receivedCrypto,
-                                                     soldQuantity,
-                                                     receivedQuantity,
-                                                     date,
-                                                     description);
+        CryptoExchange exchange = CryptoExchange.builder()
+                                      .soldCrypto(soldCrypto)
+                                      .receivedCrypto(receivedCrypto)
+                                      .soldQuantity(soldQuantity)
+                                      .receivedQuantity(receivedQuantity)
+                                      .date(date)
+                                      .description(description)
+                                      .build();
 
-        m_cryptoExchangeRepository.save(exchange);
+        cryptoExchangeRepository.save(exchange);
 
         // Update holdings quantity
-        soldCrypto.SetCurrentQuantity(
-            soldCrypto.GetCurrentQuantity().subtract(soldQuantity));
-        receivedCrypto.SetCurrentQuantity(
-            receivedCrypto.GetCurrentQuantity().add(receivedQuantity));
+        soldCrypto.setCurrentQuantity(
+            soldCrypto.getCurrentQuantity().subtract(soldQuantity));
+        receivedCrypto.setCurrentQuantity(
+            receivedCrypto.getCurrentQuantity().add(receivedQuantity));
 
         // If sold all holdings, reset average price
-        if (soldCrypto.GetCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
+        if (soldCrypto.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
         {
-            ResetAveragePrice(sourceTickerId);
+            resetAveragePrice(sourceTickerId);
         }
 
-        m_tickerRepository.save(soldCrypto);
-        m_tickerRepository.save(receivedCrypto);
+        tickerRepository.save(soldCrypto);
+        tickerRepository.save(receivedCrypto);
 
-        logger.info("CryptoExchange with id " + exchange.GetId() +
-                    " added to tickers " + soldCrypto.GetSymbol() + " and " +
-                    receivedCrypto.GetSymbol());
+        logger.info("CryptoExchange with id " + exchange.getId() +
+                    " added to tickers " + soldCrypto.getSymbol() + " and " +
+                    receivedCrypto.getSymbol());
     }
 
     /**
@@ -619,10 +634,10 @@ public class TickerService
      * @throws RuntimeException If the purchase does not exist
      */
     @Transactional
-    public void DeletePurchase(Long purchaseId)
+    public void deletePurchase(Long purchaseId)
     {
         TickerPurchase purchase =
-            m_tickerPurchaseRepository.findById(purchaseId)
+            tickerPurchaseRepository.findById(purchaseId)
                 .orElseThrow(
                     ()
                         -> new RuntimeException("TickerPurchase with id " + purchaseId +
@@ -630,10 +645,10 @@ public class TickerService
 
         // Delete purchase before deleting wallet transaction to avoid
         // foreign key constraint violation
-        m_tickerPurchaseRepository.delete(purchase);
+        tickerPurchaseRepository.delete(purchase);
 
-        m_walletTransactionService.DeleteTransaction(
-            purchase.GetWalletTransaction().GetId());
+        walletTransactionService.deleteTransaction(
+            purchase.getWalletTransaction().getId());
 
         logger.info("TickerPurchase with id " + purchaseId + " was deleted");
     }
@@ -644,19 +659,18 @@ public class TickerService
      * @throws RuntimeException If the sale does not exist
      */
     @Transactional
-    public void DeleteSale(Long saleId)
+    public void deleteSale(Long saleId)
     {
-        TickerSale sale = m_tickerSaleRepository.findById(saleId).orElseThrow(
+        TickerSale sale = tickerSaleRepository.findById(saleId).orElseThrow(
             ()
                 -> new RuntimeException("TickerSale with id " + saleId +
                                         " not found and cannot be deleted"));
 
         // Delete sale before deleting wallet transaction to avoid
         // foreign key constraint violation
-        m_tickerSaleRepository.delete(sale);
+        tickerSaleRepository.delete(sale);
 
-        m_walletTransactionService.DeleteTransaction(
-            sale.GetWalletTransaction().GetId());
+        walletTransactionService.deleteTransaction(sale.getWalletTransaction().getId());
 
         logger.info("TickerSale with id " + saleId + " was deleted");
     }
@@ -667,10 +681,10 @@ public class TickerService
      * @throws RuntimeException If the dividend does not exist
      */
     @Transactional
-    public void DeleteDividend(Long dividendId)
+    public void deleteDividend(Long dividendId)
     {
         Dividend dividend =
-            m_dividendRepository.findById(dividendId)
+            dividendRepository.findById(dividendId)
                 .orElseThrow(
                     ()
                         -> new RuntimeException("Dividend with id " + dividendId +
@@ -678,10 +692,10 @@ public class TickerService
 
         // Delete dividend before deleting wallet transaction to avoid
         // foreign key constraint violation
-        m_dividendRepository.delete(dividend);
+        dividendRepository.delete(dividend);
 
-        m_walletTransactionService.DeleteTransaction(
-            dividend.GetWalletTransaction().GetId());
+        walletTransactionService.deleteTransaction(
+            dividend.getWalletTransaction().getId());
 
         logger.info("Dividend with id " + dividendId + " was deleted");
     }
@@ -692,28 +706,28 @@ public class TickerService
      * @throws RuntimeException If the crypto exchange does not exist
      */
     @Transactional
-    public void DeleteCryptoExchange(Long exchangeId)
+    public void deleteCryptoExchange(Long exchangeId)
     {
         CryptoExchange exchange =
-            m_cryptoExchangeRepository.findById(exchangeId)
+            cryptoExchangeRepository.findById(exchangeId)
                 .orElseThrow(
                     ()
                         -> new RuntimeException("CryptoExchange with id " + exchangeId +
                                                 " not found and cannot be deleted"));
 
         // Adjust holdings quantity
-        exchange.GetSoldCrypto().SetCurrentQuantity(
-            exchange.GetSoldCrypto().GetCurrentQuantity().add(
-                exchange.GetSoldQuantity()));
+        exchange.getSoldCrypto().setCurrentQuantity(
+            exchange.getSoldCrypto().getCurrentQuantity().add(
+                exchange.getSoldQuantity()));
 
-        exchange.GetReceivedCrypto().SetCurrentQuantity(
-            exchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
-                exchange.GetReceivedQuantity()));
+        exchange.getReceivedCrypto().setCurrentQuantity(
+            exchange.getReceivedCrypto().getCurrentQuantity().subtract(
+                exchange.getReceivedQuantity()));
 
-        m_tickerRepository.save(exchange.GetSoldCrypto());
-        m_tickerRepository.save(exchange.GetReceivedCrypto());
+        tickerRepository.save(exchange.getSoldCrypto());
+        tickerRepository.save(exchange.getReceivedCrypto());
 
-        m_cryptoExchangeRepository.delete(exchange);
+        cryptoExchangeRepository.delete(exchange);
 
         logger.info("CryptoExchange with id " + exchangeId + " was deleted");
     }
@@ -727,42 +741,42 @@ public class TickerService
      * @throws RuntimeException If the unit price is less than or equal to zero
      */
     @Transactional
-    public void UpdatePurchase(TickerPurchase purchase)
+    public void updatePurchase(TickerPurchase purchase)
     {
         TickerPurchase oldPurchase =
-            m_tickerPurchaseRepository.findById(purchase.GetId())
+            tickerPurchaseRepository.findById(purchase.getId())
                 .orElseThrow(()
                                  -> new RuntimeException(
-                                     "TickerPurchase with id " + purchase.GetId() +
+                                     "TickerPurchase with id " + purchase.getId() +
                                      " not found and cannot be updated"));
 
-        m_tickerRepository.findById(purchase.GetTicker().GetId())
+        tickerRepository.findById(purchase.getTicker().getId())
             .orElseThrow(()
                              -> new RuntimeException(
-                                 "Ticker with id " + purchase.GetTicker().GetId() +
+                                 "Ticker with id " + purchase.getTicker().getId() +
                                  " not found and cannot update purchase"));
 
-        if (purchase.GetQuantity().compareTo(BigDecimal.ZERO) <= 0)
+        if (purchase.getQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Quantity must be greater than zero");
         }
 
-        if (purchase.GetUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
+        if (purchase.getUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Unit price must be greater than zero");
         }
 
-        oldPurchase.SetQuantity(purchase.GetQuantity());
-        oldPurchase.SetUnitPrice(purchase.GetUnitPrice());
+        oldPurchase.setQuantity(purchase.getQuantity());
+        oldPurchase.setUnitPrice(purchase.getUnitPrice());
 
-        purchase.GetWalletTransaction().SetAmount(
-            purchase.GetUnitPrice().multiply(purchase.GetQuantity()));
+        purchase.getWalletTransaction().setAmount(
+            purchase.getUnitPrice().multiply(purchase.getQuantity()));
 
-        m_walletTransactionService.UpdateTransaction(purchase.GetWalletTransaction());
+        walletTransactionService.updateTransaction(purchase.getWalletTransaction());
 
-        m_tickerPurchaseRepository.save(oldPurchase);
+        tickerPurchaseRepository.save(oldPurchase);
 
-        logger.info("TickerPurchase with id " + purchase.GetId() + " was updated");
+        logger.info("TickerPurchase with id " + purchase.getId() + " was updated");
     }
 
     /**
@@ -774,42 +788,42 @@ public class TickerService
      * @throws RuntimeException If the unit price is less than or equal to zero
      */
     @Transactional
-    public void UpdateSale(TickerSale sale)
+    public void updateSale(TickerSale sale)
     {
         TickerSale oldSale =
-            m_tickerSaleRepository.findById(sale.GetId())
+            tickerSaleRepository.findById(sale.getId())
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("TickerSale with id " + sale.GetId() +
+                        -> new RuntimeException("TickerSale with id " + sale.getId() +
                                                 " not found and cannot be updated"));
 
-        m_tickerRepository.findById(sale.GetTicker().GetId())
+        tickerRepository.findById(sale.getTicker().getId())
             .orElseThrow(()
                              -> new RuntimeException(
-                                 "Ticker with id " + sale.GetTicker().GetId() +
+                                 "Ticker with id " + sale.getTicker().getId() +
                                  " not found and cannot update sale"));
 
-        if (sale.GetQuantity().compareTo(BigDecimal.ZERO) <= 0)
+        if (sale.getQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Quantity must be greater than zero");
         }
 
-        if (sale.GetUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
+        if (sale.getUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Unit price must be greater than zero");
         }
 
-        oldSale.SetQuantity(sale.GetQuantity());
-        oldSale.SetUnitPrice(sale.GetUnitPrice());
+        oldSale.setQuantity(sale.getQuantity());
+        oldSale.setUnitPrice(sale.getUnitPrice());
 
-        sale.GetWalletTransaction().SetAmount(
-            sale.GetUnitPrice().multiply(sale.GetQuantity()));
+        sale.getWalletTransaction().setAmount(
+            sale.getUnitPrice().multiply(sale.getQuantity()));
 
-        m_walletTransactionService.UpdateTransaction(sale.GetWalletTransaction());
+        walletTransactionService.updateTransaction(sale.getWalletTransaction());
 
-        m_tickerSaleRepository.save(oldSale);
+        tickerSaleRepository.save(oldSale);
 
-        logger.info("TickerSale with id " + sale.GetId() + " was updated");
+        logger.info("TickerSale with id " + sale.getId() + " was updated");
     }
 
     /**
@@ -819,26 +833,26 @@ public class TickerService
      * @throws RuntimeException If the ticker does not exist
      */
     @Transactional
-    public void UpdateDividend(Dividend dividend)
+    public void updateDividend(Dividend dividend)
     {
         Dividend oldDividend =
-            m_dividendRepository.findById(dividend.GetId())
+            dividendRepository.findById(dividend.getId())
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Dividend with id " + dividend.GetId() +
+                        -> new RuntimeException("Dividend with id " + dividend.getId() +
                                                 " not found and cannot be updated"));
 
-        m_tickerRepository.findById(dividend.GetTicker().GetId())
+        tickerRepository.findById(dividend.getTicker().getId())
             .orElseThrow(()
                              -> new RuntimeException(
-                                 "Ticker with id " + dividend.GetTicker().GetId() +
+                                 "Ticker with id " + dividend.getTicker().getId() +
                                  " not found and cannot update dividend"));
 
-        m_walletTransactionService.UpdateTransaction(dividend.GetWalletTransaction());
+        walletTransactionService.updateTransaction(dividend.getWalletTransaction());
 
-        m_dividendRepository.save(oldDividend);
+        dividendRepository.save(oldDividend);
 
-        logger.info("Dividend with id " + dividend.GetId() + " was updated");
+        logger.info("Dividend with id " + dividend.getId() + " was updated");
     }
 
     /**
@@ -849,58 +863,53 @@ public class TickerService
      * @throws RuntimeException If the quantities are less than or equal to zero
      */
     @Transactional
-    public void UpdateCryptoExchange(CryptoExchange exchange)
+    public void updateCryptoExchange(CryptoExchange exchange)
     {
-        // Print ids
-        System.out.println("Exchange ID: " + exchange.GetId());
-        System.out.println("Sold ID: " + exchange.GetSoldCrypto().GetId());
-        System.out.println("Received ID: " + exchange.GetReceivedCrypto().GetId());
-
         CryptoExchange oldExchange =
-            m_cryptoExchangeRepository.findById(exchange.GetId())
+            cryptoExchangeRepository.findById(exchange.getId())
                 .orElseThrow(()
                                  -> new RuntimeException(
-                                     "CryptoExchange with id " + exchange.GetId() +
+                                     "CryptoExchange with id " + exchange.getId() +
                                      " not found and cannot be updated"));
 
-        m_tickerRepository.findById(exchange.GetSoldCrypto().GetId())
+        tickerRepository.findById(exchange.getSoldCrypto().getId())
             .orElseThrow(()
                              -> new RuntimeException(
                                  "Source ticker with id " +
-                                 exchange.GetSoldCrypto().GetId() +
+                                 exchange.getSoldCrypto().getId() +
                                  " not found and cannot update crypto exchange"));
 
-        m_tickerRepository.findById(exchange.GetReceivedCrypto().GetId())
+        tickerRepository.findById(exchange.getReceivedCrypto().getId())
             .orElseThrow(()
                              -> new RuntimeException(
                                  "Target ticker with id " +
-                                 exchange.GetReceivedCrypto().GetId() +
+                                 exchange.getReceivedCrypto().getId() +
                                  " not found and cannot update crypto exchange"));
 
-        if (exchange.GetSoldCrypto().GetId() == exchange.GetReceivedCrypto().GetId())
+        if (exchange.getSoldCrypto().getId() == exchange.getReceivedCrypto().getId())
         {
             throw new RuntimeException("Source and target tickers must be different");
         }
 
-        if (exchange.GetSoldQuantity().compareTo(BigDecimal.ZERO) <= 0 ||
-            exchange.GetReceivedQuantity().compareTo(BigDecimal.ZERO) <= 0)
+        if (exchange.getSoldQuantity().compareTo(BigDecimal.ZERO) <= 0 ||
+            exchange.getReceivedQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Quantity must be greater than zero");
         }
 
         // Complex update operations
-        ChangeSoldCrypto(oldExchange, exchange.GetSoldCrypto());
-        ChangeReceivedCrypto(oldExchange, exchange.GetReceivedCrypto());
-        ChangeSoldQuantity(oldExchange, exchange.GetSoldQuantity());
-        ChangeReceivedQuantity(oldExchange, exchange.GetReceivedQuantity());
+        changeSoldCrypto(oldExchange, exchange.getSoldCrypto());
+        changeReceivedCrypto(oldExchange, exchange.getReceivedCrypto());
+        changeSoldQuantity(oldExchange, exchange.getSoldQuantity());
+        changeReceivedQuantity(oldExchange, exchange.getReceivedQuantity());
 
         // Trivial update operations
-        oldExchange.SetDate(exchange.GetDate());
-        oldExchange.SetDescription(exchange.GetDescription());
+        oldExchange.setDate(exchange.getDate());
+        oldExchange.setDescription(exchange.getDescription());
 
-        m_cryptoExchangeRepository.save(oldExchange);
+        cryptoExchangeRepository.save(oldExchange);
 
-        logger.info("CryptoExchange with id " + exchange.GetId() + " was updated");
+        logger.info("CryptoExchange with id " + exchange.getId() + " was updated");
     }
 
     /**
@@ -908,16 +917,16 @@ public class TickerService
      * @param oldExchange The crypto exchange to be updated
      * @param soldQuantity The new sold quantity
      */
-    public void ChangeSoldQuantity(CryptoExchange oldExchange, BigDecimal soldQuantity)
+    public void changeSoldQuantity(CryptoExchange oldExchange, BigDecimal soldQuantity)
     {
         // Adjust holdings quantity
-        oldExchange.GetSoldCrypto().SetCurrentQuantity(
-            oldExchange.GetSoldCrypto().GetCurrentQuantity().add(
-                oldExchange.GetSoldQuantity().subtract(soldQuantity)));
+        oldExchange.getSoldCrypto().setCurrentQuantity(
+            oldExchange.getSoldCrypto().getCurrentQuantity().add(
+                oldExchange.getSoldQuantity().subtract(soldQuantity)));
 
-        m_tickerRepository.save(oldExchange.GetSoldCrypto());
+        tickerRepository.save(oldExchange.getSoldCrypto());
 
-        oldExchange.SetSoldQuantity(soldQuantity);
+        oldExchange.setSoldQuantity(soldQuantity);
     }
 
     /**
@@ -925,17 +934,17 @@ public class TickerService
      * @param oldExchange The crypto exchange to be updated
      * @param receivedQuantity The new target quantity
      */
-    public void ChangeReceivedQuantity(CryptoExchange oldExchange,
+    public void changeReceivedQuantity(CryptoExchange oldExchange,
                                        BigDecimal     receivedQuantity)
     {
         // Adjust holdings quantity
-        oldExchange.GetReceivedCrypto().SetCurrentQuantity(
-            oldExchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
-                oldExchange.GetReceivedQuantity().subtract(receivedQuantity)));
+        oldExchange.getReceivedCrypto().setCurrentQuantity(
+            oldExchange.getReceivedCrypto().getCurrentQuantity().subtract(
+                oldExchange.getReceivedQuantity().subtract(receivedQuantity)));
 
-        m_tickerRepository.save(oldExchange.GetReceivedCrypto());
+        tickerRepository.save(oldExchange.getReceivedCrypto());
 
-        oldExchange.SetReceivedQuantity(receivedQuantity);
+        oldExchange.setReceivedQuantity(receivedQuantity);
     }
 
     /**
@@ -943,25 +952,25 @@ public class TickerService
      * @param exchange The crypto exchange
      * @param soldCrypto The new sold ticker
      */
-    private void ChangeSoldCrypto(CryptoExchange oldExchange, Ticker soldCrypto)
+    private void changeSoldCrypto(CryptoExchange oldExchange, Ticker soldCrypto)
     {
-        if (oldExchange.GetSoldCrypto().GetId() == soldCrypto.GetId())
+        if (oldExchange.getSoldCrypto().getId() == soldCrypto.getId())
         {
             return;
         }
 
         // Adjust holdings quantity
-        oldExchange.GetSoldCrypto().SetCurrentQuantity(
-            oldExchange.GetSoldCrypto().GetCurrentQuantity().add(
-                oldExchange.GetSoldQuantity()));
+        oldExchange.getSoldCrypto().setCurrentQuantity(
+            oldExchange.getSoldCrypto().getCurrentQuantity().add(
+                oldExchange.getSoldQuantity()));
 
-        soldCrypto.SetCurrentQuantity(
-            soldCrypto.GetCurrentQuantity().subtract(oldExchange.GetSoldQuantity()));
+        soldCrypto.setCurrentQuantity(
+            soldCrypto.getCurrentQuantity().subtract(oldExchange.getSoldQuantity()));
 
-        m_tickerRepository.save(oldExchange.GetSoldCrypto());
-        m_tickerRepository.save(soldCrypto);
+        tickerRepository.save(oldExchange.getSoldCrypto());
+        tickerRepository.save(soldCrypto);
 
-        oldExchange.SetSoldCrypto(soldCrypto);
+        oldExchange.setSoldCrypto(soldCrypto);
     }
 
     /**
@@ -969,40 +978,40 @@ public class TickerService
      * @param exchange The crypto exchange
      * @param receivedCrypto The new target ticker
      */
-    private void ChangeReceivedCrypto(CryptoExchange oldExchange, Ticker receivedCrypto)
+    private void changeReceivedCrypto(CryptoExchange oldExchange, Ticker receivedCrypto)
     {
-        if (oldExchange.GetReceivedCrypto().GetId() == receivedCrypto.GetId())
+        if (oldExchange.getReceivedCrypto().getId() == receivedCrypto.getId())
         {
             return;
         }
 
         // Adjust holdings quantity
-        oldExchange.GetReceivedCrypto().SetCurrentQuantity(
-            oldExchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
-                oldExchange.GetReceivedQuantity()));
+        oldExchange.getReceivedCrypto().setCurrentQuantity(
+            oldExchange.getReceivedCrypto().getCurrentQuantity().subtract(
+                oldExchange.getReceivedQuantity()));
 
-        receivedCrypto.SetCurrentQuantity(
-            receivedCrypto.GetCurrentQuantity().add(oldExchange.GetReceivedQuantity()));
+        receivedCrypto.setCurrentQuantity(
+            receivedCrypto.getCurrentQuantity().add(oldExchange.getReceivedQuantity()));
 
-        m_tickerRepository.save(oldExchange.GetReceivedCrypto());
-        m_tickerRepository.save(receivedCrypto);
+        tickerRepository.save(oldExchange.getReceivedCrypto());
+        tickerRepository.save(receivedCrypto);
 
-        oldExchange.SetReceivedCrypto(receivedCrypto);
+        oldExchange.setReceivedCrypto(receivedCrypto);
     }
 
-    public void ResetAveragePrice(Long tickerId)
+    public void resetAveragePrice(Long tickerId)
     {
-        Ticker ticker = m_tickerRepository.findById(tickerId).orElseThrow(
+        Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
                 -> new RuntimeException("Ticker with id " + tickerId +
                                         " not found and cannot reset average price"));
 
-        ticker.SetAveragePrice(BigDecimal.ZERO);
-        ticker.SetAveragePriceCount(BigDecimal.ZERO);
+        ticker.setAverageUnitValue(BigDecimal.ZERO);
+        ticker.setAverageUnitValueCount(BigDecimal.ZERO);
 
-        m_tickerRepository.save(ticker);
+        tickerRepository.save(ticker);
 
-        logger.info("Average price of ticker " + ticker.GetSymbol() +
+        logger.info("Average price of ticker " + ticker.getSymbol() +
                     " was reset to zero");
     }
 
@@ -1010,36 +1019,36 @@ public class TickerService
      * Get all tickers
      * @return A list with all tickers
      */
-    public List<Ticker> GetAllTickers()
+    public List<Ticker> getAllTickers()
     {
-        return m_tickerRepository.findAllByOrderBySymbolAsc();
+        return tickerRepository.findAllByOrderBySymbolAsc();
     }
 
     /**
      * Get all non-archived tickers
      * @return A list with all non-archived tickers
      */
-    public List<Ticker> GetAllNonArchivedTickers()
+    public List<Ticker> getAllNonArchivedTickers()
     {
-        return m_tickerRepository.findAllByArchivedFalseOrderBySymbolAsc();
+        return tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc();
     }
 
     /**
      * Get all archived tickers
      * @return A list with all archived tickers
      */
-    public List<Ticker> GetAllArchivedTickers()
+    public List<Ticker> getAllArchivedTickers()
     {
-        return m_tickerRepository.findAllByArchivedTrueOrderBySymbolAsc();
+        return tickerRepository.findAllByIsArchivedTrueOrderBySymbolAsc();
     }
 
     /**
      * Get all non-archived tickers of a specific type
      * @param type The type of the tickers
      */
-    public List<Ticker> GetAllNonArchivedTickersByType(TickerType type)
+    public List<Ticker> getAllNonArchivedTickersByType(TickerType type)
     {
-        return m_tickerRepository.findAllByTypeAndArchivedFalseOrderBySymbolAsc(type);
+        return tickerRepository.findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(type);
     }
 
     /**
@@ -1047,11 +1056,11 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @return The count of transactions associated with the ticker
      */
-    public Long GetTransactionCountByTicker(Long tickerId)
+    public Long getTransactionCountByTicker(Long tickerId)
     {
-        return GetPurchaseCountByTicker(tickerId) + GetSaleCountByTicker(tickerId) +
-            GetDividendCountByTicker(tickerId) +
-            GetCryptoExchangeCountByTicker(tickerId);
+        return getPurchaseCountByTicker(tickerId) + getSaleCountByTicker(tickerId) +
+            getDividendCountByTicker(tickerId) +
+            getCryptoExchangeCountByTicker(tickerId);
     }
 
     /**
@@ -1059,9 +1068,9 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @return The count of purchases associated with the ticker
      */
-    public Long GetPurchaseCountByTicker(Long tickerId)
+    public Long getPurchaseCountByTicker(Long tickerId)
     {
-        return m_tickerRepository.GetPurchaseCountByTicker(tickerId);
+        return tickerRepository.getPurchaseCountByTicker(tickerId);
     }
 
     /**
@@ -1069,9 +1078,9 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @return The count of sales associated with the ticker
      */
-    public Long GetSaleCountByTicker(Long tickerId)
+    public Long getSaleCountByTicker(Long tickerId)
     {
-        return m_tickerRepository.GetSaleCountByTicker(tickerId);
+        return tickerRepository.getSaleCountByTicker(tickerId);
     }
 
     /**
@@ -1079,9 +1088,9 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @return The count of dividends associated with the ticker
      */
-    public Long GetDividendCountByTicker(Long tickerId)
+    public Long getDividendCountByTicker(Long tickerId)
     {
-        return m_tickerRepository.GetDividendCountByTicker(tickerId);
+        return tickerRepository.getDividendCountByTicker(tickerId);
     }
 
     /**
@@ -1089,44 +1098,44 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @return The count of crypto exchanges associated with the ticker
      */
-    public Long GetCryptoExchangeCountByTicker(Long tickerId)
+    public Long getCryptoExchangeCountByTicker(Long tickerId)
     {
-        return m_tickerRepository.GetCryptoExchangeCountByTicker(tickerId);
+        return tickerRepository.getCryptoExchangeCountByTicker(tickerId);
     }
 
     /**
      * Get all purchases
      * @return A list with all purchases
      */
-    public List<TickerPurchase> GetAllPurchases()
+    public List<TickerPurchase> getAllPurchases()
     {
-        return m_tickerPurchaseRepository.findAll();
+        return tickerPurchaseRepository.findAll();
     }
 
     /**
      * Get all sales
      * @return A list with all sales
      */
-    public List<TickerSale> GetAllSales()
+    public List<TickerSale> getAllSales()
     {
-        return m_tickerSaleRepository.findAll();
+        return tickerSaleRepository.findAll();
     }
 
     /**
      * Get all dividends
      * @return A list with all dividends
      */
-    public List<Dividend> GetAllDividends()
+    public List<Dividend> getAllDividends()
     {
-        return m_dividendRepository.findAll();
+        return dividendRepository.findAll();
     }
 
     /**
      * Get all crypto exchanges
      * @return A list with all crypto exchanges
      */
-    public List<CryptoExchange> GetAllCryptoExchanges()
+    public List<CryptoExchange> getAllCryptoExchanges()
     {
-        return m_cryptoExchangeRepository.findAll();
+        return cryptoExchangeRepository.findAll();
     }
 }

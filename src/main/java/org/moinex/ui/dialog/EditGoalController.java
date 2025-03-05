@@ -14,6 +14,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Goal;
 import org.moinex.services.GoalService;
 import org.moinex.util.Constants;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Edit Goal dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditGoalController
 {
     @FXML
@@ -56,8 +58,6 @@ public class EditGoalController
 
     private Goal goalToUpdate;
 
-    public EditGoalController() { }
-
     /**
      * Constructor
      * @param goalService GoalService
@@ -69,24 +69,24 @@ public class EditGoalController
         this.goalService = goalService;
     }
 
-    public void SetGoal(Goal goal)
+    public void setGoal(Goal goal)
     {
         goalToUpdate = goal;
 
-        nameField.setText(goal.GetName());
-        initialBalanceField.setText(goal.GetInitialBalance().toString());
-        currentBalanceField.setText(goal.GetBalance().toString());
-        targetBalanceField.setText(goal.GetTargetBalance().toString());
-        targetDatePicker.setValue(goal.GetTargetDate().toLocalDate());
-        motivationTextArea.setText(goal.GetMotivation());
-        archivedCheckBox.setSelected(goal.IsArchived());
-        completedCheckBox.setSelected(goal.IsCompleted());
+        nameField.setText(goal.getName());
+        initialBalanceField.setText(goal.getInitialBalance().toString());
+        currentBalanceField.setText(goal.getBalance().toString());
+        targetBalanceField.setText(goal.getTargetBalance().toString());
+        targetDatePicker.setValue(goal.getTargetDate().toLocalDate());
+        motivationTextArea.setText(goal.getMotivation());
+        archivedCheckBox.setSelected(goal.getIsArchived());
+        completedCheckBox.setSelected(goal.isCompleted());
     }
 
     @FXML
     private void initialize()
     {
-        UIUtils.SetDatePickerFormat(targetDatePicker);
+        UIUtils.setDatePickerFormat(targetDatePicker);
 
         // Ensure that the balance fields only accept monetary values
         initialBalanceField.textProperty().addListener(
@@ -139,7 +139,7 @@ public class EditGoalController
             currentBalanceStr.isEmpty() || targetBalanceStr.isEmpty() ||
             targetDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all required fields.");
 
@@ -153,45 +153,45 @@ public class EditGoalController
             BigDecimal targetBalance  = new BigDecimal(targetBalanceStr);
 
             // Check if has any modification
-            if (goalToUpdate.GetName().equals(goalName) &&
-                goalToUpdate.GetInitialBalance().equals(initialBalance) &&
-                goalToUpdate.GetBalance().equals(currentBalance) &&
-                goalToUpdate.GetTargetBalance().equals(targetBalance) &&
-                goalToUpdate.GetTargetDate().toLocalDate().equals(targetDate) &&
-                goalToUpdate.GetMotivation().equals(motivation) &&
-                goalToUpdate.IsArchived() == archived &&
-                goalToUpdate.IsCompleted() == completed)
+            if (goalToUpdate.getName().equals(goalName) &&
+                goalToUpdate.getInitialBalance().equals(initialBalance) &&
+                goalToUpdate.getBalance().equals(currentBalance) &&
+                goalToUpdate.getTargetBalance().equals(targetBalance) &&
+                goalToUpdate.getTargetDate().toLocalDate().equals(targetDate) &&
+                goalToUpdate.getMotivation().equals(motivation) &&
+                goalToUpdate.getIsArchived() == archived &&
+                goalToUpdate.isCompleted() == completed)
             {
-                WindowUtils.ShowInformationDialog("Information",
+                WindowUtils.showInformationDialog("Information",
                                                   "No changes",
                                                   "No changes were made to the goal.");
             }
             else // If there is any modification, update the goal
             {
-                goalToUpdate.SetName(goalName);
-                goalToUpdate.SetInitialBalance(initialBalance);
-                goalToUpdate.SetBalance(currentBalance);
-                goalToUpdate.SetTargetBalance(targetBalance);
-                goalToUpdate.SetTargetDate(targetDate.atStartOfDay());
-                goalToUpdate.SetMotivation(motivation);
-                goalToUpdate.SetArchived(archived);
+                goalToUpdate.setName(goalName);
+                goalToUpdate.setInitialBalance(initialBalance);
+                goalToUpdate.setBalance(currentBalance);
+                goalToUpdate.setTargetBalance(targetBalance);
+                goalToUpdate.setTargetDate(targetDate.atStartOfDay());
+                goalToUpdate.setMotivation(motivation);
+                goalToUpdate.setIsArchived(archived);
 
                 // If the goal was completed and the user unchecked the completed
                 // checkbox, set the completion date to null, otherwise set the
                 // completion date to the current date This is necessary for UpdateGoal
                 // identify if the completed field was changed
-                if (completed && !goalToUpdate.IsCompleted())
+                if (completed && !goalToUpdate.isCompleted())
                 {
-                    goalToUpdate.SetCompletionDate(LocalDate.now().atStartOfDay());
+                    goalToUpdate.setCompletionDate(LocalDate.now().atStartOfDay());
                 }
                 else
                 {
-                    goalToUpdate.SetCompletionDate(null);
+                    goalToUpdate.setCompletionDate(null);
                 }
 
-                goalService.UpdateGoal(goalToUpdate);
+                goalService.updateGoal(goalToUpdate);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Goal updated",
                                               "The goal was successfully updated.");
             }
@@ -201,13 +201,13 @@ public class EditGoalController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid balance",
                                         "Please enter a valid balance.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error", "Error creating goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error", "Error creating goal", e.getMessage());
         }
     }
 }

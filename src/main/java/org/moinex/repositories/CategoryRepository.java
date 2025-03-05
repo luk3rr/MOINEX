@@ -7,7 +7,6 @@
 package org.moinex.repositories;
 
 import java.util.List;
-
 import org.moinex.entities.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +20,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * Get all non archived categories ordered by name
      * @return List of categories
      */
-     List<Category> findAllByArchivedFalseOrderByNameAsc();
+    List<Category> findAllByIsArchivedFalseOrderByNameAsc();
 
     /**
      * Check if a category with a given name exists
@@ -42,6 +41,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @param categoryId Category ID
      * @return Number of transactions
      */
-    @Query("SELECT COUNT(t) FROM WalletTransaction t WHERE t.category.id = :categoryId")
-    Long CountTransactions(@Param("categoryId") Long categoryId);
+    @Query("SELECT count(t) FROM WalletTransaction t WHERE t.category.id = :categoryId")
+    Long getCountTransactions(@Param("categoryId") Long categoryId);
 }

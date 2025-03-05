@@ -14,22 +14,30 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 import org.moinex.util.TransactionStatus;
-import org.moinex.util.TransactionType;
 
 /**
  * Represents a transaction in a wallet
  */
 @Entity
 @Table(name = "wallet_transaction")
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public class WalletTransaction extends BaseTransaction
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "date", nullable = false)
@@ -39,77 +47,25 @@ public class WalletTransaction extends BaseTransaction
     @Column(name = "status", nullable = false)
     private TransactionStatus status;
 
-    /**
-     * Default constructor for JPA
-     */
-    public WalletTransaction() { }
-
-    /**
-     * Constructor for WalletTransaction
-     * @param wallet The wallet that the transaction belongs to
-     * @param category The category of the transaction
-     * @param type The type of the transaction
-     * @param status The status of the transaction
-     * @param date The date of the transaction
-     * @param amount The amount of the transaction
-     * @param description A description of the transaction
-     */
-    public WalletTransaction(Wallet            wallet,
-                             Category          category,
-                             TransactionType   type,
-                             TransactionStatus status,
-                             LocalDateTime     date,
-                             BigDecimal        amount,
-                             String            description)
+    public static abstract class WalletTransactionBuilder<
+        C extends   WalletTransaction, B
+            extends WalletTransactionBuilder<C, B>>
+        extends BaseTransactionBuilder<C, B>
     {
-        super(wallet, category, type, amount, description);
-
-        this.date   = date.format(Constants.DB_DATE_FORMATTER);
-        this.status = status;
+        public B date(LocalDateTime date)
+        {
+            this.date = date.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
     }
 
-    /**
-     * Get the transaction id
-     * @return The transaction id
-     */
-    public Long GetId()
-    {
-        return id;
-    }
-
-    /**
-     * Get the type of the transaction
-     * @return The type of the transaction
-     */
-    public LocalDateTime GetDate()
+    public LocalDateTime getDate()
     {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    /**
-     * Get the status of the transaction
-     * @return The status of the transaction
-     */
-    public TransactionStatus GetStatus()
-    {
-        return status;
-    }
-
-    /**
-     * Set the type of the transaction
-     * @param type The type of the transaction
-     */
-    public void SetDate(LocalDateTime date)
+    public void setDate(LocalDateTime date)
     {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
-    }
-
-    /**
-     * Set the status of the transaction
-     * @param status The status of the transaction
-     */
-    public void SetStatus(TransactionStatus status)
-    {
-        this.status = status;
     }
 }

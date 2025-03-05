@@ -6,12 +6,20 @@
 
 package org.moinex.entities;
 
+import javax.annotation.ParametersAreNullableByDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Represents a wallet type
@@ -19,11 +27,17 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "wallet_type")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class WalletType
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)
@@ -33,72 +47,11 @@ public class WalletType
     private String icon;
 
     /**
-     * Default constructor for JPA
-     */
-    public WalletType() { }
-
-    /**
      * Constructor for testing purposes
-     * @param id The id of the wallet type
-     * @param name The name of the wallet type
      */
     public WalletType(Long id, String name)
     {
-        this.id = id;
+        this.id   = id;
         this.name = name;
-    }
-
-    /**
-     * Constructor for WalletType
-     * @param name The name of the wallet type
-     */
-    public WalletType(String name)
-    {
-        this.name = name;
-    }
-
-    /**
-     * Get the id of the wallet type
-     * @return The id of the wallet type
-     */
-    public Long GetId()
-    {
-        return id;
-    }
-
-    /**
-     * Get the name of the wallet type
-     * @return The name of the wallet type
-     */
-    public String GetName()
-    {
-        return name;
-    }
-
-    /**
-     * Get the icon of the wallet type
-     * @return The icon of the wallet type
-     */
-    public String GetIcon()
-    {
-        return icon;
-    }
-
-    /**
-     * Set the name of the wallet type
-     * @param name The name of the wallet type
-     */
-    public void SetName(String name)
-    {
-        this.name = name;
-    }
-
-    /**
-     * Set the icon of the wallet type
-     * @param icon The icon of the wallet type
-     */
-    public void SetIcon(String icon)
-    {
-        this.icon = icon;
     }
 }

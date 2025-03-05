@@ -15,16 +15,25 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
 @Entity
 @Table(name = "brazilian_market_indicators")
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public class BrazilianMarketIndicators
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "selic_target")
@@ -42,57 +51,44 @@ public class BrazilianMarketIndicators
     @Column(name = "last_update")
     private String lastUpdate;
 
-    /**
-     * Default constructor for JPA
-     */
-    public BrazilianMarketIndicators() { }
-
-    /**
-     * Get the SELIC target
-     * @return The SELIC target
-     */
-    public BigDecimal GetSelicTarget()
+    public static abstract class BrazilianMarketIndicatorsBuilder<
+        C extends   BrazilianMarketIndicators, B
+            extends BrazilianMarketIndicatorsBuilder<C, B>>
     {
-        return selicTarget;
-    }
+        public B ipcaLastMonthReference(YearMonth ipcaLastMonthReference)
+        {
+            this.ipcaLastMonthReference =
+                ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
+            return self();
+        }
 
-    /**
-     * Get the IPCA of the last month
-     * @return The IPCA of the last month
-     */
-    public BigDecimal GetIpcaLastMonth()
-    {
-        return ipcaLastMonth;
+        public B lastUpdate(LocalDateTime lastUpdate)
+        {
+            this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
     }
 
     /**
      * Get the reference of the IPCA of the last month
      * @return The reference of the IPCA of the last month
      */
-    public YearMonth GetIpcaLastMonthReference()
+    public YearMonth getIpcaLastMonthReference()
     {
         if (ipcaLastMonthReference == null)
         {
             return null;
         }
 
-        return YearMonth.parse(ipcaLastMonthReference, Constants.DB_MONTH_YEAR_FORMATTER);
-    }
-
-    /**
-     * Get the IPCA of the last 12 months
-     * @return The IPCA of the last 12 months
-     */
-    public BigDecimal GetIpca12Months()
-    {
-        return ipca12Months;
+        return YearMonth.parse(ipcaLastMonthReference,
+                               Constants.DB_MONTH_YEAR_FORMATTER);
     }
 
     /**
      * Get the last update of the Brazilian market indicators
      * @return The last update of the Brazilian market indicators
      */
-    public LocalDateTime GetLastUpdate()
+    public LocalDateTime getLastUpdate()
     {
         if (lastUpdate == null)
         {
@@ -103,28 +99,10 @@ public class BrazilianMarketIndicators
     }
 
     /**
-     * Set the SELIC target
-     * @param selicTarget The SELIC target
-     */
-    public void SetSelicTarget(BigDecimal selicTarget)
-    {
-        this.selicTarget = selicTarget;
-    }
-
-    /**
-     * Set the IPCA of the last month
-     * @param ipcaLastMonth The IPCA of the last month
-     */
-    public void SetIpcaLastMonth(BigDecimal ipcaLastMonth)
-    {
-        this.ipcaLastMonth = ipcaLastMonth;
-    }
-
-    /**
      * Set the reference of the IPCA of the last month
      * @param ipcaLastMonthReference The reference of the IPCA of the last month
      */
-    public void SetIpcaLastMonthReference(YearMonth ipcaLastMonthReference)
+    public void setIpcaLastMonthReference(YearMonth ipcaLastMonthReference)
     {
         if (ipcaLastMonthReference == null)
         {
@@ -132,23 +110,15 @@ public class BrazilianMarketIndicators
             return;
         }
 
-        this.ipcaLastMonthReference = ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
-    }
-
-    /**
-     * Set the IPCA of the last 12 months
-     * @param ipca12Months The IPCA of the last 12 months
-     */
-    public void SetIpca12Months(BigDecimal ipca12Months)
-    {
-        this.ipca12Months = ipca12Months;
+        this.ipcaLastMonthReference =
+            ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
     }
 
     /**
      * Set the last update of the Brazilian market indicators
      * @param lastUpdate The last update of the Brazilian market indicators
      */
-    public void SetLastUpdate(LocalDateTime lastUpdate)
+    public void setLastUpdate(LocalDateTime lastUpdate)
     {
         if (lastUpdate == null)
         {

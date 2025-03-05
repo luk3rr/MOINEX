@@ -35,11 +35,11 @@ public interface WalletTransactionRepository
      */
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
-           + "WHERE wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "WHERE wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedTransactions();
+    findNonArchivedTransactions();
 
     /**
      * Get all income transactions
@@ -50,7 +50,7 @@ public interface WalletTransactionRepository
            + "WHERE wt.type = 'INCOME' "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindIncomeTransactions();
+    findIncomeTransactions();
 
     /**
      * Get all income transactions where both the category and wallet are not archived
@@ -59,11 +59,11 @@ public interface WalletTransactionRepository
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
            + "WHERE wt.type = 'INCOME' "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedIncomeTransactions();
+    findNonArchivedIncomeTransactions();
 
     /**
      * Get all expense transactions
@@ -74,7 +74,7 @@ public interface WalletTransactionRepository
            + "WHERE wt.type = 'EXPENSE' "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindExpenseTransactions();
+    findExpenseTransactions();
 
     /**
      * Get all expense transactions where both the category and wallet are not archived
@@ -83,11 +83,11 @@ public interface WalletTransactionRepository
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
            + "WHERE wt.type = 'EXPENSE' "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedExpenseTransactions();
+    findNonArchivedExpenseTransactions();
 
     /**
      * Get the all transactions by month and year
@@ -101,7 +101,7 @@ public interface WalletTransactionRepository
            + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindTransactionsByMonth(@Param("month") Integer month, @Param("year") Integer year);
+    findTransactionsByMonth(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
      * Get the all transactions by month and year where both the category and wallet are
@@ -114,11 +114,11 @@ public interface WalletTransactionRepository
            + "FROM WalletTransaction wt "
            + "WHERE strftime('%m', wt.date) = printf('%02d', :month) "
            + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedTransactionsByMonth(@Param("month") Integer month,
+    findNonArchivedTransactionsByMonth(@Param("month") Integer month,
                                        @Param("year") Integer  year);
 
     /**
@@ -131,7 +131,7 @@ public interface WalletTransactionRepository
            + "WHERE strftime('%Y', wt.date) = printf('%04d', :year) "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindTransactionsByYear(@Param("year") Integer year);
+    findTransactionsByYear(@Param("year") Integer year);
 
     /**
      * Get the all transactions by year where both the category and wallet are not
@@ -142,11 +142,11 @@ public interface WalletTransactionRepository
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
            + "WHERE strftime('%Y', wt.date) = printf('%04d', :year) "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedTransactionsByYear(@Param("year") Integer year);
+    findNonArchivedTransactionsByYear(@Param("year") Integer year);
 
     /**
      * Get the transactions by wallet and month
@@ -162,7 +162,7 @@ public interface WalletTransactionRepository
            + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindTransactionsByWalletAndMonth(@Param("walletId") Long walletId,
+    findTransactionsByWalletAndMonth(@Param("walletId") Long walletId,
                                      @Param("month") Integer month,
                                      @Param("year") Integer  year);
 
@@ -179,11 +179,11 @@ public interface WalletTransactionRepository
            + "WHERE wt.wallet.id = :walletId "
            + "AND strftime('%m', wt.date) = printf('%02d', :month) "
            + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedTransactionsByWalletAndMonth(@Param("walletId") Long walletId,
+    findNonArchivedTransactionsByWalletAndMonth(@Param("walletId") Long walletId,
                                                 @Param("month") Integer month,
                                                 @Param("year") Integer  year);
 
@@ -199,7 +199,7 @@ public interface WalletTransactionRepository
            + "AND wt.date <= :endDate "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindTransactionsBetweenDates(@Param("startDate") String startDate,
+    findTransactionsBetweenDates(@Param("startDate") String startDate,
                                  @Param("endDate") String   endDate);
 
     /**
@@ -213,11 +213,11 @@ public interface WalletTransactionRepository
            + "FROM WalletTransaction wt "
            + "WHERE wt.date >= :startDate "
            + "AND wt.date <= :endDate "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedTransactionsBetweenDates(@Param("startDate") String startDate,
+    findNonArchivedTransactionsBetweenDates(@Param("startDate") String startDate,
                                             @Param("endDate") String   endDate);
 
     /**
@@ -233,7 +233,7 @@ public interface WalletTransactionRepository
            + "AND wt.status = 'CONFIRMED' "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindConfirmedTransactionsByMonth(@Param("month") Integer month,
+    findConfirmedTransactionsByMonth(@Param("month") Integer month,
                                      @Param("year") Integer  year);
 
     /**
@@ -248,11 +248,11 @@ public interface WalletTransactionRepository
            + "WHERE strftime('%m', wt.date) = printf('%02d', :month) "
            + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
            + "AND wt.status = 'CONFIRMED' "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedConfirmedTransactionsByMonth(@Param("month") Integer month,
+    findNonArchivedConfirmedTransactionsByMonth(@Param("month") Integer month,
                                                 @Param("year") Integer  year);
 
     /**
@@ -268,7 +268,7 @@ public interface WalletTransactionRepository
            + "AND wt.status = 'PENDING' "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindPendingTransactionsByMonth(@Param("month") Integer month,
+    findPendingTransactionsByMonth(@Param("month") Integer month,
                                    @Param("year") Integer  year);
 
     /**
@@ -283,11 +283,11 @@ public interface WalletTransactionRepository
            + "WHERE strftime('%m', wt.date) = printf('%02d', :month) "
            + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
            + "AND wt.status = 'PENDING' "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedPendingTransactionsByMonth(@Param("month") Integer month,
+    findNonArchivedPendingTransactionsByMonth(@Param("month") Integer month,
                                               @Param("year") Integer  year);
 
     /**
@@ -299,7 +299,7 @@ public interface WalletTransactionRepository
            + "FROM WalletTransaction wt "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindLastTransactions(Pageable pageable);
+    findLastTransactions(Pageable pageable);
 
     /**
      * Get the last n transactions of all wallets where both the category and wallet are
@@ -309,11 +309,11 @@ public interface WalletTransactionRepository
      */
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
-           + "WHERE wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "WHERE wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedLastTransactions(Pageable pageable);
+    findNonArchivedLastTransactions(Pageable pageable);
 
     /**
      * Get the last n transactions in a wallet
@@ -326,7 +326,7 @@ public interface WalletTransactionRepository
            + "WHERE wt.wallet.id = :walletId "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindLastTransactionsByWallet(@Param("walletId") Long walletId, Pageable pageable);
+    findLastTransactionsByWallet(@Param("walletId") Long walletId, Pageable pageable);
 
     /**
      * Get the last n transactions in a wallet where both the category and wallet are
@@ -338,64 +338,64 @@ public interface WalletTransactionRepository
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
            + "WHERE wt.wallet.id = :walletId "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false "
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindNonArchivedLastTransactionsByWallet(@Param("walletId") Long walletId,
+    findNonArchivedLastTransactionsByWallet(@Param("walletId") Long walletId,
                                             Pageable                pageable);
 
     /**
      * Get the date of the oldest transaction
      * @return The date of the oldest transaction
      */
-    @Query("SELECT MIN(wt.date) "
+    @Query("SELECT min(wt.date) "
            + "FROM WalletTransaction wt")
     String
-    FindOldestTransactionDate();
+    findOldestTransactionDate();
 
     /**
      * Get the date of the oldest transaction where both the category and wallet are not
      * archived
      * @return The date of the oldest transaction
      */
-    @Query("SELECT MIN(wt.date) "
+    @Query("SELECT min(wt.date) "
            + "FROM WalletTransaction wt "
-           + "WHERE wt.category.archived = false "
-           + "AND wt.wallet.archived = false")
+           + "WHERE wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false")
     String
-    FindNonArchivedOldestTransactionDate();
+    findNonArchivedOldestTransactionDate();
 
     /**
      * Get the date of the newest transaction
      * @return The date of the newest transaction
      */
-    @Query("SELECT MAX(wt.date) "
+    @Query("SELECT max(wt.date) "
            + "FROM WalletTransaction wt")
     String
-    FindNewestTransactionDate();
+    findNewestTransactionDate();
 
     /**
      * Get the date of the newest transaction and the category is not archived
      * @return The date of the newest transaction
      */
-    @Query("SELECT MAX(wt.date) "
+    @Query("SELECT max(wt.date) "
            + "FROM WalletTransaction wt "
-           + "WHERE wt.category.archived = false "
-           + "AND wt.wallet.archived = false")
+           + "WHERE wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false")
     String
-    FindNonArchivedNewestTransactionDate();
+    findNonArchivedNewestTransactionDate();
 
     /**
      * Get count of transactions by wallet
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
-    @Query("SELECT COUNT(wt) "
+    @Query("SELECT count(wt) "
            + "FROM WalletTransaction wt "
            + "WHERE wt.wallet.id = :walletId")
     Long
-    GetTransactionCountByWallet(@Param("walletId") Long walletId);
+    getTransactionCountByWallet(@Param("walletId") Long walletId);
 
     /**
      * Get count of transactions by wallet where both the category and wallet are not
@@ -403,13 +403,13 @@ public interface WalletTransactionRepository
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
-    @Query("SELECT COUNT(wt) "
+    @Query("SELECT count(wt) "
            + "FROM WalletTransaction wt "
            + "WHERE wt.wallet.id = :walletId "
-           + "AND wt.category.archived = false "
-           + "AND wt.wallet.archived = false")
+           + "AND wt.category.isArchived = false "
+           + "AND wt.wallet.isArchived = false")
     Long
-    CountNonArchivedTransactionsByWallet(@Param("walletId") Long walletId);
+    getCountNonArchivedTransactionsByWallet(@Param("walletId") Long walletId);
 
     /**
      * Get the wallet by transaction id
@@ -419,7 +419,7 @@ public interface WalletTransactionRepository
            + "FROM WalletTransaction wt "
            + "WHERE wt.id = :transactionId")
     Optional<Wallet>
-    FindWalletByTransactionId(@Param("transactionId") Long transactionId);
+    findWalletByTransactionId(@Param("transactionId") Long transactionId);
 
     /**
      * Get suggestions. Suggestions are transactions with distinct descriptions
@@ -430,14 +430,14 @@ public interface WalletTransactionRepository
     @Query("SELECT wt "
            + "FROM WalletTransaction wt "
            + "WHERE wt.type = :transactionType AND "
-           + "wt.wallet.archived = false AND "
-           + "wt.category.archived = false AND "
-           + "wt.date = (SELECT MAX(wt2.date) "
+           + "wt.wallet.isArchived = false AND "
+           + "wt.category.isArchived = false AND "
+           + "wt.date = (SELECT max(wt2.date) "
            + "                  FROM WalletTransaction wt2 "
-           + "                  WHERE wt2.wallet.archived = false AND "
-           + "                        wt2.category.archived = false AND "
+           + "                  WHERE wt2.wallet.isArchived = false AND "
+           + "                        wt2.category.isArchived = false AND "
            + "                        wt2.description = wt.description) "
            + "ORDER BY wt.date DESC")
     List<WalletTransaction>
-    FindSuggestions(@Param("transactionType") TransactionType transactionType);
+    findSuggestions(@Param("transactionType") TransactionType transactionType);
 }

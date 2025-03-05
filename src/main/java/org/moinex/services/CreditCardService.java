@@ -13,6 +13,7 @@ import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardDebt;
@@ -36,29 +37,28 @@ import org.springframework.transaction.annotation.Transactional;
  * This class is responsible for the business logic Credit Card entities
  */
 @Service
+@NoArgsConstructor
 public class CreditCardService
 {
     @Autowired
-    private CreditCardDebtRepository m_creditCardDebtRepository;
+    private CreditCardDebtRepository creditCardDebtRepository;
 
     @Autowired
-    private CreditCardPaymentRepository m_creditCardPaymentRepository;
+    private CreditCardPaymentRepository creditCardPaymentRepository;
 
     @Autowired
-    private CreditCardRepository m_creditCardRepository;
+    private CreditCardRepository creditCardRepository;
 
     @Autowired
-    private CreditCardOperatorRepository m_creditCardOperatorRepository;
+    private CreditCardOperatorRepository creditCardOperatorRepository;
 
     @Autowired
-    private WalletRepository m_walletRepository;
+    private WalletRepository walletRepository;
 
     @Autowired
-    private CategoryRepository m_categoryRepository;
+    private CategoryRepository categoryRepository;
 
-    private static final Logger m_logger = LoggerConfig.GetLogger();
-
-    public CreditCardService() { }
+    private static final Logger logger = LoggerConfig.getLogger();
 
     /**
      * Creates a new credit card
@@ -73,20 +73,20 @@ public class CreditCardService
      * @return The id of the created credit card
      */
     @Transactional
-    public Long CreateCreditCard(String     name,
-                                 Integer    dueDate,
-                                 Integer    closingDay,
-                                 BigDecimal maxDebt,
-                                 String     lastFourDigits,
-                                 Long       operatorId)
+    public Long addCreditCard(String     name,
+                              Integer    dueDate,
+                              Integer    closingDay,
+                              BigDecimal maxDebt,
+                              String     lastFourDigits,
+                              Long       operatorId)
     {
-        return CreateCreditCard(name,
-                                dueDate,
-                                closingDay,
-                                maxDebt,
-                                lastFourDigits,
-                                operatorId,
-                                null);
+        return addCreditCard(name,
+                             dueDate,
+                             closingDay,
+                             maxDebt,
+                             lastFourDigits,
+                             operatorId,
+                             null);
     }
 
     /**
@@ -102,27 +102,27 @@ public class CreditCardService
      * @return The id of the created credit card
      */
     @Transactional
-    public Long CreateCreditCard(String     name,
-                                 Integer    dueDate,
-                                 Integer    closingDay,
-                                 BigDecimal maxDebt,
-                                 String     lastFourDigits,
-                                 Long       operatorId,
-                                 Long       defaultBillingWalletId)
+    public Long addCreditCard(String     name,
+                              Integer    dueDate,
+                              Integer    closingDay,
+                              BigDecimal maxDebt,
+                              String     lastFourDigits,
+                              Long       operatorId,
+                              Long       defaultBillingWalletId)
     {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
-        if (m_creditCardRepository.existsByName(name))
+        if (creditCardRepository.existsByName(name))
         {
             throw new RuntimeException("Credit card with name " + name +
                                        " already exists");
         }
 
-        CreditCardBasicChecks(name, dueDate, closingDay, maxDebt, lastFourDigits);
+        creditCardBasicChecks(name, dueDate, closingDay, maxDebt, lastFourDigits);
 
         CreditCardOperator operator =
-            m_creditCardOperatorRepository.findById(operatorId)
+            creditCardOperatorRepository.findById(operatorId)
                 .orElseThrow(
                     ()
                         -> new RuntimeException("Credit card operator with id " +
@@ -130,7 +130,7 @@ public class CreditCardService
 
         Wallet defaultBillingWallet =
             defaultBillingWalletId != null
-                ? m_walletRepository.findById(defaultBillingWalletId)
+                ? walletRepository.findById(defaultBillingWalletId)
                       .orElseThrow(()
                                        -> new RuntimeException("Wallet with id " +
                                                                defaultBillingWalletId +
@@ -138,17 +138,19 @@ public class CreditCardService
                 : null;
 
         CreditCard newCreditCard =
-            m_creditCardRepository.save(new CreditCard(name,
-                                                       dueDate,
-                                                       closingDay,
-                                                       maxDebt,
-                                                       lastFourDigits,
-                                                       operator,
-                                                       defaultBillingWallet));
+            creditCardRepository.save(CreditCard.builder()
+                                            .name(name)
+                                            .billingDueDay(dueDate)
+                                            .closingDay(closingDay)
+                                            .maxDebt(maxDebt)
+                                            .lastFourDigits(lastFourDigits)
+                                            .operator(operator)
+                                            .defaultBillingWallet(defaultBillingWallet)
+                                            .build());
 
-        m_logger.info("Credit card " + name + " has created successfully");
+        logger.info("Credit card " + name + " has created successfully");
 
-        return newCreditCard.GetId();
+        return newCreditCard.getId();
     }
 
     /**
@@ -158,22 +160,22 @@ public class CreditCardService
      * @throws RuntimeException If the credit card has debts
      */
     @Transactional
-    public void DeleteCreditCard(Long id)
+    public void deleteCreditCard(Long id)
     {
-        CreditCard creditCard = m_creditCardRepository.findById(id).orElseThrow(
+        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Credit card with id " + id +
                                         " does not exist"));
 
-        if (GetDebtCountByCreditCard(id) > 0)
+        if (getDebtCountByCreditCard(id) > 0)
         {
             throw new RuntimeException("Credit card with id " + id +
                                        " has debts and cannot be deleted");
         }
 
-        m_creditCardRepository.delete(creditCard);
+        creditCardRepository.delete(creditCard);
 
-        m_logger.info("Credit card with id " + id + " was permanently deleted");
+        logger.info("Credit card with id " + id + " was permanently deleted");
     }
 
     /**
@@ -188,75 +190,75 @@ public class CreditCardService
      *     from 4
      */
     @Transactional
-    public void UpdateCreditCard(CreditCard crc)
+    public void updateCreditCard(CreditCard crc)
     {
-        CreditCard oldCrc = m_creditCardRepository.findById(crc.GetId())
+        CreditCard oldCrc = creditCardRepository.findById(crc.getId())
                                 .orElseThrow(()
                                                  -> new RuntimeException(
                                                      "Credit card with id " +
-                                                     crc.GetId() + " does not exist"));
+                                                     crc.getId() + " does not exist"));
 
         CreditCardOperator operator =
-            m_creditCardOperatorRepository.findById(crc.GetOperator().GetId())
+            creditCardOperatorRepository.findById(crc.getOperator().getId())
                 .orElseThrow(()
                                  -> new RuntimeException(
                                      "Credit card operator with id " +
-                                     crc.GetOperator().GetId() + " does not exist"));
+                                     crc.getOperator().getId() + " does not exist"));
 
         // Remove leading and trailing whitespaces
-        crc.SetName(crc.GetName().strip());
+        crc.setName(crc.getName().strip());
 
-        if (crc.GetName().isBlank())
+        if (crc.getName().isBlank())
         {
             throw new RuntimeException("Credit card name cannot be empty");
         }
 
-        CreditCardBasicChecks(crc.GetName(),
-                              crc.GetBillingDueDay(),
-                              crc.GetClosingDay(),
-                              crc.GetMaxDebt(),
-                              crc.GetLastFourDigits());
+        creditCardBasicChecks(crc.getName(),
+                              crc.getBillingDueDay(),
+                              crc.getClosingDay(),
+                              crc.getMaxDebt(),
+                              crc.getLastFourDigits());
 
-        List<CreditCard> creditCards = m_creditCardRepository.findAll();
+        List<CreditCard> creditCards = creditCardRepository.findAll();
 
         for (CreditCard creditCard : creditCards)
         {
-            if (creditCard.GetName().equals(crc.GetName()) &&
-                !creditCard.GetId().equals(crc.GetId()))
+            if (creditCard.getName().equals(crc.getName()) &&
+                !creditCard.getId().equals(crc.getId()))
             {
-                throw new RuntimeException("Credit card with name " + crc.GetName() +
+                throw new RuntimeException("Credit card with name " + crc.getName() +
                                            " already exists");
             }
         }
 
-        oldCrc.SetName(crc.GetName());
+        oldCrc.setName(crc.getName());
 
-        oldCrc.SetMaxDebt(crc.GetMaxDebt());
-        oldCrc.SetLastFourDigits(crc.GetLastFourDigits());
-        oldCrc.SetOperator(operator);
-        oldCrc.SetDefaultBillingWallet(crc.GetDefaultBillingWallet());
+        oldCrc.setMaxDebt(crc.getMaxDebt());
+        oldCrc.setLastFourDigits(crc.getLastFourDigits());
+        oldCrc.setOperator(operator);
+        oldCrc.setDefaultBillingWallet(crc.getDefaultBillingWallet());
 
         // Update bill due day for each pending payment where the payment date is
         // greater than the current day. Overdue payments are not updated
         List<CreditCardPayment> payments =
-            GetAllPendingCreditCardPayments(oldCrc.GetId())
+            getAllPendingCreditCardPayments(oldCrc.getId())
                 .stream()
-                .filter(p -> p.GetDate().isAfter(LocalDateTime.now()))
+                .filter(p -> p.getDate().isAfter(LocalDateTime.now()))
                 .toList();
 
         for (CreditCardPayment payment : payments)
         {
-            payment.SetDate(payment.GetDate().withDayOfMonth(crc.GetBillingDueDay()));
-            m_creditCardPaymentRepository.save(payment);
+            payment.setDate(payment.getDate().withDayOfMonth(crc.getBillingDueDay()));
+            creditCardPaymentRepository.save(payment);
         }
 
-        oldCrc.SetBillingDueDay(crc.GetBillingDueDay());
+        oldCrc.setBillingDueDay(crc.getBillingDueDay());
 
-        oldCrc.SetClosingDay(crc.GetClosingDay());
+        oldCrc.setClosingDay(crc.getClosingDay());
 
-        m_creditCardRepository.save(oldCrc);
+        creditCardRepository.save(oldCrc);
 
-        m_logger.info("Credit card with id " + crc.GetId() + " updated successfully");
+        logger.info("Credit card with id " + crc.getId() + " updated successfully");
     }
 
     /**
@@ -276,21 +278,21 @@ public class CreditCardService
      * @throws RuntimeException If the credit card does not have enough credit
      */
     @Transactional
-    public void RegisterDebt(Long          crcId,
-                             Category      category,
-                             LocalDateTime registerDate,
-                             YearMonth     invoiceMonth,
-                             BigDecimal    value,
-                             Integer       installments,
-                             String        description)
+    public void addDebt(Long          crcId,
+                        Category      category,
+                        LocalDateTime registerDate,
+                        YearMonth     invoiceMonth,
+                        BigDecimal    value,
+                        Integer       installments,
+                        String        description)
     {
-        CreditCard creditCard = m_creditCardRepository.findById(crcId).orElseThrow(
+        CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
             ()
                 -> new RuntimeException("Credit card with id " + crcId +
                                         " does not exist"));
 
         Category cat =
-            m_categoryRepository.findById(category.GetId())
+            categoryRepository.findById(category.getId())
                 .orElseThrow(()
                                  -> new RuntimeException("Category with name " +
                                                          category + " does not exist"));
@@ -321,7 +323,7 @@ public class CreditCardService
             throw new RuntimeException("Invoice month cannot be null");
         }
 
-        BigDecimal availableCredit = GetAvailableCredit(crcId);
+        BigDecimal availableCredit = getAvailableCredit(crcId);
 
         if (value.compareTo(availableCredit) > 0)
         {
@@ -330,16 +332,18 @@ public class CreditCardService
                 " does not have enough credit to register debt");
         }
 
-        CreditCardDebt debt = new CreditCardDebt(creditCard,
-                                                 cat,
-                                                 registerDate,
-                                                 installments,
-                                                 value,
-                                                 description);
+        CreditCardDebt debt = CreditCardDebt.builder()
+                                  .creditCard(creditCard)
+                                  .category(cat)
+                                  .date(registerDate)
+                                  .totalAmount(value)
+                                  .installments(installments)
+                                  .description(description)
+                                  .build();
 
-        m_creditCardDebtRepository.save(debt);
+        creditCardDebtRepository.save(debt);
 
-        m_logger.info("Debit registered on credit card with id " + crcId +
+        logger.info("Debit registered on credit card with id " + crcId +
                       " with value " + value + " and description " + description);
 
         // Divide the value exactly, with full precision
@@ -362,40 +366,47 @@ public class CreditCardService
 
             // Calculate the date and save the payment
             LocalDateTime paymentDate = invoiceMonth.plusMonths(i)
-                                            .atDay(creditCard.GetBillingDueDay())
+                                            .atDay(creditCard.getBillingDueDay())
                                             .atTime(23, 59);
 
-            CreditCardPayment payment = new CreditCardPayment(debt,
-                                                              paymentDate,
-                                                              currentInstallmentValue,
-                                                              i + 1);
+            CreditCardPayment payment = CreditCardPayment.builder()
+                                            .creditCardDebt(debt)
+                                            .date(paymentDate)
+                                            .amount(currentInstallmentValue)
+                                            .installment(i + 1)
+                                            .build();
 
-            m_creditCardPaymentRepository.save(payment);
+            creditCardPaymentRepository.save(payment);
 
-            m_logger.info("Payment of debt " + description +
+            logger.info("Payment of debt " + description +
                           " on credit card with id " + crcId +
                           " registered with value " + currentInstallmentValue +
                           " and due date " + paymentDate);
         }
     }
 
+    /**
+     * Delete a debt
+     * @param debtId The id of the debt
+     * @throws RuntimeException If the debt does not exist
+     */
     @Transactional
-    public void DeleteDebt(Long debtId)
+    public void deleteDebt(Long debtId)
     {
-        CreditCardDebt debt = m_creditCardDebtRepository.findById(debtId).orElseThrow(
+        CreditCardDebt debt = creditCardDebtRepository.findById(debtId).orElseThrow(
             () -> new RuntimeException("Debt with id " + debtId + " not found"));
 
         // Delete all payments associated with the debt
-        List<CreditCardPayment> payments = GetPaymentsByDebtId(debtId);
+        List<CreditCardPayment> payments = getPaymentsByDebtId(debtId);
 
         for (CreditCardPayment payment : payments)
         {
-            DeletePayment(payment.GetId());
+            deletePayment(payment.getId());
         }
 
-        m_creditCardDebtRepository.delete(debt);
+        creditCardDebtRepository.delete(debt);
 
-        m_logger.info("Debt with id " + debtId + " deleted");
+        logger.info("Debt with id " + debtId + " deleted");
     }
 
     /**
@@ -405,24 +416,24 @@ public class CreditCardService
      * @throws RuntimeException If the credit card has pending payments
      */
     @Transactional
-    public void ArchiveCreditCard(Long id)
+    public void archiveCreditCard(Long id)
     {
-        CreditCard creditCard = m_creditCardRepository.findById(id).orElseThrow(
+        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Credit card with id " + id +
                                         " not found and cannot be archived"));
 
-        if (GetTotalPendingPayments(id).compareTo(BigDecimal.ZERO) > 0)
+        if (getTotalPendingPayments(id).compareTo(BigDecimal.ZERO) > 0)
         {
             throw new RuntimeException(
                 "Credit card with id " + id +
                 " has pending payments and cannot be archived");
         }
 
-        creditCard.SetArchived(true);
-        m_creditCardRepository.save(creditCard);
+        creditCard.setIsArchived(true);
+        creditCardRepository.save(creditCard);
 
-        m_logger.info("Credit card with id " + id + " was archived");
+        logger.info("Credit card with id " + id + " was archived");
     }
 
     /**
@@ -431,17 +442,17 @@ public class CreditCardService
      * @throws RuntimeException If the credit card does not exist
      */
     @Transactional
-    public void UnarchiveCreditCard(Long id)
+    public void unarchiveCreditCard(Long id)
     {
-        CreditCard creditCard = m_creditCardRepository.findById(id).orElseThrow(
+        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Credit card with id " + id +
                                         " not found and cannot be unarchived"));
 
-        creditCard.SetArchived(false);
-        m_creditCardRepository.save(creditCard);
+        creditCard.setIsArchived(false);
+        creditCardRepository.save(creditCard);
 
-        m_logger.info("Credit card with id " + id + " was unarchived");
+        logger.info("Credit card with id " + id + " was unarchived");
     }
 
     /**
@@ -454,39 +465,39 @@ public class CreditCardService
      *     zero
      */
     @Transactional
-    public void UpdateCreditCardDebt(CreditCardDebt debt, YearMonth invoiceMonth)
+    public void updateCreditCardDebt(CreditCardDebt debt, YearMonth invoiceMonth)
     {
         CreditCardDebt oldDebt =
-            m_creditCardDebtRepository.findById(debt.GetId())
+            creditCardDebtRepository.findById(debt.getId())
                 .orElseThrow(()
                                  -> new RuntimeException("Debt with id " +
-                                                         debt.GetId() +
+                                                         debt.getId() +
                                                          " does not exist"));
 
-        m_creditCardRepository.findById(debt.GetCreditCard().GetId())
+        creditCardRepository.findById(debt.getCreditCard().getId())
             .orElseThrow(()
                              -> new RuntimeException("Credit card with id " +
-                                                     debt.GetCreditCard().GetId() +
+                                                     debt.getCreditCard().getId() +
                                                      " does not exist"));
 
-        if (debt.GetTotalAmount().compareTo(BigDecimal.ZERO) <= 0)
+        if (debt.getTotalAmount().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Total amount must be greater than zero");
         }
 
         // Complex update
-        ChangeInvoiceMonth(oldDebt, invoiceMonth);
-        ChangeDebtTotalAmount(oldDebt, debt.GetTotalAmount());
-        ChangeDebtInstallments(oldDebt, debt.GetInstallments());
+        changeInvoiceMonth(oldDebt, invoiceMonth);
+        changeDebtTotalAmount(oldDebt, debt.getTotalAmount());
+        changeDebtInstallments(oldDebt, debt.getInstallments());
 
         // Trivial update
-        oldDebt.SetCreditCard(debt.GetCreditCard());
-        oldDebt.SetCategory(debt.GetCategory());
-        oldDebt.SetDescription(debt.GetDescription());
+        oldDebt.setCreditCard(debt.getCreditCard());
+        oldDebt.setCategory(debt.getCategory());
+        oldDebt.setDescription(debt.getDescription());
 
-        m_creditCardDebtRepository.save(oldDebt);
+        creditCardDebtRepository.save(oldDebt);
 
-        m_logger.info("Debt with id " + debt.GetId() + " updated successfully");
+        logger.info("Debt with id " + debt.getId() + " updated successfully");
     }
 
     /**
@@ -499,75 +510,75 @@ public class CreditCardService
      * @throws RuntimeException If the wallet does not exist
      */
     @Transactional
-    public void PayInvoice(Long crcId, Long walletId, Integer month, Integer year)
+    public void payInvoice(Long crcId, Long walletId, Integer month, Integer year)
     {
-        Wallet wallet = m_walletRepository.findById(walletId).orElseThrow(
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(
             ()
                 -> new RuntimeException("Wallet with id " + walletId +
                                         " does not exist"));
 
-        m_creditCardRepository.findById(crcId).orElseThrow(
+        creditCardRepository.findById(crcId).orElseThrow(
             ()
                 -> new RuntimeException("Credit card with id " + crcId +
                                         " does not exist"));
 
         List<CreditCardPayment> pendingPayments =
-            GetPendingCreditCardPayments(crcId, month, year);
+            getPendingCreditCardPayments(crcId, month, year);
 
         BigDecimal pendingPaymentsTotal = pendingPayments.stream()
-                                              .map(CreditCardPayment::GetAmount)
+                                              .map(CreditCardPayment::getAmount)
                                               .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         for (CreditCardPayment payment : pendingPayments)
         {
-            payment.SetWallet(wallet);
-            m_creditCardPaymentRepository.save(payment);
+            payment.setWallet(wallet);
+            creditCardPaymentRepository.save(payment);
 
-            m_logger.info(
-                "Payment number " + payment.GetInstallment() + " of debt with id " +
-                payment.GetCreditCardDebt().GetId() + " on credit card with id " +
-                payment.GetCreditCardDebt().GetCreditCard().GetId() + " paid");
+            logger.info(
+                "Payment number " + payment.getInstallment() + " of debt with id " +
+                payment.getCreditCardDebt().getId() + " on credit card with id " +
+                payment.getCreditCardDebt().getCreditCard().getId() + " paid");
         }
 
         // Subtract the total of pending payments from the wallet balance
-        wallet.SetBalance(wallet.GetBalance().subtract(pendingPaymentsTotal));
-        m_walletRepository.save(wallet);
+        wallet.setBalance(wallet.getBalance().subtract(pendingPaymentsTotal));
+        walletRepository.save(wallet);
     }
 
     /**
      * Get all credit cards
      * @return A list with all credit cards
      */
-    public List<CreditCard> GetAllCreditCards()
+    public List<CreditCard> getAllCreditCards()
     {
-        return m_creditCardRepository.findAll();
+        return creditCardRepository.findAll();
     }
 
     /**
      * Get all archived credit cards
      * @return A list with all archived credit cards
      */
-    public List<CreditCard> GetAllArchivedCreditCards()
+    public List<CreditCard> getAllArchivedCreditCards()
     {
-        return m_creditCardRepository.findAllByArchivedTrue();
+        return creditCardRepository.findAllByIsArchivedTrue();
     }
 
     /**
      * Get all credit cards ordered by name
      * @return A list with all credit cards ordered by name
      */
-    public List<CreditCard> GetAllCreditCardsOrderedByName()
+    public List<CreditCard> getAllCreditCardsOrderedByName()
     {
-        return m_creditCardRepository.findAllByOrderByNameAsc();
+        return creditCardRepository.findAllByOrderByNameAsc();
     }
 
     /**
      * Get all credit cards are not archived ordered by name
      * @return A list with all credit cards that are not archived ordered by name
      */
-    public List<CreditCard> GetAllNonArchivedCreditCardsOrderedByName()
+    public List<CreditCard> getAllNonArchivedCreditCardsOrderedByName()
     {
-        return m_creditCardRepository.findAllByArchivedFalseOrderByNameAsc();
+        return creditCardRepository.findAllByIsArchivedFalseOrderByNameAsc();
     }
 
     /**
@@ -576,15 +587,15 @@ public class CreditCardService
      * @return A list with all credit cards that are not archived ordered by transaction
      *    count
      */
-    public List<CreditCard> GetAllNonArchivedCreditCardsOrderedByTransactionCountDesc()
+    public List<CreditCard> getAllNonArchivedCreditCardsOrderedByTransactionCountDesc()
     {
-        return m_creditCardRepository.findAllByArchivedFalse()
+        return creditCardRepository.findAllByIsArchivedFalse()
             .stream()
             .sorted(Comparator
                         .comparingLong(
                             (CreditCard c)
-                                -> m_creditCardDebtRepository.GetDebtCountByCreditCard(
-                                    c.GetId()))
+                                -> creditCardDebtRepository.getDebtCountByCreditCard(
+                                    c.getId()))
                         .reversed())
             .toList();
     }
@@ -593,9 +604,9 @@ public class CreditCardService
      * Get all credit card operators ordered by name
      * @return A list with all credit card operators ordered by name
      */
-    public List<CreditCardOperator> GetAllCreditCardOperatorsOrderedByName()
+    public List<CreditCardOperator> getAllCreditCardOperatorsOrderedByName()
     {
-        return m_creditCardOperatorRepository.findAllByOrderByNameAsc();
+        return creditCardOperatorRepository.findAllByOrderByNameAsc();
     }
 
     /**
@@ -604,17 +615,17 @@ public class CreditCardService
      * @return The available credit of the credit card
      * @throws RuntimeException If the credit card does not exist
      */
-    public BigDecimal GetAvailableCredit(Long id)
+    public BigDecimal getAvailableCredit(Long id)
     {
-        CreditCard creditCard = m_creditCardRepository.findById(id).orElseThrow(
+        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Credit card with id " + id +
                                         " does not exist"));
 
         BigDecimal totalPendingPayments =
-            m_creditCardPaymentRepository.GetTotalPendingPayments(id);
+            creditCardPaymentRepository.getTotalPendingPayments(id);
 
-        return creditCard.GetMaxDebt().subtract(totalPendingPayments);
+        return creditCard.getMaxDebt().subtract(totalPendingPayments);
     }
 
     /**
@@ -623,9 +634,9 @@ public class CreditCardService
      * @param year The year
      * @return A list with all credit card payments in a month and year
      */
-    public List<CreditCardPayment> GetCreditCardPayments(Integer month, Integer year)
+    public List<CreditCardPayment> getCreditCardPayments(Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetCreditCardPayments(month, year);
+        return creditCardPaymentRepository.getCreditCardPayments(month, year);
     }
 
     /**
@@ -637,9 +648,9 @@ public class CreditCardService
      *     id
      */
     public List<CreditCardPayment>
-    GetCreditCardPayments(Long crcId, Integer month, Integer year)
+    getCreditCardPayments(Long crcId, Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetCreditCardPayments(crcId, month, year);
+        return creditCardPaymentRepository.getCreditCardPayments(crcId, month, year);
     }
 
     /**
@@ -651,9 +662,9 @@ public class CreditCardService
      *     credit card id
      */
     public List<CreditCardPayment>
-    GetPendingCreditCardPayments(Long crcId, Integer month, Integer year)
+    getPendingCreditCardPayments(Long crcId, Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetPendingCreditCardPayments(crcId,
+        return creditCardPaymentRepository.getPendingCreditCardPayments(crcId,
                                                                           month,
                                                                           year);
     }
@@ -663,9 +674,9 @@ public class CreditCardService
      * @param crcId The id of the credit card
      * @return A list with all pending credit card payments
      */
-    public List<CreditCardPayment> GetAllPendingCreditCardPayments(Long crcId)
+    public List<CreditCardPayment> getAllPendingCreditCardPayments(Long crcId)
     {
-        return m_creditCardPaymentRepository.GetAllPendingCreditCardPayments(crcId);
+        return creditCardPaymentRepository.getAllPendingCreditCardPayments(crcId);
     }
 
     /**
@@ -673,9 +684,9 @@ public class CreditCardService
      * @param debtId The debt id
      * @return A list with all credit card payments by debt id
      */
-    public List<CreditCardPayment> GetPaymentsByDebtId(Long debtId)
+    public List<CreditCardPayment> getPaymentsByDebtId(Long debtId)
     {
-        return m_creditCardPaymentRepository.GetPaymentsByDebtId(debtId);
+        return creditCardPaymentRepository.getPaymentsByDebtId(debtId);
     }
 
     /**
@@ -684,10 +695,10 @@ public class CreditCardService
      * @param year The year
      * @return A list with all paid payments of all credit cards in a month and year
      */
-    public List<CreditCardPayment> GetAllPaidPaymentsByMonth(Integer month,
+    public List<CreditCardPayment> getAllPaidPaymentsByMonth(Integer month,
                                                              Integer year)
     {
-        return m_creditCardPaymentRepository.GetAllPaidPaymentsByMonth(month, year);
+        return creditCardPaymentRepository.getAllPaidPaymentsByMonth(month, year);
     }
 
     /**
@@ -696,9 +707,9 @@ public class CreditCardService
      * @param year The year
      * @return The total debt amount of all credit cards in a month and year
      */
-    public BigDecimal GetTotalDebtAmount(Integer month, Integer year)
+    public BigDecimal getTotalDebtAmount(Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetTotalDebtAmount(month, year);
+        return creditCardPaymentRepository.getTotalDebtAmount(month, year);
     }
 
     /**
@@ -706,9 +717,9 @@ public class CreditCardService
      * @param year The year
      * @return The total debt amount of all credit cards in a year
      */
-    public BigDecimal GetTotalDebtAmount(Integer year)
+    public BigDecimal getTotalDebtAmount(Integer year)
     {
-        return m_creditCardPaymentRepository.GetTotalDebtAmount(year);
+        return creditCardPaymentRepository.getTotalDebtAmount(year);
     }
 
     /**
@@ -719,9 +730,9 @@ public class CreditCardService
      * @return The total of all pending payments of all credit cards from the specified
      *     month and year onward
      */
-    public BigDecimal GetTotalPendingPayments(Integer month, Integer year)
+    public BigDecimal getTotalPendingPayments(Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetTotalPendingPayments(month, year);
+        return creditCardPaymentRepository.getTotalPendingPayments(month, year);
     }
 
     /**
@@ -732,9 +743,9 @@ public class CreditCardService
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year
      */
-    public BigDecimal GetPaidPaymentsByMonth(Integer month, Integer year)
+    public BigDecimal getPaidPaymentsByMonth(Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetPaidPaymentsByMonth(month, year);
+        return creditCardPaymentRepository.getPaidPaymentsByMonth(month, year);
     }
 
     /**
@@ -746,9 +757,9 @@ public class CreditCardService
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year by a wallet
      */
-    public BigDecimal GetPaidPaymentsByMonth(Long walletId, Integer month, Integer year)
+    public BigDecimal getPaidPaymentsByMonth(Long walletId, Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetPaidPaymentsByMonth(walletId,
+        return creditCardPaymentRepository.getPaidPaymentsByMonth(walletId,
                                                                     month,
                                                                     year);
     }
@@ -761,9 +772,9 @@ public class CreditCardService
      * @return The total of all pending payments of all credit cards from the specified
      *    month and year
      */
-    public BigDecimal GetPendingPaymentsByMonth(Integer month, Integer year)
+    public BigDecimal getPendingPaymentsByMonth(Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetPendingPaymentsByMonth(month, year);
+        return creditCardPaymentRepository.getPendingPaymentsByMonth(month, year);
     }
 
     /**
@@ -773,9 +784,9 @@ public class CreditCardService
      * @return The total of all pending payments of all credit cards from the specified
      *    year onward
      */
-    public BigDecimal GetTotalPendingPayments(Integer year)
+    public BigDecimal getTotalPendingPayments(Integer year)
     {
-        return m_creditCardPaymentRepository.GetTotalPendingPayments(year);
+        return creditCardPaymentRepository.getTotalPendingPayments(year);
     }
 
     /**
@@ -784,9 +795,9 @@ public class CreditCardService
      * @return The total of all paid payments of all credit cards from the specified
      *     year
      */
-    public BigDecimal GetPaidPaymentsByYear(Integer year)
+    public BigDecimal getPaidPaymentsByYear(Integer year)
     {
-        return m_creditCardPaymentRepository.GetPaidPaymentsByYear(year);
+        return creditCardPaymentRepository.getPaidPaymentsByYear(year);
     }
 
     /**
@@ -795,27 +806,27 @@ public class CreditCardService
      * @return The total of all pending payments of all credit cards from the specified
      *     year
      */
-    public BigDecimal GetPendingPaymentsByYear(Integer year)
+    public BigDecimal getPendingPaymentsByYear(Integer year)
     {
-        return m_creditCardPaymentRepository.GetPendingPaymentsByYear(year);
+        return creditCardPaymentRepository.getPendingPaymentsByYear(year);
     }
 
     /**
      * Get the total of all pending payments of a credit card
      * @return The total of all pending payments of all credit cards
      */
-    public BigDecimal GetTotalPendingPayments(Long crcId)
+    public BigDecimal getTotalPendingPayments(Long crcId)
     {
-        return m_creditCardPaymentRepository.GetTotalPendingPayments(crcId);
+        return creditCardPaymentRepository.getTotalPendingPayments(crcId);
     }
 
     /**
      * Get the total of all pending payments of all credit cards
      * @return The total of all pending payments of all credit cards
      */
-    public BigDecimal GetTotalPendingPayments()
+    public BigDecimal getTotalPendingPayments()
     {
-        return m_creditCardPaymentRepository.GetTotalPendingPayments();
+        return creditCardPaymentRepository.getTotalPendingPayments();
     }
 
     /**
@@ -823,9 +834,9 @@ public class CreditCardService
      * @param debtId The id of the debt
      * @return The remaining debt of the purchase
      */
-    public BigDecimal GetRemainingDebt(Long debtId)
+    public BigDecimal getRemainingDebt(Long debtId)
     {
-        return m_creditCardPaymentRepository.GetRemainingDebt(debtId);
+        return creditCardPaymentRepository.getRemainingDebt(debtId);
     }
 
     /**
@@ -835,9 +846,9 @@ public class CreditCardService
      * @param year The year
      * @return The invoice amount of the credit card in the specified month and year
      */
-    public BigDecimal GetInvoiceAmount(Long crcId, Integer month, Integer year)
+    public BigDecimal getInvoiceAmount(Long crcId, Integer month, Integer year)
     {
-        return m_creditCardPaymentRepository.GetInvoiceAmount(crcId, month, year);
+        return creditCardPaymentRepository.getInvoiceAmount(crcId, month, year);
     }
 
     /**
@@ -850,9 +861,9 @@ public class CreditCardService
      * @throws RuntimeException If the credit card does not exist
      */
     public CreditCardInvoiceStatus
-    GetInvoiceStatus(Long crcId, Integer month, Integer year)
+    getInvoiceStatus(Long crcId, Integer month, Integer year)
     {
-        LocalDateTime nextInvoiceDate = GetNextInvoiceDate(crcId);
+        LocalDateTime nextInvoiceDate = getNextInvoiceDate(crcId);
         nextInvoiceDate               = nextInvoiceDate.withHour(0).withMinute(0);
 
         LocalDateTime dateToCompare =
@@ -873,10 +884,10 @@ public class CreditCardService
      * @return The next invoice date of the credit card
      * @throws RuntimeException If the credit card does not exist
      */
-    public LocalDateTime GetNextInvoiceDate(Long crcId)
+    public LocalDateTime getNextInvoiceDate(Long crcId)
     {
         String nextInvoiceDate =
-            m_creditCardPaymentRepository.GetNextInvoiceDate(crcId);
+            creditCardPaymentRepository.getNextInvoiceDate(crcId);
 
         // If there is no next invoice date, calculate it
         // If the current day is greater than the closing day, the next invoice date is
@@ -886,20 +897,20 @@ public class CreditCardService
         {
             LocalDateTime now = LocalDateTime.now();
 
-            CreditCard creditCard = m_creditCardRepository.findById(crcId).orElseThrow(
+            CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
                 ()
                     -> new RuntimeException("Credit card with id " + crcId +
                                             " does not exist"));
 
             Integer currentDay = now.getDayOfMonth();
-            Integer closingDay = creditCard.GetClosingDay();
+            Integer closingDay = creditCard.getClosingDay();
 
             if (currentDay > closingDay)
             {
-                return now.plusMonths(1).withDayOfMonth(creditCard.GetBillingDueDay());
+                return now.plusMonths(1).withDayOfMonth(creditCard.getBillingDueDay());
             }
 
-            return now.withDayOfMonth(creditCard.GetBillingDueDay());
+            return now.withDayOfMonth(creditCard.getBillingDueDay());
         }
 
         return LocalDateTime.parse(nextInvoiceDate, Constants.DB_DATE_FORMATTER);
@@ -909,9 +920,9 @@ public class CreditCardService
      * Get the date of the latest payment
      * @return The date of the latest payment or the current date if there are no debts
      */
-    public LocalDateTime GetEarliestPaymentDate()
+    public LocalDateTime getEarliestPaymentDate()
     {
-        String date = m_creditCardDebtRepository.FindEarliestPaymentDate();
+        String date = creditCardDebtRepository.findEarliestPaymentDate();
 
         if (date == null)
         {
@@ -925,9 +936,9 @@ public class CreditCardService
      * Get the date of the latest payment
      * @return The date of the latest payment or the current date if there are no debts
      */
-    public LocalDateTime GetLatestPaymentDate()
+    public LocalDateTime getLatestPaymentDate()
     {
-        String date = m_creditCardDebtRepository.FindLatestPaymentDate();
+        String date = creditCardDebtRepository.findLatestPaymentDate();
 
         if (date == null)
         {
@@ -942,15 +953,19 @@ public class CreditCardService
      * @param id The id of the credit card
      * @return The count of debts by credit card
      */
-    public Long GetDebtCountByCreditCard(Long id)
+    public Long getDebtCountByCreditCard(Long id)
     {
 
-        return m_creditCardDebtRepository.GetDebtCountByCreditCard(id);
+        return creditCardDebtRepository.getDebtCountByCreditCard(id);
     }
 
-    public List<CreditCardDebt> GetCreditCardDebtSuggestions()
+    /**
+     * Get credit card debt suggestions
+     * @return A list with credit card debt suggestions
+     */
+    public List<CreditCardDebt> getCreditCardDebtSuggestions()
     {
-        return m_creditCardDebtRepository.FindSuggestions();
+        return creditCardDebtRepository.findSuggestions();
     }
 
     /**
@@ -968,7 +983,7 @@ public class CreditCardService
      * @throws RuntimeException If the lastFourDigits is empty or has length different
      *     from 4
      */
-    private void CreditCardBasicChecks(String     name,
+    private void creditCardBasicChecks(String     name,
                                        Integer    dueDate,
                                        Integer    closingDay,
                                        BigDecimal maxDebt,
@@ -1009,35 +1024,35 @@ public class CreditCardService
      * @note WARNING: The data in CreditCardDebt is not updated when a payment is
      *   deleted
      */
-    private void DeletePayment(Long id)
+    private void deletePayment(Long id)
     {
         CreditCardPayment payment =
-            m_creditCardPaymentRepository.findById(id).orElseThrow(
+            creditCardPaymentRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Payment with id " + id + " not found"));
 
         // If payment was made with a wallet, add the amount back to the
         // wallet balance
-        if (payment.GetWallet() != null)
+        if (payment.getWallet() != null)
         {
-            payment.GetWallet().SetBalance(
-                payment.GetWallet().GetBalance().add(payment.GetAmount()));
+            payment.getWallet().setBalance(
+                payment.getWallet().getBalance().add(payment.getAmount()));
 
-            m_logger.info("Payment number " + payment.GetInstallment() +
-                          " of debt with id " + payment.GetCreditCardDebt().GetId() +
+            logger.info("Payment number " + payment.getInstallment() +
+                          " of debt with id " + payment.getCreditCardDebt().getId() +
                           " on credit card with id " +
-                          payment.GetCreditCardDebt().GetCreditCard().GetId() +
+                          payment.getCreditCardDebt().getCreditCard().getId() +
                           " deleted and added to wallet with id " +
-                          payment.GetWallet().GetId());
+                          payment.getWallet().getId());
 
-            m_walletRepository.save(payment.GetWallet());
+            walletRepository.save(payment.getWallet());
         }
 
-        m_creditCardPaymentRepository.delete(payment);
+        creditCardPaymentRepository.delete(payment);
 
-        m_logger.info("Payment number " + payment.GetInstallment() +
-                      " of debt with id " + payment.GetCreditCardDebt().GetId() +
+        logger.info("Payment number " + payment.getInstallment() +
+                      " of debt with id " + payment.getCreditCardDebt().getId() +
                       " on credit card with id " +
-                      payment.GetCreditCardDebt().GetCreditCard().GetId() + " deleted");
+                      payment.getCreditCardDebt().getCreditCard().getId() + " deleted");
     }
 
     /**
@@ -1045,38 +1060,38 @@ public class CreditCardService
      * @param debt The debt to be updated
      * @param invoiceMonth The new invoice month
      */
-    private void ChangeInvoiceMonth(CreditCardDebt oldDebt, YearMonth invoice)
+    private void changeInvoiceMonth(CreditCardDebt oldDebt, YearMonth invoice)
     {
-        List<CreditCardPayment> payments = GetPaymentsByDebtId(oldDebt.GetId());
+        List<CreditCardPayment> payments = getPaymentsByDebtId(oldDebt.getId());
 
         CreditCardPayment firstPayment = payments.getFirst();
 
         // If the first payment is in the same month and year of the invoice, do not
         // update
         if (firstPayment == null ||
-            (firstPayment.GetDate().getMonth() == invoice.getMonth() &&
-             firstPayment.GetDate().getYear() == invoice.getYear()))
+            (firstPayment.getDate().getMonth() == invoice.getMonth() &&
+             firstPayment.getDate().getYear() == invoice.getYear()))
         {
             return;
         }
 
-        for (Integer i = 0; i < oldDebt.GetInstallments(); i++)
+        for (Integer i = 0; i < oldDebt.getInstallments(); i++)
         {
             CreditCardPayment payment = payments.get(i);
 
             // Calculate the payment date
             LocalDateTime paymentDate =
                 invoice.plusMonths(i)
-                    .atDay(oldDebt.GetCreditCard().GetBillingDueDay())
+                    .atDay(oldDebt.getCreditCard().getBillingDueDay())
                     .atTime(23, 59);
 
-            payment.SetDate(paymentDate);
-            m_creditCardPaymentRepository.save(payment);
+            payment.setDate(paymentDate);
+            creditCardPaymentRepository.save(payment);
 
-            m_logger.info("Payment number " + payment.GetInstallment() +
-                          " of debt with id " + oldDebt.GetId() +
+            logger.info("Payment number " + payment.getInstallment() +
+                          " of debt with id " + oldDebt.getId() +
                           " on credit card with id " +
-                          oldDebt.GetCreditCard().GetId() + " updated with due date " +
+                          oldDebt.getCreditCard().getId() + " updated with due date " +
                           paymentDate);
         }
     }
@@ -1086,16 +1101,16 @@ public class CreditCardService
      * @param debt The debt to be updated
      * @param newInstallments The new number of installments
      */
-    private void ChangeDebtInstallments(CreditCardDebt oldDebt, Integer newInstallments)
+    private void changeDebtInstallments(CreditCardDebt oldDebt, Integer newInstallments)
     {
-        if (oldDebt.GetInstallments() == newInstallments)
+        if (oldDebt.getInstallments() == newInstallments)
         {
             return;
         }
 
-        List<CreditCardPayment> payments = GetPaymentsByDebtId(oldDebt.GetId());
+        List<CreditCardPayment> payments = getPaymentsByDebtId(oldDebt.getId());
 
-        BigDecimal value = oldDebt.GetTotalAmount();
+        BigDecimal value = oldDebt.getTotalAmount();
 
         // Calculate the new installment value
         // If the division is not exact, the first installment absorbs the remainder
@@ -1111,29 +1126,29 @@ public class CreditCardService
         BigDecimal firstInstallment = installmentValue.add(remainder);
 
         // Delete and update payments
-        if (newInstallments < oldDebt.GetInstallments())
+        if (newInstallments < oldDebt.getInstallments())
         {
-            for (Integer i = 0; i < oldDebt.GetInstallments(); i++)
+            for (Integer i = 0; i < oldDebt.getInstallments(); i++)
             {
                 CreditCardPayment payment = payments.get(i);
 
                 // If the payment is greater than the new number of installments, delete
                 // it
-                if (payment.GetInstallment() > newInstallments)
+                if (payment.getInstallment() > newInstallments)
                 {
-                    DeletePayment(payment.GetId());
+                    deletePayment(payment.getId());
                 }
                 // If the payment is less or equal than the new number of installments,
                 // update it
                 else
                 {
-                    payment.SetAmount(i == 0 ? firstInstallment : installmentValue);
-                    m_creditCardPaymentRepository.save(payment);
+                    payment.setAmount(i == 0 ? firstInstallment : installmentValue);
+                    creditCardPaymentRepository.save(payment);
 
-                    m_logger.info("Payment number " + payment.GetInstallment() +
-                                  " of debt with id " + oldDebt.GetId() +
+                    logger.info("Payment number " + payment.getInstallment() +
+                                  " of debt with id " + oldDebt.getId() +
                                   " on credit card with id " +
-                                  oldDebt.GetCreditCard().GetId() +
+                                  oldDebt.getCreditCard().getId() +
                                   " updated with value " +
                                   (i == 0 ? firstInstallment : installmentValue));
                 }
@@ -1143,23 +1158,25 @@ public class CreditCardService
         {
             for (Integer i = 1; i <= newInstallments; i++)
             {
-                if (i > oldDebt.GetInstallments())
+                if (i > oldDebt.getInstallments())
                 {
                     CreditCardPayment lastPayment = payments.getLast();
 
                     // Calculate the payment date
-                    LocalDateTime paymentDate = lastPayment.GetDate().plusMonths(1);
+                    LocalDateTime paymentDate = lastPayment.getDate().plusMonths(1);
 
-                    CreditCardPayment payment = new CreditCardPayment(oldDebt,
-                                                                      paymentDate,
-                                                                      installmentValue,
-                                                                      i);
+                    CreditCardPayment payment = CreditCardPayment.builder()
+                                                    .creditCardDebt(oldDebt)
+                                                    .date(paymentDate)
+                                                    .amount(installmentValue)
+                                                    .installment(i)
+                                                    .build();
 
-                    m_creditCardPaymentRepository.save(payment);
+                    creditCardPaymentRepository.save(payment);
 
-                    m_logger.info("Payment number " + i + " of debt with id " +
-                                  oldDebt.GetId() + " on credit card with id " +
-                                  oldDebt.GetCreditCard().GetId() +
+                    logger.info("Payment number " + i + " of debt with id " +
+                                  oldDebt.getId() + " on credit card with id " +
+                                  oldDebt.getCreditCard().getId() +
                                   " registered with value " + installmentValue +
                                   " and due date " + paymentDate);
 
@@ -1170,13 +1187,13 @@ public class CreditCardService
                 {
                     CreditCardPayment payment = payments.get(i - 1);
 
-                    payment.SetAmount(i == 0 ? firstInstallment : installmentValue);
-                    m_creditCardPaymentRepository.save(payment);
+                    payment.setAmount(i == 0 ? firstInstallment : installmentValue);
+                    creditCardPaymentRepository.save(payment);
 
-                    m_logger.info("Payment number " + payment.GetInstallment() +
-                                  " of debt with id " + oldDebt.GetId() +
+                    logger.info("Payment number " + payment.getInstallment() +
+                                  " of debt with id " + oldDebt.getId() +
                                   " on credit card with id " +
-                                  oldDebt.GetCreditCard().GetId() +
+                                  oldDebt.getCreditCard().getId() +
                                   " updated with value " +
                                   (i == 0 ? firstInstallment : installmentValue));
                 }
@@ -1184,8 +1201,8 @@ public class CreditCardService
         }
 
         // Update the number of installments
-        oldDebt.SetInstallments(newInstallments);
-        m_creditCardDebtRepository.save(oldDebt);
+        oldDebt.setInstallments(newInstallments);
+        creditCardDebtRepository.save(oldDebt);
     }
 
     /**
@@ -1193,16 +1210,16 @@ public class CreditCardService
      * @param oldDebt The debt to be updated
      * @param newAmount The new total amount
      */
-    private void ChangeDebtTotalAmount(CreditCardDebt oldDebt, BigDecimal newAmount)
+    private void changeDebtTotalAmount(CreditCardDebt oldDebt, BigDecimal newAmount)
     {
-        if (oldDebt.GetTotalAmount().equals(newAmount))
+        if (oldDebt.getTotalAmount().equals(newAmount))
         {
             return;
         }
 
-        List<CreditCardPayment> payments = GetPaymentsByDebtId(oldDebt.GetId());
+        List<CreditCardPayment> payments = getPaymentsByDebtId(oldDebt.getId());
 
-        Integer installments = oldDebt.GetInstallments();
+        Integer installments = oldDebt.getInstallments();
 
         // Divide the value exactly, with full precision
         BigDecimal exactInstallmentValue =
@@ -1213,7 +1230,7 @@ public class CreditCardService
             exactInstallmentValue.multiply(new BigDecimal(installments)));
 
         // Update payments
-        for (Integer i = 0; i < oldDebt.GetInstallments(); i++)
+        for (Integer i = 0; i < oldDebt.getInstallments(); i++)
         {
             CreditCardPayment payment = payments.get(i);
 
@@ -1226,35 +1243,35 @@ public class CreditCardService
 
             // If the payment was made with a wallet, add the amount difference back to
             // the wallet balance
-            if (payment.GetWallet() != null)
+            if (payment.getWallet() != null)
             {
-                BigDecimal diff = currentInstallmentValue.subtract(payment.GetAmount());
+                BigDecimal diff = currentInstallmentValue.subtract(payment.getAmount());
 
-                payment.GetWallet().SetBalance(
-                    payment.GetWallet().GetBalance().add(diff));
+                payment.getWallet().setBalance(
+                    payment.getWallet().getBalance().add(diff));
 
-                m_logger.info("Payment number " + payment.GetInstallment() +
-                              " of debt with id " + oldDebt.GetId() +
+                logger.info("Payment number " + payment.getInstallment() +
+                              " of debt with id " + oldDebt.getId() +
                               " on credit card with id " +
-                              oldDebt.GetCreditCard().GetId() +
+                              oldDebt.getCreditCard().getId() +
                               " updated and added to wallet with id " +
-                              payment.GetWallet().GetId());
+                              payment.getWallet().getId());
 
-                m_walletRepository.save(payment.GetWallet());
+                walletRepository.save(payment.getWallet());
             }
 
-            payment.SetAmount(currentInstallmentValue);
-            m_creditCardPaymentRepository.save(payment);
+            payment.setAmount(currentInstallmentValue);
+            creditCardPaymentRepository.save(payment);
 
-            m_logger.info("Payment number " + payment.GetInstallment() +
-                          " of debt with id " + oldDebt.GetId() +
+            logger.info("Payment number " + payment.getInstallment() +
+                          " of debt with id " + oldDebt.getId() +
                           " on credit card with id " +
-                          oldDebt.GetCreditCard().GetId() + " updated with value " +
+                          oldDebt.getCreditCard().getId() + " updated with value " +
                           currentInstallmentValue);
         }
 
         // Update the total amount
-        oldDebt.SetTotalAmount(newAmount);
-        m_creditCardDebtRepository.save(oldDebt);
+        oldDebt.setTotalAmount(newAmount);
+        creditCardDebtRepository.save(oldDebt);
     }
 }

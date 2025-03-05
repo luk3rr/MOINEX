@@ -60,150 +60,152 @@ public class CreditCardPaymentRepositoryTest
     private Wallet             m_wallet;
 
     private CreditCard
-    CreateCreditCard(String name, CreditCardOperator operator, BigDecimal maxDebt)
+    createCreditCard(String name, CreditCardOperator operator, BigDecimal maxDebt)
     {
-        CreditCard creditCard = new CreditCard();
-        creditCard.SetName(name);
-        creditCard.SetMaxDebt(maxDebt);
-        creditCard.SetBillingDueDay(10);
-        creditCard.SetClosingDay(5);
-        creditCard.SetOperator(operator);
+        CreditCard creditCard = CreditCard.builder()
+                                    .name(name)
+                                    .maxDebt(maxDebt)
+                                    .billingDueDay(10)
+                                    .closingDay(5)
+                                    .operator(operator)
+                                    .build();
+
         m_creditCardRepository.save(creditCard);
         return creditCard;
     }
 
-    private CreditCardOperator CreateCreditCardOperator(String name)
+    private CreditCardOperator createCreditCardOperator(String name)
     {
-        CreditCardOperator creditCardOperator = new CreditCardOperator();
-        creditCardOperator.SetName(name);
-        creditCardOperator.SetIcon("");
+        CreditCardOperator creditCardOperator = CreditCardOperator.builder().name(name).icon("").build();
         m_creditCardOperatorRepository.save(creditCardOperator);
         return creditCardOperator;
     }
 
-    private Wallet CreateWallet(String name, BigDecimal balance)
+    private Wallet createWallet(String name, BigDecimal balance)
     {
-        Wallet m_wallet = new Wallet();
-        m_wallet.SetName(name);
-        m_wallet.SetBalance(balance);
+        Wallet m_wallet = Wallet.builder().name(name).balance(balance).build();
         m_walletRepository.save(m_wallet);
         return m_wallet;
     }
 
-    private CreditCardDebt CreateCreditCardDebt(CreditCard creditCard,
+    private CreditCardDebt createCreditCardDebt(CreditCard creditCard,
                                                 BigDecimal totalAmount)
     {
-        CreditCardDebt creditCardDebt = new CreditCardDebt();
-        creditCardDebt.SetInstallments(1);
-        creditCardDebt.SetTotalAmount(totalAmount);
-        creditCardDebt.SetCreditCard(creditCard);
-        creditCardDebt.SetDate(LocalDateTime.now().plusDays(5));
-        creditCardDebt.SetCategory(CreateCategory("category"));
+        CreditCardDebt creditCardDebt = CreditCardDebt.builder()
+                                            .installments(1)
+                                            .totalAmount(totalAmount)
+                                            .creditCard(creditCard)
+                                            .date(LocalDateTime.now().plusDays(5))
+                                            .category(createCategory("category"))
+                                            .build();
+
         m_creditCardDebtRepository.save(creditCardDebt);
         return creditCardDebt;
     }
 
-    private Category CreateCategory(String name)
+    private Category createCategory(String name)
     {
-        Category category = new Category(name);
+        Category category = Category.builder().name(name).build();
         m_categoryRepository.save(category);
         return category;
     }
 
     private void
-    CreateCreditCardPayment(CreditCardDebt debt, Wallet wallet, BigDecimal amount)
+    createCreditCardPayment(CreditCardDebt debt, Wallet wallet, BigDecimal amount)
     {
-        CreditCardPayment creditCardPayment = new CreditCardPayment();
-        creditCardPayment.SetAmount(amount);
-        creditCardPayment.SetCreditCardDebt(debt);
-        creditCardPayment.SetWallet(wallet);
-        creditCardPayment.SetDate(LocalDateTime.now());
-        creditCardPayment.SetInstallment(1);
+        CreditCardPayment creditCardPayment = CreditCardPayment.builder()
+            .creditCardDebt(debt)
+            .wallet(wallet)
+            .amount(amount)
+            .date(LocalDateTime.now())
+            .installment(1)
+            .build();
+
         m_creditCardPaymentRepository.save(creditCardPayment);
     }
 
     @BeforeEach
-    public void SetUp()
+    public void setUp()
     {
         // Initialize CreditCard and Wallet
-        m_crcOperator = CreateCreditCardOperator("Operator");
+        m_crcOperator = createCreditCardOperator("Operator");
         m_creditCard1 =
-            CreateCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));
+            createCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));
         m_creditCard2 =
-            CreateCreditCard("CreditCard2", m_crcOperator, new BigDecimal("1000.0"));
-        m_wallet = CreateWallet("Wallet", new BigDecimal("1000.0"));
+            createCreditCard("CreditCard2", m_crcOperator, new BigDecimal("1000.0"));
+        m_wallet = createWallet("Wallet", new BigDecimal("1000.0"));
     }
 
     @Test
-    public void TestNoPayments()
+    public void testNoPayments()
     {
         // No payments yet
         assertEquals(
             0.0,
-            m_creditCardPaymentRepository.GetTotalPaidAmount(m_creditCard1.GetId())
+            m_creditCardPaymentRepository.getTotalPaidAmount(m_creditCard1.getId())
                 .doubleValue(),
             Constants.EPSILON,
             "Total paid amount must be 0.0");
     }
 
     @Test
-    public void TestSinglePayment()
+    public void testSinglePayment()
     {
         // Create CreditCardDebt and Payment
         CreditCardDebt debt =
-            CreateCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
+            createCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
 
-        CreateCreditCardPayment(debt, m_wallet, new BigDecimal("100.0"));
+        createCreditCardPayment(debt, m_wallet, new BigDecimal("100.0"));
 
         assertEquals(
             100.0,
-            m_creditCardPaymentRepository.GetTotalPaidAmount(m_creditCard1.GetId())
+            m_creditCardPaymentRepository.getTotalPaidAmount(m_creditCard1.getId())
                 .doubleValue(),
             Constants.EPSILON,
             "Total paid amount must be 100.0");
     }
 
     @Test
-    public void TestMultiplePayments()
+    public void testMultiplePayments()
     {
         // Create CreditCardDebt and Payments
         CreditCardDebt debt =
-            CreateCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
+            createCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
 
-        CreateCreditCardPayment(debt, m_wallet, new BigDecimal("100.0"));
-        CreateCreditCardPayment(debt, m_wallet, new BigDecimal("200.0"));
+        createCreditCardPayment(debt, m_wallet, new BigDecimal("100.0"));
+        createCreditCardPayment(debt, m_wallet, new BigDecimal("200.0"));
 
         assertEquals(
             300.0,
-            m_creditCardPaymentRepository.GetTotalPaidAmount(m_creditCard1.GetId())
+            m_creditCardPaymentRepository.getTotalPaidAmount(m_creditCard1.getId())
                 .doubleValue(),
             Constants.EPSILON,
             "Total paid amount must be 300.0");
     }
 
     @Test
-    public void TestPaymentsForMultipleCreditCards()
+    public void testPaymentsForMultipleCreditCards()
     {
         // Create CreditCardDebt and Payments for both credit cards
         CreditCardDebt debt1 =
-            CreateCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
+            createCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
         CreditCardDebt debt2 =
-            CreateCreditCardDebt(m_creditCard2, new BigDecimal("500.0"));
+            createCreditCardDebt(m_creditCard2, new BigDecimal("500.0"));
 
-        CreateCreditCardPayment(debt1, m_wallet, new BigDecimal("100.0"));
-        CreateCreditCardPayment(debt1, m_wallet, new BigDecimal("200.0"));
-        CreateCreditCardPayment(debt2, m_wallet, new BigDecimal("255.0"));
+        createCreditCardPayment(debt1, m_wallet, new BigDecimal("100.0"));
+        createCreditCardPayment(debt1, m_wallet, new BigDecimal("200.0"));
+        createCreditCardPayment(debt2, m_wallet, new BigDecimal("255.0"));
 
         assertEquals(
             300.0,
-            m_creditCardPaymentRepository.GetTotalPaidAmount(m_creditCard1.GetId())
+            m_creditCardPaymentRepository.getTotalPaidAmount(m_creditCard1.getId())
                 .doubleValue(),
             Constants.EPSILON,
             "Total paid amount must be 300.0");
 
         assertEquals(
             255.0,
-            m_creditCardPaymentRepository.GetTotalPaidAmount(m_creditCard2.GetId())
+            m_creditCardPaymentRepository.getTotalPaidAmount(m_creditCard2.getId())
                 .doubleValue(),
             Constants.EPSILON,
             "Total paid amount must be 255.0");

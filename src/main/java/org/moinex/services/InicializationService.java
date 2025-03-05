@@ -8,6 +8,7 @@ package org.moinex.services;
 
 import jakarta.annotation.PostConstruct;
 import java.util.logging.Logger;
+import lombok.NoArgsConstructor;
 import org.moinex.util.LoggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
  * This class is responsible for running the initialization tasks
  */
 @Component
+@NoArgsConstructor
 public class InicializationService
 {
     @Autowired
@@ -24,21 +26,19 @@ public class InicializationService
     @Autowired
     private MarketService marketService;
 
-    private static final Logger logger = LoggerConfig.GetLogger();
-
-    public InicializationService() { }
+    private static final Logger logger = LoggerConfig.getLogger();
 
     @PostConstruct
-    public void Initialize()
+    public void initialize()
     {
-        recurringTransactionService.ProcessRecurringTransactions();
-        marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync().exceptionally(
+        recurringTransactionService.processRecurringTransactions();
+        marketService.updateBrazilianMarketIndicatorsFromApiAsync().exceptionally(
             ex -> {
                 logger.severe(ex.getMessage());
                 return null;
             });
 
-        marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync().exceptionally(
+        marketService.updateMarketQuotesAndCommoditiesFromApiAsync().exceptionally(
             ex -> {
                 logger.severe(ex.getMessage());
                 return null;

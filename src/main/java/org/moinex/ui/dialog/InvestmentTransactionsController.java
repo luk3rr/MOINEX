@@ -19,6 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Dividend;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Investment Transactions dialog
  */
 @Controller
+@NoArgsConstructor
 public class InvestmentTransactionsController
 {
     @FXML
@@ -76,6 +78,7 @@ public class InvestmentTransactionsController
      * @param TickerService tickerService
      * @note This constructor is used for dependency injection
      */
+    @Autowired
     public InvestmentTransactionsController(TickerService tickerService)
 
     {
@@ -85,27 +88,27 @@ public class InvestmentTransactionsController
     @FXML
     public void initialize()
     {
-        LoadPurchasesFromDatabase();
-        LoadSalesFromDatabase();
-        LoadDividendsFromDatabase();
-        LoadCryptoExchangesFromDatabase();
+        loadPurchasesFromDatabase();
+        loadSalesFromDatabase();
+        loadDividendsFromDatabase();
+        loadCryptoExchangesFromDatabase();
 
-        ConfigurePurchaseTableView();
-        ConfigureSaleTableView();
-        ConfigureDividendTableView();
-        ConfigureCryptoExchangeTableView();
+        configurePurchaseTableView();
+        configureSaleTableView();
+        configureDividendTableView();
+        configureCryptoExchangeTableView();
 
-        UpdatePurchaseTableView();
-        UpdateSaleTableView();
-        UpdateDividendTableView();
-        UpdateCryptoExchangeTableView();
+        updatePurchaseTableView();
+        updateSaleTableView();
+        updateDividendTableView();
+        updateCryptoExchangeTableView();
 
         // Add listener to the search field
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            UpdatePurchaseTableView();
-            UpdateSaleTableView();
-            UpdateDividendTableView();
-            UpdateCryptoExchangeTableView();
+            updatePurchaseTableView();
+            updateSaleTableView();
+            updateDividendTableView();
+            updateCryptoExchangeTableView();
         });
     }
 
@@ -124,28 +127,28 @@ public class InvestmentTransactionsController
             TickerPurchase selectedPurchase =
                 purchaseTableView.getSelectionModel().getSelectedItem();
 
-            EditPurchase(selectedPurchase);
+            editpurchase(selectedPurchase);
         }
         else if (selectedTab == tabPane.getTabs().get(1))
         {
             TickerSale selectedSale =
                 saleTableView.getSelectionModel().getSelectedItem();
 
-            EditSale(selectedSale);
+            editsale(selectedSale);
         }
         else if (selectedTab == tabPane.getTabs().get(2))
         {
             Dividend selectedDividend =
                 dividendTableView.getSelectionModel().getSelectedItem();
 
-            EditDividend(selectedDividend);
+            editdividend(selectedDividend);
         }
         else if (selectedTab == tabPane.getTabs().get(3))
         {
             CryptoExchange selectedCryptoExchange =
                 cryptoExchangeTableView.getSelectionModel().getSelectedItem();
 
-            EditCryptoExchange(selectedCryptoExchange);
+            editcryptoexchange(selectedCryptoExchange);
         }
     }
 
@@ -164,28 +167,28 @@ public class InvestmentTransactionsController
             TickerPurchase selectedPurchase =
                 purchaseTableView.getSelectionModel().getSelectedItem();
 
-            DeletePurchase(selectedPurchase);
+            deletePurchase(selectedPurchase);
         }
         else if (selectedTab == tabPane.getTabs().get(1))
         {
             TickerSale selectedSale =
                 saleTableView.getSelectionModel().getSelectedItem();
 
-            DeleteSale(selectedSale);
+            deleteSale(selectedSale);
         }
         else if (selectedTab == tabPane.getTabs().get(2))
         {
             Dividend selectedDividend =
                 dividendTableView.getSelectionModel().getSelectedItem();
 
-            DeleteDividend(selectedDividend);
+            deleteDividend(selectedDividend);
         }
         else if (selectedTab == tabPane.getTabs().get(3))
         {
             CryptoExchange selectedCryptoExchange =
                 cryptoExchangeTableView.getSelectionModel().getSelectedItem();
 
-            DeleteCryptoExchange(selectedCryptoExchange);
+            deleteCryptoExchange(selectedCryptoExchange);
         }
     }
 
@@ -199,39 +202,39 @@ public class InvestmentTransactionsController
     /**
      * Loads the purchases from the database
      */
-    private void LoadPurchasesFromDatabase()
+    private void loadPurchasesFromDatabase()
     {
-        purchases = tickerService.GetAllPurchases();
+        purchases = tickerService.getAllPurchases();
     }
 
     /**
      * Loads the sales from the database
      */
-    private void LoadSalesFromDatabase()
+    private void loadSalesFromDatabase()
     {
-        sales = tickerService.GetAllSales();
+        sales = tickerService.getAllSales();
     }
 
     /**
      * Loads the dividends from the database
      */
-    private void LoadDividendsFromDatabase()
+    private void loadDividendsFromDatabase()
     {
-        dividends = tickerService.GetAllDividends();
+        dividends = tickerService.getAllDividends();
     }
 
     /**
      * Loads the crypto exchanges from the database
      */
-    private void LoadCryptoExchangesFromDatabase()
+    private void loadCryptoExchangesFromDatabase()
     {
-        cryptoExchanges = tickerService.GetAllCryptoExchanges();
+        cryptoExchanges = tickerService.getAllCryptoExchanges();
     }
 
     /**
      * Updates dividend table view
      */
-    private void UpdateDividendTableView()
+    private void updateDividendTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -246,16 +249,16 @@ public class InvestmentTransactionsController
         {
             dividends.stream()
                 .filter(d -> {
-                    String id           = d.GetId().toString();
-                    String tickerName   = d.GetTicker().GetName().toLowerCase();
-                    String tickerSymbol = d.GetTicker().GetSymbol().toLowerCase();
-                    String amount = d.GetWalletTransaction().GetAmount().toString();
+                    String id           = d.getId().toString();
+                    String tickerName   = d.getTicker().getName().toLowerCase();
+                    String tickerSymbol = d.getTicker().getSymbol().toLowerCase();
+                    String amount = d.getWalletTransaction().getAmount().toString();
                     String walletName =
-                        d.GetWalletTransaction().GetWallet().GetName().toLowerCase();
-                    String date = d.GetWalletTransaction().GetDate().format(
+                        d.getWalletTransaction().getWallet().getName().toLowerCase();
+                    String date = d.getWalletTransaction().getDate().format(
                         Constants.DATE_FORMATTER_WITH_TIME);
                     String status =
-                        d.GetWalletTransaction().GetStatus().name().toLowerCase();
+                        d.getWalletTransaction().getStatus().name().toLowerCase();
 
                     return id.contains(similarTextOrId) ||
                         tickerName.contains(similarTextOrId) ||
@@ -274,7 +277,7 @@ public class InvestmentTransactionsController
     /**
      * Updates purchase table view
      */
-    private void UpdatePurchaseTableView()
+    private void updatePurchaseTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -289,18 +292,18 @@ public class InvestmentTransactionsController
         {
             purchases.stream()
                 .filter(p -> {
-                    String id           = p.GetId().toString();
-                    String tickerName   = p.GetTicker().GetName().toLowerCase();
-                    String tickerSymbol = p.GetTicker().GetSymbol().toLowerCase();
-                    String date         = p.GetWalletTransaction().GetDate().format(
+                    String id           = p.getId().toString();
+                    String tickerName   = p.getTicker().getName().toLowerCase();
+                    String tickerSymbol = p.getTicker().getSymbol().toLowerCase();
+                    String date         = p.getWalletTransaction().getDate().format(
                         Constants.DATE_FORMATTER_WITH_TIME);
-                    String quantity  = p.GetQuantity().toString();
-                    String unitPrice = p.GetUnitPrice().toString();
-                    String amount    = p.GetWalletTransaction().GetAmount().toString();
+                    String quantity  = p.getQuantity().toString();
+                    String unitPrice = p.getUnitPrice().toString();
+                    String amount    = p.getWalletTransaction().getAmount().toString();
                     String walletName =
-                        p.GetWalletTransaction().GetWallet().GetName().toLowerCase();
+                        p.getWalletTransaction().getWallet().getName().toLowerCase();
                     String status =
-                        p.GetWalletTransaction().GetStatus().name().toLowerCase();
+                        p.getWalletTransaction().getStatus().name().toLowerCase();
 
                     return id.contains(similarTextOrId) ||
                         tickerName.contains(similarTextOrId) ||
@@ -321,7 +324,7 @@ public class InvestmentTransactionsController
     /**
      * Updates sale table view
      */
-    private void UpdateSaleTableView()
+    private void updateSaleTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -336,18 +339,18 @@ public class InvestmentTransactionsController
         {
             sales.stream()
                 .filter(s -> {
-                    String id           = s.GetId().toString();
-                    String tickerName   = s.GetTicker().GetName().toLowerCase();
-                    String tickerSymbol = s.GetTicker().GetSymbol().toLowerCase();
-                    String date         = s.GetWalletTransaction().GetDate().format(
+                    String id           = s.getId().toString();
+                    String tickerName   = s.getTicker().getName().toLowerCase();
+                    String tickerSymbol = s.getTicker().getSymbol().toLowerCase();
+                    String date         = s.getWalletTransaction().getDate().format(
                         Constants.DATE_FORMATTER_WITH_TIME);
-                    String quantity  = s.GetQuantity().toString();
-                    String unitPrice = s.GetUnitPrice().toString();
-                    String amount    = s.GetWalletTransaction().GetAmount().toString();
+                    String quantity  = s.getQuantity().toString();
+                    String unitPrice = s.getUnitPrice().toString();
+                    String amount    = s.getWalletTransaction().getAmount().toString();
                     String walletName =
-                        s.GetWalletTransaction().GetWallet().GetName().toLowerCase();
+                        s.getWalletTransaction().getWallet().getName().toLowerCase();
                     String status =
-                        s.GetWalletTransaction().GetStatus().name().toLowerCase();
+                        s.getWalletTransaction().getStatus().name().toLowerCase();
 
                     return id.contains(similarTextOrId) ||
                         tickerName.contains(similarTextOrId) ||
@@ -368,7 +371,7 @@ public class InvestmentTransactionsController
     /**
      * Updates the crypto exchange table view
      */
-    private void UpdateCryptoExchangeTableView()
+    private void updateCryptoExchangeTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -383,14 +386,15 @@ public class InvestmentTransactionsController
         {
             cryptoExchanges.stream()
                 .filter(ce -> {
-                    String id           = ce.GetId().toString();
-                    String sourceCrypto = ce.GetSoldCrypto().GetName().toLowerCase();
-                    String targetCrypto = ce.GetReceivedCrypto().GetName().toLowerCase();
+                    String id           = ce.getId().toString();
+                    String sourceCrypto = ce.getSoldCrypto().getName().toLowerCase();
+                    String targetCrypto =
+                        ce.getReceivedCrypto().getName().toLowerCase();
                     String date =
-                        ce.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME);
-                    String sourceQuantity = ce.GetSoldQuantity().toString();
-                    String targetQuantity = ce.GetReceivedQuantity().toString();
-                    String description    = ce.GetDescription().toLowerCase();
+                        ce.getDate().format(Constants.DATE_FORMATTER_WITH_TIME);
+                    String sourceQuantity = ce.getSoldQuantity().toString();
+                    String targetQuantity = ce.getReceivedQuantity().toString();
+                    String description    = ce.getDescription().toLowerCase();
 
                     return id.contains(similarTextOrId) ||
                         sourceCrypto.contains(similarTextOrId) ||
@@ -409,11 +413,11 @@ public class InvestmentTransactionsController
     /**
      * Configure the purchase table view columns
      */
-    private void ConfigurePurchaseTableView()
+    private void configurePurchaseTableView()
     {
         TableColumn<TickerPurchase, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -441,55 +445,55 @@ public class InvestmentTransactionsController
             new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTicker().GetName() + " (" +
-                                        param.getValue().GetTicker().GetSymbol() +
+            -> new SimpleStringProperty(param.getValue().getTicker().getName() + " (" +
+                                        param.getValue().getTicker().getSymbol() +
                                         ")"));
 
         TableColumn<TickerPurchase, String> tickerTypeColumn =
             new TableColumn<>("Type");
         tickerTypeColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTicker().GetType().name()));
+            -> new SimpleStringProperty(param.getValue().getTicker().getType().name()));
 
         TableColumn<TickerPurchase, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetDate().format(
+                param.getValue().getWalletTransaction().getDate().format(
                     Constants.DATE_FORMATTER_WITH_TIME)));
 
         TableColumn<TickerPurchase, String> quantityColumn =
             new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(param.getValue().GetQuantity().toString()));
+            -> new SimpleObjectProperty<>(param.getValue().getQuantity().toString()));
 
         TableColumn<TickerPurchase, String> unitPriceColumn =
             new TableColumn<>("Unit Price");
         unitPriceColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetUnitPrice())));
+                UIUtils.formatCurrency(param.getValue().getUnitPrice())));
 
         TableColumn<TickerPurchase, String> amountColumn =
             new TableColumn<>("Total Amount");
         amountColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(UIUtils.FormatCurrency(
-                param.getValue().GetWalletTransaction().GetAmount())));
+            -> new SimpleObjectProperty<>(UIUtils.formatCurrency(
+                param.getValue().getWalletTransaction().getAmount())));
 
         TableColumn<TickerPurchase, String> walletNameColumn =
             new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetWallet().GetName()));
+                param.getValue().getWalletTransaction().getWallet().getName()));
 
         TableColumn<TickerPurchase, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetStatus().name()));
+                param.getValue().getWalletTransaction().getStatus().name()));
 
         // Add the columns to the table view
         purchaseTableView.getColumns().add(idColumn);
@@ -506,11 +510,11 @@ public class InvestmentTransactionsController
     /**
      * Configure the sale table view columns
      */
-    private void ConfigureSaleTableView()
+    private void configureSaleTableView()
     {
         TableColumn<TickerSale, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -537,52 +541,52 @@ public class InvestmentTransactionsController
         TableColumn<TickerSale, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTicker().GetName() + " (" +
-                                        param.getValue().GetTicker().GetSymbol() +
+            -> new SimpleStringProperty(param.getValue().getTicker().getName() + " (" +
+                                        param.getValue().getTicker().getSymbol() +
                                         ")"));
 
         TableColumn<TickerSale, String> tickerTypeColumn = new TableColumn<>("Type");
         tickerTypeColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTicker().GetType().name()));
+            -> new SimpleStringProperty(param.getValue().getTicker().getType().name()));
 
         TableColumn<TickerSale, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetDate().format(
+                param.getValue().getWalletTransaction().getDate().format(
                     Constants.DATE_FORMATTER_WITH_TIME)));
 
         TableColumn<TickerSale, String> quantityColumn = new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(param.getValue().GetQuantity().toString()));
+            -> new SimpleObjectProperty<>(param.getValue().getQuantity().toString()));
 
         TableColumn<TickerSale, String> unitPriceColumn =
             new TableColumn<>("Unit Price");
         unitPriceColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetUnitPrice())));
+                UIUtils.formatCurrency(param.getValue().getUnitPrice())));
 
         TableColumn<TickerSale, String> amountColumn =
             new TableColumn<>("Total Amount");
         amountColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(UIUtils.FormatCurrency(
-                param.getValue().GetWalletTransaction().GetAmount())));
+            -> new SimpleObjectProperty<>(UIUtils.formatCurrency(
+                param.getValue().getWalletTransaction().getAmount())));
 
         TableColumn<TickerSale, String> walletNameColumn = new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetWallet().GetName()));
+                param.getValue().getWalletTransaction().getWallet().getName()));
 
         TableColumn<TickerSale, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetStatus().name()));
+                param.getValue().getWalletTransaction().getStatus().name()));
 
         // Add the columns to the table view
         saleTableView.getColumns().add(idColumn);
@@ -599,11 +603,11 @@ public class InvestmentTransactionsController
     /**
      * Configure the table view columns
      */
-    private void ConfigureDividendTableView()
+    private void configureDividendTableView()
     {
         TableColumn<Dividend, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -630,39 +634,39 @@ public class InvestmentTransactionsController
         TableColumn<Dividend, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTicker().GetName() + " (" +
-                                        param.getValue().GetTicker().GetSymbol() +
+            -> new SimpleStringProperty(param.getValue().getTicker().getName() + " (" +
+                                        param.getValue().getTicker().getSymbol() +
                                         ")"));
 
         TableColumn<Dividend, String> tickerTypeColumn = new TableColumn<>("Type");
         tickerTypeColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTicker().GetType().name()));
+            -> new SimpleStringProperty(param.getValue().getTicker().getType().name()));
 
         TableColumn<Dividend, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetDate().format(
+                param.getValue().getWalletTransaction().getDate().format(
                     Constants.DATE_FORMATTER_WITH_TIME)));
 
         TableColumn<Dividend, String> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(UIUtils.FormatCurrency(
-                param.getValue().GetWalletTransaction().GetAmount())));
+            -> new SimpleObjectProperty<>(UIUtils.formatCurrency(
+                param.getValue().getWalletTransaction().getAmount())));
 
         TableColumn<Dividend, String> walletNameColumn = new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetWallet().GetName()));
+                param.getValue().getWalletTransaction().getWallet().getName()));
 
         TableColumn<Dividend, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetWalletTransaction().GetStatus().name()));
+                param.getValue().getWalletTransaction().getStatus().name()));
 
         // Add the columns to the table view
         dividendTableView.getColumns().add(idColumn);
@@ -677,11 +681,11 @@ public class InvestmentTransactionsController
     /**
      * Configure the table view columns
      */
-    private void ConfigureCryptoExchangeTableView()
+    private void configureCryptoExchangeTableView()
     {
         TableColumn<CryptoExchange, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -710,37 +714,38 @@ public class InvestmentTransactionsController
         soldCryptoNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetSoldCrypto().GetName() + " (" +
-                param.getValue().GetSoldCrypto().GetSymbol() + ")"));
+                param.getValue().getSoldCrypto().getName() + " (" +
+                param.getValue().getSoldCrypto().getSymbol() + ")"));
 
         TableColumn<CryptoExchange, String> receivedCryptoNameColumn =
             new TableColumn<>("Received");
         receivedCryptoNameColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetReceivedCrypto().GetName() + " (" +
-                param.getValue().GetReceivedCrypto().GetSymbol() + ")"));
+                param.getValue().getReceivedCrypto().getName() + " (" +
+                param.getValue().getReceivedCrypto().getSymbol() + ")"));
 
         TableColumn<CryptoExchange, BigDecimal> quantitySoldColumn =
             new TableColumn<>("Quantity Sold");
         quantitySoldColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetSoldQuantity()));
+            param -> new SimpleObjectProperty<>(param.getValue().getSoldQuantity()));
 
         TableColumn<CryptoExchange, BigDecimal> quantityReceivedColumn =
             new TableColumn<>("Quantity Received");
         quantityReceivedColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetReceivedQuantity()));
+            param
+            -> new SimpleObjectProperty<>(param.getValue().getReceivedQuantity()));
 
         TableColumn<CryptoExchange, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
+                param.getValue().getDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
 
         TableColumn<CryptoExchange, String> descriptionColumn =
             new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetDescription()));
+            param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         // Add the columns to the table view
         cryptoExchangeTableView.getColumns().add(idColumn);
@@ -752,77 +757,77 @@ public class InvestmentTransactionsController
         cryptoExchangeTableView.getColumns().add(descriptionColumn);
     }
 
-    private void EditPurchase(TickerPurchase purchase)
+    private void editpurchase(TickerPurchase purchase)
     {
         if (purchase == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No purchase selected",
                                               "Please select a purchase to edit");
 
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_TICKER_PURCHASE_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_TICKER_PURCHASE_FXML,
                                     "Edit ticker purchase",
                                     springContext,
                                     (EditTickerPurchaseController controller)
-                                        -> controller.SetPurchase(purchase),
+                                        -> controller.setPurchase(purchase),
                                     List.of(() -> {
-                                        LoadPurchasesFromDatabase();
-                                        UpdatePurchaseTableView();
+                                        loadPurchasesFromDatabase();
+                                        updatePurchaseTableView();
                                     }));
     }
 
-    private void EditSale(TickerSale sale)
+    private void editsale(TickerSale sale)
     {
         if (sale == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No sale selected",
                                               "Please select a sale to edit");
 
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_TICKER_SALE_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_TICKER_SALE_FXML,
                                     "Edit ticker sale",
                                     springContext,
                                     (EditTickerSaleController controller)
-                                        -> controller.SetSale(sale),
+                                        -> controller.setSale(sale),
                                     List.of(() -> {
-                                        LoadSalesFromDatabase();
-                                        UpdateSaleTableView();
+                                        loadSalesFromDatabase();
+                                        updateSaleTableView();
                                     }));
     }
 
-    private void EditDividend(Dividend dividend)
+    private void editdividend(Dividend dividend)
     {
         if (dividend == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No dividend selected",
                                               "Please select a dividend to edit");
 
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_DIVIDEND_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_DIVIDEND_FXML,
                                     "Edit dividend",
                                     springContext,
                                     (EditDividendController controller)
-                                        -> controller.SetDividend(dividend),
+                                        -> controller.setDividend(dividend),
                                     List.of(() -> {
-                                        LoadDividendsFromDatabase();
-                                        UpdateDividendTableView();
+                                        loadDividendsFromDatabase();
+                                        updateDividendTableView();
                                     }));
     }
 
-    private void EditCryptoExchange(CryptoExchange cryptoExchange)
+    private void editcryptoexchange(CryptoExchange cryptoExchange)
     {
         if (cryptoExchange == null)
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "No crypto exchange selected",
                 "Please select a crypto exchange to edit");
@@ -830,91 +835,91 @@ public class InvestmentTransactionsController
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_CRYPTO_EXCHANGE_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_CRYPTO_EXCHANGE_FXML,
                                     "Edit crypto exchange",
                                     springContext,
                                     (EditCryptoExchangeController controller)
-                                        -> controller.SetCryptoExchange(cryptoExchange),
+                                        -> controller.setCryptoExchange(cryptoExchange),
                                     List.of(() -> {
-                                        LoadCryptoExchangesFromDatabase();
-                                        UpdateCryptoExchangeTableView();
+                                        loadCryptoExchangesFromDatabase();
+                                        updateCryptoExchangeTableView();
                                     }));
     }
 
-    private void DeletePurchase(TickerPurchase purchase)
+    private void deletePurchase(TickerPurchase purchase)
     {
         if (purchase == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No purchase selected",
                                               "Please select a purchase to delete");
             return;
         }
 
-        String message = DeleteMessage(purchase.GetWalletTransaction());
+        String message = deleteMessage(purchase.getWalletTransaction());
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirm deletion",
                 "Are you sure you want to delete the purchase?",
                 message))
         {
-            tickerService.DeletePurchase(purchase.GetId());
-            LoadPurchasesFromDatabase();
-            UpdatePurchaseTableView();
+            tickerService.deletePurchase(purchase.getId());
+            loadPurchasesFromDatabase();
+            updatePurchaseTableView();
         }
     }
 
-    private void DeleteSale(TickerSale sale)
+    private void deleteSale(TickerSale sale)
     {
         if (sale == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No sale selected",
                                               "Please select a sale to delete");
             return;
         }
 
-        String message = DeleteMessage(sale.GetWalletTransaction());
+        String message = deleteMessage(sale.getWalletTransaction());
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Delete sale",
                 "Are you sure you want to delete the sale?",
                 message))
         {
-            tickerService.DeleteSale(sale.GetId());
-            LoadSalesFromDatabase();
-            UpdateSaleTableView();
+            tickerService.deleteSale(sale.getId());
+            loadSalesFromDatabase();
+            updateSaleTableView();
         }
     }
 
-    private void DeleteDividend(Dividend dividend)
+    private void deleteDividend(Dividend dividend)
     {
         if (dividend == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No dividend selected",
                                               "Please select a dividend to delete");
             return;
         }
 
-        String message = DeleteMessage(dividend.GetWalletTransaction());
+        String message = deleteMessage(dividend.getWalletTransaction());
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Delete dividend",
                 "Are you sure you want to delete the dividend?",
                 message))
         {
-            tickerService.DeleteDividend(dividend.GetId());
-            LoadDividendsFromDatabase();
-            UpdateDividendTableView();
+            tickerService.deleteDividend(dividend.getId());
+            loadDividendsFromDatabase();
+            updateDividendTableView();
         }
     }
 
-    private void DeleteCryptoExchange(CryptoExchange cryptoExchange)
+    private void deleteCryptoExchange(CryptoExchange cryptoExchange)
     {
         if (cryptoExchange == null)
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "No crypto exchange selected",
                 "Please select a crypto exchange to delete");
@@ -923,94 +928,94 @@ public class InvestmentTransactionsController
 
         StringBuilder message = new StringBuilder();
         message.append("ID: ")
-            .append(cryptoExchange.GetId())
+            .append(cryptoExchange.getId())
             .append("\n")
             .append("Source crypto: ")
-            .append(cryptoExchange.GetSoldCrypto().GetName())
+            .append(cryptoExchange.getSoldCrypto().getName())
             .append(" (")
-            .append(cryptoExchange.GetSoldCrypto().GetSymbol())
+            .append(cryptoExchange.getSoldCrypto().getSymbol())
             .append(")\n")
             .append("Target crypto: ")
-            .append(cryptoExchange.GetReceivedCrypto().GetName())
+            .append(cryptoExchange.getReceivedCrypto().getName())
             .append(" (")
-            .append(cryptoExchange.GetReceivedCrypto().GetSymbol())
+            .append(cryptoExchange.getReceivedCrypto().getSymbol())
             .append(")\n")
             .append("Source quantity: ")
-            .append(cryptoExchange.GetSoldQuantity())
+            .append(cryptoExchange.getSoldQuantity())
             .append("\n")
             .append("Source quantity after deletion: ")
-            .append(cryptoExchange.GetSoldCrypto().GetCurrentQuantity().add(
-                cryptoExchange.GetSoldQuantity()))
+            .append(cryptoExchange.getSoldCrypto().getCurrentQuantity().add(
+                cryptoExchange.getSoldQuantity()))
             .append("\n")
             .append("Target quantity: ")
-            .append(cryptoExchange.GetReceivedQuantity())
+            .append(cryptoExchange.getReceivedQuantity())
             .append("\n")
             .append("Target quantity after deletion: ")
-            .append(cryptoExchange.GetReceivedCrypto().GetCurrentQuantity().subtract(
-                cryptoExchange.GetReceivedQuantity()))
+            .append(cryptoExchange.getReceivedCrypto().getCurrentQuantity().subtract(
+                cryptoExchange.getReceivedQuantity()))
             .append("\n")
             .append("Date: ")
-            .append(cryptoExchange.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+            .append(cryptoExchange.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
             .append("\n")
             .append("Description: ")
-            .append(cryptoExchange.GetDescription())
+            .append(cryptoExchange.getDescription())
             .append("\n");
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Delete crypto exchange",
                 "Are you sure you want to delete the crypto exchange?",
                 message.toString()))
         {
-            tickerService.DeleteCryptoExchange(cryptoExchange.GetId());
-            LoadCryptoExchangesFromDatabase();
-            UpdateCryptoExchangeTableView();
+            tickerService.deleteCryptoExchange(cryptoExchange.getId());
+            loadCryptoExchangesFromDatabase();
+            updateCryptoExchangeTableView();
         }
     }
 
-    private String DeleteMessage(WalletTransaction wt)
+    private String deleteMessage(WalletTransaction wt)
     {
         // Create a message to show to the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(wt.GetDescription())
+            .append(wt.getDescription())
             .append("\n")
             .append("Amount: ")
-            .append(UIUtils.FormatCurrency(wt.GetAmount()))
+            .append(UIUtils.formatCurrency(wt.getAmount()))
             .append("\n")
             .append("Date: ")
-            .append(wt.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+            .append(wt.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
             .append("\n")
             .append("Status: ")
-            .append(wt.GetStatus().toString())
+            .append(wt.getStatus().toString())
             .append("\n")
             .append("Wallet: ")
-            .append(wt.GetWallet().GetName())
+            .append(wt.getWallet().getName())
             .append("\n")
             .append("Wallet balance: ")
-            .append(UIUtils.FormatCurrency(wt.GetWallet().GetBalance()))
+            .append(UIUtils.formatCurrency(wt.getWallet().getBalance()))
             .append("\n")
             .append("Wallet balance after deletion: ");
 
-        if (wt.GetStatus().equals(TransactionStatus.CONFIRMED))
+        if (wt.getStatus().equals(TransactionStatus.CONFIRMED))
         {
-            if (wt.GetType().equals(TransactionType.EXPENSE))
+            if (wt.getType().equals(TransactionType.EXPENSE))
             {
                 message
-                    .append(UIUtils.FormatCurrency(
-                        wt.GetWallet().GetBalance().add(wt.GetAmount())))
+                    .append(UIUtils.formatCurrency(
+                        wt.getWallet().getBalance().add(wt.getAmount())))
                     .append("\n");
             }
             else
             {
                 message
-                    .append(UIUtils.FormatCurrency(
-                        wt.GetWallet().GetBalance().subtract(wt.GetAmount())))
+                    .append(UIUtils.formatCurrency(
+                        wt.getWallet().getBalance().subtract(wt.getAmount())))
                     .append("\n");
             }
         }
         else
         {
-            message.append(UIUtils.FormatCurrency(wt.GetWallet().GetBalance()))
+            message.append(UIUtils.formatCurrency(wt.getWallet().getBalance()))
                 .append("\n");
         }
 

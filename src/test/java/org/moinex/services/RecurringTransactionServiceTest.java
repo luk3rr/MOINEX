@@ -67,7 +67,7 @@ public class RecurringTransactionServiceTest
     private RecurringTransaction yearlyRecurringTransaction;
 
     private RecurringTransaction
-    CreateRecurringTransaction(Long                          id,
+    createRecurringTransaction(Long                          id,
                                Wallet                        wallet,
                                Category                      category,
                                TransactionType               type,
@@ -94,13 +94,13 @@ public class RecurringTransactionServiceTest
     }
 
     @BeforeEach
-    public void SetUp()
+    public void setUp()
     {
         wallet  = new Wallet(1L, "Wallet", BigDecimal.valueOf(1000.0));
         wallet2 = new Wallet(2L, "Wallet 2", BigDecimal.valueOf(500.0));
 
-        category  = new Category("c1");
-        category2 = new Category("c2");
+        category  = Category.builder().name("c1").build();
+        category2 = Category.builder().name("c2").build();
 
         startDate =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
@@ -109,7 +109,7 @@ public class RecurringTransactionServiceTest
         nextDueDate = LocalDateTime.now().with(
             Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME);
 
-        dailyRT = CreateRecurringTransaction(1L,
+        dailyRT = createRecurringTransaction(1L,
                                              wallet,
                                              category,
                                              TransactionType.EXPENSE,
@@ -121,7 +121,7 @@ public class RecurringTransactionServiceTest
                                              "Daily transaction");
 
         weeklyRecurringTransaction =
-            CreateRecurringTransaction(2L,
+            createRecurringTransaction(2L,
                                        wallet,
                                        category,
                                        TransactionType.EXPENSE,
@@ -133,7 +133,7 @@ public class RecurringTransactionServiceTest
                                        "Weekly transaction");
 
         monthlyRecurringTransaction =
-            CreateRecurringTransaction(3L,
+            createRecurringTransaction(3L,
                                        wallet,
                                        category,
                                        TransactionType.EXPENSE,
@@ -145,7 +145,7 @@ public class RecurringTransactionServiceTest
                                        "Monthly transaction");
 
         yearlyRecurringTransaction =
-            CreateRecurringTransaction(4L,
+            createRecurringTransaction(4L,
                                        wallet,
                                        category,
                                        TransactionType.EXPENSE,
@@ -159,19 +159,19 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the recurring transactions are created successfully")
-    public void TestCreateRecurringTransaction()
+    public void testCreateRecurringTransaction()
     {
-        when(walletRepository.findById(wallet.GetId())).thenReturn(Optional.of(wallet));
+        when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
 
-        recurringTransactionService.CreateRecurringTransaction(
-            dailyRT.GetWallet().GetId(),
-            dailyRT.GetCategory(),
-            dailyRT.GetType(),
-            dailyRT.GetAmount(),
-            dailyRT.GetStartDate().toLocalDate(),
-            dailyRT.GetEndDate().toLocalDate(),
-            dailyRT.GetDescription(),
-            dailyRT.GetFrequency());
+        recurringTransactionService.addRecurringTransaction(
+            dailyRT.getWallet().getId(),
+            dailyRT.getCategory(),
+            dailyRT.getType(),
+            dailyRT.getAmount(),
+            dailyRT.getStartDate().toLocalDate(),
+            dailyRT.getEndDate().toLocalDate(),
+            dailyRT.getDescription(),
+            dailyRT.getFrequency());
 
         // Capture the recurring transaction that was saved
         ArgumentCaptor<RecurringTransaction> recurringTransactionCaptor =
@@ -180,60 +180,60 @@ public class RecurringTransactionServiceTest
         verify(recurringTransactionRepository)
             .save(recurringTransactionCaptor.capture());
 
-        assertEquals(dailyRT.GetWallet(),
-                     recurringTransactionCaptor.getValue().GetWallet());
-        assertEquals(dailyRT.GetCategory(),
-                     recurringTransactionCaptor.getValue().GetCategory());
-        assertEquals(dailyRT.GetType(),
-                     recurringTransactionCaptor.getValue().GetType());
-        assertEquals(dailyRT.GetAmount(),
-                     recurringTransactionCaptor.getValue().GetAmount());
-        assertEquals(dailyRT.GetStartDate(),
-                     recurringTransactionCaptor.getValue().GetStartDate());
-        assertEquals(dailyRT.GetEndDate(),
-                     recurringTransactionCaptor.getValue().GetEndDate());
-        assertEquals(dailyRT.GetDescription(),
-                     recurringTransactionCaptor.getValue().GetDescription());
-        assertEquals(dailyRT.GetStatus(),
-                     recurringTransactionCaptor.getValue().GetStatus());
-        assertEquals(dailyRT.GetFrequency(),
-                     recurringTransactionCaptor.getValue().GetFrequency());
+        assertEquals(dailyRT.getWallet(),
+                     recurringTransactionCaptor.getValue().getWallet());
+        assertEquals(dailyRT.getCategory(),
+                     recurringTransactionCaptor.getValue().getCategory());
+        assertEquals(dailyRT.getType(),
+                     recurringTransactionCaptor.getValue().getType());
+        assertEquals(dailyRT.getAmount(),
+                     recurringTransactionCaptor.getValue().getAmount());
+        assertEquals(dailyRT.getStartDate(),
+                     recurringTransactionCaptor.getValue().getStartDate());
+        assertEquals(dailyRT.getEndDate(),
+                     recurringTransactionCaptor.getValue().getEndDate());
+        assertEquals(dailyRT.getDescription(),
+                     recurringTransactionCaptor.getValue().getDescription());
+        assertEquals(dailyRT.getStatus(),
+                     recurringTransactionCaptor.getValue().getStatus());
+        assertEquals(dailyRT.getFrequency(),
+                     recurringTransactionCaptor.getValue().getFrequency());
     }
 
     @Test
     @DisplayName("Test if the recurring transactions is not created when the wallet "
                  + "is not found")
     public void
-    TestCreateRecurringTransactionWalletNotFound()
+    testCreateRecurringTransactionWalletNotFound()
     {
-        when(walletRepository.findById(wallet.GetId())).thenReturn(Optional.empty());
+        when(walletRepository.findById(wallet.getId())).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
                      ()
-                         -> recurringTransactionService.CreateRecurringTransaction(
-                             dailyRT.GetWallet().GetId(),
-                             dailyRT.GetCategory(),
-                             dailyRT.GetType(),
-                             dailyRT.GetAmount(),
-                             dailyRT.GetStartDate().toLocalDate(),
-                             dailyRT.GetEndDate().toLocalDate(),
-                             dailyRT.GetDescription(),
-                             dailyRT.GetFrequency()));
+                         -> recurringTransactionService.addRecurringTransaction(
+                             dailyRT.getWallet().getId(),
+                             dailyRT.getCategory(),
+                             dailyRT.getType(),
+                             dailyRT.getAmount(),
+                             dailyRT.getStartDate().toLocalDate(),
+                             dailyRT.getEndDate().toLocalDate(),
+                             dailyRT.getDescription(),
+                             dailyRT.getFrequency()));
 
         verify(recurringTransactionRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Test if the recurring transactions are stopped successfully")
-    public void TestStopRecurringTransaction()
+    public void testStopRecurringTransaction()
     {
-        when(recurringTransactionRepository.findById(dailyRT.GetId()))
+        when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.of(dailyRT));
 
         // Change the end date to a date in the future
-        dailyRT.SetEndDate(LocalDateTime.now().plusDays(40));
+        dailyRT.setEndDate(LocalDateTime.now().plusDays(40));
 
-        recurringTransactionService.StopRecurringTransaction(dailyRT.GetId());
+        recurringTransactionService.stopRecurringTransaction(dailyRT.getId());
 
         // Capture the recurring transaction that was saved
         ArgumentCaptor<RecurringTransaction> recurringTransactionCaptor =
@@ -243,7 +243,7 @@ public class RecurringTransactionServiceTest
             .save(recurringTransactionCaptor.capture());
 
         // Check if the status of the recurring transaction is INACTIVE
-        assertEquals(recurringTransactionCaptor.getValue().GetStatus(),
+        assertEquals(recurringTransactionCaptor.getValue().getStatus(),
                      RecurringTransactionStatus.INACTIVE);
     }
 
@@ -251,15 +251,15 @@ public class RecurringTransactionServiceTest
     @DisplayName("Test if the recurring transactions is not stopped when the "
                  + "recurring transaction is not found")
     public void
-    TestStopRecurringTransactionNotFound()
+    testStopRecurringTransactionNotFound()
     {
-        when(recurringTransactionRepository.findById(dailyRT.GetId()))
+        when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
                      ()
-                         -> recurringTransactionService.StopRecurringTransaction(
-                             dailyRT.GetId()));
+                         -> recurringTransactionService.stopRecurringTransaction(
+                             dailyRT.getId()));
 
         verify(recurringTransactionRepository, never()).save(any());
     }
@@ -268,30 +268,30 @@ public class RecurringTransactionServiceTest
     @DisplayName("Test if the recurring transactions is not stopped when the "
                  + "recurring transaction has already ended")
     public void
-    TestStopRecurringTransactionAlreadyEnded()
+    testStopRecurringTransactionAlreadyEnded()
     {
-        when(recurringTransactionRepository.findById(dailyRT.GetId()))
+        when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.of(dailyRT));
 
         // Change the end date to a date in the past
-        dailyRT.SetStatus(RecurringTransactionStatus.INACTIVE);
+        dailyRT.setStatus(RecurringTransactionStatus.INACTIVE);
 
         assertThrows(RuntimeException.class,
                      ()
-                         -> recurringTransactionService.StopRecurringTransaction(
-                             dailyRT.GetId()));
+                         -> recurringTransactionService.stopRecurringTransaction(
+                             dailyRT.getId()));
 
         verify(recurringTransactionRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Test if the recurring transactions are deleted successfully")
-    public void TestDeleteRecurringTransaction()
+    public void testDeleteRecurringTransaction()
     {
-        when(recurringTransactionRepository.findById(dailyRT.GetId()))
+        when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.of(dailyRT));
 
-        recurringTransactionService.DeleteRecurringTransaction(dailyRT.GetId());
+        recurringTransactionService.deleteRecurringTransaction(dailyRT.getId());
 
         verify(recurringTransactionRepository).delete(dailyRT);
     }
@@ -300,60 +300,60 @@ public class RecurringTransactionServiceTest
     @DisplayName("Test if the recurring transactions is not deleted when the "
                  + "recurring transaction is not found")
     public void
-    TestDeleteRecurringTransactionNotFound()
+    testDeleteRecurringTransactionNotFound()
     {
-        when(recurringTransactionRepository.findById(dailyRT.GetId()))
+        when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
                      ()
-                         -> recurringTransactionService.DeleteRecurringTransaction(
-                             dailyRT.GetId()));
+                         -> recurringTransactionService.deleteRecurringTransaction(
+                             dailyRT.getId()));
 
         verify(recurringTransactionRepository, never()).delete(any());
     }
 
     @Test
     @DisplayName("Test if the recurring transactions are updated successfully")
-    public void TestUpdateRecurringTransaction()
+    public void testUpdateRecurringTransaction()
     {
         RecurringTransaction updatedRT =
-            new RecurringTransaction(dailyRT.GetId(),
-                                     dailyRT.GetWallet(),
-                                     dailyRT.GetCategory(),
-                                     dailyRT.GetType(),
-                                     dailyRT.GetAmount(),
-                                     dailyRT.GetStartDate(),
-                                     dailyRT.GetEndDate(),
-                                     dailyRT.GetNextDueDate(),
-                                     dailyRT.GetFrequency(),
-                                     dailyRT.GetDescription());
+            new RecurringTransaction(dailyRT.getId(),
+                                     dailyRT.getWallet(),
+                                     dailyRT.getCategory(),
+                                     dailyRT.getType(),
+                                     dailyRT.getAmount(),
+                                     dailyRT.getStartDate(),
+                                     dailyRT.getEndDate(),
+                                     dailyRT.getNextDueDate(),
+                                     dailyRT.getFrequency(),
+                                     dailyRT.getDescription());
 
-        when(recurringTransactionRepository.findById(updatedRT.GetId()))
+        when(recurringTransactionRepository.findById(updatedRT.getId()))
             .thenReturn(Optional.of(dailyRT));
 
         // Update the recurring transaction
-        updatedRT.SetWallet(dailyRT.GetWallet().GetId() == wallet.GetId() ? wallet2
+        updatedRT.setWallet(dailyRT.getWallet().getId() == wallet.getId() ? wallet2
                                                                           : wallet);
 
-        updatedRT.SetCategory(
-            updatedRT.GetCategory().GetName().equals(category.GetName()) ? category2
+        updatedRT.setCategory(
+            updatedRT.getCategory().getName().equals(category.getName()) ? category2
                                                                          : category);
 
-        updatedRT.SetType(updatedRT.GetType() == TransactionType.EXPENSE
+        updatedRT.setType(updatedRT.getType() == TransactionType.EXPENSE
                               ? TransactionType.INCOME
                               : TransactionType.EXPENSE);
 
-        updatedRT.SetAmount(BigDecimal.valueOf(200.0));
-        updatedRT.SetEndDate(updatedRT.GetEndDate().plusDays(10));
-        updatedRT.SetNextDueDate(updatedRT.GetNextDueDate().plusDays(10));
-        updatedRT.SetFrequency(updatedRT.GetFrequency() ==
+        updatedRT.setAmount(BigDecimal.valueOf(200.0));
+        updatedRT.setEndDate(updatedRT.getEndDate().plusDays(10));
+        updatedRT.setNextDueDate(updatedRT.getNextDueDate().plusDays(10));
+        updatedRT.setFrequency(updatedRT.getFrequency() ==
                                        RecurringTransactionFrequency.DAILY
                                    ? RecurringTransactionFrequency.WEEKLY
                                    : RecurringTransactionFrequency.DAILY);
-        updatedRT.SetDescription("Updated description");
+        updatedRT.setDescription("Updated description");
 
-        recurringTransactionService.UpdateRecurringTransaction(updatedRT);
+        recurringTransactionService.updateRecurringTransaction(updatedRT);
 
         // Capture the recurring transaction that was saved
         ArgumentCaptor<RecurringTransaction> recurringTransactionCaptor =
@@ -362,51 +362,51 @@ public class RecurringTransactionServiceTest
         verify(recurringTransactionRepository)
             .save(recurringTransactionCaptor.capture());
 
-        assertEquals(updatedRT.GetWallet(),
-                     recurringTransactionCaptor.getValue().GetWallet());
-        assertEquals(updatedRT.GetCategory(),
-                     recurringTransactionCaptor.getValue().GetCategory());
-        assertEquals(updatedRT.GetType(),
-                     recurringTransactionCaptor.getValue().GetType());
-        assertEquals(updatedRT.GetAmount(),
-                     recurringTransactionCaptor.getValue().GetAmount());
-        assertEquals(updatedRT.GetStartDate(),
-                     recurringTransactionCaptor.getValue().GetStartDate());
-        assertEquals(updatedRT.GetEndDate(),
-                     recurringTransactionCaptor.getValue().GetEndDate());
-        assertEquals(updatedRT.GetDescription(),
-                     recurringTransactionCaptor.getValue().GetDescription());
-        assertEquals(updatedRT.GetStatus(),
-                     recurringTransactionCaptor.getValue().GetStatus());
-        assertEquals(updatedRT.GetFrequency(),
-                     recurringTransactionCaptor.getValue().GetFrequency());
+        assertEquals(updatedRT.getWallet(),
+                     recurringTransactionCaptor.getValue().getWallet());
+        assertEquals(updatedRT.getCategory(),
+                     recurringTransactionCaptor.getValue().getCategory());
+        assertEquals(updatedRT.getType(),
+                     recurringTransactionCaptor.getValue().getType());
+        assertEquals(updatedRT.getAmount(),
+                     recurringTransactionCaptor.getValue().getAmount());
+        assertEquals(updatedRT.getStartDate(),
+                     recurringTransactionCaptor.getValue().getStartDate());
+        assertEquals(updatedRT.getEndDate(),
+                     recurringTransactionCaptor.getValue().getEndDate());
+        assertEquals(updatedRT.getDescription(),
+                     recurringTransactionCaptor.getValue().getDescription());
+        assertEquals(updatedRT.getStatus(),
+                     recurringTransactionCaptor.getValue().getStatus());
+        assertEquals(updatedRT.getFrequency(),
+                     recurringTransactionCaptor.getValue().getFrequency());
     }
 
     @Test
     @DisplayName("Test if the daily recurring transactions are processed correctly")
-    public void TestProcessDailyRecurringTransaction()
+    public void testProcessDailyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
 
-        dailyRT.SetNextDueDate(today.minusDays(10));
+        dailyRT.setNextDueDate(today.minusDays(10));
 
         when(recurringTransactionRepository.findByStatus(
                  RecurringTransactionStatus.ACTIVE))
             .thenReturn(Collections.singletonList(dailyRT));
 
-        recurringTransactionService.ProcessRecurringTransactions();
+        recurringTransactionService.processRecurringTransactions();
 
         // Capture the dates of the transactions
         ArgumentCaptor<LocalDateTime> dateCaptor =
             ArgumentCaptor.forClass(LocalDateTime.class);
 
         verify(walletTransactionService, times(10))
-            .AddExpense(eq(dailyRT.GetWallet().GetId()),
-                        eq(dailyRT.GetCategory()),
+            .addExpense(eq(dailyRT.getWallet().getId()),
+                        eq(dailyRT.getCategory()),
                         dateCaptor.capture(),
-                        eq(dailyRT.GetAmount()),
-                        eq(dailyRT.GetDescription()),
+                        eq(dailyRT.getAmount()),
+                        eq(dailyRT.getDescription()),
                         eq(TransactionStatus.PENDING));
 
         // Get the captured dates
@@ -428,29 +428,29 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the weekly recurring transactions are processed correctly")
-    public void TestProcessWeeklyRecurringTransaction()
+    public void testProcessWeeklyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
 
-        weeklyRecurringTransaction.SetNextDueDate(today.minusWeeks(5));
+        weeklyRecurringTransaction.setNextDueDate(today.minusWeeks(5));
 
         when(recurringTransactionRepository.findByStatus(
                  RecurringTransactionStatus.ACTIVE))
             .thenReturn(Collections.singletonList(weeklyRecurringTransaction));
 
-        recurringTransactionService.ProcessRecurringTransactions();
+        recurringTransactionService.processRecurringTransactions();
 
         // Capture the dates of the transactions
         ArgumentCaptor<LocalDateTime> dateCaptor =
             ArgumentCaptor.forClass(LocalDateTime.class);
 
         verify(walletTransactionService, times(5))
-            .AddExpense(eq(weeklyRecurringTransaction.GetWallet().GetId()),
-                        eq(weeklyRecurringTransaction.GetCategory()),
+            .addExpense(eq(weeklyRecurringTransaction.getWallet().getId()),
+                        eq(weeklyRecurringTransaction.getCategory()),
                         dateCaptor.capture(),
-                        eq(weeklyRecurringTransaction.GetAmount()),
-                        eq(weeklyRecurringTransaction.GetDescription()),
+                        eq(weeklyRecurringTransaction.getAmount()),
+                        eq(weeklyRecurringTransaction.getDescription()),
                         eq(TransactionStatus.PENDING));
 
         // Get the captured dates
@@ -473,29 +473,29 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the monthly recurring transactions are processed correctly")
-    public void TestProcessMonthlyRecurringTransaction()
+    public void testProcessMonthlyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
 
-        monthlyRecurringTransaction.SetNextDueDate(today.minusMonths(12));
+        monthlyRecurringTransaction.setNextDueDate(today.minusMonths(12));
 
         when(recurringTransactionRepository.findByStatus(
                  RecurringTransactionStatus.ACTIVE))
             .thenReturn(Collections.singletonList(monthlyRecurringTransaction));
 
-        recurringTransactionService.ProcessRecurringTransactions();
+        recurringTransactionService.processRecurringTransactions();
 
         // Capture the dates of the transactions
         ArgumentCaptor<LocalDateTime> dateCaptor =
             ArgumentCaptor.forClass(LocalDateTime.class);
 
         verify(walletTransactionService, times(12))
-            .AddExpense(eq(monthlyRecurringTransaction.GetWallet().GetId()),
-                        eq(monthlyRecurringTransaction.GetCategory()),
+            .addExpense(eq(monthlyRecurringTransaction.getWallet().getId()),
+                        eq(monthlyRecurringTransaction.getCategory()),
                         dateCaptor.capture(),
-                        eq(monthlyRecurringTransaction.GetAmount()),
-                        eq(monthlyRecurringTransaction.GetDescription()),
+                        eq(monthlyRecurringTransaction.getAmount()),
+                        eq(monthlyRecurringTransaction.getDescription()),
                         eq(TransactionStatus.PENDING));
 
         // Get the captured dates
@@ -518,29 +518,29 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the yearly recurring transactions are processed correctly")
-    public void TestProcessYearlyRecurringTransaction()
+    public void testProcessYearlyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
 
-        yearlyRecurringTransaction.SetNextDueDate(today.minusYears(5));
+        yearlyRecurringTransaction.setNextDueDate(today.minusYears(5));
 
         when(recurringTransactionRepository.findByStatus(
                  RecurringTransactionStatus.ACTIVE))
             .thenReturn(Collections.singletonList(yearlyRecurringTransaction));
 
-        recurringTransactionService.ProcessRecurringTransactions();
+        recurringTransactionService.processRecurringTransactions();
 
         // Capture the dates of the transactions
         ArgumentCaptor<LocalDateTime> dateCaptor =
             ArgumentCaptor.forClass(LocalDateTime.class);
 
         verify(walletTransactionService, times(5))
-            .AddExpense(eq(yearlyRecurringTransaction.GetWallet().GetId()),
-                        eq(yearlyRecurringTransaction.GetCategory()),
+            .addExpense(eq(yearlyRecurringTransaction.getWallet().getId()),
+                        eq(yearlyRecurringTransaction.getCategory()),
                         dateCaptor.capture(),
-                        eq(yearlyRecurringTransaction.GetAmount()),
-                        eq(yearlyRecurringTransaction.GetDescription()),
+                        eq(yearlyRecurringTransaction.getAmount()),
+                        eq(yearlyRecurringTransaction.getDescription()),
                         eq(TransactionStatus.PENDING));
 
         // Get the captured dates
@@ -566,20 +566,20 @@ public class RecurringTransactionServiceTest
         "Test if the active recurring transactions with end date in the past are "
         + "stopped")
     public void
-    TestProcessRecurringTransactionEnds()
+    testProcessRecurringTransactionEnds()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
 
-        dailyRT.SetNextDueDate(today.minusDays(10));
-        dailyRT.SetEndDate(today.minusDays(5));
-        dailyRT.SetStatus(RecurringTransactionStatus.ACTIVE);
+        dailyRT.setNextDueDate(today.minusDays(10));
+        dailyRT.setEndDate(today.minusDays(5));
+        dailyRT.setStatus(RecurringTransactionStatus.ACTIVE);
 
         when(recurringTransactionRepository.findByStatus(
                  RecurringTransactionStatus.ACTIVE))
             .thenReturn(Collections.singletonList(dailyRT));
 
-        recurringTransactionService.ProcessRecurringTransactions();
+        recurringTransactionService.processRecurringTransactions();
 
         // Captures and check if the recurring transaction was saved with the status as
         // INACTIVE
@@ -590,7 +590,7 @@ public class RecurringTransactionServiceTest
         RecurringTransaction capturedTransaction = captor.getValue();
 
         assertEquals(RecurringTransactionStatus.INACTIVE,
-                     capturedTransaction.GetStatus());
+                     capturedTransaction.getStatus());
     }
 
     @Test
@@ -598,7 +598,7 @@ public class RecurringTransactionServiceTest
         "Test if get future recurring transactions by month returns the correct "
         + "transactions")
     public void
-    TestGetFutureRecurringTransactionsByMonth()
+    testGetFutureRecurringTransactionsByMonth()
     {
         YearMonth     november2011YearMonth = YearMonth.of(2011, 11);
         LocalDateTime november2011DateTime =
@@ -607,17 +607,17 @@ public class RecurringTransactionServiceTest
 
         Integer expectedTransactions = 0;
 
-        dailyRT.SetNextDueDate(november2011DateTime);
+        dailyRT.setNextDueDate(november2011DateTime);
         expectedTransactions += november2011YearMonth.lengthOfMonth();
 
-        weeklyRecurringTransaction.SetNextDueDate(november2011DateTime);
+        weeklyRecurringTransaction.setNextDueDate(november2011DateTime);
         expectedTransactions += 5; // In 4 weeks there are 5 transactions, because it
                                    // includes the transaction of November 1st
 
-        monthlyRecurringTransaction.SetNextDueDate(november2011DateTime);
+        monthlyRecurringTransaction.setNextDueDate(november2011DateTime);
         expectedTransactions += 1;
 
-        yearlyRecurringTransaction.SetNextDueDate(november2011DateTime);
+        yearlyRecurringTransaction.setNextDueDate(november2011DateTime);
         expectedTransactions += 1;
 
         when(recurringTransactionRepository.findByStatus(
@@ -628,7 +628,7 @@ public class RecurringTransactionServiceTest
                                 yearlyRecurringTransaction));
 
         List<WalletTransaction> futureRecurringTransactions =
-            recurringTransactionService.GetFutureTransactionsByMonth(
+            recurringTransactionService.getFutureTransactionsByMonth(
                 november2011YearMonth,
                 november2011YearMonth);
 
@@ -640,7 +640,7 @@ public class RecurringTransactionServiceTest
         "Test if get future recurring transactions by year returns the correct "
         + "transactions")
     public void
-    TestGetFutureRecurringTransactionsByYear()
+    testGetFutureRecurringTransactionsByYear()
     {
         Year          year2011 = Year.of(2011);
         LocalDateTime january2011DateTime =
@@ -649,17 +649,17 @@ public class RecurringTransactionServiceTest
 
         Integer expectedTransactions = 0;
 
-        dailyRT.SetNextDueDate(january2011DateTime);
+        dailyRT.setNextDueDate(january2011DateTime);
         expectedTransactions += 365;
 
-        weeklyRecurringTransaction.SetNextDueDate(january2011DateTime);
+        weeklyRecurringTransaction.setNextDueDate(january2011DateTime);
         expectedTransactions += 53; // In 52 weeks there are 53 transactions, because it
                                     // includes the transaction of January 1st
 
-        monthlyRecurringTransaction.SetNextDueDate(january2011DateTime);
+        monthlyRecurringTransaction.setNextDueDate(january2011DateTime);
         expectedTransactions += 12;
 
-        yearlyRecurringTransaction.SetNextDueDate(january2011DateTime);
+        yearlyRecurringTransaction.setNextDueDate(january2011DateTime);
         expectedTransactions += 1;
 
         when(recurringTransactionRepository.findByStatus(
@@ -670,7 +670,7 @@ public class RecurringTransactionServiceTest
                                 yearlyRecurringTransaction));
 
         List<WalletTransaction> futureRecurringTransactions =
-            recurringTransactionService.GetFutureTransactionsByYear(year2011, year2011);
+            recurringTransactionService.getFutureTransactionsByYear(year2011, year2011);
 
         assertEquals(expectedTransactions, futureRecurringTransactions.size());
     }

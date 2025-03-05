@@ -28,6 +28,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Goal;
 import org.moinex.services.GoalService;
 import org.moinex.services.WalletTransactionService;
@@ -47,9 +48,10 @@ import org.springframework.stereotype.Controller;
  * Controller class for the goal view
  */
 @Controller
+@NoArgsConstructor
 public class GoalController
 {
-    private static final Logger logger = LoggerConfig.GetLogger();
+    private static final Logger logger = LoggerConfig.getLogger();
 
     @FXML
     private AnchorPane inProgressPane1;
@@ -118,39 +120,39 @@ public class GoalController
     @FXML
     private void initialize()
     {
-        PopulateStatusComboBox();
+        populateStatusComboBox();
 
-        ConfigureTableView();
+        configureTableView();
 
-        LoadGoalsFromDatabase();
+        loadGoalsFromDatabase();
 
-        UpdateDisplayInProgressGoals();
-        UpdateDisplayAccomplishedGoals();
+        updateDisplayInProgressGoals();
+        updateDisplayAccomplishedGoals();
 
-        UpdateGoalTableView();
+        updateGoalTableView();
 
-        statusComboBox.setOnAction(event -> UpdateGoalTableView());
+        statusComboBox.setOnAction(event -> updateGoalTableView());
 
         // Add listener to the search field
         goalSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { UpdateGoalTableView(); });
+            (observable, oldValue, newValue) -> { updateGoalTableView(); });
 
-        SetButtonsActions();
+        setButtonsActions();
     }
 
     @FXML
     private void handleAddGoal()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_GOAL_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_GOAL_FXML,
                                     "Add Goal",
                                     springContext,
                                     (AddGoalController controller)
                                         -> {},
                                     List.of(() -> {
-                                        LoadGoalsFromDatabase();
-                                        UpdateDisplayInProgressGoals();
-                                        UpdateDisplayAccomplishedGoals();
-                                        UpdateGoalTableView();
+                                        loadGoalsFromDatabase();
+                                        updateDisplayInProgressGoals();
+                                        updateDisplayAccomplishedGoals();
+                                        updateGoalTableView();
                                     }));
     }
 
@@ -162,32 +164,32 @@ public class GoalController
 
         if (goal == null)
         {
-            WindowUtils.ShowInformationDialog("Information",
+            WindowUtils.showInformationDialog("Information",
                                               "No goal selected",
                                               "Please select a goal to add a deposit");
             return;
         }
 
-        if (goal.IsArchived())
+        if (goal.getIsArchived())
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Information",
                 "Goal is archived",
                 "Cannot add transfer to an archived goal");
             return;
         }
 
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.ADD_TRANSFER_FXML,
             "Add new transfer",
             springContext,
             (AddTransferController controller)
-                -> { controller.SetReceiverWalletComboBox(goal); },
+                -> { controller.setReceiverWalletComboBox(goal); },
             List.of(() -> {
-                LoadGoalsFromDatabase();
-                UpdateDisplayInProgressGoals();
-                UpdateDisplayAccomplishedGoals();
-                UpdateGoalTableView();
+                loadGoalsFromDatabase();
+                updateDisplayInProgressGoals();
+                updateDisplayAccomplishedGoals();
+                updateGoalTableView();
             }));
     }
 
@@ -199,22 +201,22 @@ public class GoalController
 
         if (goal == null)
         {
-            WindowUtils.ShowInformationDialog("Information",
+            WindowUtils.showInformationDialog("Information",
                                               "No goal selected",
                                               "Please select a goal to edit");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_GOAL_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_GOAL_FXML,
                                     "Edit Goal",
                                     springContext,
                                     (EditGoalController controller)
-                                        -> { controller.SetGoal(goal); },
+                                        -> { controller.setGoal(goal); },
                                     List.of(() -> {
-                                        LoadGoalsFromDatabase();
-                                        UpdateDisplayInProgressGoals();
-                                        UpdateDisplayAccomplishedGoals();
-                                        UpdateGoalTableView();
+                                        loadGoalsFromDatabase();
+                                        updateDisplayInProgressGoals();
+                                        updateDisplayAccomplishedGoals();
+                                        updateGoalTableView();
                                     }));
     }
 
@@ -226,16 +228,16 @@ public class GoalController
 
         if (goal == null)
         {
-            WindowUtils.ShowInformationDialog("Information",
+            WindowUtils.showInformationDialog("Information",
                                               "No goal selected",
                                               "Please select a goal to delete");
             return;
         }
 
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.GetTransactionCountByWallet(goal.GetId()) > 0)
+        if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Goal wallet has transactions",
                 "Cannot delete a goal wallet with associated transactions. "
@@ -246,45 +248,45 @@ public class GoalController
         // Create a message to show to the user
         StringBuilder message = new StringBuilder();
 
-        message.append("Name: ").append(goal.GetName()).append("\n");
+        message.append("Name: ").append(goal.getName()).append("\n");
         message.append("Initial Amount: ")
-            .append(UIUtils.FormatCurrency(goal.GetInitialBalance()))
+            .append(UIUtils.formatCurrency(goal.getInitialBalance()))
             .append("\n");
         message.append("Current Amount: ")
-            .append(UIUtils.FormatCurrency(goal.GetBalance()))
+            .append(UIUtils.formatCurrency(goal.getBalance()))
             .append("\n");
         message.append("Target Amount: ")
-            .append(UIUtils.FormatCurrency(goal.GetTargetBalance()))
+            .append(UIUtils.formatCurrency(goal.getTargetBalance()))
             .append("\n");
         message.append("Target Date: ")
-            .append(goal.GetTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
+            .append(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
             .append("\n");
 
         try
         {
             // Confirm the deletion
-            if (WindowUtils.ShowConfirmationDialog(
+            if (WindowUtils.showConfirmationDialog(
                     "Delete Goal",
                     "Are you sure you want to delete this goal?",
                     message.toString()))
             {
-                goalService.DeleteGoal(goal.GetId());
+                goalService.deleteGoal(goal.getId());
                 goals.remove(goal);
 
-                UpdateDisplayInProgressGoals();
-                UpdateDisplayAccomplishedGoals();
-                UpdateGoalTableView();
+                updateDisplayInProgressGoals();
+                updateDisplayAccomplishedGoals();
+                updateGoalTableView();
             }
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error", "Error deleting goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error", "Error deleting goal", e.getMessage());
         }
     }
 
-    private void LoadGoalsFromDatabase()
+    private void loadGoalsFromDatabase()
     {
-        goals = goalService.GetGoals();
+        goals = goalService.getGoals();
     }
 
     /**
@@ -292,26 +294,26 @@ public class GoalController
      * @note: This method can be called by other controllers to update the screen when
      * there is a change
      */
-    public void UpdateDisplay()
+    public void updateDisplay()
     {
-        LoadGoalsFromDatabase();
+        loadGoalsFromDatabase();
 
-        UpdateDisplayInProgressGoals();
-        UpdateDisplayAccomplishedGoals();
-        UpdateGoalTableView();
+        updateDisplayInProgressGoals();
+        updateDisplayAccomplishedGoals();
+        updateGoalTableView();
     }
 
     /**
      * Update the display of in progress goals
      */
-    private void UpdateDisplayInProgressGoals()
+    private void updateDisplayInProgressGoals()
     {
         inProgressPane1.getChildren().clear();
         inProgressPane2.getChildren().clear();
 
         List<Goal> inProgressGoals =
             goals.stream()
-                .filter(g -> !g.IsCompleted() && !g.IsArchived())
+                .filter(g -> !g.isCompleted() && !g.getIsArchived())
                 .collect(Collectors.toList());
 
         Integer start = inProgressCurrentPage * inProgressItemsPerPage;
@@ -337,7 +339,7 @@ public class GoalController
 
                 GoalFullPaneController goalFullPaneController = loader.getController();
 
-                goalFullPaneController.UpdateGoalPane(goal);
+                goalFullPaneController.updateGoalPane(goal);
 
                 AnchorPane.setTopAnchor(newContent, 0.0);
                 AnchorPane.setBottomAnchor(newContent, 0.0);
@@ -370,13 +372,13 @@ public class GoalController
     /**
      * Update the display of accomplished goals
      */
-    private void UpdateDisplayAccomplishedGoals()
+    private void updateDisplayAccomplishedGoals()
     {
         accomplishedPane1.getChildren().clear();
         accomplishedPane2.getChildren().clear();
 
         List<Goal> accomplishedGoals =
-            goals.stream().filter(g -> g.IsCompleted()).collect(Collectors.toList());
+            goals.stream().filter(g -> g.isCompleted()).collect(Collectors.toList());
 
         Integer start = accomplishedCurrentPage * accomplishedItemsPerPage;
         Integer end =
@@ -402,7 +404,7 @@ public class GoalController
 
                 GoalFullPaneController goalFullPaneController = loader.getController();
 
-                goalFullPaneController.UpdateGoalPane(goal);
+                goalFullPaneController.updateGoalPane(goal);
 
                 AnchorPane.setTopAnchor(newContent, 0.0);
                 AnchorPane.setBottomAnchor(newContent, 0.0);
@@ -432,7 +434,7 @@ public class GoalController
         accomplishedNextButton.setDisable(end >= accomplishedGoals.size());
     }
 
-    private void UpdateGoalTableView()
+    private void updateGoalTableView()
     {
         // Get the search text
         String searchText = goalSearchField.getText();
@@ -453,15 +455,15 @@ public class GoalController
                     }
                     else if (selectedGoalStatus.equals("COMPLETED"))
                     {
-                        return g.IsCompleted() && !g.IsArchived();
+                        return g.isCompleted() && !g.getIsArchived();
                     }
                     else if (selectedGoalStatus.equals("ACTIVE"))
                     {
-                        return !g.IsCompleted() && !g.IsArchived();
+                        return !g.isCompleted() && !g.getIsArchived();
                     }
                     else if (selectedGoalStatus.equals("ARCHIVED"))
                     {
-                        return g.IsArchived();
+                        return g.getIsArchived();
                     }
 
                     return false;
@@ -478,47 +480,47 @@ public class GoalController
                     }
                     else if (selectedGoalStatus.equals("COMPLETED"))
                     {
-                        return g.IsCompleted() && !g.IsArchived();
+                        return g.isCompleted() && !g.getIsArchived();
                     }
                     else if (selectedGoalStatus.equals("ACTIVE"))
                     {
-                        return !g.IsCompleted() && !g.IsArchived();
+                        return !g.isCompleted() && !g.getIsArchived();
                     }
                     else if (selectedGoalStatus.equals("ARCHIVED"))
                     {
-                        return g.IsArchived();
+                        return g.getIsArchived();
                     }
 
                     return false;
                 })
                 .filter(g -> {
-                    String name          = g.GetName().toLowerCase();
-                    String initialAmount = g.GetInitialBalance().toString();
-                    String currentAmount = g.GetBalance().toString();
-                    String targetAmount  = g.GetTargetBalance().toString();
+                    String name          = g.getName().toLowerCase();
+                    String initialAmount = g.getInitialBalance().toString();
+                    String currentAmount = g.getBalance().toString();
+                    String targetAmount  = g.getTargetBalance().toString();
                     String targetDate =
-                        g.GetTargetDate().format(Constants.DATE_FORMATTER_NO_TIME);
+                        g.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME);
 
-                    String completionDate = g.GetCompletionDate() != null
-                                                ? g.GetCompletionDate().format(
+                    String completionDate = g.getCompletionDate() != null
+                                                ? g.getCompletionDate().format(
                                                       Constants.DATE_FORMATTER_NO_TIME)
                                                 : "-";
 
-                    String status = g.IsCompleted() ? "completed" : "active";
+                    String status = g.isCompleted() ? "completed" : "active";
 
                     String monthsUntilTarget =
                         Constants
-                            .CalculateMonthsUntilTarget(LocalDate.now(),
-                                                        g.GetTargetDate().toLocalDate())
+                            .calculateMonthsUntilTarget(LocalDate.now(),
+                                                        g.getTargetDate().toLocalDate())
                             .toString();
 
                     String recommendedMonthlyDeposit =
-                        g.GetTargetBalance()
-                            .subtract(g.GetBalance())
+                        g.getTargetBalance()
+                            .subtract(g.getBalance())
                             .divide(
-                                BigDecimal.valueOf(Constants.CalculateMonthsUntilTarget(
+                                BigDecimal.valueOf(Constants.calculateMonthsUntilTarget(
                                     LocalDate.now(),
-                                    g.GetTargetDate().toLocalDate())),
+                                    g.getTargetDate().toLocalDate())),
                                 2,
                                 RoundingMode.HALF_UP)
                             .toString();
@@ -542,11 +544,11 @@ public class GoalController
     /**
      * Set the actions for the buttons
      */
-    private void SetButtonsActions()
+    private void setButtonsActions()
     {
         Integer inProgressGoalsSize =
             goals.stream()
-                .filter(g -> !g.IsCompleted() && !g.IsArchived())
+                .filter(g -> !g.isCompleted() && !g.getIsArchived())
                 .collect(Collectors.toList())
                 .size();
 
@@ -554,7 +556,7 @@ public class GoalController
             if (inProgressCurrentPage > 0)
             {
                 inProgressCurrentPage--;
-                UpdateDisplayInProgressGoals();
+                updateDisplayInProgressGoals();
             }
         });
 
@@ -562,12 +564,12 @@ public class GoalController
             if (inProgressCurrentPage < inProgressGoalsSize / inProgressItemsPerPage)
             {
                 inProgressCurrentPage++;
-                UpdateDisplayInProgressGoals();
+                updateDisplayInProgressGoals();
             }
         });
 
         Integer accomplishedGoalsSize = goals.stream()
-                                            .filter(g -> g.IsCompleted())
+                                            .filter(g -> g.isCompleted())
                                             .collect(Collectors.toList())
                                             .size();
 
@@ -575,7 +577,7 @@ public class GoalController
             if (accomplishedCurrentPage > 0)
             {
                 accomplishedCurrentPage--;
-                UpdateDisplayAccomplishedGoals();
+                updateDisplayAccomplishedGoals();
             }
         });
 
@@ -584,16 +586,16 @@ public class GoalController
                 accomplishedGoalsSize / accomplishedItemsPerPage)
             {
                 accomplishedCurrentPage++;
-                UpdateDisplayAccomplishedGoals();
+                updateDisplayAccomplishedGoals();
             }
         });
     }
 
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<Goal, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -619,47 +621,47 @@ public class GoalController
 
         TableColumn<Goal, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetName()));
+            param -> new SimpleObjectProperty<>(param.getValue().getName()));
 
         TableColumn<Goal, String> initialAmountColumn =
             new TableColumn<>("Initial Amount");
         initialAmountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetInitialBalance())));
+                UIUtils.formatCurrency(param.getValue().getInitialBalance())));
 
         TableColumn<Goal, String> currentAmountColumn =
             new TableColumn<>("Current Amount");
         currentAmountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetBalance())));
+                UIUtils.formatCurrency(param.getValue().getBalance())));
 
         TableColumn<Goal, String> targetAmountColumn =
             new TableColumn<>("Target Amount");
         targetAmountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetTargetBalance())));
+                UIUtils.formatCurrency(param.getValue().getTargetBalance())));
 
         TableColumn<Goal, String> progressColumn = new TableColumn<>("Progress");
         progressColumn.setCellValueFactory(param -> {
             // If the goal is archived, return 100 %
-            if (param.getValue().IsCompleted())
-                return new SimpleObjectProperty<>(UIUtils.FormatPercentage(100));
+            if (param.getValue().isCompleted())
+                return new SimpleObjectProperty<>(UIUtils.formatPercentage(100));
 
-            return new SimpleObjectProperty<>(UIUtils.FormatPercentage(
+            return new SimpleObjectProperty<>(UIUtils.formatPercentage(
                 // Calculate the progress, avoiding division by zero
-                param.getValue().GetBalance().compareTo(BigDecimal.ZERO) == 0
+                param.getValue().getBalance().compareTo(BigDecimal.ZERO) == 0
                     ? BigDecimal.ZERO
-                    : param.getValue().GetBalance().doubleValue() /
-                          param.getValue().GetTargetBalance().doubleValue() * 100));
+                    : param.getValue().getBalance().doubleValue() /
+                          param.getValue().getTargetBalance().doubleValue() * 100));
         });
 
         TableColumn<Goal, String> targetDateColumn = new TableColumn<>("Target Date");
         targetDateColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetTargetDate().format(
+            -> new SimpleStringProperty(param.getValue().getTargetDate().format(
                 Constants.DATE_FORMATTER_NO_TIME)));
 
         TableColumn<Goal, String> completionDateColumn =
@@ -667,11 +669,11 @@ public class GoalController
         completionDateColumn.setCellValueFactory(param -> {
             // If the goal is archived and has a completion date, return it
             // formatted, otherwise return an empty string
-            if (param.getValue().IsCompleted() &&
-                param.getValue().GetCompletionDate() != null)
+            if (param.getValue().isCompleted() &&
+                param.getValue().getCompletionDate() != null)
             {
                 return new SimpleStringProperty(
-                    param.getValue().GetCompletionDate().format(
+                    param.getValue().getCompletionDate().format(
                         Constants.DATE_FORMATTER_NO_TIME));
             }
 
@@ -681,20 +683,20 @@ public class GoalController
         TableColumn<Goal, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(param.getValue().IsCompleted() ? "COMPLETED"
+            -> new SimpleObjectProperty<>(param.getValue().isCompleted() ? "COMPLETED"
                                                                          : "ACTIVE"));
 
         TableColumn<Goal, String> monthsUntilTargetColumn =
             new TableColumn<>("Months Until Target");
         monthsUntilTargetColumn.setCellValueFactory(param -> {
             // If the goal is archived, return an empty string
-            if (param.getValue().IsCompleted())
+            if (param.getValue().isCompleted())
                 return new SimpleObjectProperty<>("-");
 
             // Calculate the number of months until the target date
-            Long monthsUntilTarget = Constants.CalculateMonthsUntilTarget(
+            Long monthsUntilTarget = Constants.calculateMonthsUntilTarget(
                 LocalDate.now(),
-                param.getValue().GetTargetDate().toLocalDate());
+                param.getValue().getTargetDate().toLocalDate());
 
             return new SimpleObjectProperty<>(monthsUntilTarget.toString());
         });
@@ -703,13 +705,13 @@ public class GoalController
             new TableColumn<>("Recommended Monthly Deposit");
         recommendedMonthlyDepositColumn.setCellValueFactory(param -> {
             // If the goal is archived, return an empty string
-            if (param.getValue().IsCompleted())
+            if (param.getValue().isCompleted())
                 return new SimpleObjectProperty<>("-");
 
             // Calculate the number of months until the target date
-            Long monthsUntilTarget = Constants.CalculateMonthsUntilTarget(
+            Long monthsUntilTarget = Constants.calculateMonthsUntilTarget(
                 LocalDate.now(),
-                param.getValue().GetTargetDate().toLocalDate());
+                param.getValue().getTargetDate().toLocalDate());
 
             // Calculate the recommended monthly deposit
             Double recommendedMonthlyDeposit;
@@ -717,22 +719,22 @@ public class GoalController
             if (monthsUntilTarget <= 0)
             {
                 recommendedMonthlyDeposit = param.getValue()
-                                                .GetTargetBalance()
-                                                .subtract(param.getValue().GetBalance())
+                                                .getTargetBalance()
+                                                .subtract(param.getValue().getBalance())
                                                 .doubleValue();
             }
             else
             {
                 recommendedMonthlyDeposit =
                     param.getValue()
-                        .GetTargetBalance()
-                        .subtract(param.getValue().GetBalance())
+                        .getTargetBalance()
+                        .subtract(param.getValue().getBalance())
                         .doubleValue() /
                     BigDecimal.valueOf(monthsUntilTarget).doubleValue();
             }
 
             return new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(recommendedMonthlyDeposit));
+                UIUtils.formatCurrency(recommendedMonthlyDeposit));
         });
 
         goalTableView.getColumns().add(idColumn);
@@ -754,7 +756,7 @@ public class GoalController
                 if (newItem != null)
                 {
                     Tooltip tooltip =
-                        new Tooltip("Motivation: " + newItem.GetMotivation());
+                        new Tooltip("Motivation: " + newItem.getMotivation());
                     Tooltip.install(row, tooltip);
                 }
             });
@@ -762,7 +764,7 @@ public class GoalController
         });
     }
 
-    private void PopulateStatusComboBox()
+    private void populateStatusComboBox()
     {
         statusComboBox.getItems().add("ALL");
         statusComboBox.getItems().add("ACTIVE");

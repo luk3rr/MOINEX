@@ -38,7 +38,7 @@ public class CircularProgressBar extends Canvas
         fontColor       = Color.web("#000000");
     }
 
-    public void Draw(Double percent)
+    public void draw(Double percent)
     {
         percent = Math.max(Math.min(percent, 100), 0);
 
@@ -70,6 +70,6 @@ public class CircularProgressBar extends Canvas
             ArcType.OPEN);
 
         gc.setFill(fontColor);
-        gc.fillText(UIUtils.FormatPercentage(percent), getWidth() / 2, getHeight() / 2);
+        gc.fillText(UIUtils.formatPercentage(percent), getWidth() / 2, getHeight() / 2);
     }
 }

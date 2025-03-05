@@ -13,6 +13,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.services.GoalService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Goal dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddGoalController
 {
     @FXML
@@ -43,8 +45,6 @@ public class AddGoalController
 
     private GoalService goalService;
 
-    public AddGoalController() { }
-
     /**
      * Constructor
      * @param goalService GoalService
@@ -59,7 +59,7 @@ public class AddGoalController
     @FXML
     private void initialize()
     {
-        UIUtils.SetDatePickerFormat(targetDatePicker);
+        UIUtils.setDatePickerFormat(targetDatePicker);
 
         // Ensure that the balance fields only accept monetary values
         initialBalanceField.textProperty().addListener(
@@ -100,7 +100,7 @@ public class AddGoalController
         if (goalName.isEmpty() || initialBalanceStr.isEmpty() ||
             targetBalanceStr.isEmpty() || targetDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all required fields.");
 
@@ -112,13 +112,13 @@ public class AddGoalController
             BigDecimal initialBalance = new BigDecimal(initialBalanceStr);
             BigDecimal targetBalance  = new BigDecimal(targetBalanceStr);
 
-            goalService.CreateGoal(goalName,
-                                   initialBalance,
-                                   targetBalance,
-                                   targetDate,
-                                   motivation);
+            goalService.addGoal(goalName,
+                                initialBalance,
+                                targetBalance,
+                                targetDate,
+                                motivation);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Goal created",
                                           "The goal was successfully created.");
 
@@ -127,13 +127,13 @@ public class AddGoalController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid balance",
                                         "Please enter a valid balance.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error", "Error creating goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error", "Error creating goal", e.getMessage());
         }
     }
 }

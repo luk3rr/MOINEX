@@ -32,13 +32,13 @@ public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
      * Get all credit cards that are archived
      * @return A list with all credit cards that are archived
      */
-    List<CreditCard> findAllByArchivedTrue();
+    List<CreditCard> findAllByIsArchivedTrue();
 
     /**
      * Get all credit cards that are not archived
      * @return A list with all credit cards that are not archived
      */
-    List<CreditCard> findAllByArchivedFalse();
+    List<CreditCard> findAllByIsArchivedFalse();
 
     /**
      * Get all credit cards ordered by name
@@ -50,5 +50,5 @@ public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
      * Get all credit cards are not archived ordered by name
      * @return A list with all credit cards that are not archived ordered by name
      */
-    List<CreditCard> findAllByArchivedFalseOrderByNameAsc();
+    List<CreditCard> findAllByIsArchivedFalseOrderByNameAsc();
 }

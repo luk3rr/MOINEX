@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.moinex.services.CalculatorService;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
  * Controller class for the Calculator application
  */
 @Controller
+@NoArgsConstructor
 public class CalculatorController
 {
     @FXML
@@ -32,8 +34,6 @@ public class CalculatorController
     private CalculatorService calculatorService;
 
     private StringBuilder expression = new StringBuilder();
-
-    public CalculatorController() { }
 
     /**
      * Constructor for CalculatorController
@@ -49,7 +49,7 @@ public class CalculatorController
     private void initialize()
     {
         // Clear the result when the calculator is opened
-        calculatorService.SetResult(null);
+        calculatorService.setResult(null);
         expression.setLength(0);
         expressionDisplay.setText("");
         mainDisplay.setText("0");
@@ -89,12 +89,13 @@ public class CalculatorController
             expressionDisplay.setText(
                 expression.toString().replaceAll("([+\\-*/])", " $1 ") + " = " +
                 result);
+
             mainDisplay.setText(String.valueOf(result));
 
             expression = new StringBuilder(
                 String.valueOf(result)); // Save the result for further calculations
 
-            calculatorService.SetResult(result.toString());
+            calculatorService.setResult(result.toString());
         }
         catch (RuntimeException e)
         {
@@ -102,9 +103,9 @@ public class CalculatorController
             mainDisplay.setText("");
             expression.setLength(0); // Clear the expression
 
-            calculatorService.SetResult(null);
+            calculatorService.setResult(null);
 
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error evaluating expression",
                                         e.getMessage());
         }

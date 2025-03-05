@@ -32,12 +32,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.stage.FileChooser;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.Wallet;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
-import org.moinex.services.WalletTransactionService;
 import org.moinex.util.LoggerConfig;
 import org.moinex.util.MappingRow;
 import org.moinex.util.WindowUtils;
@@ -51,6 +51,7 @@ import org.springframework.stereotype.Controller;
  * TODO: Add option to default values
  */
 @Controller
+@NoArgsConstructor
 public class CSVImportController
 {
     @FXML
@@ -71,35 +72,36 @@ public class CSVImportController
 
     private WalletService walletService;
 
-    private WalletTransactionService walletTransactionService;
-
     private ObservableList<String> availableDbColumns;
 
-    private static final Logger m_logger = LoggerConfig.GetLogger();
+    private static final Logger m_logger = LoggerConfig.getLogger();
 
-    public CSVImportController() { }
-
+    /**
+     * Constructor
+     * @param categoryService CategoryService
+     * @param creditCardService CreditCardService
+     * @param walletService WalletService
+     * @note This constructor is used for dependency injection
+     */
     @Autowired
-    public CSVImportController(CategoryService          categoryService,
-                               CreditCardService        creditCardService,
-                               WalletService            walletService,
-                               WalletTransactionService walletTransactionService)
+    public CSVImportController(CategoryService   categoryService,
+                               CreditCardService creditCardService,
+                               WalletService     walletService)
     {
-        this.categoryService          = categoryService;
-        this.creditCardService        = creditCardService;
-        this.walletService            = walletService;
-        this.walletTransactionService = walletTransactionService;
+        this.categoryService   = categoryService;
+        this.creditCardService = creditCardService;
+        this.walletService     = walletService;
     }
 
     @FXML
     private void initialize()
     {
-        ConfigureMappingTable();
-        PopulateSelectTableComboBox();
+        configureMappingTable();
+        populateSelectTableComboBox();
 
         // Add a listener to the table selector
         tableSelectorComboBox.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> { PopulateMappingTable(); });
+            (observable, oldValue, newValue) -> { populateMappingTable(); });
     }
 
     /**
@@ -122,12 +124,12 @@ public class CSVImportController
         if (selectedFile != null)
         {
             selectedCsvField.setText(selectedFile.getAbsolutePath());
-            LoadCsvIntoTableView(selectedFile);
+            loadCSVIntoTableView(selectedFile);
         }
         else
         {
             selectedCsvField.setText("");
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "No file selected",
                 "No file was selected. Please select a file.");
@@ -144,19 +146,19 @@ public class CSVImportController
         {
             try
             {
-                List<String> dbColumns = GetDbColumnsForTable(selectedTable);
+                List<String> dbColumns = getDBColumnsForTable(selectedTable);
 
                 for (MappingRow row : mappingTableView.getItems())
                 {
-                    row.GetDbColumnOptions().clear();
-                    row.GetDbColumnOptions().addAll(dbColumns);
+                    row.getDBColumnOptions().clear();
+                    row.getDBColumnOptions().addAll(dbColumns);
                 }
 
                 mappingTableView.refresh();
             }
             catch (ClassNotFoundException e)
             {
-                WindowUtils.ShowErrorDialog(
+                WindowUtils.showErrorDialog(
                     "Error",
                     "Error getting columns",
                     "An error occurred while getting the "
@@ -172,12 +174,12 @@ public class CSVImportController
      * @param tableName The name of the table
      * @return A list of column names
      */
-    public List<String> GetDbColumnsForTable(String tableName)
+    public List<String> getDBColumnsForTable(String tableName)
         throws ClassNotFoundException
     {
         Class<?> entityClass = Class.forName("org.moinex.entities." + tableName);
 
-        return GetDbColumnsForTable(entityClass);
+        return getDBColumnsForTable(entityClass);
     }
 
     /**
@@ -185,7 +187,7 @@ public class CSVImportController
      * @param entityClass The entity class
      * @return A list of column names
      */
-    public List<String> GetDbColumnsForTable(Class<?> entityClass)
+    public List<String> getDBColumnsForTable(Class<?> entityClass)
     {
         List<String> columns = new ArrayList<>();
 
@@ -211,7 +213,7 @@ public class CSVImportController
         return columns;
     }
 
-    private void LoadCsvIntoTableView(File csvFile)
+    private void loadCSVIntoTableView(File csvFile)
     {
         csvPreviewTableView.getColumns().clear();
         csvPreviewTableView.getItems().clear();
@@ -222,7 +224,7 @@ public class CSVImportController
 
             if (lines.isEmpty())
             {
-                WindowUtils.ShowInformationDialog(
+                WindowUtils.showInformationDialog(
                     "Info",
                     "Empty file",
                     "The selected file is empty. Please select another file.");
@@ -268,7 +270,7 @@ public class CSVImportController
         }
         catch (Exception e)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Error reading file",
                 "An error occurred while reading the file. Please try again.");
@@ -276,13 +278,13 @@ public class CSVImportController
             m_logger.severe(e.getMessage());
         }
 
-        PopulateMappingTable();
+        populateMappingTable();
     }
 
     /**
      * Maps the CSV columns to the database columns
      */
-    public void PopulateMappingTable()
+    public void populateMappingTable()
     {
         mappingTableView.getItems().clear();
 
@@ -297,7 +299,7 @@ public class CSVImportController
         try
         {
 
-            List<String> dbColumns = GetDbColumnsForTable(selectedTable);
+            List<String> dbColumns = getDBColumnsForTable(selectedTable);
 
             List<String> csvColumns = csvPreviewTableView.getColumns()
                                           .stream()
@@ -317,7 +319,7 @@ public class CSVImportController
         }
         catch (ClassNotFoundException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error getting columns",
                                         "An error occurred while getting the "
                                             +
@@ -327,7 +329,7 @@ public class CSVImportController
         }
     }
 
-    public void PopulateSelectTableComboBox()
+    public void populateSelectTableComboBox()
     {
         List<String> entityNames = new ArrayList<>();
 
@@ -354,7 +356,7 @@ public class CSVImportController
      * @throws IOException if the file is not found or cannot be read
      * @throws CsvException if the CSV file is not well formatted
      */
-    public List<String[]> ReadCSV(String csvFilePath) throws IOException, CsvException
+    public List<String[]> readCSV(String csvFilePath) throws IOException, CsvException
     {
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath)))
         {
@@ -367,7 +369,7 @@ public class CSVImportController
      * @param csvData the data from the CSV file
      * @param columnMapping a map that maps the CSV columns to the database columns
      */
-    public void MapAndInsertCategory(List<String[]>      csvData,
+    public void mapAndInsertCategory(List<String[]>      csvData,
                                      Map<String, String> columnMapping)
     {
         String[]       csvHeaders = csvData.get(0);                     // CSV Headers
@@ -384,8 +386,8 @@ public class CSVImportController
                 {
                     try
                     {
-                        categoryService.AddCategory(
-                            GetValueForColumn(csvHeaders, row, csvColumn));
+                        categoryService.addCategory(
+                            getvalueforcolumn(csvHeaders, row, csvColumn));
                     }
                     catch (IllegalArgumentException e)
                     {
@@ -405,7 +407,7 @@ public class CSVImportController
      * @param csvData the data from the CSV file
      * @param columnMapping a map that maps the CSV columns to the database columns
      */
-    public void MapAndInsertWallet(List<String[]>      csvData,
+    public void mapAndInsertWallet(List<String[]>      csvData,
                                    Map<String, String> columnMapping)
     {
         String[]       csvHeaders = csvData.get(0);                     // CSV Headers
@@ -413,7 +415,7 @@ public class CSVImportController
 
         for (String[] row : dataRows)
         {
-            Wallet wt = new Wallet();
+            Wallet wt = Wallet.builder().build();
 
             for (Map.Entry<String, String> entry : columnMapping.entrySet())
             {
@@ -424,12 +426,12 @@ public class CSVImportController
                 {
                     if (dbColumn.equals("name"))
                     {
-                        wt.SetName(GetValueForColumn(csvHeaders, row, csvColumn));
+                        wt.setName(getvalueforcolumn(csvHeaders, row, csvColumn));
                     }
                     else if (dbColumn.equals("balance"))
                     {
-                        wt.SetBalance(new BigDecimal(
-                            GetValueForColumn(csvHeaders, row, csvColumn)));
+                        wt.setBalance(new BigDecimal(
+                            getvalueforcolumn(csvHeaders, row, csvColumn)));
                     }
                 }
                 catch (IllegalArgumentException e)
@@ -442,7 +444,7 @@ public class CSVImportController
                 }
             }
 
-            walletService.CreateWallet(wt.GetName(), wt.GetBalance());
+            walletService.addWallet(wt.getName(), wt.getBalance());
         }
     }
 
@@ -451,7 +453,7 @@ public class CSVImportController
      * @param csvData the data from the CSV file
      * @param columnMapping a map that maps the CSV columns to the database columns
      */
-    public void MapAndInsertCreditCard(List<String[]>      csvData,
+    public void mapandinsertcreditcard(List<String[]>      csvData,
                                        Map<String, String> columnMapping)
     {
         String[]       csvHeaders = csvData.get(0);                     // CSV Headers
@@ -459,7 +461,7 @@ public class CSVImportController
 
         for (String[] row : dataRows)
         {
-            CreditCard crc = new CreditCard();
+            CreditCard crc = CreditCard.builder().build();
 
             for (Map.Entry<String, String> entry : columnMapping.entrySet())
             {
@@ -470,27 +472,27 @@ public class CSVImportController
                 {
                     if (dbColumn.equals("name"))
                     {
-                        crc.SetName(GetValueForColumn(csvHeaders, row, csvColumn));
+                        crc.setName(getvalueforcolumn(csvHeaders, row, csvColumn));
                     }
                     else if (dbColumn.equals("max_debt"))
                     {
-                        crc.SetMaxDebt(new BigDecimal(
-                            GetValueForColumn(csvHeaders, row, csvColumn)));
+                        crc.setMaxDebt(new BigDecimal(
+                            getvalueforcolumn(csvHeaders, row, csvColumn)));
                     }
                     else if (dbColumn.equals("closing_day"))
                     {
-                        crc.SetClosingDay(Integer.parseInt(
-                            GetValueForColumn(csvHeaders, row, csvColumn)));
+                        crc.setClosingDay(Integer.parseInt(
+                            getvalueforcolumn(csvHeaders, row, csvColumn)));
                     }
                     else if (dbColumn.equals("billing_due_day"))
                     {
-                        crc.SetBillingDueDay(Integer.parseInt(
-                            GetValueForColumn(csvHeaders, row, csvColumn)));
+                        crc.setBillingDueDay(Integer.parseInt(
+                            getvalueforcolumn(csvHeaders, row, csvColumn)));
                     }
                     else if (dbColumn.equals("last_four_digits"))
                     {
-                        crc.SetLastFourDigits(
-                            GetValueForColumn(csvHeaders, row, csvColumn));
+                        crc.setLastFourDigits(
+                            getvalueforcolumn(csvHeaders, row, csvColumn));
                     }
                 }
                 catch (NumberFormatException e)
@@ -507,12 +509,12 @@ public class CSVImportController
                 }
             }
 
-            creditCardService.CreateCreditCard(crc.GetName(),
-                                               crc.GetBillingDueDay(),
-                                               crc.GetClosingDay(),
-                                               crc.GetMaxDebt(),
-                                               crc.GetLastFourDigits(),
-                                               0L); // default operator id
+            creditCardService.addCreditCard(crc.getName(),
+                                            crc.getBillingDueDay(),
+                                            crc.getClosingDay(),
+                                            crc.getMaxDebt(),
+                                            crc.getLastFourDigits(),
+                                            0L); // default operator id
         }
     }
 
@@ -524,7 +526,7 @@ public class CSVImportController
      * @return the value for the given column
      */
     private String
-    GetValueForColumn(String[] csvHeaders, String[] row, String csvColumn)
+    getvalueforcolumn(String[] csvHeaders, String[] row, String csvColumn)
     {
         for (int i = 0; i < csvHeaders.length; i++)
         {
@@ -537,7 +539,7 @@ public class CSVImportController
         throw new IllegalArgumentException("Column " + csvColumn + " not found");
     }
 
-    private void ConfigureMappingTable()
+    private void configureMappingTable()
     {
         TableColumn<MappingRow, String> csvColumnTableColumn =
             new TableColumn<>("CSV Column");
@@ -545,10 +547,10 @@ public class CSVImportController
             new TableColumn<>("DB Column");
 
         csvColumnTableColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetCsvColumn()));
+            param -> new SimpleStringProperty(param.getValue().getCSVColumn()));
 
         dbColumnTableColumn.setCellValueFactory(param -> {
-            return new SimpleStringProperty(param.getValue().GetSelectedDbColumn());
+            return new SimpleStringProperty(param.getValue().getSelectedDBColumn());
         });
 
         dbColumnTableColumn.setCellFactory(
@@ -579,7 +581,7 @@ public class CSVImportController
 
                             // Configure the ComboBox
                             comboBox.setItems(availableOptions);
-                            comboBox.setValue(row.GetSelectedDbColumn());
+                            comboBox.setValue(row.getSelectedDBColumn());
                             comboBox.setMaxWidth(Double.MAX_VALUE);
 
                             comboBox.valueProperty().addListener(
@@ -591,7 +593,7 @@ public class CSVImportController
                                         FXCollections.sort(availableDbColumns);
                                     }
 
-                                    row.SetSelectedDbColumn(newValue);
+                                    row.setSelectedDBColumn(newValue);
 
                                     if (newValue != null && !newValue.isEmpty())
                                     {
@@ -622,9 +624,9 @@ public class CSVImportController
                     // Remove selections made by other rows, except the current row
                     for (MappingRow row : mappingTableView.getItems())
                     {
-                        if (row != currentRow && row.GetSelectedDbColumn() != null)
+                        if (row != currentRow && row.getSelectedDBColumn() != null)
                         {
-                            availableOptions.remove(row.GetSelectedDbColumn());
+                            availableOptions.remove(row.getSelectedDBColumn());
                         }
                     }
 

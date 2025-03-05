@@ -85,7 +85,7 @@ public class TickerServiceTest
     private Category          m_category;
 
     @BeforeEach
-    public void SetUp()
+    public void setUp()
     {
         m_ticker1 = new Ticker(1L,
                                "Ticker1",
@@ -134,28 +134,33 @@ public class TickerServiceTest
 
         m_wallet = new Wallet(1L, "Main Wallet", BigDecimal.ZERO);
 
-        m_category = new Category("Dividend Payment");
+        m_category = Category.builder().name("Category").build();
 
-        m_purchaseTransaction = new WalletTransaction(m_wallet,
-                                                      m_category,
-                                                      TransactionType.EXPENSE,
-                                                      TransactionStatus.CONFIRMED,
-                                                      LocalDateTime.now(),
-                                                      new BigDecimal("50"),
-                                                      "TickerPurchase");
-        m_purchase            = new TickerPurchase(1L,
+        m_purchaseTransaction = WalletTransaction.builder()
+                                    .wallet(m_wallet)
+                                    .category(m_category)
+                                    .type(TransactionType.EXPENSE)
+                                    .status(TransactionStatus.CONFIRMED)
+                                    .date(LocalDateTime.now())
+                                    .amount(new BigDecimal("50"))
+                                    .description("TickerPurchase")
+                                    .build();
+
+        m_purchase = new TickerPurchase(1L,
                                         m_ticker1,
                                         new BigDecimal("1"),
                                         new BigDecimal("50"),
                                         m_purchaseTransaction);
 
-        m_saleTransaction = new WalletTransaction(m_wallet,
-                                                  m_category,
-                                                  TransactionType.INCOME,
-                                                  TransactionStatus.CONFIRMED,
-                                                  LocalDateTime.now(),
-                                                  new BigDecimal("50"),
-                                                  "TickerSale");
+        m_saleTransaction = WalletTransaction.builder()
+                                .wallet(m_wallet)
+                                .category(m_category)
+                                .type(TransactionType.INCOME)
+                                .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
+                                .amount(new BigDecimal("50"))
+                                .description("TickerSale")
+                                .build();
 
         m_sale = new TickerSale(1L,
                                 m_ticker1,
@@ -164,13 +169,15 @@ public class TickerServiceTest
                                 m_saleTransaction,
                                 new BigDecimal("50"));
 
-        m_dividendTransaction = new WalletTransaction(m_wallet,
-                                                      m_category,
-                                                      TransactionType.INCOME,
-                                                      TransactionStatus.CONFIRMED,
-                                                      LocalDateTime.now(),
-                                                      new BigDecimal("50"),
-                                                      "Dividend Payment");
+        m_dividendTransaction = WalletTransaction.builder()
+                                    .wallet(m_wallet)
+                                    .category(m_category)
+                                    .type(TransactionType.INCOME)
+                                    .status(TransactionStatus.CONFIRMED)
+                                    .date(LocalDateTime.now())
+                                    .amount(new BigDecimal("50"))
+                                    .description("Dividend Payment")
+                                    .build();
 
         m_dividend = new Dividend(1L, m_ticker1, m_dividendTransaction);
 
@@ -193,47 +200,46 @@ public class TickerServiceTest
 
     @Test
     @DisplayName("Test if a ticker is registered successfully")
-    public void TestRegisterTicker()
+    public void testRegisterTicker()
     {
-        when(m_tickerRepository.existsBySymbol(m_ticker1.GetSymbol()))
+        when(m_tickerRepository.existsBySymbol(m_ticker1.getSymbol()))
             .thenReturn(false);
 
-        m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                       m_ticker1.GetSymbol(),
-                                       m_ticker1.GetType(),
-                                       m_ticker1.GetCurrentUnitValue(),
-                                       m_ticker1.GetAveragePrice(),
-                                       m_ticker1.GetCurrentQuantity());
+        m_tickerService.addTicker(m_ticker1.getName(),
+                                  m_ticker1.getSymbol(),
+                                  m_ticker1.getType(),
+                                  m_ticker1.getCurrentUnitValue(),
+                                  m_ticker1.getAverageUnitValue(),
+                                  m_ticker1.getCurrentQuantity());
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository).save(tickerCaptor.capture());
 
         Ticker savedTicker = tickerCaptor.getValue();
-        assertEquals(m_ticker1.GetName(), savedTicker.GetName());
-        assertEquals(m_ticker1.GetSymbol(), savedTicker.GetSymbol());
-        assertEquals(m_ticker1.GetType(), savedTicker.GetType());
+        assertEquals(m_ticker1.getName(), savedTicker.getName());
+        assertEquals(m_ticker1.getSymbol(), savedTicker.getSymbol());
+        assertEquals(m_ticker1.getType(), savedTicker.getType());
         assertEquals(0,
-                     m_ticker1.GetCurrentUnitValue().compareTo(
-                         savedTicker.GetCurrentUnitValue()));
+                     m_ticker1.getCurrentUnitValue().compareTo(
+                         savedTicker.getCurrentUnitValue()));
     }
 
     @Test
     @DisplayName(
         "Test if exception is thrown when registering a ticker with an existing symbol")
     public void
-    TestRegisterTickerAlreadyExists()
+    testRegisterTickerAlreadyExists()
     {
-        when(m_tickerRepository.existsBySymbol(m_ticker1.GetSymbol())).thenReturn(true);
+        when(m_tickerRepository.existsBySymbol(m_ticker1.getSymbol())).thenReturn(true);
 
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                                  m_ticker1.GetSymbol(),
-                                                  m_ticker1.GetType(),
-                                                  m_ticker1.GetCurrentUnitValue(),
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(m_ticker1.getName(),
+                                                      m_ticker1.getSymbol(),
+                                                      m_ticker1.getType(),
+                                                      m_ticker1.getCurrentUnitValue(),
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -242,28 +248,26 @@ public class TickerServiceTest
     @DisplayName(
         "Test if exception is thrown when registering a ticker with an empty name")
     public void
-    TestRegisterTickerEmptyName()
+    testRegisterTickerEmptyName()
     {
         // Test with empty name
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker("",
-                                                  m_ticker1.GetSymbol(),
-                                                  m_ticker1.GetType(),
-                                                  m_ticker1.GetCurrentUnitValue(),
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker("",
+                                                      m_ticker1.getSymbol(),
+                                                      m_ticker1.getType(),
+                                                      m_ticker1.getCurrentUnitValue(),
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
         // Test with blank name
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(" ",
-                                                  m_ticker1.GetSymbol(),
-                                                  m_ticker1.GetType(),
-                                                  m_ticker1.GetCurrentUnitValue(),
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(" ",
+                                                      m_ticker1.getSymbol(),
+                                                      m_ticker1.getType(),
+                                                      m_ticker1.getCurrentUnitValue(),
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -272,29 +276,27 @@ public class TickerServiceTest
     @DisplayName(
         "Test if exception is thrown when registering a ticker with an empty symbol")
     public void
-    TestRegisterTickerEmptySymbol()
+    testRegisterTickerEmptySymbol()
     {
         // Test with empty symbol
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                                  "",
-                                                  m_ticker1.GetType(),
-                                                  m_ticker1.GetCurrentUnitValue(),
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(m_ticker1.getName(),
+                                                      "",
+                                                      m_ticker1.getType(),
+                                                      m_ticker1.getCurrentUnitValue(),
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
 
         // Test with blank symbol
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                                  " ",
-                                                  m_ticker1.GetType(),
-                                                  m_ticker1.GetCurrentUnitValue(),
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(m_ticker1.getName(),
+                                                      " ",
+                                                      m_ticker1.getType(),
+                                                      m_ticker1.getCurrentUnitValue(),
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -303,32 +305,30 @@ public class TickerServiceTest
     @DisplayName("Test if exception is thrown when registering a ticker with price "
                  + "less than or equal to zero")
     public void
-    TestRegisterTickerInvalidPrice()
+    testRegisterTickerInvalidPrice()
     {
-        when(m_tickerRepository.existsBySymbol(m_ticker1.GetSymbol()))
+        when(m_tickerRepository.existsBySymbol(m_ticker1.getSymbol()))
             .thenReturn(false);
 
         // Test with price less than zero
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                                  m_ticker1.GetSymbol(),
-                                                  m_ticker1.GetType(),
-                                                  new BigDecimal("-0.05"),
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(m_ticker1.getName(),
+                                                      m_ticker1.getSymbol(),
+                                                      m_ticker1.getType(),
+                                                      new BigDecimal("-0.05"),
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
 
         // Test with price equal to zero
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                                  m_ticker1.GetSymbol(),
-                                                  m_ticker1.GetType(),
-                                                  BigDecimal.ZERO,
-                                                  m_ticker1.GetAveragePrice(),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(m_ticker1.getName(),
+                                                      m_ticker1.getSymbol(),
+                                                      m_ticker1.getType(),
+                                                      BigDecimal.ZERO,
+                                                      m_ticker1.getAverageUnitValue(),
+                                                      m_ticker1.getCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -338,117 +338,116 @@ public class TickerServiceTest
         "Test if exception is thrown when registering a ticker with average unit price "
         + "less than zero")
     public void
-    TestRegisterTickerInvalidAverageUnitPrice()
+    testRegisterTickerInvalidAverageUnitPrice()
     {
-        when(m_tickerRepository.existsBySymbol(m_ticker1.GetSymbol()))
+        when(m_tickerRepository.existsBySymbol(m_ticker1.getSymbol()))
             .thenReturn(false);
 
         // Test with average unit price less than zero
-        assertThrows(
-            RuntimeException.class,
-            ()
-                -> m_tickerService.RegisterTicker(m_ticker1.GetName(),
-                                                  m_ticker1.GetSymbol(),
-                                                  m_ticker1.GetType(),
-                                                  m_ticker1.GetCurrentUnitValue(),
-                                                  new BigDecimal("-0.05"),
-                                                  m_ticker1.GetCurrentQuantity()));
+        assertThrows(RuntimeException.class,
+                     ()
+                         -> m_tickerService.addTicker(m_ticker1.getName(),
+                                                      m_ticker1.getSymbol(),
+                                                      m_ticker1.getType(),
+                                                      m_ticker1.getCurrentUnitValue(),
+                                                      new BigDecimal("-0.05"),
+                                                      m_ticker1.getCurrentQuantity()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if a ticker is deleted successfully")
-    public void TestDeleteTicker()
+    public void testDeleteTicker()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        when(m_tickerRepository.GetPurchaseCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getPurchaseCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetSaleCountByTicker(m_ticker1.GetId())).thenReturn(0L);
-        when(m_tickerRepository.GetDividendCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getSaleCountByTicker(m_ticker1.getId())).thenReturn(0L);
+        when(m_tickerRepository.getDividendCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetCryptoExchangeCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
-        m_tickerService.DeleteTicker(m_ticker1.GetId());
+        m_tickerService.deleteTicker(m_ticker1.getId());
 
         verify(m_tickerRepository).delete(m_ticker1);
     }
 
     @Test
     @DisplayName("Test if exception is thrown when deleting a non-existent ticker")
-    public void TestDeleteTickerNotFound()
+    public void testDeleteTickerNotFound()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.DeleteTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when deleting a ticker with purchases")
-    public void TestDeleteTickerWithPurchases()
+    public void testDeleteTickerWithPurchases()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        when(m_tickerRepository.GetPurchaseCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getPurchaseCountByTicker(m_ticker1.getId()))
             .thenReturn(1L);
-        when(m_tickerRepository.GetSaleCountByTicker(m_ticker1.GetId())).thenReturn(0L);
-        when(m_tickerRepository.GetDividendCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getSaleCountByTicker(m_ticker1.getId())).thenReturn(0L);
+        when(m_tickerRepository.getDividendCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetCryptoExchangeCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.DeleteTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when deleting a ticker with sales")
-    public void TestDeleteTickerWithSales()
+    public void testDeleteTickerWithSales()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        when(m_tickerRepository.GetPurchaseCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getPurchaseCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetSaleCountByTicker(m_ticker1.GetId())).thenReturn(1L);
-        when(m_tickerRepository.GetDividendCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getSaleCountByTicker(m_ticker1.getId())).thenReturn(1L);
+        when(m_tickerRepository.getDividendCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetCryptoExchangeCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.DeleteTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when deleting a ticker with dividends")
-    public void TestDeleteTickerWithDividends()
+    public void testDeleteTickerWithDividends()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        when(m_tickerRepository.GetPurchaseCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getPurchaseCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetSaleCountByTicker(m_ticker1.GetId())).thenReturn(0L);
-        when(m_tickerRepository.GetDividendCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getSaleCountByTicker(m_ticker1.getId())).thenReturn(0L);
+        when(m_tickerRepository.getDividendCountByTicker(m_ticker1.getId()))
             .thenReturn(1L);
-        when(m_tickerRepository.GetCryptoExchangeCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.DeleteTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
     }
@@ -457,118 +456,120 @@ public class TickerServiceTest
     @DisplayName(
         "Test if exception is thrown when deleting a ticker with crypto exchanges")
     public void
-    TestDeleteTickerWithCryptoExchanges()
+    testDeleteTickerWithCryptoExchanges()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        when(m_tickerRepository.GetPurchaseCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getPurchaseCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetSaleCountByTicker(m_ticker1.GetId())).thenReturn(0L);
-        when(m_tickerRepository.GetDividendCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getSaleCountByTicker(m_ticker1.getId())).thenReturn(0L);
+        when(m_tickerRepository.getDividendCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
-        when(m_tickerRepository.GetCryptoExchangeCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(1L);
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.DeleteTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when deleting a ticker with transactions")
-    public void TestDeleteTickerWithTransactions()
+    public void testDeleteTickerWithTransactions()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        when(m_tickerRepository.GetPurchaseCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getPurchaseCountByTicker(m_ticker1.getId()))
             .thenReturn(1L);
-        when(m_tickerRepository.GetSaleCountByTicker(m_ticker1.GetId())).thenReturn(2L);
-        when(m_tickerRepository.GetDividendCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getSaleCountByTicker(m_ticker1.getId())).thenReturn(2L);
+        when(m_tickerRepository.getDividendCountByTicker(m_ticker1.getId()))
             .thenReturn(3L);
-        when(m_tickerRepository.GetCryptoExchangeCountByTicker(m_ticker1.GetId()))
+        when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(4L);
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.DeleteTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if a ticker is archived successfully")
-    public void TestArchiveTicker()
+    public void testArchiveTicker()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        m_tickerService.ArchiveTicker(m_ticker1.GetId());
+        m_tickerService.archiveTicker(m_ticker1.getId());
 
         verify(m_tickerRepository).save(m_ticker1);
-        assertTrue(m_ticker1.IsArchived());
+        assertTrue(m_ticker1.getIsArchived());
     }
 
     @Test
     @DisplayName("Test if exception is thrown when archiving a non-existent ticker")
-    public void TestArchiveTickerNotFound()
+    public void testArchiveTickerNotFound()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.ArchiveTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.archiveTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if a ticker is unarchived successfully")
-    public void TestUnarchiveTicker()
+    public void testUnarchiveTicker()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.of(m_ticker1));
 
-        m_tickerService.UnarchiveTicker(m_ticker1.GetId());
+        m_tickerService.unarchiveTicker(m_ticker1.getId());
 
         verify(m_tickerRepository).save(m_ticker1);
-        assertFalse(m_ticker1.IsArchived());
+        assertFalse(m_ticker1.getIsArchived());
     }
 
     @Test
     @DisplayName("Test if exception is thrown when unarchiving a non-existent ticker")
-    public void TestUnarchiveTickerNotFound()
+    public void testUnarchiveTickerNotFound()
     {
-        when(m_tickerRepository.findById(m_ticker1.GetId()))
+        when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> m_tickerService.UnarchiveTicker(m_ticker1.GetId()));
+                     () -> m_tickerService.unarchiveTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if a purchase is added successfully to a ticker")
-    public void TestAddPurchase()
+    public void testAddPurchase()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         when(m_walletTransactionService
-                 .AddExpense(anyLong(), any(), any(), any(), any(), any()))
+                 .addExpense(anyLong(), any(), any(), any(), any(), any()))
             .thenReturn(100L);
 
-        when(m_walletTransactionService.GetTransactionById(100L))
-            .thenReturn(new WalletTransaction(m_wallet,
-                                              m_category,
-                                              TransactionType.EXPENSE,
-                                              TransactionStatus.CONFIRMED,
-                                              LocalDateTime.now(),
-                                              new BigDecimal("50"),
-                                              "TickerPurchase"));
+        when(m_walletTransactionService.getTransactionById(100L))
+            .thenReturn(WalletTransaction.builder()
+                            .wallet(m_wallet)
+                            .category(m_category)
+                            .type(TransactionType.EXPENSE)
+                            .status(TransactionStatus.CONFIRMED)
+                            .date(LocalDateTime.now())
+                            .amount(new BigDecimal("50"))
+                            .description("TickerPurchase")
+                            .build());
 
-        m_tickerService.AddPurchase(1L,
+        m_tickerService.addPurchase(1L,
                                     1L,
                                     new BigDecimal("10"),
                                     new BigDecimal("150"),
@@ -583,20 +584,20 @@ public class TickerServiceTest
 
         verify(m_tickerPurchaseRepository).save(purchaseCaptor.capture());
 
-        assertEquals(m_ticker1, purchaseCaptor.getValue().GetTicker());
-        assertEquals(new BigDecimal("10"), purchaseCaptor.getValue().GetQuantity());
+        assertEquals(m_ticker1, purchaseCaptor.getValue().getTicker());
+        assertEquals(new BigDecimal("10"), purchaseCaptor.getValue().getQuantity());
     }
 
     @Test
     @DisplayName(
         "Test if adding a purchase to a non-existent ticker throws an exception")
     public void
-    TestAddPurchaseTickerNotFound()
+    testAddPurchaseTickerNotFound()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddPurchase(1L,
+            m_tickerService.addPurchase(1L,
                                         1L,
                                         new BigDecimal("10"),
                                         new BigDecimal("150"),
@@ -614,12 +615,12 @@ public class TickerServiceTest
     @DisplayName("Test if adding a purchase with quantity less than or equal to zero "
                  + "throws an exception")
     public void
-    TestAddPurchaseInvalidQuantity()
+    testAddPurchaseInvalidQuantity()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddPurchase(1L,
+            m_tickerService.addPurchase(1L,
                                         1L,
                                         BigDecimal.ZERO,
                                         new BigDecimal("150"),
@@ -637,12 +638,12 @@ public class TickerServiceTest
     @DisplayName("Test if adding a purchase with unit price less than or equal to "
                  + "zero throws an exception")
     public void
-    TestAddPurchaseInvalidUnitPrice()
+    testAddPurchaseInvalidUnitPrice()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddPurchase(1L,
+            m_tickerService.addPurchase(1L,
                                         1L,
                                         new BigDecimal("10"),
                                         BigDecimal.ZERO,
@@ -658,26 +659,28 @@ public class TickerServiceTest
 
     @Test
     @DisplayName("Test if a sale is added successfully to a ticker")
-    public void TestAddSale()
+    public void testAddSale()
     {
-        m_ticker1.SetCurrentQuantity(new BigDecimal("20"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("20"));
 
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         when(m_walletTransactionService
-                 .AddIncome(anyLong(), any(), any(), any(), any(), any()))
+                 .addIncome(anyLong(), any(), any(), any(), any(), any()))
             .thenReturn(100L);
 
-        when(m_walletTransactionService.GetTransactionById(100L))
-            .thenReturn(new WalletTransaction(m_wallet,
-                                              m_category,
-                                              TransactionType.INCOME,
-                                              TransactionStatus.CONFIRMED,
-                                              LocalDateTime.now(),
-                                              new BigDecimal("50"),
-                                              "TickerSale"));
+        when(m_walletTransactionService.getTransactionById(100L))
+            .thenReturn(WalletTransaction.builder()
+                            .wallet(m_wallet)
+                            .category(m_category)
+                            .type(TransactionType.INCOME)
+                            .status(TransactionStatus.CONFIRMED)
+                            .date(LocalDateTime.now())
+                            .amount(new BigDecimal("50"))
+                            .description("TickerSale")
+                            .build());
 
-        m_tickerService.AddSale(1L,
+        m_tickerService.addSale(1L,
                                 1L,
                                 new BigDecimal("10"),
                                 new BigDecimal("200"),
@@ -692,18 +695,18 @@ public class TickerServiceTest
 
         verify(m_tickerSaleRepository).save(saleCapptor.capture());
 
-        assertEquals(m_ticker1, saleCapptor.getValue().GetTicker());
-        assertEquals(new BigDecimal("10"), saleCapptor.getValue().GetQuantity());
+        assertEquals(m_ticker1, saleCapptor.getValue().getTicker());
+        assertEquals(new BigDecimal("10"), saleCapptor.getValue().getQuantity());
     }
 
     @Test
     @DisplayName("Test if adding a sale to a non-existent ticker throws an exception")
-    public void TestAddSaleTickerNotFound()
+    public void testAddSaleTickerNotFound()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddSale(1L,
+            m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("10"),
                                     new BigDecimal("200"),
@@ -721,13 +724,13 @@ public class TickerServiceTest
     @DisplayName("Test if adding a sale with quantity greater than current quantity "
                  + "throws an exception")
     public void
-    TestAddSaleExceedsQuantity()
+    testAddSaleExceedsQuantity()
     {
-        m_ticker1.SetCurrentQuantity(new BigDecimal("5"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("5"));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddSale(1L,
+            m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("10"),
                                     new BigDecimal("200"),
@@ -745,13 +748,13 @@ public class TickerServiceTest
     @DisplayName("Test if adding a sale with unit price less than or equal to zero "
                  + "throws an exception")
     public void
-    TestAddSaleInvalidUnitPrice()
+    testAddSaleInvalidUnitPrice()
     {
-        m_ticker1.SetCurrentQuantity(new BigDecimal("10"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("10"));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddSale(1L,
+            m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("5"),
                                     BigDecimal.ZERO,
@@ -767,24 +770,26 @@ public class TickerServiceTest
 
     @Test
     @DisplayName("Test if a dividend is added successfully to a ticker")
-    public void TestAddDividend()
+    public void testAddDividend()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         when(m_walletTransactionService
-                 .AddIncome(anyLong(), any(), any(), any(), any(), any()))
+                 .addIncome(anyLong(), any(), any(), any(), any(), any()))
             .thenReturn(100L);
 
-        when(m_walletTransactionService.GetTransactionById(100L))
-            .thenReturn(new WalletTransaction(m_wallet,
-                                              m_category,
-                                              TransactionType.INCOME,
-                                              TransactionStatus.CONFIRMED,
-                                              LocalDateTime.now(),
-                                              new BigDecimal("50"),
-                                              "Dividend Payment"));
+        when(m_walletTransactionService.getTransactionById(100L))
+            .thenReturn(WalletTransaction.builder()
+                            .wallet(m_wallet)
+                            .category(m_category)
+                            .type(TransactionType.INCOME)
+                            .status(TransactionStatus.CONFIRMED)
+                            .date(LocalDateTime.now())
+                            .amount(new BigDecimal("50"))
+                            .description("Dividend Payment")
+                            .build());
 
-        m_tickerService.AddDividend(1L,
+        m_tickerService.addDividend(1L,
                                     1L,
                                     m_category,
                                     new BigDecimal("50"),
@@ -799,12 +804,12 @@ public class TickerServiceTest
     @DisplayName(
         "Test if adding a dividend to a non-existent ticker throws an exception")
     public void
-    TestAddDividendTickerNotFound()
+    testAddDividendTickerNotFound()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddDividend(1L,
+            m_tickerService.addDividend(1L,
                                         1L,
                                         m_category,
                                         new BigDecimal("50"),
@@ -818,19 +823,19 @@ public class TickerServiceTest
 
         // Verify that the wallet transaction was not created
         verify(m_walletTransactionService, never())
-            .AddIncome(anyLong(), any(), any(), any(), any(), any());
+            .addIncome(anyLong(), any(), any(), any(), any(), any());
     }
 
     @Test
     @DisplayName("Test if adding a dividend with amount less than or equal to zero "
                  + "throws an exception")
     public void
-    TestAddDividendInvalidAmount()
+    testAddDividendInvalidAmount()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddDividend(1L,
+            m_tickerService.addDividend(1L,
                                         1L,
                                         m_category,
                                         BigDecimal.ZERO,
@@ -844,18 +849,18 @@ public class TickerServiceTest
 
         // Verify that the wallet transaction was not created
         verify(m_walletTransactionService, never())
-            .AddIncome(anyLong(), any(), any(), any(), any(), any());
+            .addIncome(anyLong(), any(), any(), any(), any(), any());
     }
 
     @Test
     @DisplayName("Test if a crypto exchange is added successfully to a ticker")
-    public void TestAddCryptoExchange()
+    public void testAddCryptoExchange()
     {
-        m_ticker1.SetType(TickerType.CRYPTOCURRENCY);
-        m_ticker2.SetType(TickerType.CRYPTOCURRENCY);
+        m_ticker1.setType(TickerType.CRYPTOCURRENCY);
+        m_ticker2.setType(TickerType.CRYPTOCURRENCY);
 
-        m_ticker1.SetCurrentQuantity(new BigDecimal("10"));
-        m_ticker2.SetCurrentQuantity(new BigDecimal("0"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("10"));
+        m_ticker2.setCurrentQuantity(new BigDecimal("0"));
 
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
@@ -863,13 +868,13 @@ public class TickerServiceTest
         when(m_cryptoExchangeRepository.save(any(CryptoExchange.class)))
             .thenReturn(m_exchange);
 
-        BigDecimal sourcePreviousQuantity = m_ticker1.GetCurrentQuantity();
-        BigDecimal targetPreviousQuantity = m_ticker2.GetCurrentQuantity();
+        BigDecimal sourcePreviousQuantity = m_ticker1.getCurrentQuantity();
+        BigDecimal targetPreviousQuantity = m_ticker2.getCurrentQuantity();
 
         BigDecimal sourceQuantity = new BigDecimal("1");
         BigDecimal targetQuantity = new BigDecimal("1");
 
-        m_tickerService.AddCryptoExchange(1L,
+        m_tickerService.addCryptoExchange(1L,
                                           2L,
                                           sourceQuantity,
                                           targetQuantity,
@@ -882,13 +887,13 @@ public class TickerServiceTest
 
         verify(m_cryptoExchangeRepository).save(exchangeCaptor.capture());
 
-        assertEquals(m_ticker1, exchangeCaptor.getValue().GetSoldCrypto());
+        assertEquals(m_ticker1, exchangeCaptor.getValue().getSoldCrypto());
 
-        assertEquals(m_ticker2, exchangeCaptor.getValue().GetReceivedCrypto());
+        assertEquals(m_ticker2, exchangeCaptor.getValue().getReceivedCrypto());
 
         // Capture the source and target tickers after the exchange
-        BigDecimal sourceCurrentQuantity = m_ticker1.GetCurrentQuantity();
-        BigDecimal targetCurrentQuantity = m_ticker2.GetCurrentQuantity();
+        BigDecimal sourceCurrentQuantity = m_ticker1.getCurrentQuantity();
+        BigDecimal targetCurrentQuantity = m_ticker2.getCurrentQuantity();
 
         // Check if the quantities were updated correctly
         assertEquals(0,
@@ -904,10 +909,10 @@ public class TickerServiceTest
     @DisplayName("Test if adding a crypto exchange with source and target tickers "
                  + "being the same throws an exception")
     public void
-    TestAddCryptoExchangeSameTicker()
+    testAddCryptoExchangeSameTicker()
     {
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               1L,
                                               new BigDecimal("1"),
                                               new BigDecimal("1"),
@@ -923,12 +928,12 @@ public class TickerServiceTest
     @DisplayName("Test if adding a crypto exchange with source ticker not found "
                  + "throws an exception")
     public void
-    TestAddCryptoExchangeSourceNotFound()
+    testAddCryptoExchangeSourceNotFound()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
                                               new BigDecimal("1"),
@@ -944,13 +949,13 @@ public class TickerServiceTest
     @DisplayName("Test if adding a crypto exchange with target ticker not found "
                  + "throws an exception")
     public void
-    TestAddCryptoExchangeTargetNotFound()
+    testAddCryptoExchangeTargetNotFound()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
                                               new BigDecimal("1"),
@@ -967,16 +972,16 @@ public class TickerServiceTest
         "Test if adding a crypto exchange with source or target ticker type is not "
         + " cryptocurrency throws an exception")
     public void
-    TestAddCryptoExchangeInvalidTickerType()
+    testAddCryptoExchangeInvalidTickerType()
     {
-        m_ticker1.SetType(TickerType.STOCK);
-        m_ticker2.SetType(TickerType.STOCK);
+        m_ticker1.setType(TickerType.STOCK);
+        m_ticker2.setType(TickerType.STOCK);
 
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
                                               new BigDecimal("1"),
@@ -992,16 +997,16 @@ public class TickerServiceTest
     @DisplayName("Test if adding a crypto exchange with source quantity less than or "
                  + "equal to zero throws an exception")
     public void
-    TestAddCryptoExchangeInvalidSourceQuantity()
+    testAddCryptoExchangeInvalidSourceQuantity()
     {
-        m_ticker1.SetType(TickerType.CRYPTOCURRENCY);
-        m_ticker2.SetType(TickerType.CRYPTOCURRENCY);
+        m_ticker1.setType(TickerType.CRYPTOCURRENCY);
+        m_ticker2.setType(TickerType.CRYPTOCURRENCY);
 
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               BigDecimal.ZERO,
                                               new BigDecimal("1"),
@@ -1017,16 +1022,16 @@ public class TickerServiceTest
     @DisplayName("Test if adding a crypto exchange with target quantity less than or "
                  + "equal to zero throws an exception")
     public void
-    TestAddCryptoExchangeInvalidTargetQuantity()
+    testAddCryptoExchangeInvalidTargetQuantity()
     {
-        m_ticker1.SetType(TickerType.CRYPTOCURRENCY);
-        m_ticker2.SetType(TickerType.CRYPTOCURRENCY);
+        m_ticker1.setType(TickerType.CRYPTOCURRENCY);
+        m_ticker2.setType(TickerType.CRYPTOCURRENCY);
 
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
                                               BigDecimal.ZERO,
@@ -1042,19 +1047,19 @@ public class TickerServiceTest
     @DisplayName("Test if adding a crypto exchange with source quantity greater than "
                  + "current quantity throws an exception")
     public void
-    TestAddCryptoExchangeExceedsSourceQuantity()
+    testAddCryptoExchangeExceedsSourceQuantity()
     {
-        m_ticker1.SetType(TickerType.CRYPTOCURRENCY);
-        m_ticker2.SetType(TickerType.CRYPTOCURRENCY);
+        m_ticker1.setType(TickerType.CRYPTOCURRENCY);
+        m_ticker2.setType(TickerType.CRYPTOCURRENCY);
 
-        m_ticker1.SetCurrentQuantity(new BigDecimal("5"));
-        m_ticker2.SetCurrentQuantity(new BigDecimal("0"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("5"));
+        m_ticker2.setCurrentQuantity(new BigDecimal("0"));
 
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
         assertThrows(RuntimeException.class, () -> {
-            m_tickerService.AddCryptoExchange(1L,
+            m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("10"),
                                               new BigDecimal("1"),
@@ -1068,30 +1073,30 @@ public class TickerServiceTest
 
     @Test
     @DisplayName("Test if ticker name is changed successfully")
-    public void TestChangeTickerName()
+    public void testChangeTickerName()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        String oldName = m_ticker1.GetName();
+        String oldName = m_ticker1.getName();
         String newName = oldName + " Changed";
-        m_ticker1.SetName(newName);
+        m_ticker1.setName(newName);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(newName, tickerCaptor.getValue().GetName());
+        assertEquals(newName, tickerCaptor.getValue().getName());
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a non-existent ticker")
-    public void TestChangeTickerNameNotFound()
+    public void testChangeTickerNameNotFound()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -1100,76 +1105,76 @@ public class TickerServiceTest
     @DisplayName(
         "Test if exception is thrown when updating a ticker with an empty name")
     public void
-    TestChangeTickerEmptyName()
+    testChangeTickerEmptyName()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetName("");
+        m_ticker1.setName("");
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a ticker with a blank name")
-    public void TestChangeTickerBlankName()
+    public void testChangeTickerBlankName()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetName(" ");
+        m_ticker1.setName(" ");
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a ticker with null name")
-    public void TestChangeTickerNullName()
+    public void testChangeTickerNullName()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetName(null);
+        m_ticker1.setName(null);
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if ticker symbol is changed successfully")
-    public void TestChangeTickerSymbol()
+    public void testChangeTickerSymbol()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        String oldSymbol = m_ticker1.GetSymbol();
+        String oldSymbol = m_ticker1.getSymbol();
         String newSymbol = oldSymbol + " Changed";
-        m_ticker1.SetSymbol(newSymbol);
+        m_ticker1.setSymbol(newSymbol);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(newSymbol, tickerCaptor.getValue().GetSymbol());
+        assertEquals(newSymbol, tickerCaptor.getValue().getSymbol());
     }
 
     @Test
     @DisplayName(
         "Test if exception is thrown when updating a ticker with an empty symbol")
     public void
-    TestChangeTickerEmptySymbol()
+    testChangeTickerEmptySymbol()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetSymbol("");
+        m_ticker1.setSymbol("");
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -1178,39 +1183,39 @@ public class TickerServiceTest
     @DisplayName(
         "Test if exception is thrown when updating a ticker with a blank symbol")
     public void
-    TestChangeTickerBlankSymbol()
+    testChangeTickerBlankSymbol()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetSymbol(" ");
+        m_ticker1.setSymbol(" ");
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a ticker with null symbol")
-    public void TestChangeTickerNullSymbol()
+    public void testChangeTickerNullSymbol()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetSymbol(null);
+        m_ticker1.setSymbol(null);
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if ticker type is changed successfully")
-    public void TestChangeTickerType()
+    public void testChangeTickerType()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        TickerType oldType = m_ticker1.GetType();
+        TickerType oldType = m_ticker1.getType();
 
         TickerType newType;
 
@@ -1223,23 +1228,23 @@ public class TickerServiceTest
             newType = TickerType.STOCK;
         }
 
-        m_ticker1.SetType(newType);
+        m_ticker1.setType(newType);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(newType, tickerCaptor.getValue().GetType());
+        assertEquals(newType, tickerCaptor.getValue().getType());
     }
 
     @Test
     @DisplayName("Test if ticker price is changed successfully")
-    public void TestChangeTickerPrice()
+    public void testChangeTickerPrice()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        BigDecimal oldPrice = m_ticker1.GetCurrentUnitValue();
+        BigDecimal oldPrice = m_ticker1.getCurrentUnitValue();
 
         BigDecimal newPrice;
 
@@ -1252,29 +1257,29 @@ public class TickerServiceTest
             newPrice = BigDecimal.ONE;
         }
 
-        m_ticker1.SetCurrentUnitValue(newPrice);
+        m_ticker1.setCurrentUnitValue(newPrice);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
         assertEquals(0,
-                     newPrice.compareTo(tickerCaptor.getValue().GetCurrentUnitValue()));
+                     newPrice.compareTo(tickerCaptor.getValue().getCurrentUnitValue()));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a ticker with price "
                  + "less than zero")
     public void
-    TestChangeTickerPriceLessThanZero()
+    testChangeTickerPriceLessThanZero()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetCurrentUnitValue(new BigDecimal("-0.05"));
+        m_ticker1.setCurrentUnitValue(new BigDecimal("-0.05"));
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
@@ -1283,25 +1288,25 @@ public class TickerServiceTest
     @DisplayName("Test if exception is thrown when updating a ticker with price "
                  + "equal to zero")
     public void
-    TestChangeTickerPriceEqualToZero()
+    testChangeTickerPriceEqualToZero()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetCurrentUnitValue(BigDecimal.ZERO);
+        m_ticker1.setCurrentUnitValue(BigDecimal.ZERO);
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if ticker current quantity is changed successfully")
-    public void TestChangeTickerCurrentQuantity()
+    public void testChangeTickerCurrentQuantity()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        BigDecimal oldQuantity = m_ticker1.GetCurrentQuantity();
+        BigDecimal oldQuantity = m_ticker1.getCurrentQuantity();
 
         BigDecimal newQuantity;
 
@@ -1314,14 +1319,14 @@ public class TickerServiceTest
             newQuantity = BigDecimal.ONE;
         }
 
-        m_ticker1.SetCurrentQuantity(newQuantity);
+        m_ticker1.setCurrentQuantity(newQuantity);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository).save(tickerCaptor.capture());
 
-        assertEquals(newQuantity, tickerCaptor.getValue().GetCurrentQuantity());
+        assertEquals(newQuantity, tickerCaptor.getValue().getCurrentQuantity());
     }
 
     @Test
@@ -1329,29 +1334,29 @@ public class TickerServiceTest
         "Test if exception is thrown when updating a ticker with current quantity "
         + "less than zero")
     public void
-    TestChangeTickerCurrentQuantityLessThanZero()
+    testChangeTickerCurrentQuantityLessThanZero()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetCurrentQuantity(new BigDecimal("-0.05"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("-0.05"));
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if ticker average price is changed successfully")
-    public void TestChangeTickerAveragePrice()
+    public void testChangeTickerAveragePrice()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        BigDecimal oldPrice = m_ticker1.GetAveragePrice();
+        BigDecimal oldPrice = m_ticker1.getAverageUnitValue();
 
         // Quantitycannot be zero, because in this case the average price is reset at
         // the end of the function
-        m_ticker1.SetCurrentQuantity(new BigDecimal("1"));
+        m_ticker1.setCurrentQuantity(new BigDecimal("1"));
 
         BigDecimal newPrice;
 
@@ -1364,14 +1369,15 @@ public class TickerServiceTest
             newPrice = BigDecimal.ONE;
         }
 
-        m_ticker1.SetAveragePrice(newPrice);
+        m_ticker1.setAverageUnitValue(newPrice);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertEquals(0, newPrice.compareTo(tickerCaptor.getValue().GetAveragePrice()));
+        assertEquals(0,
+                     newPrice.compareTo(tickerCaptor.getValue().getAverageUnitValue()));
     }
 
     @Test
@@ -1379,59 +1385,59 @@ public class TickerServiceTest
         "Test if exception is thrown when updating a ticker with average price "
         + "less than zero")
     public void
-    TestChangeTickerAveragePriceLessThanZero()
+    testChangeTickerAveragePriceLessThanZero()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetAveragePrice(new BigDecimal("-0.05"));
+        m_ticker1.setAverageUnitValue(new BigDecimal("-0.05"));
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdateTicker(m_ticker1); });
+                     () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
     }
 
     @Test
     @DisplayName("Test if ticker is set to archived successfully")
-    public void TestChangeTickerArchived()
+    public void testChangeTickerArchived()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetArchived(true);
+        m_ticker1.setIsArchived(true);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertTrue(tickerCaptor.getValue().IsArchived());
+        assertTrue(tickerCaptor.getValue().getIsArchived());
     }
 
     @Test
     @DisplayName("Test if ticker is set to unarchived successfully")
-    public void TestChangeTickerUnarchived()
+    public void testChangeTickerUnarchived()
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_ticker1.SetArchived(false);
+        m_ticker1.setIsArchived(false);
 
-        m_tickerService.UpdateTicker(m_ticker1);
+        m_tickerService.updateTicker(m_ticker1);
 
         ArgumentCaptor<Ticker> tickerCaptor = ArgumentCaptor.forClass(Ticker.class);
         verify(m_tickerRepository, atLeastOnce()).save(tickerCaptor.capture());
 
-        assertFalse(tickerCaptor.getValue().IsArchived());
+        assertFalse(tickerCaptor.getValue().getIsArchived());
     }
 
     @Test
     @DisplayName("Test if purchase quantity is updated successfully")
-    public void TestUpdatePurchaseQuantity()
+    public void testUpdatePurchaseQuantity()
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        BigDecimal oldQuantity = m_purchase.GetQuantity();
+        BigDecimal oldQuantity = m_purchase.getQuantity();
 
         BigDecimal newQuantity;
 
@@ -1445,29 +1451,29 @@ public class TickerServiceTest
         }
 
         BigDecimal expectedAmountAfterUpdate =
-            newQuantity.multiply(m_purchase.GetUnitPrice());
+            newQuantity.multiply(m_purchase.getUnitPrice());
 
-        m_purchase.SetQuantity(newQuantity);
+        m_purchase.setQuantity(newQuantity);
 
-        m_tickerService.UpdatePurchase(m_purchase);
+        m_tickerService.updatePurchase(m_purchase);
 
         ArgumentCaptor<TickerPurchase> purchaseCaptor =
             ArgumentCaptor.forClass(TickerPurchase.class);
         verify(m_tickerPurchaseRepository).save(purchaseCaptor.capture());
 
-        assertEquals(newQuantity, purchaseCaptor.getValue().GetQuantity());
+        assertEquals(newQuantity, purchaseCaptor.getValue().getQuantity());
         assertEquals(expectedAmountAfterUpdate,
-                     purchaseCaptor.getValue().GetWalletTransaction().GetAmount());
+                     purchaseCaptor.getValue().getWalletTransaction().getAmount());
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a non-existent purchase")
-    public void TestUpdatePurchaseNotFound()
+    public void testUpdatePurchaseNotFound()
     {
         when(m_tickerPurchaseRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdatePurchase(m_purchase); });
+                     () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
@@ -1476,16 +1482,16 @@ public class TickerServiceTest
     @DisplayName("Test if exception is thrown when updating a purchase with quantity "
                  + "less than zero")
     public void
-    TestUpdatePurchaseQuantityLessThanZero()
+    testUpdatePurchaseQuantityLessThanZero()
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_purchase.SetQuantity(new BigDecimal("-0.05"));
+        m_purchase.setQuantity(new BigDecimal("-0.05"));
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdatePurchase(m_purchase); });
+                     () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
@@ -1494,29 +1500,29 @@ public class TickerServiceTest
     @DisplayName("Test if exception is thrown when updating a purchase with quantity "
                  + "equal to zero")
     public void
-    TestUpdatePurchaseQuantityEqualToZero()
+    testUpdatePurchaseQuantityEqualToZero()
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_purchase.SetQuantity(BigDecimal.ZERO);
+        m_purchase.setQuantity(BigDecimal.ZERO);
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdatePurchase(m_purchase); });
+                     () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
     @DisplayName("Test if purchase unit price is updated successfully")
-    public void TestUpdatePurchaseUnitPrice()
+    public void testUpdatePurchaseUnitPrice()
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        BigDecimal oldUnitPrice = m_purchase.GetUnitPrice();
+        BigDecimal oldUnitPrice = m_purchase.getUnitPrice();
 
         BigDecimal newUnitPrice;
 
@@ -1530,11 +1536,11 @@ public class TickerServiceTest
         }
 
         BigDecimal expectedAmountAfterUpdate =
-            m_purchase.GetQuantity().multiply(newUnitPrice);
+            m_purchase.getQuantity().multiply(newUnitPrice);
 
-        m_purchase.SetUnitPrice(newUnitPrice);
+        m_purchase.setUnitPrice(newUnitPrice);
 
-        m_tickerService.UpdatePurchase(m_purchase);
+        m_tickerService.updatePurchase(m_purchase);
 
         verify(m_tickerPurchaseRepository).save(m_purchase);
 
@@ -1542,25 +1548,25 @@ public class TickerServiceTest
             ArgumentCaptor.forClass(TickerPurchase.class);
         verify(m_tickerPurchaseRepository).save(purchaseCaptor.capture());
 
-        assertEquals(newUnitPrice, purchaseCaptor.getValue().GetUnitPrice());
+        assertEquals(newUnitPrice, purchaseCaptor.getValue().getUnitPrice());
         assertEquals(expectedAmountAfterUpdate,
-                     purchaseCaptor.getValue().GetWalletTransaction().GetAmount());
+                     purchaseCaptor.getValue().getWalletTransaction().getAmount());
     }
 
     @Test
     @DisplayName("Test if exception is thrown when updating a purchase with unit price "
                  + "less than zero")
     public void
-    TestUpdatePurchaseUnitPriceLessThanZero()
+    testUpdatePurchaseUnitPriceLessThanZero()
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_purchase.SetUnitPrice(new BigDecimal("-0.05"));
+        m_purchase.setUnitPrice(new BigDecimal("-0.05"));
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdatePurchase(m_purchase); });
+                     () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
@@ -1569,110 +1575,110 @@ public class TickerServiceTest
     @DisplayName("Test if exception is thrown when updating a purchase with unit price "
                  + "equal to zero")
     public void
-    TestUpdatePurchaseUnitPriceEqualToZero()
+    testUpdatePurchaseUnitPriceEqualToZero()
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        m_purchase.SetUnitPrice(BigDecimal.ZERO);
+        m_purchase.setUnitPrice(BigDecimal.ZERO);
 
         assertThrows(RuntimeException.class,
-                     () -> { m_tickerService.UpdatePurchase(m_purchase); });
+                     () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
     }
 
     @Test
     @DisplayName("Test if crypto exchange sold ticker is updated successfully")
-    public void TestUpdateCryptoExchangeSoldTicker()
+    public void testUpdateCryptoExchangeSoldTicker()
     {
         // Currently: crypto1 -> crypto2
         // After: crypto3 -> crypto2
-        BigDecimal exchangeSoldQuantity = m_exchangeCrypto1ToCrypto2.GetSoldQuantity();
-        BigDecimal crypto1OldQuantity   = m_crypto1.GetCurrentQuantity();
-        BigDecimal crypto2OldQuantity   = m_crypto2.GetCurrentQuantity();
-        BigDecimal crypto3OldQuantity   = m_crypto3.GetCurrentQuantity();
+        BigDecimal exchangeSoldQuantity = m_exchangeCrypto1ToCrypto2.getSoldQuantity();
+        BigDecimal crypto1OldQuantity   = m_crypto1.getCurrentQuantity();
+        BigDecimal crypto2OldQuantity   = m_crypto2.getCurrentQuantity();
+        BigDecimal crypto3OldQuantity   = m_crypto3.getCurrentQuantity();
 
         CryptoExchange updatedCryptoExchange =
-            new CryptoExchange(m_exchangeCrypto1ToCrypto2.GetId(),
+            new CryptoExchange(m_exchangeCrypto1ToCrypto2.getId(),
                                m_crypto3,
-                               m_exchangeCrypto1ToCrypto2.GetReceivedCrypto(),
-                               m_exchangeCrypto1ToCrypto2.GetSoldQuantity(),
-                               m_exchangeCrypto1ToCrypto2.GetReceivedQuantity(),
-                               m_exchangeCrypto1ToCrypto2.GetDate(),
-                               m_exchangeCrypto1ToCrypto2.GetDescription());
+                               m_exchangeCrypto1ToCrypto2.getReceivedCrypto(),
+                               m_exchangeCrypto1ToCrypto2.getSoldQuantity(),
+                               m_exchangeCrypto1ToCrypto2.getReceivedQuantity(),
+                               m_exchangeCrypto1ToCrypto2.getDate(),
+                               m_exchangeCrypto1ToCrypto2.getDescription());
 
-        when(m_cryptoExchangeRepository.findById(m_exchangeCrypto1ToCrypto2.GetId()))
+        when(m_cryptoExchangeRepository.findById(m_exchangeCrypto1ToCrypto2.getId()))
             .thenReturn(Optional.of(m_exchangeCrypto1ToCrypto2));
 
-        when(m_tickerRepository.findById(m_crypto2.GetId()))
+        when(m_tickerRepository.findById(m_crypto2.getId()))
             .thenReturn(Optional.of(m_crypto2));
-        when(m_tickerRepository.findById(m_crypto3.GetId()))
+        when(m_tickerRepository.findById(m_crypto3.getId()))
             .thenReturn(Optional.of(m_crypto3));
 
-        m_tickerService.UpdateCryptoExchange(updatedCryptoExchange);
+        m_tickerService.updateCryptoExchange(updatedCryptoExchange);
 
         verify(m_cryptoExchangeRepository).save(m_exchangeCrypto1ToCrypto2);
 
         assertEquals(0,
-                     m_crypto1.GetCurrentQuantity().compareTo(
+                     m_crypto1.getCurrentQuantity().compareTo(
                          crypto1OldQuantity.add(exchangeSoldQuantity)));
-        assertEquals(0, m_crypto2.GetCurrentQuantity().compareTo(crypto2OldQuantity));
+        assertEquals(0, m_crypto2.getCurrentQuantity().compareTo(crypto2OldQuantity));
         assertEquals(0,
-                     m_crypto3.GetCurrentQuantity().compareTo(
+                     m_crypto3.getCurrentQuantity().compareTo(
                          crypto3OldQuantity.subtract(exchangeSoldQuantity)));
     }
 
     @Test
     @DisplayName("Test if crypto exchange received ticker is updated successfully")
-    public void TestUpdateCryptoExchangeReceivedTicker()
+    public void testUpdateCryptoExchangeReceivedTicker()
     {
         // Currently: crypto1 -> crypto2
         // After: crypto1 -> crypto3
-        BigDecimal exchangeQuantity = m_exchangeCrypto1ToCrypto2.GetReceivedQuantity();
-        BigDecimal crypto1OldQuantity = m_crypto1.GetCurrentQuantity();
-        BigDecimal crypto2OldQuantity = m_crypto2.GetCurrentQuantity();
-        BigDecimal crypto3OldQuantity = m_crypto3.GetCurrentQuantity();
+        BigDecimal exchangeQuantity = m_exchangeCrypto1ToCrypto2.getReceivedQuantity();
+        BigDecimal crypto1OldQuantity = m_crypto1.getCurrentQuantity();
+        BigDecimal crypto2OldQuantity = m_crypto2.getCurrentQuantity();
+        BigDecimal crypto3OldQuantity = m_crypto3.getCurrentQuantity();
 
         CryptoExchange updatedCryptoExchange =
-            new CryptoExchange(m_exchangeCrypto1ToCrypto2.GetId(),
-                               m_exchangeCrypto1ToCrypto2.GetSoldCrypto(),
+            new CryptoExchange(m_exchangeCrypto1ToCrypto2.getId(),
+                               m_exchangeCrypto1ToCrypto2.getSoldCrypto(),
                                m_crypto3,
-                               m_exchangeCrypto1ToCrypto2.GetSoldQuantity(),
-                               m_exchangeCrypto1ToCrypto2.GetReceivedQuantity(),
-                               m_exchangeCrypto1ToCrypto2.GetDate(),
-                               m_exchangeCrypto1ToCrypto2.GetDescription());
+                               m_exchangeCrypto1ToCrypto2.getSoldQuantity(),
+                               m_exchangeCrypto1ToCrypto2.getReceivedQuantity(),
+                               m_exchangeCrypto1ToCrypto2.getDate(),
+                               m_exchangeCrypto1ToCrypto2.getDescription());
 
-        when(m_cryptoExchangeRepository.findById(m_exchangeCrypto1ToCrypto2.GetId()))
+        when(m_cryptoExchangeRepository.findById(m_exchangeCrypto1ToCrypto2.getId()))
             .thenReturn(Optional.of(m_exchangeCrypto1ToCrypto2));
 
-        when(m_tickerRepository.findById(m_crypto1.GetId()))
+        when(m_tickerRepository.findById(m_crypto1.getId()))
             .thenReturn(Optional.of(m_crypto1));
-        when(m_tickerRepository.findById(m_crypto3.GetId()))
+        when(m_tickerRepository.findById(m_crypto3.getId()))
             .thenReturn(Optional.of(m_crypto3));
 
-        m_tickerService.UpdateCryptoExchange(updatedCryptoExchange);
+        m_tickerService.updateCryptoExchange(updatedCryptoExchange);
 
         verify(m_cryptoExchangeRepository).save(m_exchangeCrypto1ToCrypto2);
 
-        assertEquals(0, m_crypto1.GetCurrentQuantity().compareTo(crypto1OldQuantity));
+        assertEquals(0, m_crypto1.getCurrentQuantity().compareTo(crypto1OldQuantity));
         assertEquals(0,
-                     m_crypto2.GetCurrentQuantity().compareTo(
+                     m_crypto2.getCurrentQuantity().compareTo(
                          crypto2OldQuantity.subtract(exchangeQuantity)));
         assertEquals(0,
-                     m_crypto3.GetCurrentQuantity().compareTo(
+                     m_crypto3.getCurrentQuantity().compareTo(
                          crypto3OldQuantity.add(exchangeQuantity)));
     }
 
     @Test
     @DisplayName("Test if all tickers are retrieved")
-    public void TestGetAllTickers()
+    public void testGetAllTickers()
     {
         when(m_tickerRepository.findAllByOrderBySymbolAsc())
             .thenReturn(Collections.singletonList(m_ticker1));
 
-        List<Ticker> tickers = m_tickerService.GetAllTickers();
+        List<Ticker> tickers = m_tickerService.getAllTickers();
 
         assertEquals(1, tickers.size());
         assertEquals(m_ticker1, tickers.get(0));

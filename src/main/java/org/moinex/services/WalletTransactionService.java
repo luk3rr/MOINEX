@@ -11,6 +11,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
@@ -34,20 +35,19 @@ import org.springframework.transaction.annotation.Transactional;
  * that have a category that is not archived
  */
 @Service
+@NoArgsConstructor
 public class WalletTransactionService
 {
     @Autowired
-    private WalletRepository m_walletRepository;
+    private WalletRepository walletRepository;
 
     @Autowired
-    private TransferRepository m_transferRepository;
+    private TransferRepository transferRepository;
 
     @Autowired
-    private WalletTransactionRepository m_walletTransactionRepository;
+    private WalletTransactionRepository walletTransactionRepository;
 
-    private static final Logger m_logger = LoggerConfig.GetLogger();
-
-    public WalletTransactionService() { }
+    private static final Logger logger = LoggerConfig.getLogger();
 
     /**
      * Transfer money between two wallets
@@ -64,7 +64,7 @@ public class WalletTransactionService
      * to transfer
      */
     @Transactional
-    public Long TransferMoney(Long          senderId,
+    public Long transferMoney(Long          senderId,
                               Long          receiverId,
                               LocalDateTime date,
                               BigDecimal    amount,
@@ -83,38 +83,42 @@ public class WalletTransactionService
         // Round the amount to two decimal places
         amount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        Wallet senderWallet = m_walletRepository.findById(senderId).orElseThrow(
+        Wallet senderWallet = walletRepository.findById(senderId).orElseThrow(
             ()
                 -> new RuntimeException(
                     "Sender wallet not found and cannot transfer money"));
 
         Wallet receiverWallet =
-            m_walletRepository.findById(receiverId)
+            walletRepository.findById(receiverId)
                 .orElseThrow(
                     ()
                         -> new RuntimeException(
                             "Receiver wallet not found and cannot transfer money"));
 
-        if (senderWallet.GetBalance().compareTo(amount) < 0)
+        if (senderWallet.getBalance().compareTo(amount) < 0)
         {
             throw new RuntimeException(
                 "Sender wallet does not have enough balance to transfer");
         }
 
-        Transfer transfer = m_transferRepository.save(
-            new Transfer(senderWallet, receiverWallet, date, amount, description));
+        Transfer transfer = transferRepository.save(Transfer.builder()
+                                                        .senderWallet(senderWallet)
+                                                        .receiverWallet(receiverWallet)
+                                                        .date(date)
+                                                        .amount(amount)
+                                                        .description(description)
+                                                        .build());
 
-        senderWallet.SetBalance(senderWallet.GetBalance().subtract(amount));
-        receiverWallet.SetBalance(receiverWallet.GetBalance().add(amount));
+        senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
+        receiverWallet.setBalance(receiverWallet.getBalance().add(amount));
 
-        m_walletRepository.save(senderWallet);
-        m_walletRepository.save(receiverWallet);
+        walletRepository.save(senderWallet);
+        walletRepository.save(receiverWallet);
 
-        m_logger.info("Transfer from wallet with id " + senderId +
-                      " to wallet with id " + receiverId + " of " + amount +
-                      " was successful");
+        logger.info("Transfer from wallet with id " + senderId + " to wallet with id " +
+                    receiverId + " of " + amount + " was successful");
 
-        return transfer.GetId();
+        return transfer.getId();
     }
 
     /**
@@ -130,14 +134,14 @@ public class WalletTransactionService
      * @throws RuntimeException If the amount is less than or equal to zero
      */
     @Transactional
-    public Long AddIncome(Long              walletId,
+    public Long addIncome(Long              walletId,
                           Category          category,
                           LocalDateTime     date,
                           BigDecimal        amount,
                           String            description,
                           TransactionStatus status)
     {
-        Wallet wallet = m_walletRepository.findById(walletId).orElseThrow(
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(
             () -> new RuntimeException("Wallet with id " + walletId + " not found"));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -148,26 +152,28 @@ public class WalletTransactionService
         // Round the amount to two decimal places
         amount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        WalletTransaction wt = new WalletTransaction(wallet,
-                                                     category,
-                                                     TransactionType.INCOME,
-                                                     status,
-                                                     date,
-                                                     amount,
-                                                     description);
+        WalletTransaction wt = WalletTransaction.builder()
+                                   .wallet(wallet)
+                                   .category(category)
+                                   .type(TransactionType.INCOME)
+                                   .status(status)
+                                   .date(date)
+                                   .amount(amount)
+                                   .description(description)
+                                   .build();
 
-        m_walletTransactionRepository.save(wt);
+        walletTransactionRepository.save(wt);
 
         if (status == TransactionStatus.CONFIRMED)
         {
-            wallet.SetBalance(wallet.GetBalance().add(amount));
-            m_walletRepository.save(wallet);
+            wallet.setBalance(wallet.getBalance().add(amount));
+            walletRepository.save(wallet);
         }
 
-        m_logger.info("Income with status " + status.toString() + " of " + amount +
-                      " added to wallet with id " + walletId);
+        logger.info("Income with status " + status.toString() + " of " + amount +
+                    " added to wallet with id " + walletId);
 
-        return wt.GetId();
+        return wt.getId();
     }
 
     /**
@@ -183,14 +189,14 @@ public class WalletTransactionService
      * @throws RuntimeException If the amount is less than or equal to zero
      */
     @Transactional
-    public Long AddExpense(Long              walletId,
+    public Long addExpense(Long              walletId,
                            Category          category,
                            LocalDateTime     date,
                            BigDecimal        amount,
                            String            description,
                            TransactionStatus status)
     {
-        Wallet wallet = m_walletRepository.findById(walletId).orElseThrow(
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(
             () -> new RuntimeException("Wallet with id " + walletId + " not found"));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -201,26 +207,28 @@ public class WalletTransactionService
         // Round the amount to two decimal places
         amount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        WalletTransaction wt = new WalletTransaction(wallet,
-                                                     category,
-                                                     TransactionType.EXPENSE,
-                                                     status,
-                                                     date,
-                                                     amount,
-                                                     description);
+        WalletTransaction wt = WalletTransaction.builder()
+                                   .wallet(wallet)
+                                   .category(category)
+                                   .type(TransactionType.EXPENSE)
+                                   .status(status)
+                                   .date(date)
+                                   .amount(amount)
+                                   .description(description)
+                                   .build();
 
-        m_walletTransactionRepository.save(wt);
+        walletTransactionRepository.save(wt);
 
         if (status.equals(TransactionStatus.CONFIRMED))
         {
-            wallet.SetBalance(wallet.GetBalance().subtract(amount));
-            m_walletRepository.save(wallet);
+            wallet.setBalance(wallet.getBalance().subtract(amount));
+            walletRepository.save(wallet);
         }
 
-        m_logger.info("Expense with status " + status.toString() + " of " + amount +
-                      " added to wallet with id " + walletId);
+        logger.info("Expense with status " + status.toString() + " of " + amount +
+                    " added to wallet with id " + walletId);
 
-        return wt.GetId();
+        return wt.getId();
     }
 
     /**
@@ -231,48 +239,48 @@ public class WalletTransactionService
      * @throws RuntimeException If the amount is less than or equal to zero
      */
     @Transactional
-    public void UpdateTransaction(WalletTransaction transaction)
+    public void updateTransaction(WalletTransaction transaction)
     {
         // Check if the transaction exists
         WalletTransaction oldTransaction =
-            m_walletTransactionRepository.findById(transaction.GetId())
+            walletTransactionRepository.findById(transaction.getId())
                 .orElseThrow(()
                                  -> new RuntimeException("Transaction with id " +
-                                                         transaction.GetId() +
+                                                         transaction.getId() +
                                                          " not found"));
 
         // Check if the wallet exists
-        m_walletTransactionRepository.FindWalletByTransactionId(transaction.GetId())
+        walletTransactionRepository.findWalletByTransactionId(transaction.getId())
             .orElseThrow(()
                              -> new RuntimeException("Wallet with name " +
-                                                     transaction.GetWallet().GetName() +
+                                                     transaction.getWallet().getName() +
                                                      " not found"));
 
         // Check if the amount is greater than zero
-        if (transaction.GetAmount().compareTo(BigDecimal.ZERO) <= 0)
+        if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
         {
             throw new RuntimeException("Amount must be greater than or equal to zero");
         }
 
         // Round the amount to two decimal places
-        transaction.SetAmount(
-            transaction.GetAmount().setScale(2, RoundingMode.HALF_UP));
+        transaction.setAmount(
+            transaction.getAmount().setScale(2, RoundingMode.HALF_UP));
 
         // Complex update of the transaction
-        ChangeTransactionWallet(oldTransaction, transaction.GetWallet());
-        ChangeTransactionType(oldTransaction, transaction.GetType());
-        ChangeTransactionAmount(oldTransaction, transaction.GetAmount());
-        ChangeTransactionStatus(oldTransaction, transaction.GetStatus());
+        changeTransactionWallet(oldTransaction, transaction.getWallet());
+        changeTransactionType(oldTransaction, transaction.getType());
+        changeTransactionAmount(oldTransaction, transaction.getAmount());
+        changeTransactionStatus(oldTransaction, transaction.getStatus());
 
         // Trivial update of the transaction
-        oldTransaction.SetDate(transaction.GetDate());
-        oldTransaction.SetDescription(transaction.GetDescription());
-        oldTransaction.SetCategory(transaction.GetCategory());
+        oldTransaction.setDate(transaction.getDate());
+        oldTransaction.setDescription(transaction.getDescription());
+        oldTransaction.setCategory(transaction.getCategory());
 
-        m_walletTransactionRepository.save(oldTransaction);
+        walletTransactionRepository.save(oldTransaction);
 
-        m_logger.info("Transaction with id " + transaction.GetId() +
-                      " updated successfully");
+        logger.info("Transaction with id " + transaction.getId() +
+                    " updated successfully");
     }
 
     /**
@@ -284,32 +292,32 @@ public class WalletTransactionService
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void ChangeTransactionType(WalletTransaction oldTransaction,
+    private void changeTransactionType(WalletTransaction oldTransaction,
                                        TransactionType   newType)
     {
-        if (oldTransaction.GetType().equals(newType))
+        if (oldTransaction.getType().equals(newType))
         {
-            m_logger.info("Transaction with id " + oldTransaction.GetId() +
-                          " has the same type as before");
+            logger.info("Transaction with id " + oldTransaction.getId() +
+                        " has the same type as before");
 
             return;
         }
 
-        Wallet wallet = oldTransaction.GetWallet();
+        Wallet wallet = oldTransaction.getWallet();
 
-        TransactionType oldType = oldTransaction.GetType();
+        TransactionType oldType = oldTransaction.getType();
 
-        if (oldTransaction.GetStatus().equals(TransactionStatus.CONFIRMED))
+        if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
             // Revert the old transaction
             if (oldType.equals(TransactionType.EXPENSE))
             {
-                wallet.SetBalance(wallet.GetBalance().add(oldTransaction.GetAmount()));
+                wallet.setBalance(wallet.getBalance().add(oldTransaction.getAmount()));
             }
             else if (oldType.equals(TransactionType.INCOME))
             {
-                wallet.SetBalance(
-                    wallet.GetBalance().subtract(oldTransaction.GetAmount()));
+                wallet.setBalance(
+                    wallet.getBalance().subtract(oldTransaction.getAmount()));
             }
             else
             {
@@ -321,12 +329,12 @@ public class WalletTransactionService
             // Apply the new transaction
             if (newType.equals(TransactionType.EXPENSE))
             {
-                wallet.SetBalance(
-                    wallet.GetBalance().subtract(oldTransaction.GetAmount()));
+                wallet.setBalance(
+                    wallet.getBalance().subtract(oldTransaction.getAmount()));
             }
             else if (newType.equals(TransactionType.INCOME))
             {
-                wallet.SetBalance(wallet.GetBalance().add(oldTransaction.GetAmount()));
+                wallet.setBalance(wallet.getBalance().add(oldTransaction.getAmount()));
             }
             else
             {
@@ -335,14 +343,14 @@ public class WalletTransactionService
                 throw new RuntimeException("Transaction type not recognized");
             }
 
-            m_walletRepository.save(wallet);
+            walletRepository.save(wallet);
         }
 
-        oldTransaction.SetType(newType);
-        m_walletTransactionRepository.save(oldTransaction);
+        oldTransaction.setType(newType);
+        walletTransactionRepository.save(oldTransaction);
 
-        m_logger.info("Transaction with id " + oldTransaction.GetId() +
-                      " type changed to " + newType.toString());
+        logger.info("Transaction with id " + oldTransaction.getId() +
+                    " type changed to " + newType.toString());
     }
 
     /**
@@ -354,40 +362,40 @@ public class WalletTransactionService
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void ChangeTransactionWallet(WalletTransaction oldTransaction,
+    private void changeTransactionWallet(WalletTransaction oldTransaction,
                                          Wallet            newWallet)
     {
-        if (oldTransaction.GetWallet().GetId() == newWallet.GetId())
+        if (oldTransaction.getWallet().getId() == newWallet.getId())
         {
-            m_logger.info("Transaction with id " + oldTransaction.GetId() +
-                          " has the same wallet as before");
+            logger.info("Transaction with id " + oldTransaction.getId() +
+                        " has the same wallet as before");
 
             return;
         }
 
-        Wallet oldWallet = oldTransaction.GetWallet();
+        Wallet oldWallet = oldTransaction.getWallet();
 
-        if (oldTransaction.GetStatus().equals(TransactionStatus.CONFIRMED))
+        if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
-            if (oldTransaction.GetType().equals(TransactionType.EXPENSE))
+            if (oldTransaction.getType().equals(TransactionType.EXPENSE))
             {
                 // Revert expense from old wallet
-                oldWallet.SetBalance(
-                    oldWallet.GetBalance().add(oldTransaction.GetAmount()));
+                oldWallet.setBalance(
+                    oldWallet.getBalance().add(oldTransaction.getAmount()));
 
                 // Apply expense to new wallet
-                newWallet.SetBalance(
-                    newWallet.GetBalance().subtract(oldTransaction.GetAmount()));
+                newWallet.setBalance(
+                    newWallet.getBalance().subtract(oldTransaction.getAmount()));
             }
-            else if (oldTransaction.GetType().equals(TransactionType.INCOME))
+            else if (oldTransaction.getType().equals(TransactionType.INCOME))
             {
                 // Revert income from old wallet
-                oldWallet.SetBalance(
-                    oldWallet.GetBalance().subtract(oldTransaction.GetAmount()));
+                oldWallet.setBalance(
+                    oldWallet.getBalance().subtract(oldTransaction.getAmount()));
 
                 // Apply income to new wallet
-                newWallet.SetBalance(
-                    newWallet.GetBalance().add(oldTransaction.GetAmount()));
+                newWallet.setBalance(
+                    newWallet.getBalance().add(oldTransaction.getAmount()));
             }
             else
             {
@@ -396,15 +404,15 @@ public class WalletTransactionService
                 throw new RuntimeException("Transaction type not recognized");
             }
 
-            m_walletRepository.save(oldWallet);
-            m_walletRepository.save(newWallet);
+            walletRepository.save(oldWallet);
+            walletRepository.save(newWallet);
         }
 
-        oldTransaction.SetWallet(newWallet);
-        m_walletTransactionRepository.save(oldTransaction);
+        oldTransaction.setWallet(newWallet);
+        walletTransactionRepository.save(oldTransaction);
 
-        m_logger.info("Transaction with id " + oldTransaction.GetId() +
-                      " wallet changed to " + newWallet.GetName());
+        logger.info("Transaction with id " + oldTransaction.getId() +
+                    " wallet changed to " + newWallet.getName());
     }
 
     /**
@@ -415,49 +423,49 @@ public class WalletTransactionService
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void ChangeTransactionAmount(WalletTransaction oldTransaction,
+    private void changeTransactionAmount(WalletTransaction oldTransaction,
                                          BigDecimal        newAmount)
     {
-        BigDecimal oldAmount = oldTransaction.GetAmount();
+        BigDecimal oldAmount = oldTransaction.getAmount();
 
         BigDecimal diff = oldAmount.subtract(newAmount).abs();
 
         // Check if the new amount is the same as the old amount
         if (diff.compareTo(BigDecimal.ZERO) == 0)
         {
-            m_logger.info("Transaction with id " + oldTransaction.GetId() +
-                          " has the same amount as before");
+            logger.info("Transaction with id " + oldTransaction.getId() +
+                        " has the same amount as before");
 
             return;
         }
 
-        Wallet wallet = oldTransaction.GetWallet();
+        Wallet wallet = oldTransaction.getWallet();
 
         // Apply the difference to the wallet balance
-        if (oldTransaction.GetStatus().equals(TransactionStatus.CONFIRMED))
+        if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
-            if (oldTransaction.GetType().equals(TransactionType.EXPENSE))
+            if (oldTransaction.getType().equals(TransactionType.EXPENSE))
             {
-                BigDecimal balance = wallet.GetBalance();
+                BigDecimal balance = wallet.getBalance();
 
                 if (oldAmount.compareTo(newAmount) > 0)
                 {
-                    wallet.SetBalance(balance.add(diff));
+                    wallet.setBalance(balance.add(diff));
                 }
                 else
                 {
-                    wallet.SetBalance(balance.subtract(diff));
+                    wallet.setBalance(balance.subtract(diff));
                 }
             }
-            else if (oldTransaction.GetType().equals(TransactionType.INCOME))
+            else if (oldTransaction.getType().equals(TransactionType.INCOME))
             {
                 if (oldAmount.compareTo(newAmount) > 0)
                 {
-                    wallet.SetBalance(wallet.GetBalance().subtract(diff));
+                    wallet.setBalance(wallet.getBalance().subtract(diff));
                 }
                 else
                 {
-                    wallet.SetBalance(wallet.GetBalance().add(diff));
+                    wallet.setBalance(wallet.getBalance().add(diff));
                 }
             }
             else
@@ -467,17 +475,17 @@ public class WalletTransactionService
                 throw new RuntimeException("Transaction type not recognized");
             }
 
-            m_logger.info("Wallet with id " + wallet.GetId() + " balance changed to " +
-                          wallet.GetBalance());
+            logger.info("Wallet with id " + wallet.getId() + " balance changed to " +
+                        wallet.getBalance());
 
-            m_walletRepository.save(wallet);
+            walletRepository.save(wallet);
         }
 
-        oldTransaction.SetAmount(newAmount);
-        m_walletTransactionRepository.save(oldTransaction);
+        oldTransaction.setAmount(newAmount);
+        walletTransactionRepository.save(oldTransaction);
 
-        m_logger.info("Transaction with id " + oldTransaction.GetId() +
-                      " amount changed to " + newAmount);
+        logger.info("Transaction with id " + oldTransaction.getId() +
+                    " amount changed to " + newAmount);
     }
 
     /**
@@ -489,28 +497,28 @@ public class WalletTransactionService
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void ChangeTransactionStatus(WalletTransaction transaction,
+    private void changeTransactionStatus(WalletTransaction transaction,
                                          TransactionStatus newStatus)
     {
-        if (transaction.GetStatus().equals(newStatus))
+        if (transaction.getStatus().equals(newStatus))
         {
-            m_logger.info("Transaction with id " + transaction.GetId() +
-                          " has the same status as before");
+            logger.info("Transaction with id " + transaction.getId() +
+                        " has the same status as before");
 
             return;
         }
 
-        Wallet            wallet    = transaction.GetWallet();
-        TransactionStatus oldStatus = transaction.GetStatus();
+        Wallet            wallet    = transaction.getWallet();
+        TransactionStatus oldStatus = transaction.getStatus();
 
-        if (transaction.GetType().equals(TransactionType.EXPENSE))
+        if (transaction.getType().equals(TransactionType.EXPENSE))
         {
             if (oldStatus.equals(TransactionStatus.CONFIRMED))
             {
                 if (newStatus.equals(TransactionStatus.PENDING))
                 {
                     // Revert the expense
-                    wallet.SetBalance(wallet.GetBalance().add(transaction.GetAmount()));
+                    wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
                 }
             }
             else if (oldStatus.equals(TransactionStatus.PENDING))
@@ -518,8 +526,8 @@ public class WalletTransactionService
                 if (newStatus.equals(TransactionStatus.CONFIRMED))
                 {
                     // Apply the expense
-                    wallet.SetBalance(
-                        wallet.GetBalance().subtract(transaction.GetAmount()));
+                    wallet.setBalance(
+                        wallet.getBalance().subtract(transaction.getAmount()));
                 }
             }
             else
@@ -529,21 +537,21 @@ public class WalletTransactionService
                 throw new RuntimeException("Transaction status not recognized");
             }
         }
-        else if (transaction.GetType().equals(TransactionType.INCOME))
+        else if (transaction.getType().equals(TransactionType.INCOME))
         {
             if (oldStatus.equals(TransactionStatus.CONFIRMED))
             {
                 if (newStatus.equals(TransactionStatus.PENDING))
                 {
-                    wallet.SetBalance(
-                        wallet.GetBalance().subtract(transaction.GetAmount()));
+                    wallet.setBalance(
+                        wallet.getBalance().subtract(transaction.getAmount()));
                 }
             }
             else if (oldStatus.equals(TransactionStatus.PENDING))
             {
                 if (newStatus.equals(TransactionStatus.CONFIRMED))
                 {
-                    wallet.SetBalance(wallet.GetBalance().add(transaction.GetAmount()));
+                    wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
                 }
             }
             else
@@ -560,16 +568,16 @@ public class WalletTransactionService
             throw new RuntimeException("Transaction type not recognized");
         }
 
-        transaction.SetStatus(newStatus);
-        m_walletRepository.save(wallet);
+        transaction.setStatus(newStatus);
+        walletRepository.save(wallet);
 
-        m_logger.info("Wallet with id " + wallet.GetId() + " balance changed to " +
-                      wallet.GetBalance());
+        logger.info("Wallet with id " + wallet.getId() + " balance changed to " +
+                    wallet.getBalance());
 
-        m_walletTransactionRepository.save(transaction);
+        walletTransactionRepository.save(transaction);
 
-        m_logger.info("Transaction with id " + transaction.GetId() +
-                      " status changed to " + newStatus.toString());
+        logger.info("Transaction with id " + transaction.getId() +
+                    " status changed to " + newStatus.toString());
     }
 
     /**
@@ -578,36 +586,36 @@ public class WalletTransactionService
      * @throws RuntimeException If the transaction does not exist
      */
     @Transactional
-    public void DeleteTransaction(Long transactionId)
+    public void deleteTransaction(Long transactionId)
     {
         WalletTransaction transaction =
-            m_walletTransactionRepository.findById(transactionId)
+            walletTransactionRepository.findById(transactionId)
                 .orElseThrow(()
                                  -> new RuntimeException("Transaction with id " +
                                                          transactionId + " not found"));
 
-        Wallet wallet = transaction.GetWallet();
+        Wallet wallet = transaction.getWallet();
 
         // Update the wallet balance if the transaction is confirmed
-        if (transaction.GetStatus() == TransactionStatus.CONFIRMED)
+        if (transaction.getStatus() == TransactionStatus.CONFIRMED)
         {
-            BigDecimal amount = transaction.GetAmount();
-            if (transaction.GetType() == TransactionType.INCOME)
+            BigDecimal amount = transaction.getAmount();
+            if (transaction.getType() == TransactionType.INCOME)
             {
-                wallet.SetBalance(wallet.GetBalance().subtract(amount));
+                wallet.setBalance(wallet.getBalance().subtract(amount));
             }
             else
             {
-                wallet.SetBalance(wallet.GetBalance().add(amount));
+                wallet.setBalance(wallet.getBalance().add(amount));
             }
 
-            m_walletRepository.save(wallet);
+            walletRepository.save(wallet);
         }
 
-        m_walletTransactionRepository.delete(transaction);
+        walletTransactionRepository.delete(transaction);
 
-        m_logger.info("Transaction " + transactionId + " deleted from wallet " +
-                      wallet.GetName());
+        logger.info("Transaction " + transactionId + " deleted from wallet " +
+                    wallet.getName());
     }
 
     /**
@@ -617,44 +625,44 @@ public class WalletTransactionService
      * @throws RuntimeException If the transaction is already confirmed
      */
     @Transactional
-    public void ConfirmTransaction(Long transactionId)
+    public void confirmTransaction(Long transactionId)
     {
         WalletTransaction transaction =
-            m_walletTransactionRepository.findById(transactionId)
+            walletTransactionRepository.findById(transactionId)
                 .orElseThrow(()
                                  -> new RuntimeException("Transaction with id " +
                                                          transactionId + " not found"));
 
-        if (transaction.GetStatus() == TransactionStatus.CONFIRMED)
+        if (transaction.getStatus() == TransactionStatus.CONFIRMED)
         {
             throw new RuntimeException("Transaction with id " + transactionId +
                                        " is already confirmed");
         }
 
-        Wallet wallet = transaction.GetWallet();
+        Wallet wallet = transaction.getWallet();
 
-        if (transaction.GetType() == TransactionType.EXPENSE)
+        if (transaction.getType() == TransactionType.EXPENSE)
         {
-            wallet.SetBalance(wallet.GetBalance().subtract(transaction.GetAmount()));
+            wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
         }
         else
         {
-            wallet.SetBalance(wallet.GetBalance().add(transaction.GetAmount()));
+            wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
         }
 
-        transaction.SetStatus(TransactionStatus.CONFIRMED);
+        transaction.setStatus(TransactionStatus.CONFIRMED);
 
-        m_walletRepository.save(wallet);
-        m_walletTransactionRepository.save(transaction);
+        walletRepository.save(wallet);
+        walletTransactionRepository.save(transaction);
     }
 
     /**
      * Get all transactions
      * @return A list with all transactions
      */
-    public List<WalletTransaction> GetAllTransactions()
+    public List<WalletTransaction> getAllTransactions()
     {
-        return m_walletTransactionRepository.findAll();
+        return walletTransactionRepository.findAll();
     }
 
     /**
@@ -663,9 +671,9 @@ public class WalletTransactionService
      * @return The transaction with the provided id
      * @throws RuntimeException If the transaction does not exist
      */
-    public WalletTransaction GetTransactionById(Long id)
+    public WalletTransaction getTransactionById(Long id)
     {
-        return m_walletTransactionRepository.findById(id).orElseThrow(
+        return walletTransactionRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Transaction with id " + id + " not found"));
     }
 
@@ -673,45 +681,45 @@ public class WalletTransactionService
      * Get all transactions where both wallet and category are not archived
      * @return A list with all transactions
      */
-    public List<WalletTransaction> GetNonArchivedTransactions()
+    public List<WalletTransaction> getNonArchivedTransactions()
     {
-        return m_walletTransactionRepository.FindNonArchivedTransactions();
+        return walletTransactionRepository.findNonArchivedTransactions();
     }
 
     /**
      * Get all income transactions
      * @return A list with all income transactions
      */
-    public List<WalletTransaction> GetIncomes()
+    public List<WalletTransaction> getIncomes()
     {
-        return m_walletTransactionRepository.FindIncomeTransactions();
+        return walletTransactionRepository.findIncomeTransactions();
     }
 
     /**
      * Get all income transactions where both wallet and category are not archived
      * @return A list with all income transactions
      */
-    public List<WalletTransaction> GetNonArchivedIncomes()
+    public List<WalletTransaction> getNonArchivedIncomes()
     {
-        return m_walletTransactionRepository.FindNonArchivedIncomeTransactions();
+        return walletTransactionRepository.findNonArchivedIncomeTransactions();
     }
 
     /**
      * Get all expense transactions
      * @return A list with all expense transactions
      */
-    public List<WalletTransaction> GetExpenses()
+    public List<WalletTransaction> getExpenses()
     {
-        return m_walletTransactionRepository.FindExpenseTransactions();
+        return walletTransactionRepository.findExpenseTransactions();
     }
 
     /**
      * Get all expense transactions where both wallet and category are not archived
      * @return A list with all expense transactions
      */
-    public List<WalletTransaction> GetNonArchivedExpenses()
+    public List<WalletTransaction> getNonArchivedExpenses()
     {
-        return m_walletTransactionRepository.FindNonArchivedExpenseTransactions();
+        return walletTransactionRepository.findNonArchivedExpenseTransactions();
     }
 
     /**
@@ -719,9 +727,9 @@ public class WalletTransactionService
      * @param month The month of the transactions
      * @param year The year of the transactions
      */
-    public List<WalletTransaction> GetTransactionsByMonth(Integer month, Integer year)
+    public List<WalletTransaction> getTransactionsByMonth(Integer month, Integer year)
     {
-        return m_walletTransactionRepository.FindTransactionsByMonth(month, year);
+        return walletTransactionRepository.findTransactionsByMonth(month, year);
     }
 
     /**
@@ -729,11 +737,11 @@ public class WalletTransactionService
      * @param month The month of the transactions
      * @param year The year of the transactions
      */
-    public List<WalletTransaction> GetNonArchivedTransactionsByMonth(Integer month,
+    public List<WalletTransaction> getNonArchivedTransactionsByMonth(Integer month,
                                                                      Integer year)
     {
-        return m_walletTransactionRepository.FindNonArchivedTransactionsByMonth(month,
-                                                                                year);
+        return walletTransactionRepository.findNonArchivedTransactionsByMonth(month,
+                                                                              year);
     }
 
     /**
@@ -741,9 +749,9 @@ public class WalletTransactionService
      * @param year The year of the transactions
      * @return A list with all transactions of the year
      */
-    public List<WalletTransaction> GetTransactionsByYear(Integer year)
+    public List<WalletTransaction> getTransactionsByYear(Integer year)
     {
-        return m_walletTransactionRepository.FindTransactionsByYear(year);
+        return walletTransactionRepository.findTransactionsByYear(year);
     }
 
     /**
@@ -751,9 +759,9 @@ public class WalletTransactionService
      * @param year The year of the transactions
      * @return A list with all transactions of the year
      */
-    public List<WalletTransaction> GetNonArchivedTransactionsByYear(Integer year)
+    public List<WalletTransaction> getNonArchivedTransactionsByYear(Integer year)
     {
-        return m_walletTransactionRepository.FindNonArchivedTransactionsByYear(year);
+        return walletTransactionRepository.findNonArchivedTransactionsByYear(year);
     }
 
     /**
@@ -763,11 +771,11 @@ public class WalletTransactionService
      * @param year The year of the transactions
      */
     public List<WalletTransaction>
-    GetTransactionsByWalletAndMonth(Long walletId, Integer month, Integer year)
+    getTransactionsByWalletAndMonth(Long walletId, Integer month, Integer year)
     {
-        return m_walletTransactionRepository.FindTransactionsByWalletAndMonth(walletId,
-                                                                              month,
-                                                                              year);
+        return walletTransactionRepository.findTransactionsByWalletAndMonth(walletId,
+                                                                            month,
+                                                                            year);
     }
 
     /**
@@ -777,12 +785,14 @@ public class WalletTransactionService
      * @param year The year of the transactions
      */
     public List<WalletTransaction>
-    GetNonArchivedTransactionsByWalletAndMonth(Long    walletId,
+    getNonArchivedTransactionsByWalletAndMonth(Long    walletId,
                                                Integer month,
                                                Integer year)
     {
-        return m_walletTransactionRepository
-            .FindNonArchivedTransactionsByWalletAndMonth(walletId, month, year);
+        return walletTransactionRepository.findNonArchivedTransactionsByWalletAndMonth(
+            walletId,
+            month,
+            year);
     }
 
     /**
@@ -791,14 +801,14 @@ public class WalletTransactionService
      * @param endDate The end date
      * @return A list with all transactions between the two dates
      */
-    public List<WalletTransaction> GetTransactionsBetweenDates(LocalDateTime startDate,
+    public List<WalletTransaction> getTransactionsBetweenDates(LocalDateTime startDate,
                                                                LocalDateTime endDate)
     {
         String startDateStr = startDate.format(Constants.DB_DATE_FORMATTER);
         String endDateStr   = endDate.format(Constants.DB_DATE_FORMATTER);
 
-        return m_walletTransactionRepository.FindTransactionsBetweenDates(startDateStr,
-                                                                          endDateStr);
+        return walletTransactionRepository.findTransactionsBetweenDates(startDateStr,
+                                                                        endDateStr);
     }
 
     /**
@@ -809,13 +819,13 @@ public class WalletTransactionService
      * @return A list with all transactions between the two dates
      */
     public List<WalletTransaction>
-    GetNonArchivedTransactionsBetweenDates(LocalDateTime startDate,
+    getNonArchivedTransactionsBetweenDates(LocalDateTime startDate,
                                            LocalDateTime endDate)
     {
         String startDateStr = startDate.format(Constants.DB_DATE_FORMATTER);
         String endDateStr   = endDate.format(Constants.DB_DATE_FORMATTER);
 
-        return m_walletTransactionRepository.FindNonArchivedTransactionsBetweenDates(
+        return walletTransactionRepository.findNonArchivedTransactionsBetweenDates(
             startDateStr,
             endDateStr);
     }
@@ -825,11 +835,11 @@ public class WalletTransactionService
      * @param month The month of the transactions
      * @param year The year of the transactions
      */
-    public List<WalletTransaction> GetConfirmedTransactionsByMonth(Integer month,
+    public List<WalletTransaction> getConfirmedTransactionsByMonth(Integer month,
                                                                    Integer year)
     {
-        return m_walletTransactionRepository.FindConfirmedTransactionsByMonth(month,
-                                                                              year);
+        return walletTransactionRepository.findConfirmedTransactionsByMonth(month,
+                                                                            year);
     }
 
     /**
@@ -839,10 +849,11 @@ public class WalletTransactionService
      * @param year The year of the transactions
      */
     public List<WalletTransaction>
-    GetNonArchivedConfirmedTransactionsByMonth(Integer month, Integer year)
+    getNonArchivedConfirmedTransactionsByMonth(Integer month, Integer year)
     {
-        return m_walletTransactionRepository
-            .FindNonArchivedConfirmedTransactionsByMonth(month, year);
+        return walletTransactionRepository.findNonArchivedConfirmedTransactionsByMonth(
+            month,
+            year);
     }
 
     /**
@@ -850,11 +861,10 @@ public class WalletTransactionService
      * @param month The month of the transactions
      * @param year The year of the transactions
      */
-    public List<WalletTransaction> GetPendingTransactionsByMonth(Integer month,
+    public List<WalletTransaction> getPendingTransactionsByMonth(Integer month,
                                                                  Integer year)
     {
-        return m_walletTransactionRepository.FindPendingTransactionsByMonth(month,
-                                                                            year);
+        return walletTransactionRepository.findPendingTransactionsByMonth(month, year);
     }
 
     /**
@@ -864,9 +874,9 @@ public class WalletTransactionService
      * @param year The year of the transactions
      */
     public List<WalletTransaction>
-    GetNonArchivedPendingTransactionsByMonth(Integer month, Integer year)
+    getNonArchivedPendingTransactionsByMonth(Integer month, Integer year)
     {
-        return m_walletTransactionRepository.FindNonArchivedPendingTransactionsByMonth(
+        return walletTransactionRepository.findNonArchivedPendingTransactionsByMonth(
             month,
             year);
     }
@@ -876,10 +886,9 @@ public class WalletTransactionService
      * @param n The number of transactions to get
      * @return A list with the last n transactions of all wallets
      */
-    public List<WalletTransaction> GetLastTransactions(Integer n)
+    public List<WalletTransaction> getLastTransactions(Integer n)
     {
-        return m_walletTransactionRepository.FindLastTransactions(
-            PageRequest.ofSize(n));
+        return walletTransactionRepository.findLastTransactions(PageRequest.ofSize(n));
     }
 
     /**
@@ -888,9 +897,9 @@ public class WalletTransactionService
      * @param n The number of transactions to get
      * @return A list with the last n transactions of all wallets
      */
-    public List<WalletTransaction> GetNonArchivedLastTransactions(Integer n)
+    public List<WalletTransaction> getNonArchivedLastTransactions(Integer n)
     {
-        return m_walletTransactionRepository.FindNonArchivedLastTransactions(
+        return walletTransactionRepository.findNonArchivedLastTransactions(
             PageRequest.ofSize(n));
     }
 
@@ -900,9 +909,9 @@ public class WalletTransactionService
      * @param n The number of transactions to get
      * @return A list with the last n transactions of the wallet
      */
-    public List<WalletTransaction> GetLastTransactionsByWallet(Long walletId, Integer n)
+    public List<WalletTransaction> getLastTransactionsByWallet(Long walletId, Integer n)
     {
-        return m_walletTransactionRepository.FindLastTransactionsByWallet(
+        return walletTransactionRepository.findLastTransactionsByWallet(
             walletId,
             PageRequest.ofSize(n));
     }
@@ -914,10 +923,10 @@ public class WalletTransactionService
      * @param n The number of transactions to get
      * @return A list with the last n transactions of the wallet
      */
-    public List<WalletTransaction> GetNonArchivedLastTransactionsByWallet(Long walletId,
+    public List<WalletTransaction> getNonArchivedLastTransactionsByWallet(Long walletId,
                                                                           Integer n)
     {
-        return m_walletTransactionRepository.FindNonArchivedLastTransactionsByWallet(
+        return walletTransactionRepository.findNonArchivedLastTransactionsByWallet(
             walletId,
             PageRequest.ofSize(n));
     }
@@ -927,9 +936,9 @@ public class WalletTransactionService
      * @return The date of the oldest transaction or the current date if there are no
      *     transactions
      */
-    public LocalDateTime GetOldestTransactionDate()
+    public LocalDateTime getOldestTransactionDate()
     {
-        String date = m_walletTransactionRepository.FindOldestTransactionDate();
+        String date = walletTransactionRepository.findOldestTransactionDate();
 
         if (date == null)
         {
@@ -945,10 +954,10 @@ public class WalletTransactionService
      * @return The date of the oldest transaction or the current date if there are no
      *    transactions
      */
-    public LocalDateTime GetNonArchivedOldestTransactionDate()
+    public LocalDateTime getNonArchivedOldestTransactionDate()
     {
         String date =
-            m_walletTransactionRepository.FindNonArchivedOldestTransactionDate();
+            walletTransactionRepository.findNonArchivedOldestTransactionDate();
 
         if (date == null)
         {
@@ -963,9 +972,9 @@ public class WalletTransactionService
      * @return The date of the newest transaction or the current date if there are no
      *     transactions
      */
-    public LocalDateTime GetNewestTransactionDate()
+    public LocalDateTime getNewestTransactionDate()
     {
-        String date = m_walletTransactionRepository.FindNewestTransactionDate();
+        String date = walletTransactionRepository.findNewestTransactionDate();
 
         if (date == null)
         {
@@ -981,10 +990,10 @@ public class WalletTransactionService
      * @return The date of the newest transaction or the current date if there are no
      *     transactions
      */
-    public LocalDateTime GetNonArchivedNewestTransactionDate()
+    public LocalDateTime getNonArchivedNewestTransactionDate()
     {
         String date =
-            m_walletTransactionRepository.FindNonArchivedNewestTransactionDate();
+            walletTransactionRepository.findNonArchivedNewestTransactionDate();
 
         if (date == null)
         {
@@ -999,10 +1008,10 @@ public class WalletTransactionService
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
-    public Long GetTransactionCountByWallet(Long walletId)
+    public Long getTransactionCountByWallet(Long walletId)
     {
-        return m_walletTransactionRepository.GetTransactionCountByWallet(walletId) +
-            m_transferRepository.GetTransferCountByWallet(walletId);
+        return walletTransactionRepository.getTransactionCountByWallet(walletId) +
+            transferRepository.getTransferCountByWallet(walletId);
     }
 
     /**
@@ -1011,9 +1020,9 @@ public class WalletTransactionService
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
-    public Long GetNonArchivedTransactionCountByWallet(Long walletId)
+    public Long getNonArchivedTransactionCountByWallet(Long walletId)
     {
-        return m_walletTransactionRepository.CountNonArchivedTransactionsByWallet(
+        return walletTransactionRepository.getCountNonArchivedTransactionsByWallet(
             walletId);
     }
 
@@ -1022,9 +1031,9 @@ public class WalletTransactionService
      * @param walletId The id of the wallet
      * @return A list with the transfers in the wallet
      */
-    public List<Transfer> GetTransfersByWallet(Long walletId)
+    public List<Transfer> getTransfersByWallet(Long walletId)
     {
-        return m_transferRepository.FindTransfersByWallet(walletId);
+        return transferRepository.findTransfersByWallet(walletId);
     }
 
     /**
@@ -1033,9 +1042,9 @@ public class WalletTransactionService
      * @param year The year
      * @return A list with the transfers by month and year
      */
-    public List<Transfer> GetTransfersByMonthAndYear(Integer month, Integer year)
+    public List<Transfer> getTransfersByMonthAndYear(Integer month, Integer year)
     {
-        return m_transferRepository.FindTransferByMonthAndYear(month, year);
+        return transferRepository.findTransferByMonthAndYear(month, year);
     }
 
     /**
@@ -1046,11 +1055,9 @@ public class WalletTransactionService
      * @return A list with the transfers in the wallet by month
      */
     public List<Transfer>
-    GetTransfersByWalletAndMonth(Long walletId, Integer month, Integer year)
+    getTransfersByWalletAndMonth(Long walletId, Integer month, Integer year)
     {
-        return m_transferRepository.FindTransfersByWalletAndMonth(walletId,
-                                                                  month,
-                                                                  year);
+        return transferRepository.findTransfersByWalletAndMonth(walletId, month, year);
     }
 
     /**
@@ -1058,9 +1065,9 @@ public class WalletTransactionService
      * and most recent date
      * @return A list with the suggestions
      */
-    public List<WalletTransaction> GetIncomeSuggestions()
+    public List<WalletTransaction> getIncomeSuggestions()
     {
-        return m_walletTransactionRepository.FindSuggestions(TransactionType.INCOME);
+        return walletTransactionRepository.findSuggestions(TransactionType.INCOME);
     }
 
     /**
@@ -1068,9 +1075,9 @@ public class WalletTransactionService
      * and most recent date
      * @return A list with the suggestions
      */
-    public List<WalletTransaction> GetExpenseSuggestions()
+    public List<WalletTransaction> getExpenseSuggestions()
     {
-        return m_walletTransactionRepository.FindSuggestions(TransactionType.EXPENSE);
+        return walletTransactionRepository.findSuggestions(TransactionType.EXPENSE);
     }
 
     /**
@@ -1078,8 +1085,8 @@ public class WalletTransactionService
      * and most recent date
      * @return A list with the suggestions
      */
-    public List<Transfer> GetTransferSuggestions()
+    public List<Transfer> getTransferSuggestions()
     {
-        return m_transferRepository.FindSuggestions();
+        return transferRepository.findSuggestions();
     }
 }

@@ -24,6 +24,10 @@ import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.services.InicializationService;
 
+/**
+ * Utility class for managing API-related operations, like fetching stock prices and
+ * market indicators
+ */
 public class APIUtils
 {
     private static final ExecutorService executorService =
@@ -33,7 +37,7 @@ public class APIUtils
 
     private static Boolean shuttingDown = false;
 
-    private static final Logger logger = LoggerConfig.GetLogger();
+    private static final Logger logger = LoggerConfig.getLogger();
 
     // Prevent instantiation
     private APIUtils() { }
@@ -41,7 +45,7 @@ public class APIUtils
     /**
      * Shutdown the executor service
      */
-    public static synchronized void ShutdownExecutor()
+    public static synchronized void shutdownExecutor()
     {
         if (shuttingDown)
         {
@@ -52,7 +56,7 @@ public class APIUtils
 
         logger.info("Shutting down executor service");
 
-        ShutdownProcesses();
+        shutdownProcesses();
 
         executorService.shutdown();
 
@@ -75,7 +79,7 @@ public class APIUtils
     /**
      * Shutdown all running processes
      */
-    private static synchronized void ShutdownProcesses()
+    private static synchronized void shutdownProcesses()
     {
         logger.info("Shutting down running processes");
 
@@ -116,7 +120,7 @@ public class APIUtils
      * Register a process to be managed by the APIUtils class
      * @param process The process to register
      */
-    private static synchronized void RegisterProcess(Process process)
+    private static synchronized void registerProcess(Process process)
     {
         if (shuttingDown)
         {
@@ -130,7 +134,7 @@ public class APIUtils
      * Remove a process from the list of running processes
      * @param process The process to remove
      */
-    private static synchronized void RemoveProcess(Process process)
+    private static synchronized void removeProcess(Process process)
     {
         if (shuttingDown)
         {
@@ -146,10 +150,10 @@ public class APIUtils
      * @param symbols Array of stock symbols
      * @return A CompletableFuture containing the JSON response
      */
-    public static CompletableFuture<JSONObject> FetchStockPricesAsync(String[] symbols)
+    public static CompletableFuture<JSONObject> fetchStockPricesAsync(String[] symbols)
     {
         return CompletableFuture.supplyAsync(() -> {
-            return RunPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols);
+            return runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols);
         }, executorService);
     }
 
@@ -158,10 +162,10 @@ public class APIUtils
      *
      * @return A CompletableFuture containing the JSON response
      */
-    public static CompletableFuture<JSONObject> FetchBrazilianMarketIndicatorsAsync()
+    public static CompletableFuture<JSONObject> fetchBrazilianMarketIndicatorsAsync()
     {
         return CompletableFuture.supplyAsync(() -> {
-            return RunPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
+            return runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
                                    new String[0]);
         }, executorService);
     }
@@ -171,7 +175,7 @@ public class APIUtils
      * @param script The script to run
      * @param args The arguments to pass to the script
      */
-    public static JSONObject RunPythonScript(String script, String[] args)
+    public static JSONObject runPythonScript(String script, String[] args)
     {
         try (InputStream scriptInputStream =
                  InicializationService.class.getResourceAsStream(Constants.SCRIPT_PATH +
@@ -206,7 +210,7 @@ public class APIUtils
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             Process        process        = processBuilder.start();
-            RegisterProcess(process);
+            registerProcess(process);
 
             try (BufferedReader reader = new BufferedReader(
                      new InputStreamReader(process.getInputStream())))
@@ -231,7 +235,7 @@ public class APIUtils
             {
                 synchronized (runningProcesses)
                 {
-                    RemoveProcess(process);
+                    removeProcess(process);
                 }
             }
         }

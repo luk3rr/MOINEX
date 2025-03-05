@@ -30,7 +30,7 @@ public interface CreditCardPaymentRepository
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year)"
            + "AND ccp.wallet IS NOT NULL")
     List<CreditCardPayment>
-    GetAllPaidPaymentsByMonth(@Param("month") Integer month,
+    getAllPaidPaymentsByMonth(@Param("month") Integer month,
                               @Param("year") Integer  year);
 
     /**
@@ -44,7 +44,7 @@ public interface CreditCardPaymentRepository
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year)")
     List<CreditCardPayment>
-    GetCreditCardPayments(@Param("month") Integer month, @Param("year") Integer year);
+    getCreditCardPayments(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
      * Get credit card payments in a month and year by credit card
@@ -59,7 +59,7 @@ public interface CreditCardPaymentRepository
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year)"
            + "AND ccp.creditCardDebt.creditCard.id = :crcId")
     List<CreditCardPayment>
-    GetCreditCardPayments(@Param("crcId") Long    crcId,
+    getCreditCardPayments(@Param("crcId") Long    crcId,
                           @Param("month") Integer month,
                           @Param("year") Integer  year);
 
@@ -78,7 +78,7 @@ public interface CreditCardPaymentRepository
            + "AND ccp.creditCardDebt.creditCard.id = :crcId "
            + "AND ccp.wallet IS NULL")
     List<CreditCardPayment>
-    GetPendingCreditCardPayments(@Param("crcId") Long    crcId,
+    getPendingCreditCardPayments(@Param("crcId") Long    crcId,
                                  @Param("month") Integer month,
                                  @Param("year") Integer  year);
 
@@ -92,7 +92,7 @@ public interface CreditCardPaymentRepository
            + "WHERE ccp.creditCardDebt.creditCard.id = :crcId "
            + "AND ccp.wallet IS NULL")
     List<CreditCardPayment>
-    GetAllPendingCreditCardPayments(@Param("crcId") Long crcId);
+    getAllPendingCreditCardPayments(@Param("crcId") Long crcId);
 
     /**
      * Get payments by debt id
@@ -103,19 +103,19 @@ public interface CreditCardPaymentRepository
            + "FROM CreditCardPayment ccp "
            + "WHERE ccp.creditCardDebt.id = :debtId")
     List<CreditCardPayment>
-    GetPaymentsByDebtId(@Param("debtId") Long debtId);
+    getPaymentsByDebtId(@Param("debtId") Long debtId);
 
     /**
      * Get the total paid amount of a credit card
      * @param creditCardId The credit card id
      * @return The total paid amount of the credit card
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE ccp.creditCardDebt.creditCard.id = :creditCardId "
            + "AND ccp.wallet IS NOT NULL")
     BigDecimal
-    GetTotalPaidAmount(@Param("creditCardId") Long creditCardId);
+    getTotalPaidAmount(@Param("creditCardId") Long creditCardId);
 
     /**
      * TODO: Create tests
@@ -124,23 +124,23 @@ public interface CreditCardPaymentRepository
      * @param year The year
      * @return The total debt amount of all credit cards in a month and year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year)")
     BigDecimal
-    GetTotalDebtAmount(@Param("month") Integer month, @Param("year") Integer year);
+    getTotalDebtAmount(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
      * Get the total debt amount of all credit cards in a year
      * @param year The year
      * @return The total debt amount of all credit cards in a year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%Y', ccp.date) = printf('%04d', :year)")
     BigDecimal
-    GetTotalDebtAmount(@Param("year") Integer year);
+    getTotalDebtAmount(@Param("year") Integer year);
 
     /**
      * TODO: Create tests
@@ -151,13 +151,13 @@ public interface CreditCardPaymentRepository
      * @return The total of all pending payments of all credit cards from the specified
      *     month and year onward
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) >= printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) >= printf('%04d', :year) "
            + "AND ccp.wallet IS NULL")
     BigDecimal
-    GetTotalPendingPayments(@Param("month") Integer month, @Param("year") Integer year);
+    getTotalPendingPayments(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
      * Get the total of all paid payments of all credit cards from a specified month
@@ -167,13 +167,13 @@ public interface CreditCardPaymentRepository
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet IS NOT NULL")
     BigDecimal
-    GetPaidPaymentsByMonth(@Param("month") Integer month, @Param("year") Integer year);
+    getPaidPaymentsByMonth(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
      * Get the total of all paid payments of all credit cards from a specified month
@@ -183,13 +183,13 @@ public interface CreditCardPaymentRepository
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year by wallet id
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet.id = :walletId")
     BigDecimal
-    GetPaidPaymentsByMonth(@Param("walletId") Long walletId,
+    getPaidPaymentsByMonth(@Param("walletId") Long walletId,
                            @Param("month") Integer month,
                            @Param("year") Integer  year);
 
@@ -201,13 +201,13 @@ public interface CreditCardPaymentRepository
      * @return The total of all pending payments of all credit cards from the specified
      *   month and year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet IS NULL")
     BigDecimal
-    GetPendingPaymentsByMonth(@Param("month") Integer month,
+    getPendingPaymentsByMonth(@Param("month") Integer month,
                               @Param("year") Integer  year);
 
     /**
@@ -217,12 +217,12 @@ public interface CreditCardPaymentRepository
      * @return The total of all pending payments of all credit cards from the specified
      *    year onward
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%Y', ccp.date) >= printf('%04d', :year) "
            + "AND ccp.wallet IS NULL")
     BigDecimal
-    GetTotalPendingPayments(@Param("year") Integer year);
+    getTotalPendingPayments(@Param("year") Integer year);
 
     /**
      * Get the total of all paid payments of all credit cards from a specified year
@@ -230,12 +230,12 @@ public interface CreditCardPaymentRepository
      * @return The total of all paid payments of all credit cards from the specified
      *     year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet IS NOT NULL")
     BigDecimal
-    GetPaidPaymentsByYear(@Param("year") Integer year);
+    getPaidPaymentsByYear(@Param("year") Integer year);
 
     /**
      * Get the total of all pending payments of all credit cards from a specified year
@@ -243,47 +243,47 @@ public interface CreditCardPaymentRepository
      * @return The total of all pending payments of all credit cards from the specified
      *     year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet IS NULL")
     BigDecimal
-    GetPendingPaymentsByYear(@Param("year") Integer year);
+    getPendingPaymentsByYear(@Param("year") Integer year);
 
     /**
      * Get the total of all pending payments of a credit card
      * @param creditCardId The credit card id
      * @return The total of all pending payments of a credit card
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "JOIN ccp.creditCardDebt ccd "
            + "WHERE ccd.creditCard.id = :creditCardId "
            + "AND ccp.wallet IS NULL")
     BigDecimal
-    GetTotalPendingPayments(@Param("creditCardId") Long creditCardId);
+    getTotalPendingPayments(@Param("creditCardId") Long creditCardId);
 
     /**
      * Get the total of all pending payments of all credit cards
      * @return The total of all pending payments of all credit cards
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE ccp.wallet IS NULL")
     BigDecimal
-    GetTotalPendingPayments();
+    getTotalPendingPayments();
 
     /**
      * Get the remaining debt of a purchase
      * @param debtId The id of the debt
      * @return The remaining debt of the purchase
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE ccp.creditCardDebt.id = :debtId "
            + "AND ccp.wallet IS NULL")
     BigDecimal
-    GetRemainingDebt(@Param("debtId") Long debtId);
+    getRemainingDebt(@Param("debtId") Long debtId);
 
     /**
      * Get the invoice amount of a credit card in a specified month and year
@@ -292,14 +292,14 @@ public interface CreditCardPaymentRepository
      * @param year The year
      * @return The invoice amount of the credit card in the specified month and year
      */
-    @Query("SELECT COALESCE(SUM(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount), 0) "
            + "FROM CreditCardPayment ccp "
            + "JOIN ccp.creditCardDebt ccd "
            + "WHERE ccd.creditCard.id = :creditCardId "
            + "AND strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year)")
     BigDecimal
-    GetInvoiceAmount(@Param("creditCardId") Long creditCardId,
+    getInvoiceAmount(@Param("creditCardId") Long creditCardId,
                      @Param("month") Integer     month,
                      @Param("year") Integer      year);
 
@@ -308,11 +308,11 @@ public interface CreditCardPaymentRepository
      * @param creditCardId The credit card id
      * @return The next invoice date of the credit card
      */
-    @Query("SELECT MIN(ccp.date) "
+    @Query("SELECT min(ccp.date) "
            + "FROM CreditCardPayment ccp "
            + "JOIN ccp.creditCardDebt ccd "
            + "WHERE ccd.creditCard.id = :creditCardId "
            + "AND ccp.wallet IS NULL")
     String
-    GetNextInvoiceDate(@Param("creditCardId") Long creditCardId);
+    getNextInvoiceDate(@Param("creditCardId") Long creditCardId);
 }

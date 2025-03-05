@@ -12,6 +12,10 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
 /**
@@ -22,6 +26,10 @@ import org.moinex.util.Constants;
 @Entity
 @Table(name = "goal")
 @PrimaryKeyJoinColumn(name = "wallet_id", referencedColumnName = "id")
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 public class Goal extends Wallet
 {
     @Column(name = "initial_balance", nullable = false)
@@ -39,20 +47,31 @@ public class Goal extends Wallet
     @Column(name = "motivation", length = 500)
     private String motivation;
 
-    /**
-     * Default constructor for JPA
-     */
-    public Goal() { }
+    public static abstract class GoalBuilder<C extends   Goal, B
+                                                 extends GoalBuilder<C, B>>
+        extends WalletBuilder<C, B>
+    {
+        public B targetDate(LocalDateTime targetDate)
+        {
+            this.targetDate = targetDate.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
+
+        public B completionDate(LocalDateTime completionDate)
+        {
+            if (completionDate == null)
+            {
+                this.completionDate = null;
+                return self();
+            }
+
+            this.completionDate = completionDate.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
+    }
 
     /**
      * Constructor for testing purposes
-     * @param id The ID of the goal
-     * @param name The name of the goal
-     * @param initialBalance The initial balance of the goal
-     * @param targetBalance The target balance of the goal
-     * @param targetDate The target date of the goal
-     * @param motivation The motivation for the goal
-     * @param walletType The wallet type of the goal
      */
     public Goal(Long          id,
                 String        name,
@@ -63,50 +82,15 @@ public class Goal extends Wallet
                 WalletType    walletType)
     {
         super(id, name, initialBalance);
-        this.SetType(walletType);
 
+        this.setType(walletType);
         this.initialBalance = initialBalance;
         this.targetBalance  = targetBalance;
         this.targetDate     = targetDate.format(Constants.DB_DATE_FORMATTER);
         this.motivation     = motivation;
     }
 
-    /**
-     * Constructor for Goal
-     * @param name The name of the goal
-     * @param initialBalance The initial balance of the goal
-     * @param targetBalance The target balance of the goal
-     * @param targetDate The target date of the goal
-     * @param motivation The motivation for the goal
-     * @param walletType The wallet type of the goal
-     */
-    public Goal(String        name,
-                BigDecimal    initialBalance,
-                BigDecimal    targetBalance,
-                LocalDateTime targetDate,
-                String        motivation,
-                WalletType    walletType)
-    {
-        super(name, initialBalance);
-        this.SetType(walletType);
-
-        this.initialBalance = initialBalance;
-        this.targetBalance  = targetBalance;
-        this.targetDate     = targetDate.format(Constants.DB_DATE_FORMATTER);
-        this.motivation     = motivation;
-    }
-
-    public BigDecimal GetInitialBalance()
-    {
-        return initialBalance;
-    }
-
-    public BigDecimal GetTargetBalance()
-    {
-        return targetBalance;
-    }
-
-    public LocalDateTime GetCompletionDate()
+    public LocalDateTime getCompletionDate()
     {
         if (completionDate == null)
         {
@@ -116,32 +100,17 @@ public class Goal extends Wallet
         return LocalDateTime.parse(completionDate, Constants.DB_DATE_FORMATTER);
     }
 
-    public LocalDateTime GetTargetDate()
+    public LocalDateTime getTargetDate()
     {
         return LocalDateTime.parse(targetDate, Constants.DB_DATE_FORMATTER);
     }
 
-    public String GetMotivation()
-    {
-        return motivation;
-    }
-
-    public void SetInitialBalance(BigDecimal initialBalance)
-    {
-        this.initialBalance = initialBalance;
-    }
-
-    public void SetTargetBalance(BigDecimal targetBalance)
-    {
-        this.targetBalance = targetBalance;
-    }
-
-    public void SetTargetDate(LocalDateTime targetDate)
+    public void setTargetDate(LocalDateTime targetDate)
     {
         this.targetDate = targetDate.format(Constants.DB_DATE_FORMATTER);
     }
 
-    public void SetCompletionDate(LocalDateTime completionDate)
+    public void setCompletionDate(LocalDateTime completionDate)
     {
         if (completionDate == null)
         {
@@ -152,12 +121,7 @@ public class Goal extends Wallet
         this.completionDate = completionDate.format(Constants.DB_DATE_FORMATTER);
     }
 
-    public void SetMotivation(String motivation)
-    {
-        this.motivation = motivation;
-    }
-
-    public Boolean IsCompleted()
+    public Boolean isCompleted()
     {
         return this.completionDate != null;
     }

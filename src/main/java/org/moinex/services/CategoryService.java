@@ -8,6 +8,7 @@ package org.moinex.services;
 
 import java.util.List;
 import java.util.logging.Logger;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.CreditCardDebtRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * This class is responsible for managing the categories
  */
 @Service
+@NoArgsConstructor
 public class CategoryService
 {
     @Autowired
@@ -28,17 +30,16 @@ public class CategoryService
     @Autowired
     private CreditCardDebtRepository creditCardDebtRepository;
 
-    private static final Logger m_logger = LoggerConfig.GetLogger();
-
-    public CategoryService() { }
+    private static final Logger logger = LoggerConfig.getLogger();
 
     /**
      * Add a new category
      * @param name Category name
      * @return Category ID
+     * @throws RuntimeException If the category name is empty or already exists
      */
     @Transactional
-    public Long AddCategory(String name)
+    public Long addCategory(String name)
     {
         // Remove leading and trailing whitespaces
         name = name.strip();
@@ -54,44 +55,47 @@ public class CategoryService
                                        " already exists");
         }
 
-        Category category = new Category(name);
+        Category category = Category.builder().name(name).build();
 
         categoryRepository.save(category);
 
-        m_logger.info("Category " + name + " added successfully");
+        logger.info("Category " + name + " added successfully");
 
-        return category.GetId();
+        return category.getId();
     }
 
     /**
      * Delete a category
      * @param id Category ID
+     * @throws RuntimeException If the category not found or has associated transactions
      */
     @Transactional
-    public void DeleteCategory(Long id)
+    public void deleteCategory(Long id)
     {
         Category category = categoryRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Category with ID " + id + " not found"));
 
-        if (CountTransactions(id) > 0)
+        if (getCountTransactions(id) > 0)
         {
             throw new RuntimeException(
-                "Category " + category.GetName() +
+                "Category " + category.getName() +
                 " cannot be deleted because it has associated transactions");
         }
 
         categoryRepository.delete(category);
 
-        m_logger.info("Category " + category.GetName() + " deleted successfully");
+        logger.info("Category " + category.getName() + " deleted successfully");
     }
 
     /**
      * Rename a category
      * @param id Category ID
      * @param newName New category name
+     * @throws RuntimeException If the category not found, the new name is empty or
+     *     already exists
      */
     @Transactional
-    public void RenameCategory(Long id, String newName)
+    public void renameCategory(Long id, String newName)
     {
         // Remove leading and trailing whitespaces
         newName = newName.strip();
@@ -110,49 +114,51 @@ public class CategoryService
         Category category = categoryRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Category with ID " + id + " not found"));
 
-        category.SetName(newName);
+        category.setName(newName);
 
         categoryRepository.save(category);
 
-        m_logger.info("Category " + newName + " renamed successfully");
+        logger.info("Category " + newName + " renamed successfully");
     }
 
     /**
      * Archive a category
      * @param id Category ID to be archived
+     * @throws RuntimeException If the category not found
      */
     @Transactional
-    public void ArchiveCategory(Long id)
+    public void archiveCategory(Long id)
     {
         Category category = categoryRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Category with ID " + id +
                                         " not found and cannot be archived"));
 
-        category.SetArchived(true);
+        category.setIsArchived(true);
 
         categoryRepository.save(category);
 
-        m_logger.info("Category with id " + id + " was archived");
+        logger.info("Category with id " + id + " was archived");
     }
 
     /**
      * Unarchive a category
      * @param id Category ID to be unarchived
+     * @throws RuntimeException If the category not found
      */
     @Transactional
-    public void UnarchiveCategory(Long id)
+    public void unarchiveCategory(Long id)
     {
         Category category = categoryRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Category with ID " + id +
                                         " not found and cannot be unarchived"));
 
-        category.SetArchived(false);
+        category.setIsArchived(false);
 
         categoryRepository.save(category);
 
-        m_logger.info("Category with id " + id + " was unarchived");
+        logger.info("Category with id " + id + " was unarchived");
     }
 
     /**
@@ -160,7 +166,7 @@ public class CategoryService
      * @param name Category name
      * @return Category
      */
-    public Category GetCategoryByName(String name)
+    public Category getCategoryByName(String name)
     {
         return categoryRepository.findByName(name);
     }
@@ -169,7 +175,7 @@ public class CategoryService
      * Get all categories
      * @return List of categories
      */
-    public List<Category> GetCategories()
+    public List<Category> getCategories()
     {
         return categoryRepository.findAll();
     }
@@ -178,9 +184,9 @@ public class CategoryService
      * Get all non-archived categories ordered by name
      * @return List of categories
      */
-    public List<Category> GetNonArchivedCategoriesOrderedByName()
+    public List<Category> getNonArchivedCategoriesOrderedByName()
     {
-        return categoryRepository.findAllByArchivedFalseOrderByNameAsc();
+        return categoryRepository.findAllByIsArchivedFalseOrderByNameAsc();
     }
 
     /**
@@ -188,9 +194,9 @@ public class CategoryService
      * @param categoryId Category ID
      * @return Number of transactions
      */
-    public Long CountTransactions(Long categoryId)
+    public Long getCountTransactions(Long categoryId)
     {
-        return categoryRepository.CountTransactions(categoryId) +
-            creditCardDebtRepository.CountTransactions(categoryId);
+        return categoryRepository.getCountTransactions(categoryId) +
+            creditCardDebtRepository.getCountTransactions(categoryId);
     }
 }

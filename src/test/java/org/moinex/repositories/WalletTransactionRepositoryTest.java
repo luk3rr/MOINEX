@@ -51,66 +51,66 @@ public class WalletTransactionRepositoryTest
 
     private Wallet m_wallet2;
 
-    private Category CreateCategory(String name)
+    private Category createCategory(String name)
     {
-        Category category = new Category(name);
+        Category category = Category.builder().name(name).build();
         m_categoryRepository.save(category);
         m_categoryRepository.flush();
         return category;
     }
 
     private WalletTransaction
-    CreateWalletTransaction(Wallet walletName, BigDecimal amount, LocalDateTime date)
+    createWalletTransaction(Wallet wallet, BigDecimal amount, LocalDateTime date)
     {
-        WalletTransaction walletTransaction = new WalletTransaction();
-        walletTransaction.SetWallet(walletName);
-        walletTransaction.SetAmount(amount);
-        walletTransaction.SetDate(date);
-        walletTransaction.SetStatus(TransactionStatus.CONFIRMED);
-        walletTransaction.SetType(TransactionType.EXPENSE);
-        walletTransaction.SetCategory(CreateCategory("Category"));
+        WalletTransaction walletTransaction = WalletTransaction.builder()
+                                                  .wallet(wallet)
+                                                  .amount(amount)
+                                                  .date(date)
+                                                  .status(TransactionStatus.CONFIRMED)
+                                                  .type(TransactionType.EXPENSE)
+                                                  .category(createCategory("Category"))
+                                                  .build();
+
         m_walletTransactionRepository.save(walletTransaction);
         m_walletTransactionRepository.flush();
         return walletTransaction;
     }
 
-    private Wallet CreateWallet(String name, BigDecimal balance)
+    private Wallet createWallet(String name, BigDecimal balance)
     {
-        Wallet wallet = new Wallet();
-        wallet.SetName(name);
-        wallet.SetBalance(balance);
+        Wallet wallet = Wallet.builder().name(name).balance(balance).build();
         m_walletRepository.save(wallet);
         m_walletRepository.flush();
         return wallet;
     }
 
     @BeforeEach
-    public void SetUp()
+    public void setUp()
     {
-        m_wallet1 = CreateWallet("Wallet1", new BigDecimal("1000.0"));
-        m_wallet2 = CreateWallet("Wallet2", new BigDecimal("2000.0"));
+        m_wallet1 = createWallet("Wallet1", new BigDecimal("1000.0"));
+        m_wallet2 = createWallet("Wallet2", new BigDecimal("2000.0"));
     }
 
     @Test
     @DisplayName("Test if the last n transactions in a wallet are returned correctly")
-    public void TestGetLastTransactions()
+    public void testGetLastTransactions()
     {
         // Create the wallet transactions
         WalletTransaction walletTransaction1 =
-            CreateWalletTransaction(m_wallet1,
+            createWalletTransaction(m_wallet1,
                                     new BigDecimal("140.0"),
                                     LocalDateTime.now());
         WalletTransaction walletTransaction2 =
-            CreateWalletTransaction(m_wallet1,
+            createWalletTransaction(m_wallet1,
                                     new BigDecimal("210.0"),
                                     LocalDateTime.now().minusDays(1));
 
         WalletTransaction walletTransaction3 =
-            CreateWalletTransaction(m_wallet1,
+            createWalletTransaction(m_wallet1,
                                     new BigDecimal("300.0"),
                                     LocalDateTime.now().minusDays(2));
 
-        CreateWalletTransaction(m_wallet1,
+        createWalletTransaction(m_wallet1,
                                 new BigDecimal("300.0"),
                                 LocalDateTime.now().minusDays(3));
 
@@ -119,8 +119,8 @@ public class WalletTransactionRepositoryTest
 
         // Get the last transactions in the wallet by date
         List<WalletTransaction> lastTransactions =
-            m_walletTransactionRepository.FindLastTransactionsByWallet(
-                m_wallet1.GetId(),
+            m_walletTransactionRepository.findLastTransactionsByWallet(
+                m_wallet1.getId(),
                 request);
 
         // Check if the last transactions are correct
@@ -136,15 +136,15 @@ public class WalletTransactionRepositoryTest
     @DisplayName("Test if the last n transactions in a wallet are returned correctly "
                  + "when there are no transactions")
     public void
-    TestGetLastTransactionsNoTransactions()
+    testGetLastTransactionsNoTransactions()
     {
         // Request the last 3 transactions
         Pageable request = PageRequest.ofSize(3);
 
         // Get the last transactions in the wallet by date
         List<WalletTransaction> lastTransactions =
-            m_walletTransactionRepository.FindLastTransactionsByWallet(
-                m_wallet1.GetId(),
+            m_walletTransactionRepository.findLastTransactionsByWallet(
+                m_wallet1.getId(),
                 request);
 
         // Check if the last transactions are correct
@@ -155,24 +155,24 @@ public class WalletTransactionRepositoryTest
     @DisplayName(
         "Test if the last n transactions of all wallets are returned correctly")
     public void
-    TestGetLastTransactionsAllWallets()
+    testGetLastTransactionsAllWallets()
     {
         // Create the wallet transactions
         WalletTransaction walletTransaction1 =
-            CreateWalletTransaction(m_wallet1,
+            createWalletTransaction(m_wallet1,
                                     new BigDecimal("140.0"),
                                     LocalDateTime.now());
         WalletTransaction walletTransaction2 =
-            CreateWalletTransaction(m_wallet1,
+            createWalletTransaction(m_wallet1,
                                     new BigDecimal("210.0"),
                                     LocalDateTime.now().minusDays(1));
 
         WalletTransaction walletTransaction3 =
-            CreateWalletTransaction(m_wallet2,
+            createWalletTransaction(m_wallet2,
                                     new BigDecimal("300.0"),
                                     LocalDateTime.now().minusDays(2));
 
-        CreateWalletTransaction(m_wallet2,
+        createWalletTransaction(m_wallet2,
                                 new BigDecimal("300.0"),
                                 LocalDateTime.now().minusDays(3));
 
@@ -181,7 +181,7 @@ public class WalletTransactionRepositoryTest
 
         // Get the last transactions in the wallet by date
         List<WalletTransaction> lastTransactions =
-            m_walletTransactionRepository.FindLastTransactions(request);
+            m_walletTransactionRepository.findLastTransactions(request);
 
         // Check if the last transactions are correct
         assertEquals(3, lastTransactions.size());

@@ -31,10 +31,10 @@ import org.springframework.stereotype.Service;
 public class MarketService
 {
     @Autowired
-    private BrazilianMarketIndicatorsRepository m_brazilianMarketIndicatorsRepository;
+    private BrazilianMarketIndicatorsRepository brazilianMarketIndicatorsRepository;
 
     @Autowired
-    private MarketQuotesAndCommoditiesRepository m_marketQuotesAndCommoditiesRepository;
+    private MarketQuotesAndCommoditiesRepository marketQuotesAndCommoditiesRepository;
 
     private Boolean isBrazilianMarketIndicatorsUpdating = false;
 
@@ -46,10 +46,10 @@ public class MarketService
      * @throws RuntimeException If no Brazilian market indicators are found
      */
     @Transactional
-    public BrazilianMarketIndicators GetBrazilianMarketIndicators()
+    public BrazilianMarketIndicators getBrazilianMarketIndicators()
     {
         List<BrazilianMarketIndicators> indicatorsList =
-            m_brazilianMarketIndicatorsRepository.findAll();
+            brazilianMarketIndicatorsRepository.findAll();
 
         if (indicatorsList.isEmpty())
         {
@@ -62,7 +62,7 @@ public class MarketService
                 // If there are more than one indicator, delete the others
                 for (Integer i = 1; i < indicatorsList.size(); i++)
                 {
-                    m_brazilianMarketIndicatorsRepository.delete(indicatorsList.get(i));
+                    brazilianMarketIndicatorsRepository.delete(indicatorsList.get(i));
                 }
             }
 
@@ -77,10 +77,10 @@ public class MarketService
      * @throws RuntimeException If no market quotes and commodities are found
      */
     @Transactional
-    public MarketQuotesAndCommodities GetMarketQuotesAndCommodities()
+    public MarketQuotesAndCommodities getMarketQuotesAndCommodities()
     {
         List<MarketQuotesAndCommodities> marketQuotesAndCommoditiesList =
-            m_marketQuotesAndCommoditiesRepository.findAll();
+            marketQuotesAndCommoditiesRepository.findAll();
 
         if (marketQuotesAndCommoditiesList.isEmpty())
         {
@@ -93,7 +93,7 @@ public class MarketService
                 // If there are more than one indicator, delete the others
                 for (Integer i = 1; i < marketQuotesAndCommoditiesList.size(); i++)
                 {
-                    m_marketQuotesAndCommoditiesRepository.delete(
+                    marketQuotesAndCommoditiesRepository.delete(
                         marketQuotesAndCommoditiesList.get(i));
                 }
             }
@@ -110,20 +110,22 @@ public class MarketService
      */
     @Transactional
     public CompletableFuture<BrazilianMarketIndicators>
-    UpdateBrazilianMarketIndicatorsFromAPIAsync()
+    updateBrazilianMarketIndicatorsFromApiAsync()
     {
         if (isBrazilianMarketIndicatorsUpdating)
         {
             CompletableFuture<BrazilianMarketIndicators> failedFuture =
                 new CompletableFuture<>();
+
             failedFuture.completeExceptionally(new RuntimeException(
                 "Brazilian market indicators are already being updated"));
+
             return failedFuture;
         }
 
         isBrazilianMarketIndicatorsUpdating = true;
 
-        return APIUtils.FetchBrazilianMarketIndicatorsAsync()
+        return APIUtils.fetchBrazilianMarketIndicatorsAsync()
             .thenApply(jsonObject -> {
                 if (jsonObject != null)
                 {
@@ -131,24 +133,24 @@ public class MarketService
 
                     try
                     {
-                        bmi = GetBrazilianMarketIndicators();
+                        bmi = getBrazilianMarketIndicators();
                     }
                     catch (RuntimeException e)
                     {
                         // Create a new indicator if none is found
-                        bmi = new BrazilianMarketIndicators();
+                        bmi = BrazilianMarketIndicators.builder().build();
                     }
 
-                    bmi.SetSelicTarget(jsonObject.getJSONObject("selic_target")
+                    bmi.setSelicTarget(jsonObject.getJSONObject("selic_target")
                                            .getBigDecimal("valor"));
 
-                    bmi.SetIpca12Months(jsonObject.getJSONObject("ipca_12_months")
+                    bmi.setIpca12Months(jsonObject.getJSONObject("ipca_12_months")
                                             .getBigDecimal("valor"));
 
                     JSONObject ipcaLastMonth =
                         jsonObject.getJSONObject("ipca_last_month");
 
-                    bmi.SetIpcaLastMonth(ipcaLastMonth.getBigDecimal("valor"));
+                    bmi.setIpcaLastMonth(ipcaLastMonth.getBigDecimal("valor"));
 
                     // Extract the date in the format DD/MM/YYYY
                     // and convert it to a YearMonth object
@@ -158,11 +160,11 @@ public class MarketService
                     LocalDate localDate = LocalDate.parse(date, inputFormatter);
                     YearMonth dateDateTime = YearMonth.from(localDate);
 
-                    bmi.SetIpcaLastMonthReference(dateDateTime);
+                    bmi.setIpcaLastMonthReference(dateDateTime);
 
-                    bmi.SetLastUpdate(LocalDateTime.now());
+                    bmi.setLastUpdate(LocalDateTime.now());
 
-                    m_brazilianMarketIndicatorsRepository.save(bmi);
+                    brazilianMarketIndicatorsRepository.save(bmi);
                     return bmi;
                 }
                 else
@@ -187,14 +189,16 @@ public class MarketService
      * @return A CompletableFuture with the market quotes and commodities
      */
     public CompletableFuture<MarketQuotesAndCommodities>
-    UpdateMarketQuotesAndCommoditiesFromAPIAsync()
+    updateMarketQuotesAndCommoditiesFromApiAsync()
     {
         if (isMarketQuotesAndCommoditiesUpdating)
         {
             CompletableFuture<MarketQuotesAndCommodities> failedFuture =
                 new CompletableFuture<>();
+
             failedFuture.completeExceptionally(new RuntimeException(
                 "Market quotes and commodities are already being updated"));
+
             return failedFuture;
         }
 
@@ -206,7 +210,7 @@ public class MarketService
                              Constants.WHEAT_TICKER,    Constants.OIL_BRENT_TICKER,
                              Constants.BITCOIN_TICKER,  Constants.ETHEREUM_TICKER };
 
-        return APIUtils.FetchStockPricesAsync(symbols)
+        return APIUtils.fetchStockPricesAsync(symbols)
             .thenApply(jsonObject -> {
                 if (jsonObject != null)
                 {
@@ -214,49 +218,49 @@ public class MarketService
 
                     try
                     {
-                        mqac = GetMarketQuotesAndCommodities();
+                        mqac = getMarketQuotesAndCommodities();
                     }
                     catch (RuntimeException e)
                     {
                         // Create a new indicator if none is found
-                        mqac = new MarketQuotesAndCommodities();
+                        mqac = MarketQuotesAndCommodities.builder().build();
                     }
 
-                    mqac.SetDollar(jsonObject.getJSONObject(Constants.DOLLAR_TICKER)
+                    mqac.setDollar(jsonObject.getJSONObject(Constants.DOLLAR_TICKER)
                                        .getBigDecimal("price"));
 
-                    mqac.SetEuro(jsonObject.getJSONObject(Constants.EURO_TICKER)
+                    mqac.setEuro(jsonObject.getJSONObject(Constants.EURO_TICKER)
                                      .getBigDecimal("price"));
 
-                    mqac.SetIbovespa(jsonObject.getJSONObject(Constants.IBOVESPA_TICKER)
+                    mqac.setIbovespa(jsonObject.getJSONObject(Constants.IBOVESPA_TICKER)
                                          .getBigDecimal("price"));
 
-                    mqac.SetBitcoin(jsonObject.getJSONObject(Constants.BITCOIN_TICKER)
+                    mqac.setBitcoin(jsonObject.getJSONObject(Constants.BITCOIN_TICKER)
                                         .getBigDecimal("price"));
 
-                    mqac.SetEthereum(jsonObject.getJSONObject(Constants.ETHEREUM_TICKER)
+                    mqac.setEthereum(jsonObject.getJSONObject(Constants.ETHEREUM_TICKER)
                                          .getBigDecimal("price"));
 
-                    mqac.SetGold(jsonObject.getJSONObject(Constants.GOLD_TICKER)
+                    mqac.setGold(jsonObject.getJSONObject(Constants.GOLD_TICKER)
                                      .getBigDecimal("price"));
 
-                    mqac.SetSoybean(jsonObject.getJSONObject(Constants.SOYBEAN_TICKER)
+                    mqac.setSoybean(jsonObject.getJSONObject(Constants.SOYBEAN_TICKER)
                                         .getBigDecimal("price"));
 
-                    mqac.SetCoffee(
+                    mqac.setCoffee(
                         jsonObject.getJSONObject(Constants.COFFEE_ARABICA_TICKER)
                             .getBigDecimal("price"));
 
-                    mqac.SetWheat(jsonObject.getJSONObject(Constants.WHEAT_TICKER)
+                    mqac.setWheat(jsonObject.getJSONObject(Constants.WHEAT_TICKER)
                                       .getBigDecimal("price"));
 
-                    mqac.SetOilBrent(
+                    mqac.setOilBrent(
                         jsonObject.getJSONObject(Constants.OIL_BRENT_TICKER)
                             .getBigDecimal("price"));
 
-                    mqac.SetLastUpdate(LocalDateTime.now());
+                    mqac.setLastUpdate(LocalDateTime.now());
 
-                    m_marketQuotesAndCommoditiesRepository.save(mqac);
+                    marketQuotesAndCommoditiesRepository.save(mqac);
                     return mqac;
                 }
                 else

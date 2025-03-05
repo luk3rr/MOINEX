@@ -53,7 +53,7 @@ public final class LoggerConfig
      * Get the logger instance
      * @return The logger instance
      */
-    public static Logger GetLogger()
+    public static Logger getLogger()
     {
         return m_logger;
     }

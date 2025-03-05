@@ -15,15 +15,25 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.entities.WalletTransaction;
 
 @Entity
 @Table(name = "ticker_purchase")
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 public class TickerPurchase extends Transaction
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne
@@ -31,17 +41,7 @@ public class TickerPurchase extends Transaction
     private Ticker ticker;
 
     /**
-     * Default constructor for JPA
-     */
-    public TickerPurchase() { }
-
-    /**
      * Constructor for testing purposes
-     * @param id The id of the purchase
-     * @param ticker The ticker of the purchase
-     * @param quantity The quantity of the purchase
-     * @param unitPrice The unit price of the purchase
-     * @param walletTransaction The wallet transaction of the purchase
      */
     public TickerPurchase(Long              id,
                           Ticker            ticker,
@@ -50,38 +50,8 @@ public class TickerPurchase extends Transaction
                           WalletTransaction walletTransaction)
     {
         super(quantity, unitPrice, walletTransaction);
+
         this.id     = id;
-        this.ticker = ticker;
-    }
-
-    /**
-     * Constructor for TickerPurchase
-     * @param ticker The ticker of the purchase
-     * @param quantity The quantity of the purchase
-     * @param unitPrice The unit price of the purchase
-     * @param walletTransaction The wallet transaction of the purchase
-     */
-    public TickerPurchase(Ticker            ticker,
-                          BigDecimal        quantity,
-                          BigDecimal        unitPrice,
-                          WalletTransaction walletTransaction)
-    {
-        super(quantity, unitPrice, walletTransaction);
-        this.ticker = ticker;
-    }
-
-    public Long GetId()
-    {
-        return id;
-    }
-
-    public Ticker GetTicker()
-    {
-        return ticker;
-    }
-
-    public void SetTicker(Ticker ticker)
-    {
         this.ticker = ticker;
     }
 }

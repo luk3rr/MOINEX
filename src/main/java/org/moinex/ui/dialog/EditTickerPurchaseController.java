@@ -18,6 +18,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.investment.TickerPurchase;
@@ -29,13 +30,13 @@ import org.moinex.util.TransactionStatus;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Edit Ticker Purchase dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditTickerPurchaseController
 {
     @FXML
@@ -71,9 +72,6 @@ public class EditTickerPurchaseController
     @FXML
     private DatePicker buyDatePicker;
 
-    @Autowired
-    private ConfigurableApplicationContext springContext;
-
     private WalletService walletService;
 
     private CategoryService categoryService;
@@ -103,47 +101,47 @@ public class EditTickerPurchaseController
         this.tickerService   = tickerService;
     }
 
-    public void SetWalletComboBox(Wallet wt)
+    public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        walletComboBox.setValue(wt.GetName());
+        walletComboBox.setValue(wt.getName());
 
-        UpdateWalletBalance();
+        updateWalletBalance();
     }
 
-    public void SetPurchase(TickerPurchase p)
+    public void setPurchase(TickerPurchase p)
     {
         this.purchase = p;
 
-        tickerNameLabel.setText(p.GetTicker().GetName() + " (" +
-                                p.GetTicker().GetSymbol() + ")");
-        unitPriceField.setText(p.GetTicker().GetCurrentUnitValue().toString());
+        tickerNameLabel.setText(p.getTicker().getName() + " (" +
+                                p.getTicker().getSymbol() + ")");
+        unitPriceField.setText(p.getTicker().getCurrentUnitValue().toString());
 
-        SetWalletComboBox(p.GetWalletTransaction().GetWallet());
+        setWalletComboBox(p.getWalletTransaction().getWallet());
 
-        descriptionField.setText(p.GetWalletTransaction().GetDescription());
-        unitPriceField.setText(p.GetUnitPrice().toString());
-        quantityField.setText(p.GetQuantity().toString());
-        statusComboBox.setValue(p.GetWalletTransaction().GetStatus().name());
-        categoryComboBox.setValue(p.GetWalletTransaction().GetCategory().GetName());
-        buyDatePicker.setValue(p.GetWalletTransaction().GetDate().toLocalDate());
+        descriptionField.setText(p.getWalletTransaction().getDescription());
+        unitPriceField.setText(p.getUnitPrice().toString());
+        quantityField.setText(p.getQuantity().toString());
+        statusComboBox.setValue(p.getWalletTransaction().getStatus().name());
+        categoryComboBox.setValue(p.getWalletTransaction().getCategory().getName());
+        buyDatePicker.setValue(p.getWalletTransaction().getDate().toLocalDate());
 
         totalPriceLabel.setText(
-            UIUtils.FormatCurrency(p.GetWalletTransaction().GetAmount()));
+            UIUtils.formatCurrency(p.getWalletTransaction().getAmount()));
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadCategories();
+        loadWalletsFromDatabase();
+        loadCategoriesFromDatabase();
 
         // Configure date picker
-        UIUtils.SetDatePickerFormat(buyDatePicker);
+        UIUtils.setDatePickerFormat(buyDatePicker);
 
         // For each element in enum TransactionStatus, add its name to the
         // statusComboBox
@@ -151,15 +149,15 @@ public class EditTickerPurchaseController
             Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
 
         // Reset all labels
-        UIUtils.ResetLabel(walletAfterBalanceValueLabel);
-        UIUtils.ResetLabel(walletCurrentBalanceValueLabel);
+        UIUtils.resetLabel(walletAfterBalanceValueLabel);
+        UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
         walletComboBox.setOnAction(e -> {
-            UpdateWalletBalance();
-            WalletAfterBalance();
+            updateWalletBalance();
+            walletAfterBalance();
         });
 
-        ConfigureListeners();
+        configureListeners();
     }
 
     @FXML
@@ -186,7 +184,7 @@ public class EditTickerPurchaseController
             unitPriceStr.strip().isEmpty() || quantityStr == null ||
             quantityStr.strip().isEmpty() || buyDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields");
 
@@ -200,28 +198,28 @@ public class EditTickerPurchaseController
             BigDecimal quantity = new BigDecimal(quantityStr);
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             Category category = categories.stream()
-                                    .filter(c -> c.GetName().equals(categoryString))
+                                    .filter(c -> c.getName().equals(categoryString))
                                     .findFirst()
                                     .get();
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             // Check if has any modification
-            if (purchase.GetWalletTransaction().GetWallet().GetId() == wallet.GetId() &&
-                purchase.GetWalletTransaction().GetDescription().equals(description) &&
-                purchase.GetWalletTransaction().GetStatus().equals(status) &&
-                purchase.GetWalletTransaction().GetCategory().GetId() ==
-                    category.GetId() &&
-                purchase.GetUnitPrice().compareTo(unitPrice) == 0 &&
-                purchase.GetQuantity().compareTo(quantity) == 0 &&
-                purchase.GetWalletTransaction().GetDate().toLocalDate().equals(buyDate))
+            if (purchase.getWalletTransaction().getWallet().getId() == wallet.getId() &&
+                purchase.getWalletTransaction().getDescription().equals(description) &&
+                purchase.getWalletTransaction().getStatus().equals(status) &&
+                purchase.getWalletTransaction().getCategory().getId() ==
+                    category.getId() &&
+                purchase.getUnitPrice().compareTo(unitPrice) == 0 &&
+                purchase.getQuantity().compareTo(quantity) == 0 &&
+                purchase.getWalletTransaction().getDate().toLocalDate().equals(buyDate))
             {
-                WindowUtils.ShowInformationDialog(
+                WindowUtils.showInformationDialog(
                     "Information",
                     "No changes",
                     "No changes were made to the purchase.");
@@ -231,17 +229,17 @@ public class EditTickerPurchaseController
                 LocalTime     currentTime             = LocalTime.now();
                 LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
 
-                purchase.GetWalletTransaction().SetWallet(wallet);
-                purchase.GetWalletTransaction().SetDescription(description);
-                purchase.GetWalletTransaction().SetStatus(status);
-                purchase.GetWalletTransaction().SetCategory(category);
-                purchase.SetUnitPrice(unitPrice);
-                purchase.SetQuantity(quantity);
-                purchase.GetWalletTransaction().SetDate(dateTimeWithCurrentHour);
+                purchase.getWalletTransaction().setWallet(wallet);
+                purchase.getWalletTransaction().setDescription(description);
+                purchase.getWalletTransaction().setStatus(status);
+                purchase.getWalletTransaction().setCategory(category);
+                purchase.setUnitPrice(unitPrice);
+                purchase.setQuantity(quantity);
+                purchase.getWalletTransaction().setDate(dateTimeWithCurrentHour);
 
-                tickerService.UpdatePurchase(purchase);
+                tickerService.updatePurchase(purchase);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "TickerPurchase updated",
                                               "TickerPurchase updated successfully");
             }
@@ -251,19 +249,19 @@ public class EditTickerPurchaseController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid number",
                                         "Invalid price or quantity");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while updating purchase",
                                         e.getMessage());
         }
     }
 
-    private void UpdateTotalPrice()
+    private void updateTotalPrice()
     {
         String unitPriceStr = unitPriceField.getText();
         String quantityStr  = quantityField.getText();
@@ -273,7 +271,7 @@ public class EditTickerPurchaseController
         if (unitPriceStr == null || quantityStr == null ||
             unitPriceStr.strip().isEmpty() || quantityStr.strip().isEmpty())
         {
-            totalPriceLabel.setText(UIUtils.FormatCurrency(totalPrice));
+            totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
             return;
         }
 
@@ -284,21 +282,21 @@ public class EditTickerPurchaseController
 
             totalPrice = unitPrice.multiply(quantity);
 
-            totalPriceLabel.setText(UIUtils.FormatCurrency(totalPrice));
+            totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid number",
                                         "Invalid price or quantity");
 
             totalPrice = new BigDecimal("0.00");
 
-            totalPriceLabel.setText(UIUtils.FormatCurrency(totalPrice));
+            totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
         }
     }
 
-    private void UpdateWalletBalance()
+    private void updateWalletBalance()
     {
         String walletName = walletComboBox.getValue();
 
@@ -308,26 +306,26 @@ public class EditTickerPurchaseController
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
-        if (wallet.GetBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
-            UIUtils.SetLabelStyle(walletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(walletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         walletCurrentBalanceValueLabel.setText(
-            UIUtils.FormatCurrency(wallet.GetBalance()));
+            UIUtils.formatCurrency(wallet.getBalance()));
     }
 
-    private void WalletAfterBalance()
+    private void walletAfterBalance()
     {
         String unitPriceStr = unitPriceField.getText();
         String quantityStr  = quantityField.getText();
@@ -336,7 +334,7 @@ public class EditTickerPurchaseController
         if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
             quantityStr == null || quantityStr.strip().isEmpty() || walletName == null)
         {
-            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
         }
 
@@ -347,83 +345,83 @@ public class EditTickerPurchaseController
 
             if (buyValue.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+                UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
-            if (purchase.GetWalletTransaction().GetStatus().equals(
+            if (purchase.getWalletTransaction().getStatus().equals(
                     TransactionStatus.CONFIRMED))
             {
                 // If the transaction is confirmed, the balance will be updated
                 // based on the difference between the new and the old value
                 BigDecimal diff =
-                    buyValue.subtract(purchase.GetWalletTransaction().GetAmount());
+                    buyValue.subtract(purchase.getWalletTransaction().getAmount());
 
-                walletAfterBalanceValue = wallet.GetBalance().subtract(diff);
+                walletAfterBalanceValue = wallet.getBalance().subtract(diff);
             }
             else
             {
                 // If the transaction is not confirmed, the balance will be
                 // updated based on the new value
-                walletAfterBalanceValue = wallet.GetBalance().subtract(buyValue);
+                walletAfterBalanceValue = wallet.getBalance().subtract(buyValue);
             }
 
             // Episilon is used to avoid floating point arithmetic errors
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             walletAfterBalanceValueLabel.setText(
-                UIUtils.FormatCurrency(walletAfterBalanceValue));
+                UIUtils.formatCurrency(walletAfterBalanceValue));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
-    private void LoadCategories()
+    private void loadCategoriesFromDatabase()
     {
-        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
 
         categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::GetName).toList());
+            categories.stream().map(Category::getName).toList());
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
         if (categories.size() == 0)
         {
-            UIUtils.AddTooltipToNode(
+            UIUtils.addTooltipToNode(
                 categoryComboBox,
                 "You need to add a category before adding an dividend");
         }
     }
 
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         // Update wallet after balance when the value field changes
         unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -433,8 +431,8 @@ public class EditTickerPurchaseController
             }
             else
             {
-                UpdateTotalPrice();
-                WalletAfterBalance();
+                updateTotalPrice();
+                walletAfterBalance();
             }
         });
 
@@ -445,19 +443,19 @@ public class EditTickerPurchaseController
             }
             else
             {
-                UpdateTotalPrice();
-                WalletAfterBalance();
+                updateTotalPrice();
+                walletAfterBalance();
             }
         });
 
         unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
-            UpdateTotalPrice();
-            WalletAfterBalance();
+            updateTotalPrice();
+            walletAfterBalance();
         });
 
         quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
-            UpdateTotalPrice();
-            WalletAfterBalance();
+            updateTotalPrice();
+            walletAfterBalance();
         });
     }
 }

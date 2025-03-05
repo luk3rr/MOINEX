@@ -17,6 +17,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.RecurringTransaction;
 import org.moinex.entities.Wallet;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Edit Recurring Transaction dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditRecurringTransactionController
 {
     @FXML
@@ -80,8 +82,6 @@ public class EditRecurringTransactionController
 
     private RecurringTransaction rtToUpdate;
 
-    public EditRecurringTransactionController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -100,44 +100,44 @@ public class EditRecurringTransactionController
         this.categoryService             = categoryService;
     }
 
-    public void SetRecurringTransaction(RecurringTransaction rt)
+    public void setRecurringTransaction(RecurringTransaction rt)
     {
         rtToUpdate = rt;
 
-        walletComboBox.setValue(rt.GetWallet().GetName());
-        descriptionField.setText(rt.GetDescription());
-        valueField.setText(rt.GetAmount().toString());
-        typeComboBox.setValue(rt.GetType().name());
-        categoryComboBox.setValue(rt.GetCategory().GetName());
+        walletComboBox.setValue(rt.getWallet().getName());
+        descriptionField.setText(rt.getDescription());
+        valueField.setText(rt.getAmount().toString());
+        typeComboBox.setValue(rt.getType().name());
+        categoryComboBox.setValue(rt.getCategory().getName());
 
-        nextDueDatePicker.setValue(rt.GetNextDueDate().toLocalDate());
+        nextDueDatePicker.setValue(rt.getNextDueDate().toLocalDate());
 
-        if (rt.GetEndDate().toLocalDate().equals(
+        if (rt.getEndDate().toLocalDate().equals(
                 Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE))
         {
             endDatePicker.setValue(null);
         }
         else
         {
-            endDatePicker.setValue(rt.GetEndDate().toLocalDate());
+            endDatePicker.setValue(rt.getEndDate().toLocalDate());
         }
 
-        frequencyComboBox.setValue(rt.GetFrequency().name());
+        frequencyComboBox.setValue(rt.getFrequency().name());
 
-        activeCheckBox.setSelected(rt.GetStatus() == RecurringTransactionStatus.ACTIVE);
+        activeCheckBox.setSelected(rt.getStatus() == RecurringTransactionStatus.ACTIVE);
 
-        UpdateInfoLabel();
+        updateInfoLabel();
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadCategories();
+        loadWalletsFromDatabase();
+        loadCategoriesFromDatabase();
 
         // Configure date picker
-        UIUtils.SetDatePickerFormat(nextDueDatePicker);
-        UIUtils.SetDatePickerFormat(endDatePicker);
+        UIUtils.setDatePickerFormat(nextDueDatePicker);
+        UIUtils.setDatePickerFormat(endDatePicker);
 
         // For each element in enum RecurringTransactionStatus, add its name to the
         // typeComboBox
@@ -151,11 +151,11 @@ public class EditRecurringTransactionController
                 .map(Enum::name)
                 .toList());
 
-        nextDueDatePicker.setOnAction(e -> { UpdateInfoLabel(); });
+        nextDueDatePicker.setOnAction(e -> { updateInfoLabel(); });
 
-        endDatePicker.setOnAction(e -> { UpdateInfoLabel(); });
+        endDatePicker.setOnAction(e -> { updateInfoLabel(); });
 
-        frequencyComboBox.setOnAction(e -> { UpdateInfoLabel(); });
+        frequencyComboBox.setOnAction(e -> { updateInfoLabel(); });
 
         // Check if the value field is a valid monetary value
         valueField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -174,7 +174,7 @@ public class EditRecurringTransactionController
                 }
             });
 
-        activeCheckBox.setOnAction(e -> { UpdateInfoLabel(); });
+        activeCheckBox.setOnAction(e -> { updateInfoLabel(); });
     }
 
     @FXML
@@ -201,7 +201,7 @@ public class EditRecurringTransactionController
             valueString.strip().isEmpty() || typeString == null ||
             categoryString == null || nextDueDate == null || frequencyString == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill the required fields.");
             return;
@@ -212,12 +212,12 @@ public class EditRecurringTransactionController
             BigDecimal transactionAmount = new BigDecimal(valueString);
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             Category category = categories.stream()
-                                    .filter(c -> c.GetName().equals(categoryString))
+                                    .filter(c -> c.getName().equals(categoryString))
                                     .findFirst()
                                     .get();
 
@@ -228,36 +228,36 @@ public class EditRecurringTransactionController
 
             Boolean endDateChanged =
                 (endDate != null &&
-                 !endDate.equals(rtToUpdate.GetEndDate().toLocalDate())) ||
+                 !endDate.equals(rtToUpdate.getEndDate().toLocalDate())) ||
                 (endDate == null &&
-                 !rtToUpdate.GetEndDate().toLocalDate().equals(
+                 !rtToUpdate.getEndDate().toLocalDate().equals(
                      Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE));
 
             // Check if has any modification
-            if (rtToUpdate.GetWallet().GetName().equals(walletName) &&
-                rtToUpdate.GetDescription().equals(description) &&
-                rtToUpdate.GetAmount().compareTo(transactionAmount) == 0 &&
-                rtToUpdate.GetType().equals(type) &&
-                rtToUpdate.GetCategory().GetName().equals(categoryString) &&
-                rtToUpdate.GetNextDueDate().toLocalDate().equals(nextDueDate) &&
-                !endDateChanged && rtToUpdate.GetFrequency().equals(frequency) &&
-                rtToUpdate.GetStatus().equals(
+            if (rtToUpdate.getWallet().getName().equals(walletName) &&
+                rtToUpdate.getDescription().equals(description) &&
+                rtToUpdate.getAmount().compareTo(transactionAmount) == 0 &&
+                rtToUpdate.getType().equals(type) &&
+                rtToUpdate.getCategory().getName().equals(categoryString) &&
+                rtToUpdate.getNextDueDate().toLocalDate().equals(nextDueDate) &&
+                !endDateChanged && rtToUpdate.getFrequency().equals(frequency) &&
+                rtToUpdate.getStatus().equals(
                     activeCheckBox.isSelected() ? RecurringTransactionStatus.ACTIVE
                                                 : RecurringTransactionStatus.INACTIVE))
             {
-                WindowUtils.ShowInformationDialog(
+                WindowUtils.showInformationDialog(
                     "Information",
                     "No changes",
                     "No changes were made to the transaction.");
             }
             else // If there is any modification, update the transaction
             {
-                rtToUpdate.SetWallet(wallet);
-                rtToUpdate.SetDescription(description);
-                rtToUpdate.SetAmount(transactionAmount);
-                rtToUpdate.SetType(type);
-                rtToUpdate.SetCategory(category);
-                rtToUpdate.SetNextDueDate(
+                rtToUpdate.setWallet(wallet);
+                rtToUpdate.setDescription(description);
+                rtToUpdate.setAmount(transactionAmount);
+                rtToUpdate.setType(type);
+                rtToUpdate.setCategory(category);
+                rtToUpdate.setNextDueDate(
                     nextDueDate.atTime(Constants.RECURRING_TRANSACTION_DEFAULT_TIME));
 
                 // If the end date not set, set the default end date
@@ -265,16 +265,16 @@ public class EditRecurringTransactionController
                               ? Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE
                               : endDate;
 
-                rtToUpdate.SetEndDate(
+                rtToUpdate.setEndDate(
                     endDate.atTime(Constants.RECURRING_TRANSACTION_DEFAULT_TIME));
-                rtToUpdate.SetFrequency(frequency);
-                rtToUpdate.SetStatus(activeCheckBox.isSelected()
+                rtToUpdate.setFrequency(frequency);
+                rtToUpdate.setStatus(activeCheckBox.isSelected()
                                          ? RecurringTransactionStatus.ACTIVE
                                          : RecurringTransactionStatus.INACTIVE);
 
-                recurringTransactionService.UpdateRecurringTransaction(rtToUpdate);
+                recurringTransactionService.updateRecurringTransaction(rtToUpdate);
 
-                WindowUtils.ShowSuccessDialog(
+                WindowUtils.showSuccessDialog(
                     "Success",
                     "Recurring transaction updated",
                     "Recurring transaction updated successfully.");
@@ -285,19 +285,19 @@ public class EditRecurringTransactionController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid transaction value",
                                         "Transaction value must be a number.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while editing recurring transaction",
                                         e.getMessage());
         }
     }
 
-    private void UpdateInfoLabel()
+    private void updateInfoLabel()
     {
         LocalDate nextDueDate     = nextDueDatePicker.getValue();
         LocalDate endDate         = endDatePicker.getValue();
@@ -324,7 +324,7 @@ public class EditRecurringTransactionController
 
                     msg +=
                         "\nLast transaction: " +
-                        recurringTransactionService.GetLastTransactionDate(nextDueDate,
+                        recurringTransactionService.getLastTransactionDate(nextDueDate,
                                                                            endDate,
                                                                            frequency);
                 }
@@ -342,26 +342,26 @@ public class EditRecurringTransactionController
         infoLabel.setText(msg);
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
-    private void LoadCategories()
+    private void loadCategoriesFromDatabase()
     {
-        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
 
         categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::GetName).toList());
+            categories.stream().map(Category::getName).toList());
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
         if (categories.size() == 0)
         {
-            UIUtils.AddTooltipToNode(
+            UIUtils.addTooltipToNode(
                 categoryComboBox,
                 "You need to add a category before adding an transaction");
         }

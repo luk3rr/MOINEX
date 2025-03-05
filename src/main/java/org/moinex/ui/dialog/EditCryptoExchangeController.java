@@ -18,6 +18,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.CalculatorService;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the edit crypto exchange dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditCryptoExchangeController
 {
     @FXML
@@ -78,8 +80,6 @@ public class EditCryptoExchangeController
 
     private CryptoExchange cryptoExchangeToUpdate;
 
-    public EditCryptoExchangeController() { }
-
     /**
      * Constructor
      * @param tickerService TickerService
@@ -94,47 +94,47 @@ public class EditCryptoExchangeController
         this.calculatorService = calculatorService;
     }
 
-    public void SetCryptoExchange(CryptoExchange cryptoExchange)
+    public void setCryptoExchange(CryptoExchange cryptoExchange)
     {
         this.cryptoExchangeToUpdate = cryptoExchange;
 
-        cryptoSoldComboBox.setValue(cryptoExchange.GetSoldCrypto().GetSymbol());
-        cryptoReceivedComboBox.setValue(cryptoExchange.GetReceivedCrypto().GetSymbol());
+        cryptoSoldComboBox.setValue(cryptoExchange.getSoldCrypto().getSymbol());
+        cryptoReceivedComboBox.setValue(cryptoExchange.getReceivedCrypto().getSymbol());
 
-        cryptoSoldQuantityField.setText(cryptoExchange.GetSoldQuantity().toString());
+        cryptoSoldQuantityField.setText(cryptoExchange.getSoldQuantity().toString());
         cryptoReceivedQuantityField.setText(
-            cryptoExchange.GetReceivedQuantity().toString());
-        descriptionField.setText(cryptoExchange.GetDescription());
-        exchangeDatePicker.setValue(cryptoExchange.GetDate().toLocalDate());
+            cryptoExchange.getReceivedQuantity().toString());
+        descriptionField.setText(cryptoExchange.getDescription());
+        exchangeDatePicker.setValue(cryptoExchange.getDate().toLocalDate());
 
-        UpdateFromCryptoCurrentQuantity();
-        UpdateToCryptoCurrentQuantity();
-        UpdateFromCryptoQuantityAfterExchange();
-        UpdateToCryptoQuantityAfterExchange();
+        updateFromCryptoCurrentQuantity();
+        updateToCryptoCurrentQuantity();
+        updateFromCryptoQuantityAfterExchange();
+        updateToCryptoQuantityAfterExchange();
     }
 
     @FXML
     private void initialize()
     {
-        LoadCryptos();
+        loadCryptosFromDatabase();
 
         // Configure the date picker
-        UIUtils.SetDatePickerFormat(exchangeDatePicker);
+        UIUtils.setDatePickerFormat(exchangeDatePicker);
 
         // Reset all labels
-        UIUtils.ResetLabel(cryptoSoldAfterBalanceValueLabel);
-        UIUtils.ResetLabel(cryptoReceivedAfterBalanceValueLabel);
-        UIUtils.ResetLabel(cryptoSoldCurrentBalanceValueLabel);
-        UIUtils.ResetLabel(cryptoReceivedCurrentBalanceValueLabel);
+        UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
+        UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
+        UIUtils.resetLabel(cryptoSoldCurrentBalanceValueLabel);
+        UIUtils.resetLabel(cryptoReceivedCurrentBalanceValueLabel);
 
         cryptoSoldComboBox.setOnAction(e -> {
-            UpdateFromCryptoCurrentQuantity();
-            UpdateFromCryptoQuantityAfterExchange();
+            updateFromCryptoCurrentQuantity();
+            updateFromCryptoQuantityAfterExchange();
         });
 
         cryptoReceivedComboBox.setOnAction(e -> {
-            UpdateToCryptoCurrentQuantity();
-            UpdateToCryptoQuantityAfterExchange();
+            updateToCryptoCurrentQuantity();
+            updateToCryptoQuantityAfterExchange();
         });
 
         // Ensure that the user can only input numbers in the quantity field
@@ -146,8 +146,8 @@ public class EditCryptoExchangeController
                 }
                 else
                 {
-                    UpdateFromCryptoQuantityAfterExchange();
-                    UpdateToCryptoQuantityAfterExchange();
+                    updateFromCryptoQuantityAfterExchange();
+                    updateToCryptoQuantityAfterExchange();
                 }
             });
 
@@ -159,8 +159,8 @@ public class EditCryptoExchangeController
                 }
                 else
                 {
-                    UpdateFromCryptoQuantityAfterExchange();
-                    UpdateToCryptoQuantityAfterExchange();
+                    updateFromCryptoQuantityAfterExchange();
+                    updateToCryptoQuantityAfterExchange();
                 }
             });
     }
@@ -188,7 +188,7 @@ public class EditCryptoExchangeController
             cryptoReceivedQuantityStr.strip().isEmpty() || description == null ||
             description.strip().isEmpty() || exchangeDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields.");
             return;
@@ -201,13 +201,13 @@ public class EditCryptoExchangeController
                 new BigDecimal(cryptoReceivedQuantityStr);
 
             Ticker soldCrypto = cryptos.stream()
-                                    .filter(c -> c.GetSymbol().equals(soldCryptoSymbol))
+                                    .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
                                     .findFirst()
                                     .get();
 
             Ticker cryptoReceived =
                 cryptos.stream()
-                    .filter(c -> c.GetSymbol().equals(receivedCryptoSymbol))
+                    .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                     .findFirst()
                     .get();
 
@@ -215,35 +215,35 @@ public class EditCryptoExchangeController
             LocalDateTime dateTimeWithCurrentHour = exchangeDate.atTime(currentTime);
 
             // Check if has any modification
-            if (cryptoExchangeToUpdate.GetSoldCrypto().GetSymbol().equals(
+            if (cryptoExchangeToUpdate.getSoldCrypto().getSymbol().equals(
                     soldCryptoSymbol) &&
-                cryptoExchangeToUpdate.GetReceivedCrypto().GetSymbol().equals(
+                cryptoExchangeToUpdate.getReceivedCrypto().getSymbol().equals(
                     receivedCryptoSymbol) &&
-                cryptoExchangeToUpdate.GetSoldQuantity().compareTo(
+                cryptoExchangeToUpdate.getSoldQuantity().compareTo(
                     cryptoSoldQuantity) == 0 &&
-                cryptoExchangeToUpdate.GetReceivedQuantity().compareTo(
+                cryptoExchangeToUpdate.getReceivedQuantity().compareTo(
                     cryptoReceivedQuantity) == 0 &&
-                cryptoExchangeToUpdate.GetDescription().equals(description) &&
-                cryptoExchangeToUpdate.GetDate().toLocalDate().equals(
+                cryptoExchangeToUpdate.getDescription().equals(description) &&
+                cryptoExchangeToUpdate.getDate().toLocalDate().equals(
                     dateTimeWithCurrentHour.toLocalDate()))
             {
-                WindowUtils.ShowInformationDialog(
+                WindowUtils.showInformationDialog(
                     "Information",
                     "No changes",
                     "No changes were made to the exchange");
             }
             else // If there is any modification, update the exchange
             {
-                cryptoExchangeToUpdate.SetSoldCrypto(soldCrypto);
-                cryptoExchangeToUpdate.SetReceivedCrypto(cryptoReceived);
-                cryptoExchangeToUpdate.SetSoldQuantity(cryptoSoldQuantity);
-                cryptoExchangeToUpdate.SetReceivedQuantity(cryptoReceivedQuantity);
-                cryptoExchangeToUpdate.SetDescription(description);
-                cryptoExchangeToUpdate.SetDate(dateTimeWithCurrentHour);
+                cryptoExchangeToUpdate.setSoldCrypto(soldCrypto);
+                cryptoExchangeToUpdate.setReceivedCrypto(cryptoReceived);
+                cryptoExchangeToUpdate.setSoldQuantity(cryptoSoldQuantity);
+                cryptoExchangeToUpdate.setReceivedQuantity(cryptoReceivedQuantity);
+                cryptoExchangeToUpdate.setDescription(description);
+                cryptoExchangeToUpdate.setDate(dateTimeWithCurrentHour);
 
-                tickerService.UpdateCryptoExchange(cryptoExchangeToUpdate);
+                tickerService.updateCryptoExchange(cryptoExchangeToUpdate);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Exchange updated",
                                               "Exchange updated successfully");
             }
@@ -253,13 +253,13 @@ public class EditCryptoExchangeController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid exchange quantity",
                                         "The quantity must be a number");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while creating exchange",
                                         e.getMessage());
             return;
@@ -269,31 +269,31 @@ public class EditCryptoExchangeController
     @FXML
     private void handleCryptoSoldOpenCalculator()
     {
-        WindowUtils.OpenPopupWindow(
+        WindowUtils.openPopupWindow(
             Constants.CALCULATOR_FXML,
             "Calculator",
             springContext,
             (CalculatorController controller)
                 -> {},
-            List.of(() -> { GetResultFromCalculator(cryptoSoldQuantityField); }));
+            List.of(() -> { getResultFromCalculator(cryptoSoldQuantityField); }));
     }
 
     @FXML
     private void handleCryptoReceivedOpenCalculator()
     {
-        WindowUtils.OpenPopupWindow(
+        WindowUtils.openPopupWindow(
             Constants.CALCULATOR_FXML,
             "Calculator",
             springContext,
             (CalculatorController controller)
                 -> {},
-            List.of(() -> { GetResultFromCalculator(cryptoReceivedQuantityField); }));
+            List.of(() -> { getResultFromCalculator(cryptoReceivedQuantityField); }));
     }
 
-    private void GetResultFromCalculator(TextField field)
+    private void getResultFromCalculator(TextField field)
     {
         // If the user saved the result, set it in the field
-        String result = calculatorService.GetResult();
+        String result = calculatorService.getResult();
 
         if (result != null)
         {
@@ -303,7 +303,7 @@ public class EditCryptoExchangeController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.ShowErrorDialog(
+                    WindowUtils.showErrorDialog(
                         "Error",
                         "Invalid quantity",
                         "The quantity must be a positive number");
@@ -322,14 +322,14 @@ public class EditCryptoExchangeController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Invalid quantity",
                                             "The quantity must be a number");
             }
         }
     }
 
-    private void UpdateFromCryptoCurrentQuantity()
+    private void updateFromCryptoCurrentQuantity()
     {
         String soldCryptoSymbol = cryptoSoldComboBox.getValue();
 
@@ -339,27 +339,27 @@ public class EditCryptoExchangeController
         }
 
         Ticker soldCrypto = cryptos.stream()
-                                .filter(c -> c.GetSymbol().equals(soldCryptoSymbol))
+                                .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
                                 .findFirst()
                                 .get();
 
-        if (soldCrypto.GetCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
+        if (soldCrypto.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
             // Must be unreachable
-            UIUtils.SetLabelStyle(cryptoSoldCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(cryptoSoldCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         cryptoSoldCurrentBalanceValueLabel.setText(
-            soldCrypto.GetCurrentQuantity().toString());
+            soldCrypto.getCurrentQuantity().toString());
     }
 
-    private void UpdateToCryptoCurrentQuantity()
+    private void updateToCryptoCurrentQuantity()
     {
         String receivedCryptoSymbol = cryptoReceivedComboBox.getValue();
 
@@ -370,27 +370,27 @@ public class EditCryptoExchangeController
 
         Ticker cryptoReceived =
             cryptos.stream()
-                .filter(c -> c.GetSymbol().equals(receivedCryptoSymbol))
+                .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                 .findFirst()
                 .get();
 
-        if (cryptoReceived.GetCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
+        if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
             // Must be unreachable
-            UIUtils.SetLabelStyle(cryptoReceivedCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(cryptoReceivedCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         cryptoReceivedCurrentBalanceValueLabel.setText(
-            cryptoReceived.GetCurrentQuantity().toString());
+            cryptoReceived.getCurrentQuantity().toString());
     }
 
-    private void UpdateFromCryptoQuantityAfterExchange()
+    private void updateFromCryptoQuantityAfterExchange()
     {
         String cryptoSoldQuantityStr = cryptoSoldQuantityField.getText();
         String soldCryptoSymbol      = cryptoSoldComboBox.getValue();
@@ -398,41 +398,41 @@ public class EditCryptoExchangeController
         if (cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.strip().isEmpty() ||
             soldCryptoSymbol == null)
         {
-            UIUtils.ResetLabel(cryptoSoldAfterBalanceValueLabel);
+            UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
             return;
         }
 
         try
         {
-            BigDecimal oldSoldQuantity = cryptoExchangeToUpdate.GetSoldQuantity();
+            BigDecimal oldSoldQuantity = cryptoExchangeToUpdate.getSoldQuantity();
 
             BigDecimal exchangeQuantity = new BigDecimal(cryptoSoldQuantityStr);
 
             if (exchangeQuantity.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(cryptoSoldAfterBalanceValueLabel);
+                UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
                 return;
             }
 
             Ticker soldCrypto = cryptos.stream()
-                                    .filter(c -> c.GetSymbol().equals(soldCryptoSymbol))
+                                    .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
                                     .findFirst()
                                     .get();
 
-            BigDecimal soldCryptoAfterBalance = soldCrypto.GetCurrentQuantity()
+            BigDecimal soldCryptoAfterBalance = soldCrypto.getCurrentQuantity()
                                                     .add(oldSoldQuantity)
                                                     .subtract(exchangeQuantity);
 
             if (soldCryptoAfterBalance.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(cryptoSoldAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(cryptoSoldAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
@@ -440,11 +440,11 @@ public class EditCryptoExchangeController
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(cryptoSoldAfterBalanceValueLabel);
+            UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
         }
     }
 
-    private void UpdateToCryptoQuantityAfterExchange()
+    private void updateToCryptoQuantityAfterExchange()
     {
         String cryptoReceivedQuantityStr = cryptoReceivedQuantityField.getText();
         String receivedCryptoSymbol      = cryptoReceivedComboBox.getValue();
@@ -452,43 +452,43 @@ public class EditCryptoExchangeController
         if (cryptoReceivedQuantityStr == null ||
             cryptoReceivedQuantityStr.strip().isEmpty() || receivedCryptoSymbol == null)
         {
-            UIUtils.ResetLabel(cryptoReceivedAfterBalanceValueLabel);
+            UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
             return;
         }
 
         try
         {
             BigDecimal oldReceivedQuantity =
-                cryptoExchangeToUpdate.GetReceivedQuantity();
+                cryptoExchangeToUpdate.getReceivedQuantity();
 
             BigDecimal exchangeQuantity = new BigDecimal(cryptoReceivedQuantityStr);
 
             if (exchangeQuantity.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(cryptoReceivedAfterBalanceValueLabel);
+                UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
                 return;
             }
 
             Ticker cryptoReceived =
                 cryptos.stream()
-                    .filter(c -> c.GetSymbol().equals(receivedCryptoSymbol))
+                    .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                     .findFirst()
                     .get();
 
-            BigDecimal cryptoReceivedAfterBalance = cryptoReceived.GetCurrentQuantity()
+            BigDecimal cryptoReceivedAfterBalance = cryptoReceived.getCurrentQuantity()
                                                         .subtract(oldReceivedQuantity)
                                                         .add(exchangeQuantity);
 
             if (cryptoReceivedAfterBalance.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(cryptoReceivedAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(cryptoReceivedAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
@@ -497,19 +497,19 @@ public class EditCryptoExchangeController
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(cryptoReceivedAfterBalanceValueLabel);
+            UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
         }
     }
 
-    private void LoadCryptos()
+    private void loadCryptosFromDatabase()
     {
         cryptos =
-            tickerService.GetAllNonArchivedTickersByType(TickerType.CRYPTOCURRENCY);
+            tickerService.getAllNonArchivedTickersByType(TickerType.CRYPTOCURRENCY);
 
         cryptoSoldComboBox.getItems().addAll(
-            cryptos.stream().map(Ticker::GetSymbol).toList());
+            cryptos.stream().map(Ticker::getSymbol).toList());
 
         cryptoReceivedComboBox.getItems().addAll(
-            cryptos.stream().map(Ticker::GetSymbol).toList());
+            cryptos.stream().map(Ticker::getSymbol).toList());
     }
 }

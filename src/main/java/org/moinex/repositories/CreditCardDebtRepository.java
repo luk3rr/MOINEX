@@ -23,34 +23,34 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
      * @param creditCardName The name of the credit card
      * @return The total debt of the credit card
      */
-    @Query("SELECT COALESCE(SUM(ccd.totalAmount), 0) FROM CreditCardDebt ccd "
+    @Query("SELECT coalesce(sum(ccd.totalAmount), 0) FROM CreditCardDebt ccd "
            + "WHERE ccd.creditCard.id = :creditCardId")
     BigDecimal
-    GetTotalDebt(@Param("creditCardId") Long creditCardId);
+    getTotalDebt(@Param("creditCardId") Long creditCardId);
 
     /**
      * Get the date of the earliest payment
      * @return The date of the earliest payment
      */
-    @Query("SELECT MIN(ccp.date) FROM CreditCardPayment ccp")
-    String FindEarliestPaymentDate();
+    @Query("SELECT min(ccp.date) FROM CreditCardPayment ccp")
+    String findEarliestPaymentDate();
 
     /**
      * Get the date of the latest payment
      * @return The date of the latest payment
      */
-    @Query("SELECT MAX(ccp.date) FROM CreditCardPayment ccp")
-    String FindLatestPaymentDate();
+    @Query("SELECT max(ccp.date) FROM CreditCardPayment ccp")
+    String findLatestPaymentDate();
 
     /**
      * Get count of debts by credit card
      * @param creditCardId The id of the credit card
      * @return The count of debts by credit card
      */
-    @Query("SELECT COUNT(ccd) FROM CreditCardDebt ccd "
+    @Query("SELECT count(ccd) FROM CreditCardDebt ccd "
            + "WHERE ccd.creditCard.id = :creditCardId")
     Long
-    GetDebtCountByCreditCard(@Param("creditCardId") Long creditCardId);
+    getDebtCountByCreditCard(@Param("creditCardId") Long creditCardId);
 
     /**
      * Get the number of associated transactions for a category
@@ -58,9 +58,9 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
      * @return Number of transactions
      */
     @Query(
-        "SELECT COUNT(ccd) FROM CreditCardDebt ccd WHERE ccd.category.id = :categoryId")
+        "SELECT count(ccd) FROM CreditCardDebt ccd WHERE ccd.category.id = :categoryId")
     Long
-    CountTransactions(@Param("categoryId") Long categoryId);
+    getCountTransactions(@Param("categoryId") Long categoryId);
 
     /**
      * Get suggestions. Suggestions are debts with distinct descriptions
@@ -69,12 +69,12 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
      */
     @Query("SELECT ccd "
            + "FROM CreditCardDebt ccd "
-           + "WHERE ccd.creditCard.archived = false AND "
-           + "ccd.date = (SELECT MAX(ccd2.date) "
+           + "WHERE ccd.creditCard.isArchived = false AND "
+           + "ccd.date = (SELECT max(ccd2.date) "
            + "                 FROM CreditCardDebt ccd2 "
-           + "                 WHERE ccd2.creditCard.archived = false AND "
+           + "                 WHERE ccd2.creditCard.isArchived = false AND "
            + "                 ccd2.description = ccd.description) "
            + "ORDER BY ccd.date DESC")
     List<CreditCardDebt>
-    FindSuggestions();
+    findSuggestions();
 }

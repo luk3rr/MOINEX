@@ -15,6 +15,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.util.CalendarEventType;
 import org.moinex.util.Constants;
 
@@ -23,11 +28,16 @@ import org.moinex.util.Constants;
  */
 @Entity
 @Table(name = "calendar_event")
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 public class CalendarEvent
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(name = "date", nullable = false)
@@ -43,107 +53,23 @@ public class CalendarEvent
     @Column(name = "event_type", nullable = false)
     private CalendarEventType eventType;
 
-    /**
-     * Default constructor for JPA
-     */
-    public CalendarEvent() { }
-
-    /**
-     * Constructor for CalendarEvent
-     * @param date The date of the event
-     * @param title The title of the event
-     * @param description A description of the event
-     * @param eventType The type of the event
-     */
-    public CalendarEvent(LocalDateTime     date,
-                         String            title,
-                         String            description,
-                         CalendarEventType eventType)
+    public static abstract class CalendarEventBuilder<
+        C extends CalendarEvent, B extends CalendarEventBuilder<C, B>>
     {
-        this.date        = date.format(Constants.DB_DATE_FORMATTER);
-        this.title       = title;
-        this.description = description;
-        this.eventType   = eventType;
+        public B date(LocalDateTime date)
+        {
+            this.date = date.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
     }
 
-    /**
-     * Get the id of the event
-     * @return The id of the event
-     */
-    public Long GetId()
-    {
-        return id;
-    }
-
-    /**
-     * Get the date of the event
-     * @return The date of the event
-     */
-    public LocalDateTime GetDate()
+    public LocalDateTime getDate()
     {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    /**
-     * Get the title of the event
-     * @return The title of the event
-     */
-    public String GetTitle()
-    {
-        return title;
-    }
-
-    /**
-     * Get the description of the event
-     * @return The description of the event
-     */
-    public String GetDescription()
-    {
-        return description;
-    }
-
-    /**
-     * Get the type of the event
-     * @return The type of the event
-     */
-    public CalendarEventType GetEventType()
-    {
-        return eventType;
-    }
-
-    /**
-     * Set the date of the event
-     * @param date The date of the event
-     */
-    public void SetDate(LocalDateTime date)
+    public void setDate(LocalDateTime date)
     {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
-    }
-
-    /**
-     * Set the title of the event
-     * @param title The title of the event
-     */
-    public void SetTitle(String title)
-    {
-        this.title = title;
-    }
-
-    /**
-     * Set the description of the event
-     * @param description The description of the event
-     */
-    public void SetDescription(String description)
-    {
-        this.description = description;
-    }
-
-    /**
-     * Set the type of the event
-     * @param eventType The type of the event
-     */
-    public void SetEventType(CalendarEventType eventType)
-    {
-        this.eventType = eventType;
     }
 }

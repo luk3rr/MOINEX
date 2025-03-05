@@ -18,6 +18,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Edit Transaction dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditTransactionController
 {
     @FXML
@@ -76,8 +78,6 @@ public class EditTransactionController
 
     private WalletTransaction transactionToUpdate;
 
-    public EditTransactionController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -95,29 +95,29 @@ public class EditTransactionController
         this.categoryService          = categoryService;
     }
 
-    public void SetTransaction(WalletTransaction wt)
+    public void setTransaction(WalletTransaction wt)
     {
         transactionToUpdate = wt;
 
-        walletComboBox.setValue(wt.GetWallet().GetName());
-        statusComboBox.setValue(wt.GetStatus().toString());
-        categoryComboBox.setValue(wt.GetCategory().GetName());
-        transactionValueField.setText(wt.GetAmount().toString());
-        descriptionField.setText(wt.GetDescription());
-        transactionDatePicker.setValue(wt.GetDate().toLocalDate());
-        transactionTypeComboBox.setValue(wt.GetType().toString());
+        walletComboBox.setValue(wt.getWallet().getName());
+        statusComboBox.setValue(wt.getStatus().toString());
+        categoryComboBox.setValue(wt.getCategory().getName());
+        transactionValueField.setText(wt.getAmount().toString());
+        descriptionField.setText(wt.getDescription());
+        transactionDatePicker.setValue(wt.getDate().toLocalDate());
+        transactionTypeComboBox.setValue(wt.getType().toString());
 
-        UpdateWalletBalance();
-        WalletAfterBalance();
+        updateWalletBalance();
+        walletAfterBalance();
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadCategories();
+        loadWalletsFromDatabase();
+        loadCategoriesFromDatabase();
 
-        UIUtils.SetDatePickerFormat(transactionDatePicker);
+        UIUtils.setDatePickerFormat(transactionDatePicker);
 
         // For each element in enum TransactionStatus, add its name to the
         // statusComboBox
@@ -130,17 +130,17 @@ public class EditTransactionController
             Arrays.stream(TransactionType.values()).map(Enum::name).toList());
 
         // Reset all labels
-        UIUtils.ResetLabel(walletAfterBalanceValueLabel);
-        UIUtils.ResetLabel(walletCurrentBalanceValueLabel);
+        UIUtils.resetLabel(walletAfterBalanceValueLabel);
+        UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
         walletComboBox.setOnAction(e -> {
-            UpdateWalletBalance();
-            WalletAfterBalance();
+            updateWalletBalance();
+            walletAfterBalance();
         });
 
-        transactionTypeComboBox.setOnAction(e -> { WalletAfterBalance(); });
+        transactionTypeComboBox.setOnAction(e -> { walletAfterBalance(); });
 
-        statusComboBox.setOnAction(e -> { WalletAfterBalance(); });
+        statusComboBox.setOnAction(e -> { walletAfterBalance(); });
 
         transactionValueField.textProperty().addListener(
             (observable, oldValue, newValue) -> {
@@ -150,7 +150,7 @@ public class EditTransactionController
                 }
                 else
                 {
-                    WalletAfterBalance();
+                    walletAfterBalance();
                 }
             });
     }
@@ -177,7 +177,7 @@ public class EditTransactionController
             description == null || transactionValueString == null ||
             statusString == null || categoryString == null || transactionDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields.");
             return;
@@ -188,12 +188,12 @@ public class EditTransactionController
             BigDecimal transactionValue = new BigDecimal(transactionValueString);
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             Category category = categories.stream()
-                                    .filter(c -> c.GetName().equals(categoryString))
+                                    .filter(c -> c.getName().equals(categoryString))
                                     .findFirst()
                                     .get();
 
@@ -204,34 +204,34 @@ public class EditTransactionController
             LocalDateTime dateTimeWithCurrentHour = transactionDate.atTime(currentTime);
 
             // Check if has any modification
-            if (wallet.GetName().equals(transactionToUpdate.GetWallet().GetName()) &&
-                category.GetName().equals(
-                    transactionToUpdate.GetCategory().GetName()) &&
-                transactionValue.compareTo(transactionToUpdate.GetAmount()) == 0 &&
-                description.equals(transactionToUpdate.GetDescription()) &&
-                status == transactionToUpdate.GetStatus() &&
-                type == transactionToUpdate.GetType() &&
+            if (wallet.getName().equals(transactionToUpdate.getWallet().getName()) &&
+                category.getName().equals(
+                    transactionToUpdate.getCategory().getName()) &&
+                transactionValue.compareTo(transactionToUpdate.getAmount()) == 0 &&
+                description.equals(transactionToUpdate.getDescription()) &&
+                status == transactionToUpdate.getStatus() &&
+                type == transactionToUpdate.getType() &&
                 dateTimeWithCurrentHour.toLocalDate().equals(
-                    transactionToUpdate.GetDate().toLocalDate()))
+                    transactionToUpdate.getDate().toLocalDate()))
             {
-                WindowUtils.ShowInformationDialog(
+                WindowUtils.showInformationDialog(
                     "Information",
                     "No changes",
                     "No changes were made to the transaction.");
             }
             else // If there is any modification, update the transaction
             {
-                transactionToUpdate.SetWallet(wallet);
-                transactionToUpdate.SetCategory(category);
-                transactionToUpdate.SetDate(dateTimeWithCurrentHour);
-                transactionToUpdate.SetAmount(transactionValue);
-                transactionToUpdate.SetDescription(description);
-                transactionToUpdate.SetStatus(status);
-                transactionToUpdate.SetType(type);
+                transactionToUpdate.setWallet(wallet);
+                transactionToUpdate.setCategory(category);
+                transactionToUpdate.setDate(dateTimeWithCurrentHour);
+                transactionToUpdate.setAmount(transactionValue);
+                transactionToUpdate.setDescription(description);
+                transactionToUpdate.setStatus(status);
+                transactionToUpdate.setType(type);
 
-                walletTransactionService.UpdateTransaction(transactionToUpdate);
+                walletTransactionService.updateTransaction(transactionToUpdate);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Transaction updated",
                                               "Transaction updated successfully.");
             }
@@ -241,19 +241,19 @@ public class EditTransactionController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid income value",
                                         "Income value must be a number.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while updating transaction",
                                         e.getMessage());
         }
     }
 
-    private void UpdateWalletBalance()
+    private void updateWalletBalance()
     {
         String walletName = walletComboBox.getValue();
 
@@ -263,15 +263,15 @@ public class EditTransactionController
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
         walletCurrentBalanceValueLabel.setText(
-            UIUtils.FormatCurrency(wallet.GetBalance()));
+            UIUtils.formatCurrency(wallet.getBalance()));
     }
 
-    private void WalletAfterBalance()
+    private void walletAfterBalance()
     {
         String transactionValueString = transactionValueField.getText();
         String transactionTypeString  = transactionTypeComboBox.getValue();
@@ -280,7 +280,7 @@ public class EditTransactionController
         if (transactionValueString == null || transactionValueString.trim().isEmpty() ||
             walletName == null || transactionTypeString == null)
         {
-            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
         }
 
@@ -290,36 +290,36 @@ public class EditTransactionController
 
             if (transactionValue.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+                UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
-            if (transactionToUpdate.GetStatus().equals(TransactionStatus.CONFIRMED))
+            if (transactionToUpdate.getStatus().equals(TransactionStatus.CONFIRMED))
             {
                 // If the transaction is confirmed, the balance will be updated
                 // based on the difference between the new and the old value
                 BigDecimal diff =
-                    transactionValue.subtract(transactionToUpdate.GetAmount());
+                    transactionValue.subtract(transactionToUpdate.getAmount());
 
                 if (transactionTypeString.equals(TransactionType.EXPENSE.toString()))
                 {
-                    walletAfterBalanceValue = wallet.GetBalance().subtract(diff);
+                    walletAfterBalanceValue = wallet.getBalance().subtract(diff);
                 }
                 else if (transactionTypeString.equals(
                              TransactionType.INCOME.toString()))
                 {
-                    walletAfterBalanceValue = wallet.GetBalance().add(diff);
+                    walletAfterBalanceValue = wallet.getBalance().add(diff);
                 }
                 else
                 {
-                    UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+                    UIUtils.resetLabel(walletAfterBalanceValueLabel);
                     return;
                 }
             }
@@ -330,16 +330,16 @@ public class EditTransactionController
                 if (transactionTypeString.equals(TransactionType.EXPENSE.toString()))
                 {
                     walletAfterBalanceValue =
-                        wallet.GetBalance().subtract(transactionValue);
+                        wallet.getBalance().subtract(transactionValue);
                 }
                 else if (transactionTypeString.equals(
                              TransactionType.INCOME.toString()))
                 {
-                    walletAfterBalanceValue = wallet.GetBalance().add(transactionValue);
+                    walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
                 }
                 else
                 {
-                    UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+                    UIUtils.resetLabel(walletAfterBalanceValueLabel);
                     return;
                 }
             }
@@ -348,38 +348,38 @@ public class EditTransactionController
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             walletAfterBalanceValueLabel.setText(
-                UIUtils.FormatCurrency(walletAfterBalanceValue));
+                UIUtils.formatCurrency(walletAfterBalanceValue));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
-    private void LoadCategories()
+    private void loadCategoriesFromDatabase()
     {
-        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
 
         categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::GetName).toList());
+            categories.stream().map(Category::getName).toList());
     }
 }

@@ -34,7 +34,7 @@ public final class WindowUtils
      * @param message The message to be displayed
      */
     private static void
-    SetAlertAttributes(Alert alert, String title, String header, String message)
+    setAlertAttributes(Alert alert, String title, String header, String message)
     {
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -49,14 +49,14 @@ public final class WindowUtils
      * @return True if the user clicked Yes, false otherwise
      */
     public static boolean
-    ShowConfirmationDialog(String title, String header, String message)
+    showConfirmationDialog(String title, String header, String message)
     {
         Alert alert = new Alert(AlertType.CONFIRMATION);
 
         // Set the confirmation button
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
-        SetAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, title, header, message);
 
         ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
         return result == ButtonType.YES;
@@ -69,10 +69,10 @@ public final class WindowUtils
      * @param message The message to be displayed
      */
     public static void
-    ShowInformationDialog(String title, String header, String message)
+    showInformationDialog(String title, String header, String message)
     {
         Alert alert = new Alert(AlertType.INFORMATION);
-        SetAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, title, header, message);
         alert.showAndWait();
     }
 
@@ -82,10 +82,10 @@ public final class WindowUtils
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
-    public static void ShowErrorDialog(String title, String header, String message)
+    public static void showErrorDialog(String title, String header, String message)
     {
         Alert alert = new Alert(AlertType.ERROR);
-        SetAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, title, header, message);
         alert.showAndWait();
     }
 
@@ -95,7 +95,7 @@ public final class WindowUtils
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
-    public static void ShowSuccessDialog(String title, String header, String message)
+    public static void showSuccessDialog(String title, String header, String message)
     {
         Alert alert = new Alert(AlertType.INFORMATION);
 
@@ -103,7 +103,7 @@ public final class WindowUtils
         alert.setGraphic(new ImageView(new Image(
             WindowUtils.class.getResource(Constants.SUCCESS_ICON).toString())));
 
-        SetAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, title, header, message);
         alert.showAndWait();
     }
 
@@ -111,7 +111,7 @@ public final class WindowUtils
      * Centers the window on the screen
      * @param stage The stage to be centered
      */
-    public static void CenterWindowOnScreen(Stage stage)
+    public static void centerWindowOnScreen(Stage stage)
     {
         stage.centerOnScreen();
     }
@@ -123,12 +123,12 @@ public final class WindowUtils
      * @param springContext The Spring application context
      * @param controllerSetup A consumer to setup the controller
      */
-    public static <T> void OpenModalWindow(String             fxmlFileName,
+    public static <T> void openModalWindow(String             fxmlFileName,
                                            String             title,
                                            ApplicationContext springContext,
                                            Consumer<T>        controllerSetup)
     {
-        OpenModalWindow(fxmlFileName, title, springContext, controllerSetup, List.of());
+        openModalWindow(fxmlFileName, title, springContext, controllerSetup, List.of());
     }
 
     /**
@@ -139,7 +139,7 @@ public final class WindowUtils
      * @param controllerSetup A consumer to setup the controller
      * @param onHiddenActions A list of actions to be executed when the window is hidden
      */
-    public static <T> void OpenModalWindow(String             fxmlFileName,
+    public static <T> void openModalWindow(String             fxmlFileName,
                                            String             title,
                                            ApplicationContext springContext,
                                            Consumer<T>        controllerSetup,
@@ -183,12 +183,12 @@ public final class WindowUtils
      * @param springContext The Spring application context
      * @param controllerSetup A consumer to setup the controller
      */
-    public static <T> void OpenPopupWindow(String             fxmlFileName,
+    public static <T> void openPopupWindow(String             fxmlFileName,
                                            String             title,
                                            ApplicationContext springContext,
                                            Consumer<T>        controllerSetup)
     {
-        OpenPopupWindow(fxmlFileName, title, springContext, controllerSetup, List.of());
+        openPopupWindow(fxmlFileName, title, springContext, controllerSetup, List.of());
     }
 
     /**
@@ -199,7 +199,7 @@ public final class WindowUtils
      * @param controllerSetup A consumer to setup the controller
      * @param onHiddenActions A list of actions to be executed when the window is hidden
      */
-    public static <T> void OpenPopupWindow(String             fxmlFileName,
+    public static <T> void openPopupWindow(String             fxmlFileName,
                                            String             title,
                                            ApplicationContext springContext,
                                            Consumer<T>        controllerSetup,

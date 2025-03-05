@@ -26,6 +26,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
 import org.moinex.services.CalculatorService;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Transfer dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddTransferController
 {
     @FXML
@@ -91,8 +93,6 @@ public class AddTransferController
 
     private ChangeListener<String> descriptionFieldListener;
 
-    public AddTransferController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -110,58 +110,58 @@ public class AddTransferController
         this.calculatorService        = calculatorService;
     }
 
-    public void SetSenderWalletComboBox(Wallet wt)
+    public void setSenderWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        senderWalletComboBox.setValue(wt.GetName());
+        senderWalletComboBox.setValue(wt.getName());
 
-        UpdateSenderWalletBalance();
+        updateSenderWalletBalance();
     }
 
-    public void SetReceiverWalletComboBox(Wallet wt)
+    public void setReceiverWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        receiverWalletComboBox.setValue(wt.GetName());
+        receiverWalletComboBox.setValue(wt.getName());
 
-        UpdateReceiverWalletBalance();
+        updateReceiverWalletBalance();
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadSuggestions();
+        loadWalletsFromDatabase();
+        loadSuggestionsFromDatabase();
 
         // Configure the date picker
-        UIUtils.SetDatePickerFormat(transferDatePicker);
+        UIUtils.setDatePickerFormat(transferDatePicker);
 
         // Reset all labels
-        UIUtils.ResetLabel(senderWalletAfterBalanceValueLabel);
-        UIUtils.ResetLabel(receiverWalletAfterBalanceValueLabel);
-        UIUtils.ResetLabel(senderWalletCurrentBalanceValueLabel);
-        UIUtils.ResetLabel(receiverWalletCurrentBalanceValueLabel);
+        UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
+        UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
+        UIUtils.resetLabel(senderWalletCurrentBalanceValueLabel);
+        UIUtils.resetLabel(receiverWalletCurrentBalanceValueLabel);
 
         senderWalletComboBox.setOnAction(e -> {
-            UpdateSenderWalletBalance();
-            UpdateSenderWalletAfterBalance();
+            updateSenderWalletBalance();
+            updateSenderWalletAfterBalance();
         });
 
         receiverWalletComboBox.setOnAction(e -> {
-            UpdateReceiverWalletBalance();
-            UpdateReceiverWalletAfterBalance();
+            updateReceiverWalletBalance();
+            updateReceiverWalletAfterBalance();
         });
 
-        ConfigureSuggestionsListView();
-        ConfigureSuggestionsPopup();
-        ConfigureListeners();
+        configureSuggestionsListView();
+        configureSuggestionsPopup();
+        configureListeners();
     }
 
     @FXML
@@ -185,7 +185,7 @@ public class AddTransferController
             description == null || description.strip().isEmpty() ||
             transferDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields.");
             return;
@@ -196,26 +196,26 @@ public class AddTransferController
             BigDecimal transferValue = new BigDecimal(transferValueString);
 
             Wallet senderWallet = wallets.stream()
-                                      .filter(w -> w.GetName().equals(senderWalletName))
+                                      .filter(w -> w.getName().equals(senderWalletName))
                                       .findFirst()
                                       .get();
 
             Wallet receiverWallet =
                 wallets.stream()
-                    .filter(w -> w.GetName().equals(receiverWalletName))
+                    .filter(w -> w.getName().equals(receiverWalletName))
                     .findFirst()
                     .get();
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transferDate.atTime(currentTime);
 
-            walletTransactionService.TransferMoney(senderWallet.GetId(),
-                                                   receiverWallet.GetId(),
+            walletTransactionService.transferMoney(senderWallet.getId(),
+                                                   receiverWallet.getId(),
                                                    dateTimeWithCurrentHour,
                                                    transferValue,
                                                    description);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Transfer created",
                                           "The transfer was successfully created.");
 
@@ -224,13 +224,13 @@ public class AddTransferController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid transfer value",
                                         "Transfer value must be a number.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while creating transfer",
                                         e.getMessage());
             return;
@@ -240,18 +240,18 @@ public class AddTransferController
     @FXML
     private void handleOpenCalculator()
     {
-        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
                                     "Calculator",
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { GetResultFromCalculator(); }));
+                                    List.of(() -> { getResultFromCalculator(); }));
     }
 
-    private void GetResultFromCalculator()
+    private void getResultFromCalculator()
     {
         // If the user saved the result, set it in the transferValueField
-        String result = calculatorService.GetResult();
+        String result = calculatorService.getResult();
 
         if (result != null)
         {
@@ -261,7 +261,7 @@ public class AddTransferController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.ShowErrorDialog("Error",
+                    WindowUtils.showErrorDialog("Error",
                                                 "Invalid value",
                                                 "The value must be positive");
                     return;
@@ -275,14 +275,14 @@ public class AddTransferController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Invalid value",
                                             "The value must be a number");
             }
         }
     }
 
-    private void UpdateSenderWalletBalance()
+    private void updateSenderWalletBalance()
     {
         String senderWalletName = senderWalletComboBox.getValue();
 
@@ -292,26 +292,26 @@ public class AddTransferController
         }
 
         Wallet senderWallet = wallets.stream()
-                                  .filter(w -> w.GetName().equals(senderWalletName))
+                                  .filter(w -> w.getName().equals(senderWalletName))
                                   .findFirst()
                                   .get();
 
-        if (senderWallet.GetBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (senderWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
-            UIUtils.SetLabelStyle(senderWalletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(senderWalletCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(senderWalletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(senderWalletCurrentBalanceValueLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         senderWalletCurrentBalanceValueLabel.setText(
-            UIUtils.FormatCurrency(senderWallet.GetBalance()));
+            UIUtils.formatCurrency(senderWallet.getBalance()));
     }
 
-    private void UpdateReceiverWalletBalance()
+    private void updateReceiverWalletBalance()
     {
         String receiverWalletName = receiverWalletComboBox.getValue();
 
@@ -321,26 +321,26 @@ public class AddTransferController
         }
 
         Wallet receiverWallet = wallets.stream()
-                                    .filter(w -> w.GetName().equals(receiverWalletName))
+                                    .filter(w -> w.getName().equals(receiverWalletName))
                                     .findFirst()
                                     .get();
 
-        if (receiverWallet.GetBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (receiverWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
-            UIUtils.SetLabelStyle(receiverWalletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(receiverWalletCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(receiverWalletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(receiverWalletCurrentBalanceValueLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         receiverWalletCurrentBalanceValueLabel.setText(
-            UIUtils.FormatCurrency(receiverWallet.GetBalance()));
+            UIUtils.formatCurrency(receiverWallet.getBalance()));
     }
 
-    private void UpdateSenderWalletAfterBalance()
+    private void updateSenderWalletAfterBalance()
     {
         String transferValueString = transferValueField.getText();
         String senderWalletName    = senderWalletComboBox.getValue();
@@ -348,7 +348,7 @@ public class AddTransferController
         if (transferValueString == null || transferValueString.strip().isEmpty() ||
             senderWalletName == null)
         {
-            UIUtils.ResetLabel(senderWalletAfterBalanceValueLabel);
+            UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
             return;
         }
 
@@ -358,42 +358,42 @@ public class AddTransferController
 
             if (transferValue.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(senderWalletAfterBalanceValueLabel);
+                UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
                 return;
             }
 
             Wallet senderWallet = wallets.stream()
-                                      .filter(w -> w.GetName().equals(senderWalletName))
+                                      .filter(w -> w.getName().equals(senderWalletName))
                                       .findFirst()
                                       .get();
 
             BigDecimal senderWalletAfterBalance =
-                senderWallet.GetBalance().subtract(transferValue);
+                senderWallet.getBalance().subtract(transferValue);
 
             // Episilon is used to avoid floating point arithmetic errors
             if (senderWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(senderWalletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(senderWalletAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(senderWalletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(senderWalletAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             senderWalletAfterBalanceValueLabel.setText(
-                UIUtils.FormatCurrency(senderWalletAfterBalance));
+                UIUtils.formatCurrency(senderWalletAfterBalance));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(senderWalletAfterBalanceValueLabel);
+            UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
         }
     }
 
-    private void UpdateReceiverWalletAfterBalance()
+    private void updateReceiverWalletAfterBalance()
     {
         String transferValueString = transferValueField.getText();
         String receiverWalletName  = receiverWalletComboBox.getValue();
@@ -401,7 +401,7 @@ public class AddTransferController
         if (transferValueString == null || transferValueString.strip().isEmpty() ||
             receiverWalletName == null)
         {
-            UIUtils.ResetLabel(receiverWalletAfterBalanceValueLabel);
+            UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
             return;
         }
 
@@ -411,43 +411,43 @@ public class AddTransferController
 
             if (transferValue.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(receiverWalletAfterBalanceValueLabel);
+                UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
                 return;
             }
 
             Wallet receiverWallet =
                 wallets.stream()
-                    .filter(w -> w.GetName().equals(receiverWalletName))
+                    .filter(w -> w.getName().equals(receiverWalletName))
                     .findFirst()
                     .get();
 
             BigDecimal receiverWalletAfterBalance =
-                receiverWallet.GetBalance().add(transferValue);
+                receiverWallet.getBalance().add(transferValue);
 
             // Episilon is used to avoid floating point arithmetic errors
             if (receiverWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(receiverWalletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(receiverWalletAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(receiverWalletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(receiverWalletAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             receiverWalletAfterBalanceValueLabel.setText(
-                UIUtils.FormatCurrency(receiverWalletAfterBalance));
+                UIUtils.formatCurrency(receiverWalletAfterBalance));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(receiverWalletAfterBalanceValueLabel);
+            UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
         }
     }
 
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         // Update sender wallet after balance when transfer value changes
         transferValueField.textProperty().addListener(
@@ -458,8 +458,8 @@ public class AddTransferController
                 }
                 else
                 {
-                    UpdateSenderWalletAfterBalance();
-                    UpdateReceiverWalletAfterBalance();
+                    updateSenderWalletAfterBalance();
+                    updateReceiverWalletAfterBalance();
                 }
             });
 
@@ -480,7 +480,7 @@ public class AddTransferController
             List<Transfer> filteredSuggestions =
                 suggestions.stream()
                     .filter(tx
-                            -> tx.GetDescription().toLowerCase().contains(
+                            -> tx.getDescription().toLowerCase().contains(
                                 newValue.toLowerCase()))
                     .toList();
 
@@ -494,8 +494,8 @@ public class AddTransferController
 
             if (!filteredSuggestions.isEmpty())
             {
-                AdjustPopupWidth();
-                AdjustPopupHeight();
+                adjustPopupWidth();
+                adjustPopupHeight();
 
                 suggestionsPopup.show(
                     descriptionField,
@@ -516,27 +516,27 @@ public class AddTransferController
         descriptionField.textProperty().addListener(descriptionFieldListener);
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         senderWalletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
 
         receiverWalletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
-    public void LoadSuggestions()
+    public void loadSuggestionsFromDatabase()
     {
-        suggestions = walletTransactionService.GetTransferSuggestions();
+        suggestions = walletTransactionService.getTransferSuggestions();
     }
 
-    private void ConfigureSuggestionsPopup()
+    private void configureSuggestionsPopup()
     {
         if (suggestionsPopup == null)
         {
-            ConfigureSuggestionsListView();
+            configureSuggestionsListView();
         }
 
         suggestionsPopup = new Popup();
@@ -545,12 +545,12 @@ public class AddTransferController
         suggestionsPopup.getContent().add(suggestionListView);
     }
 
-    private void AdjustPopupWidth()
+    private void adjustPopupWidth()
     {
         suggestionListView.setPrefWidth(descriptionField.getWidth());
     }
 
-    private void AdjustPopupHeight()
+    private void adjustPopupHeight()
     {
         Integer itemCount = suggestionListView.getItems().size();
 
@@ -563,7 +563,7 @@ public class AddTransferController
         suggestionListView.setPrefHeight(totalHeight);
     }
 
-    private void ConfigureSuggestionsListView()
+    private void configureSuggestionsListView()
     {
         suggestionListView = new ListView<>();
 
@@ -586,12 +586,12 @@ public class AddTransferController
                     VBox cellContent = new VBox();
                     cellContent.setSpacing(2);
 
-                    Label descriptionLabel = new Label(item.GetDescription());
+                    Label descriptionLabel = new Label(item.getDescription());
 
                     String infoString =
-                        UIUtils.FormatCurrency(item.GetAmount()) +
-                        " | From: " + item.GetSenderWallet().GetName() +
-                        " | To: " + item.GetReceiverWallet().GetName();
+                        UIUtils.formatCurrency(item.getAmount()) +
+                        " | From: " + item.getSenderWallet().getName() +
+                        " | To: " + item.getReceiverWallet().getName();
 
                     Label infoLabel = new Label(infoString);
 
@@ -619,32 +619,32 @@ public class AddTransferController
             (observable, oldValue, newValue) -> {
                 if (newValue != null)
                 {
-                    FillFieldsWithTransaction(newValue);
+                    fillFieldsWithTransaction(newValue);
                     suggestionsPopup.hide();
                 }
             });
     }
 
-    private void FillFieldsWithTransaction(Transfer t)
+    private void fillFieldsWithTransaction(Transfer t)
     {
-        senderWalletComboBox.setValue(t.GetSenderWallet().GetName());
-        receiverWalletComboBox.setValue(t.GetReceiverWallet().GetName());
+        senderWalletComboBox.setValue(t.getSenderWallet().getName());
+        receiverWalletComboBox.setValue(t.getReceiverWallet().getName());
 
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
         descriptionField.textProperty().removeListener(descriptionFieldListener);
 
-        descriptionField.setText(t.GetDescription());
+        descriptionField.setText(t.getDescription());
 
         descriptionField.textProperty().addListener(descriptionFieldListener);
 
-        transferValueField.setText(t.GetAmount().toString());
+        transferValueField.setText(t.getAmount().toString());
 
-        UpdateSenderWalletBalance();
-        UpdateSenderWalletAfterBalance();
+        updateSenderWalletBalance();
+        updateSenderWalletAfterBalance();
 
-        UpdateReceiverWalletBalance();
-        UpdateReceiverWalletAfterBalance();
+        updateReceiverWalletBalance();
+        updateReceiverWalletAfterBalance();
     }
 }

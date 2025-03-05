@@ -28,6 +28,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.CalendarEvent;
 import org.moinex.services.CalendarService;
 import org.moinex.ui.dialog.AddCalendarEventController;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the calendar view
  */
 @Controller
+@NoArgsConstructor
 public class CalendarController
 {
     @FXML
@@ -60,8 +62,6 @@ public class CalendarController
 
     private CalendarService calendarService;
 
-    public CalendarController() { }
-
     /**
      * Constructor for CalendarController
      * @param calendarService The service for the calendar
@@ -78,9 +78,9 @@ public class CalendarController
         dateFocus = LocalDate.now();
         today     = LocalDate.now();
 
-        LoadCalendarEventsFromDatabase();
+        loadCalendarEventsFromDatabase();
 
-        DrawCalendar();
+        drawCalendar();
     }
 
     @FXML
@@ -88,7 +88,7 @@ public class CalendarController
     {
         dateFocus = dateFocus.minusMonths(1);
         calendar.getChildren().clear();
-        DrawCalendar();
+        drawCalendar();
     }
 
     @FXML
@@ -96,32 +96,32 @@ public class CalendarController
     {
         dateFocus = dateFocus.plusMonths(1);
         calendar.getChildren().clear();
-        DrawCalendar();
+        drawCalendar();
     }
 
     @FXML
     private void handleAddEvent()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_CALENDAR_EVENT_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_CALENDAR_EVENT_FXML,
                                     "Add Calendar Event",
                                     springContext,
                                     (AddCalendarEventController controller)
                                         -> {},
-                                    List.of(() -> { DrawCalendar(); }));
+                                    List.of(() -> { drawCalendar(); }));
     }
 
     /**
      * Load the calendar events from the database
      */
-    private void LoadCalendarEventsFromDatabase()
+    private void loadCalendarEventsFromDatabase()
     {
-        calendarEvents = calendarService.GetAllEvents();
+        calendarEvents = calendarService.getAllEvents();
     }
 
     /**
      * Draw the calendar grid
      */
-    private void DrawCalendar()
+    private void drawCalendar()
     {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
         currentMonth.setText(dateFocus.format(formatter));
@@ -150,7 +150,7 @@ public class CalendarController
             (int)Math.ceil(totalGridCells / Constants.WEEK_DAYS.doubleValue());
 
         Map<Integer, List<CalendarEvent>> calendarEventMap =
-            GetCalendarEventsMonth(dateFocus);
+            getCalendarEventsMonth(dateFocus);
 
         calendar.getChildren().clear();
 
@@ -179,6 +179,7 @@ public class CalendarController
                 VBox cell = new VBox();
                 cell.setMinSize(calendarWidth / Constants.WEEK_DAYS,
                                 calendarHeight / (totalRows + 1));
+
                 cell.setAlignment(Pos.TOP_CENTER);
 
                 // Define the border style for the cell
@@ -221,7 +222,7 @@ public class CalendarController
                         {
                             Circle indicator = new Circle(
                                 4,
-                                Color.web(event.GetEventType().GetColorHex()));
+                                Color.web(event.getEventType().getColorHex()));
                             eventIndicators.getChildren().add(indicator);
                         }
                     }
@@ -263,13 +264,13 @@ public class CalendarController
      * @return A map of calendar events by date
      */
     private Map<Integer, List<CalendarEvent>>
-    CreateCalendarMap(List<CalendarEvent> calendarEvents)
+    createCalendarMap(List<CalendarEvent> calendarEvents)
     {
         Map<Integer, List<CalendarEvent>> calendarEventMap = new HashMap<>();
 
         for (CalendarEvent event : calendarEvents)
         {
-            Integer eventDate = event.GetDate().getDayOfMonth();
+            Integer eventDate = event.getDate().getDayOfMonth();
             if (!calendarEventMap.containsKey(eventDate))
             {
                 calendarEventMap.put(eventDate, List.of(event));
@@ -293,19 +294,19 @@ public class CalendarController
      * @return A map of calendar events by date
      */
     private Map<Integer, List<CalendarEvent>>
-    GetCalendarEventsMonth(LocalDate dateFocus)
+    getCalendarEventsMonth(LocalDate dateFocus)
     {
         List<CalendarEvent> calendarEventsMonth = new ArrayList<>();
 
         for (CalendarEvent event : calendarEvents)
         {
-            if (event.GetDate().getMonth() == dateFocus.getMonth() &&
-                event.GetDate().getYear() == dateFocus.getYear())
+            if (event.getDate().getMonth() == dateFocus.getMonth() &&
+                event.getDate().getYear() == dateFocus.getYear())
             {
                 calendarEventsMonth.add(event);
             }
         }
 
-        return CreateCalendarMap(calendarEventsMonth);
+        return createCalendarMap(calendarEventsMonth);
     }
 }

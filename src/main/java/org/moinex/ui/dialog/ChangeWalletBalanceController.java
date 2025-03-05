@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Wallet;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Rename Wallet dialog
  */
 @Controller
+@NoArgsConstructor
 public class ChangeWalletBalanceController
 {
     @FXML
@@ -35,8 +37,6 @@ public class ChangeWalletBalanceController
 
     private WalletService walletService;
 
-    public ChangeWalletBalanceController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -48,24 +48,24 @@ public class ChangeWalletBalanceController
         this.walletService = walletService;
     }
 
-    public void SetWalletComboBox(Wallet wt)
+    public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        walletComboBox.setValue(wt.GetName());
-        balanceField.setText(wt.GetBalance().toString());
+        walletComboBox.setValue(wt.getName());
+        balanceField.setText(wt.getBalance().toString());
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
+        loadWalletsFromDatabase();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
 
         balanceField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
@@ -83,14 +83,14 @@ public class ChangeWalletBalanceController
 
         if (walletName == null || newBalanceStr.isBlank())
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid input",
                                         "Please fill all fields");
             return;
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
@@ -99,18 +99,18 @@ public class ChangeWalletBalanceController
             BigDecimal newBalance = new BigDecimal(newBalanceStr);
 
             // Check if has modification
-            if (wallet.GetBalance().compareTo(newBalance) == 0)
+            if (wallet.getBalance().compareTo(newBalance) == 0)
             {
-                WindowUtils.ShowInformationDialog("Information",
+                WindowUtils.showInformationDialog("Information",
                                                   "No changes",
                                                   "The balance was not changed.");
                 return;
             }
             else // Update balance
             {
-                walletService.UpdateWalletBalance(wallet.GetId(), newBalance);
+                walletService.updateWalletBalance(wallet.getId(), newBalance);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Wallet updated",
                                               "The balance was updated successfully.");
             }
@@ -120,14 +120,14 @@ public class ChangeWalletBalanceController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid input",
                                         "Balance must be a number");
             return;
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error renaming wallet",
                                         e.getMessage());
             return;
@@ -144,8 +144,8 @@ public class ChangeWalletBalanceController
         stage.close();
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 }

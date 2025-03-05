@@ -16,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.util.Constants;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("prototype") // Create a new instance each time it is requested
+@NoArgsConstructor
 public class RemoveTransactionController
 {
     @FXML
@@ -67,7 +69,7 @@ public class RemoveTransactionController
      * Initializes the controller with the transaction type
      * @param transactionType TransactionType
      */
-    public void InitializeWithTransactionType(TransactionType transactionType)
+    public void initializeWithTransactionType(TransactionType transactionType)
     {
         this.transactionType = transactionType;
 
@@ -76,14 +78,14 @@ public class RemoveTransactionController
             throw new IllegalStateException("Transaction type not set");
         }
 
-        ConfigureTableView();
-        LoadTransaction();
+        configureTableView();
+        loadTransactionFromDatabase();
 
-        UpdateTransactionTableView();
+        updateTransactionTableView();
 
         // Add listener to the search field
         searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> UpdateTransactionTableView());
+            (observable, oldValue, newValue) -> updateTransactionTableView());
     }
 
     @FXML
@@ -101,59 +103,59 @@ public class RemoveTransactionController
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(selectedIncome.GetDescription())
+            .append(selectedIncome.getDescription())
             .append("\n")
             .append("Amount: ")
-            .append(UIUtils.FormatCurrency(selectedIncome.GetAmount()))
+            .append(UIUtils.formatCurrency(selectedIncome.getAmount()))
             .append("\n")
             .append("Date: ")
-            .append(selectedIncome.GetDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+            .append(selectedIncome.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
             .append("\n")
             .append("Status: ")
-            .append(selectedIncome.GetStatus().toString())
+            .append(selectedIncome.getStatus().toString())
             .append("\n")
             .append("Wallet: ")
-            .append(selectedIncome.GetWallet().GetName())
+            .append(selectedIncome.getWallet().getName())
             .append("\n")
             .append("Wallet balance: ")
-            .append(UIUtils.FormatCurrency(selectedIncome.GetWallet().GetBalance()))
+            .append(UIUtils.formatCurrency(selectedIncome.getWallet().getBalance()))
             .append("\n")
             .append("Wallet balance after deletion: ");
 
-        if (selectedIncome.GetStatus().equals(TransactionStatus.CONFIRMED))
+        if (selectedIncome.getStatus().equals(TransactionStatus.CONFIRMED))
         {
             if (transactionType == TransactionType.EXPENSE)
             {
                 message
-                    .append(UIUtils.FormatCurrency(
-                        selectedIncome.GetWallet().GetBalance().add(
-                            selectedIncome.GetAmount())))
+                    .append(UIUtils.formatCurrency(
+                        selectedIncome.getWallet().getBalance().add(
+                            selectedIncome.getAmount())))
                     .append("\n");
             }
             else
             {
                 message
-                    .append(UIUtils.FormatCurrency(
-                        selectedIncome.GetWallet().GetBalance().add(
-                            selectedIncome.GetAmount())))
+                    .append(UIUtils.formatCurrency(
+                        selectedIncome.getWallet().getBalance().add(
+                            selectedIncome.getAmount())))
                     .append("\n");
             }
         }
         else
         {
             message
-                .append(UIUtils.FormatCurrency(selectedIncome.GetWallet().GetBalance()))
+                .append(UIUtils.formatCurrency(selectedIncome.getWallet().getBalance()))
                 .append("\n");
         }
 
         // Confirm deletion
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirm Deletion",
                 "Are you sure you want to remove this " +
                     transactionType.toString().toLowerCase() + "?",
                 message.toString()))
         {
-            walletTransactionService.DeleteTransaction(selectedIncome.GetId());
+            walletTransactionService.deleteTransaction(selectedIncome.getId());
             transactionsTableView.getItems().remove(selectedIncome);
         }
     }
@@ -165,19 +167,19 @@ public class RemoveTransactionController
         stage.close();
     }
 
-    private void LoadTransaction()
+    private void loadTransactionFromDatabase()
     {
         if (transactionType == TransactionType.EXPENSE)
         {
-            incomes = walletTransactionService.GetNonArchivedExpenses();
+            incomes = walletTransactionService.getNonArchivedExpenses();
         }
         else
         {
-            incomes = walletTransactionService.GetNonArchivedIncomes();
+            incomes = walletTransactionService.getNonArchivedIncomes();
         }
     }
 
-    private void UpdateTransactionTableView()
+    private void updateTransactionTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -192,8 +194,8 @@ public class RemoveTransactionController
 
         incomes.stream()
             .filter(t
-                    -> t.GetDescription().toLowerCase().contains(similarTextOrId) ||
-                           t.GetId().toString().contains(similarTextOrId))
+                    -> t.getDescription().toLowerCase().contains(similarTextOrId) ||
+                           t.getId().toString().contains(similarTextOrId))
             .forEach(transactionsTableView.getItems()::add);
 
         transactionsTableView.refresh();
@@ -202,11 +204,11 @@ public class RemoveTransactionController
     /**
      * Configures the TableView to display the incomes.
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -234,35 +236,35 @@ public class RemoveTransactionController
             new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetCategory().GetName()));
+            -> new SimpleStringProperty(param.getValue().getCategory().getName()));
 
         TableColumn<WalletTransaction, String> statusColumn =
             new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetStatus().name()));
+            param -> new SimpleStringProperty(param.getValue().getStatus().name()));
 
         TableColumn<WalletTransaction, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
             param
             -> new SimpleStringProperty(
-                param.getValue().GetDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
+                param.getValue().getDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
 
         TableColumn<WalletTransaction, String> walletNameColumn =
             new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetWallet().GetName()));
+            param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
 
         TableColumn<WalletTransaction, String> amountColumn =
             new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrency(param.getValue().GetAmount())));
+                UIUtils.formatCurrency(param.getValue().getAmount())));
 
         TableColumn<WalletTransaction, String> descriptionColumn =
             new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetDescription()));
+            param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         transactionsTableView.getColumns().add(idColumn);
         transactionsTableView.getColumns().add(descriptionColumn);

@@ -12,19 +12,20 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Edit Ticker dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditTickerController
 {
     @FXML
@@ -48,9 +49,6 @@ public class EditTickerController
     @FXML
     private CheckBox archivedCheckBox;
 
-    @Autowired
-    private ConfigurableApplicationContext springContext;
-
     private TickerService tickerService;
 
     private Ticker tickerToUpdate;
@@ -66,25 +64,25 @@ public class EditTickerController
         this.tickerService = tickerService;
     }
 
-    public void SetTicker(Ticker tk)
+    public void setTicker(Ticker tk)
     {
         this.tickerToUpdate = tk;
 
-        nameField.setText(tk.GetName());
-        symbolField.setText(tk.GetSymbol());
-        currentPriceField.setText(tk.GetCurrentUnitValue().toString());
-        quantityField.setText(tk.GetCurrentQuantity().toString());
-        avgUnitPriceField.setText(tk.GetAveragePrice().toString());
-        typeComboBox.setValue(tk.GetType().toString());
+        nameField.setText(tk.getName());
+        symbolField.setText(tk.getSymbol());
+        currentPriceField.setText(tk.getCurrentUnitValue().toString());
+        quantityField.setText(tk.getCurrentQuantity().toString());
+        avgUnitPriceField.setText(tk.getAverageUnitValue().toString());
+        typeComboBox.setValue(tk.getType().toString());
 
-        archivedCheckBox.setSelected(tk.IsArchived());
+        archivedCheckBox.setSelected(tk.getIsArchived());
     }
 
     @FXML
     private void initialize()
     {
-        ConfigureTypeComboBox();
-        ConfigureListeners();
+        configureTypeComboBox();
+        configureListeners();
     }
 
     @FXML
@@ -110,7 +108,7 @@ public class EditTickerController
             typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
             currentPriceStr.strip().isEmpty())
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all required fields");
 
@@ -123,7 +121,7 @@ public class EditTickerController
             (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()) &&
                 !(quantityStr == null || quantityStr.strip().isEmpty()))
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "Invalid fields",
                 "Quantity must be set if average unit price is set or vice-versa");
@@ -155,15 +153,15 @@ public class EditTickerController
             Boolean archived = archivedCheckBox.isSelected();
 
             // Check if has any modification
-            if (tickerToUpdate.GetName().equals(name) &&
-                tickerToUpdate.GetSymbol().equals(symbol) &&
-                tickerToUpdate.GetCurrentUnitValue().compareTo(currentPrice) == 0 &&
-                tickerToUpdate.GetType().equals(type) &&
-                tickerToUpdate.GetCurrentQuantity().compareTo(quantity) == 0 &&
-                tickerToUpdate.GetAveragePrice().compareTo(avgUnitPrice) == 0 &&
-                tickerToUpdate.IsArchived().equals(archived))
+            if (tickerToUpdate.getName().equals(name) &&
+                tickerToUpdate.getSymbol().equals(symbol) &&
+                tickerToUpdate.getCurrentUnitValue().compareTo(currentPrice) == 0 &&
+                tickerToUpdate.getType().equals(type) &&
+                tickerToUpdate.getCurrentQuantity().compareTo(quantity) == 0 &&
+                tickerToUpdate.getAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
+                tickerToUpdate.getIsArchived().equals(archived))
             {
-                WindowUtils.ShowInformationDialog("Info",
+                WindowUtils.showInformationDialog("Info",
                                                   "No changes",
                                                   "No changes were to the ticker");
 
@@ -171,17 +169,17 @@ public class EditTickerController
             }
             else // If there is any modification, update the ticker
             {
-                tickerToUpdate.SetName(name);
-                tickerToUpdate.SetSymbol(symbol);
-                tickerToUpdate.SetCurrentUnitValue(currentPrice);
-                tickerToUpdate.SetType(type);
-                tickerToUpdate.SetCurrentQuantity(quantity);
-                tickerToUpdate.SetAveragePrice(avgUnitPrice);
-                tickerToUpdate.SetArchived(archived);
+                tickerToUpdate.setName(name);
+                tickerToUpdate.setSymbol(symbol);
+                tickerToUpdate.setCurrentUnitValue(currentPrice);
+                tickerToUpdate.setType(type);
+                tickerToUpdate.setCurrentQuantity(quantity);
+                tickerToUpdate.setAverageUnitValue(avgUnitPrice);
+                tickerToUpdate.setIsArchived(archived);
 
-                tickerService.UpdateTicker(tickerToUpdate);
+                tickerService.updateTicker(tickerToUpdate);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Ticker updated",
                                               "The ticker updated successfully.");
             }
@@ -191,19 +189,19 @@ public class EditTickerController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid number",
                                         "Invalid price or quantity");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while adding ticker",
                                         e.getMessage());
         }
     }
 
-    private void ConfigureTypeComboBox()
+    private void configureTypeComboBox()
     {
         for (TickerType type : TickerType.values())
         {
@@ -211,7 +209,7 @@ public class EditTickerController
         }
     }
 
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         currentPriceField.textProperty().addListener(
             (observable, oldValue, newValue) -> {

@@ -6,7 +6,6 @@
 
 package org.moinex.ui.dialog;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -15,10 +14,9 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.services.CalendarService;
-import org.moinex.services.GoalService;
 import org.moinex.util.CalendarEventType;
-import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Calendar Event dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddCalendarEventController
 {
     @FXML
@@ -44,8 +43,6 @@ public class AddCalendarEventController
 
     private CalendarService calendarService;
 
-    public AddCalendarEventController() { }
-
     /**
      * Constructor
      * @param calendarService The CalendarService instance
@@ -60,8 +57,8 @@ public class AddCalendarEventController
     @FXML
     private void initialize()
     {
-        UIUtils.SetDatePickerFormat(datePicker);
-        PopulateComboBoxes();
+        UIUtils.setDatePickerFormat(datePicker);
+        populateComboBoxes();
     }
 
     @FXML
@@ -83,7 +80,7 @@ public class AddCalendarEventController
 
         if (eventTitle.isEmpty() || eventDate == null || eventType == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all required fields.");
 
@@ -92,12 +89,12 @@ public class AddCalendarEventController
 
         try
         {
-            calendarService.AddEvent(eventTitle,
+            calendarService.addEvent(eventTitle,
                                      description,
                                      eventDate.atStartOfDay(),
                                      eventType);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Event created",
                                           "The event was successfully created.");
 
@@ -106,13 +103,13 @@ public class AddCalendarEventController
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error creating event",
                                         e.getMessage());
         }
     }
 
-    private void PopulateComboBoxes()
+    private void populateComboBoxes()
     {
         typeComboBox.getItems().setAll(CalendarEventType.values());
 
@@ -122,7 +119,7 @@ public class AddCalendarEventController
             protected void updateItem(CalendarEventType type, boolean empty)
             {
                 super.updateItem(type, empty);
-                setText((type == null || empty) ? null : type.GetDescription());
+                setText((type == null || empty) ? null : type.getDescription());
             }
         });
 
@@ -131,7 +128,7 @@ public class AddCalendarEventController
             protected void updateItem(CalendarEventType type, boolean empty)
             {
                 super.updateItem(type, empty);
-                setText((type == null || empty) ? null : type.GetDescription());
+                setText((type == null || empty) ? null : type.getDescription());
             }
         });
     }

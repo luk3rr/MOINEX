@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.WalletType;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Wallet dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddWalletController
 {
     @FXML
@@ -38,8 +40,6 @@ public class AddWalletController
 
     private List<WalletType> walletTypes;
 
-    public AddWalletController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -54,10 +54,10 @@ public class AddWalletController
     @FXML
     private void initialize()
     {
-        LoadWalletTypes();
+        loadWalletTypes();
 
         walletTypeComboBox.getItems().addAll(
-            walletTypes.stream().map(WalletType::GetName).toList());
+            walletTypes.stream().map(WalletType::getName).toList());
 
         walletBalanceField.textProperty().addListener(
             (observable, oldValue, newValue) -> {
@@ -86,14 +86,14 @@ public class AddWalletController
 
         if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletTypeStr == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields.");
             return;
         }
 
         WalletType walletType = walletTypes.stream()
-                                    .filter(wt -> wt.GetName().equals(walletTypeStr))
+                                    .filter(wt -> wt.getName().equals(walletTypeStr))
                                     .findFirst()
                                     .get();
 
@@ -101,9 +101,9 @@ public class AddWalletController
         {
             BigDecimal walletBalance = new BigDecimal(walletBalanceStr);
 
-            walletService.CreateWallet(walletName, walletBalance, walletType);
+            walletService.addWallet(walletName, walletBalance, walletType);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Wallet created",
                                           "The wallet was successfully created");
 
@@ -112,13 +112,13 @@ public class AddWalletController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid balance",
                                         "Please enter a valid balance.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error creating wallet",
                                         e.getMessage());
         }
@@ -127,20 +127,20 @@ public class AddWalletController
     /**
      * Load the wallet types
      */
-    private void LoadWalletTypes()
+    private void loadWalletTypes()
     {
-        walletTypes = walletService.GetAllWalletTypes();
+        walletTypes = walletService.getAllWalletTypes();
 
         String nameToMove = "Others";
 
         // Move the "Others" wallet type to the end of the list
         if (walletTypes.stream()
-                .filter(n -> n.GetName().equals(nameToMove))
+                .filter(n -> n.getName().equals(nameToMove))
                 .findFirst()
                 .isPresent())
         {
             WalletType walletType = walletTypes.stream()
-                                        .filter(wt -> wt.GetName().equals(nameToMove))
+                                        .filter(wt -> wt.getName().equals(nameToMove))
                                         .findFirst()
                                         .get();
 
@@ -151,6 +151,6 @@ public class AddWalletController
         // Remove Goals wallet type to prevent the user from creating a goal wallet.
         // Goal wallets are created through the Add Goal dialog.
         walletTypes.removeIf(
-            wt -> wt.GetName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME));
+            wt -> wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME));
     }
 }

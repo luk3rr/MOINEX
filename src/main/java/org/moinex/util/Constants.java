@@ -363,7 +363,7 @@ public final class Constants
      * @return The regex
      * @throws IllegalArgumentException If n is negative
      */
-    public static String GetDigitsRegexUpTo(Integer n)
+    public static String getDigitsRegexUpTo(Integer n)
     {
         if (n < 0)
         {
@@ -379,7 +379,7 @@ public final class Constants
      * @param targetDate The target date
      * @return The number of months until the target date
      */
-    public static Long CalculateMonthsUntilTarget(LocalDate beginDate,
+    public static Long calculateMonthsUntilTarget(LocalDate beginDate,
                                                   LocalDate targetDate)
     {
         return ChronoUnit.MONTHS.between(beginDate, targetDate);
@@ -391,7 +391,7 @@ public final class Constants
      * @param targetDate The target date
      * @return The number of days until the target date
      */
-    public static Long CalculateDaysUntilTarget(LocalDate beginDate,
+    public static Long calculateDaysUntilTarget(LocalDate beginDate,
                                                 LocalDate targetDate)
     {
         return ChronoUnit.DAYS.between(beginDate, targetDate);
@@ -402,7 +402,7 @@ public final class Constants
      * @param price The price to be rounded
      * @param tickerType The ticker type
      */
-    public static BigDecimal RoundPrice(BigDecimal price, TickerType tickerType)
+    public static BigDecimal roundPrice(BigDecimal price, TickerType tickerType)
     {
         // Stocks and funds have two decimal places
         // Cryptocurrencies have MAX allowed by settings

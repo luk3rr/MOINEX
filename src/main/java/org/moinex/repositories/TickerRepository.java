@@ -36,45 +36,45 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @param tickerId The id of the ticker
      * @return The count of purchases associated with the ticker
      */
-    @Query("SELECT COUNT(p) "
+    @Query("SELECT count(p) "
            + "FROM TickerPurchase p "
            + "WHERE p.ticker.id = :tickerId")
 
     Long
-    GetPurchaseCountByTicker(@Param("tickerId") Long tickerId);
+    getPurchaseCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Get count of sales associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of sales associated with the ticker
      */
-    @Query("SELECT COUNT(s) "
+    @Query("SELECT count(s) "
            + "FROM TickerSale s "
            + "WHERE s.ticker.id = :tickerId")
     Long
-    GetSaleCountByTicker(@Param("tickerId") Long tickerId);
+    getSaleCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Get count of dividends associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of dividends associated with the ticker
      */
-    @Query("SELECT COUNT(d) "
+    @Query("SELECT count(d) "
            + "FROM Dividend d "
            + "WHERE d.ticker.id = :tickerId")
     Long
-    GetDividendCountByTicker(@Param("tickerId") Long tickerId);
+    getDividendCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Get count of crypto exchanges associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of crypto exchanges associated with the ticker
      */
-    @Query("SELECT COUNT(e) "
+    @Query("SELECT count(e) "
            + "FROM CryptoExchange e "
            + "WHERE e.soldCrypto.id = :tickerId OR e.receivedCrypto.id = :tickerId")
     Long
-    GetCryptoExchangeCountByTicker(@Param("tickerId") Long tickerId);
+    getCryptoExchangeCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Findall tickers and order them by symbol in ascending order
@@ -88,19 +88,19 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @return A list of tickers that are not archived and ordered by symbol in
      *     ascending order
      */
-    public List<Ticker> findAllByArchivedFalseOrderBySymbolAsc();
+    public List<Ticker> findAllByIsArchivedFalseOrderBySymbolAsc();
 
     /**
      * Find all tickers that are archived and order them by symbol in ascending order
      * @return A list of tickers that are archived and ordered by symbol in ascending
      *     order
      */
-    public List<Ticker> findAllByArchivedTrueOrderBySymbolAsc();
+    public List<Ticker> findAllByIsArchivedTrueOrderBySymbolAsc();
 
 
     /**
      * Get all non-archived tickers of a specific type
      * @param type The type of the tickers
      */
-    public List<Ticker> findAllByTypeAndArchivedFalseOrderBySymbolAsc(TickerType type);
+    public List<Ticker> findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(TickerType type);
 }

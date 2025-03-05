@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Wallet;
 import org.moinex.services.WalletService;
 import org.moinex.util.WindowUtils;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Rename Wallet dialog
  */
 @Controller
+@NoArgsConstructor
 public class RenameWalletController
 {
     @FXML
@@ -33,8 +35,6 @@ public class RenameWalletController
 
     private WalletService walletService;
 
-    public RenameWalletController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -46,23 +46,23 @@ public class RenameWalletController
         this.walletService = walletService;
     }
 
-    public void SetWalletComboBox(Wallet wt)
+    public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        walletComboBox.setValue(wt.GetName());
+        walletComboBox.setValue(wt.getName());
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
+        loadWalletsFromDatabase();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
     @FXML
@@ -73,24 +73,24 @@ public class RenameWalletController
 
         if (walletName == null || walletNewName.isBlank())
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid input",
                                         "Please fill all fields");
             return;
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
         try
         {
-            walletService.RenameWallet(wallet.GetId(), walletNewName);
+            walletService.renameWallet(wallet.getId(), walletNewName);
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error renaming wallet",
                                         e.getMessage());
             return;
@@ -107,8 +107,8 @@ public class RenameWalletController
         stage.close();
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 }

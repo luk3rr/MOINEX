@@ -11,6 +11,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.services.CategoryService;
 import org.moinex.util.WindowUtils;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Edit Category dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditCategoryController
 {
     @FXML
@@ -46,12 +48,12 @@ public class EditCategoryController
     public void initialize()
     { }
 
-    public void SetCategory(Category ct)
+    public void setCategory(Category ct)
     {
-        selectedCategoryLabel.setText(ct.GetName());
+        selectedCategoryLabel.setText(ct.getName());
         selectedCategory = ct;
 
-        archivedCheckBox.setSelected(ct.IsArchived());
+        archivedCheckBox.setSelected(ct.getIsArchived());
     }
 
     @FXML
@@ -65,50 +67,50 @@ public class EditCategoryController
         Boolean archivedChanged = false;
 
         if (newName == null ||
-            !newName.isBlank() && !newName.equals(selectedCategory.GetName()))
+            !newName.isBlank() && !newName.equals(selectedCategory.getName()))
         {
             try
             {
-                categoryService.RenameCategory(selectedCategory.GetId(), newName);
+                categoryService.renameCategory(selectedCategory.getId(), newName);
 
                 nameChanged = true;
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error updating category name",
                                             e.getMessage());
                 return;
             }
         }
 
-        if (archived && !selectedCategory.IsArchived())
+        if (archived && !selectedCategory.getIsArchived())
         {
             try
             {
-                categoryService.ArchiveCategory(selectedCategory.GetId());
+                categoryService.archiveCategory(selectedCategory.getId());
 
                 archivedChanged = true;
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error updating category",
                                             e.getMessage());
                 return;
             }
         }
-        else if (!archived && selectedCategory.IsArchived())
+        else if (!archived && selectedCategory.getIsArchived())
         {
             try
             {
-                categoryService.UnarchiveCategory(selectedCategory.GetId());
+                categoryService.unarchiveCategory(selectedCategory.getId());
 
                 archivedChanged = true;
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error updating category",
                                             e.getMessage());
                 return;
@@ -122,7 +124,7 @@ public class EditCategoryController
                          : archivedChanged ? "Category archived status updated"
                                            : "Category name updated";
 
-            WindowUtils.ShowSuccessDialog("Success", "Category updated", msg);
+            WindowUtils.showSuccessDialog("Success", "Category updated", msg);
         }
 
         Stage stage = (Stage)categoryNewNameField.getScene().getWindow();

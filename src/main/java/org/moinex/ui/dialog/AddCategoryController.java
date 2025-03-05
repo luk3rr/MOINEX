@@ -9,6 +9,7 @@ package org.moinex.ui.dialog;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.services.CategoryService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,13 @@ import org.springframework.stereotype.Controller;
  * Controller for the Add Category dialog
  */
 @Controller
+@NoArgsConstructor
 public class AddCategoryController
 {
     @FXML
     private TextField categoryNameField;
 
     private CategoryService categoryService;
-
-    public AddCategoryController() { }
 
     @Autowired
     public AddCategoryController(CategoryService categoryService)
@@ -34,15 +34,19 @@ public class AddCategoryController
     }
 
     @FXML
+    private void initialize()
+    { }
+
+    @FXML
     public void handleSave()
     {
         String name = categoryNameField.getText();
 
         try
         {
-            categoryService.AddCategory(name);
+            categoryService.addCategory(name);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Category added",
                                           "Category " + name + " added successfully");
 
@@ -51,7 +55,7 @@ public class AddCategoryController
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error adding category",
                                         e.getMessage());
         }
@@ -63,8 +67,4 @@ public class AddCategoryController
         Stage stage = (Stage)categoryNameField.getScene().getWindow();
         stage.close();
     }
-
-    @FXML
-    private void initialize()
-    { }
 }

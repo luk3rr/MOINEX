@@ -11,12 +11,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import java.math.BigDecimal;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.moinex.entities.WalletTransaction;
 
 /**
  * Base class for transactions in the investment domain
  */
 @MappedSuperclass
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public abstract class Transaction
 {
     @Column(name = "quantity", nullable = false, precision = 20, scale = 8)
@@ -30,54 +41,4 @@ public abstract class Transaction
                 referencedColumnName = "id",
                 nullable             = false)
     private WalletTransaction walletTransaction;
-
-    /**
-     * Default constructor for JPA
-     */
-    public Transaction() { }
-
-    /**
-     * Constructor for Transaction
-     * @param quantity The quantity of the transaction
-     * @param unitPrice The unit price of the transaction
-     * @param walletTransaction The wallet transaction of the transaction
-     */
-    public Transaction(BigDecimal        quantity,
-                       BigDecimal        unitPrice,
-                       WalletTransaction walletTransaction)
-    {
-        this.quantity          = quantity;
-        this.unitPrice         = unitPrice;
-        this.walletTransaction = walletTransaction;
-    }
-
-    public BigDecimal GetQuantity()
-    {
-        return quantity;
-    }
-
-    public WalletTransaction GetWalletTransaction()
-    {
-        return walletTransaction;
-    }
-
-    public void SetQuantity(BigDecimal quantity)
-    {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal GetUnitPrice()
-    {
-        return unitPrice;
-    }
-
-    public void SetUnitPrice(BigDecimal unitPrice)
-    {
-        this.unitPrice = unitPrice;
-    }
-
-    public void SetWalletTransaction(WalletTransaction walletTransaction)
-    {
-        this.walletTransaction = walletTransaction;
-    }
 }

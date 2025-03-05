@@ -38,17 +38,17 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
      * Get all wallets that are archived
      * @return A list with all wallets that are archived
      */
-    List<Wallet> findAllByArchivedTrue();
+    List<Wallet> findAllByIsArchivedTrue();
 
     /**
      * Get all wallets that are not archived
      * @return A list with all wallets that are not archived
      */
-    List<Wallet> findAllByArchivedFalse();
+    List<Wallet> findAllByIsArchivedFalse();
 
     /**
      * Get all wallets that are not archived ordered by name
      * @return A list with all wallets that are not archived
      */
-    List<Wallet> findAllByArchivedFalseOrderByNameAsc();
+    List<Wallet> findAllByIsArchivedFalseOrderByNameAsc();
 }

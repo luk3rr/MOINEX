@@ -13,6 +13,7 @@ import java.time.YearMonth;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.RecurringTransactionService;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("prototype") // Each instance of this controller is unique
+@NoArgsConstructor
 public class ResumePaneController
 {
     @FXML
@@ -124,31 +126,31 @@ public class ResumePaneController
     public void initialize()
     {
         LocalDateTime now = LocalDateTime.now();
-        UpdateResumePane(now.getMonthValue(), now.getYear());
+        updateResumePane(now.getMonthValue(), now.getYear());
     }
 
     /**
      * Update the display of the resume
      */
-    public void UpdateResumePane(Integer year)
+    public void updateResumePane(Integer year)
     {
         List<WalletTransaction> allYearTransactions =
-            walletTransactionService.GetNonArchivedTransactionsByYear(year);
+            walletTransactionService.getNonArchivedTransactionsByYear(year);
 
         List<WalletTransaction> futureTransactions =
-            recurringTransactionService.GetFutureTransactionsByYear(Year.of(year),
+            recurringTransactionService.getFutureTransactionsByYear(Year.of(year),
                                                                     Year.of(year));
 
         allYearTransactions.addAll(futureTransactions);
 
-        BigDecimal crcTotalDebtAmount = creditCardService.GetTotalDebtAmount(year);
+        BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmount(year);
 
         BigDecimal crcPendingPayments =
-            creditCardService.GetPendingPaymentsByYear(year);
+            creditCardService.getPendingPaymentsByYear(year);
 
-        BigDecimal crcPaidPayments = creditCardService.GetPaidPaymentsByYear(year);
+        BigDecimal crcPaidPayments = creditCardService.getPaidPaymentsByYear(year);
 
-        UpdateResumePane(allYearTransactions,
+        updateResumePane(allYearTransactions,
                          crcTotalDebtAmount,
                          crcPendingPayments,
                          crcPaidPayments);
@@ -157,51 +159,51 @@ public class ResumePaneController
     /**
      * Update the display of the month resume
      */
-    public void UpdateResumePane(Integer month, Integer year)
+    public void updateResumePane(Integer month, Integer year)
     {
         // Get all transactions of the month, including future transactions
         List<WalletTransaction> transactions =
-            walletTransactionService.GetNonArchivedTransactionsByMonth(month, year);
+            walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
 
         List<WalletTransaction> futureTransactions =
-            recurringTransactionService.GetFutureTransactionsByMonth(
+            recurringTransactionService.getFutureTransactionsByMonth(
                 YearMonth.of(year, month),
                 YearMonth.of(year, month));
 
         transactions.addAll(futureTransactions);
 
         BigDecimal crcTotalDebtAmount =
-            creditCardService.GetTotalDebtAmount(month, year);
+            creditCardService.getTotalDebtAmount(month, year);
 
         BigDecimal crcPendingPayments =
-            creditCardService.GetPendingPaymentsByMonth(month, year);
+            creditCardService.getPendingPaymentsByMonth(month, year);
 
         BigDecimal crcPaidPayments =
-            creditCardService.GetPaidPaymentsByMonth(month, year);
+            creditCardService.getPaidPaymentsByMonth(month, year);
 
-        UpdateResumePane(transactions,
+        updateResumePane(transactions,
                          crcTotalDebtAmount,
                          crcPendingPayments,
                          crcPaidPayments);
     }
 
-    private void UpdateResumePane(List<WalletTransaction> transactions,
+    private void updateResumePane(List<WalletTransaction> transactions,
                                   BigDecimal              crcTotalDebtAmount,
                                   BigDecimal              crcTotalPendingPayments,
                                   BigDecimal              crcTotalPaidPayments)
     {
         BigDecimal totalConfirmedIncome =
             transactions.stream()
-                .filter(t -> t.GetType().equals(TransactionType.INCOME))
-                .filter(t -> t.GetStatus().equals(TransactionStatus.CONFIRMED))
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType().equals(TransactionType.INCOME))
+                .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalConfirmedExpenses =
             transactions.stream()
-                .filter(t -> t.GetType().equals(TransactionType.EXPENSE))
-                .filter(t -> t.GetStatus().equals(TransactionStatus.CONFIRMED))
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Consider the paid payments of the credit card as total expenses
@@ -209,14 +211,14 @@ public class ResumePaneController
 
         BigDecimal totalForeseenIncome =
             transactions.stream()
-                .filter(t -> t.GetType() == TransactionType.INCOME)
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalForeseenExpenses =
             transactions.stream()
-                .filter(t -> t.GetType() == TransactionType.EXPENSE)
-                .map(WalletTransaction::GetAmount)
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .map(WalletTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Consider the payments of the credit card as total of foreseen expenses
@@ -225,30 +227,30 @@ public class ResumePaneController
 
         BigDecimal balance = totalConfirmedIncome.subtract(totalConfirmedExpenses);
 
-        incomesCurrentValue.setText(UIUtils.FormatCurrency(totalConfirmedIncome));
+        incomesCurrentValue.setText(UIUtils.formatCurrency(totalConfirmedIncome));
         incomesCurrentSign.setText(" "); // default
         incomesCurrentValue.getStyleClass().clear();
         incomesCurrentValue.getStyleClass().add(Constants.POSITIVE_BALANCE_STYLE);
 
-        incomesForeseenValue.setText(UIUtils.FormatCurrency(totalForeseenIncome));
+        incomesForeseenValue.setText(UIUtils.formatCurrency(totalForeseenIncome));
         incomesForeseenSign.setText(" "); // default
 
         // Total Expenses
-        expensesCurrentValue.setText(UIUtils.FormatCurrency(totalConfirmedExpenses));
+        expensesCurrentValue.setText(UIUtils.formatCurrency(totalConfirmedExpenses));
         expensesCurrentSign.setText(" "); // default
         expensesCurrentValue.getStyleClass().clear();
         expensesCurrentValue.getStyleClass().add(Constants.NEGATIVE_BALANCE_STYLE);
 
-        expensesForeseenValue.setText(UIUtils.FormatCurrency(totalForeseenExpenses));
+        expensesForeseenValue.setText(UIUtils.formatCurrency(totalForeseenExpenses));
         expensesForeseenSign.setText(" "); // default
 
         // Balance
-        balanceCurrentValue.setText(UIUtils.FormatCurrency(balance));
+        balanceCurrentValue.setText(UIUtils.formatCurrency(balance));
 
         // Set the balance label and sign label according to the balance value
         if (balance.compareTo(BigDecimal.ZERO) > 0)
         {
-            balanceCurrentValue.setText(UIUtils.FormatCurrency(balance));
+            balanceCurrentValue.setText(UIUtils.formatCurrency(balance));
             balanceCurrentSign.setText("+");
 
             balanceCurrentValue.getStyleClass().clear();
@@ -259,7 +261,7 @@ public class ResumePaneController
         }
         else if (balance.compareTo(BigDecimal.ZERO) < 0)
         {
-            balanceCurrentValue.setText(UIUtils.FormatCurrency(balance.abs()));
+            balanceCurrentValue.setText(UIUtils.formatCurrency(balance.abs()));
             balanceCurrentSign.setText("-");
 
             balanceCurrentValue.getStyleClass().clear();
@@ -270,7 +272,7 @@ public class ResumePaneController
         }
         else
         {
-            balanceCurrentValue.setText(UIUtils.FormatCurrency(0.0));
+            balanceCurrentValue.setText(UIUtils.formatCurrency(0.0));
             balanceCurrentSign.setText("");
 
             balanceCurrentValue.getStyleClass().clear();
@@ -285,17 +287,17 @@ public class ResumePaneController
 
         if (foreseenBalance.compareTo(BigDecimal.ZERO) > 0)
         {
-            balanceForeseenValue.setText(UIUtils.FormatCurrency(foreseenBalance));
+            balanceForeseenValue.setText(UIUtils.formatCurrency(foreseenBalance));
             balanceForeseenSign.setText("+");
         }
         else if (foreseenBalance.compareTo(BigDecimal.ZERO) < 0)
         {
-            balanceForeseenValue.setText(UIUtils.FormatCurrency(foreseenBalance.abs()));
+            balanceForeseenValue.setText(UIUtils.formatCurrency(foreseenBalance.abs()));
             balanceForeseenSign.setText("-");
         }
         else
         {
-            balanceForeseenValue.setText(UIUtils.FormatCurrency(0.0));
+            balanceForeseenValue.setText(UIUtils.formatCurrency(0.0));
             balanceForeseenSign.setText(" ");
         }
 
@@ -317,7 +319,7 @@ public class ResumePaneController
         if (savingsPercentage > 0)
         {
             savingsLabel.setText("Savings");
-            savingsCurrentValue.setText(UIUtils.FormatPercentage(savingsPercentage));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
             savingsCurrentSign.setText("+");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -329,7 +331,7 @@ public class ResumePaneController
         else if (savingsPercentage < 0)
         {
             savingsLabel.setText("No savings");
-            savingsCurrentValue.setText(UIUtils.FormatPercentage(-savingsPercentage));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(-savingsPercentage));
             savingsCurrentSign.setText("-");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -341,7 +343,7 @@ public class ResumePaneController
         else
         {
             savingsLabel.setText("No savings");
-            savingsCurrentValue.setText(UIUtils.FormatPercentage(0.0));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(0.0));
             savingsCurrentSign.setText(" ");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -363,27 +365,27 @@ public class ResumePaneController
         if (foreseenSavingsPercentage > 0)
         {
             savingsForeseenValue.setText(
-                UIUtils.FormatPercentage(foreseenSavingsPercentage));
+                UIUtils.formatPercentage(foreseenSavingsPercentage));
             savingsForeseenSign.setText("+");
         }
         else if (foreseenSavingsPercentage < 0)
         {
             savingsForeseenValue.setText(
-                UIUtils.FormatPercentage(-foreseenSavingsPercentage));
+                UIUtils.formatPercentage(-foreseenSavingsPercentage));
             savingsForeseenSign.setText("-");
         }
         else
         {
-            savingsForeseenValue.setText(UIUtils.FormatPercentage(0.0));
+            savingsForeseenValue.setText(UIUtils.formatPercentage(0.0));
             savingsForeseenSign.setText(" ");
         }
 
         // Credit Card
-        creditCardsCurrentValue.setText(UIUtils.FormatCurrency(crcTotalDebtAmount));
+        creditCardsCurrentValue.setText(UIUtils.formatCurrency(crcTotalDebtAmount));
         creditCardsCurrentSign.setText(" "); // default
 
         creditCardsForeseenValue.setText(
-            String.format(UIUtils.FormatCurrency(crcTotalPendingPayments)));
+            String.format(UIUtils.formatCurrency(crcTotalPendingPayments)));
         creditCardsForeseenSign.setText(" "); // default
     }
 }

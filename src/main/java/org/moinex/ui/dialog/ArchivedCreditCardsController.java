@@ -16,15 +16,18 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.CreditCard;
 import org.moinex.services.CreditCardService;
 import org.moinex.util.WindowUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Archived Credit Cards dialog
  */
 @Controller
+@NoArgsConstructor
 public class ArchivedCreditCardsController
 {
     @FXML
@@ -42,6 +45,7 @@ public class ArchivedCreditCardsController
      * @param creditCardService CreditCardService
      * @note This constructor is used for dependency injection
      */
+    @Autowired
     public ArchivedCreditCardsController(CreditCardService creditCardService)
     {
         this.creditCardService = creditCardService;
@@ -50,15 +54,15 @@ public class ArchivedCreditCardsController
     @FXML
     public void initialize()
     {
-        LoadArchivedCreditCardsFromDatabase();
+        loadArchivedCreditCardsFromDatabase();
 
-        ConfigureTableView();
+        configureTableView();
 
-        UpdateCreditCardTableView();
+        updateCreditCardTableView();
 
         // Add listener to the search field
         searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> UpdateCreditCardTableView());
+            (observable, oldValue, newValue) -> updateCreditCardTableView());
     }
 
     @FXML
@@ -69,33 +73,33 @@ public class ArchivedCreditCardsController
 
         if (selectedCrc == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "No credit card selected",
                                         "Please select a credit card to unarchive");
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Unarchive credit card " + selectedCrc.GetName(),
+                "Unarchive credit card " + selectedCrc.getName(),
                 "Are you sure you want to unarchive this credit card?"))
         {
             try
             {
-                creditCardService.UnarchiveCreditCard(selectedCrc.GetId());
+                creditCardService.unarchiveCreditCard(selectedCrc.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Credit Card unarchived",
-                                              "Credit Card " + selectedCrc.GetName() +
+                                              "Credit Card " + selectedCrc.getName() +
                                                   " has been unarchived");
 
                 // Remove this credit card from the list and update the table view
                 archivedCreditCards.remove(selectedCrc);
-                UpdateCreditCardTableView();
+                updateCreditCardTableView();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving credit card",
                                             e.getMessage());
                 return;
@@ -111,43 +115,43 @@ public class ArchivedCreditCardsController
 
         if (selectedCrc == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "No credit card selected",
                                         "Please select a credit card to delete");
             return;
         }
 
         // Prevent the removal of a credit card with associated transactions
-        if (creditCardService.GetDebtCountByCreditCard(selectedCrc.GetId()) > 0)
+        if (creditCardService.getDebtCountByCreditCard(selectedCrc.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Credit Card has debts",
                 "Cannot delete a credit card with associated debts");
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Delete credit card " + selectedCrc.GetName(),
+                "Delete credit card " + selectedCrc.getName(),
                 "Are you sure you want to remove this credit card?"))
         {
             try
             {
-                creditCardService.DeleteCreditCard(selectedCrc.GetId());
+                creditCardService.deleteCreditCard(selectedCrc.getId());
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Credit card deleted",
-                                              "Credit card " + selectedCrc.GetName() +
+                                              "Credit card " + selectedCrc.getName() +
                                                   " has been deleted");
 
                 // Remove this credit card from the list and update the table view
                 archivedCreditCards.remove(selectedCrc);
-                UpdateCreditCardTableView();
+                updateCreditCardTableView();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error removing credit card",
                                             e.getMessage());
                 return;
@@ -165,15 +169,15 @@ public class ArchivedCreditCardsController
     /**
      * Loads the credit cards from the database
      */
-    private void LoadArchivedCreditCardsFromDatabase()
+    private void loadArchivedCreditCardsFromDatabase()
     {
-        archivedCreditCards = creditCardService.GetAllArchivedCreditCards();
+        archivedCreditCards = creditCardService.getAllArchivedCreditCards();
     }
 
     /**
      * Updates the credit card table view
      */
-    private void UpdateCreditCardTableView()
+    private void updateCreditCardTableView()
     {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -188,9 +192,9 @@ public class ArchivedCreditCardsController
         {
             archivedCreditCards.stream()
                 .filter(c -> {
-                    String operatorName = c.GetOperator().GetName().toLowerCase();
-                    String id           = c.GetId().toString();
-                    String name         = c.GetName().toLowerCase();
+                    String operatorName = c.getOperator().getName().toLowerCase();
+                    String id           = c.getId().toString();
+                    String name         = c.getName().toLowerCase();
 
                     return operatorName.contains(similarTextOrId) ||
                         id.contains(similarTextOrId) || name.contains(similarTextOrId);
@@ -204,11 +208,11 @@ public class ArchivedCreditCardsController
     /**
      * Configures the table view columns
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<CreditCard, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(column -> new TableCell<CreditCard, Long>() {
             @Override
@@ -230,19 +234,19 @@ public class ArchivedCreditCardsController
 
         TableColumn<CreditCard, String> crcColumn = new TableColumn<>("Credit Card");
         crcColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetName()));
+            param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<CreditCard, String> operatorColumn = new TableColumn<>("Operator");
         operatorColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().GetOperator().GetName()));
+            -> new SimpleStringProperty(param.getValue().getOperator().getName()));
 
         TableColumn<CreditCard, Long> numOfDebtsColumn =
             new TableColumn<>("Associated Debts");
         numOfDebtsColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                creditCardService.GetDebtCountByCreditCard(param.getValue().GetId())));
+                creditCardService.getDebtCountByCreditCard(param.getValue().getId())));
 
         numOfDebtsColumn.setCellFactory(column -> new TableCell<CreditCard, Long>() {
             @Override

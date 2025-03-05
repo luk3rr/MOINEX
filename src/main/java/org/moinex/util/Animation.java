@@ -30,7 +30,7 @@ public final class Animation
      * @param data The data to be animated
      * @param targetValue The target value for the bar
      */
-    static public void XYChartAnimation(XYChart.Data<String, Number> data,
+    static public void xyChartAnimation(XYChart.Data<String, Number> data,
                                         Double                       targetValue)
     {
         // Property to store the current value being animated
@@ -57,7 +57,7 @@ public final class Animation
      * @param data The data to be animated
      * @param targetValues The target values for each part of the stacked bar
      */
-    static public void StackedXYChartAnimation(List<XYChart.Data<String, Number>> data,
+    static public void stackedXYChartAnimation(List<XYChart.Data<String, Number>> data,
                                                List<Double> targetValues)
     {
         if (data.size() != targetValues.size())
@@ -132,7 +132,7 @@ public final class Animation
      * @param numberAxis The Y axis to be updated
      * @param maxValue The maximum value of the data
      */
-    static public void SetDynamicYAxisBounds(NumberAxis numberAxis, Double maxValue)
+    static public void setDynamicYAxisBounds(NumberAxis numberAxis, Double maxValue)
     {
         numberAxis.setAutoRanging(false);
         // Define the lower bound as 0
@@ -149,7 +149,7 @@ public final class Animation
      * Applies a fade-in animation to the window
      * @param stage The stage to apply the animation
      */
-    public static void ApplyFadeInAnimation(Stage stage)
+    public static void applyFadeInAnimation(Stage stage)
     {
         FadeTransition fadeIn =
             new FadeTransition(Duration.seconds(Constants.FADE_IN_ANIMATION_DURATION),
@@ -163,7 +163,7 @@ public final class Animation
      * Applies a fade-out animation to the window
      * @param stage The stage to apply the animation
      */
-    public static void ApplyFadeOutAnimation(Stage stage)
+    public static void applyFadeOutAnimation(Stage stage)
     {
         FadeTransition fadeOut =
             new FadeTransition(Duration.seconds(Constants.FADE_OUT_ANIMATION_DURATION),
@@ -177,7 +177,7 @@ public final class Animation
      * Applies a slide-in animation to the window
      * @param stage The stage to apply the animation
      */
-    public static void ApplySlideInAnimation(Stage stage)
+    public static void applySlideInAnimation(Stage stage)
     {
         TranslateTransition slideIn = new TranslateTransition(
             Duration.seconds(Constants.SLIDE_ANIMATION_DURANTION),

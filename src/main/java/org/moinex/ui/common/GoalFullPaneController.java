@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import lombok.NoArgsConstructor;
 import org.moinex.charts.CircularProgressBar;
 import org.moinex.entities.Goal;
 import org.moinex.services.GoalService;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("prototype") // Each instance of this controller is unique
+@NoArgsConstructor
 public class GoalFullPaneController
 {
     @FXML
@@ -113,8 +115,6 @@ public class GoalFullPaneController
 
     private Goal goal;
 
-    public GoalFullPaneController() { }
-
     /**
      * Constructor
      * @param GoalService Goal service
@@ -132,7 +132,7 @@ public class GoalFullPaneController
     /**
      * Load goal information from the database
      */
-    public void LoadGoalInfo()
+    public void loadGoalInfo()
     {
         if (goal == null)
         {
@@ -140,7 +140,7 @@ public class GoalFullPaneController
         }
 
         // Reload goal from the database
-        goal = goalService.GetGoalById(goal.GetId());
+        goal = goalService.getGoalById(goal.getId());
     }
 
     /**
@@ -148,38 +148,38 @@ public class GoalFullPaneController
      * @param gl Goal to update the pane with
      * @return The updated VBox
      */
-    public VBox UpdateGoalPane(Goal gl)
+    public VBox updateGoalPane(Goal gl)
     {
         // If the goal is null, do not update the pane
         if (gl == null)
         {
-            SetDefaultValues();
+            setDefaultValues();
             return rootVBox;
         }
 
         goal = gl;
-        LoadGoalInfo();
+        loadGoalInfo();
 
-        goalName.setText(goal.GetName());
-        goalMotivation.setText(goal.GetMotivation());
+        goalName.setText(goal.getName());
+        goalMotivation.setText(goal.getMotivation());
 
         // If the goal is archived, then is finished, so show the trophy icon
         // Otherwise, show the goal icon
-        goalIcon.setImage(new Image(goal.IsCompleted()
+        goalIcon.setImage(new Image(goal.isCompleted()
                                         ? Constants.TROPHY_ICON
                                         : Constants.WALLET_TYPE_ICONS_PATH +
-                                              goal.GetType().GetIcon()));
+                                              goal.getType().getIcon()));
 
-        goalTargetAmount.setText(UIUtils.FormatCurrency(goal.GetTargetBalance()));
+        goalTargetAmount.setText(UIUtils.formatCurrency(goal.getTargetBalance()));
         goalTargetDate.setText(
-            goal.GetTargetDate().format(Constants.DATE_FORMATTER_NO_TIME));
+            goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME));
 
         // Create a tooltip for name and motivation
-        UIUtils.AddTooltipToNode(goalName, goal.GetName());
+        UIUtils.addTooltipToNode(goalName, goal.getName());
 
-        if (!goal.GetMotivation().isEmpty())
+        if (!goal.getMotivation().isEmpty())
         {
-            UIUtils.AddTooltipToNode(goalMotivation, goal.GetMotivation());
+            UIUtils.addTooltipToNode(goalMotivation, goal.getMotivation());
         }
 
         // Add the progress bar to the pane
@@ -189,22 +189,22 @@ public class GoalFullPaneController
 
         Double percentage;
 
-        if (goal.IsArchived())
+        if (goal.getIsArchived())
         {
             // Set the button text according to the goal status
             toggleArchiveGoal.setText("Unarchive Goal");
         }
 
-        if (goal.IsCompleted())
+        if (goal.isCompleted())
         {
             dateTitleLabel.setText("Achieved");
             goalTargetDate.setText(
-                goal.GetCompletionDate().format(Constants.DATE_FORMATTER_NO_TIME));
+                goal.getCompletionDate().format(Constants.DATE_FORMATTER_NO_TIME));
 
             daysTitleLabel.setText("Days ahead of target");
-            missingDays.setText(String.valueOf(Constants.CalculateDaysUntilTarget(
-                goal.GetCompletionDate().toLocalDate(),
-                goal.GetTargetDate().toLocalDate())));
+            missingDays.setText(String.valueOf(Constants.calculateDaysUntilTarget(
+                goal.getCompletionDate().toLocalDate(),
+                goal.getTargetDate().toLocalDate())));
 
             // Remove the fields that are not necessary
             infosVBox.getChildren().remove(currentHBox);
@@ -218,12 +218,12 @@ public class GoalFullPaneController
         else
         {
             // Show the current amount
-            goalCurrentAmount.setText(UIUtils.FormatCurrency(goal.GetBalance()));
+            goalCurrentAmount.setText(UIUtils.formatCurrency(goal.getBalance()));
 
             // Calculate the number of months until the target date
-            Long monthsUntilTarget = Constants.CalculateMonthsUntilTarget(
+            Long monthsUntilTarget = Constants.calculateMonthsUntilTarget(
                 LocalDate.now(),
-                goal.GetTargetDate().toLocalDate());
+                goal.getTargetDate().toLocalDate());
 
             // Calculate the ideal amount per month
             BigDecimal idealAmountPerMonth;
@@ -231,42 +231,42 @@ public class GoalFullPaneController
             if (monthsUntilTarget <= 0)
             {
                 idealAmountPerMonth =
-                    goal.GetTargetBalance().subtract(goal.GetBalance());
+                    goal.getTargetBalance().subtract(goal.getBalance());
             }
             else
             {
                 idealAmountPerMonth =
-                    goal.GetTargetBalance()
-                        .subtract(goal.GetBalance())
-                        .divide(BigDecimal.valueOf(Constants.CalculateMonthsUntilTarget(
+                    goal.getTargetBalance()
+                        .subtract(goal.getBalance())
+                        .divide(BigDecimal.valueOf(Constants.calculateMonthsUntilTarget(
                                     LocalDate.now(),
-                                    goal.GetTargetDate().toLocalDate())),
+                                    goal.getTargetDate().toLocalDate())),
                                 2,
                                 RoundingMode.HALF_UP);
             }
 
             goalIdealAMountPerMonth.setText(
-                UIUtils.FormatCurrency(idealAmountPerMonth));
+                UIUtils.formatCurrency(idealAmountPerMonth));
 
             // Calculate the missing days
             Long missingDaysValue =
-                Constants.CalculateDaysUntilTarget(LocalDate.now(),
-                                                   goal.GetTargetDate().toLocalDate());
+                Constants.calculateDaysUntilTarget(LocalDate.now(),
+                                                   goal.getTargetDate().toLocalDate());
 
             missingDays.setText(missingDaysValue.toString());
 
-            if (goal.GetTargetBalance().compareTo(BigDecimal.ZERO) == 0)
+            if (goal.getTargetBalance().compareTo(BigDecimal.ZERO) == 0)
             {
                 percentage = 0.0;
             }
             else
             {
-                percentage = goal.GetBalance().doubleValue() /
-                             goal.GetTargetBalance().doubleValue() * 100.0;
+                percentage = goal.getBalance().doubleValue() /
+                             goal.getTargetBalance().doubleValue() * 100.0;
             }
         }
 
-        progressBar.Draw(percentage);
+        progressBar.draw(percentage);
 
         progressBarPane.getChildren().clear();
         progressBarPane.getChildren().add(progressBar);
@@ -281,110 +281,110 @@ public class GoalFullPaneController
     @FXML
     private void handleAddIncome()
     {
-        if (goal.IsArchived())
+        if (goal.getIsArchived())
         {
-            WindowUtils.ShowInformationDialog("Information",
+            WindowUtils.showInformationDialog("Information",
                                               "Goal is archived",
                                               "Cannot add income to an archived goal");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.ADD_INCOME_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_INCOME_FXML,
                                     "Add new income",
                                     springContext,
                                     (AddIncomeController controller)
-                                        -> { controller.SetWalletComboBox(goal); },
-                                    List.of(() -> goalController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(goal); },
+                                    List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
     private void handleAddExpense()
     {
-        if (goal.IsArchived())
+        if (goal.getIsArchived())
         {
-            WindowUtils.ShowInformationDialog("Information",
+            WindowUtils.showInformationDialog("Information",
                                               "Goal is archived",
                                               "Cannot add expense to an archived goal");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.ADD_EXPENSE_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_EXPENSE_FXML,
                                     "Add new expense",
                                     springContext,
                                     (AddExpenseController controller)
-                                        -> { controller.SetWalletComboBox(goal); },
-                                    List.of(() -> goalController.UpdateDisplay()));
+                                        -> { controller.setWalletComboBox(goal); },
+                                    List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
     private void handleAddTransfer()
     {
-        if (goal.IsArchived())
+        if (goal.getIsArchived())
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Information",
                 "Goal is archived",
                 "Cannot add transfer to an archived goal");
             return;
         }
 
-        WindowUtils.OpenModalWindow(
+        WindowUtils.openModalWindow(
             Constants.ADD_TRANSFER_FXML,
             "Add new transfer",
             springContext,
             (AddTransferController controller)
-                -> { controller.SetReceiverWalletComboBox(goal); },
-            List.of(() -> goalController.UpdateDisplay()));
+                -> { controller.setReceiverWalletComboBox(goal); },
+            List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
     private void handleEditGoal()
     {
-        WindowUtils.OpenModalWindow(Constants.EDIT_GOAL_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_GOAL_FXML,
                                     "Edit goal",
                                     springContext,
                                     (EditGoalController controller)
-                                        -> { controller.SetGoal(goal); },
-                                    List.of(() -> goalController.UpdateDisplay()));
+                                        -> { controller.setGoal(goal); },
+                                    List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
     private void handleCompleteGoal()
     {
-        if (goal.IsCompleted())
+        if (goal.isCompleted())
         {
-            if (WindowUtils.ShowConfirmationDialog(
+            if (WindowUtils.showConfirmationDialog(
                     "Confirmation",
-                    "Reopen goal " + goal.GetName(),
+                    "Reopen goal " + goal.getName(),
                     "Are you sure you want to reopen this goal?"))
             {
-                goalService.ReopenGoal(goal.GetId());
+                goalService.reopenGoal(goal.getId());
 
                 // Update goal display in the main window
-                goalController.UpdateDisplay();
+                goalController.updateDisplay();
             }
         }
         else
         {
-            if (WindowUtils.ShowConfirmationDialog(
+            if (WindowUtils.showConfirmationDialog(
                     "Confirmation",
-                    "Complete goal " + goal.GetName(),
+                    "Complete goal " + goal.getName(),
                     "Are you sure you want to complete this goal?"))
             {
                 try
                 {
-                    goalService.CompleteGoal(goal.GetId());
+                    goalService.completeGoal(goal.getId());
                 }
                 catch (RuntimeException e)
                 {
-                    WindowUtils.ShowErrorDialog("Error",
+                    WindowUtils.showErrorDialog("Error",
                                                 "Error completing goal",
                                                 e.getMessage());
                     return;
                 }
 
                 // Update goal display in the main window
-                goalController.UpdateDisplay();
+                goalController.updateDisplay();
             }
         }
     }
@@ -392,30 +392,30 @@ public class GoalFullPaneController
     @FXML
     private void handleArchiveGoal()
     {
-        if (goal.IsArchived())
+        if (goal.getIsArchived())
         {
-            if (WindowUtils.ShowConfirmationDialog(
+            if (WindowUtils.showConfirmationDialog(
                     "Confirmation",
-                    "Unarchive goal " + goal.GetName(),
+                    "Unarchive goal " + goal.getName(),
                     "Are you sure you want to unarchive this goal?"))
             {
-                goalService.UnarchiveGoal(goal.GetId());
+                goalService.unarchiveGoal(goal.getId());
 
                 // Update goal display in the main window
-                goalController.UpdateDisplay();
+                goalController.updateDisplay();
             }
         }
         else
         {
-            if (WindowUtils.ShowConfirmationDialog(
+            if (WindowUtils.showConfirmationDialog(
                     "Confirmation",
-                    "Archive goal " + goal.GetName(),
+                    "Archive goal " + goal.getName(),
                     "Are you sure you want to archive this goal?"))
             {
-                goalService.ArchiveGoal(goal.GetId());
+                goalService.archiveGoal(goal.getId());
 
                 // Update goal display in the main window
-                goalController.UpdateDisplay();
+                goalController.updateDisplay();
             }
         }
     }
@@ -424,9 +424,9 @@ public class GoalFullPaneController
     private void handleDeleteGoal()
     {
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.GetTransactionCountByWallet(goal.GetId()) > 0)
+        if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Goal wallet has transactions",
                 "Cannot delete a goal wallet with associated transactions. "
@@ -437,41 +437,41 @@ public class GoalFullPaneController
         // Create a message to show to the user
         StringBuilder message = new StringBuilder();
 
-        message.append("Name: ").append(goal.GetName()).append("\n");
+        message.append("Name: ").append(goal.getName()).append("\n");
         message.append("Initial Amount: ")
-            .append(UIUtils.FormatCurrency(goal.GetInitialBalance()))
+            .append(UIUtils.formatCurrency(goal.getInitialBalance()))
             .append("\n");
         message.append("Current Amount: ")
-            .append(UIUtils.FormatCurrency(goal.GetBalance()))
+            .append(UIUtils.formatCurrency(goal.getBalance()))
             .append("\n");
         message.append("Target Amount: ")
-            .append(UIUtils.FormatCurrency(goal.GetTargetBalance()))
+            .append(UIUtils.formatCurrency(goal.getTargetBalance()))
             .append("\n");
         message.append("Target Date: ")
-            .append(goal.GetTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
+            .append(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
             .append("\n");
 
         try
         {
             // Confirm the deletion
-            if (WindowUtils.ShowConfirmationDialog(
+            if (WindowUtils.showConfirmationDialog(
                     "Delete Goal",
                     "Are you sure you want to delete this goal?",
                     message.toString()))
             {
-                goalService.DeleteGoal(goal.GetId());
+                goalService.deleteGoal(goal.getId());
 
                 // Update goal display in the main window
-                goalController.UpdateDisplay();
+                goalController.updateDisplay();
             }
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error", "Error deleting goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error", "Error deleting goal", e.getMessage());
         }
     }
 
-    private void SetDefaultValues()
+    private void setDefaultValues()
     {
         goalName.setText("");
         goalMotivation.setText("");
@@ -480,8 +480,8 @@ public class GoalFullPaneController
         goalTargetDate.setText("YY-MM-DD");
         missingDays.setText("0");
 
-        SetLabelValue(goalTargetAmount, BigDecimal.ZERO);
-        SetLabelValue(goalIdealAMountPerMonth, BigDecimal.ZERO);
+        setlabelvalue(goalTargetAmount, BigDecimal.ZERO);
+        setlabelvalue(goalIdealAMountPerMonth, BigDecimal.ZERO);
     }
 
     /**
@@ -490,9 +490,9 @@ public class GoalFullPaneController
      * @param valueLabel Label to set the value
      * @param value Value to set
      */
-    private void SetLabelValue(Label valueLabel, BigDecimal value)
+    private void setlabelvalue(Label valueLabel, BigDecimal value)
     {
-        valueLabel.setText(UIUtils.FormatCurrency(value));
-        UIUtils.SetLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE);
+        valueLabel.setText(UIUtils.formatCurrency(value));
+        UIUtils.setLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE);
     }
 }

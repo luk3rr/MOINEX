@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletType;
 import org.moinex.repositories.TransferRepository;
@@ -25,25 +26,25 @@ import org.springframework.transaction.annotation.Transactional;
  * This class is responsible for the business logic of the Wallet entity
  */
 @Service
+@NoArgsConstructor
 public class WalletService
 {
     @Autowired
-    private WalletRepository m_walletRepository;
+    private WalletRepository walletRepository;
 
     @Autowired
-    private TransferRepository m_transfersRepository;
+    private TransferRepository transfersRepository;
 
     @Autowired
-    private WalletTransactionRepository m_walletTransactionRepository;
+    private WalletTransactionRepository walletTransactionRepository;
 
     @Autowired
-    private WalletTypeRepository m_walletTypeRepository;
+    private WalletTypeRepository walletTypeRepository;
 
-    private static final Logger m_logger = LoggerConfig.GetLogger();
-
-    public WalletService() { }
+    private static final Logger logger = LoggerConfig.getLogger();
 
     /**
+     * TODO: Check if a wallet can have no type
      * Creates a new wallet
      * @param name The name of the wallet
      * @param balance The initial balance of the wallet
@@ -51,7 +52,7 @@ public class WalletService
      * @return The id of the created wallet
      */
     @Transactional
-    public Long CreateWallet(String name, BigDecimal balance)
+    public Long addWallet(String name, BigDecimal balance)
     {
         // Remove leading and trailing whitespaces
         name = name.strip();
@@ -61,18 +62,18 @@ public class WalletService
             throw new RuntimeException("Wallet name cannot be empty");
         }
 
-        if (m_walletRepository.existsByName(name))
+        if (walletRepository.existsByName(name))
         {
             throw new RuntimeException("Wallet with name " + name + " already exists");
         }
 
-        m_logger.info("Wallet " + name + " created with balance " + balance);
+        logger.info("Wallet " + name + " created with balance " + balance);
 
-        Wallet wt = new Wallet(name, balance);
+        Wallet wt = Wallet.builder().name(name).balance(balance).build();
 
-        m_walletRepository.save(wt);
+        walletRepository.save(wt);
 
-        return wt.GetId();
+        return wt.getId();
     }
 
     /**
@@ -84,7 +85,7 @@ public class WalletService
      * @return The id of the created wallet
      */
     @Transactional
-    public Long CreateWallet(String name, BigDecimal balance, WalletType walletType)
+    public Long addWallet(String name, BigDecimal balance, WalletType walletType)
     {
         // Remove leading and trailing whitespaces
         name = name.strip();
@@ -94,18 +95,19 @@ public class WalletService
             throw new RuntimeException("Wallet name cannot be empty");
         }
 
-        if (m_walletRepository.existsByName(name))
+        if (walletRepository.existsByName(name))
         {
             throw new RuntimeException("Wallet with name " + name + " already exists");
         }
 
-        m_logger.info("Wallet " + name + " created with balance " + balance);
+        logger.info("Wallet " + name + " created with balance " + balance);
 
-        Wallet wt = new Wallet(name, balance, walletType);
+        Wallet wt =
+            Wallet.builder().name(name).balance(balance).type(walletType).build();
 
-        m_walletRepository.save(wt);
+        walletRepository.save(wt);
 
-        return wt.GetId();
+        return wt.getId();
     }
 
     /**
@@ -115,15 +117,15 @@ public class WalletService
      * @throws RuntimeException If the wallet has transactions
      */
     @Transactional
-    public void DeleteWallet(Long id)
+    public void deleteWallet(Long id)
     {
-        Wallet wallet = m_walletRepository.findById(id).orElseThrow(
+        Wallet wallet = walletRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Wallet with id " + id +
                                         " not found and cannot be deleted"));
 
-        if (m_walletTransactionRepository.GetTransactionCountByWallet(id) > 0 ||
-            m_transfersRepository.GetTransferCountByWallet(id) > 0)
+        if (walletTransactionRepository.getTransactionCountByWallet(id) > 0 ||
+            transfersRepository.getTransferCountByWallet(id) > 0)
         {
             throw new RuntimeException(
                 "Wallet with id " + id +
@@ -131,9 +133,9 @@ public class WalletService
                 + "the transactions first or archive the wallet");
         }
 
-        m_walletRepository.delete(wallet);
+        walletRepository.delete(wallet);
 
-        m_logger.info("Wallet with id " + id + " was permanently deleted");
+        logger.info("Wallet with id " + id + " was permanently deleted");
     }
 
     /**
@@ -145,17 +147,17 @@ public class WalletService
      * application anymore
      */
     @Transactional
-    public void ArchiveWallet(Long id)
+    public void archiveWallet(Long id)
     {
-        Wallet wallet = m_walletRepository.findById(id).orElseThrow(
+        Wallet wallet = walletRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Wallet with id " + id +
                                         " not found and cannot be archived"));
 
-        wallet.SetArchived(true);
-        m_walletRepository.save(wallet);
+        wallet.setIsArchived(true);
+        walletRepository.save(wallet);
 
-        m_logger.info("Wallet with id " + id + " was archived");
+        logger.info("Wallet with id " + id + " was archived");
     }
 
     /**
@@ -166,17 +168,17 @@ public class WalletService
      * will be used in the application again
      */
     @Transactional
-    public void UnarchiveWallet(Long id)
+    public void unarchiveWallet(Long id)
     {
-        Wallet wallet = m_walletRepository.findById(id).orElseThrow(
+        Wallet wallet = walletRepository.findById(id).orElseThrow(
             ()
                 -> new RuntimeException("Wallet with id " + id +
                                         " not found and cannot be unarchived"));
 
-        wallet.SetArchived(false);
-        m_walletRepository.save(wallet);
+        wallet.setIsArchived(false);
+        walletRepository.save(wallet);
 
-        m_logger.info("Wallet with id " + id + " was unarchived");
+        logger.info("Wallet with id " + id + " was unarchived");
     }
 
     /**
@@ -187,7 +189,7 @@ public class WalletService
      * @throws RuntimeException If the new name is already in use
      */
     @Transactional
-    public void RenameWallet(Long id, String newName)
+    public void renameWallet(Long id, String newName)
     {
         // Remove leading and trailing whitespaces
         newName = newName.strip();
@@ -197,19 +199,19 @@ public class WalletService
             throw new RuntimeException("Wallet name cannot be empty");
         }
 
-        Wallet wallet = m_walletRepository.findById(id).orElseThrow(
+        Wallet wallet = walletRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Wallet with id " + id + " not found"));
 
-        if (m_walletRepository.existsByName(newName))
+        if (walletRepository.existsByName(newName))
         {
             throw new RuntimeException("Wallet with name " + newName +
                                        " already exists");
         }
 
-        wallet.SetName(newName);
-        m_walletRepository.save(wallet);
+        wallet.setName(newName);
+        walletRepository.save(wallet);
 
-        m_logger.info("Wallet with id " + id + " renamed to " + newName);
+        logger.info("Wallet with id " + id + " renamed to " + newName);
     }
 
     /**
@@ -221,26 +223,26 @@ public class WalletService
      * @throws RuntimeException If the wallet type is already the new type
      */
     @Transactional
-    public void ChangeWalletType(Long id, WalletType newType)
+    public void changeWalletType(Long id, WalletType newType)
     {
-        Wallet wallet = m_walletRepository.findById(id).orElseThrow(
+        Wallet wallet = walletRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Wallet with id " + id + " not found"));
 
-        if (newType == null || !m_walletTypeRepository.existsById(newType.GetId()))
+        if (newType == null || !walletTypeRepository.existsById(newType.getId()))
         {
             throw new RuntimeException("Wallet type not found");
         }
 
-        if (wallet.GetType().GetId() == newType.GetId())
+        if (wallet.getType().getId() == newType.getId())
         {
-            throw new RuntimeException("Wallet with name " + wallet.GetName() +
-                                       " already has type " + newType.GetName());
+            throw new RuntimeException("Wallet with name " + wallet.getName() +
+                                       " already has type " + newType.getName());
         }
 
-        wallet.SetType(newType);
-        m_walletRepository.save(wallet);
+        wallet.setType(newType);
+        walletRepository.save(wallet);
 
-        m_logger.info("Wallet with id " + id + " type changed to " + newType.GetName());
+        logger.info("Wallet with id " + id + " type changed to " + newType.getName());
     }
 
     /**
@@ -250,33 +252,33 @@ public class WalletService
      * @throws RuntimeException If the wallet does not exist
      */
     @Transactional
-    public void UpdateWalletBalance(Long id, BigDecimal newBalance)
+    public void updateWalletBalance(Long id, BigDecimal newBalance)
     {
-        Wallet wallet = m_walletRepository.findById(id).orElseThrow(
+        Wallet wallet = walletRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Wallet with id " + id + " not found"));
 
-        wallet.SetBalance(newBalance);
-        m_walletRepository.save(wallet);
+        wallet.setBalance(newBalance);
+        walletRepository.save(wallet);
 
-        m_logger.info("Wallet with id " + id + " balance updated to " + newBalance);
+        logger.info("Wallet with id " + id + " balance updated to " + newBalance);
     }
 
     /**
      * Get all wallets
      * @return A list with all wallets
      */
-    public List<Wallet> GetAllWallets()
+    public List<Wallet> getAllWallets()
     {
-        return m_walletRepository.findAll();
+        return walletRepository.findAll();
     }
 
     /**
      * Get all wallets ordered by name
      * @return A list with all wallets ordered by name
      */
-    public List<Wallet> GetAllWalletsOrderedByName()
+    public List<Wallet> getAllWalletsOrderedByName()
     {
-        return m_walletRepository.findAllByOrderByNameAsc();
+        return walletRepository.findAllByOrderByNameAsc();
     }
 
     /**
@@ -285,9 +287,9 @@ public class WalletService
      * @return The wallet with the provided name
      * @throws RuntimeException If the wallet does not exist
      */
-    public Wallet GetWalletByName(String name)
+    public Wallet getWalletByName(String name)
     {
-        return m_walletRepository.findByName(name).orElseThrow(
+        return walletRepository.findByName(name).orElseThrow(
             () -> new RuntimeException("Wallet with name " + name + " not found"));
     }
 
@@ -297,9 +299,9 @@ public class WalletService
      * @return The wallet with the provided id
      * @throws RuntimeException If the wallet does not exist
      */
-    public Wallet GetWalletById(Long id)
+    public Wallet getWalletById(Long id)
     {
-        return m_walletRepository.findById(id).orElseThrow(
+        return walletRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Wallet with id " + id + " not found"));
     }
 
@@ -307,27 +309,27 @@ public class WalletService
      * Get all wallet types
      * @return A list with all wallet types
      */
-    public List<WalletType> GetAllWalletTypes()
+    public List<WalletType> getAllWalletTypes()
     {
-        return m_walletTypeRepository.findAllByOrderByNameAsc();
+        return walletTypeRepository.findAllByOrderByNameAsc();
     }
 
     /**
      * Get all archived wallets
      * @return A list with all archived wallets
      */
-    public List<Wallet> GetAllArchivedWallets()
+    public List<Wallet> getAllArchivedWallets()
     {
-        return m_walletRepository.findAllByArchivedTrue();
+        return walletRepository.findAllByIsArchivedTrue();
     }
 
     /**
      * Get all wallets that are not archived ordered by name
      * @return A list with all wallets that are not archived
      */
-    public List<Wallet> GetAllNonArchivedWalletsOrderedByName()
+    public List<Wallet> getAllNonArchivedWalletsOrderedByName()
     {
-        return m_walletRepository.findAllByArchivedFalseOrderByNameAsc();
+        return walletRepository.findAllByIsArchivedFalseOrderByNameAsc();
     }
 
     /**
@@ -335,18 +337,19 @@ public class WalletService
      * transactions
      * @return A list with all wallets that are not archived
      */
-    public List<Wallet> GetAllNonArchivedWalletsOrderedByTransactionCountDesc()
+    public List<Wallet> getAllNonArchivedWalletsOrderedByTransactionCountDesc()
     {
-        return m_walletRepository.findAllByArchivedFalse()
+        return walletRepository.findAllByIsArchivedFalse()
             .stream()
-            .sorted(Comparator
-                        .comparingLong(
-                            (Wallet w)
-                                -> m_walletTransactionRepository
-                                           .GetTransactionCountByWallet(w.GetId()) +
-                                       m_transfersRepository.GetTransferCountByWallet(
-                                           w.GetId()))
-                        .reversed())
+            .sorted(
+                Comparator
+                    .comparingLong(
+                        (Wallet w)
+                            -> walletTransactionRepository.getTransactionCountByWallet(
+                                   w.getId()) +
+                                   transfersRepository.getTransferCountByWallet(
+                                       w.getId()))
+                    .reversed())
             .toList();
     }
 }

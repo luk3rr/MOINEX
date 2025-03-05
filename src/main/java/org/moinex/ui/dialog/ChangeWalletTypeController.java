@@ -11,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
+
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletType;
 import org.moinex.services.WalletService;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Change Wallet Type dialog
  */
 @Controller
+@NoArgsConstructor
 public class ChangeWalletTypeController
 {
     @FXML
@@ -40,8 +43,6 @@ public class ChangeWalletTypeController
 
     private WalletService walletService;
 
-    public ChangeWalletTypeController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -53,44 +54,44 @@ public class ChangeWalletTypeController
         this.walletService = walletService;
     }
 
-    public void SetWalletComboBox(Wallet wt)
+    public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        walletComboBox.setValue(wt.GetName());
+        walletComboBox.setValue(wt.getName());
 
-        UpdateCurrentTypeLabel(wt);
+        updateCurrentTypeLabel(wt);
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadWalletTypes();
+        loadWalletsFromDatabase();
+        loadWalletTypesFromDatabase();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
 
         // Add wallet types, but remove the default goal wallet type
         newTypeComboBox.getItems().addAll(
             walletTypes.stream()
                 .filter(
-                    wt -> !wt.GetName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
-                .map(WalletType::GetName)
+                    wt -> !wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
+                .map(WalletType::getName)
                 .toList());
 
         // Set the current type label
         walletComboBox.setOnAction(e -> {
             String walletName = walletComboBox.getValue();
             Wallet wallet     = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
-            UpdateCurrentTypeLabel(wallet);
+            updateCurrentTypeLabel(wallet);
         });
     }
 
@@ -102,34 +103,34 @@ public class ChangeWalletTypeController
 
         if (walletName == null || walletNewTypeStr == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields.");
             return;
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
         WalletType walletNewType =
             walletTypes.stream()
-                .filter(wt -> wt.GetName().equals(walletNewTypeStr))
+                .filter(wt -> wt.getName().equals(walletNewTypeStr))
                 .findFirst()
                 .get();
 
         try
         {
-            walletService.ChangeWalletType(wallet.GetId(), walletNewType);
+            walletService.changeWalletType(wallet.getId(), walletNewType);
 
-            WindowUtils.ShowSuccessDialog("Success",
+            WindowUtils.showSuccessDialog("Success",
                                           "Wallet type changed",
                                           "The wallet type was successfully changed.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error", "Invalid input", e.getMessage());
+            WindowUtils.showErrorDialog("Error", "Invalid input", e.getMessage());
             return;
         }
 
@@ -144,25 +145,25 @@ public class ChangeWalletTypeController
         stage.close();
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
-    private void LoadWalletTypes()
+    private void loadWalletTypesFromDatabase()
     {
-        walletTypes = walletService.GetAllWalletTypes();
+        walletTypes = walletService.getAllWalletTypes();
 
         String nameToMove = "Others";
 
         // Move the "Others" wallet type to the end of the list
         if (walletTypes.stream()
-                .filter(n -> n.GetName().equals(nameToMove))
+                .filter(n -> n.getName().equals(nameToMove))
                 .findFirst()
                 .isPresent())
         {
             WalletType walletType = walletTypes.stream()
-                                        .filter(wt -> wt.GetName().equals(nameToMove))
+                                        .filter(wt -> wt.getName().equals(nameToMove))
                                         .findFirst()
                                         .get();
 
@@ -171,7 +172,7 @@ public class ChangeWalletTypeController
         }
     }
 
-    private void UpdateCurrentTypeLabel(Wallet wt)
+    private void updateCurrentTypeLabel(Wallet wt)
     {
         if (wt == null)
         {
@@ -179,6 +180,6 @@ public class ChangeWalletTypeController
             return;
         }
 
-        currentTypeLabel.setText(wt.GetType().GetName());
+        currentTypeLabel.setText(wt.getType().getName());
     }
 }

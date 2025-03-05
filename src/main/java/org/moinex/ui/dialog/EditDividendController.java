@@ -19,6 +19,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.investment.Dividend;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Controller;
  * Controller for the Edit Dividend dialog
  */
 @Controller
+@NoArgsConstructor
 public class EditDividendController
 {
     @FXML
@@ -85,8 +87,6 @@ public class EditDividendController
 
     private Dividend dividend;
 
-    public EditDividendController() { }
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -107,42 +107,42 @@ public class EditDividendController
         this.tickerService     = tickerService;
     }
 
-    public void SetWalletComboBox(Wallet wt)
+    public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.GetId() == wt.GetId()))
+        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
         {
             return;
         }
 
-        walletComboBox.setValue(wt.GetName());
+        walletComboBox.setValue(wt.getName());
 
-        UpdateWalletBalance();
+        updateWalletBalance();
     }
 
-    public void SetDividend(Dividend d)
+    public void setDividend(Dividend d)
     {
         this.dividend = d;
 
-        tickerNameLabel.setText(d.GetTicker().GetName() + " (" +
-                                d.GetTicker().GetSymbol() + ")");
+        tickerNameLabel.setText(d.getTicker().getName() + " (" +
+                                d.getTicker().getSymbol() + ")");
 
-        SetWalletComboBox(d.GetWalletTransaction().GetWallet());
+        setWalletComboBox(d.getWalletTransaction().getWallet());
 
-        descriptionField.setText(d.GetWalletTransaction().GetDescription());
-        dividendValueField.setText(d.GetWalletTransaction().GetAmount().toString());
-        statusComboBox.setValue(d.GetWalletTransaction().GetStatus().name());
-        categoryComboBox.setValue(d.GetWalletTransaction().GetCategory().GetName());
-        dividendDatePicker.setValue(d.GetWalletTransaction().GetDate().toLocalDate());
+        descriptionField.setText(d.getWalletTransaction().getDescription());
+        dividendValueField.setText(d.getWalletTransaction().getAmount().toString());
+        statusComboBox.setValue(d.getWalletTransaction().getStatus().name());
+        categoryComboBox.setValue(d.getWalletTransaction().getCategory().getName());
+        dividendDatePicker.setValue(d.getWalletTransaction().getDate().toLocalDate());
     }
 
     @FXML
     private void initialize()
     {
-        LoadWallets();
-        LoadCategories();
+        loadWalletsFromDatabase();
+        loadCategoriesFromDatabase();
 
         // Configure date picker
-        UIUtils.SetDatePickerFormat(dividendDatePicker);
+        UIUtils.setDatePickerFormat(dividendDatePicker);
 
         // For each element in enum TransactionStatus, add its name to the
         // statusComboBox
@@ -150,15 +150,15 @@ public class EditDividendController
             Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
 
         // Reset all labels
-        UIUtils.ResetLabel(walletAfterBalanceValueLabel);
-        UIUtils.ResetLabel(walletCurrentBalanceValueLabel);
+        UIUtils.resetLabel(walletAfterBalanceValueLabel);
+        UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
         walletComboBox.setOnAction(e -> {
-            UpdateWalletBalance();
-            WalletAfterBalance();
+            updateWalletBalance();
+            walletAfterBalance();
         });
 
-        ConfigureListeners();
+        configureListeners();
     }
 
     @FXML
@@ -183,7 +183,7 @@ public class EditDividendController
             dividendValueString.strip().isEmpty() || statusString == null ||
             categoryString == null || dividendDate == null)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Empty fields",
                                         "Please fill all the fields.");
             return;
@@ -194,29 +194,29 @@ public class EditDividendController
             BigDecimal dividendValue = new BigDecimal(dividendValueString);
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             Category category = categories.stream()
-                                    .filter(c -> c.GetName().equals(categoryString))
+                                    .filter(c -> c.getName().equals(categoryString))
                                     .findFirst()
                                     .get();
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             // Check if has any modification
-            if (dividend.GetWalletTransaction().GetAmount().compareTo(dividendValue) ==
+            if (dividend.getWalletTransaction().getAmount().compareTo(dividendValue) ==
                     0 &&
-                dividend.GetWalletTransaction().GetCategory().GetId() ==
-                    category.GetId() &&
-                dividend.GetWalletTransaction().GetStatus().equals(status) &&
-                dividend.GetWalletTransaction().GetDate().toLocalDate().equals(
+                dividend.getWalletTransaction().getCategory().getId() ==
+                    category.getId() &&
+                dividend.getWalletTransaction().getStatus().equals(status) &&
+                dividend.getWalletTransaction().getDate().toLocalDate().equals(
                     dividendDate) &&
-                dividend.GetWalletTransaction().GetDescription().equals(description) &&
-                dividend.GetWalletTransaction().GetWallet().GetId() == wallet.GetId())
+                dividend.getWalletTransaction().getDescription().equals(description) &&
+                dividend.getWalletTransaction().getWallet().getId() == wallet.getId())
             {
-                WindowUtils.ShowInformationDialog(
+                WindowUtils.showInformationDialog(
                     "Info",
                     "No changes",
                     "No changes were made to the dividend");
@@ -227,16 +227,16 @@ public class EditDividendController
                 LocalDateTime dateTimeWithCurrentHour =
                     dividendDate.atTime(currentTime);
 
-                dividend.GetWalletTransaction().SetAmount(dividendValue);
-                dividend.GetWalletTransaction().SetCategory(category);
-                dividend.GetWalletTransaction().SetStatus(status);
-                dividend.GetWalletTransaction().SetDate(dateTimeWithCurrentHour);
-                dividend.GetWalletTransaction().SetDescription(description);
-                dividend.GetWalletTransaction().SetWallet(wallet);
+                dividend.getWalletTransaction().setAmount(dividendValue);
+                dividend.getWalletTransaction().setCategory(category);
+                dividend.getWalletTransaction().setStatus(status);
+                dividend.getWalletTransaction().setDate(dateTimeWithCurrentHour);
+                dividend.getWalletTransaction().setDescription(description);
+                dividend.getWalletTransaction().setWallet(wallet);
 
-                tickerService.UpdateDividend(dividend);
+                tickerService.updateDividend(dividend);
 
-                WindowUtils.ShowSuccessDialog("Success",
+                WindowUtils.showSuccessDialog("Success",
                                               "Dividend updated",
                                               "Dividend updated successfully");
             }
@@ -246,13 +246,13 @@ public class EditDividendController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Invalid dividend value",
                                         "Dividend value must be a number.");
         }
         catch (RuntimeException e)
         {
-            WindowUtils.ShowErrorDialog("Error",
+            WindowUtils.showErrorDialog("Error",
                                         "Error while updating dividend",
                                         e.getMessage());
         }
@@ -261,18 +261,18 @@ public class EditDividendController
     @FXML
     private void handleOpenCalculator()
     {
-        WindowUtils.OpenPopupWindow(Constants.CALCULATOR_FXML,
+        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
                                     "Calculator",
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { GetResultFromCalculator(); }));
+                                    List.of(() -> { getResultFromCalculator(); }));
     }
 
-    private void GetResultFromCalculator()
+    private void getResultFromCalculator()
     {
         // If the user saved the result, set it in the dividendValueField
-        String result = calculatorService.GetResult();
+        String result = calculatorService.getResult();
 
         if (result != null)
         {
@@ -282,7 +282,7 @@ public class EditDividendController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.ShowErrorDialog("Error",
+                    WindowUtils.showErrorDialog("Error",
                                                 "Invalid value",
                                                 "The value must be positive");
                     return;
@@ -296,14 +296,14 @@ public class EditDividendController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Invalid value",
                                             "The value must be a number");
             }
         }
     }
 
-    private void UpdateWalletBalance()
+    private void updateWalletBalance()
     {
         String walletName = walletComboBox.getValue();
 
@@ -313,26 +313,26 @@ public class EditDividendController
         }
 
         Wallet wallet = wallets.stream()
-                            .filter(w -> w.GetName().equals(walletName))
+                            .filter(w -> w.getName().equals(walletName))
                             .findFirst()
                             .get();
 
-        if (wallet.GetBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
-            UIUtils.SetLabelStyle(walletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
         }
         else
         {
-            UIUtils.SetLabelStyle(walletCurrentBalanceValueLabel,
+            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
                                   Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         walletCurrentBalanceValueLabel.setText(
-            UIUtils.FormatCurrency(wallet.GetBalance()));
+            UIUtils.formatCurrency(wallet.getBalance()));
     }
 
-    private void WalletAfterBalance()
+    private void walletAfterBalance()
     {
         String dividendValueString = dividendValueField.getText();
         String walletName          = walletComboBox.getValue();
@@ -340,7 +340,7 @@ public class EditDividendController
         if (dividendValueString == null || dividendValueString.strip().isEmpty() ||
             walletName == null)
         {
-            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
         }
 
@@ -350,83 +350,83 @@ public class EditDividendController
 
             if (dividendValue.compareTo(BigDecimal.ZERO) < 0)
             {
-                UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+                UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
 
             Wallet wallet = wallets.stream()
-                                .filter(w -> w.GetName().equals(walletName))
+                                .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .get();
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
-            if (dividend.GetWalletTransaction().GetStatus().equals(
+            if (dividend.getWalletTransaction().getStatus().equals(
                     TransactionStatus.CONFIRMED))
             {
                 // If the transaction is confirmed, the balance will be updated
                 // based on the difference between the new and the old value
                 BigDecimal diff =
-                    dividendValue.subtract(dividend.GetWalletTransaction().GetAmount());
+                    dividendValue.subtract(dividend.getWalletTransaction().getAmount());
 
-                walletAfterBalanceValue = wallet.GetBalance().add(diff);
+                walletAfterBalanceValue = wallet.getBalance().add(diff);
             }
             else
             {
                 // If the transaction is not confirmed, the balance will be
                 // updated based on the new value
-                walletAfterBalanceValue = wallet.GetBalance().add(dividendValue);
+                walletAfterBalanceValue = wallet.getBalance().add(dividendValue);
             }
 
             // Episilon is used to avoid floating point arithmetic errors
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
-                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
                                       Constants.NEGATIVE_BALANCE_STYLE);
             }
             else
             {
                 // Remove old style and add neutral style
-                UIUtils.SetLabelStyle(walletAfterBalanceValueLabel,
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
                                       Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             walletAfterBalanceValueLabel.setText(
-                UIUtils.FormatCurrency(walletAfterBalanceValue));
+                UIUtils.formatCurrency(walletAfterBalanceValue));
         }
         catch (NumberFormatException e)
         {
-            UIUtils.ResetLabel(walletAfterBalanceValueLabel);
+            UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
     }
 
-    private void LoadWallets()
+    private void loadWalletsFromDatabase()
     {
-        wallets = walletService.GetAllNonArchivedWalletsOrderedByName();
+        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
 
         walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::GetName).toList());
+            wallets.stream().map(Wallet::getName).toList());
     }
 
-    private void LoadCategories()
+    private void loadCategoriesFromDatabase()
     {
-        categories = categoryService.GetNonArchivedCategoriesOrderedByName();
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
 
         categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::GetName).toList());
+            categories.stream().map(Category::getName).toList());
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
         if (categories.size() == 0)
         {
-            UIUtils.AddTooltipToNode(
+            UIUtils.addTooltipToNode(
                 categoryComboBox,
                 "You need to add a category before adding an dividend");
         }
     }
 
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         // Update wallet after balance when the value field changes
         dividendValueField.textProperty().addListener(
@@ -437,7 +437,7 @@ public class EditDividendController
                 }
                 else
                 {
-                    WalletAfterBalance();
+                    walletAfterBalance();
                 }
             });
     }

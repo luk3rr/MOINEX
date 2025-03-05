@@ -30,6 +30,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
+import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.BrazilianMarketIndicators;
 import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.MarketQuotesAndCommodities;
@@ -59,10 +60,9 @@ import org.springframework.stereotype.Controller;
  * Controller class for the Savings view
  */
 @Controller
+@NoArgsConstructor
 public class SavingsController
 {
-    private static final Logger logger = LoggerConfig.GetLogger();
-
     @FXML
     private Text stocksFundsTabNetCapitalInvestedField;
 
@@ -182,6 +182,8 @@ public class SavingsController
     private BigDecimal profitLoss;
     private BigDecimal dividendsReceived;
 
+    private static final Logger logger = LoggerConfig.getLogger();
+
     /**
      * Constructor
      * @param tickerService The ticker service
@@ -198,40 +200,40 @@ public class SavingsController
     @FXML
     private void initialize()
     {
-        LoadBrazilianMarketIndicatorsFromDatabase();
-        LoadMarketQuotesAndCommoditiesFromDatabase();
+        loadBrazilianMarketIndicatorsFromDatabase();
+        loadMarketQuotesAndCommoditiesFromDatabase();
 
-        ConfigureTableView();
-        PopulateTickerTypeComboBox();
+        configureTableView();
+        populateTickerTypeComboBox();
 
-        UpdateTransactionTableView();
-        UpdatePortfolioIndicators();
-        UpdateBrazilianMarketIndicators();
-        UpdateMarketQuotesAndCommodities();
+        updateTransactionTableView();
+        updatePortfolioIndicators();
+        updateBrazilianMarketIndicators();
+        updateMarketQuotesAndCommodities();
 
         if (isUpdatingPortfolioPrices)
         {
-            SetOffUpdatePortfolioPricesButton();
+            setOffUpdatePortfolioPricesButton();
         }
         else
         {
-            SetOnUpdatePortfolioPricesButton();
+            setOnUpdatePortfolioPricesButton();
         }
 
-        ConfigureListeners();
+        configureListeners();
     }
 
     @FXML
     private void handleRegisterTicker()
     {
-        WindowUtils.OpenModalWindow(Constants.ADD_TICKER_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_TICKER_FXML,
                                     "Add Ticker",
                                     springContext,
                                     (AddTickerController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
@@ -243,20 +245,20 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No ticker selected",
                                               "Please select a ticker to buy");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.BUY_TICKER_FXML,
+        WindowUtils.openModalWindow(Constants.BUY_TICKER_FXML,
                                     "Buy Ticker",
                                     springContext,
                                     (BuyTickerController controller)
-                                        -> controller.SetTicker(selectedTicker),
+                                        -> controller.setTicker(selectedTicker),
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
@@ -268,20 +270,20 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No ticker selected",
                                               "Please select a ticker to sell");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.SALE_TICKER_FXML,
+        WindowUtils.openModalWindow(Constants.SALE_TICKER_FXML,
                                     "Sell Ticker",
                                     springContext,
                                     (SaleTickerController controller)
-                                        -> controller.SetTicker(selectedTicker),
+                                        -> controller.setTicker(selectedTicker),
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
@@ -293,21 +295,21 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowInformationDialog(
+            WindowUtils.showInformationDialog(
                 "Info",
                 "No ticker selected",
                 "Please select a ticker to add a dividend");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.ADD_DIVIDEND_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_DIVIDEND_FXML,
                                     "Add Dividend",
                                     springContext,
                                     (AddDividendController controller)
-                                        -> controller.SetTicker(selectedTicker),
+                                        -> controller.setTicker(selectedTicker),
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
@@ -315,57 +317,57 @@ public class SavingsController
     private void handleAddCryptoExchange()
     {
 
-        WindowUtils.OpenModalWindow(Constants.ADD_CRYPTO_EXCHANGE_FXML,
+        WindowUtils.openModalWindow(Constants.ADD_CRYPTO_EXCHANGE_FXML,
                                     "Add Crypto Exchange",
                                     springContext,
                                     (AddCryptoExchangeController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
     @FXML
     private void handleOpenTickerArchive()
     {
-        WindowUtils.OpenModalWindow(Constants.ARCHIVED_TICKERS_FXML,
+        WindowUtils.openModalWindow(Constants.ARCHIVED_TICKERS_FXML,
                                     "Ticker Archive",
                                     springContext,
                                     (ArchivedTickersController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
     @FXML
     private void handleShowTransactions()
     {
-        WindowUtils.OpenModalWindow(Constants.INVESTMENT_TRANSACTIONS_FXML,
+        WindowUtils.openModalWindow(Constants.INVESTMENT_TRANSACTIONS_FXML,
                                     "Investment Transactions",
                                     springContext,
                                     (InvestmentTransactionsController controller)
                                         -> {},
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
     @FXML
     private void handleUpdatePortfolioPrices()
     {
-        Platform.runLater(this::SetOffUpdatePortfolioPricesButton);
+        Platform.runLater(this::setOffUpdatePortfolioPricesButton);
 
         tickerService
-            .UpdateTickersPriceFromAPIAsync(stocksFundsTabTickerTable.getItems())
+            .updateTickersPriceFromApiAsync(stocksFundsTabTickerTable.getItems())
             .thenAccept(failed -> {
                 Platform.runLater(() -> {
                     if (failed.isEmpty())
                     {
-                        WindowUtils.ShowSuccessDialog(
+                        WindowUtils.showSuccessDialog(
                             "Success",
                             "Finished updating prices",
                             "All tickers were successfully updated");
@@ -373,19 +375,19 @@ public class SavingsController
                     else if (failed.size() ==
                              stocksFundsTabTickerTable.getItems().size())
                     {
-                        WindowUtils.ShowInformationDialog(
+                        WindowUtils.showInformationDialog(
                             "Info",
                             "Finished updating prices with errors",
                             "Failed to update all tickers");
                     }
                     else
                     {
-                        WindowUtils.ShowInformationDialog(
+                        WindowUtils.showInformationDialog(
                             "Info",
                             "Finished updating prices with errors",
                             "Failed to update tickers:\n" +
                                 failed.stream()
-                                    .map(Ticker::GetSymbol)
+                                    .map(Ticker::getSymbol)
                                     .reduce((a, b) -> a + ", " + b)
                                     .orElse(""));
                     }
@@ -393,17 +395,17 @@ public class SavingsController
             })
             .exceptionally(e -> {
                 Platform.runLater(() -> {
-                    WindowUtils.ShowErrorDialog("Error",
+                    WindowUtils.showErrorDialog("Error",
                                                 "Error updating prices",
                                                 e.getMessage());
-                    SetOnUpdatePortfolioPricesButton();
+                    setOnUpdatePortfolioPricesButton();
                 });
                 return null;
             })
             .whenComplete((v, e) -> Platform.runLater(() -> {
-                SetOnUpdatePortfolioPricesButton();
-                UpdateTransactionTableView();
-                UpdatePortfolioIndicators();
+                setOnUpdatePortfolioPricesButton();
+                updateTransactionTableView();
+                updatePortfolioIndicators();
             }));
     }
 
@@ -415,20 +417,20 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No ticker selected",
                                               "Please select a ticker to edit");
             return;
         }
 
-        WindowUtils.OpenModalWindow(Constants.EDIT_TICKER_FXML,
+        WindowUtils.openModalWindow(Constants.EDIT_TICKER_FXML,
                                     "Edit Ticker",
                                     springContext,
                                     (EditTickerController controller)
-                                        -> controller.SetTicker(selectedTicker),
+                                        -> controller.setTicker(selectedTicker),
                                     List.of(() -> {
-                                        UpdateTransactionTableView();
-                                        UpdatePortfolioIndicators();
+                                        updateTransactionTableView();
+                                        updatePortfolioIndicators();
                                     }));
     }
 
@@ -440,16 +442,16 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.ShowInformationDialog("Info",
+            WindowUtils.showInformationDialog("Info",
                                               "No ticker selected",
                                               "Please select a ticker to delete");
             return;
         }
 
         // Prevent the removal of a ticker with associated transactions
-        if (tickerService.GetTransactionCountByTicker(selectedTicker.GetId()) > 0)
+        if (tickerService.getTransactionCountByTicker(selectedTicker.getId()) > 0)
         {
-            WindowUtils.ShowErrorDialog(
+            WindowUtils.showErrorDialog(
                 "Error",
                 "Ticker has transactions",
                 "Cannot delete a ticker with associated transactions. Remove the "
@@ -457,20 +459,20 @@ public class SavingsController
             return;
         }
 
-        if (WindowUtils.ShowConfirmationDialog(
+        if (WindowUtils.showConfirmationDialog(
                 "Confirmation",
-                "Delete ticker " + selectedTicker.GetName() + " (" +
-                    selectedTicker.GetSymbol() + ")",
+                "Delete ticker " + selectedTicker.getName() + " (" +
+                    selectedTicker.getSymbol() + ")",
                 "Are you sure you want to delete this ticker?"))
         {
             try
             {
-                tickerService.DeleteTicker(selectedTicker.GetId());
-                UpdateTransactionTableView();
+                tickerService.deleteTicker(selectedTicker.getId());
+                updateTransactionTableView();
             }
             catch (RuntimeException e)
             {
-                WindowUtils.ShowErrorDialog("Error",
+                WindowUtils.showErrorDialog("Error",
                                             "Error deleting ticker",
                                             e.getMessage());
             }
@@ -480,50 +482,50 @@ public class SavingsController
     /**
      * Load the tickers from the database
      */
-    private void LoadTickersFromDatabase()
+    private void loadTickersFromDatabase()
     {
-        tickers = tickerService.GetAllNonArchivedTickers();
+        tickers = tickerService.getAllNonArchivedTickers();
     }
 
     /**
      * Load the purchases from the database
      */
-    private void LoadPurchasesFromDatabase()
+    private void loadPurchasesFromDatabase()
     {
-        purchases = tickerService.GetAllPurchases();
+        purchases = tickerService.getAllPurchases();
     }
 
     /**
      * Load the sales from the database
      */
-    private void LoadSalesFromDatabase()
+    private void loadSalesFromDatabase()
     {
-        sales = tickerService.GetAllSales();
+        sales = tickerService.getAllSales();
     }
 
     /**
      * Load the dividends from the database
      */
-    private void LoadDividendsFromDatabase()
+    private void loadDividendsFromDatabase()
     {
-        dividends = tickerService.GetAllDividends();
+        dividends = tickerService.getAllDividends();
     }
 
     /**
      * Load the Brazilian market indicators from the database
      */
-    private void LoadBrazilianMarketIndicatorsFromDatabase()
+    private void loadBrazilianMarketIndicatorsFromDatabase()
     {
         try
         {
-            brazilianMarketIndicators = marketService.GetBrazilianMarketIndicators();
+            brazilianMarketIndicators = marketService.getBrazilianMarketIndicators();
             logger.info("Loaded Brazilian market indicators from the database");
         }
         catch (RuntimeException e)
         {
             // If the indicators are not found in the database, update them from the
             // API
-            marketService.UpdateBrazilianMarketIndicatorsFromAPIAsync()
+            marketService.updateBrazilianMarketIndicatorsFromApiAsync()
                 .thenAccept(brazilianMarketIndicators -> {
                     Platform.runLater(() -> {
                         this.brazilianMarketIndicators = brazilianMarketIndicators;
@@ -534,7 +536,7 @@ public class SavingsController
                 })
                 .exceptionally(ex -> {
                     Platform.runLater(
-                        () -> { ScheduleRetryForUpdatingBrazilianIndicators(); });
+                        () -> { schedulerEtryForUpdatingBrazilianIndicators(); });
                     logger.severe(ex.getMessage());
                     return null;
                 });
@@ -544,18 +546,18 @@ public class SavingsController
     /**
      * Load the market quotes and commodities from the database
      */
-    private void LoadMarketQuotesAndCommoditiesFromDatabase()
+    private void loadMarketQuotesAndCommoditiesFromDatabase()
     {
         try
         {
-            marketQuotesAndCommodities = marketService.GetMarketQuotesAndCommodities();
+            marketQuotesAndCommodities = marketService.getMarketQuotesAndCommodities();
             logger.info("Loaded market quotes and commodities from the database");
         }
         catch (RuntimeException e)
         {
             // If the market quotes and commodities are not found in the database,
             // update them from the API
-            marketService.UpdateMarketQuotesAndCommoditiesFromAPIAsync()
+            marketService.updateMarketQuotesAndCommoditiesFromApiAsync()
                 .thenAccept(marketQuotesAndCommodities -> {
                     Platform.runLater(() -> {
                         this.marketQuotesAndCommodities = marketQuotesAndCommodities;
@@ -566,7 +568,7 @@ public class SavingsController
                 })
                 .exceptionally(ex -> {
                     Platform.runLater(
-                        () -> { ScheduleRetryForUpdatingMarketQuotes(); });
+                        () -> { schedulerEntryForUpdatingMarketQuotes(); });
                     logger.severe(ex.getMessage());
                     return null;
                 });
@@ -576,76 +578,76 @@ public class SavingsController
     /**
      * Update the net capital invested field
      */
-    private void UpdateNetCapitalInvestedField()
+    private void updateNetCapitalInvestedField()
     {
         // Calculate the net capital invested
         // Net capital invested = sum of (average price * current quantity) for all
         // tickers
         netCapitalInvested =
             tickers.stream()
-                .map(t -> t.GetAveragePrice().multiply(t.GetCurrentQuantity()))
+                .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         stocksFundsTabNetCapitalInvestedField.setText(
-            UIUtils.FormatCurrency(netCapitalInvested));
+            UIUtils.formatCurrency(netCapitalInvested));
     }
 
     /**
      * Update the current value field
      */
-    private void UpdateCurrentValueField()
+    private void updateCurrentValueField()
     {
         currentValue =
             tickers.stream()
-                .map(t -> t.GetCurrentQuantity().multiply(t.GetCurrentUnitValue()))
+                .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        stocksFundsTabCurrentValueField.setText(UIUtils.FormatCurrency(currentValue));
+        stocksFundsTabCurrentValueField.setText(UIUtils.formatCurrency(currentValue));
     }
 
     /**
      * Update the profit/loss field
      */
-    private void UpdateProfitLossField()
+    private void updateProfitLossField()
     {
         profitLoss = currentValue.subtract(netCapitalInvested);
 
-        stocksFundsTabProfitLossField.setText(UIUtils.FormatCurrency(profitLoss));
+        stocksFundsTabProfitLossField.setText(UIUtils.formatCurrency(profitLoss));
     }
 
     /**
      * Update the dividends received field
      */
-    private void UpdateDividendsReceivedField()
+    private void updateDividendsReceivedField()
     {
         dividendsReceived = dividends.stream()
-                                .map(d -> d.GetWalletTransaction().GetAmount())
+                                .map(d -> d.getWalletTransaction().getAmount())
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         stocksFundsTabDividendsReceivedField.setText(
-            UIUtils.FormatCurrency(dividendsReceived));
+            UIUtils.formatCurrency(dividendsReceived));
     }
 
     /**
      * Update the portfolio indicators
      */
-    private void UpdatePortfolioIndicators()
+    private void updatePortfolioIndicators()
     {
-        LoadTickersFromDatabase();
-        LoadPurchasesFromDatabase();
-        LoadSalesFromDatabase();
-        LoadDividendsFromDatabase();
+        loadTickersFromDatabase();
+        loadPurchasesFromDatabase();
+        loadSalesFromDatabase();
+        loadDividendsFromDatabase();
 
-        UpdateNetCapitalInvestedField();
-        UpdateCurrentValueField();
-        UpdateProfitLossField();
-        UpdateDividendsReceivedField();
+        updateNetCapitalInvestedField();
+        updateCurrentValueField();
+        updateProfitLossField();
+        updateDividendsReceivedField();
     }
 
     /**
      * Update the transaction table view
      */
-    private void UpdateTransactionTableView()
+    private void updateTransactionTableView()
     {
         // Get the search text
         String similarTextOrId =
@@ -661,30 +663,30 @@ public class SavingsController
         // type. If ticker type is null, all tickers are fetched
         if (similarTextOrId.isEmpty())
         {
-            tickerService.GetAllNonArchivedTickers()
+            tickerService.getAllNonArchivedTickers()
                 .stream()
                 .filter(t
                         -> selectedTickerType == null ||
-                               t.GetType().equals(selectedTickerType))
+                               t.getType().equals(selectedTickerType))
                 .forEach(stocksFundsTabTickerTable.getItems()::add);
         }
         else
         {
-            tickerService.GetAllNonArchivedTickers()
+            tickerService.getAllNonArchivedTickers()
                 .stream()
                 .filter(t
                         -> selectedTickerType == null ||
-                               t.GetType().equals(selectedTickerType))
+                               t.getType().equals(selectedTickerType))
                 .filter(t -> {
-                    String name       = t.GetName().toLowerCase();
-                    String symbol     = t.GetSymbol().toLowerCase();
-                    String type       = t.GetType().toString().toLowerCase();
-                    String quantity   = t.GetCurrentQuantity().toString();
-                    String unitValue  = t.GetCurrentUnitValue().toString();
-                    String totalValue = t.GetCurrentQuantity()
-                                            .multiply(t.GetCurrentUnitValue())
+                    String name       = t.getName().toLowerCase();
+                    String symbol     = t.getSymbol().toLowerCase();
+                    String type       = t.getType().toString().toLowerCase();
+                    String quantity   = t.getCurrentQuantity().toString();
+                    String unitValue  = t.getCurrentUnitValue().toString();
+                    String totalValue = t.getCurrentQuantity()
+                                            .multiply(t.getCurrentUnitValue())
                                             .toString();
-                    String avgPrice = t.GetAveragePrice().toString();
+                    String avgPrice = t.getAverageUnitValue().toString();
 
                     return name.contains(similarTextOrId) ||
                         symbol.contains(similarTextOrId) ||
@@ -703,7 +705,7 @@ public class SavingsController
     /**
      * Populate the ticker type combo box
      */
-    private void PopulateTickerTypeComboBox()
+    private void populateTickerTypeComboBox()
     {
         // Make a copy of the list to add the 'All' option
         // Add 'All' option to the ticker type combo box
@@ -738,25 +740,25 @@ public class SavingsController
     /**
      * Configure the listeners
      */
-    private void ConfigureListeners()
+    private void configureListeners()
     {
         // Add a listener to the search field to update the table view
         stocksFundsTabTickerSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> UpdateTransactionTableView());
+            (observable, oldValue, newValue) -> updateTransactionTableView());
 
         // Add a listener to the ticker type combo box to update the table view
         stocksFundsTabTickerTypeComboBox.valueProperty().addListener(
-            (observable, oldValue, newValue) -> UpdateTransactionTableView());
+            (observable, oldValue, newValue) -> updateTransactionTableView());
     }
 
     /**
      * Configure the table view columns
      */
-    private void ConfigureTableView()
+    private void configureTableView()
     {
         TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetId()));
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
         idColumn.setCellFactory(column -> {
@@ -782,40 +784,40 @@ public class SavingsController
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetName()));
+            param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<Ticker, String> SymbolColumn = new TableColumn<>("Symbol");
         SymbolColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetSymbol()));
+            param -> new SimpleStringProperty(param.getValue().getSymbol()));
 
         TableColumn<Ticker, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().GetType().toString()));
+            param -> new SimpleStringProperty(param.getValue().getType().toString()));
 
         TableColumn<Ticker, BigDecimal> quantityColumn =
             new TableColumn<>("Quantity Owned");
         quantityColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().GetCurrentQuantity()));
+            param -> new SimpleObjectProperty<>(param.getValue().getCurrentQuantity()));
 
         TableColumn<Ticker, String> unitColumn = new TableColumn<>("Unit Price");
         unitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrencyDynamic(param.getValue().GetCurrentUnitValue())));
+                UIUtils.formatCurrencyDynamic(param.getValue().getCurrentUnitValue())));
 
         TableColumn<Ticker, String> totalColumn = new TableColumn<>("Total Value");
         totalColumn.setCellValueFactory(
             param
-            -> new SimpleObjectProperty<>(UIUtils.FormatCurrencyDynamic(
-                param.getValue().GetCurrentQuantity().multiply(
-                    param.getValue().GetCurrentUnitValue()))));
+            -> new SimpleObjectProperty<>(UIUtils.formatCurrencyDynamic(
+                param.getValue().getCurrentQuantity().multiply(
+                    param.getValue().getCurrentUnitValue()))));
 
         TableColumn<Ticker, String> avgUnitColumn =
             new TableColumn<>("Average Unit Price");
         avgUnitColumn.setCellValueFactory(
             param
             -> new SimpleObjectProperty<>(
-                UIUtils.FormatCurrencyDynamic(param.getValue().GetAveragePrice())));
+                UIUtils.formatCurrencyDynamic(param.getValue().getAverageUnitValue())));
 
         // Add the columns to the table view
         stocksFundsTabTickerTable.getColumns().add(idColumn);
@@ -828,7 +830,7 @@ public class SavingsController
         stocksFundsTabTickerTable.getColumns().add(avgUnitColumn);
     }
 
-    private void SetOffUpdatePortfolioPricesButton()
+    private void setOffUpdatePortfolioPricesButton()
     {
         updatePricesButtonIcon.setImage(
             new Image(getClass().getResource(Constants.LOADING_GIF).toExternalForm()));
@@ -838,7 +840,7 @@ public class SavingsController
         isUpdatingPortfolioPrices = true;
     }
 
-    private void SetOnUpdatePortfolioPricesButton()
+    private void setOnUpdatePortfolioPricesButton()
     {
         updatePortfolioPricesButton.setDisable(false);
         updatePricesButtonIcon.setImage(new Image(
@@ -853,7 +855,7 @@ public class SavingsController
     /**
      * Update the Brazilian market indicators
      */
-    private void UpdateBrazilianMarketIndicators()
+    private void updateBrazilianMarketIndicators()
     {
         if (brazilianMarketIndicators == null)
         {
@@ -861,23 +863,23 @@ public class SavingsController
         }
 
         overviewTabSelicValueField.setText(
-            UIUtils.FormatPercentage(brazilianMarketIndicators.GetSelicTarget()));
+            UIUtils.formatPercentage(brazilianMarketIndicators.getSelicTarget()));
 
         overviewTabIPCALastMonthValueField.setText(
-            UIUtils.FormatPercentage(brazilianMarketIndicators.GetIpcaLastMonth()));
+            UIUtils.formatPercentage(brazilianMarketIndicators.getIpcaLastMonth()));
 
         overviewTabIPCALastMonthDescriptionField.setText(
-            "IPCA " + brazilianMarketIndicators.GetIpcaLastMonthReference());
+            "IPCA " + brazilianMarketIndicators.getIpcaLastMonthReference());
 
         overviewTabIPCA12MonthsValueField.setText(
-            UIUtils.FormatPercentage(brazilianMarketIndicators.GetIpca12Months()));
+            UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months()));
 
         overviewTabBrazilianMarketIndicatorsLastUpdate.setText(
-            brazilianMarketIndicators.GetLastUpdate().format(
+            brazilianMarketIndicators.getLastUpdate().format(
                 Constants.DATE_FORMATTER_NO_TIME));
     }
 
-    private void UpdateMarketQuotesAndCommodities()
+    private void updateMarketQuotesAndCommodities()
     {
         if (marketQuotesAndCommodities == null)
         {
@@ -885,48 +887,48 @@ public class SavingsController
         }
 
         overviewTabDollarValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetDollar()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getDollar()));
 
         overviewTabEuroValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetEuro()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getEuro()));
 
         overviewTabIbovespaValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetIbovespa()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getIbovespa()));
 
         overviewTabBitcoinValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetBitcoin()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getBitcoin()));
 
         overviewTabEthereumValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetEthereum()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getEthereum()));
 
         overviewTabGoldValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetGold()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getGold()));
 
         overviewTabSoybeanValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetSoybean()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getSoybean()));
 
         overviewTabCoffeeValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetCoffee()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getCoffee()));
 
         overviewTabWheatValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetWheat()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getWheat()));
 
         overviewTabOilBrentValueField.setText(
-            UIUtils.FormatCurrency(marketQuotesAndCommodities.GetOilBrent()));
+            UIUtils.formatCurrency(marketQuotesAndCommodities.getOilBrent()));
 
         overviewTabMarketQuotesLastUpdate.setText(
-            marketQuotesAndCommodities.GetLastUpdate().format(
+            marketQuotesAndCommodities.getLastUpdate().format(
                 Constants.DATE_FORMATTER_NO_TIME));
 
         overviewTabCommoditiesLastUpdate.setText(
-            marketQuotesAndCommodities.GetLastUpdate().format(
+            marketQuotesAndCommodities.getLastUpdate().format(
                 Constants.DATE_FORMATTER_NO_TIME));
     }
 
     /**
      * Schedules a retry for updating market quotes and commodities after a delay
      */
-    private synchronized void ScheduleRetryForUpdatingMarketQuotes()
+    private synchronized void schedulerEntryForUpdatingMarketQuotes()
     {
         if (scheduledUpdatingMarketQuotesRetries >= maxRetries)
         {
@@ -946,7 +948,7 @@ public class SavingsController
         logger.info("Scheduling retry for updating market quotes");
 
         scheduler.schedule(() -> {
-            LoadMarketQuotesAndCommoditiesFromDatabase();
+            loadMarketQuotesAndCommoditiesFromDatabase();
             scheduledUpdatingMarketQuotes = false;
         }, scheduleDelayInSeconds, TimeUnit.SECONDS);
     }
@@ -954,7 +956,7 @@ public class SavingsController
     /**
      * Schedules a retry for updating Brazilian market indicators after a delay
      */
-    private synchronized void ScheduleRetryForUpdatingBrazilianIndicators()
+    private synchronized void schedulerEtryForUpdatingBrazilianIndicators()
     {
         if (scheduledUpdatingBrazilianIndicatorsRetries >= maxRetries)
         {
@@ -975,7 +977,7 @@ public class SavingsController
         logger.info("Scheduling retry for updating Brazilian market indicators");
 
         scheduler.schedule(() -> {
-            LoadBrazilianMarketIndicatorsFromDatabase();
+            loadBrazilianMarketIndicatorsFromDatabase();
             scheduledUpdatingBrazilianIndicators = false;
         }, scheduleDelayInSeconds, TimeUnit.SECONDS);
     }
