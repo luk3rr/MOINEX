@@ -643,13 +643,37 @@ public class CreditCardService
         if (pendingPaymentsTotalWithRebate.compareTo(BigDecimal.ZERO) < 0)
         {
             pendingPaymentsTotalWithRebate = BigDecimal.ZERO;
-            rebate = pendingPaymentsTotal;
+            rebate                         = pendingPaymentsTotal;
         }
+
+        // Distribute the rebate proportionally to the pending payments
+        BigDecimal totalRebateUsed = BigDecimal.ZERO;
+        BigDecimal remainingRebate = rebate;
 
         for (CreditCardPayment payment : pendingPayments)
         {
+            BigDecimal rebateForThisPayment;
+
+            if (payment.getId() ==
+                pendingPayments.get(pendingPayments.size() - 1).getId())
+            {
+                // Last payment gets the remaining rebate
+                rebateForThisPayment = remainingRebate;
+            }
+            else
+            {
+                rebateForThisPayment =
+                    payment.getAmount()
+                        .divide(pendingPaymentsTotal, 2, RoundingMode.HALF_UP)
+                        .multiply(rebate);
+            }
+
+            payment.setRebateUsed(rebateForThisPayment);
             payment.setWallet(wallet);
             creditCardPaymentRepository.save(payment);
+
+            totalRebateUsed = totalRebateUsed.add(rebateForThisPayment);
+            remainingRebate = remainingRebate.subtract(rebateForThisPayment);
 
             logger.info("Payment number " + payment.getInstallment() +
                         " of debt with id " + payment.getCreditCardDebt().getId() +
@@ -871,32 +895,33 @@ public class CreditCardService
     }
 
     /**
-     * Get the total of all paid payments of all credit cards from a specified month
-     * and year
+     * Get the effective amount paid for all credit card payments for a given month, and
+     * year This value considers discounts (such as rebates used).
      * @param month The month
      * @param year The year
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year
      */
-    public BigDecimal getPaidPaymentsByMonth(Integer month, Integer year)
+    public BigDecimal getEffectivePaidPaymentsByMonth(Integer month, Integer year)
     {
-        return creditCardPaymentRepository.getPaidPaymentsByMonth(month, year);
+        return creditCardPaymentRepository.getEffectivePaidPaymentsByMonth(month, year);
     }
 
     /**
-     * Get the total of all paid payments of all credit cards from a specified month and
-     * year by a wallet
+     * Get the effective amount paid for all credit card payments for a given wallet,
+     * month, and year. This value considers discounts (such as rebates used)
      * @param walletId The wallet id
      * @param month The month
      * @param year The year
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year by a wallet
      */
-    public BigDecimal getPaidPaymentsByMonth(Long walletId, Integer month, Integer year)
+    public BigDecimal
+    getEffectivePaidPaymentsByMonth(Long walletId, Integer month, Integer year)
     {
-        return creditCardPaymentRepository.getPaidPaymentsByMonth(walletId,
-                                                                  month,
-                                                                  year);
+        return creditCardPaymentRepository.getEffectivePaidPaymentsByMonth(walletId,
+                                                                           month,
+                                                                           year);
     }
 
     /**

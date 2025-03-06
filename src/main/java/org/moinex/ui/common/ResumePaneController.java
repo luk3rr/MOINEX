@@ -179,7 +179,7 @@ public class ResumePaneController
             creditCardService.getPendingPaymentsByMonth(month, year);
 
         BigDecimal crcPaidPayments =
-            creditCardService.getPaidPaymentsByMonth(month, year);
+            creditCardService.getEffectivePaidPaymentsByMonth(month, year);
 
         updateResumePane(transactions,
                          crcTotalDebtAmount,

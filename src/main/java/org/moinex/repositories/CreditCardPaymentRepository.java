@@ -167,13 +167,13 @@ public interface CreditCardPaymentRepository
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year
      */
-    @Query("SELECT coalesce(sum(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount - ccp.rebateUsed), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet IS NOT NULL")
     BigDecimal
-    getPaidPaymentsByMonth(@Param("month") Integer month, @Param("year") Integer year);
+    getEffectivePaidPaymentsByMonth(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
      * Get the total of all paid payments of all credit cards from a specified month
@@ -183,13 +183,13 @@ public interface CreditCardPaymentRepository
      * @return The total of all paid payments of all credit cards from the specified
      *   month and year by wallet id
      */
-    @Query("SELECT coalesce(sum(ccp.amount), 0) "
+    @Query("SELECT coalesce(sum(ccp.amount - ccp.rebateUsed), 0) "
            + "FROM CreditCardPayment ccp "
            + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
            + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
            + "AND ccp.wallet.id = :walletId")
     BigDecimal
-    getPaidPaymentsByMonth(@Param("walletId") Long walletId,
+    getEffectivePaidPaymentsByMonth(@Param("walletId") Long walletId,
                            @Param("month") Integer month,
                            @Param("year") Integer  year);
 

@@ -455,7 +455,7 @@ public class HomeController
                         month + "/" + year);
 
             BigDecimal crcPaidPayments =
-                creditCardService.getPaidPaymentsByMonth(month, year);
+                creditCardService.getEffectivePaidPaymentsByMonth(month, year);
 
             BigDecimal crcPendingPayments =
                 creditCardService.getPendingPaymentsByMonth(month, year);

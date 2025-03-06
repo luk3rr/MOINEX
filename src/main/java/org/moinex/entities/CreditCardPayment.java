@@ -57,6 +57,10 @@ public class CreditCardPayment
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
+    @Builder.Default
+    @Column(name = "rebateUsed", nullable = false, scale = 2)
+    private BigDecimal rebateUsed = BigDecimal.ZERO;
+
     @Column(name = "installment", nullable = false)
     private Integer installment;
 

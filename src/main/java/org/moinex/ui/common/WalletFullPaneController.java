@@ -17,7 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
-
 import org.moinex.entities.CreditCardPayment;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
@@ -180,9 +179,10 @@ public class WalletFullPaneController
                                                                   now.getMonthValue(),
                                                                   now.getYear());
 
-        crcPaidAmount = creditCardService.getPaidPaymentsByMonth(wallet.getId(),
-                                                                 now.getMonthValue(),
-                                                                 now.getYear());
+        crcPaidAmount =
+            creditCardService.getEffectivePaidPaymentsByMonth(wallet.getId(),
+                                                              now.getMonthValue(),
+                                                              now.getYear());
 
         List<CreditCardPayment> payments =
             creditCardService.getCreditCardPayments(now.getMonthValue(), now.getYear());
