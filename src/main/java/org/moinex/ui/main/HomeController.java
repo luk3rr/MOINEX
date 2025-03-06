@@ -434,7 +434,7 @@ public class HomeController
         for (Integer i = 0; i < totalMonths; i++)
         {
             // Get the data from the oldest month to the most recent, to keep the order
-            LocalDateTime date  = maxMonth.minusMonths(totalMonths - i - 1);
+            LocalDateTime date  = maxMonth.minusMonths((long)(totalMonths - i - 1));
             Integer       month = date.getMonthValue();
             Integer       year  = date.getYear();
 

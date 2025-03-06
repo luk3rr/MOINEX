@@ -200,16 +200,23 @@ public class EditCryptoExchangeController
             BigDecimal cryptoReceivedQuantity =
                 new BigDecimal(cryptoReceivedQuantityStr);
 
-            Ticker soldCrypto = cryptos.stream()
-                                    .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
-                                    .findFirst()
-                                    .get();
+            Ticker soldCrypto =
+                cryptos.stream()
+                    .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Crypto with symbol: " + soldCryptoSymbol +
+                                         " not found"));
 
             Ticker cryptoReceived =
                 cryptos.stream()
                     .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                     .findFirst()
-                    .get();
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Crypto with symbol: " + receivedCryptoSymbol +
+                                         " not found"));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = exchangeDate.atTime(currentTime);
@@ -338,10 +345,14 @@ public class EditCryptoExchangeController
             return;
         }
 
-        Ticker soldCrypto = cryptos.stream()
-                                .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
-                                .findFirst()
-                                .get();
+        Ticker soldCrypto =
+            cryptos.stream()
+                .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
+                .findFirst()
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException(
+                            "Crypto with symbol: " + soldCryptoSymbol + " not found"));
 
         if (soldCrypto.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -372,7 +383,10 @@ public class EditCryptoExchangeController
             cryptos.stream()
                 .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                 .findFirst()
-                .get();
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Crypto with symbol: " + receivedCryptoSymbol +
+                                     " not found"));
 
         if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -414,10 +428,14 @@ public class EditCryptoExchangeController
                 return;
             }
 
-            Ticker soldCrypto = cryptos.stream()
-                                    .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
-                                    .findFirst()
-                                    .get();
+            Ticker soldCrypto =
+                cryptos.stream()
+                    .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Crypto with symbol: " + soldCryptoSymbol +
+                                         " not found"));
 
             BigDecimal soldCryptoAfterBalance = soldCrypto.getCurrentQuantity()
                                                     .add(oldSoldQuantity)
@@ -473,7 +491,10 @@ public class EditCryptoExchangeController
                 cryptos.stream()
                     .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                     .findFirst()
-                    .get();
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Crypto with symbol: " + receivedCryptoSymbol +
+                                         " not found"));
 
             BigDecimal cryptoReceivedAfterBalance = cryptoReceived.getCurrentQuantity()
                                                         .subtract(oldReceivedQuantity)

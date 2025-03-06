@@ -190,12 +190,19 @@ public class EditTransactionController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryString))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryString))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Category with name: " + categoryString +
+                                         " not found"));
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
             TransactionType   type   = TransactionType.valueOf(transactionTypeString);
@@ -262,10 +269,13 @@ public class EditTransactionController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Wallet with name: " + walletName + " not found"));
 
         walletCurrentBalanceValueLabel.setText(
             UIUtils.formatCurrency(wallet.getBalance()));
@@ -297,7 +307,10 @@ public class EditTransactionController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 

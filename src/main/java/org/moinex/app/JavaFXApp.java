@@ -6,6 +6,7 @@
 
 package org.moinex.app;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -68,9 +69,9 @@ public class JavaFXApp extends Application
                     splashStage.close();
                 });
             }
-            catch (Exception e)
+            catch (InterruptedException | IOException e)
             {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
                 javafx.application.Platform.exit();
             }
         }).start();

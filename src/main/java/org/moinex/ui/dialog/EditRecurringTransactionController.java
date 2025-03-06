@@ -214,12 +214,19 @@ public class EditRecurringTransactionController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryString))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryString))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Category with name: " + categoryString +
+                                         " not found"));
 
             TransactionType type = TransactionType.valueOf(typeString);
 

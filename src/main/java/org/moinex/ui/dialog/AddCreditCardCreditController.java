@@ -89,7 +89,7 @@ public class AddCreditCardCreditController
 
     public void setCreditCard(CreditCard crc)
     {
-        if (creditCards.stream().noneMatch(c -> c.getId() == crc.getId()))
+        if (creditCards.stream().noneMatch(c -> c.getId().equals(crc.getId())))
         {
             return;
         }
@@ -137,10 +137,11 @@ public class AddCreditCardCreditController
         {
             BigDecimal creditValue = new BigDecimal(valueStr);
 
-            CreditCard crc = creditCards.stream()
-                                 .filter(c -> c.getName().equals(crcName))
-                                 .findFirst()
-                                 .get();
+            CreditCard crc =
+                creditCards.stream()
+                    .filter(c -> c.getName().equals(crcName))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Credit card not found"));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);

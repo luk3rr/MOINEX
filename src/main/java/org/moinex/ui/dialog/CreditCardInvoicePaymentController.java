@@ -218,7 +218,10 @@ public class CreditCardInvoicePaymentController
                 Wallet wallet = wallets.stream()
                                     .filter(w -> w.getName().equals(walletName))
                                     .findFirst()
-                                    .get();
+                                    .orElseThrow(()
+                                                     -> new RuntimeException(
+                                                         "Wallet with name " +
+                                                         walletName + " not found"));
 
                 creditCardService.payInvoice(creditCard.getId(),
                                              wallet.getId(),
@@ -299,10 +302,13 @@ public class CreditCardInvoicePaymentController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException("Wallet with name " +
+                                                         walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -354,7 +360,10 @@ public class CreditCardInvoicePaymentController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name " + walletName +
+                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue =
                 wallet.getBalance().subtract(invoiceAmount);

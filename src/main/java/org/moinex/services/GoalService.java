@@ -229,7 +229,7 @@ public class GoalService
         oldGoal.setIsArchived(goal.getIsArchived());
 
         // Check if the goal was completed or reopened, and update it
-        if (goal.isCompleted() != oldGoal.isCompleted())
+        if (!goal.isCompleted().equals(oldGoal.isCompleted()))
         {
             if (goal.isCompleted())
             {

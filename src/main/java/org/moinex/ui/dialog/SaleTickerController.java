@@ -124,7 +124,7 @@ public class SaleTickerController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -211,12 +211,19 @@ public class SaleTickerController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryString))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryString))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Category with name: " + categoryString +
+                                         " not found"));
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
@@ -297,10 +304,13 @@ public class SaleTickerController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -344,7 +354,10 @@ public class SaleTickerController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue = wallet.getBalance().add(buyValue);
 

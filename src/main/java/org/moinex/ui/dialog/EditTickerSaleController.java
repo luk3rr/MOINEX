@@ -103,7 +103,7 @@ public class EditTickerSaleController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -200,20 +200,29 @@ public class EditTickerSaleController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryString))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryString))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Category with name: " + categoryString +
+                                         " not found"));
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             // Check if has any modification
-            if (sale.getWalletTransaction().getWallet().getId() == wallet.getId() &&
+            if (sale.getWalletTransaction().getWallet().getId().equals(
+                    wallet.getId()) &&
                 sale.getWalletTransaction().getDescription().equals(description) &&
                 sale.getWalletTransaction().getStatus().equals(status) &&
-                sale.getWalletTransaction().getCategory().getId() == category.getId() &&
+                sale.getWalletTransaction().getCategory().getId().equals(
+                    category.getId()) &&
                 sale.getUnitPrice().compareTo(unitPrice) == 0 &&
                 sale.getQuantity().compareTo(quantity) == 0 &&
                 sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate))
@@ -303,10 +312,13 @@ public class EditTickerSaleController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -350,7 +362,10 @@ public class EditTickerSaleController
             Wallet wallet = wallets.stream()
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(()
+                                                 -> new RuntimeException(
+                                                     "Wallet with name: " + walletName +
+                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 

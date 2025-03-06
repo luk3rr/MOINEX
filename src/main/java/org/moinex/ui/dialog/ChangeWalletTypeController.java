@@ -12,7 +12,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletType;
 import org.moinex.services.WalletService;
@@ -109,16 +108,19 @@ public class ChangeWalletTypeController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException("Wallet with name " +
+                                                         walletName + " not found"));
 
         WalletType walletNewType =
             walletTypes.stream()
                 .filter(wt -> wt.getName().equals(walletNewTypeStr))
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new RuntimeException("Invalid wallet type"));
 
         try
         {
@@ -162,10 +164,11 @@ public class ChangeWalletTypeController
                 .findFirst()
                 .isPresent())
         {
-            WalletType walletType = walletTypes.stream()
-                                        .filter(wt -> wt.getName().equals(nameToMove))
-                                        .findFirst()
-                                        .get();
+            WalletType walletType =
+                walletTypes.stream()
+                    .filter(wt -> wt.getName().equals(nameToMove))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Invalid wallet type"));
 
             walletTypes.remove(walletType);
             walletTypes.add(walletType);

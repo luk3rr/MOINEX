@@ -130,7 +130,7 @@ public class AddDividendController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -208,15 +208,22 @@ public class AddDividendController
         {
             BigDecimal dividendValue = new BigDecimal(dividendValueString);
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .get();
+            Wallet wallet =
+                wallets.stream()
+                    .filter(w -> w.getName().equals(walletName))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Wallet not found with name: " + walletName));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryString))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryString))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Category not found with name: " +
+                                                    categoryString));
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
@@ -306,10 +313,13 @@ public class AddDividendController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Wallet not found with name: " + walletName));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -348,10 +358,13 @@ public class AddDividendController
                 return;
             }
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .get();
+            Wallet wallet =
+                wallets.stream()
+                    .filter(w -> w.getName().equals(walletName))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Wallet not found with name: " + walletName));
 
             BigDecimal walletAfterBalanceValue = wallet.getBalance().add(dividendValue);
 

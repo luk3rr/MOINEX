@@ -195,16 +195,23 @@ public class AddTransferController
         {
             BigDecimal transferValue = new BigDecimal(transferValueString);
 
-            Wallet senderWallet = wallets.stream()
-                                      .filter(w -> w.getName().equals(senderWalletName))
-                                      .findFirst()
-                                      .get();
+            Wallet senderWallet =
+                wallets.stream()
+                    .filter(w -> w.getName().equals(senderWalletName))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Wallet not found with name: " +
+                                                    senderWalletName));
 
             Wallet receiverWallet =
                 wallets.stream()
                     .filter(w -> w.getName().equals(receiverWalletName))
                     .findFirst()
-                    .get();
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Wallet not found with name: " +
+                                                    receiverWalletName));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transferDate.atTime(currentTime);
@@ -294,7 +301,10 @@ public class AddTransferController
         Wallet senderWallet = wallets.stream()
                                   .filter(w -> w.getName().equals(senderWalletName))
                                   .findFirst()
-                                  .get();
+                                  .orElseThrow(()
+                                                   -> new RuntimeException(
+                                                       "Wallet not found with name: " +
+                                                       senderWalletName));
 
         if (senderWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -320,10 +330,14 @@ public class AddTransferController
             return;
         }
 
-        Wallet receiverWallet = wallets.stream()
-                                    .filter(w -> w.getName().equals(receiverWalletName))
-                                    .findFirst()
-                                    .get();
+        Wallet receiverWallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(receiverWalletName))
+                .findFirst()
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Wallet not found with name: " +
+                                                receiverWalletName));
 
         if (receiverWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -362,10 +376,14 @@ public class AddTransferController
                 return;
             }
 
-            Wallet senderWallet = wallets.stream()
-                                      .filter(w -> w.getName().equals(senderWalletName))
-                                      .findFirst()
-                                      .get();
+            Wallet senderWallet =
+                wallets.stream()
+                    .filter(w -> w.getName().equals(senderWalletName))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Wallet not found with name: " +
+                                                    senderWalletName));
 
             BigDecimal senderWalletAfterBalance =
                 senderWallet.getBalance().subtract(transferValue);
@@ -419,7 +437,10 @@ public class AddTransferController
                 wallets.stream()
                     .filter(w -> w.getName().equals(receiverWalletName))
                     .findFirst()
-                    .get();
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Wallet not found with name: " +
+                                                    receiverWalletName));
 
             BigDecimal receiverWalletAfterBalance =
                 receiverWallet.getBalance().add(transferValue);

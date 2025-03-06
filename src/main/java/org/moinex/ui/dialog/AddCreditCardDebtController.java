@@ -174,12 +174,14 @@ public class AddCreditCardDebtController
             CreditCard crc = creditCards.stream()
                                  .filter(c -> c.getName().equals(crcName))
                                  .findFirst()
-                                 .get();
+                                 .orElseThrow(
+                                     () -> new RuntimeException("Credit card not found"));
 
             Category category = categories.stream()
                                     .filter(c -> c.getName().equals(categoryName))
                                     .findFirst()
-                                    .get();
+                                    .orElseThrow(
+                                        () -> new RuntimeException("Category not found"));
 
             creditCardService.addDebt(crc.getId(),
                                       category,

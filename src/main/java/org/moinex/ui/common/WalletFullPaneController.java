@@ -191,9 +191,10 @@ public class WalletFullPaneController
         crcPendingAmount = payments.stream()
                                .filter(p
                                        -> p.getCreditCardDebt()
-                                                  .getCreditCard()
-                                                  .getDefaultBillingWallet()
-                                                  .getId() == wallet.getId())
+                                              .getCreditCard()
+                                              .getDefaultBillingWallet()
+                                              .getId()
+                                              .equals(wallet.getId()))
                                .filter(p -> p.getWallet() == null)
                                .map(CreditCardPayment::getAmount)
                                .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -257,13 +258,13 @@ public class WalletFullPaneController
 
         BigDecimal creditedTransfersSum =
             transfers.stream()
-                .filter(t -> t.getReceiverWallet().getId() == wallet.getId())
+                .filter(t -> t.getReceiverWallet().getId().equals(wallet.getId()))
                 .map(Transfer::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal debitedTransfersSum =
             transfers.stream()
-                .filter(t -> t.getSenderWallet().getId() == wallet.getId())
+                .filter(t -> t.getSenderWallet().getId().equals(wallet.getId()))
                 .map(Transfer::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

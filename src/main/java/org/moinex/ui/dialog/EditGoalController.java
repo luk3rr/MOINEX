@@ -159,8 +159,8 @@ public class EditGoalController
                 goalToUpdate.getTargetBalance().equals(targetBalance) &&
                 goalToUpdate.getTargetDate().toLocalDate().equals(targetDate) &&
                 goalToUpdate.getMotivation().equals(motivation) &&
-                goalToUpdate.getIsArchived() == archived &&
-                goalToUpdate.isCompleted() == completed)
+                goalToUpdate.getIsArchived().equals(archived) &&
+                goalToUpdate.isCompleted().equals(completed))
             {
                 WindowUtils.showInformationDialog("Information",
                                                   "No changes",

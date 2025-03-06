@@ -48,7 +48,7 @@ public class RenameWalletController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -79,10 +79,13 @@ public class RenameWalletController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow((()
+                                  -> new RuntimeException("Wallet with name " +
+                                                          walletName + " not found")));
 
         try
         {

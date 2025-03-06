@@ -139,7 +139,7 @@ public class CalendarController
                 .getValue();
 
         // Adjust the date offset to start from Sunday at first line of the calendar
-        if (dateOffset == Constants.WEEK_DAYS)
+        if (dateOffset.equals(Constants.WEEK_DAYS))
         {
             dateOffset = 0;
         }

@@ -50,7 +50,7 @@ public class ChangeWalletBalanceController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -92,7 +92,7 @@ public class ChangeWalletBalanceController
         Wallet wallet = wallets.stream()
                             .filter(w -> w.getName().equals(walletName))
                             .findFirst()
-                            .get();
+                            .orElseThrow(() -> new RuntimeException("Wallet with name " + walletName + " not found"));
 
         try
         {

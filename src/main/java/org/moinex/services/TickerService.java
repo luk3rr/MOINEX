@@ -301,7 +301,7 @@ public class TickerService
             tickers.stream().map(Ticker::getSymbol).toArray(String[] ::new);
 
         return APIUtils.fetchStockPricesAsync(symbols).thenApply(jsonObject -> {
-                List<Ticker> failed = new ArrayList<>();
+            List<Ticker> failed = new ArrayList<>();
             tickers.forEach(ticker -> {
                 try
                 {
@@ -750,11 +750,12 @@ public class TickerService
                                      "TickerPurchase with id " + purchase.getId() +
                                      " not found and cannot be updated"));
 
-        tickerRepository.findById(purchase.getTicker().getId())
-            .orElseThrow(()
-                             -> new RuntimeException(
-                                 "Ticker with id " + purchase.getTicker().getId() +
-                                 " not found and cannot update purchase"));
+        if (!tickerRepository.existsById(purchase.getTicker().getId()))
+        {
+            throw new RuntimeException("Ticker with id " +
+                                       purchase.getTicker().getId() +
+                                       " not found and cannot update purchase");
+        }
 
         if (purchase.getQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
@@ -797,11 +798,11 @@ public class TickerService
                         -> new RuntimeException("TickerSale with id " + sale.getId() +
                                                 " not found and cannot be updated"));
 
-        tickerRepository.findById(sale.getTicker().getId())
-            .orElseThrow(()
-                             -> new RuntimeException(
-                                 "Ticker with id " + sale.getTicker().getId() +
-                                 " not found and cannot update sale"));
+        if (!tickerRepository.existsById(sale.getTicker().getId()))
+        {
+            throw new RuntimeException("Ticker with id " + sale.getTicker().getId() +
+                                       " not found and cannot update sale");
+        }
 
         if (sale.getQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
@@ -842,11 +843,12 @@ public class TickerService
                         -> new RuntimeException("Dividend with id " + dividend.getId() +
                                                 " not found and cannot be updated"));
 
-        tickerRepository.findById(dividend.getTicker().getId())
-            .orElseThrow(()
-                             -> new RuntimeException(
-                                 "Ticker with id " + dividend.getTicker().getId() +
-                                 " not found and cannot update dividend"));
+        if (!tickerRepository.existsById(dividend.getTicker().getId()))
+        {
+            throw new RuntimeException("Ticker with id " +
+                                       dividend.getTicker().getId() +
+                                       " not found and cannot update dividend");
+        }
 
         walletTransactionService.updateTransaction(dividend.getWalletTransaction());
 

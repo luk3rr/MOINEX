@@ -462,7 +462,7 @@ public class TransactionController
         {
             // Get the date for the current month
             LocalDateTime date =
-                currentDate.minusMonths(Constants.XYBAR_CHART_MONTHS - i - 1);
+                currentDate.minusMonths((long)(Constants.XYBAR_CHART_MONTHS - i - 1));
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
 
             // Get confirmed transactions for the month
@@ -486,15 +486,15 @@ public class TransactionController
                 BigDecimal totalWalletTransaction =
                     transactions.stream()
                         .filter(t -> t.getType().equals(selectedTransactionType))
-                        .filter(t -> t.getCategory().getId() == category.getId())
+                        .filter(t -> t.getCategory().getId().equals(category.getId()))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal totalCreditCardPayment =
                     creditCardPayments.stream()
                         .filter(p
-                                -> p.getCreditCardDebt().getCategory().getId() ==
-                                       category.getId())
+                                -> p.getCreditCardDebt().getCategory().getId().equals(
+                                    category.getId()))
                         .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 

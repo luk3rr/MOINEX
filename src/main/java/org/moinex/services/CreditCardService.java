@@ -542,11 +542,12 @@ public class CreditCardService
                                                          debt.getId() +
                                                          " does not exist"));
 
-        creditCardRepository.findById(debt.getCreditCard().getId())
-            .orElseThrow(()
-                             -> new RuntimeException("Credit card with id " +
-                                                     debt.getCreditCard().getId() +
-                                                     " does not exist"));
+        if (!creditCardRepository.existsById(debt.getCreditCard().getId()))
+        {
+            throw new RuntimeException("Credit card with id " +
+                                       debt.getCreditCard().getId() +
+                                       " does not exist");
+        }
 
         if (debt.getAmount().compareTo(BigDecimal.ZERO) <= 0)
         {
@@ -654,8 +655,8 @@ public class CreditCardService
         {
             BigDecimal rebateForThisPayment;
 
-            if (payment.getId() ==
-                pendingPayments.get(pendingPayments.size() - 1).getId())
+            if (payment.getId().equals(
+                    pendingPayments.get(pendingPayments.size() - 1).getId()))
             {
                 // Last payment gets the remaining rebate
                 rebateForThisPayment = remainingRebate;
@@ -1307,7 +1308,7 @@ public class CreditCardService
      */
     private void changeDebtInstallments(CreditCardDebt oldDebt, Integer newInstallments)
     {
-        if (oldDebt.getInstallments() == newInstallments)
+        if (oldDebt.getInstallments().equals(newInstallments))
         {
             return;
         }

@@ -93,7 +93,7 @@ public class AddCryptoExchangeController
 
     public void setFromCryptoComboBox(Ticker tk)
     {
-        if (cryptos.stream().noneMatch(c -> c.getId() == tk.getId()))
+        if (cryptos.stream().noneMatch(c -> c.getId().equals(tk.getId())))
         {
             return;
         }
@@ -193,13 +193,19 @@ public class AddCryptoExchangeController
             Ticker cryptoSold = cryptos.stream()
                                     .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
                                     .findFirst()
-                                    .get();
+                                    .orElseThrow(
+                                        ()
+                                            -> new RuntimeException("Crypto not found with symbol: " +
+                                                                    cryptoSoldSymbol));
 
             Ticker cryptoReceived =
                 cryptos.stream()
                     .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
                     .findFirst()
-                    .get();
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Crypto not found with symbol: " +
+                                                    cryptoReceivedSymbol));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = exchangeDate.atTime(currentTime);
@@ -308,7 +314,10 @@ public class AddCryptoExchangeController
         Ticker cryptoSold = cryptos.stream()
                                 .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
                                 .findFirst()
-                                .get();
+                                .orElseThrow(
+                                    ()
+                                        -> new RuntimeException("Crypto not found with symbol: " +
+                                                                cryptoSoldSymbol));
 
         if (cryptoSold.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -339,7 +348,10 @@ public class AddCryptoExchangeController
             cryptos.stream()
                 .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
                 .findFirst()
-                .get();
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Crypto not found with symbol: " +
+                                                cryptoReceivedSymbol));
 
         if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -382,7 +394,10 @@ public class AddCryptoExchangeController
             Ticker cryptoSold = cryptos.stream()
                                     .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
                                     .findFirst()
-                                    .get();
+                                    .orElseThrow(
+                                        ()
+                                            -> new RuntimeException("Crypto not found with symbol: " +
+                                                                    cryptoSoldSymbol));
 
             BigDecimal cryptoSoldAfterBalance =
                 cryptoSold.getCurrentQuantity().subtract(exchangeQuantity);
@@ -434,7 +449,10 @@ public class AddCryptoExchangeController
                 cryptos.stream()
                     .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
                     .findFirst()
-                    .get();
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Crypto not found with symbol: " +
+                                                    cryptoReceivedSymbol));
 
             BigDecimal cryptoReceivedAfterBalance =
                 cryptoReceived.getCurrentQuantity().add(exchangeQuantity);

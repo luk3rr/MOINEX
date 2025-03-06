@@ -193,15 +193,22 @@ public class EditCreditCardDebtController
             Integer installments =
                 installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
-            CreditCard crc = creditCards.stream()
-                                 .filter(c -> c.getName().equals(crcName))
-                                 .findFirst()
-                                 .get();
+            CreditCard crc =
+                creditCards.stream()
+                    .filter(c -> c.getName().equals(crcName))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException("Credit card with name: " +
+                                                             crcName + " not found"));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryName))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryName))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException(
+                                "Category with name: " + categoryName + " not found"));
 
             // Get the date of the first payment to check if the invoice month is the
             // same
@@ -212,10 +219,10 @@ public class EditCreditCardDebtController
                                              firstPayment.getDate().getMonth());
 
             // Check if has any modification
-            if (debtToUpdate.getCreditCard().getId() == crc.getId() &&
-                debtToUpdate.getCategory().getId() == category.getId() &&
+            if (debtToUpdate.getCreditCard().getId().equals(crc.getId()) &&
+                debtToUpdate.getCategory().getId().equals(category.getId()) &&
                 debtValue.compareTo(debtToUpdate.getAmount()) == 0 &&
-                debtToUpdate.getInstallments() == installments &&
+                debtToUpdate.getInstallments().equals(installments) &&
                 debtToUpdate.getDescription().equals(description) &&
                 invoice.equals(invoiceMonth))
             {

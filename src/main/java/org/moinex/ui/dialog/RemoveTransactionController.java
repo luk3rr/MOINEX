@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -91,11 +92,11 @@ public class RemoveTransactionController
     @FXML
     public void handleDelete()
     {
-        WalletTransaction selectedIncome =
+        WalletTransaction selectedTransaction =
             transactionsTableView.getSelectionModel().getSelectedItem();
 
         // If no income is selected, do nothing
-        if (selectedIncome == null)
+        if (selectedTransaction == null)
         {
             return;
         }
@@ -103,50 +104,36 @@ public class RemoveTransactionController
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(selectedIncome.getDescription())
+            .append(selectedTransaction.getDescription())
             .append("\n")
             .append("Amount: ")
-            .append(UIUtils.formatCurrency(selectedIncome.getAmount()))
+            .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
             .append("\n")
             .append("Date: ")
-            .append(selectedIncome.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+            .append(selectedTransaction.getDate().format(
+                Constants.DATE_FORMATTER_WITH_TIME))
             .append("\n")
             .append("Status: ")
-            .append(selectedIncome.getStatus().toString())
+            .append(selectedTransaction.getStatus().toString())
             .append("\n")
             .append("Wallet: ")
-            .append(selectedIncome.getWallet().getName())
+            .append(selectedTransaction.getWallet().getName())
             .append("\n")
             .append("Wallet balance: ")
-            .append(UIUtils.formatCurrency(selectedIncome.getWallet().getBalance()))
+            .append(
+                UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
             .append("\n")
             .append("Wallet balance after deletion: ");
 
-        if (selectedIncome.getStatus().equals(TransactionStatus.CONFIRMED))
-        {
-            if (transactionType == TransactionType.EXPENSE)
-            {
-                message
-                    .append(UIUtils.formatCurrency(
-                        selectedIncome.getWallet().getBalance().add(
-                            selectedIncome.getAmount())))
-                    .append("\n");
-            }
-            else
-            {
-                message
-                    .append(UIUtils.formatCurrency(
-                        selectedIncome.getWallet().getBalance().add(
-                            selectedIncome.getAmount())))
-                    .append("\n");
-            }
-        }
-        else
-        {
-            message
-                .append(UIUtils.formatCurrency(selectedIncome.getWallet().getBalance()))
-                .append("\n");
-        }
+        // if the transaction is confirmed, add the amount to the wallet balance
+        // otherwise, the wallet balance remains the same
+        message
+            .append(
+                UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance().add(
+                    selectedTransaction.getStatus().equals(TransactionStatus.CONFIRMED)
+                        ? selectedTransaction.getAmount()
+                        : BigDecimal.ZERO)))
+            .append("\n");
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
@@ -155,8 +142,8 @@ public class RemoveTransactionController
                     transactionType.toString().toLowerCase() + "?",
                 message.toString()))
         {
-            walletTransactionService.deleteTransaction(selectedIncome.getId());
-            transactionsTableView.getItems().remove(selectedIncome);
+            walletTransactionService.deleteTransaction(selectedTransaction.getId());
+            transactionsTableView.getItems().remove(selectedTransaction);
         }
     }
 

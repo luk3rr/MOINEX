@@ -1435,7 +1435,7 @@ public class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
+        when(m_tickerRepository.existsById(1L)).thenReturn(true);
 
         BigDecimal oldQuantity = m_purchase.getQuantity();
 
@@ -1486,7 +1486,7 @@ public class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
+        when(m_tickerRepository.existsById(1L)).thenReturn(true);
 
         m_purchase.setQuantity(new BigDecimal("-0.05"));
 
@@ -1504,7 +1504,7 @@ public class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
+        when(m_tickerRepository.existsById(1L)).thenReturn(true);
 
         m_purchase.setQuantity(BigDecimal.ZERO);
 
@@ -1520,7 +1520,7 @@ public class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
+        when(m_tickerRepository.existsById(1L)).thenReturn(true);
 
         BigDecimal oldUnitPrice = m_purchase.getUnitPrice();
 
@@ -1561,7 +1561,7 @@ public class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
+        when(m_tickerRepository.existsById(1L)).thenReturn(true);
 
         m_purchase.setUnitPrice(new BigDecimal("-0.05"));
 
@@ -1579,7 +1579,7 @@ public class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L))
             .thenReturn(Optional.of(m_purchase));
-        when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
+        when(m_tickerRepository.existsById(1L)).thenReturn(true);
 
         m_purchase.setUnitPrice(BigDecimal.ZERO);
 

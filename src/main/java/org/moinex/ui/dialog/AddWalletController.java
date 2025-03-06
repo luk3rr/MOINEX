@@ -92,10 +92,11 @@ public class AddWalletController
             return;
         }
 
-        WalletType walletType = walletTypes.stream()
-                                    .filter(wt -> wt.getName().equals(walletTypeStr))
-                                    .findFirst()
-                                    .get();
+        WalletType walletType =
+            walletTypes.stream()
+                .filter(wt -> wt.getName().equals(walletTypeStr))
+                .findFirst()
+                .orElseThrow((() -> new RuntimeException("Invalid wallet type")));
 
         try
         {
@@ -139,10 +140,11 @@ public class AddWalletController
                 .findFirst()
                 .isPresent())
         {
-            WalletType walletType = walletTypes.stream()
-                                        .filter(wt -> wt.getName().equals(nameToMove))
-                                        .findFirst()
-                                        .get();
+            WalletType walletType =
+                walletTypes.stream()
+                    .filter(wt -> wt.getName().equals(nameToMove))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Invalid wallet type"));
 
             walletTypes.remove(walletType);
             walletTypes.add(walletType);

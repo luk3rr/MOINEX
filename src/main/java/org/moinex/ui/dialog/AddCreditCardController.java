@@ -131,7 +131,10 @@ public class AddCreditCardController
             operators.stream()
                 .filter(op -> op.getName().equals(crcOperatorName))
                 .findFirst()
-                .get();
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException("Operator not found with name: " +
+                                                crcOperatorName));
 
         try
         {
@@ -146,7 +149,10 @@ public class AddCreditCardController
                     ? wallets.stream()
                           .filter(w -> w.getName().equals(crcDefaultBillingWalletName))
                           .findFirst()
-                          .get()
+                          .orElseThrow(
+                              ()
+                                  -> new RuntimeException("Wallet not found with name: " +
+                                                          crcDefaultBillingWalletName))
                           .getId()
                     : null;
 

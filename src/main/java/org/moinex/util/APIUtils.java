@@ -101,6 +101,7 @@ public class APIUtils
             }
             catch (InterruptedException e)
             {
+                Thread.currentThread().interrupt();
                 // Se a espera pelo processo for interrompida, forçamos imediatamente
                 logger.warning("Process interrupted. Forcing shutdown...");
                 process.destroyForcibly();
@@ -241,6 +242,7 @@ public class APIUtils
         }
         catch (Exception e)
         {
+            Thread.currentThread().interrupt();
             throw new RuntimeException("Error running Python script: " + e.getMessage(),
                                        e);
         }

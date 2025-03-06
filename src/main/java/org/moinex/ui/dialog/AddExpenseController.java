@@ -120,7 +120,7 @@ public class AddExpenseController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -191,15 +191,22 @@ public class AddExpenseController
         {
             BigDecimal expenseValue = new BigDecimal(expenseValueString);
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .get();
+            Wallet wallet =
+                wallets.stream()
+                    .filter(w -> w.getName().equals(walletName))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Wallet not found with name: " + walletName));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryString))
-                                    .findFirst()
-                                    .get();
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryString))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new RuntimeException("Category not found with name: " +
+                                                    categoryString));
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
@@ -288,10 +295,13 @@ public class AddExpenseController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .get();
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new RuntimeException(
+                                     "Wallet not found with name: " + walletName));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -330,10 +340,13 @@ public class AddExpenseController
                 return;
             }
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .get();
+            Wallet wallet =
+                wallets.stream()
+                    .filter(w -> w.getName().equals(walletName))
+                    .findFirst()
+                    .orElseThrow(()
+                                     -> new RuntimeException(
+                                         "Wallet not found with name: " + walletName));
 
             BigDecimal walletAfterBalanceValue =
                 wallet.getBalance().subtract(expenseValue);

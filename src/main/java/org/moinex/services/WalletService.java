@@ -233,7 +233,7 @@ public class WalletService
             throw new RuntimeException("Wallet type not found");
         }
 
-        if (wallet.getType().getId() == newType.getId())
+        if (wallet.getType().getId().equals(newType.getId()))
         {
             throw new RuntimeException("Wallet with name " + wallet.getName() +
                                        " already has type " + newType.getName());

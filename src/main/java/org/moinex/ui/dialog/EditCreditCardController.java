@@ -155,7 +155,10 @@ public class EditCreditCardController
             operators.stream()
                 .filter(op -> op.getName().equals(crcOperatorName))
                 .findFirst()
-                .get();
+                .orElseThrow(
+                    ()
+                        -> new RuntimeException(
+                            "Operator with name: " + crcOperatorName + " not found"));
 
         try
         {
@@ -169,14 +172,18 @@ public class EditCreditCardController
                     ? wallets.stream()
                           .filter(w -> w.getName().equals(crcDefaultBillingWalletName))
                           .findFirst()
-                          .get()
+                          .orElseThrow(
+                              ()
+                                  -> new RuntimeException("Wallet with name: " +
+                                                          crcDefaultBillingWalletName +
+                                                          " not found"))
                     : null;
 
             Boolean defaultWalletChanged =
                 (crcDefaultBillingWallet != null &&
                  crcToUpdate.getDefaultBillingWallet() != null &&
-                 crcDefaultBillingWallet.getId() ==
-                     crcToUpdate.getDefaultBillingWallet().getId()) ||
+                 crcDefaultBillingWallet.getId().equals(
+                     crcToUpdate.getDefaultBillingWallet().getId())) ||
                 (crcDefaultBillingWallet == null &&
                  crcToUpdate.getDefaultBillingWallet() == null);
 
@@ -184,9 +191,9 @@ public class EditCreditCardController
             if (crcToUpdate.getName().equals(crcName) &&
                 crcLimit.compareTo(crcToUpdate.getMaxDebt()) == 0 &&
                 crcToUpdate.getLastFourDigits().equals(crcLastFourDigitsStr) &&
-                crcToUpdate.getClosingDay() == crcClosingDay &&
-                crcToUpdate.getBillingDueDay() == crcDueDay &&
-                crcToUpdate.getOperator().getId() == crcOperator.getId() &&
+                crcToUpdate.getClosingDay().equals(crcClosingDay) &&
+                crcToUpdate.getBillingDueDay().equals(crcDueDay) &&
+                crcToUpdate.getOperator().getId().equals(crcOperator.getId()) &&
                 defaultWalletChanged)
             {
                 WindowUtils.showInformationDialog(
