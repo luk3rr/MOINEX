@@ -40,6 +40,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controller for the Add Credit Card Credit dialog
+ */
 @Controller
 @NoArgsConstructor
 public class AddCreditCardCreditController

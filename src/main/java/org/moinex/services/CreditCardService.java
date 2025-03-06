@@ -1001,6 +1001,11 @@ public class CreditCardService
     }
 
     /**
+     * Get the total of all credit card credits in a month and year
+     * @param crcId The id of the credit card
+     * @param month The month
+     * @param year The year
+     * @return The total of all credit card credits in a month and year
      */
     public BigDecimal
     getTotalCreditCardCreditsByMonth(Long crcId, Integer month, Integer year)
@@ -1008,6 +1013,15 @@ public class CreditCardService
         return creditCardCreditRepository.getTotalCreditCardCreditsByMonth(crcId,
                                                                            month,
                                                                            year);
+    }
+
+    /**
+     * Get all credit card credits
+     * @return A list with all credit card credits
+     */
+    public List<CreditCardCredit> getAllCreditCardCredits()
+    {
+        return creditCardCreditRepository.findAll();
     }
 
     /**

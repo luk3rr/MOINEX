@@ -23,6 +23,7 @@ import org.moinex.entities.CreditCard;
 import org.moinex.services.CreditCardService;
 import org.moinex.ui.dialog.AddCreditCardCreditController;
 import org.moinex.ui.dialog.AddCreditCardDebtController;
+import org.moinex.ui.dialog.CreditCardCreditsController;
 import org.moinex.ui.dialog.CreditCardInvoicePaymentController;
 import org.moinex.ui.dialog.EditCreditCardController;
 import org.moinex.ui.main.CreditCardController;
@@ -239,7 +240,15 @@ public class CreditCardPaneController
 
     @FXML
     private void handleShowRebates()
-    { }
+    {
+        WindowUtils.openModalWindow(
+            Constants.CREDIT_CARD_CREDITS_FXML,
+            "Credit Card Credits",
+            springContext,
+            (CreditCardCreditsController controller)
+                -> {},
+            List.of(() -> creditCardController.updateDisplay()));
+    }
 
     @FXML
     private void handlePrevMonth()

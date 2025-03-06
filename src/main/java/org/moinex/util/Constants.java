@@ -74,6 +74,9 @@ public final class Constants
     public static final String ADD_CREDIT_CARD_CREDIT_FXML =
         UI_DIALOG_PATH + "add_credit_card_credit.fxml";
 
+    public static final String CREDIT_CARD_CREDITS_FXML =
+        UI_DIALOG_PATH + "credit_card_credits.fxml";
+
     public static final String ADD_CREDIT_CARD_FXML =
         UI_DIALOG_PATH + "add_credit_card.fxml";
 
