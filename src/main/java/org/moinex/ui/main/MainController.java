@@ -8,6 +8,8 @@ package org.moinex.ui.main;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -24,6 +26,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.ui.common.CalendarController;
 import org.moinex.util.Constants;
+import org.moinex.util.LoggerConfig;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -80,6 +83,8 @@ public class MainController
 
     private boolean  isMenuExpanded = false;
     private Button[] sidebarButtons;
+
+    private static final Logger logger = LoggerConfig.getLogger();
 
     @FXML
     public void initialize()
@@ -196,7 +201,7 @@ public class MainController
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            logger.severe("Error loading content: " + e.getMessage());
         }
     }
 

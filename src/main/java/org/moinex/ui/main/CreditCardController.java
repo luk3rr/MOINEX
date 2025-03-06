@@ -481,7 +481,6 @@ public class CreditCardController
             catch (IOException e)
             {
                 logger.severe("Error while loading credit card pane");
-                e.printStackTrace();
             }
         }
 

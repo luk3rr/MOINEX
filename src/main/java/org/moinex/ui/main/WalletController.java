@@ -326,10 +326,11 @@ public class WalletController
                 .findFirst()
                 .isPresent())
         {
-            WalletType wt = walletTypes.stream()
-                                .filter(n -> n.getName().equals(nameToMove))
-                                .findFirst()
-                                .orElseThrow(() -> new RuntimeException("Wallet type not found"));
+            WalletType wt =
+                walletTypes.stream()
+                    .filter(n -> n.getName().equals(nameToMove))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Wallet type not found"));
 
             walletTypes.remove(wt);
             walletTypes.add(wt);
@@ -504,7 +505,6 @@ public class WalletController
             catch (IOException e)
             {
                 logger.severe("Error while loading wallet full pane");
-                e.printStackTrace();
                 continue;
             }
         }

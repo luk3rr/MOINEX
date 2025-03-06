@@ -360,7 +360,6 @@ public class GoalController
             catch (IOException e)
             {
                 logger.severe("Error while loading goal full pane");
-                e.printStackTrace();
                 continue;
             }
         }
@@ -425,7 +424,6 @@ public class GoalController
             catch (IOException e)
             {
                 logger.severe("Error while loading accomplished goal full pane");
-                e.printStackTrace();
                 continue;
             }
         }

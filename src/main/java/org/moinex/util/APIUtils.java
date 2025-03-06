@@ -7,11 +7,14 @@
 package org.moinex.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -193,8 +196,11 @@ public class APIUtils
             }
 
             // Script name without extension
-            String scriptName = script.substring(0, script.lastIndexOf('.'));
-            Path   tempFile   = Files.createTempFile(scriptName, ".py");
+            String scriptName    = script.substring(0, script.lastIndexOf('.'));
+            Path   tempDirectory = Paths.get(System.getProperty("java.io.tmpdir"));
+            Path   tempFile = Files.createTempFile(tempDirectory, scriptName, ".py");
+
+            setSecurePermissions(tempFile);
 
             Files.copy(scriptInputStream,
                        tempFile,
@@ -240,11 +246,28 @@ public class APIUtils
                 }
             }
         }
+        catch (InterruptedException e)
+        {
+            // Handle the case where the thread is interrupted
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Python script execution was interrupted", e);
+        }
         catch (Exception e)
         {
-            Thread.currentThread().interrupt();
+            // Handle general errors and exceptions
             throw new RuntimeException("Error running Python script: " + e.getMessage(),
                                        e);
         }
+    }
+
+    /**
+     * Set secure file permissions to restrict access to the owner only
+     * @param file The file to set permissions for
+     */
+    private static void setSecurePermissions(Path file) throws IOException
+    {
+        // Set file permissions to be readable and writable only by the owner
+        Files.setPosixFilePermissions(file,
+                                      PosixFilePermissions.fromString("rw-------"));
     }
 }
