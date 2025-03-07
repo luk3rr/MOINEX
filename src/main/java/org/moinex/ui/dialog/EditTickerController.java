@@ -75,7 +75,7 @@ public class EditTickerController
         avgUnitPriceField.setText(tk.getAverageUnitValue().toString());
         typeComboBox.setValue(tk.getType().toString());
 
-        archivedCheckBox.setSelected(tk.getIsArchived());
+        archivedCheckBox.setSelected(tk.isArchived());
     }
 
     @FXML
@@ -150,7 +150,7 @@ public class EditTickerController
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 
-            Boolean archived = archivedCheckBox.isSelected();
+            boolean archived = archivedCheckBox.isSelected();
 
             // Check if has any modification
             if (tickerToUpdate.getName().equals(name) &&
@@ -159,7 +159,7 @@ public class EditTickerController
                 tickerToUpdate.getType().equals(type) &&
                 tickerToUpdate.getCurrentQuantity().compareTo(quantity) == 0 &&
                 tickerToUpdate.getAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
-                tickerToUpdate.getIsArchived().equals(archived))
+                tickerToUpdate.isArchived() == archived)
             {
                 WindowUtils.showInformationDialog("Info",
                                                   "No changes",
@@ -175,7 +175,7 @@ public class EditTickerController
                 tickerToUpdate.setType(type);
                 tickerToUpdate.setCurrentQuantity(quantity);
                 tickerToUpdate.setAverageUnitValue(avgUnitPrice);
-                tickerToUpdate.setIsArchived(archived);
+                tickerToUpdate.setArchived(archived);
 
                 tickerService.updateTicker(tickerToUpdate);
 

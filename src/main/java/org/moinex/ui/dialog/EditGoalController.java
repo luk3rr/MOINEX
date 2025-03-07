@@ -79,7 +79,7 @@ public class EditGoalController
         targetBalanceField.setText(goal.getTargetBalance().toString());
         targetDatePicker.setValue(goal.getTargetDate().toLocalDate());
         motivationTextArea.setText(goal.getMotivation());
-        archivedCheckBox.setSelected(goal.getIsArchived());
+        archivedCheckBox.setSelected(goal.isArchived());
         completedCheckBox.setSelected(goal.isCompleted());
     }
 
@@ -132,8 +132,8 @@ public class EditGoalController
         String    targetBalanceStr  = targetBalanceField.getText();
         LocalDate targetDate        = targetDatePicker.getValue();
         String    motivation        = motivationTextArea.getText();
-        Boolean   archived          = archivedCheckBox.isSelected();
-        Boolean   completed         = completedCheckBox.isSelected();
+        boolean   archived          = archivedCheckBox.isSelected();
+        boolean   completed         = completedCheckBox.isSelected();
 
         if (goalName.isEmpty() || initialBalanceStr.isEmpty() ||
             currentBalanceStr.isEmpty() || targetBalanceStr.isEmpty() ||
@@ -159,8 +159,8 @@ public class EditGoalController
                 goalToUpdate.getTargetBalance().equals(targetBalance) &&
                 goalToUpdate.getTargetDate().toLocalDate().equals(targetDate) &&
                 goalToUpdate.getMotivation().equals(motivation) &&
-                goalToUpdate.getIsArchived().equals(archived) &&
-                goalToUpdate.isCompleted().equals(completed))
+                goalToUpdate.isArchived() == archived &&
+                goalToUpdate.isCompleted() == completed)
             {
                 WindowUtils.showInformationDialog("Information",
                                                   "No changes",
@@ -174,7 +174,7 @@ public class EditGoalController
                 goalToUpdate.setTargetBalance(targetBalance);
                 goalToUpdate.setTargetDate(targetDate.atStartOfDay());
                 goalToUpdate.setMotivation(motivation);
-                goalToUpdate.setIsArchived(archived);
+                goalToUpdate.setArchived(archived);
 
                 // If the goal was completed and the user unchecked the completed
                 // checkbox, set the completion date to null, otherwise set the

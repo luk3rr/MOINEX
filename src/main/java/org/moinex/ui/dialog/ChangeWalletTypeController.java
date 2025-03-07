@@ -159,10 +159,7 @@ public class ChangeWalletTypeController
         String nameToMove = "Others";
 
         // Move the "Others" wallet type to the end of the list
-        if (walletTypes.stream()
-                .filter(n -> n.getName().equals(nameToMove))
-                .findFirst()
-                .isPresent())
+        if (walletTypes.stream().anyMatch(n -> n.getName().equals(nameToMove)))
         {
             WalletType walletType =
                 walletTypes.stream()

@@ -170,7 +170,7 @@ public class GoalController
             return;
         }
 
-        if (goal.getIsArchived())
+        if (goal.isArchived())
         {
             WindowUtils.showInformationDialog(
                 "Information",
@@ -313,7 +313,7 @@ public class GoalController
 
         List<Goal> inProgressGoals =
             goals.stream()
-                .filter(g -> !g.isCompleted() && !g.getIsArchived())
+                .filter(g -> !g.isCompleted() && !g.isArchived())
                 .collect(Collectors.toList());
 
         Integer start = inProgressCurrentPage * inProgressItemsPerPage;
@@ -453,15 +453,15 @@ public class GoalController
                     }
                     else if (selectedGoalStatus.equals("COMPLETED"))
                     {
-                        return g.isCompleted() && !g.getIsArchived();
+                        return g.isCompleted() && !g.isArchived();
                     }
                     else if (selectedGoalStatus.equals("ACTIVE"))
                     {
-                        return !g.isCompleted() && !g.getIsArchived();
+                        return !g.isCompleted() && !g.isArchived();
                     }
                     else if (selectedGoalStatus.equals("ARCHIVED"))
                     {
-                        return g.getIsArchived();
+                        return g.isArchived();
                     }
 
                     return false;
@@ -478,15 +478,15 @@ public class GoalController
                     }
                     else if (selectedGoalStatus.equals("COMPLETED"))
                     {
-                        return g.isCompleted() && !g.getIsArchived();
+                        return g.isCompleted() && !g.isArchived();
                     }
                     else if (selectedGoalStatus.equals("ACTIVE"))
                     {
-                        return !g.isCompleted() && !g.getIsArchived();
+                        return !g.isCompleted() && !g.isArchived();
                     }
                     else if (selectedGoalStatus.equals("ARCHIVED"))
                     {
-                        return g.getIsArchived();
+                        return g.isArchived();
                     }
 
                     return false;
@@ -546,7 +546,7 @@ public class GoalController
     {
         Integer inProgressGoalsSize =
             goals.stream()
-                .filter(g -> !g.isCompleted() && !g.getIsArchived())
+                .filter(g -> !g.isCompleted() && !g.isArchived())
                 .collect(Collectors.toList())
                 .size();
 

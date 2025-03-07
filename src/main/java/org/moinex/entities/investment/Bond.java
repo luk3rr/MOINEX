@@ -63,5 +63,5 @@ public class Bond extends Asset
     @Column(name             = "archived",
             nullable         = false,
             columnDefinition = "boolean default false")
-    private Boolean archived = false; // Default value is false
+    private boolean archived = false; // Default value is false
 }

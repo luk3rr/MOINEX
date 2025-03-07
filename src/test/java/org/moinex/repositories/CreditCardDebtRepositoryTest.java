@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { MainApplication.class })
 @ActiveProfiles("test")
-public class CreditCardDebtRepositoryTest
+class CreditCardDebtRepositoryTest
 {
     @Autowired
     private CreditCardDebtRepository m_creditCardDebtRepository;
@@ -96,7 +96,7 @@ public class CreditCardDebtRepositoryTest
     }
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         // Initialize the credit card
         m_crcOperator = createCreditCardOperator("Operator");
@@ -105,7 +105,7 @@ public class CreditCardDebtRepositoryTest
     }
 
     @Test
-    public void testNoDebt()
+    void testNoDebt()
     {
         // No debt yet
         assertEquals(
@@ -116,7 +116,7 @@ public class CreditCardDebtRepositoryTest
     }
 
     @Test
-    public void testSingleDebt()
+    void testSingleDebt()
     {
         createCreditCardDebt(m_creditCard,
                              new BigDecimal("1000.0"),
@@ -130,7 +130,7 @@ public class CreditCardDebtRepositoryTest
     }
 
     @Test
-    public void testMultipleDebts()
+    void testMultipleDebts()
     {
         createCreditCardDebt(m_creditCard,
                              new BigDecimal("1000.0"),
@@ -148,7 +148,7 @@ public class CreditCardDebtRepositoryTest
     }
 
     @Test
-    public void testDebtsForMultipleCreditCards()
+    void testDebtsForMultipleCreditCards()
     {
         CreditCard creditCard1 =
             createCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));

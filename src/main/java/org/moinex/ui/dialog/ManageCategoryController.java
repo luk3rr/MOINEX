@@ -180,7 +180,7 @@ public class ManageCategoryController
                 .filter(c -> {
                     String name     = c.getName().toLowerCase();
                     String id       = c.getId().toString();
-                    String archived = c.getIsArchived() ? "yes" : "no";
+                    String archived = c.isArchived() ? "yes" : "no";
 
                     return name.contains(similarTextOrId) ||
                         id.contains(similarTextOrId) ||
@@ -252,8 +252,7 @@ public class ManageCategoryController
         TableColumn<Category, String> archivedColumn = new TableColumn<>("Archived");
         archivedColumn.setCellValueFactory(
             param
-            -> new SimpleStringProperty(param.getValue().getIsArchived() ? "Yes"
-                                                                         : "No"));
+            -> new SimpleStringProperty(param.getValue().isArchived() ? "Yes" : "No"));
 
         archivedColumn.setCellFactory(column -> new TableCell<Category, String>() {
             @Override

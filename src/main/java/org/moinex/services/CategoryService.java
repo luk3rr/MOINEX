@@ -134,7 +134,7 @@ public class CategoryService
                 -> new RuntimeException("Category with ID " + id +
                                         " not found and cannot be archived"));
 
-        category.setIsArchived(true);
+        category.setArchived(true);
 
         categoryRepository.save(category);
 
@@ -154,7 +154,7 @@ public class CategoryService
                 -> new RuntimeException("Category with ID " + id +
                                         " not found and cannot be unarchived"));
 
-        category.setIsArchived(false);
+        category.setArchived(false);
 
         categoryRepository.save(category);
 

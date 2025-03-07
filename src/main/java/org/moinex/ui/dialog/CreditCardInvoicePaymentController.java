@@ -256,7 +256,7 @@ public class CreditCardInvoicePaymentController
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { getResultFromCalculator(); }));
+                                    List.of(() -> getResultFromCalculator()));
     }
 
     private void getResultFromCalculator()

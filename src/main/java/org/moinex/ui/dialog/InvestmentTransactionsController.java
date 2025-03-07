@@ -420,25 +420,23 @@ public class InvestmentTransactionsController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<TickerPurchase, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
+        idColumn.setCellFactory(column -> new TableCell<TickerPurchase, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (item == null || empty)
                 {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
+                    setText(null);
                 }
-            };
+                else
+                {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                                 // ensure the text is centered
+                }
+            }
         });
 
         TableColumn<TickerPurchase, String> tickerNameColumn =
@@ -517,25 +515,23 @@ public class InvestmentTransactionsController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<TickerSale, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
+        idColumn.setCellFactory(column -> new TableCell<TickerSale, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (item == null || empty)
                 {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
+                    setText(null);
                 }
-            };
+                else
+                {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                                 // ensure the text is centered
+                }
+            }
         });
 
         TableColumn<TickerSale, String> tickerNameColumn = new TableColumn<>("Ticker");
@@ -610,25 +606,23 @@ public class InvestmentTransactionsController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<Dividend, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
+        idColumn.setCellFactory(column -> new TableCell<Dividend, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (item == null || empty)
                 {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
+                    setText(null);
                 }
-            };
+                else
+                {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                                 // ensure the text is centered
+                }
+            }
         });
 
         TableColumn<Dividend, String> tickerNameColumn = new TableColumn<>("Ticker");
@@ -688,25 +682,23 @@ public class InvestmentTransactionsController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<CryptoExchange, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
+        idColumn.setCellFactory(column -> new TableCell<CryptoExchange, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (item == null || empty)
                 {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
+                    setText(null);
                 }
-            };
+                else
+                {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                                 // ensure the text is centered
+                }
+            }
         });
 
         TableColumn<CryptoExchange, String> soldCryptoNameColumn =

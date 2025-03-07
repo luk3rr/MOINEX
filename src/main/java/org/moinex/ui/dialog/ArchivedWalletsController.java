@@ -106,7 +106,6 @@ public class ArchivedWalletsController
                 WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving wallet",
                                             e.getMessage());
-                return;
             }
         }
     }
@@ -158,7 +157,6 @@ public class ArchivedWalletsController
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing wallet",
                                             e.getMessage());
-                return;
             }
         }
     }

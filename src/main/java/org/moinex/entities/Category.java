@@ -42,5 +42,5 @@ public class Category
 
     @Builder.Default
     @Column(name = "archived", nullable = false)
-    private Boolean isArchived = false; // Default value is false
+    private boolean isArchived = false; // Default value is false
 }

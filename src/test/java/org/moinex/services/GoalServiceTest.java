@@ -36,7 +36,7 @@ import org.moinex.repositories.WalletTypeRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)
-public class GoalServiceTest
+class GoalServiceTest
 {
     @Mock
     private WalletRepository m_walletRepository;
@@ -77,13 +77,13 @@ public class GoalServiceTest
     }
 
     @BeforeAll
-    public static void setUp()
+    static void setUp()
     {
         MockitoAnnotations.openMocks(WalletServiceTest.class);
     }
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         m_goal = createGoal(1L,
                             "Goal1",
@@ -97,7 +97,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is created successfully")
-    public void testCreateGoal()
+    void testCreateGoal()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
@@ -126,7 +126,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not created when the name already exists")
-    public void testCreateGoalAlreadyExists()
+    void testCreateGoalAlreadyExists()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(true);
 
@@ -143,7 +143,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not created when the initial balance is negative")
-    public void testCreateGoalNegativeInitialBalance()
+    void testCreateGoalNegativeInitialBalance()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
@@ -160,7 +160,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not created when the target balance is negative")
-    public void testCreateGoalNegativeTargetBalance()
+    void testCreateGoalNegativeTargetBalance()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
@@ -177,7 +177,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not created when target balance zero")
-    public void testCreateGoalZeroBalance()
+    void testCreateGoalZeroBalance()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
@@ -194,7 +194,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not created when the target date is in the past")
-    public void testCreateGoalTargetDateInPast()
+    void testCreateGoalTargetDateInPast()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
@@ -212,7 +212,7 @@ public class GoalServiceTest
     @Test
     @DisplayName("Test if the goal is not created when the target balance is less "
                  + "than the initial balance")
-    public void
+    void
     testCreateGoalTargetBalanceLessThanInitialBalance()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
@@ -231,7 +231,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not created when the wallet type does not exist")
-    public void testCreateGoalWalletTypeDoesNotExist()
+    void testCreateGoalWalletTypeDoesNotExist()
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
@@ -253,33 +253,33 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is archived successfully")
-    public void testArchiveGoal()
+    void testArchiveGoal()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
         m_goalService.archiveGoal(m_goal.getId());
 
         verify(m_goalRepository).save(m_goal);
-        assertTrue(m_goal.getIsArchived());
+        assertTrue(m_goal.isArchived());
     }
 
     @Test
     @DisplayName("Test if the goal is unarchived successfully")
-    public void testUnarchiveGoal()
+    void testUnarchiveGoal()
     {
-        m_goal.setIsArchived(true);
+        m_goal.setArchived(true);
 
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
         m_goalService.unarchiveGoal(m_goal.getId());
 
         verify(m_goalRepository).save(m_goal);
-        assertTrue(!m_goal.getIsArchived());
+        assertTrue(!m_goal.isArchived());
     }
 
     @Test
     @DisplayName("Test if the goal is not archived when it does not exist")
-    public void testArchiveGoalDoesNotExist()
+    void testArchiveGoalDoesNotExist()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
@@ -291,7 +291,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not unarchived when it does not exist")
-    public void testUnarchiveGoalDoesNotExist()
+    void testUnarchiveGoalDoesNotExist()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
@@ -303,7 +303,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is renamed successfully")
-    public void testRenameGoal()
+    void testRenameGoal()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
@@ -316,7 +316,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not renamed when it does not exist")
-    public void testRenameGoalDoesNotExist()
+    void testRenameGoalDoesNotExist()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
@@ -328,7 +328,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the goal is not renamed when the new name already exists")
-    public void testRenameGoalAlreadyExists()
+    void testRenameGoalAlreadyExists()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
@@ -344,7 +344,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the initial balance is updated successfully")
-    public void testUpdateInitialBalance()
+    void testUpdateInitialBalance()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
@@ -361,7 +361,7 @@ public class GoalServiceTest
     @Test
     @DisplayName(
         "Test if the initial balance is not updated when the new balance is negative")
-    public void
+    void
     testUpdateInitialBalanceNegative()
     {
         assertThrows(RuntimeException.class, () -> {
@@ -375,7 +375,7 @@ public class GoalServiceTest
     @Test
     @DisplayName(
         "Test if the initial balance is not updated when the goal does not exist")
-    public void
+    void
     testUpdateInitialBalanceDoesNotExist()
     {
         assertThrows(RuntimeException.class, () -> {
@@ -388,7 +388,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the target balance is updated successfully")
-    public void testUpdateTargetBalance()
+    void testUpdateTargetBalance()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
@@ -403,7 +403,7 @@ public class GoalServiceTest
     @Test
     @DisplayName(
         "Test if the target balance is not updated when the new balance is negative")
-    public void
+    void
     testUpdateTargetBalanceNegative()
     {
         assertThrows(RuntimeException.class, () -> {
@@ -416,7 +416,7 @@ public class GoalServiceTest
     @Test
     @DisplayName(
         "Test if the target balance is not updated when the goal does not exist")
-    public void
+    void
     testUpdateTargetBalanceDoesNotExist()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
@@ -431,7 +431,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the target date is updated successfully")
-    public void testUpdateTargetDate()
+    void testUpdateTargetDate()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
@@ -444,7 +444,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the target date is not updated when the goal does not exist")
-    public void testUpdateTargetDateDoesNotExist()
+    void testUpdateTargetDateDoesNotExist()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
@@ -458,7 +458,7 @@ public class GoalServiceTest
     @Test
     @DisplayName(
         "Test if the target date is not updated when the new date is in the past")
-    public void
+    void
     testUpdateTargetDateInPast()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
@@ -473,7 +473,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the motivation is updated successfully")
-    public void testUpdateMotivation()
+    void testUpdateMotivation()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
@@ -486,7 +486,7 @@ public class GoalServiceTest
 
     @Test
     @DisplayName("Test if the motivation is not updated when the goal does not exist")
-    public void testUpdateMotivationDoesNotExist()
+    void testUpdateMotivationDoesNotExist()
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 

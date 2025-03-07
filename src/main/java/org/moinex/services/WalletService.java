@@ -154,7 +154,7 @@ public class WalletService
                 -> new RuntimeException("Wallet with id " + id +
                                         " not found and cannot be archived"));
 
-        wallet.setIsArchived(true);
+        wallet.setArchived(true);
         walletRepository.save(wallet);
 
         logger.info("Wallet with id " + id + " was archived");
@@ -175,7 +175,7 @@ public class WalletService
                 -> new RuntimeException("Wallet with id " + id +
                                         " not found and cannot be unarchived"));
 
-        wallet.setIsArchived(false);
+        wallet.setArchived(false);
         walletRepository.save(wallet);
 
         logger.info("Wallet with id " + id + " was unarchived");

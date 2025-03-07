@@ -39,7 +39,7 @@ import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
-public class RecurringTransactionServiceTest
+class RecurringTransactionServiceTest
 {
     @Mock
     private RecurringTransactionRepository recurringTransactionRepository;
@@ -94,7 +94,7 @@ public class RecurringTransactionServiceTest
     }
 
     @BeforeEach
-    public void setUp()
+    void beforeEach()
     {
         wallet  = new Wallet(1L, "Wallet", BigDecimal.valueOf(1000.0));
         wallet2 = new Wallet(2L, "Wallet 2", BigDecimal.valueOf(500.0));
@@ -159,7 +159,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the recurring transactions are created successfully")
-    public void testCreateRecurringTransaction()
+    void testCreateRecurringTransaction()
     {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
 
@@ -203,7 +203,7 @@ public class RecurringTransactionServiceTest
     @Test
     @DisplayName("Test if the recurring transactions is not created when the wallet "
                  + "is not found")
-    public void
+    void
     testCreateRecurringTransactionWalletNotFound()
     {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.empty());
@@ -225,7 +225,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the recurring transactions are stopped successfully")
-    public void testStopRecurringTransaction()
+    void testStopRecurringTransaction()
     {
         when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.of(dailyRT));
@@ -250,7 +250,7 @@ public class RecurringTransactionServiceTest
     @Test
     @DisplayName("Test if the recurring transactions is not stopped when the "
                  + "recurring transaction is not found")
-    public void
+    void
     testStopRecurringTransactionNotFound()
     {
         when(recurringTransactionRepository.findById(dailyRT.getId()))
@@ -267,7 +267,7 @@ public class RecurringTransactionServiceTest
     @Test
     @DisplayName("Test if the recurring transactions is not stopped when the "
                  + "recurring transaction has already ended")
-    public void
+    void
     testStopRecurringTransactionAlreadyEnded()
     {
         when(recurringTransactionRepository.findById(dailyRT.getId()))
@@ -286,7 +286,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the recurring transactions are deleted successfully")
-    public void testDeleteRecurringTransaction()
+    void testDeleteRecurringTransaction()
     {
         when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.of(dailyRT));
@@ -299,7 +299,7 @@ public class RecurringTransactionServiceTest
     @Test
     @DisplayName("Test if the recurring transactions is not deleted when the "
                  + "recurring transaction is not found")
-    public void
+    void
     testDeleteRecurringTransactionNotFound()
     {
         when(recurringTransactionRepository.findById(dailyRT.getId()))
@@ -315,7 +315,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the recurring transactions are updated successfully")
-    public void testUpdateRecurringTransaction()
+    void testUpdateRecurringTransaction()
     {
         RecurringTransaction updatedRT =
             new RecurringTransaction(dailyRT.getId(),
@@ -384,7 +384,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the daily recurring transactions are processed correctly")
-    public void testProcessDailyRecurringTransaction()
+    void testProcessDailyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
@@ -428,7 +428,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the weekly recurring transactions are processed correctly")
-    public void testProcessWeeklyRecurringTransaction()
+    void testProcessWeeklyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
@@ -473,7 +473,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the monthly recurring transactions are processed correctly")
-    public void testProcessMonthlyRecurringTransaction()
+    void testProcessMonthlyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
@@ -518,7 +518,7 @@ public class RecurringTransactionServiceTest
 
     @Test
     @DisplayName("Test if the yearly recurring transactions are processed correctly")
-    public void testProcessYearlyRecurringTransaction()
+    void testProcessYearlyRecurringTransaction()
     {
         LocalDateTime today =
             LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
@@ -565,7 +565,7 @@ public class RecurringTransactionServiceTest
     @DisplayName(
         "Test if the active recurring transactions with end date in the past are "
         + "stopped")
-    public void
+    void
     testProcessRecurringTransactionEnds()
     {
         LocalDateTime today =
@@ -597,7 +597,7 @@ public class RecurringTransactionServiceTest
     @DisplayName(
         "Test if get future recurring transactions by month returns the correct "
         + "transactions")
-    public void
+    void
     testGetFutureRecurringTransactionsByMonth()
     {
         YearMonth     november2011YearMonth = YearMonth.of(2011, 11);
@@ -639,7 +639,7 @@ public class RecurringTransactionServiceTest
     @DisplayName(
         "Test if get future recurring transactions by year returns the correct "
         + "transactions")
-    public void
+    void
     testGetFutureRecurringTransactionsByYear()
     {
         Year          year2011 = Year.of(2011);

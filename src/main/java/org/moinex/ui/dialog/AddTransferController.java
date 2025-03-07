@@ -240,7 +240,6 @@ public class AddTransferController
             WindowUtils.showErrorDialog("Error",
                                         "Error while creating transfer",
                                         e.getMessage());
-            return;
         }
     }
 
@@ -252,7 +251,7 @@ public class AddTransferController
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { getResultFromCalculator(); }));
+                                    List.of(() -> getResultFromCalculator()));
     }
 
     private void getResultFromCalculator()

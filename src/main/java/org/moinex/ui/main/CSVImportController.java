@@ -101,7 +101,7 @@ public class CSVImportController
 
         // Add a listener to the table selector
         tableSelectorComboBox.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> { populateMappingTable(); });
+            (observable, oldValue, newValue) -> populateMappingTable());
     }
 
     /**
@@ -495,10 +495,6 @@ public class CSVImportController
                             getvalueforcolumn(csvHeaders, row, csvColumn));
                     }
                 }
-                catch (NumberFormatException e)
-                {
-                    m_logger.severe(e.getMessage());
-                }
                 catch (IllegalArgumentException e)
                 {
                     m_logger.severe(e.getMessage());
@@ -549,9 +545,8 @@ public class CSVImportController
         csvColumnTableColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getCSVColumn()));
 
-        dbColumnTableColumn.setCellValueFactory(param -> {
-            return new SimpleStringProperty(param.getValue().getSelectedDBColumn());
-        });
+        dbColumnTableColumn.setCellValueFactory(
+            param -> new SimpleStringProperty(param.getValue().getSelectedDBColumn()));
 
         dbColumnTableColumn.setCellFactory(
             col -> new ComboBoxTableCell<MappingRow, String>() {

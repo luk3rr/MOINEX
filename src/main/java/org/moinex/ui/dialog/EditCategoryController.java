@@ -53,7 +53,7 @@ public class EditCategoryController
         selectedCategoryLabel.setText(ct.getName());
         selectedCategory = ct;
 
-        archivedCheckBox.setSelected(ct.getIsArchived());
+        archivedCheckBox.setSelected(ct.isArchived());
     }
 
     @FXML
@@ -61,10 +61,10 @@ public class EditCategoryController
     {
         String newName = categoryNewNameField.getText();
 
-        Boolean archived = archivedCheckBox.isSelected();
+        boolean archived = archivedCheckBox.isSelected();
 
-        Boolean nameChanged     = false;
-        Boolean archivedChanged = false;
+        boolean nameChanged     = false;
+        boolean archivedChanged = false;
 
         if (newName == null ||
             !newName.isBlank() && !newName.equals(selectedCategory.getName()))
@@ -84,7 +84,7 @@ public class EditCategoryController
             }
         }
 
-        if (archived && !selectedCategory.getIsArchived())
+        if (archived && !selectedCategory.isArchived())
         {
             try
             {
@@ -100,7 +100,7 @@ public class EditCategoryController
                 return;
             }
         }
-        else if (!archived && selectedCategory.getIsArchived())
+        else if (!archived && selectedCategory.isArchived())
         {
             try
             {

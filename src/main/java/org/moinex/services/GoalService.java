@@ -226,10 +226,10 @@ public class GoalService
         oldGoal.setTargetBalance(goal.getTargetBalance());
         oldGoal.setTargetDate(goal.getTargetDate());
         oldGoal.setMotivation(goal.getMotivation());
-        oldGoal.setIsArchived(goal.getIsArchived());
+        oldGoal.setArchived(goal.isArchived());
 
         // Check if the goal was completed or reopened, and update it
-        if (!goal.isCompleted().equals(oldGoal.isCompleted()))
+        if (goal.isCompleted() != oldGoal.isCompleted())
         {
             if (goal.isCompleted())
             {
@@ -262,7 +262,7 @@ public class GoalService
                 -> new RuntimeException("Goal with id " + idGoal +
                                         " not found and cannot be archived"));
 
-        goal.setIsArchived(true);
+        goal.setArchived(true);
 
         goalRepository.save(goal);
 
@@ -284,7 +284,7 @@ public class GoalService
                 -> new RuntimeException("Goal with id " + idGoal +
                                         " not found and cannot be unarchived"));
 
-        goal.setIsArchived(false);
+        goal.setArchived(false);
 
         goalRepository.save(goal);
 

@@ -36,7 +36,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { MainApplication.class })
 @ActiveProfiles("test")
-public class WalletTransactionRepositoryTest
+class WalletTransactionRepositoryTest
 {
     @Autowired
     private WalletTransactionRepository m_walletTransactionRepository;
@@ -85,7 +85,7 @@ public class WalletTransactionRepositoryTest
     }
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         m_wallet1 = createWallet("Wallet1", new BigDecimal("1000.0"));
         m_wallet2 = createWallet("Wallet2", new BigDecimal("2000.0"));
@@ -93,7 +93,7 @@ public class WalletTransactionRepositoryTest
 
     @Test
     @DisplayName("Test if the last n transactions in a wallet are returned correctly")
-    public void testGetLastTransactions()
+    void testGetLastTransactions()
     {
         // Create the wallet transactions
         WalletTransaction walletTransaction1 =
@@ -135,7 +135,7 @@ public class WalletTransactionRepositoryTest
     @Test
     @DisplayName("Test if the last n transactions in a wallet are returned correctly "
                  + "when there are no transactions")
-    public void
+    void
     testGetLastTransactionsNoTransactions()
     {
         // Request the last 3 transactions
@@ -154,7 +154,7 @@ public class WalletTransactionRepositoryTest
     @Test
     @DisplayName(
         "Test if the last n transactions of all wallets are returned correctly")
-    public void
+    void
     testGetLastTransactionsAllWallets()
     {
         // Create the wallet transactions

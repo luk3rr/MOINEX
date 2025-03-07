@@ -235,7 +235,6 @@ public class AddCryptoExchangeController
             WindowUtils.showErrorDialog("Error",
                                         "Error while creating exchange",
                                         e.getMessage());
-            return;
         }
     }
 
@@ -248,7 +247,7 @@ public class AddCryptoExchangeController
             springContext,
             (CalculatorController controller)
                 -> {},
-            List.of(() -> { getResultFromCalculator(cryptoSoldQuantityField); }));
+            List.of(() -> getResultFromCalculator(cryptoSoldQuantityField)));
     }
 
     @FXML
@@ -260,7 +259,7 @@ public class AddCryptoExchangeController
             springContext,
             (CalculatorController controller)
                 -> {},
-            List.of(() -> { getResultFromCalculator(cryptoReceivedQuantityField); }));
+            List.of(() -> getResultFromCalculator(cryptoReceivedQuantityField)));
     }
 
     private void getResultFromCalculator(TextField field)

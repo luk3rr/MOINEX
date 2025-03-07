@@ -53,7 +53,7 @@ public class Ticker extends Asset
     @Column(name             = "archived",
             nullable         = false,
             columnDefinition = "boolean default false")
-    private Boolean isArchived = false; // Default value is false
+    private boolean isArchived = false; // Default value is false
 
     public abstract static class TickerBuilder<C extends   Ticker, B
                                                    extends TickerBuilder<C, B>>

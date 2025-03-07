@@ -189,7 +189,7 @@ public class GoalFullPaneController
 
         Double percentage;
 
-        if (goal.getIsArchived())
+        if (goal.isArchived())
         {
             // Set the button text according to the goal status
             toggleArchiveGoal.setText("Unarchive Goal");
@@ -281,7 +281,7 @@ public class GoalFullPaneController
     @FXML
     private void handleAddIncome()
     {
-        if (goal.getIsArchived())
+        if (goal.isArchived())
         {
             WindowUtils.showInformationDialog("Information",
                                               "Goal is archived",
@@ -293,14 +293,14 @@ public class GoalFullPaneController
                                     "Add new income",
                                     springContext,
                                     (AddIncomeController controller)
-                                        -> { controller.setWalletComboBox(goal); },
+                                        -> controller.setWalletComboBox(goal),
                                     List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
     private void handleAddExpense()
     {
-        if (goal.getIsArchived())
+        if (goal.isArchived())
         {
             WindowUtils.showInformationDialog("Information",
                                               "Goal is archived",
@@ -312,14 +312,14 @@ public class GoalFullPaneController
                                     "Add new expense",
                                     springContext,
                                     (AddExpenseController controller)
-                                        -> { controller.setWalletComboBox(goal); },
+                                        -> controller.setWalletComboBox(goal),
                                     List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
     private void handleAddTransfer()
     {
-        if (goal.getIsArchived())
+        if (goal.isArchived())
         {
             WindowUtils.showInformationDialog(
                 "Information",
@@ -333,7 +333,7 @@ public class GoalFullPaneController
             "Add new transfer",
             springContext,
             (AddTransferController controller)
-                -> { controller.setReceiverWalletComboBox(goal); },
+                -> controller.setReceiverWalletComboBox(goal),
             List.of(() -> goalController.updateDisplay()));
     }
 
@@ -344,7 +344,7 @@ public class GoalFullPaneController
                                     "Edit goal",
                                     springContext,
                                     (EditGoalController controller)
-                                        -> { controller.setGoal(goal); },
+                                        -> controller.setGoal(goal),
                                     List.of(() -> goalController.updateDisplay()));
     }
 
@@ -392,7 +392,7 @@ public class GoalFullPaneController
     @FXML
     private void handleArchiveGoal()
     {
-        if (goal.getIsArchived())
+        if (goal.isArchived())
         {
             if (WindowUtils.showConfirmationDialog(
                     "Confirmation",

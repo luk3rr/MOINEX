@@ -151,11 +151,11 @@ public class EditRecurringTransactionController
                 .map(Enum::name)
                 .toList());
 
-        nextDueDatePicker.setOnAction(e -> { updateInfoLabel(); });
+        nextDueDatePicker.setOnAction(e -> updateInfoLabel());
 
-        endDatePicker.setOnAction(e -> { updateInfoLabel(); });
+        endDatePicker.setOnAction(e -> updateInfoLabel());
 
-        frequencyComboBox.setOnAction(e -> { updateInfoLabel(); });
+        frequencyComboBox.setOnAction(e -> updateInfoLabel());
 
         // Check if the value field is a valid monetary value
         valueField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -174,7 +174,7 @@ public class EditRecurringTransactionController
                 }
             });
 
-        activeCheckBox.setOnAction(e -> { updateInfoLabel(); });
+        activeCheckBox.setOnAction(e -> updateInfoLabel());
     }
 
     @FXML
@@ -233,7 +233,7 @@ public class EditRecurringTransactionController
             RecurringTransactionFrequency frequency =
                 RecurringTransactionFrequency.valueOf(frequencyString);
 
-            Boolean endDateChanged =
+            boolean endDateChanged =
                 (endDate != null &&
                  !endDate.equals(rtToUpdate.getEndDate().toLocalDate())) ||
                 (endDate == null &&
@@ -366,7 +366,7 @@ public class EditRecurringTransactionController
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
-        if (categories.size() == 0)
+        if (categories.isEmpty())
         {
             UIUtils.addTooltipToNode(
                 categoryComboBox,

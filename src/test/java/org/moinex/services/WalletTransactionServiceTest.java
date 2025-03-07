@@ -41,7 +41,7 @@ import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
-public class WalletTransactionServiceTest
+class WalletTransactionServiceTest
 {
     @Mock
     private WalletRepository m_walletRepository;
@@ -113,13 +113,13 @@ public class WalletTransactionServiceTest
     }
 
     @BeforeAll
-    public static void SetUp()
+    static void setUp()
     {
         MockitoAnnotations.openMocks(WalletTransactionServiceTest.class);
     }
 
     @BeforeEach
-    public void BeforeEach()
+    void beforeEach()
     {
         m_incomeAmount   = new BigDecimal("500");
         m_expenseAmount  = new BigDecimal("200");
@@ -159,7 +159,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the money transfer is successful")
-    public void testTransferMoneySuccess()
+    void testTransferMoneySuccess()
     {
         BigDecimal m_senderPreviousBalance   = m_wallet1.getBalance();
         BigDecimal m_receiverPreviousBalance = m_wallet2.getBalance();
@@ -209,7 +209,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the sender wallet does not exist")
-    public void testTransferMoneySenderDoesNotExist()
+    void testTransferMoneySenderDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
@@ -228,7 +228,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the receiver wallet does not exist")
-    public void testTransferMoneyReceiverDoesNotExist()
+    void testTransferMoneyReceiverDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
@@ -252,7 +252,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName(
         "Test if exception is thrown when the sender and receiver wallets are the same")
-    public void
+    void
     testTransferMoneySameWallet()
     {
         assertThrows(RuntimeException.class,
@@ -270,7 +270,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if exception is thrown when the amount to transfer is less "
                  + "than or equal to zero")
-    public void
+    void
     testTransferMoneyAmountZero()
     {
         assertThrows(
@@ -288,7 +288,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the confirmed income is added successfully")
-    public void testAddConfirmedIncome()
+    void testAddConfirmedIncome()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
 
@@ -323,7 +323,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the pending income is added successfully")
-    public void testAddPendingIncome()
+    void testAddPendingIncome()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
 
@@ -358,7 +358,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if exception is thrown when the wallet to receive the income "
                  + "does not exist")
-    public void
+    void
     testAddIncomeWalletDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -393,7 +393,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the confirmed expense is added successfully")
-    public void testAddConfirmedExpense()
+    void testAddConfirmedExpense()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
 
@@ -428,7 +428,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the pending expense is added successfully")
-    public void testAddPendingExpense()
+    void testAddPendingExpense()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
 
@@ -463,7 +463,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if exception is thrown when the wallet to receive the expense "
                  + "does not exist")
-    public void
+    void
     testAddExpenseWalletDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -499,7 +499,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if transaction type is changed from EXPENSE to INCOME and "
                  + "wallet balance is updated correctly")
-    public void
+    void
     testChangeTransactionTypeFromExpenseToIncome()
     {
         // Setup previous state
@@ -547,7 +547,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if transaction status is changed from CONFIRMED to PENDING "
                  + "and balance is reverted")
-    public void
+    void
     testChangeTransactionStatusFromConfirmedToPending()
     {
         BigDecimal        oldBalance = m_wallet1.getBalance();
@@ -591,7 +591,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName(
         "Test if the wallet is changed and transaction is applied to the new wallet")
-    public void
+    void
     testChangeTransactionWallet()
     {
         BigDecimal oldWallet1Balance = m_wallet1.getBalance();
@@ -645,7 +645,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if transaction amount is increased and wallet balance is "
                  + "updated correctly")
-    public void
+    void
     testIncreaseTransactionAmount()
     {
         // Setup previous state
@@ -694,7 +694,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if transaction amount is decreased and wallet balance is "
                  + "updated correctly")
-    public void
+    void
     testDecreaseTransactionAmount()
     {
         // Setup previous state
@@ -743,7 +743,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName(
         "Test if transaction amount remains the same and wallet balance is unaffected")
-    public void
+    void
     testChangeTransactionAmountWithNoChange()
     {
         // Setup previous state
@@ -788,7 +788,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName(
         "Test if exception is thrown when updating transaction with amount <= 0")
-    public void
+    void
     testChangeTransactionAmountInvalidAmount()
     {
         BigDecimal invalidAmount = BigDecimal.ZERO;
@@ -820,7 +820,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if an exception is thrown when transaction does not exist")
-    public void testUpdateNonExistentTransaction()
+    void testUpdateNonExistentTransaction()
     {
         WalletTransaction nonExistentTransaction =
             createWalletTransaction(m_wallet1,
@@ -846,7 +846,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the confirmed expense is deleted successfully")
-    public void testDeleteConfirmedExpense()
+    void testDeleteConfirmedExpense()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
 
@@ -870,7 +870,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the pending expense is deleted successfully")
-    public void testDeletePendingExpense()
+    void testDeletePendingExpense()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
         m_wallet1ExpenseTransaction.setStatus(TransactionStatus.PENDING);
@@ -895,7 +895,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the confirmed income transaction is deleted successfully")
-    public void testDeleteConfirmedIncome()
+    void testDeleteConfirmedIncome()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
 
@@ -918,7 +918,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the pending income transaction is deleted successfully")
-    public void testDeletePendingIncome()
+    void testDeletePendingIncome()
     {
         BigDecimal previousBalance = m_wallet1.getBalance();
         m_wallet1IncomeTransaction.setStatus(TransactionStatus.PENDING);
@@ -943,7 +943,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if exception is thrown when the transaction to delete does not "
                  + "exist")
-    public void
+    void
     testDeleteTransactionDoesNotExist()
     {
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
@@ -957,7 +957,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the income transaction is confirmed successfully")
-    public void testConfirmIncomeTransaction()
+    void testConfirmIncomeTransaction()
     {
         m_wallet1IncomeTransaction.setStatus(TransactionStatus.PENDING);
         BigDecimal previousBalance = m_wallet1.getBalance();
@@ -982,7 +982,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the expense transaction is confirmed successfully")
-    public void testConfirmExpenseTransaction()
+    void testConfirmExpenseTransaction()
     {
         m_wallet1ExpenseTransaction.setStatus(TransactionStatus.PENDING);
         BigDecimal previousBalance = m_wallet1.getBalance();
@@ -1009,7 +1009,7 @@ public class WalletTransactionServiceTest
     @Test
     @DisplayName("Test if exception is thrown when the transaction to confirm does not "
                  + "exist")
-    public void
+    void
     testConfirmTransactionDoesNotExist()
     {
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
@@ -1023,7 +1023,7 @@ public class WalletTransactionServiceTest
 
     @Test
     @DisplayName("Test if the transaction already confirmed is not confirmed again")
-    public void testConfirmTransactionAlreadyConfirmed()
+    void testConfirmTransactionAlreadyConfirmed()
     {
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1IncomeTransaction));

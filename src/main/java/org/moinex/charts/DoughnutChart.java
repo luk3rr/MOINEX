@@ -100,13 +100,11 @@ public class DoughnutChart extends PieChart
 
     private void addInnerCircleIfNotPresent()
     {
-        if (getData().size() > 0)
+        if (!getData().isEmpty())
         {
             Node pie = getData().get(0).getNode();
-            if (pie.getParent() instanceof Pane)
+            if (pie.getParent() instanceof Pane parent)
             {
-                Pane parent = (Pane)pie.getParent();
-
                 if (!parent.getChildren().contains(innerCircle))
                 {
                     parent.getChildren().add(innerCircle);
@@ -127,8 +125,10 @@ public class DoughnutChart extends PieChart
 
     private void updateInnerCircleLayout()
     {
-        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE;
+        double maxY = Double.MIN_VALUE;
 
         for (PieChart.Data data : getData())
         {

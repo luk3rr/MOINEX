@@ -114,11 +114,11 @@ public class AddRecurringTransactionController
                 .map(Enum::name)
                 .toList());
 
-        startDatePicker.setOnAction(e -> { updateInfoLabel(); });
+        startDatePicker.setOnAction(e -> updateInfoLabel());
 
-        endDatePicker.setOnAction(e -> { updateInfoLabel(); });
+        endDatePicker.setOnAction(e -> updateInfoLabel());
 
-        frequencyComboBox.setOnAction(e -> { updateInfoLabel(); });
+        frequencyComboBox.setOnAction(e -> updateInfoLabel());
 
         // Check if the value field is a valid monetary value
         valueField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -296,7 +296,7 @@ public class AddRecurringTransactionController
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
-        if (categories.size() == 0)
+        if (categories.isEmpty())
         {
             UIUtils.addTooltipToNode(
                 categoryComboBox,

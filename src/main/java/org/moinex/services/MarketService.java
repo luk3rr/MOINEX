@@ -7,7 +7,6 @@
 package org.moinex.services;
 
 import jakarta.transaction.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -36,9 +35,9 @@ public class MarketService
     @Autowired
     private MarketQuotesAndCommoditiesRepository marketQuotesAndCommoditiesRepository;
 
-    private Boolean isBrazilianMarketIndicatorsUpdating = false;
+    private boolean isBrazilianMarketIndicatorsUpdating = false;
 
-    private Boolean isMarketQuotesAndCommoditiesUpdating = false;
+    private boolean isMarketQuotesAndCommoditiesUpdating = false;
 
     /**
      * Get the Brazilian market indicators
@@ -156,8 +155,9 @@ public class MarketService
                     // and convert it to a YearMonth object
                     String date = ipcaLastMonth.getString("data");
 
-                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    LocalDate localDate = LocalDate.parse(date, inputFormatter);
+                    DateTimeFormatter inputFormatter =
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate localDate    = LocalDate.parse(date, inputFormatter);
                     YearMonth dateDateTime = YearMonth.from(localDate);
 
                     bmi.setIpcaLastMonthReference(dateDateTime);
@@ -173,8 +173,7 @@ public class MarketService
                         "Failed to fetch Brazilian market indicators");
                 }
             })
-            .whenComplete(
-                (result, e) -> { isBrazilianMarketIndicatorsUpdating = false; })
+            .whenComplete((result, e) -> isBrazilianMarketIndicatorsUpdating = false)
             .exceptionally(e -> {
                 isBrazilianMarketIndicatorsUpdating = false;
                 throw new RuntimeException(
@@ -270,7 +269,7 @@ public class MarketService
                 }
             })
             .whenComplete(
-                (result, e) -> { isMarketQuotesAndCommoditiesUpdating = false; })
+                (result, e) -> isMarketQuotesAndCommoditiesUpdating = false)
             .exceptionally(e -> {
                 isMarketQuotesAndCommoditiesUpdating = false;
                 throw new RuntimeException(

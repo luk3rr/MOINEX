@@ -107,7 +107,7 @@ public class CalendarController
                                     springContext,
                                     (AddCalendarEventController controller)
                                         -> {},
-                                    List.of(() -> { drawCalendar(); }));
+                                    List.of(() -> drawCalendar()));
     }
 
     /**
@@ -230,9 +230,8 @@ public class CalendarController
                     // Make the cell clickable to open the event details
                     // TODO: Implement the event details view
                     final Integer selectedDate = currentDate;
-                    cell.setOnMouseClicked(event -> {
-                        System.out.println("Selected date: " + selectedDate);
-                    });
+                    cell.setOnMouseClicked(
+                        event -> System.out.println("Selected date: " + selectedDate));
 
                     // Align the event indicators to the bottom of the cell
                     Region spacer = new Region();
@@ -277,9 +276,9 @@ public class CalendarController
             }
             else
             {
-                List<CalendarEvent> OldListByDate = calendarEventMap.get(eventDate);
+                List<CalendarEvent> oldListByDate = calendarEventMap.get(eventDate);
 
-                List<CalendarEvent> newList = new ArrayList<>(OldListByDate);
+                List<CalendarEvent> newList = new ArrayList<>(oldListByDate);
                 newList.add(event);
                 calendarEventMap.put(eventDate, newList);
             }

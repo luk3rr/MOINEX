@@ -19,7 +19,7 @@ public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
      * @param name The name of the credit card
      * @return True if a credit card with the given name exists, false otherwise
      */
-    Boolean existsByName(String name);
+    boolean existsByName(String name);
 
     /**
      * Get a credit card by its name

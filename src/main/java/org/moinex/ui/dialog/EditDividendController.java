@@ -273,7 +273,7 @@ public class EditDividendController
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { getResultFromCalculator(); }));
+                                    List.of(() -> getResultFromCalculator()));
     }
 
     private void getResultFromCalculator()
@@ -431,7 +431,7 @@ public class EditDividendController
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
-        if (categories.size() == 0)
+        if (categories.isEmpty())
         {
             UIUtils.addTooltipToNode(
                 categoryComboBox,

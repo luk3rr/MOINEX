@@ -17,7 +17,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardCredit;
 import org.moinex.services.CreditCardService;
 import org.moinex.util.Constants;

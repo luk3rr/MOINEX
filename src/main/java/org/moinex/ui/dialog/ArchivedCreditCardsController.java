@@ -102,7 +102,6 @@ public class ArchivedCreditCardsController
                 WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving credit card",
                                             e.getMessage());
-                return;
             }
         }
     }
@@ -154,7 +153,6 @@ public class ArchivedCreditCardsController
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing credit card",
                                             e.getMessage());
-                return;
             }
         }
     }

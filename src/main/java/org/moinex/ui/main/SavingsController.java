@@ -144,7 +144,7 @@ public class SavingsController
     @Autowired
     private ConfigurableApplicationContext springContext;
 
-    private Boolean isUpdatingPortfolioPrices = false;
+    private boolean isUpdatingPortfolioPrices = false;
 
     private final ScheduledExecutorService scheduler =
         Executors.newScheduledThreadPool(1);
@@ -153,11 +153,11 @@ public class SavingsController
 
     private Integer scheduledUpdatingMarketQuotesRetries = 0;
 
-    private Boolean scheduledUpdatingMarketQuotes = false;
+    private boolean scheduledUpdatingMarketQuotes = false;
 
     private Integer scheduledUpdatingBrazilianIndicatorsRetries = 0;
 
-    private Boolean scheduledUpdatingBrazilianIndicators = false;
+    private boolean scheduledUpdatingBrazilianIndicators = false;
 
     private final Integer maxRetries = 3;
 

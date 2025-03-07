@@ -138,9 +138,9 @@ public class EditTransactionController
             walletAfterBalance();
         });
 
-        transactionTypeComboBox.setOnAction(e -> { walletAfterBalance(); });
+        transactionTypeComboBox.setOnAction(e -> walletAfterBalance());
 
-        statusComboBox.setOnAction(e -> { walletAfterBalance(); });
+        statusComboBox.setOnAction(e -> walletAfterBalance());
 
         transactionValueField.textProperty().addListener(
             (observable, oldValue, newValue) -> {

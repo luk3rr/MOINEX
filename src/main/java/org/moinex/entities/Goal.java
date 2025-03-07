@@ -121,7 +121,7 @@ public class Goal extends Wallet
         this.completionDate = completionDate.format(Constants.DB_DATE_FORMATTER);
     }
 
-    public Boolean isCompleted()
+    public boolean isCompleted()
     {
         return this.completionDate != null;
     }

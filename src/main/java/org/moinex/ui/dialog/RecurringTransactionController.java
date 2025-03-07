@@ -79,7 +79,7 @@ public class RecurringTransactionController
 
         updateRecurringTransactionTableView();
 
-        statusComboBox.setOnAction(event -> { updateRecurringTransactionTableView(); });
+        statusComboBox.setOnAction(event -> updateRecurringTransactionTableView());
 
         // Add listener to the search field
         searchField.textProperty().addListener(
@@ -353,7 +353,7 @@ public class RecurringTransactionController
                     }
                     else
                     {
-                        setText(item.toString());
+                        setText(item);
                         setAlignment(Pos.CENTER);
                         setStyle("-fx-padding: 0;");
                     }

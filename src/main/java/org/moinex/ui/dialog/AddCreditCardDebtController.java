@@ -226,7 +226,7 @@ public class AddCreditCardDebtController
                                     springContext,
                                     (CalculatorController controller)
                                         -> {},
-                                    List.of(() -> { getResultFromCalculator(); }));
+                                    List.of(() -> getResultFromCalculator()));
     }
 
     private void getResultFromCalculator()
@@ -388,7 +388,7 @@ public class AddCreditCardDebtController
             BigDecimal remainder = debtValue.subtract(
                 exactInstallmentValue.multiply(new BigDecimal(installments)));
 
-            Boolean exactDivision = remainder.compareTo(BigDecimal.ZERO) == 0;
+            boolean exactDivision = remainder.compareTo(BigDecimal.ZERO) == 0;
 
             if (exactDivision)
             {

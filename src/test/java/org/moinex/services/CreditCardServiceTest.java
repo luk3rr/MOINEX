@@ -42,7 +42,7 @@ import org.moinex.repositories.CreditCardRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)
-public class CreditCardServiceTest
+class CreditCardServiceTest
 {
     @Mock
     private CreditCardDebtRepository m_creditCardDebtRepository;
@@ -71,13 +71,13 @@ public class CreditCardServiceTest
     private String             m_crcLastFourDigits;
 
     @BeforeAll
-    public static void setUp()
+    static void setUp()
     {
         MockitoAnnotations.openMocks(CreditCardServiceTest.class);
     }
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         m_crcLastFourDigits = "1234";
         m_operator          = new CreditCardOperator(1L, "Operator");
@@ -99,7 +99,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if the credit card is created successfully")
-    public void testCreateCreditCard()
+    void testCreateCreditCard()
     {
         when(m_creditCardRepository.save(any(CreditCard.class)))
             .thenReturn(m_creditCard);
@@ -133,7 +133,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName(
         "Test if the credit card is not created when the name is already in use")
-    public void
+    void
     testCreateCreditCardAlreadyExists()
     {
         when(m_creditCardRepository.existsByName(m_creditCard.getName()))
@@ -156,7 +156,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName(
         "Test if the credit card is not created when the billing due day is invalid")
-    public void
+    void
     testCreateCreditCardInvalidDueDate()
     {
         when(m_creditCardRepository.existsByName(m_creditCard.getName()))
@@ -194,7 +194,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if the credit card is not created when the max debt is negative")
-    public void testCreateCreditCardNegativeMaxDebt()
+    void testCreateCreditCardNegativeMaxDebt()
     {
         when(m_creditCardRepository.existsByName(m_creditCard.getName()))
             .thenReturn(false);
@@ -220,7 +220,7 @@ public class CreditCardServiceTest
     @DisplayName(
         "Test if the credit card is not when last four digits is blank or not has 4 "
         + "digits")
-    public void
+    void
     testCreateCreditCardInvalidLastFourDigits()
     {
         when(m_creditCardRepository.existsByName(m_creditCard.getName()))
@@ -272,7 +272,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName(
         "Test if the credit card is not created when the operator does not exist")
-    public void
+    void
     testCreateCreditCardOperatorDoesNotExists()
     {
         when(m_creditCardRepository.existsByName(m_creditCard.getName()))
@@ -297,7 +297,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if the credit card is deleted successfully")
-    public void testDeleteCreditCard()
+    void testDeleteCreditCard()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.of(m_creditCard));
@@ -310,7 +310,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if the credit card is not deleted when it does not exist")
-    public void testdeletecreditCardDoesNotExists()
+    void testdeletecreditCardDoesNotExists()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.empty());
@@ -325,7 +325,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName(
         "Test if the available credit is returned correctly when there is no debt")
-    public void
+    void
     testGetAvailableCredit()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
@@ -344,7 +344,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName(
         "Test if the available credit is returned correctly when there is a debt")
-    public void
+    void
     testGetAvailableCreditWithDebt()
     {
         BigDecimal maxDebt              = m_creditCard.getMaxDebt();
@@ -368,7 +368,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName("Test if the available credit is returned correctly when there is a "
                  + "debt and payments")
-    public void
+    void
     testGetAvailableCreditWithDebtAndPayments()
     {
         m_creditCard.setMaxDebt(new BigDecimal("1000.0"));
@@ -393,7 +393,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the credit card does not exist")
-    public void testGetAvailableCreditDoesNotExists()
+    void testGetAvailableCreditDoesNotExists()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.empty());
@@ -405,7 +405,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if the debt is registered successfully")
-    public void testRegisterDebt()
+    void testRegisterDebt()
     {
         m_creditCard.setMaxDebt(new BigDecimal("1000.0"));
 
@@ -436,7 +436,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the credit card does not exist")
-    public void testRegisterDebtCreditCardDoesNotExists()
+    void testRegisterDebtCreditCardDoesNotExists()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.empty());
@@ -457,7 +457,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the category does not exist")
-    public void testRegisterDebtCategoryDoesNotExists()
+    void testRegisterDebtCategoryDoesNotExists()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.of(m_creditCard));
@@ -485,7 +485,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the value is negative")
-    public void testRegisterDebtNegativeValue()
+    void testRegisterDebtNegativeValue()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.of(m_creditCard));
@@ -513,7 +513,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if exception is thrown when the installment is less than 1")
-    public void testRegisterDebtInvalidInstallment()
+    void testRegisterDebtInvalidInstallment()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.of(m_creditCard));
@@ -542,7 +542,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName("Test if exception is thrown when the installment is greater than "
                  + "Constants.MAX_INSTALLMENTS")
-    public void
+    void
     testRegisterDebtInvalidInstallment2()
     {
         when(m_creditCardRepository.findById(m_creditCard.getId()))
@@ -573,7 +573,7 @@ public class CreditCardServiceTest
     @DisplayName(
         "Test if exception is thrown when the credit card does not have enough "
         + "credit to register the debt")
-    public void
+    void
     testRegisterDebtNotEnoughCredit()
     {
         m_creditCard.setMaxDebt(new BigDecimal("100.0"));
@@ -604,7 +604,7 @@ public class CreditCardServiceTest
 
     @Test
     @DisplayName("Test if the payment is registered successfully")
-    public void testRegisterPayment()
+    void testRegisterPayment()
     {
         // Setup mocks
         when(m_creditCardRepository.findById(m_creditCard.getId()))
@@ -681,7 +681,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName("Test if the payment is registered correctly when the debt is divided "
                  + "into installments")
-    public void
+    void
     testRegisterPaymentWithInstallmentsExactDivision()
     {
         // Case: 120 / 3 = 40
@@ -741,7 +741,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName("Test if the payment is registered correctly when the debt is not "
                  + "divided into installments")
-    public void
+    void
     testRegisterPaymentWithInstallmentsNotExactDivisionCase1()
     {
         // 100 / 3 =
@@ -798,7 +798,7 @@ public class CreditCardServiceTest
     @Test
     @DisplayName("Test if the payment is registered correctly when the debt is not "
                  + "divided into installments")
-    public void
+    void
     testRegisterPaymentWithInstallmentsNotExactDivisionCase2()
     {
         // 100 / 6 =

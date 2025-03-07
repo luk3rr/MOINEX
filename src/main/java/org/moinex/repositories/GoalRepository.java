@@ -18,5 +18,5 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
      * @param name The name of the goal
      * @return True if a goal with the given name exists, false otherwise
      */
-    Boolean existsByName(String name);
+    boolean existsByName(String name);
 }

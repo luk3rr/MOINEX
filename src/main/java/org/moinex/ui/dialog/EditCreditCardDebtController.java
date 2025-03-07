@@ -389,7 +389,7 @@ public class EditCreditCardDebtController
             BigDecimal remainder = debtValue.subtract(
                 exactInstallmentValue.multiply(new BigDecimal(installments)));
 
-            Boolean exactDivision = remainder.compareTo(BigDecimal.ZERO) == 0;
+            boolean exactDivision = remainder.compareTo(BigDecimal.ZERO) == 0;
 
             if (exactDivision)
             {

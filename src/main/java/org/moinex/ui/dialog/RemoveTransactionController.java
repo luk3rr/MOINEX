@@ -198,25 +198,23 @@ public class RemoveTransactionController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<WalletTransaction, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
+        idColumn.setCellFactory(column -> new TableCell<WalletTransaction, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (item == null || empty)
                 {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to ensure
-                                                     // the text is centered
-                    }
+                    setText(null);
                 }
-            };
+                else
+                {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to ensure
+                                                 // the text is centered
+                }
+            }
         });
 
         TableColumn<WalletTransaction, String> categoryColumn =

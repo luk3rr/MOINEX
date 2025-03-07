@@ -308,7 +308,7 @@ public class WalletFullPaneController
                                     "Add new income",
                                     springContext,
                                     (AddIncomeController controller)
-                                        -> { controller.setWalletComboBox(wallet); },
+                                        -> controller.setWalletComboBox(wallet),
                                     List.of(() -> walletController.updateDisplay()));
     }
 
@@ -319,20 +319,19 @@ public class WalletFullPaneController
                                     "Add new expense",
                                     springContext,
                                     (AddExpenseController controller)
-                                        -> { controller.setWalletComboBox(wallet); },
+                                        -> controller.setWalletComboBox(wallet),
                                     List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
     private void handleAddTransfer()
     {
-        WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
-            "Add new transfer",
-            springContext,
-            (AddTransferController controller)
-                -> { controller.setSenderWalletComboBox(wallet); },
-            List.of(() -> walletController.updateDisplay()));
+        WindowUtils.openModalWindow(Constants.ADD_TRANSFER_FXML,
+                                    "Add new transfer",
+                                    springContext,
+                                    (AddTransferController controller)
+                                        -> controller.setSenderWalletComboBox(wallet),
+                                    List.of(() -> walletController.updateDisplay()));
     }
 
     @FXML
@@ -342,7 +341,7 @@ public class WalletFullPaneController
                                     "Rename wallet",
                                     springContext,
                                     (RenameWalletController controller)
-                                        -> { controller.setWalletComboBox(wallet); },
+                                        -> controller.setWalletComboBox(wallet),
                                     List.of(() -> walletController.updateDisplay()));
     }
 
@@ -353,7 +352,7 @@ public class WalletFullPaneController
                                     "Change wallet type",
                                     springContext,
                                     (ChangeWalletTypeController controller)
-                                        -> { controller.setWalletComboBox(wallet); },
+                                        -> controller.setWalletComboBox(wallet),
                                     List.of(() -> walletController.updateDisplay()));
     }
 
@@ -364,7 +363,7 @@ public class WalletFullPaneController
                                     "Change wallet balance",
                                     springContext,
                                     (ChangeWalletBalanceController controller)
-                                        -> { controller.setWalletComboBox(wallet); },
+                                        -> controller.setWalletComboBox(wallet),
                                     List.of(() -> walletController.updateDisplay()));
     }
 
@@ -419,7 +418,6 @@ public class WalletFullPaneController
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing wallet",
                                             e.getMessage());
-                return;
             }
         }
     }

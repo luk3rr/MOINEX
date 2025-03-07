@@ -6,8 +6,6 @@
 
 package org.moinex.entities;
 
-import javax.annotation.ParametersAreNullableByDefault;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

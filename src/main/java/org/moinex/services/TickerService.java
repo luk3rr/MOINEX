@@ -184,7 +184,7 @@ public class TickerService
                 -> new RuntimeException("Ticker with id " + id +
                                         " not found and cannot be archived"));
 
-        ticker.setIsArchived(true);
+        ticker.setArchived(true);
         tickerRepository.save(ticker);
 
         logger.info("Ticker with id " + id + " was archived");
@@ -205,7 +205,7 @@ public class TickerService
                 -> new RuntimeException("Ticker with id " + id +
                                         " not found and cannot be unarchived"));
 
-        ticker.setIsArchived(false);
+        ticker.setArchived(false);
         tickerRepository.save(ticker);
 
         logger.info("Ticker with id " + id + " was unarchived");
@@ -267,7 +267,7 @@ public class TickerService
         oldTicker.setCurrentUnitValue(tk.getCurrentUnitValue());
         oldTicker.setCurrentQuantity(tk.getCurrentQuantity());
         oldTicker.setAverageUnitValue(tk.getAverageUnitValue());
-        oldTicker.setIsArchived(tk.getIsArchived());
+        oldTicker.setArchived(tk.isArchived());
 
         // If sold all holdings, reset average price
         if (oldTicker.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)

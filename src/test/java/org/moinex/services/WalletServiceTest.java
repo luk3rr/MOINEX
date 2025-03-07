@@ -36,7 +36,7 @@ import org.moinex.repositories.WalletTypeRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)
-public class WalletServiceTest
+class WalletServiceTest
 {
     @Mock
     private WalletRepository m_walletRepository;
@@ -74,13 +74,13 @@ public class WalletServiceTest
     }
 
     @BeforeAll
-    public static void setUp()
+    static void setUp()
     {
         MockitoAnnotations.openMocks(WalletServiceTest.class);
     }
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         m_wallet1 = CreateWallet(1L, "Wallet1", new BigDecimal("1000"));
         m_wallet2 = CreateWallet(2L, "Wallet2", new BigDecimal("2000"));
@@ -91,7 +91,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet is created successfully")
-    public void testCreateWallet()
+    void testCreateWallet()
     {
         when(m_walletRepository.existsByName(m_wallet1.getName())).thenReturn(false);
 
@@ -111,7 +111,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet is not created when the name is already in use")
-    public void testCreateWalletAlreadyExists()
+    void testCreateWalletAlreadyExists()
     {
         when(m_walletRepository.existsByName(m_wallet1.getName())).thenReturn(true);
 
@@ -126,7 +126,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet is deleted successfully")
-    public void testDeleteWallet()
+    void testDeleteWallet()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
@@ -139,7 +139,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet is not deleted when it does not exist")
-    public void testDeleteWalletDoesNotExist()
+    void testDeleteWalletDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
@@ -153,7 +153,7 @@ public class WalletServiceTest
 
     @DisplayName("Test if the wallet is archived successfully")
     @Test
-    public void testArchiveWallet()
+    void testArchiveWallet()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
@@ -164,13 +164,13 @@ public class WalletServiceTest
 
         // Check if the wallet was archived
         verify(m_walletRepository).save(m_wallet1);
-        assertTrue(m_wallet1.getIsArchived());
+        assertTrue(m_wallet1.isArchived());
     }
 
     @Test
     @DisplayName(
         "Test if exception is thrown when trying to archive a non-existent wallet")
-    public void
+    void
     testArchiveWalletDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -185,7 +185,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet has been renamed successfully")
-    public void testRenameWallet()
+    void testRenameWallet()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
@@ -204,7 +204,7 @@ public class WalletServiceTest
     @Test
     @DisplayName(
         "Test if exception is thrown when trying to rename a non-existent wallet")
-    public void
+    void
     testRenameWalletDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -221,7 +221,7 @@ public class WalletServiceTest
     @Test
     @DisplayName("Test if exception is thrown when trying to rename a wallet to an "
                  + "already existing name")
-    public void
+    void
     testRenameWalletAlreadyExists()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -239,7 +239,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet type is changed successfully")
-    public void testChangeWalletType()
+    void testChangeWalletType()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
@@ -261,7 +261,7 @@ public class WalletServiceTest
     @Test
     @DisplayName("Test if exception is thrown when trying to change the wallet type of "
                  + "a non-existent wallet")
-    public void
+    void
     testChangeWalletTypeWalletDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -278,7 +278,7 @@ public class WalletServiceTest
     @Test
     @DisplayName("Test if exception is thrown when trying to change the wallet type to "
                  + "a non-existent type")
-    public void
+    void
     testChangeWalletTypeDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
@@ -301,7 +301,7 @@ public class WalletServiceTest
     @Test
     @DisplayName("Test if exception is thrown when trying to change the wallet type of "
                  + "a wallet to the same type")
-    public void
+    void
     testChangeWalletTypeSameType()
     {
         // Define the wallet type of the wallet to be changed
@@ -324,7 +324,7 @@ public class WalletServiceTest
 
     @Test
     @DisplayName("Test if the wallet balance is updated successfully")
-    public void testUpdateWalletBalance()
+    void testUpdateWalletBalance()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.of(m_wallet1));
@@ -344,7 +344,7 @@ public class WalletServiceTest
     @Test
     @DisplayName("Test if exception is thrown when trying to update the balance of a "
                  + "non-existent wallet")
-    public void
+    void
     testUpdateWalletBalanceDoesNotExist()
     {
         when(m_walletRepository.findById(m_wallet1.getId()))

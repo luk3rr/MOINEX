@@ -140,7 +140,7 @@ public class CreditCardPaneController
             "Add Credit Card Debt",
             springContext,
             (AddCreditCardDebtController controller)
-                -> { controller.setCreditCard(creditCard); },
+                -> controller.setCreditCard(creditCard),
             List.of(() -> creditCardController.updateDisplay()));
     }
 
@@ -152,7 +152,7 @@ public class CreditCardPaneController
             "Add Credit Card Credit",
             springContext,
             (AddCreditCardCreditController controller)
-                -> { controller.setCreditCard(creditCard); },
+                -> controller.setCreditCard(creditCard),
             List.of(() -> creditCardController.updateDisplay()));
     }
 
@@ -164,7 +164,7 @@ public class CreditCardPaneController
             "Edit Credit Card",
             springContext,
             (EditCreditCardController controller)
-                -> { controller.setCreditCard(creditCard); },
+                -> controller.setCreditCard(creditCard),
             List.of(() -> creditCardController.updateDisplay()));
     }
 
@@ -193,7 +193,6 @@ public class CreditCardPaneController
                 WindowUtils.showErrorDialog("Error",
                                             "Error archiving credit card",
                                             e.getMessage());
-                return;
             }
         }
     }
@@ -233,7 +232,6 @@ public class CreditCardPaneController
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing credit card",
                                             e.getMessage());
-                return;
             }
         }
     }
@@ -272,10 +270,9 @@ public class CreditCardPaneController
             "Register Payment",
             springContext,
             (CreditCardInvoicePaymentController controller)
-                -> { controller.setCreditCard(creditCard, currentDisplayedMonth); },
+                -> controller.setCreditCard(creditCard, currentDisplayedMonth),
             // Update the display after the payment is registered with the current month
-            List.of(
-                () -> { creditCardController.updateDisplay(currentDisplayedMonth); }));
+            List.of(() -> creditCardController.updateDisplay(currentDisplayedMonth)));
     }
 
     /**

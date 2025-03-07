@@ -106,7 +106,6 @@ public class ArchivedTickersController
                 WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving ticker",
                                             e.getMessage());
-                return;
             }
         }
     }
@@ -159,7 +158,6 @@ public class ArchivedTickersController
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing ticker",
                                             e.getMessage());
-                return;
             }
         }
     }
@@ -231,33 +229,31 @@ public class ArchivedTickersController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<Ticker, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
+        idColumn.setCellFactory(column -> new TableCell<Ticker, Long>() {
+            @Override
+            protected void updateItem(Long item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                if (item == null || empty)
                 {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
+                    setText(null);
                 }
-            };
+                else
+                {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                                 // ensure the text is centered
+                }
+            }
         });
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getName()));
 
-        TableColumn<Ticker, String> SymbolColumn = new TableColumn<>("Symbol");
-        SymbolColumn.setCellValueFactory(
+        TableColumn<Ticker, String> symbolColumn = new TableColumn<>("Symbol");
+        symbolColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getSymbol()));
 
         TableColumn<Ticker, String> typeColumn = new TableColumn<>("Type");
@@ -292,7 +288,7 @@ public class ArchivedTickersController
         // Add the columns to the table view
         tickerTableView.getColumns().add(idColumn);
         tickerTableView.getColumns().add(nameColumn);
-        tickerTableView.getColumns().add(SymbolColumn);
+        tickerTableView.getColumns().add(symbolColumn);
         tickerTableView.getColumns().add(typeColumn);
         tickerTableView.getColumns().add(quantityColumn);
         tickerTableView.getColumns().add(unitColumn);

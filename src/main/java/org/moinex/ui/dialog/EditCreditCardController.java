@@ -179,7 +179,7 @@ public class EditCreditCardController
                                                           " not found"))
                     : null;
 
-            Boolean defaultWalletChanged =
+            boolean defaultWalletChanged =
                 (crcDefaultBillingWallet != null &&
                  crcToUpdate.getDefaultBillingWallet() != null &&
                  crcDefaultBillingWallet.getId().equals(

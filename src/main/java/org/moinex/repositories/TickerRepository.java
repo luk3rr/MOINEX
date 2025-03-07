@@ -22,14 +22,14 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @param name The name of the ticker
      * @return True if a ticker with the given name exists, false otherwise
      */
-    Boolean existsByName(String name);
+    boolean existsByName(String name);
 
     /**
      * Check if a ticker with the given symbol exists
      * @param symbol The symbol of the ticker
      * @return True if a ticker with the given symbol exists, false otherwise
      */
-    Boolean existsBySymbol(String symbol);
+    boolean existsBySymbol(String symbol);
 
     /**
      * Get count of purchases associated with the ticker

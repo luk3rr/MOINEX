@@ -38,7 +38,7 @@ public class APIUtils
 
     private static final List<Process> runningProcesses = new ArrayList<>();
 
-    private static Boolean shuttingDown = false;
+    private static boolean shuttingDown = false;
 
     private static final Logger logger = LoggerConfig.getLogger();
 

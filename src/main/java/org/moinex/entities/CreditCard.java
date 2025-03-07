@@ -78,5 +78,5 @@ public class CreditCard
     @Column(name             = "archived",
             nullable         = false,
             columnDefinition = "boolean default false")
-    private Boolean isArchived = false; // Default value is false
+    private boolean isArchived = false; // Default value is false
 }

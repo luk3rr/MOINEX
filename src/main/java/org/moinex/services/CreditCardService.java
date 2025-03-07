@@ -471,8 +471,8 @@ public class CreditCardService
                     -> new RuntimeException("Credit with id " + creditId +
                                             " not found"));
 
-        // creditCardCreditRepository.delete(credit);
         //  TODO: Tratar a exclusão de créditos
+        creditCardCreditRepository.delete(credit);
 
         logger.info("Credit with id " + creditId + " deleted");
     }
@@ -498,7 +498,7 @@ public class CreditCardService
                 " has pending payments and cannot be archived");
         }
 
-        creditCard.setIsArchived(true);
+        creditCard.setArchived(true);
         creditCardRepository.save(creditCard);
 
         logger.info("Credit card with id " + id + " was archived");
@@ -517,7 +517,7 @@ public class CreditCardService
                 -> new RuntimeException("Credit card with id " + id +
                                         " not found and cannot be unarchived"));
 
-        creditCard.setIsArchived(false);
+        creditCard.setArchived(false);
         creditCardRepository.save(creditCard);
 
         logger.info("Credit card with id " + id + " was unarchived");

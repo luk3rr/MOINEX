@@ -147,7 +147,7 @@ public class CreditCardController
         // Select the default values
         debtsListMonthFilterComboBox.setValue(currentYearMonth);
 
-        debtsListMonthFilterComboBox.setOnAction(event -> { updateDebtsTableView(); });
+        debtsListMonthFilterComboBox.setOnAction(event -> updateDebtsTableView());
 
         updateTotalDebtsInfo();
         updateDisplayCards();
@@ -165,7 +165,7 @@ public class CreditCardController
                                     springContext,
                                     (AddCreditCardDebtController controller)
                                         -> {},
-                                    List.of(() -> { updateDisplay(); }));
+                                    List.of(() -> updateDisplay()));
     }
 
     @FXML
@@ -176,7 +176,7 @@ public class CreditCardController
                                     springContext,
                                     (AddCreditCardController controller)
                                         -> {},
-                                    List.of(() -> { updateDisplayCards(); }));
+                                    List.of(() -> updateDisplayCards()));
     }
 
     @FXML
@@ -194,15 +194,13 @@ public class CreditCardController
             return;
         }
 
-        WindowUtils.openModalWindow(Constants.EDIT_CREDIT_CARD_DEBT_FXML,
-                                    "Edit Credit Card Debt",
-                                    springContext,
-                                    (EditCreditCardDebtController controller)
-                                        -> {
-                                        controller.setCreditCardDebt(
-                                            selectedPayment.getCreditCardDebt());
-                                    },
-                                    List.of(() -> { updateDisplay(); }));
+        WindowUtils.openModalWindow(
+            Constants.EDIT_CREDIT_CARD_DEBT_FXML,
+            "Edit Credit Card Debt",
+            springContext,
+            (EditCreditCardDebtController controller)
+                -> controller.setCreditCardDebt(selectedPayment.getCreditCardDebt()),
+            List.of(() -> updateDisplay()));
     }
 
     @FXML
@@ -289,7 +287,7 @@ public class CreditCardController
                                     springContext,
                                     (ArchivedCreditCardsController controller)
                                         -> {},
-                                    List.of(() -> { updateDisplay(); }));
+                                    List.of(() -> updateDisplay()));
     }
 
     @FXML
