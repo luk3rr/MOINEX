@@ -62,7 +62,7 @@ public class Transfer
     @Column(name = "description", nullable = true)
     private String description;
 
-    public static abstract class TransferBuilder<C extends   Transfer, B
+    public abstract static class TransferBuilder<C extends   Transfer, B
                                                      extends TransferBuilder<C, B>>
     {
         public B date(LocalDateTime date)

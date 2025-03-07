@@ -47,7 +47,7 @@ public class WalletTransaction extends BaseTransaction
     @Column(name = "status", nullable = false)
     private TransactionStatus status;
 
-    public static abstract class WalletTransactionBuilder<
+    public abstract static class WalletTransactionBuilder<
         C extends   WalletTransaction, B
             extends WalletTransactionBuilder<C, B>>
         extends BaseTransactionBuilder<C, B>

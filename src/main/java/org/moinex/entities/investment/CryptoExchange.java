@@ -62,7 +62,7 @@ public class CryptoExchange
     @Column(name = "description", nullable = true)
     private String description;
 
-    public static abstract class CryptoExchangeBuilder<
+    public abstract static class CryptoExchangeBuilder<
         C extends CryptoExchange, B extends CryptoExchangeBuilder<C, B>>
     {
         public B date(LocalDateTime date)

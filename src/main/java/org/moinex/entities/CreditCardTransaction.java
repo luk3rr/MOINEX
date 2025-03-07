@@ -45,7 +45,7 @@ public abstract class CreditCardTransaction
     @Column(name = "description", nullable = true)
     private String description;
 
-    public static abstract class CreditCardTransactionBuilder<
+    public abstract static class CreditCardTransactionBuilder<
         C extends CreditCardTransaction, B extends CreditCardTransactionBuilder<C, B>>
     {
         public B date(LocalDateTime date)

@@ -53,7 +53,7 @@ public class CalendarEvent
     @Column(name = "event_type", nullable = false)
     private CalendarEventType eventType;
 
-    public static abstract class CalendarEventBuilder<
+    public abstract static class CalendarEventBuilder<
         C extends CalendarEvent, B extends CalendarEventBuilder<C, B>>
     {
         public B date(LocalDateTime date)

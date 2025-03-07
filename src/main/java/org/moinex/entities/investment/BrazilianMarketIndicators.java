@@ -51,7 +51,7 @@ public class BrazilianMarketIndicators
     @Column(name = "last_update")
     private String lastUpdate;
 
-    public static abstract class BrazilianMarketIndicatorsBuilder<
+    public abstract static class BrazilianMarketIndicatorsBuilder<
         C extends   BrazilianMarketIndicators, B
             extends BrazilianMarketIndicatorsBuilder<C, B>>
     {

@@ -47,7 +47,7 @@ public class Goal extends Wallet
     @Column(name = "motivation", length = 500)
     private String motivation;
 
-    public static abstract class GoalBuilder<C extends   Goal, B
+    public abstract static class GoalBuilder<C extends   Goal, B
                                                  extends GoalBuilder<C, B>>
         extends WalletBuilder<C, B>
     {

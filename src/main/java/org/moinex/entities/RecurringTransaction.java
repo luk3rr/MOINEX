@@ -63,7 +63,7 @@ public class RecurringTransaction extends BaseTransaction
             columnDefinition = "varchar default 'ACTIVE'")
     private RecurringTransactionStatus status = RecurringTransactionStatus.ACTIVE;
 
-    public static abstract class RecurringTransactionBuilder<
+    public abstract static class RecurringTransactionBuilder<
         C extends RecurringTransaction, B extends RecurringTransactionBuilder<C, B>>
         extends BaseTransactionBuilder<C, B>
     {
