@@ -10,8 +10,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.moinex.entities.Category;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
@@ -20,7 +21,6 @@ import org.moinex.repositories.TransferRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.repositories.WalletTransactionRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class WalletTransactionService
     @Autowired
     private WalletTransactionRepository walletTransactionRepository;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(WalletTransactionService.class);
 
     /**
      * Transfer money between two wallets

@@ -9,8 +9,6 @@ package org.moinex.util;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,6 +19,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -28,7 +28,7 @@ import org.springframework.context.ApplicationContext;
  */
 public final class WindowUtils
 {
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(WindowUtils.class);
 
     /**
      * Sets the attributes of an alert dialog
@@ -176,7 +176,7 @@ public final class WindowUtils
         }
         catch (IOException e)
         {
-            logger.severe("Error loading FXML file: " + fxmlFileName);
+            logger.error("Error loading FXML file: '{}'", fxmlFileName);
         }
     }
 
@@ -235,7 +235,7 @@ public final class WindowUtils
         }
         catch (IOException e)
         {
-            logger.severe("Error loading FXML file: " + fxmlFileName);
+            logger.error("Error loading FXML file: '{}'", fxmlFileName);
         }
     }
 }

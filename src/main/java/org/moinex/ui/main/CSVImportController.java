@@ -20,8 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -74,7 +75,7 @@ public class CSVImportController
 
     private ObservableList<String> availableDbColumns;
 
-    private static final Logger m_logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(CSVImportController.class);
 
     /**
      * Constructor
@@ -164,7 +165,7 @@ public class CSVImportController
                     "An error occurred while getting the "
                         + "columns for the table. Please try again.");
 
-                m_logger.severe(e.getMessage());
+                logger.error(e.getMessage());
             }
         }
     }
@@ -275,7 +276,7 @@ public class CSVImportController
                 "Error reading file",
                 "An error occurred while reading the file. Please try again.");
 
-            m_logger.severe(e.getMessage());
+            logger.error(e.getMessage());
         }
 
         populateMappingTable();
@@ -325,7 +326,7 @@ public class CSVImportController
                                             +
                                             "columns for the table. Please try again.");
 
-            m_logger.severe(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -391,11 +392,7 @@ public class CSVImportController
                     }
                     catch (IllegalArgumentException e)
                     {
-                        m_logger.severe(e.getMessage());
-                    }
-                    catch (RuntimeException e)
-                    {
-                        m_logger.warning(e.getMessage());
+                        logger.error(e.getMessage());
                     }
                 }
             }
@@ -436,11 +433,11 @@ public class CSVImportController
                 }
                 catch (IllegalArgumentException e)
                 {
-                    m_logger.severe(e.getMessage());
+                    logger.error(e.getMessage());
                 }
                 catch (RuntimeException e)
                 {
-                    m_logger.warning(e.getMessage());
+                    logger.warn(e.getMessage());
                 }
             }
 
@@ -497,11 +494,11 @@ public class CSVImportController
                 }
                 catch (IllegalArgumentException e)
                 {
-                    m_logger.severe(e.getMessage());
+                    logger.error(e.getMessage());
                 }
                 catch (RuntimeException e)
                 {
-                    m_logger.warning(e.getMessage());
+                    logger.warn(e.getMessage());
                 }
             }
 

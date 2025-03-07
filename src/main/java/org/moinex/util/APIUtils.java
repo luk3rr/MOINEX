@@ -22,10 +22,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.services.InicializationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for managing API-related operations, like fetching stock prices and
@@ -40,7 +41,7 @@ public class APIUtils
 
     private static boolean shuttingDown = false;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(APIUtils.class);
 
     // Prevent instantiation
     private APIUtils() { }
@@ -67,13 +68,13 @@ public class APIUtils
         {
             if (!executorService.awaitTermination(10, TimeUnit.SECONDS))
             {
-                logger.warning("Forcing shutdown of executor service...");
+                logger.warn("Forcing shutdown of executor service...");
                 executorService.shutdownNow();
             }
         }
         catch (InterruptedException e)
         {
-            logger.warning("Shutdown interrupted. Forcing shutdown...");
+            logger.warn("Shutdown interrupted. Forcing shutdown...");
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
         }
@@ -96,7 +97,7 @@ public class APIUtils
                 {
                     // Se o processo não terminar dentro do limite de tempo, forçamos a
                     // destruição
-                    logger.warning(
+                    logger.warn(
                         "Process did not terminate in time. Forcing shutdown...");
                     process.destroyForcibly();
                 }
@@ -106,12 +107,12 @@ public class APIUtils
             {
                 Thread.currentThread().interrupt();
                 // Se a espera pelo processo for interrompida, forçamos imediatamente
-                logger.warning("Process interrupted. Forcing shutdown...");
+                logger.warn("Process interrupted. Forcing shutdown...");
                 process.destroyForcibly();
             }
             catch (Exception e)
             {
-                logger.warning("Error during process shutdown: " + e.getMessage());
+                logger.warn("Error during process shutdown: " + e.getMessage());
             }
         }
 

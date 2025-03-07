@@ -7,13 +7,14 @@
 package org.moinex.services;
 
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.CreditCardDebtRepository;
-import org.moinex.util.LoggerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,7 @@ public class CategoryService
     @Autowired
     private CreditCardDebtRepository creditCardDebtRepository;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
     /**
      * Add a new category
@@ -59,7 +60,7 @@ public class CategoryService
 
         categoryRepository.save(category);
 
-        logger.info("Category " + name + " added successfully");
+        logger.info("Category '{}' added successfully", name);
 
         return category.getId();
     }

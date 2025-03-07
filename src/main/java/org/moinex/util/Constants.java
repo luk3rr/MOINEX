@@ -20,8 +20,6 @@ import javafx.scene.text.FontWeight;
  */
 public final class Constants
 {
-    public static final String LOG_FILE =
-        System.getProperty("user.home") + "/.local/state/moinex/moinex.log";
     public static final String APP_NAME = "Moinex";
 
     public static final String SCRIPT_PATH = "/scripts/";

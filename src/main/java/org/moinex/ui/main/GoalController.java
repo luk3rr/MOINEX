@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -37,9 +36,10 @@ import org.moinex.ui.dialog.AddGoalController;
 import org.moinex.ui.dialog.AddTransferController;
 import org.moinex.ui.dialog.EditGoalController;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -51,7 +51,7 @@ import org.springframework.stereotype.Controller;
 @NoArgsConstructor
 public class GoalController
 {
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(GoalController.class);
 
     @FXML
     private AnchorPane inProgressPane1;
@@ -359,7 +359,7 @@ public class GoalController
             }
             catch (IOException e)
             {
-                logger.severe("Error while loading goal full pane");
+                logger.error("Error while loading goal full pane");
                 continue;
             }
         }
@@ -423,7 +423,7 @@ public class GoalController
             }
             catch (IOException e)
             {
-                logger.severe("Error while loading accomplished goal full pane");
+                logger.error("Error while loading accomplished goal full pane");
                 continue;
             }
         }

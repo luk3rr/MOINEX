@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -48,13 +47,14 @@ import org.moinex.services.WalletTransactionService;
 import org.moinex.ui.common.ResumePaneController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller for the home view
@@ -63,7 +63,7 @@ import org.springframework.util.StringUtils;
 @NoArgsConstructor
 public class HomeController
 {
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     @FXML
     private JFXButton walletPrevButton;
@@ -580,7 +580,7 @@ public class HomeController
         }
         catch (Exception e)
         {
-            logger.severe("Error updating month resume: " + e.getMessage());
+            logger.error("Error updating month resume: " + e.getMessage());
         }
     }
 

@@ -16,7 +16,6 @@ import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.RecurringTransaction;
@@ -25,11 +24,12 @@ import org.moinex.entities.WalletTransaction;
 import org.moinex.repositories.RecurringTransactionRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.RecurringTransactionFrequency;
 import org.moinex.util.RecurringTransactionStatus;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,8 @@ public class RecurringTransactionService
     @Autowired
     private WalletRepository walletRepository;
 
-    private static final Logger m_logger = LoggerConfig.getLogger();
+    private static final Logger m_logger =
+        LoggerFactory.getLogger(RecurringTransactionService.class);
 
     /**
      * Validate start and end dates for editing a recurring transaction
@@ -399,7 +400,7 @@ public class RecurringTransactionService
         }
         catch (RuntimeException e)
         {
-            m_logger.warning("Failed to create transaction for recurring transaction " +
+            m_logger.warn("Failed to create transaction for recurring transaction " +
                              recurring.getId() + ": " + e.getMessage());
         }
     }
@@ -604,8 +605,7 @@ public class RecurringTransactionService
                 if (nextDueDate.isAfter(startMonth.atDay(1).atTime(0, 0, 0, 0)) ||
                     nextDueDate.equals(startMonth.atDay(1).atTime(0, 0, 0, 0)))
                 {
-                    futureTransactions.add(
-                                           WalletTransaction.builder()
+                    futureTransactions.add(WalletTransaction.builder()
                                                .wallet(recurring.getWallet())
                                                .category(recurring.getCategory())
                                                .type(recurring.getType())

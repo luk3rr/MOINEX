@@ -17,8 +17,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleObjectProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -53,7 +54,6 @@ import org.moinex.ui.dialog.ManageCategoryController;
 import org.moinex.ui.dialog.RecurringTransactionController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
@@ -114,7 +114,7 @@ public class TransactionController
 
     private CategoryService categoryService;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     /**
      * Constructor
@@ -619,7 +619,7 @@ public class TransactionController
         }
         catch (Exception e)
         {
-            logger.severe("Error updating year resume: " + e.getMessage());
+            logger.error("Error updating year resume: " + e.getMessage());
         }
     }
 
@@ -654,7 +654,7 @@ public class TransactionController
         }
         catch (Exception e)
         {
-            logger.severe("Error updating month resume: " + e.getMessage());
+            logger.error("Error updating month resume: " + e.getMessage());
         }
     }
 

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
@@ -31,7 +30,8 @@ import org.moinex.repositories.WalletRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.CreditCardCreditType;
 import org.moinex.util.CreditCardInvoiceStatus;
-import org.moinex.util.LoggerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +64,8 @@ public class CreditCardService
     @Autowired
     private CategoryRepository categoryRepository;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger =
+        LoggerFactory.getLogger(CreditCardService.class);
 
     /**
      * Creates a new credit card

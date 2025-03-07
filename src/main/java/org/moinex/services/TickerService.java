@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 import org.moinex.entities.Category;
@@ -30,9 +29,10 @@ import org.moinex.repositories.TickerSaleRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
 import org.moinex.util.TransactionStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +65,7 @@ public class TickerService
     @Autowired
     private WalletTransactionService walletTransactionService;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(TickerService.class);
 
     /**
      * Registers a new ticker
@@ -97,7 +97,7 @@ public class TickerService
 
         if (tickerRepository.existsBySymbol(symbol))
         {
-            logger.warning("Ticker with symbol " + symbol + " already exists");
+            logger.warn("Ticker with symbol " + symbol + " already exists");
 
             throw new RuntimeException("Ticker with symbol " + symbol +
                                        " already exists");
@@ -317,7 +317,7 @@ public class TickerService
                 }
                 catch (Exception e)
                 {
-                    logger.warning("Failed to update ticker " + ticker.getSymbol() +
+                    logger.warn("Failed to update ticker " + ticker.getSymbol() +
                                    ": " + e.getMessage());
                     failed.add(ticker);
                 }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -43,12 +42,13 @@ import org.moinex.ui.dialog.AddCryptoExchangeController;
 import org.moinex.ui.dialog.AddDividendController;
 import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.ArchivedTickersController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
 import org.moinex.ui.dialog.InvestmentTransactionsController;
 import org.moinex.ui.dialog.SaleTickerController;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.TickerType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -182,7 +182,7 @@ public class SavingsController
     private BigDecimal profitLoss;
     private BigDecimal dividendsReceived;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
 
     /**
      * Constructor
@@ -537,7 +537,7 @@ public class SavingsController
                 .exceptionally(ex -> {
                     Platform.runLater(
                         () -> { schedulerEtryForUpdatingBrazilianIndicators(); });
-                    logger.severe(ex.getMessage());
+                    logger.error(ex.getMessage());
                     return null;
                 });
         }
@@ -569,7 +569,7 @@ public class SavingsController
                 .exceptionally(ex -> {
                     Platform.runLater(
                         () -> { schedulerEntryForUpdatingMarketQuotes(); });
-                    logger.severe(ex.getMessage());
+                    logger.error(ex.getMessage());
                     return null;
                 });
         }
@@ -932,13 +932,13 @@ public class SavingsController
     {
         if (scheduledUpdatingMarketQuotesRetries >= maxRetries)
         {
-            logger.warning("Max retries reached for updating market quotes");
+            logger.warn("Max retries reached for updating market quotes");
             return;
         }
 
         if (scheduledUpdatingMarketQuotes)
         {
-            logger.warning("Already scheduled to update market quotes");
+            logger.warn("Already scheduled to update market quotes");
             return;
         }
 
@@ -960,14 +960,14 @@ public class SavingsController
     {
         if (scheduledUpdatingBrazilianIndicatorsRetries >= maxRetries)
         {
-            logger.warning(
+            logger.warn(
                 "Max retries reached for updating Brazilian market indicators");
             return;
         }
 
         if (scheduledUpdatingBrazilianIndicators)
         {
-            logger.warning("Already scheduled to update Brazilian market indicators");
+            logger.warn("Already scheduled to update Brazilian market indicators");
             return;
         }
 

@@ -23,6 +23,11 @@
     <opencsv.version>5.9</opencsv.version>
     <reflections.version>0.10.2</reflections.version>
     <slf4j.version>2.0.16</slf4j.version>
+    <logback.version>1.5.17</logback.version>
+    <exp4j.version>0.4.8</exp4j.version>
+    <json.version>20240303</json.version>
+    <lombok.version>1.18.36</lombok.version>
+    <flyway.version>11.3.4</flyway.version>
     <sonar.projectKey>moinex</sonar.projectKey>
     <sonar.organization>luk3rr</sonar.organization>
     <sonar.host.url>http://localhost:9000</sonar.host.url>
@@ -124,35 +129,37 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
     </dependency>
+    <!-- Logback -->
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>${slf4j.version}</version>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+        <scope>compile</scope>
     </dependency>
     <!-- exp4j uses Dijkstra's Shunting Yard Algorithm to solve mathematical expressions -->
     <dependency>
         <groupId>net.objecthunter</groupId>
         <artifactId>exp4j</artifactId>
-        <version>0.4.8</version>
+        <version>${exp4j.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.json/json -->
     <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20240303</version>
+        <version>${json.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
     <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.36</version>
+        <version>${lombok.version}</version>
         <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-maven-plugin -->
     <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
-        <version>11.3.4</version>
+        <version>${flyway.version}</version>
     </dependency>
   </dependencies>
   <build>

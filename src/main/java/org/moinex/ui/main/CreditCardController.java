@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -55,9 +54,10 @@ import org.moinex.ui.dialog.ArchivedCreditCardsController;
 import org.moinex.ui.dialog.EditCreditCardDebtController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -112,7 +112,8 @@ public class CreditCardController
 
     private Integer crcPaneCurrentPage = 0;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger =
+        LoggerFactory.getLogger(CreditCardController.class);
 
     /**
      * Constructor
@@ -478,7 +479,7 @@ public class CreditCardController
             }
             catch (IOException e)
             {
-                logger.severe("Error while loading credit card pane");
+                logger.error("Error while loading credit card pane");
             }
         }
 

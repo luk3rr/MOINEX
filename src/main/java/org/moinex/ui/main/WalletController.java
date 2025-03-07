@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -50,11 +49,12 @@ import org.moinex.ui.dialog.AddWalletController;
 import org.moinex.ui.dialog.ArchivedWalletsController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -140,7 +140,7 @@ public class WalletController
 
     private Integer itemsPerPage = 3;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
 
     /**
      * Constructor
@@ -419,7 +419,7 @@ public class WalletController
         }
         else
         {
-            logger.warning("Invalid index: " + selectedIndex);
+            logger.warn("Invalid index: " + selectedIndex);
         }
 
         BigDecimal foreseenBalance =
@@ -504,7 +504,7 @@ public class WalletController
             }
             catch (IOException e)
             {
-                logger.severe("Error while loading wallet full pane");
+                logger.error("Error while loading wallet full pane");
                 continue;
             }
         }
@@ -688,7 +688,7 @@ public class WalletController
             }
             else
             {
-                logger.warning("Invalid index: " + selectedIndex);
+                logger.warn("Invalid index: " + selectedIndex);
             }
 
             monthlyExpenses.put(date.format(formatter), totalExpenses.doubleValue());

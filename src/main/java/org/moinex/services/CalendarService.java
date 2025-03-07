@@ -6,15 +6,16 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.CalendarEvent;
 import org.moinex.repositories.CalendarEventRepository;
 import org.moinex.util.CalendarEventType;
-import org.moinex.util.LoggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ public class CalendarService
     @Autowired
     private CalendarEventRepository calendarEventRepository;
 
-    private static final Logger logger = LoggerConfig.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
 
     /**
      * Adds an event to the calendar
