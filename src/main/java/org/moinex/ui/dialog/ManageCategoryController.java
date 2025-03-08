@@ -93,9 +93,8 @@ public class ManageCategoryController
 
         if (selectedCategory == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No category selected",
-                                        "Please select a category to edit");
+            WindowUtils.showInformationDialog("No category selected",
+                                              "Please select a category to edit");
             return;
         }
 
@@ -118,8 +117,7 @@ public class ManageCategoryController
 
         if (selectedCategory == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No category selected",
+            WindowUtils.showErrorDialog("No category selected",
                                         "Please select a category to remove");
             return;
         }
@@ -127,8 +125,7 @@ public class ManageCategoryController
         // Prevent the removal of categories with associated transactions
         if (categoryService.getCountTransactions(selectedCategory.getId()) > 0)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Category has transactions",
+            WindowUtils.showErrorDialog("Category has transactions",
                                         "Cannot remove a category with transactions");
             // TODO: Implement a way to change the category of the transactions
             // TODO: Implement a way to archive the category
@@ -136,7 +133,6 @@ public class ManageCategoryController
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Remove category " + selectedCategory.getName(),
                 "Are you sure you want to remove this category?"))
         {
@@ -149,9 +145,7 @@ public class ManageCategoryController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error removing category",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error removing category", e.getMessage());
             }
         }
     }

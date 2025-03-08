@@ -199,9 +199,9 @@ public class AddDividendController
             dividendValueString.strip().isEmpty() || statusString == null ||
             categoryString == null || dividendDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -239,8 +239,7 @@ public class AddDividendController
                                       description,
                                       status);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Dividend created",
+            WindowUtils.showSuccessDialog("Dividend created",
                                           "The dividend was successfully created.");
 
             Stage stage = (Stage)descriptionField.getScene().getWindow();
@@ -248,15 +247,15 @@ public class AddDividendController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid dividend value",
+            WindowUtils.showErrorDialog("Invalid dividend value",
                                         "Dividend value must be a number.");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while creating dividend",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog(
+
+                "Error while creating dividend",
+                e.getMessage());
         }
     }
 
@@ -284,9 +283,8 @@ public class AddDividendController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
-                                                "The value must be positive");
+                    WindowUtils.showInformationDialog("Invalid value",
+                                                      "The value must be positive");
                     return;
                 }
 
@@ -298,8 +296,7 @@ public class AddDividendController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
+                WindowUtils.showErrorDialog("Invalid value",
                                             "The value must be a number");
             }
         }

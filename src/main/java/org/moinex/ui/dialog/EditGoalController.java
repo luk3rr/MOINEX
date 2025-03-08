@@ -141,9 +141,9 @@ public class EditGoalController
             currentBalanceStr.isEmpty() || targetBalanceStr.isEmpty() ||
             targetDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -164,8 +164,7 @@ public class EditGoalController
                 goalToUpdate.isArchived() == archived &&
                 goalToUpdate.isCompleted() == completed)
             {
-                WindowUtils.showInformationDialog("Information",
-                                                  "No changes",
+                WindowUtils.showInformationDialog("No changes",
                                                   "No changes were made to the goal.");
             }
             else // If there is any modification, update the goal
@@ -193,8 +192,7 @@ public class EditGoalController
 
                 goalService.updateGoal(goalToUpdate);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Goal updated",
+                WindowUtils.showSuccessDialog("Goal updated",
                                               "The goal was successfully updated.");
             }
 
@@ -203,14 +201,13 @@ public class EditGoalController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid balance",
+            WindowUtils.showErrorDialog("Invalid balance",
                                         "Please enter a valid balance.");
         }
         catch (EntityNotFoundException | IllegalArgumentException |
                EntityExistsException e)
         {
-            WindowUtils.showErrorDialog("Error", "Error creating goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
         }
     }
 }

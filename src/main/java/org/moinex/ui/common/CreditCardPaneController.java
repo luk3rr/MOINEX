@@ -173,7 +173,6 @@ public class CreditCardPaneController
     private void handleArchiveCreditCard()
     {
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Archive credit card " + creditCard.getName(),
                 "Are you sure you want to archive this credit card?"))
         {
@@ -181,8 +180,7 @@ public class CreditCardPaneController
             {
                 creditCardService.archiveCreditCard(creditCard.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Credit card archived",
+                WindowUtils.showSuccessDialog("Credit card archived",
                                               "Credit card " + creditCard.getName() +
                                                   " has been archived");
 
@@ -191,8 +189,7 @@ public class CreditCardPaneController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error archiving credit card",
+                WindowUtils.showErrorDialog("Error archiving credit card",
                                             e.getMessage());
             }
         }
@@ -204,15 +201,14 @@ public class CreditCardPaneController
         // Prevent the removal of a credit card with associated debts
         if (creditCardService.getDebtCountByCreditCard(creditCard.getId()) > 0)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "Credit card has debts",
-                "Cannot delete a credit card with associated debts");
+                "Cannot delete a credit card with associated debts. You can archive "
+                    + "it instead.");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Delete credit card " + creditCard.getName(),
                 "Are you sure you want to remove this credit card?"))
         {
@@ -220,8 +216,7 @@ public class CreditCardPaneController
             {
                 creditCardService.deleteCreditCard(creditCard.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Credit card deleted",
+                WindowUtils.showSuccessDialog("Credit card deleted",
                                               "Credit card " + creditCard.getName() +
                                                   " has been deleted");
 
@@ -230,8 +225,7 @@ public class CreditCardPaneController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error removing credit card",
+                WindowUtils.showErrorDialog("Error removing credit card",
                                             e.getMessage());
             }
         }

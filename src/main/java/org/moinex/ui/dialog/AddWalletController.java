@@ -88,9 +88,9 @@ public class AddWalletController
 
         if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletTypeStr == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -109,8 +109,7 @@ public class AddWalletController
 
             walletService.addWallet(walletName, walletBalance, walletType);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Wallet created",
+            WindowUtils.showSuccessDialog("Wallet created",
                                           "The wallet was successfully created");
 
             Stage stage = (Stage)walletNameField.getScene().getWindow();
@@ -118,15 +117,12 @@ public class AddWalletController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid balance",
+            WindowUtils.showErrorDialog("Invalid balance",
                                         "Please enter a valid balance.");
         }
         catch (IllegalArgumentException | EntityExistsException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error creating wallet",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error creating wallet", e.getMessage());
         }
     }
 

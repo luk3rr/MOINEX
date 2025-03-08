@@ -188,9 +188,9 @@ public class AddTransferController
             description == null || description.strip().isEmpty() ||
             transferDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -225,8 +225,7 @@ public class AddTransferController
                                                    transferValue,
                                                    description);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Transfer created",
+            WindowUtils.showSuccessDialog("Transfer created",
                                           "The transfer was successfully created.");
 
             Stage stage = (Stage)descriptionField.getScene().getWindow();
@@ -234,15 +233,13 @@ public class AddTransferController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid transfer value",
+            WindowUtils.showErrorDialog("Invalid transfer value",
                                         "Transfer value must be a number.");
         }
         catch (SameSourceDestionationException | IllegalArgumentException |
                EntityNotFoundException | InsufficientResourcesException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while creating transfer",
+            WindowUtils.showErrorDialog("Error while creating transfer",
                                         e.getMessage());
         }
     }
@@ -271,8 +268,7 @@ public class AddTransferController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
+                    WindowUtils.showErrorDialog("Invalid value",
                                                 "The value must be positive");
                     return;
                 }
@@ -285,9 +281,9 @@ public class AddTransferController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
-                                            "The value must be a number");
+                WindowUtils.showErrorDialog(
+                    "Invalid value",
+                    "The value must be a number");
             }
         }
     }

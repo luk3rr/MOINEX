@@ -247,8 +247,7 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No ticker selected",
+            WindowUtils.showInformationDialog("No ticker selected",
                                               "Please select a ticker to buy");
             return;
         }
@@ -272,8 +271,7 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No ticker selected",
+            WindowUtils.showInformationDialog("No ticker selected",
                                               "Please select a ticker to sell");
             return;
         }
@@ -298,7 +296,6 @@ public class SavingsController
         if (selectedTicker == null)
         {
             WindowUtils.showInformationDialog(
-                "Info",
                 "No ticker selected",
                 "Please select a ticker to add a dividend");
             return;
@@ -370,7 +367,6 @@ public class SavingsController
                     if (failed.isEmpty())
                     {
                         WindowUtils.showSuccessDialog(
-                            "Success",
                             "Finished updating prices",
                             "All tickers were successfully updated");
                     }
@@ -378,14 +374,12 @@ public class SavingsController
                              stocksFundsTabTickerTable.getItems().size())
                     {
                         WindowUtils.showInformationDialog(
-                            "Info",
                             "Finished updating prices with errors",
                             "Failed to update all tickers");
                     }
                     else
                     {
                         WindowUtils.showInformationDialog(
-                            "Info",
                             "Finished updating prices with errors",
                             "Failed to update tickers:\n" +
                                 failed.stream()
@@ -397,8 +391,7 @@ public class SavingsController
             })
             .exceptionally(e -> {
                 Platform.runLater(() -> {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Error updating prices",
+                    WindowUtils.showErrorDialog("Error updating prices",
                                                 e.getMessage());
                     setOnUpdatePortfolioPricesButton();
                 });
@@ -419,8 +412,7 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No ticker selected",
+            WindowUtils.showInformationDialog("No ticker selected",
                                               "Please select a ticker to edit");
             return;
         }
@@ -444,8 +436,7 @@ public class SavingsController
 
         if (selectedTicker == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No ticker selected",
+            WindowUtils.showInformationDialog("No ticker selected",
                                               "Please select a ticker to delete");
             return;
         }
@@ -454,7 +445,6 @@ public class SavingsController
         if (tickerService.getTransactionCountByTicker(selectedTicker.getId()) > 0)
         {
             WindowUtils.showErrorDialog(
-                "Error",
                 "Ticker has transactions",
                 "Cannot delete a ticker with associated transactions. Remove the "
                     + "transactions first or archive the ticker.");
@@ -462,7 +452,6 @@ public class SavingsController
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Delete ticker " + selectedTicker.getName() + " (" +
                     selectedTicker.getSymbol() + ")",
                 "Are you sure you want to delete this ticker?"))
@@ -474,9 +463,7 @@ public class SavingsController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error deleting ticker",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error deleting ticker", e.getMessage());
             }
         }
     }

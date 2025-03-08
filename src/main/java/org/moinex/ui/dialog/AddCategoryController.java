@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -13,7 +14,6 @@ import lombok.NoArgsConstructor;
 import org.moinex.services.CategoryService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -47,8 +47,7 @@ public class AddCategoryController
         {
             categoryService.addCategory(name);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Category added",
+            WindowUtils.showSuccessDialog("Category added",
                                           "Category " + name + " added successfully");
 
             Stage stage = (Stage)categoryNameField.getScene().getWindow();
@@ -56,9 +55,7 @@ public class AddCategoryController
         }
         catch (IllegalArgumentException | EntityExistsException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error adding category",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error adding category", e.getMessage());
         }
     }
 

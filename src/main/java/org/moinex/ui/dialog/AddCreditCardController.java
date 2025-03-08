@@ -122,9 +122,9 @@ public class AddCreditCardController
             crcLastFourDigitsStr.isEmpty() || crcOperatorName == null ||
             crcClosingDayStr == null || crcDueDayStr == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -166,8 +166,7 @@ public class AddCreditCardController
                                             crcOperator.getId(),
                                             crcDefaultBillingWalletId);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Credit card created",
+            WindowUtils.showSuccessDialog("Credit card created",
                                           "The credit card was successfully created");
 
             Stage stage = (Stage)nameField.getScene().getWindow();
@@ -175,16 +174,12 @@ public class AddCreditCardController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid limit",
-                                        "Please enter a valid limit");
+            WindowUtils.showErrorDialog("Invalid limit", "Please enter a valid limit");
         }
         catch (EntityExistsException | EntityNotFoundException |
                IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error creating credit card",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error creating credit card", e.getMessage());
         }
     }
 

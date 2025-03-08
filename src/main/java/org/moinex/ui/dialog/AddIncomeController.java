@@ -182,9 +182,9 @@ public class AddIncomeController
             incomeValueString.strip().isEmpty() || statusString == null ||
             categoryString == null || incomeDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -221,8 +221,7 @@ public class AddIncomeController
                                                description,
                                                status);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Income created",
+            WindowUtils.showSuccessDialog("Income created",
                                           "The income was successfully created.");
 
             Stage stage = (Stage)descriptionField.getScene().getWindow();
@@ -230,15 +229,12 @@ public class AddIncomeController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid income value",
+            WindowUtils.showErrorDialog("Invalid income value",
                                         "Income value must be a number.");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while creating income",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error while creating income", e.getMessage());
         }
     }
 
@@ -266,9 +262,8 @@ public class AddIncomeController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
-                                                "The value must be positive");
+                    WindowUtils.showInformationDialog("Invalid value",
+                                                      "The value must be positive");
                     return;
                 }
 
@@ -280,8 +275,7 @@ public class AddIncomeController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
+                WindowUtils.showErrorDialog("Invalid value",
                                             "The value must be a number");
             }
         }

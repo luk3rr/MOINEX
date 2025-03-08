@@ -80,9 +80,9 @@ public class AddCalendarEventController
 
         if (eventTitle.isEmpty() || eventDate == null || eventType == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -94,8 +94,7 @@ public class AddCalendarEventController
                                      eventDate.atStartOfDay(),
                                      eventType);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Event created",
+            WindowUtils.showSuccessDialog("Event created",
                                           "The event was successfully created.");
 
             Stage stage = (Stage)titleField.getScene().getWindow();
@@ -103,9 +102,7 @@ public class AddCalendarEventController
         }
         catch (IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error creating event",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error creating event", e.getMessage());
         }
     }
 

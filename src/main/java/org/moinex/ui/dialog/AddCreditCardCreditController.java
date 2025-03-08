@@ -128,9 +128,9 @@ public class AddCreditCardCreditController
             date == null || description.isEmpty() || valueStr.isEmpty())
 
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -154,8 +154,7 @@ public class AddCreditCardCreditController
                                         creditType,
                                         description);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Credit created",
+            WindowUtils.showSuccessDialog("Credit created",
                                           "Credit created successfully");
 
             Stage stage = (Stage)crcComboBox.getScene().getWindow();
@@ -163,13 +162,12 @@ public class AddCreditCardCreditController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid expense value",
+            WindowUtils.showErrorDialog("Invalid expense value",
                                         "Credit value must be a number");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error", "Error creating debt", e.getMessage());
+            WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
         }
     }
 
@@ -205,9 +203,8 @@ public class AddCreditCardCreditController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
-                                                "The value must be positive");
+                    WindowUtils.showInformationDialog("Invalid value",
+                                                      "The value must be positive");
                     return;
                 }
 
@@ -219,8 +216,7 @@ public class AddCreditCardCreditController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
+                WindowUtils.showErrorDialog("Invalid value",
                                             "The value must be a number");
             }
         }

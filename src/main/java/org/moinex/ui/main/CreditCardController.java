@@ -188,8 +188,7 @@ public class CreditCardController
 
         if (selectedPayment == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No payment selected",
+            WindowUtils.showInformationDialog("No payment selected",
                                               "Please select a payment to edit.");
 
             return;
@@ -213,7 +212,6 @@ public class CreditCardController
         if (selectedPayment == null)
         {
             WindowUtils.showInformationDialog(
-                "Info",
                 "No payment selected",
                 "Please select a payment to delete the associated debt.");
 
@@ -271,7 +269,6 @@ public class CreditCardController
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Delete debt",
                 "Are you sure you want to delete the debt?",
                 message.toString()))
         {

@@ -18,8 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.property.SimpleObjectProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,6 +56,8 @@ import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -114,7 +114,8 @@ public class TransactionController
 
     private CategoryService categoryService;
 
-    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(TransactionController.class);
 
     /**
      * Constructor
@@ -234,8 +235,7 @@ public class TransactionController
 
         if (selectedTransaction == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No transaction selected",
+            WindowUtils.showInformationDialog("No transaction selected",
                                               "Please select a transaction to edit.");
 
             return;
@@ -263,8 +263,7 @@ public class TransactionController
 
         if (selectedTransaction == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No transaction selected",
+            WindowUtils.showInformationDialog("No transaction selected",
                                               "Please select a transaction to remove.");
 
             return;
@@ -323,7 +322,6 @@ public class TransactionController
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Confirm Deletion",
                 "Are you sure you want to remove this " +
                     selectedTransaction.getType().toString().toLowerCase() + "?",
                 message.toString()))

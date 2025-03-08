@@ -181,9 +181,9 @@ public class EditCreditCardDebtController
             categoryName.isEmpty() || description.isEmpty() || valueStr.isEmpty() ||
             invoiceMonth == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -228,8 +228,7 @@ public class EditCreditCardDebtController
                 debtToUpdate.getDescription().equals(description) &&
                 invoice.equals(invoiceMonth))
             {
-                WindowUtils.showInformationDialog("Info",
-                                                  "No changes",
+                WindowUtils.showInformationDialog("No changes",
                                                   "No changes were made.");
             }
             else // If there is any modification, update the debt
@@ -242,8 +241,7 @@ public class EditCreditCardDebtController
 
                 creditCardService.updateCreditCardDebt(debtToUpdate, invoiceMonth);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Transaction updated",
+                WindowUtils.showSuccessDialog("Transaction updated",
                                               "Transaction updated successfully.");
             }
 
@@ -252,13 +250,12 @@ public class EditCreditCardDebtController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid expense value",
+            WindowUtils.showErrorDialog("Invalid expense value",
                                         "Debt value must be a number");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error", "Error creating debt", e.getMessage());
+            WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
         }
     }
 

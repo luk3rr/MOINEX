@@ -285,9 +285,9 @@ public class GoalFullPaneController
     {
         if (goal.isArchived())
         {
-            WindowUtils.showInformationDialog("Information",
-                                              "Goal is archived",
-                                              "Cannot add income to an archived goal");
+            WindowUtils.showInformationDialog(
+                "Goal is archived",
+                "Cannot add income to an archived goal. Unarchive the goal first");
             return;
         }
 
@@ -304,9 +304,9 @@ public class GoalFullPaneController
     {
         if (goal.isArchived())
         {
-            WindowUtils.showInformationDialog("Information",
-                                              "Goal is archived",
-                                              "Cannot add expense to an archived goal");
+            WindowUtils.showInformationDialog(
+                "Goal is archived",
+                "Cannot add expense to an archived goal. Unarchive the goal first");
             return;
         }
 
@@ -324,9 +324,8 @@ public class GoalFullPaneController
         if (goal.isArchived())
         {
             WindowUtils.showInformationDialog(
-                "Information",
                 "Goal is archived",
-                "Cannot add transfer to an archived goal");
+                "Cannot add transfer to an archived goal. Unarchive the goal first");
             return;
         }
 
@@ -355,7 +354,6 @@ public class GoalFullPaneController
         if (goal.isCompleted())
         {
             if (WindowUtils.showConfirmationDialog(
-                    "Confirmation",
                     "Reopen goal " + goal.getName(),
                     "Are you sure you want to reopen this goal?"))
             {
@@ -368,7 +366,6 @@ public class GoalFullPaneController
         else
         {
             if (WindowUtils.showConfirmationDialog(
-                    "Confirmation",
                     "Complete goal " + goal.getName(),
                     "Are you sure you want to complete this goal?"))
             {
@@ -378,8 +375,7 @@ public class GoalFullPaneController
                 }
                 catch (EntityNotFoundException | IncompleteGoalException e)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Error completing goal",
+                    WindowUtils.showErrorDialog("Error completing goal",
                                                 e.getMessage());
                     return;
                 }
@@ -396,7 +392,6 @@ public class GoalFullPaneController
         if (goal.isArchived())
         {
             if (WindowUtils.showConfirmationDialog(
-                    "Confirmation",
                     "Unarchive goal " + goal.getName(),
                     "Are you sure you want to unarchive this goal?"))
             {
@@ -409,7 +404,6 @@ public class GoalFullPaneController
         else
         {
             if (WindowUtils.showConfirmationDialog(
-                    "Confirmation",
                     "Archive goal " + goal.getName(),
                     "Are you sure you want to archive this goal?"))
             {
@@ -427,8 +421,7 @@ public class GoalFullPaneController
         // Prevent the removal of a wallet with associated transactions
         if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "Goal wallet has transactions",
                 "Cannot delete a goal wallet with associated transactions. "
                     + "Remove the transactions first or archive the goal");
@@ -456,7 +449,6 @@ public class GoalFullPaneController
         {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
-                    "Delete Goal",
                     "Are you sure you want to delete this goal?",
                     message.toString()))
             {
@@ -468,7 +460,7 @@ public class GoalFullPaneController
         }
         catch (EntityNotFoundException | IllegalStateException e)
         {
-            WindowUtils.showErrorDialog("Error", "Error deleting goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error deleting goal", e.getMessage());
         }
     }
 

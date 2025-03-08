@@ -145,9 +145,9 @@ public class EditCreditCardController
             crcLastFourDigitsStr.isEmpty() || crcOperatorName == null ||
             crcClosingDayStr == null || crcDueDayStr == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -198,7 +198,6 @@ public class EditCreditCardController
                 defaultWalletChanged)
             {
                 WindowUtils.showInformationDialog(
-                    "Information",
                     "No changes",
                     "No changes were made to the credit card.");
             }
@@ -214,8 +213,7 @@ public class EditCreditCardController
 
                 creditCardService.updateCreditCard(crcToUpdate);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Credit card updated",
+                WindowUtils.showSuccessDialog("Credit card updated",
                                               "The credit card updated successfully.");
             }
 
@@ -224,16 +222,12 @@ public class EditCreditCardController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid limit",
-                                        "Please enter a valid limit");
+            WindowUtils.showErrorDialog("Invalid limit", "Please enter a valid limit");
         }
         catch (EntityNotFoundException | IllegalArgumentException |
                IllegalStateException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error creating credit card",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error creating credit card", e.getMessage());
         }
     }
 

@@ -188,9 +188,8 @@ public class CreditCardInvoicePaymentController
 
         if (walletName == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Wallet not selected",
-                                        "Please select a wallet");
+            WindowUtils.showInformationDialog("Wallet not selected",
+                                              "Please select a wallet");
             return;
         }
 
@@ -209,8 +208,7 @@ public class CreditCardInvoicePaymentController
 
         if (invoiceAmount.compareTo(BigDecimal.ZERO) == 0)
         {
-            WindowUtils.showInformationDialog("Information",
-                                              "Invoice already paid",
+            WindowUtils.showInformationDialog("Invoice already paid",
                                               "This invoice has already been paid");
         }
         else
@@ -231,8 +229,7 @@ public class CreditCardInvoicePaymentController
                                              invoiceDate.getYear(),
                                              rebateValue);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Invoice paid",
+                WindowUtils.showSuccessDialog("Invoice paid",
                                               "Invoice was successfully paid");
 
                 Stage stage = (Stage)crcNameLabel.getScene().getWindow();
@@ -241,9 +238,7 @@ public class CreditCardInvoicePaymentController
             catch (EntityNotFoundException | IllegalArgumentException |
                    InsufficientResourcesException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error paying invoice",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error paying invoice", e.getMessage());
             }
         }
 
@@ -275,9 +270,8 @@ public class CreditCardInvoicePaymentController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
-                                                "The value must be positive");
+                    WindowUtils.showInformationDialog("Invalid value",
+                                                      "The value must be positive");
                     return;
                 }
 
@@ -289,8 +283,7 @@ public class CreditCardInvoicePaymentController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
+                WindowUtils.showErrorDialog("Invalid value",
                                             "The value must be a number");
             }
         }

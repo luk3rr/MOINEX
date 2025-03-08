@@ -178,9 +178,9 @@ public class EditTransactionController
             description == null || transactionValueString == null ||
             statusString == null || categoryString == null || transactionDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -223,7 +223,6 @@ public class EditTransactionController
                     transactionToUpdate.getDate().toLocalDate()))
             {
                 WindowUtils.showInformationDialog(
-                    "Information",
                     "No changes",
                     "No changes were made to the transaction.");
             }
@@ -239,8 +238,7 @@ public class EditTransactionController
 
                 walletTransactionService.updateTransaction(transactionToUpdate);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Transaction updated",
+                WindowUtils.showSuccessDialog("Transaction updated",
                                               "Transaction updated successfully.");
             }
 
@@ -249,16 +247,15 @@ public class EditTransactionController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid income value",
+            WindowUtils.showErrorDialog("Invalid income value",
                                         "Income value must be a number.");
         }
         catch (EntityNotFoundException | IllegalArgumentException |
                IllegalStateException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while updating transaction",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog(
+                "Error while updating transaction",
+                e.getMessage());
         }
     }
 

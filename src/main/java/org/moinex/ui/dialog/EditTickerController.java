@@ -109,9 +109,9 @@ public class EditTickerController
             typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
             currentPriceStr.strip().isEmpty())
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -123,8 +123,7 @@ public class EditTickerController
                 !(quantityStr == null || quantityStr.strip().isEmpty()))
         {
             WindowUtils.showInformationDialog(
-                "Info",
-                "Invalid fields",
+                "Empty fields",
                 "Quantity must be set if average unit price is set or vice-versa");
 
             return;
@@ -162,8 +161,7 @@ public class EditTickerController
                 tickerToUpdate.getAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
                 tickerToUpdate.isArchived() == archived)
             {
-                WindowUtils.showInformationDialog("Info",
-                                                  "No changes",
+                WindowUtils.showInformationDialog("No changes",
                                                   "No changes were to the ticker");
 
                 return;
@@ -180,8 +178,7 @@ public class EditTickerController
 
                 tickerService.updateTicker(tickerToUpdate);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Ticker updated",
+                WindowUtils.showSuccessDialog("Ticker updated",
                                               "The ticker updated successfully.");
             }
 
@@ -190,15 +187,11 @@ public class EditTickerController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid number",
-                                        "Invalid price or quantity");
+            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while adding ticker",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error while adding ticker", e.getMessage());
         }
     }
 

@@ -76,14 +76,12 @@ public class ArchivedTickersController
 
         if (selectedTicker == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No ticker selected",
-                                        "Please select a ticker to unarchive");
+            WindowUtils.showInformationDialog("No ticker selected",
+                                              "Please select a ticker to unarchive");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Unarchive ticker " + selectedTicker.getName() + " ( " +
                     selectedTicker.getSymbol() + ")",
                 "Are you sure you want to unarchive this ticker?"))
@@ -92,8 +90,7 @@ public class ArchivedTickersController
             {
                 tickerService.unarchiveTicker(selectedTicker.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Ticker unarchived",
+                WindowUtils.showSuccessDialog("Ticker unarchived",
                                               "Ticker " + selectedTicker.getName() +
                                                   " ( " + selectedTicker.getSymbol() +
                                                   ") has been unarchived");
@@ -104,9 +101,7 @@ public class ArchivedTickersController
             }
             catch (EntityNotFoundException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error unarchiving ticker",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error unarchiving ticker", e.getMessage());
             }
         }
     }
@@ -118,8 +113,7 @@ public class ArchivedTickersController
 
         if (selectedTicker == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No ticker selected",
+            WindowUtils.showErrorDialog("No ticker selected",
                                         "Please select a ticker to delete");
             return;
         }
@@ -127,15 +121,14 @@ public class ArchivedTickersController
         // Prevent the removal of a ticker with associated transactions
         if (tickerService.getTransactionCountByTicker(selectedTicker.getId()) > 0)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "Ticker has transactions",
-                "Cannot delete a ticker with associated transactions");
+                "Cannot delete a ticker with associated transactions. You can "
+                    + "archive it instead");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Remove ticker " + selectedTicker.getName() + " ( " +
                     selectedTicker.getSymbol() + ")",
                 "Are you sure you want to remove this ticker?"))
@@ -144,8 +137,7 @@ public class ArchivedTickersController
             {
                 tickerService.deleteTicker(selectedTicker.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Ticker deleted",
+                WindowUtils.showSuccessDialog("Ticker deleted",
                                               "Ticker " + selectedTicker.getName() +
                                                   " (" + selectedTicker.getSymbol() +
                                                   ") has been deleted");
@@ -156,9 +148,7 @@ public class ArchivedTickersController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error removing ticker",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error removing ticker", e.getMessage());
             }
         }
     }

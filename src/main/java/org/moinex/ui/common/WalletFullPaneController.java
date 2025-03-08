@@ -372,7 +372,6 @@ public class WalletFullPaneController
     private void handleArchiveWallet()
     {
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Archive wallet " + wallet.getName(),
                 "Are you sure you want to archive this wallet?"))
         {
@@ -389,8 +388,7 @@ public class WalletFullPaneController
         // Prevent the removal of a wallet with associated transactions
         if (walletTransactionService.getTransactionCountByWallet(wallet.getId()) > 0)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "Wallet has transactions",
                 "Cannot delete a wallet with associated transactions. "
                     + "Remove the transactions first or archive the wallet");
@@ -398,7 +396,6 @@ public class WalletFullPaneController
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Delete wallet " + wallet.getName(),
                 "Are you sure you want to remove this wallet?"))
         {
@@ -406,8 +403,7 @@ public class WalletFullPaneController
             {
                 walletService.deleteWallet(wallet.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Wallet deleted",
+                WindowUtils.showSuccessDialog("Wallet deleted",
                                               "Wallet " + wallet.getName() +
                                                   " has been deleted");
 
@@ -416,9 +412,10 @@ public class WalletFullPaneController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error removing wallet",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog(
+
+                    "Error removing wallet",
+                    e.getMessage());
             }
         }
     }

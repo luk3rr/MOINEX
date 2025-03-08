@@ -753,8 +753,7 @@ public class InvestmentTransactionsController
     {
         if (purchase == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No purchase selected",
+            WindowUtils.showInformationDialog("No purchase selected",
                                               "Please select a purchase to edit");
 
             return;
@@ -775,8 +774,7 @@ public class InvestmentTransactionsController
     {
         if (sale == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No sale selected",
+            WindowUtils.showInformationDialog("No sale selected",
                                               "Please select a sale to edit");
 
             return;
@@ -797,8 +795,7 @@ public class InvestmentTransactionsController
     {
         if (dividend == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No dividend selected",
+            WindowUtils.showInformationDialog("No dividend selected",
                                               "Please select a dividend to edit");
 
             return;
@@ -820,7 +817,6 @@ public class InvestmentTransactionsController
         if (cryptoExchange == null)
         {
             WindowUtils.showInformationDialog(
-                "Info",
                 "No crypto exchange selected",
                 "Please select a crypto exchange to edit");
 
@@ -842,8 +838,7 @@ public class InvestmentTransactionsController
     {
         if (purchase == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No purchase selected",
+            WindowUtils.showInformationDialog("No purchase selected",
                                               "Please select a purchase to delete");
             return;
         }
@@ -851,7 +846,6 @@ public class InvestmentTransactionsController
         String message = deleteMessage(purchase.getWalletTransaction());
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirm deletion",
                 "Are you sure you want to delete the purchase?",
                 message))
         {
@@ -865,8 +859,7 @@ public class InvestmentTransactionsController
     {
         if (sale == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No sale selected",
+            WindowUtils.showInformationDialog("No sale selected",
                                               "Please select a sale to delete");
             return;
         }
@@ -874,7 +867,6 @@ public class InvestmentTransactionsController
         String message = deleteMessage(sale.getWalletTransaction());
 
         if (WindowUtils.showConfirmationDialog(
-                "Delete sale",
                 "Are you sure you want to delete the sale?",
                 message))
         {
@@ -888,8 +880,7 @@ public class InvestmentTransactionsController
     {
         if (dividend == null)
         {
-            WindowUtils.showInformationDialog("Info",
-                                              "No dividend selected",
+            WindowUtils.showInformationDialog("No dividend selected",
                                               "Please select a dividend to delete");
             return;
         }
@@ -897,7 +888,6 @@ public class InvestmentTransactionsController
         String message = deleteMessage(dividend.getWalletTransaction());
 
         if (WindowUtils.showConfirmationDialog(
-                "Delete dividend",
                 "Are you sure you want to delete the dividend?",
                 message))
         {
@@ -912,7 +902,6 @@ public class InvestmentTransactionsController
         if (cryptoExchange == null)
         {
             WindowUtils.showInformationDialog(
-                "Info",
                 "No crypto exchange selected",
                 "Please select a crypto exchange to delete");
             return;
@@ -954,7 +943,6 @@ public class InvestmentTransactionsController
             .append("\n");
 
         if (WindowUtils.showConfirmationDialog(
-                "Delete crypto exchange",
                 "Are you sure you want to delete the crypto exchange?",
                 message.toString()))
         {

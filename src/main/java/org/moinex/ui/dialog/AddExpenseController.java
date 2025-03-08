@@ -182,9 +182,9 @@ public class AddExpenseController
             expenseValueString.strip().isEmpty() || statusString == null ||
             categoryString == null || expenseDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -221,8 +221,7 @@ public class AddExpenseController
                                                 description,
                                                 status);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Expense created",
+            WindowUtils.showSuccessDialog("Expense created",
                                           "Expense created successfully");
 
             Stage stage = (Stage)descriptionField.getScene().getWindow();
@@ -230,15 +229,12 @@ public class AddExpenseController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid expense value",
+            WindowUtils.showErrorDialog("Invalid expense value",
                                         "Expense value must be a number");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error creating expense",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error creating expense", e.getMessage());
         }
     }
 
@@ -266,9 +262,8 @@ public class AddExpenseController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
-                                                "The value must be positive");
+                    WindowUtils.showInformationDialog("Invalid value",
+                                                      "The value must be positive");
                     return;
                 }
 
@@ -280,8 +275,7 @@ public class AddExpenseController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
+                WindowUtils.showErrorDialog("Invalid value",
                                             "The value must be a number");
             }
         }

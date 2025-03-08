@@ -190,9 +190,9 @@ public class EditCryptoExchangeController
             cryptoReceivedQuantityStr.strip().isEmpty() || description == null ||
             description.strip().isEmpty() || exchangeDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -237,7 +237,6 @@ public class EditCryptoExchangeController
                     dateTimeWithCurrentHour.toLocalDate()))
             {
                 WindowUtils.showInformationDialog(
-                    "Information",
                     "No changes",
                     "No changes were made to the exchange");
             }
@@ -252,8 +251,7 @@ public class EditCryptoExchangeController
 
                 tickerService.updateCryptoExchange(cryptoExchangeToUpdate);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Exchange updated",
+                WindowUtils.showSuccessDialog("Exchange updated",
                                               "Exchange updated successfully");
             }
 
@@ -262,15 +260,13 @@ public class EditCryptoExchangeController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid exchange quantity",
+            WindowUtils.showErrorDialog("Invalid exchange quantity",
                                         "The quantity must be a number");
         }
         catch (EntityNotFoundException | SameSourceDestionationException |
                IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while creating exchange",
+            WindowUtils.showErrorDialog("Error while creating exchange",
                                         e.getMessage());
         }
     }
@@ -312,10 +308,8 @@ public class EditCryptoExchangeController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog(
-                        "Error",
-                        "Invalid quantity",
-                        "The quantity must be a positive number");
+                    WindowUtils.showInformationDialog("Invalid quantity",
+                                                      "The quantity must be positive");
                     return;
                 }
 
@@ -331,8 +325,7 @@ public class EditCryptoExchangeController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid quantity",
+                WindowUtils.showErrorDialog("Invalid quantity",
                                             "The quantity must be a number");
             }
         }

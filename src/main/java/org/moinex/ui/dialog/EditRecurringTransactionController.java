@@ -202,9 +202,9 @@ public class EditRecurringTransactionController
             valueString.strip().isEmpty() || typeString == null ||
             categoryString == null || nextDueDate == null || frequencyString == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill the required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -254,7 +254,6 @@ public class EditRecurringTransactionController
                                                 : RecurringTransactionStatus.INACTIVE))
             {
                 WindowUtils.showInformationDialog(
-                    "Information",
                     "No changes",
                     "No changes were made to the transaction.");
             }
@@ -283,7 +282,6 @@ public class EditRecurringTransactionController
                 recurringTransactionService.updateRecurringTransaction(rtToUpdate);
 
                 WindowUtils.showSuccessDialog(
-                    "Success",
                     "Recurring transaction updated",
                     "Recurring transaction updated successfully.");
             }
@@ -293,14 +291,12 @@ public class EditRecurringTransactionController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid transaction value",
+            WindowUtils.showErrorDialog("Invalid transaction value",
                                         "Transaction value must be a number.");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while editing recurring transaction",
+            WindowUtils.showErrorDialog("Error while editing recurring transaction",
                                         e.getMessage());
         }
     }

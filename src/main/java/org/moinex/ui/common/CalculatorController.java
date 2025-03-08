@@ -82,6 +82,11 @@ public class CalculatorController
     @FXML
     private void calculate(ActionEvent event)
     {
+        if (expression.isEmpty())
+        {
+            return;
+        }
+
         try
         {
             Double result = evaluateExpression(expression.toString());
@@ -105,9 +110,7 @@ public class CalculatorController
 
             calculatorService.setResult(null);
 
-            WindowUtils.showErrorDialog("Error",
-                                        "Error evaluating expression",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error evaluating expression", e.getMessage());
         }
     }
 

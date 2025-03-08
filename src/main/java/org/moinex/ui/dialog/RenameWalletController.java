@@ -75,9 +75,9 @@ public class RenameWalletController
 
         if (walletName == null || walletNewName.isBlank())
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid input",
-                                        "Please fill all fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -97,9 +97,7 @@ public class RenameWalletController
         catch (IllegalArgumentException | EntityNotFoundException |
                EntityExistsException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error renaming wallet",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error renaming wallet", e.getMessage());
             return;
         }
 

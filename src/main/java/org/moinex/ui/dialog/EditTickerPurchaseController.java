@@ -185,9 +185,9 @@ public class EditTickerPurchaseController
             unitPriceStr.strip().isEmpty() || quantityStr == null ||
             quantityStr.strip().isEmpty() || buyDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -229,7 +229,6 @@ public class EditTickerPurchaseController
                 purchase.getWalletTransaction().getDate().toLocalDate().equals(buyDate))
             {
                 WindowUtils.showInformationDialog(
-                    "Information",
                     "No changes",
                     "No changes were made to the purchase.");
             }
@@ -248,8 +247,7 @@ public class EditTickerPurchaseController
 
                 tickerService.updatePurchase(purchase);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "TickerPurchase updated",
+                WindowUtils.showSuccessDialog("TickerPurchase updated",
                                               "TickerPurchase updated successfully");
             }
 
@@ -258,14 +256,11 @@ public class EditTickerPurchaseController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid number",
-                                        "Invalid price or quantity");
+            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while updating purchase",
+            WindowUtils.showErrorDialog("Error while updating purchase",
                                         e.getMessage());
         }
     }
@@ -295,9 +290,7 @@ public class EditTickerPurchaseController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid number",
-                                        "Invalid price or quantity");
+            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
 
             totalPrice = new BigDecimal("0.00");
 

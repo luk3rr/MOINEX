@@ -86,9 +86,9 @@ public class AddTickerController
             typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
             currentPriceStr.strip().isEmpty())
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -100,7 +100,6 @@ public class AddTickerController
                 !(quantityStr == null || quantityStr.strip().isEmpty()))
         {
             WindowUtils.showInformationDialog(
-                "Info",
                 "Invalid fields",
                 "Quantity must be set if average unit price is set or vice-versa");
 
@@ -131,24 +130,18 @@ public class AddTickerController
             tickerService
                 .addTicker(name, symbol, type, currentPrice, avgUnitPrice, quantity);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Ticker added",
-                                          "Ticker added successfully.");
+            WindowUtils.showSuccessDialog("Ticker added", "Ticker added successfully.");
 
             Stage stage = (Stage)nameField.getScene().getWindow();
             stage.close();
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid number",
-                                        "Invalid price or quantity");
+            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
         }
         catch (IllegalArgumentException | EntityExistsException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while adding ticker",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error while adding ticker", e.getMessage());
         }
     }
 

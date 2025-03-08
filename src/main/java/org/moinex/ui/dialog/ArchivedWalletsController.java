@@ -78,14 +78,12 @@ public class ArchivedWalletsController
 
         if (selectedWallet == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No wallet selected",
-                                        "Please select a wallet to unarchive");
+            WindowUtils.showInformationDialog("No wallet selected",
+                                              "Please select a wallet to unarchive");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Unarchive wallet " + selectedWallet.getName(),
                 "Are you sure you want to unarchive this wallet?"))
         {
@@ -93,8 +91,7 @@ public class ArchivedWalletsController
             {
                 walletService.unarchiveWallet(selectedWallet.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Wallet unarchived",
+                WindowUtils.showSuccessDialog("Wallet unarchived",
                                               "Wallet " + selectedWallet.getName() +
                                                   " has been unarchived");
 
@@ -104,9 +101,7 @@ public class ArchivedWalletsController
             }
             catch (EntityNotFoundException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error unarchiving wallet",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error unarchiving wallet", e.getMessage());
             }
         }
     }
@@ -118,9 +113,8 @@ public class ArchivedWalletsController
 
         if (selectedWallet == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No wallet selected",
-                                        "Please select a wallet to delete");
+            WindowUtils.showInformationDialog("No wallet selected",
+                                              "Please select a wallet to delete");
             return;
         }
 
@@ -128,15 +122,14 @@ public class ArchivedWalletsController
         if (walletTransactionService.getTransactionCountByWallet(
                 selectedWallet.getId()) > 0)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "Wallet has transactions",
-                "Cannot delete a wallet with associated transactions");
+                "Cannot delete a wallet with associated transactions. You can " +
+                "archive it instead.");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Remove wallet " + selectedWallet.getName(),
                 "Are you sure you want to remove this wallet?"))
         {
@@ -144,8 +137,7 @@ public class ArchivedWalletsController
             {
                 walletService.deleteWallet(selectedWallet.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Wallet deleted",
+                WindowUtils.showSuccessDialog("Wallet deleted",
                                               "Wallet " + selectedWallet.getName() +
                                                   " has been deleted");
 
@@ -155,9 +147,7 @@ public class ArchivedWalletsController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error removing wallet",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error removing wallet", e.getMessage());
             }
         }
     }

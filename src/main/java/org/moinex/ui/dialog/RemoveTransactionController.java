@@ -137,7 +137,6 @@ public class RemoveTransactionController
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Confirm Deletion",
                 "Are you sure you want to remove this " +
                     transactionType.toString().toLowerCase() + "?",
                 message.toString()))

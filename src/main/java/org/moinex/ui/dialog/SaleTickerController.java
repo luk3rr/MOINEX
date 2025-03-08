@@ -197,9 +197,9 @@ public class SaleTickerController
             unitPriceStr.strip().isEmpty() || quantityStr == null ||
             quantityStr.strip().isEmpty() || buyDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -241,25 +241,19 @@ public class SaleTickerController
                                   description,
                                   status);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Sale added",
-                                          "Sale added successfully");
+            WindowUtils.showSuccessDialog("Sale added", "Sale added successfully");
 
             Stage stage = (Stage)tickerNameLabel.getScene().getWindow();
             stage.close();
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid number",
-                                        "Invalid price or quantity");
+            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
         }
         catch (EntityNotFoundException | IllegalArgumentException |
                InsufficientResourcesException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while selling ticker",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error while selling ticker", e.getMessage());
         }
     }
 
@@ -288,9 +282,7 @@ public class SaleTickerController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid number",
-                                        "Invalid price or quantity");
+            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
 
             totalPrice = new BigDecimal("0.00");
 

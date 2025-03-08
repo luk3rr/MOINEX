@@ -74,14 +74,12 @@ public class ArchivedCreditCardsController
 
         if (selectedCrc == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No credit card selected",
+            WindowUtils.showErrorDialog("No credit card selected",
                                         "Please select a credit card to unarchive");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Unarchive credit card " + selectedCrc.getName(),
                 "Are you sure you want to unarchive this credit card?"))
         {
@@ -89,8 +87,7 @@ public class ArchivedCreditCardsController
             {
                 creditCardService.unarchiveCreditCard(selectedCrc.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Credit Card unarchived",
+                WindowUtils.showSuccessDialog("Credit Card unarchived",
                                               "Credit Card " + selectedCrc.getName() +
                                                   " has been unarchived");
 
@@ -100,8 +97,7 @@ public class ArchivedCreditCardsController
             }
             catch (EntityNotFoundException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error unarchiving credit card",
+                WindowUtils.showErrorDialog("Error unarchiving credit card",
                                             e.getMessage());
             }
         }
@@ -115,9 +111,8 @@ public class ArchivedCreditCardsController
 
         if (selectedCrc == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "No credit card selected",
-                                        "Please select a credit card to delete");
+            WindowUtils.showInformationDialog("No credit card selected",
+                                              "Please select a credit card to delete");
             return;
         }
 
@@ -125,14 +120,13 @@ public class ArchivedCreditCardsController
         if (creditCardService.getDebtCountByCreditCard(selectedCrc.getId()) > 0)
         {
             WindowUtils.showErrorDialog(
-                "Error",
                 "Credit Card has debts",
-                "Cannot delete a credit card with associated debts");
+                "Cannot delete a credit card with associated debts. You can "
+                    + "archive it instead.");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Delete credit card " + selectedCrc.getName(),
                 "Are you sure you want to remove this credit card?"))
         {
@@ -140,8 +134,7 @@ public class ArchivedCreditCardsController
             {
                 creditCardService.deleteCreditCard(selectedCrc.getId());
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Credit card deleted",
+                WindowUtils.showSuccessDialog("Credit card deleted",
                                               "Credit card " + selectedCrc.getName() +
                                                   " has been deleted");
 
@@ -151,8 +144,7 @@ public class ArchivedCreditCardsController
             }
             catch (EntityNotFoundException | IllegalStateException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error removing credit card",
+                WindowUtils.showErrorDialog("Error removing credit card",
                                             e.getMessage());
             }
         }

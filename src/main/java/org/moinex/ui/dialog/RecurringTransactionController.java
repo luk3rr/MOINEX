@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,8 +31,6 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-
-import jakarta.persistence.EntityNotFoundException;
 
 /**
  * Controller for the Manage Recurring Transactions dialog
@@ -110,8 +109,7 @@ public class RecurringTransactionController
 
         if (selectedRt == null)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "No recurring transaction selected",
                 "Please select a recurring transaction to edit");
             return;
@@ -137,15 +135,13 @@ public class RecurringTransactionController
 
         if (selectedRt == null)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "No recurring transaction selected",
                 "Please select a recurring transaction to delete");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Confirmation",
                 "Remove recurring transaction with ID " + selectedRt.getId(),
                 "Are you sure you want to delete this recurring transaction?"))
         {

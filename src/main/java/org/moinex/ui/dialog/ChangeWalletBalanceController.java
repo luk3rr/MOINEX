@@ -84,9 +84,9 @@ public class ChangeWalletBalanceController
 
         if (walletName == null || newBalanceStr.isBlank())
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid input",
-                                        "Please fill all fields");
+            WindowUtils.showInformationDialog(
+                "Invalid input",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -105,8 +105,7 @@ public class ChangeWalletBalanceController
             // Check if has modification
             if (wallet.getBalance().compareTo(newBalance) == 0)
             {
-                WindowUtils.showInformationDialog("Information",
-                                                  "No changes",
+                WindowUtils.showInformationDialog("No changes",
                                                   "The balance was not changed.");
                 return;
             }
@@ -114,8 +113,7 @@ public class ChangeWalletBalanceController
             {
                 walletService.updateWalletBalance(wallet.getId(), newBalance);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Wallet updated",
+                WindowUtils.showSuccessDialog("Wallet updated",
                                               "The balance was updated successfully.");
             }
 
@@ -124,16 +122,12 @@ public class ChangeWalletBalanceController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid input",
-                                        "Balance must be a number");
+            WindowUtils.showErrorDialog("Invalid input", "Balance must be a number");
             return;
         }
         catch (EntityNotFoundException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error renaming wallet",
-                                        e.getMessage());
+            WindowUtils.showErrorDialog("Error renaming wallet", e.getMessage());
             return;
         }
 

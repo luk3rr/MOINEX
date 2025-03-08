@@ -165,8 +165,7 @@ public class GoalController
 
         if (goal == null)
         {
-            WindowUtils.showInformationDialog("Information",
-                                              "No goal selected",
+            WindowUtils.showInformationDialog("No goal selected",
                                               "Please select a goal to add a deposit");
             return;
         }
@@ -174,9 +173,8 @@ public class GoalController
         if (goal.isArchived())
         {
             WindowUtils.showInformationDialog(
-                "Information",
                 "Goal is archived",
-                "Cannot add transfer to an archived goal");
+                "Cannot add transfer to an archived goal. Unarchive the goal first");
             return;
         }
 
@@ -202,8 +200,7 @@ public class GoalController
 
         if (goal == null)
         {
-            WindowUtils.showInformationDialog("Information",
-                                              "No goal selected",
+            WindowUtils.showInformationDialog("No goal selected",
                                               "Please select a goal to edit");
             return;
         }
@@ -229,8 +226,7 @@ public class GoalController
 
         if (goal == null)
         {
-            WindowUtils.showInformationDialog("Information",
-                                              "No goal selected",
+            WindowUtils.showInformationDialog("No goal selected",
                                               "Please select a goal to delete");
             return;
         }
@@ -238,8 +234,7 @@ public class GoalController
         // Prevent the removal of a wallet with associated transactions
         if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0)
         {
-            WindowUtils.showErrorDialog(
-                "Error",
+            WindowUtils.showInformationDialog(
                 "Goal wallet has transactions",
                 "Cannot delete a goal wallet with associated transactions. "
                     + "Remove the transactions first or archive the goal");
@@ -267,7 +262,6 @@ public class GoalController
         {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
-                    "Delete Goal",
                     "Are you sure you want to delete this goal?",
                     message.toString()))
             {
@@ -281,7 +275,7 @@ public class GoalController
         }
         catch (EntityNotFoundException | IllegalStateException e)
         {
-            WindowUtils.showErrorDialog("Error", "Error deleting goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error deleting goal", e.getMessage());
         }
     }
 

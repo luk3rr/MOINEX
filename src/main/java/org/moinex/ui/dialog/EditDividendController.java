@@ -184,9 +184,9 @@ public class EditDividendController
             dividendValueString.strip().isEmpty() || statusString == null ||
             categoryString == null || dividendDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -225,7 +225,6 @@ public class EditDividendController
                 dividend.getWalletTransaction().getWallet().getId() == wallet.getId())
             {
                 WindowUtils.showInformationDialog(
-                    "Info",
                     "No changes",
                     "No changes were made to the dividend");
             }
@@ -244,8 +243,7 @@ public class EditDividendController
 
                 tickerService.updateDividend(dividend);
 
-                WindowUtils.showSuccessDialog("Success",
-                                              "Dividend updated",
+                WindowUtils.showSuccessDialog("Dividend updated",
                                               "Dividend updated successfully");
             }
 
@@ -254,14 +252,12 @@ public class EditDividendController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid dividend value",
+            WindowUtils.showErrorDialog("Invalid dividend value",
                                         "Dividend value must be a number.");
         }
         catch (EntityNotFoundException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while updating dividend",
+            WindowUtils.showErrorDialog("Error while updating dividend",
                                         e.getMessage());
         }
     }
@@ -290,8 +286,7 @@ public class EditDividendController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog("Error",
-                                                "Invalid value",
+                    WindowUtils.showErrorDialog("Invalid value",
                                                 "The value must be positive");
                     return;
                 }
@@ -304,8 +299,7 @@ public class EditDividendController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid value",
+                WindowUtils.showErrorDialog("Invalid value",
                                             "The value must be a number");
             }
         }

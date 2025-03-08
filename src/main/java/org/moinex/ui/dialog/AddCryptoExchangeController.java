@@ -182,9 +182,9 @@ public class AddCryptoExchangeController
             cryptoReceivedQuantityStr.strip().isEmpty() || description == null ||
             description.strip().isEmpty() || exchangeDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -222,8 +222,7 @@ public class AddCryptoExchangeController
                                             dateTimeWithCurrentHour,
                                             description);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Exchange created",
+            WindowUtils.showSuccessDialog("Exchange created",
                                           "The exchange was successfully created");
 
             Stage stage = (Stage)cryptoReceivedQuantityField.getScene().getWindow();
@@ -231,16 +230,14 @@ public class AddCryptoExchangeController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid exchange quantity",
+            WindowUtils.showErrorDialog("Invalid exchange quantity",
                                         "The quantity must be a number");
         }
         catch (SameSourceDestionationException | EntityNotFoundException |
                InvalidTickerTypeException | IllegalArgumentException |
                InsufficientResourcesException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while creating exchange",
+            WindowUtils.showErrorDialog("Error while creating exchange",
                                         e.getMessage());
         }
     }
@@ -282,10 +279,8 @@ public class AddCryptoExchangeController
 
                 if (resultValue.compareTo(BigDecimal.ZERO) < 0)
                 {
-                    WindowUtils.showErrorDialog(
-                        "Error",
-                        "Invalid quantity",
-                        "The quantity must be a positive number");
+                    WindowUtils.showInformationDialog("Invalid quantity",
+                                                      "The quantity must be positive");
                     return;
                 }
 
@@ -301,8 +296,7 @@ public class AddCryptoExchangeController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Error",
-                                            "Invalid quantity",
+                WindowUtils.showErrorDialog("Invalid quantity",
                                             "The quantity must be a number");
             }
         }

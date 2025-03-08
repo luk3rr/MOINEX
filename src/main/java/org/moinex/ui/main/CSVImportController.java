@@ -9,6 +9,7 @@ package org.moinex.ui.main;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityExistsException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,8 +41,9 @@ import org.moinex.services.WalletService;
 import org.moinex.util.MappingRow;
 import org.moinex.util.WindowUtils;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -75,7 +75,8 @@ public class CSVImportController
 
     private ObservableList<String> availableDbColumns;
 
-    private static final Logger logger = LoggerFactory.getLogger(CSVImportController.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(CSVImportController.class);
 
     /**
      * Constructor
@@ -131,7 +132,6 @@ public class CSVImportController
         {
             selectedCsvField.setText("");
             WindowUtils.showInformationDialog(
-                "Info",
                 "No file selected",
                 "No file was selected. Please select a file.");
         }
@@ -160,7 +160,6 @@ public class CSVImportController
             catch (ClassNotFoundException e)
             {
                 WindowUtils.showErrorDialog(
-                    "Error",
                     "Error getting columns",
                     "An error occurred while getting the "
                         + "columns for the table. Please try again.");
@@ -226,9 +225,8 @@ public class CSVImportController
             if (lines.isEmpty())
             {
                 WindowUtils.showInformationDialog(
-                    "Info",
                     "Empty file",
-                    "The selected file is empty. Please select another file.");
+                    "The selected file is empty. Please select another file");
                 return;
             }
 
@@ -272,7 +270,6 @@ public class CSVImportController
         catch (Exception e)
         {
             WindowUtils.showErrorDialog(
-                "Error",
                 "Error reading file",
                 "An error occurred while reading the file. Please try again.");
 
@@ -320,8 +317,7 @@ public class CSVImportController
         }
         catch (ClassNotFoundException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error getting columns",
+            WindowUtils.showErrorDialog("Error getting columns",
                                         "An error occurred while getting the "
                                             +
                                             "columns for the table. Please try again.");

@@ -104,9 +104,9 @@ public class ChangeWalletTypeController
 
         if (walletName == null || walletNewTypeStr == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all the fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -128,13 +128,12 @@ public class ChangeWalletTypeController
         {
             walletService.changeWalletType(wallet.getId(), walletNewType);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Wallet type changed",
+            WindowUtils.showSuccessDialog("Wallet type changed",
                                           "The wallet type was successfully changed.");
         }
         catch (EntityNotFoundException | AttributeAlreadySetException e)
         {
-            WindowUtils.showErrorDialog("Error", "Invalid input", e.getMessage());
+            WindowUtils.showErrorDialog("Invalid input", e.getMessage());
             return;
         }
 

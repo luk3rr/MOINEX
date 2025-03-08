@@ -102,9 +102,9 @@ public class AddGoalController
         if (goalName.isEmpty() || initialBalanceStr.isEmpty() ||
             targetBalanceStr.isEmpty() || targetDate == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill all required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
 
             return;
         }
@@ -120,8 +120,7 @@ public class AddGoalController
                                 targetDate,
                                 motivation);
 
-            WindowUtils.showSuccessDialog("Success",
-                                          "Goal created",
+            WindowUtils.showSuccessDialog("Goal created",
                                           "The goal was successfully created.");
 
             Stage stage = (Stage)nameField.getScene().getWindow();
@@ -129,14 +128,13 @@ public class AddGoalController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid balance",
+            WindowUtils.showErrorDialog("Invalid balance",
                                         "Please enter a valid balance.");
         }
         catch (IllegalArgumentException | EntityExistsException |
                EntityNotFoundException e)
         {
-            WindowUtils.showErrorDialog("Error", "Error creating goal", e.getMessage());
+            WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
         }
     }
 }

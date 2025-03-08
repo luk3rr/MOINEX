@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -17,7 +18,6 @@ import org.moinex.entities.Category;
 import org.moinex.services.CategoryService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -80,8 +80,7 @@ public class EditCategoryController
             catch (IllegalArgumentException | EntityExistsException |
                    EntityNotFoundException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error updating category name",
+                WindowUtils.showErrorDialog("Error updating category name",
                                             e.getMessage());
                 return;
             }
@@ -97,9 +96,7 @@ public class EditCategoryController
             }
             catch (EntityNotFoundException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error updating category",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error updating category", e.getMessage());
                 return;
             }
         }
@@ -113,9 +110,7 @@ public class EditCategoryController
             }
             catch (EntityNotFoundException e)
             {
-                WindowUtils.showErrorDialog("Error",
-                                            "Error updating category",
-                                            e.getMessage());
+                WindowUtils.showErrorDialog("Error updating category", e.getMessage());
                 return;
             }
         }
@@ -127,7 +122,7 @@ public class EditCategoryController
                          : archivedChanged ? "Category archived status updated"
                                            : "Category name updated";
 
-            WindowUtils.showSuccessDialog("Success", "Category updated", msg);
+            WindowUtils.showSuccessDialog("Category updated", msg);
         }
 
         Stage stage = (Stage)categoryNewNameField.getScene().getWindow();

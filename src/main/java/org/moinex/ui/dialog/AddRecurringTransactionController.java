@@ -164,9 +164,9 @@ public class AddRecurringTransactionController
             valueString.strip().isEmpty() || typeString == null ||
             categoryString == null || startDate == null || frequencyString == null)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Empty fields",
-                                        "Please fill the required fields.");
+            WindowUtils.showInformationDialog(
+                "Empty fields",
+                "Please fill all required fields before saving");
             return;
         }
 
@@ -219,7 +219,6 @@ public class AddRecurringTransactionController
             }
 
             WindowUtils.showSuccessDialog(
-                "Success",
                 "Recurring transaction created",
                 "Recurring transaction created successfully.");
 
@@ -228,14 +227,12 @@ public class AddRecurringTransactionController
         }
         catch (NumberFormatException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Invalid transaction value",
+            WindowUtils.showErrorDialog("Invalid transaction value",
                                         "Transaction value must be a number.");
         }
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
-            WindowUtils.showErrorDialog("Error",
-                                        "Error while creating recurring transaction",
+            WindowUtils.showErrorDialog("Error while creating recurring transaction",
                                         e.getMessage());
         }
     }

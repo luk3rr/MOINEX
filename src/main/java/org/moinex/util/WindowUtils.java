@@ -47,20 +47,18 @@ public final class WindowUtils
 
     /**
      * Shows a confirmation dialog with Yes/No options
-     * @param title The title of the dialog
      * @param header The header of the dialog
      * @param message The message to be displayed
      * @return True if the user clicked Yes, false otherwise
      */
-    public static boolean
-    showConfirmationDialog(String title, String header, String message)
+    public static boolean showConfirmationDialog(String header, String message)
     {
         Alert alert = new Alert(AlertType.CONFIRMATION);
 
         // Set the confirmation button
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
-        setAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, "Confirmation", header, message);
 
         ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
         return result == ButtonType.YES;
@@ -68,38 +66,34 @@ public final class WindowUtils
 
     /**
      * Shows an information dialog with an OK button
-     * @param title The title of the dialog
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
-    public static void
-    showInformationDialog(String title, String header, String message)
+    public static void showInformationDialog(String header, String message)
     {
         Alert alert = new Alert(AlertType.INFORMATION);
-        setAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, "Info", header, message);
         alert.showAndWait();
     }
 
     /**
      * Shows an error dialog with an OK button
-     * @param title The title of the dialog
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
-    public static void showErrorDialog(String title, String header, String message)
+    public static void showErrorDialog(String header, String message)
     {
         Alert alert = new Alert(AlertType.ERROR);
-        setAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, "Error", header, message);
         alert.showAndWait();
     }
 
     /**
      * Shows a success dialog with an OK button
-     * @param title The title of the dialog
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
-    public static void showSuccessDialog(String title, String header, String message)
+    public static void showSuccessDialog(String header, String message)
     {
         Alert alert = new Alert(AlertType.INFORMATION);
 
@@ -107,7 +101,7 @@ public final class WindowUtils
         alert.setGraphic(new ImageView(new Image(
             WindowUtils.class.getResource(Constants.SUCCESS_ICON).toString())));
 
-        setAlertAttributes(alert, title, header, message);
+        setAlertAttributes(alert, "Success", header, message);
         alert.showAndWait();
     }
 
