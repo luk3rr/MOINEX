@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardDebt;
+import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
@@ -171,17 +173,19 @@ public class AddCreditCardDebtController
             Integer installments =
                 installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
-            CreditCard crc = creditCards.stream()
-                                 .filter(c -> c.getName().equals(crcName))
-                                 .findFirst()
-                                 .orElseThrow(
-                                     () -> new RuntimeException("Credit card not found"));
+            CreditCard crc =
+                creditCards.stream()
+                    .filter(c -> c.getName().equals(crcName))
+                    .findFirst()
+                    .orElseThrow(
+                        () -> new EntityNotFoundException("Credit card not found"));
 
-            Category category = categories.stream()
-                                    .filter(c -> c.getName().equals(categoryName))
-                                    .findFirst()
-                                    .orElseThrow(
-                                        () -> new RuntimeException("Category not found"));
+            Category category =
+                categories.stream()
+                    .filter(c -> c.getName().equals(categoryName))
+                    .findFirst()
+                    .orElseThrow(
+                        () -> new EntityNotFoundException("Category not found"));
 
             creditCardService.addDebt(crc.getId(),
                                       category,
@@ -204,7 +208,8 @@ public class AddCreditCardDebtController
                                         "Invalid expense value",
                                         "Debt value must be a number");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException |
+               InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error", "Error creating debt", e.getMessage());
         }

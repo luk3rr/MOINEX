@@ -6,6 +6,7 @@
 
 package org.moinex.ui.common;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -413,7 +414,7 @@ public class WalletFullPaneController
                 // Update wallet display in the main window
                 walletController.updateDisplay();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalStateException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing wallet",

@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
+import jakarta.persistence.EntityNotFoundException;
+
 /**
  * Controller for the Manage Recurring Transactions dialog
  */
@@ -373,7 +375,7 @@ public class RecurringTransactionController
                     recurringTransactionService.calculateExpectedRemainingAmount(
                         rt.getId());
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException e)
             {
                 expectedRemainingAmount = 0.0;
             }

@@ -7,6 +7,7 @@
 package org.moinex.ui.common;
 
 import com.jfoenix.controls.JFXButton;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.YearMonth;
@@ -188,7 +189,7 @@ public class CreditCardPaneController
                 // Update credit card display in the main window
                 creditCardController.updateDisplay();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalStateException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error archiving credit card",
@@ -227,7 +228,7 @@ public class CreditCardPaneController
                 // Update credit card display in the main window
                 creditCardController.updateDisplay();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalStateException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing credit card",

@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Ticker;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.ui.common.CalculatorController;
@@ -205,7 +207,7 @@ public class EditCryptoExchangeController
                     .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Crypto with symbol: " + soldCryptoSymbol +
                                          " not found"));
 
@@ -214,7 +216,7 @@ public class EditCryptoExchangeController
                     .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Crypto with symbol: " + receivedCryptoSymbol +
                                          " not found"));
 
@@ -264,7 +266,8 @@ public class EditCryptoExchangeController
                                         "Invalid exchange quantity",
                                         "The quantity must be a number");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | SameSourceDestionationException |
+               IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while creating exchange",
@@ -350,7 +353,7 @@ public class EditCryptoExchangeController
                 .findFirst()
                 .orElseThrow(
                     ()
-                        -> new RuntimeException(
+                        -> new EntityNotFoundException(
                             "Crypto with symbol: " + soldCryptoSymbol + " not found"));
 
         if (soldCrypto.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
@@ -383,7 +386,7 @@ public class EditCryptoExchangeController
                 .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Crypto with symbol: " + receivedCryptoSymbol +
                                      " not found"));
 
@@ -432,7 +435,7 @@ public class EditCryptoExchangeController
                     .filter(c -> c.getSymbol().equals(soldCryptoSymbol))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Crypto with symbol: " + soldCryptoSymbol +
                                          " not found"));
 
@@ -491,7 +494,7 @@ public class EditCryptoExchangeController
                     .filter(c -> c.getSymbol().equals(receivedCryptoSymbol))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Crypto with symbol: " + receivedCryptoSymbol +
                                          " not found"));
 

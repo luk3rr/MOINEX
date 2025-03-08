@@ -101,7 +101,7 @@ public class AddCalendarEventController
             Stage stage = (Stage)titleField.getScene().getWindow();
             stage.close();
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error creating event",

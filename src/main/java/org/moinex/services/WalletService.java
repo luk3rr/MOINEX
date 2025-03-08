@@ -6,12 +6,15 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletType;
+import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.repositories.TransferRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.repositories.WalletTransactionRepository;
@@ -48,8 +51,9 @@ public class WalletService
      * Creates a new wallet
      * @param name The name of the wallet
      * @param balance The initial balance of the wallet
-     * @throws RuntimeException If the wallet name is already in use
      * @return The id of the created wallet
+     * @throws IllegalArgumentException If the wallet name is empty
+     * @throws EntityExistsException If the wallet name is already in use
      */
     @Transactional
     public Long addWallet(String name, BigDecimal balance)
@@ -59,12 +63,13 @@ public class WalletService
 
         if (name.isBlank())
         {
-            throw new RuntimeException("Wallet name cannot be empty");
+            throw new IllegalArgumentException("Wallet name cannot be empty");
         }
 
         if (walletRepository.existsByName(name))
         {
-            throw new RuntimeException("Wallet with name " + name + " already exists");
+            throw new EntityExistsException("Wallet with name " + name +
+                                            " already exists");
         }
 
         logger.info("Wallet " + name + " created with balance " + balance);
@@ -81,8 +86,9 @@ public class WalletService
      * @param name The name of the wallet
      * @param balance The initial balance of the wallet
      * @param walletType The type of the wallet
-     * @throws RuntimeException If the wallet name is already in use
      * @return The id of the created wallet
+     * @throws IllegalArgumentException If the wallet name is empty
+     * @throws EntityExistsException If the wallet name is already in use
      */
     @Transactional
     public Long addWallet(String name, BigDecimal balance, WalletType walletType)
@@ -92,12 +98,13 @@ public class WalletService
 
         if (name.isBlank())
         {
-            throw new RuntimeException("Wallet name cannot be empty");
+            throw new IllegalArgumentException("Wallet name cannot be empty");
         }
 
         if (walletRepository.existsByName(name))
         {
-            throw new RuntimeException("Wallet with name " + name + " already exists");
+            throw new EntityExistsException("Wallet with name " + name +
+                                            " already exists");
         }
 
         logger.info("Wallet " + name + " created with balance " + balance);
@@ -113,21 +120,21 @@ public class WalletService
     /**
      * Delete a wallet
      * @param id The id of the wallet to be deleted
-     * @throws RuntimeException If the wallet does not exist
-     * @throws RuntimeException If the wallet has transactions
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws IllegalStateException If the wallet has transactions
      */
     @Transactional
     public void deleteWallet(Long id)
     {
         Wallet wallet = walletRepository.findById(id).orElseThrow(
             ()
-                -> new RuntimeException("Wallet with id " + id +
-                                        " not found and cannot be deleted"));
+                -> new EntityNotFoundException("Wallet with id " + id +
+                                               " not found and cannot be deleted"));
 
         if (walletTransactionRepository.getTransactionCountByWallet(id) > 0 ||
             transfersRepository.getTransferCountByWallet(id) > 0)
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                 "Wallet with id " + id +
                 " has transactions and cannot be deleted. Remove "
                 + "the transactions first or archive the wallet");
@@ -141,7 +148,7 @@ public class WalletService
     /**
      * Archive a wallet
      * @param id The id of the wallet to be archived
-     * @throws RuntimeException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      * @note This method is used to archive a wallet, which means that the wallet
      * will not be deleted from the database, but it will not be used in the
      * application anymore
@@ -151,8 +158,8 @@ public class WalletService
     {
         Wallet wallet = walletRepository.findById(id).orElseThrow(
             ()
-                -> new RuntimeException("Wallet with id " + id +
-                                        " not found and cannot be archived"));
+                -> new EntityNotFoundException("Wallet with id " + id +
+                                               " not found and cannot be archived"));
 
         wallet.setArchived(true);
         walletRepository.save(wallet);
@@ -163,7 +170,7 @@ public class WalletService
     /**
      * Unarchive a wallet
      * @param id The id of the wallet to be unarchived
-     * @throws RuntimeException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      * @note This method is used to unarchive a wallet, which means that the wallet
      * will be used in the application again
      */
@@ -172,8 +179,8 @@ public class WalletService
     {
         Wallet wallet = walletRepository.findById(id).orElseThrow(
             ()
-                -> new RuntimeException("Wallet with id " + id +
-                                        " not found and cannot be unarchived"));
+                -> new EntityNotFoundException(
+                    "Wallet with id " + id + " not found and cannot be unarchived"));
 
         wallet.setArchived(false);
         walletRepository.save(wallet);
@@ -185,8 +192,9 @@ public class WalletService
      * Rename a wallet
      * @param id The id of the wallet to be renamed
      * @param newName The new name of the wallet
-     * @throws RuntimeException If the wallet does not exist
-     * @throws RuntimeException If the new name is already in use
+     * @throws IllegalArgumentException If the wallet name is empty
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws EntityExistsException If the wallet name is already in use
      */
     @Transactional
     public void renameWallet(Long id, String newName)
@@ -196,16 +204,16 @@ public class WalletService
 
         if (newName.isBlank())
         {
-            throw new RuntimeException("Wallet name cannot be empty");
+            throw new IllegalArgumentException("Wallet name cannot be empty");
         }
 
         Wallet wallet = walletRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + id + " not found"));
+            () -> new EntityNotFoundException("Wallet with id " + id + " not found"));
 
         if (walletRepository.existsByName(newName))
         {
-            throw new RuntimeException("Wallet with name " + newName +
-                                       " already exists");
+            throw new EntityExistsException("Wallet with name " + newName +
+                                            " already exists");
         }
 
         wallet.setName(newName);
@@ -218,25 +226,26 @@ public class WalletService
      * Change wallet type
      * @param id The id of the wallet to change the type
      * @param newType The new type of the wallet
-     * @throws RuntimeException If the wallet does not exist
-     * @throws RuntimeException If the new type does not exist
-     * @throws RuntimeException If the wallet type is already the new type
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet type does not exist
+     * @throws AttributeAlreadySetException If the wallet already has the new type
      */
     @Transactional
     public void changeWalletType(Long id, WalletType newType)
     {
         Wallet wallet = walletRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + id + " not found"));
+            () -> new EntityNotFoundException("Wallet with id " + id + " not found"));
 
         if (newType == null || !walletTypeRepository.existsById(newType.getId()))
         {
-            throw new RuntimeException("Wallet type not found");
+            throw new EntityNotFoundException("Wallet type not found");
         }
 
         if (wallet.getType().getId().equals(newType.getId()))
         {
-            throw new RuntimeException("Wallet with name " + wallet.getName() +
-                                       " already has type " + newType.getName());
+            throw new AttributeAlreadySetException(
+                "Wallet with name " + wallet.getName() + " already has type " +
+                newType.getName());
         }
 
         wallet.setType(newType);
@@ -249,13 +258,13 @@ public class WalletService
      * Update the balance of a wallet
      * @param id The id of the wallet
      * @param newBalance The new balance of the wallet
-     * @throws RuntimeException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      */
     @Transactional
     public void updateWalletBalance(Long id, BigDecimal newBalance)
     {
         Wallet wallet = walletRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + id + " not found"));
+            () -> new EntityNotFoundException("Wallet with id " + id + " not found"));
 
         wallet.setBalance(newBalance);
         walletRepository.save(wallet);
@@ -285,24 +294,26 @@ public class WalletService
      * Get wallet by name
      * @param name The name of the wallet
      * @return The wallet with the provided name
-     * @throws RuntimeException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      */
     public Wallet getWalletByName(String name)
     {
         return walletRepository.findByName(name).orElseThrow(
-            () -> new RuntimeException("Wallet with name " + name + " not found"));
+            ()
+                -> new EntityNotFoundException("Wallet with name " + name +
+                                               " not found"));
     }
 
     /**
      * Get wallet by id
      * @param id The id of the wallet
      * @return The wallet with the provided id
-     * @throws RuntimeException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      */
     public Wallet getWalletById(Long id)
     {
         return walletRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + id + " not found"));
+            () -> new EntityNotFoundException("Wallet with id " + id + " not found"));
     }
 
     /**

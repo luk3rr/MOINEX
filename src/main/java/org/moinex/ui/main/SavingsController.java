@@ -7,6 +7,7 @@
 package org.moinex.ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -42,8 +43,6 @@ import org.moinex.ui.dialog.AddCryptoExchangeController;
 import org.moinex.ui.dialog.AddDividendController;
 import org.moinex.ui.dialog.AddTickerController;
 import org.moinex.ui.dialog.ArchivedTickersController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.moinex.ui.dialog.BuyTickerController;
 import org.moinex.ui.dialog.EditTickerController;
 import org.moinex.ui.dialog.InvestmentTransactionsController;
@@ -52,6 +51,8 @@ import org.moinex.util.Constants;
 import org.moinex.util.TickerType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -182,7 +183,8 @@ public class SavingsController
     private BigDecimal profitLoss;
     private BigDecimal dividendsReceived;
 
-    private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(SavingsController.class);
 
     /**
      * Constructor
@@ -470,7 +472,7 @@ public class SavingsController
                 tickerService.deleteTicker(selectedTicker.getId());
                 updateTransactionTableView();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalStateException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error deleting ticker",
@@ -521,7 +523,7 @@ public class SavingsController
             brazilianMarketIndicators = marketService.getBrazilianMarketIndicators();
             logger.info("Loaded Brazilian market indicators from the database");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException e)
         {
             // If the indicators are not found in the database, update them from the
             // API
@@ -553,7 +555,7 @@ public class SavingsController
             marketQuotesAndCommodities = marketService.getMarketQuotesAndCommodities();
             logger.info("Loaded market quotes and commodities from the database");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException e)
         {
             // If the market quotes and commodities are not found in the database,
             // update them from the API
@@ -960,8 +962,7 @@ public class SavingsController
     {
         if (scheduledUpdatingBrazilianIndicatorsRetries >= maxRetries)
         {
-            logger.warn(
-                "Max retries reached for updating Brazilian market indicators");
+            logger.warn("Max retries reached for updating Brazilian market indicators");
             return;
         }
 

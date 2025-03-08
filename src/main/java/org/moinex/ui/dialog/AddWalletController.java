@@ -6,6 +6,8 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -96,7 +98,10 @@ public class AddWalletController
             walletTypes.stream()
                 .filter(wt -> wt.getName().equals(walletTypeStr))
                 .findFirst()
-                .orElseThrow((() -> new RuntimeException("Invalid wallet type")));
+                .orElseThrow(
+                    (()
+                         -> new EntityNotFoundException("Wallet type with name " +
+                                                        walletTypeStr + " not found")));
 
         try
         {
@@ -117,7 +122,7 @@ public class AddWalletController
                                         "Invalid balance",
                                         "Please enter a valid balance.");
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException | EntityExistsException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error creating wallet",
@@ -141,7 +146,8 @@ public class AddWalletController
                 walletTypes.stream()
                     .filter(wt -> wt.getName().equals(nameToMove))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Invalid wallet type"));
+                    .orElseThrow(
+                        () -> new IllegalStateException("Invalid wallet type"));
 
             walletTypes.remove(walletType);
             walletTypes.add(walletType);

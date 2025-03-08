@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -89,10 +90,13 @@ public class ChangeWalletBalanceController
             return;
         }
 
-        Wallet wallet = wallets.stream()
-                            .filter(w -> w.getName().equals(walletName))
-                            .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Wallet with name " + walletName + " not found"));
+        Wallet wallet =
+            wallets.stream()
+                .filter(w -> w.getName().equals(walletName))
+                .findFirst()
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Wallet with name " + walletName + " not found"));
 
         try
         {
@@ -125,7 +129,7 @@ public class ChangeWalletBalanceController
                                         "Balance must be a number");
             return;
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error renaming wallet",

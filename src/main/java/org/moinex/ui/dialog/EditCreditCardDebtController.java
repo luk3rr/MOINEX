@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.YearMonth;
@@ -197,9 +198,10 @@ public class EditCreditCardDebtController
                 creditCards.stream()
                     .filter(c -> c.getName().equals(crcName))
                     .findFirst()
-                    .orElseThrow(()
-                                     -> new RuntimeException("Credit card with name: " +
-                                                             crcName + " not found"));
+                    .orElseThrow(
+                        ()
+                            -> new EntityNotFoundException(
+                                "Credit card with name: " + crcName + " not found"));
 
             Category category =
                 categories.stream()
@@ -207,7 +209,7 @@ public class EditCreditCardDebtController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException(
+                            -> new EntityNotFoundException(
                                 "Category with name: " + categoryName + " not found"));
 
             // Get the date of the first payment to check if the invoice month is the
@@ -254,7 +256,7 @@ public class EditCreditCardDebtController
                                         "Invalid expense value",
                                         "Debt value must be a number");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error", "Error creating debt", e.getMessage());
         }

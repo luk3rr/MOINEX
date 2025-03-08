@@ -30,6 +30,7 @@ import org.moinex.entities.Category;
 import org.moinex.entities.RecurringTransaction;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.repositories.RecurringTransactionRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.util.Constants;
@@ -37,6 +38,8 @@ import org.moinex.util.RecurringTransactionFrequency;
 import org.moinex.util.RecurringTransactionStatus;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class RecurringTransactionServiceTest
@@ -208,7 +211,7 @@ class RecurringTransactionServiceTest
     {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> recurringTransactionService.addRecurringTransaction(
                              dailyRT.getWallet().getId(),
@@ -256,7 +259,7 @@ class RecurringTransactionServiceTest
         when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> recurringTransactionService.stopRecurringTransaction(
                              dailyRT.getId()));
@@ -276,7 +279,7 @@ class RecurringTransactionServiceTest
         // Change the end date to a date in the past
         dailyRT.setStatus(RecurringTransactionStatus.INACTIVE);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(AttributeAlreadySetException.class,
                      ()
                          -> recurringTransactionService.stopRecurringTransaction(
                              dailyRT.getId()));
@@ -305,7 +308,7 @@ class RecurringTransactionServiceTest
         when(recurringTransactionRepository.findById(dailyRT.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> recurringTransactionService.deleteRecurringTransaction(
                              dailyRT.getId()));

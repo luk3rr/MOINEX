@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -191,7 +192,7 @@ public class EditTransactionController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 
@@ -200,7 +201,7 @@ public class EditTransactionController
                     .filter(c -> c.getName().equals(categoryString))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Category with name: " + categoryString +
                                          " not found"));
 
@@ -252,7 +253,8 @@ public class EditTransactionController
                                         "Invalid income value",
                                         "Income value must be a number.");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException |
+               IllegalStateException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while updating transaction",
@@ -274,7 +276,7 @@ public class EditTransactionController
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Wallet with name: " + walletName + " not found"));
 
         walletCurrentBalanceValueLabel.setText(
@@ -308,7 +310,7 @@ public class EditTransactionController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 

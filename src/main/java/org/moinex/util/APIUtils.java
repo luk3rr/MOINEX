@@ -24,6 +24,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
+import org.moinex.exceptions.APIFetchException;
+import org.moinex.exceptions.ApplicationShuttingDownException;
+import org.moinex.exceptions.ScriptNotFoundException;
 import org.moinex.services.InicializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +132,7 @@ public class APIUtils
     {
         if (shuttingDown)
         {
-            throw new RuntimeException("Application is shutting down");
+            throw new ApplicationShuttingDownException("Application is shutting down");
         }
 
         runningProcesses.add(process);
@@ -143,7 +146,7 @@ public class APIUtils
     {
         if (shuttingDown)
         {
-            throw new RuntimeException("Application is shutting down");
+            throw new ApplicationShuttingDownException("Application is shutting down");
         }
 
         runningProcesses.remove(process);
@@ -188,12 +191,14 @@ public class APIUtils
         {
             if (scriptInputStream == null)
             {
-                throw new RuntimeException("Python " + script + " script not found");
+                throw new ScriptNotFoundException("Python " + script +
+                                                  " script not found");
             }
 
             if (shuttingDown)
             {
-                throw new RuntimeException("Application is shutting down");
+                throw new ApplicationShuttingDownException(
+                    "Application is shutting down");
             }
 
             // Script name without extension
@@ -228,7 +233,7 @@ public class APIUtils
 
                 if (exitCode != 0)
                 {
-                    throw new RuntimeException(
+                    throw new APIFetchException(
                         "Error executing Python script. Exit code: " + exitCode);
                 }
 
@@ -251,13 +256,14 @@ public class APIUtils
         {
             // Handle the case where the thread is interrupted
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Python script execution was interrupted", e);
+            throw new APIFetchException("Python script execution was interrupted: " +
+                                        e);
         }
         catch (Exception e)
         {
             // Handle general errors and exceptions
-            throw new RuntimeException("Error running Python script: " + e.getMessage(),
-                                       e);
+            throw new APIFetchException("Error running Python script: " +
+                                        e.getMessage());
         }
     }
 

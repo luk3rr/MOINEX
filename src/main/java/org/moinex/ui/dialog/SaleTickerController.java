@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
 import org.moinex.entities.investment.Ticker;
+import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
 import org.moinex.services.WalletService;
@@ -212,7 +214,7 @@ public class SaleTickerController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 
@@ -221,7 +223,7 @@ public class SaleTickerController
                     .filter(c -> c.getName().equals(categoryString))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Category with name: " + categoryString +
                                          " not found"));
 
@@ -252,7 +254,8 @@ public class SaleTickerController
                                         "Invalid number",
                                         "Invalid price or quantity");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException |
+               InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while selling ticker",
@@ -309,7 +312,7 @@ public class SaleTickerController
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
@@ -355,7 +358,7 @@ public class SaleTickerController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 

@@ -39,11 +39,11 @@ import org.moinex.entities.Wallet;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
-import org.moinex.util.LoggerConfig;
 import org.moinex.util.MappingRow;
 import org.moinex.util.WindowUtils;
 import org.reflections.Reflections;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -390,7 +390,7 @@ public class CSVImportController
                         categoryService.addCategory(
                             getvalueforcolumn(csvHeaders, row, csvColumn));
                     }
-                    catch (IllegalArgumentException e)
+                    catch (IllegalArgumentException | EntityExistsException e)
                     {
                         logger.error(e.getMessage());
                     }

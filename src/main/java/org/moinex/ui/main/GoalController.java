@@ -7,6 +7,7 @@
 package org.moinex.ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -278,7 +279,7 @@ public class GoalController
                 updateGoalTableView();
             }
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalStateException e)
         {
             WindowUtils.showErrorDialog("Error", "Error deleting goal", e.getMessage());
         }

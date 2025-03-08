@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -20,6 +21,9 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.Ticker;
+import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.exceptions.InvalidTickerTypeException;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.ui.common.CalculatorController;
@@ -190,22 +194,23 @@ public class AddCryptoExchangeController
             BigDecimal cryptoReceivedQuantity =
                 new BigDecimal(cryptoReceivedQuantityStr);
 
-            Ticker cryptoSold = cryptos.stream()
-                                    .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
-                                    .findFirst()
-                                    .orElseThrow(
-                                        ()
-                                            -> new RuntimeException("Crypto not found with symbol: " +
-                                                                    cryptoSoldSymbol));
+            Ticker cryptoSold =
+                cryptos.stream()
+                    .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new EntityNotFoundException(
+                                "Crypto not found with symbol: " + cryptoSoldSymbol));
 
             Ticker cryptoReceived =
                 cryptos.stream()
                     .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
                     .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new RuntimeException("Crypto not found with symbol: " +
-                                                    cryptoReceivedSymbol));
+                    .orElseThrow(()
+                                     -> new EntityNotFoundException(
+                                         "Crypto not found with symbol: " +
+                                         cryptoReceivedSymbol));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = exchangeDate.atTime(currentTime);
@@ -230,7 +235,9 @@ public class AddCryptoExchangeController
                                         "Invalid exchange quantity",
                                         "The quantity must be a number");
         }
-        catch (RuntimeException e)
+        catch (SameSourceDestionationException | EntityNotFoundException |
+               InvalidTickerTypeException | IllegalArgumentException |
+               InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while creating exchange",
@@ -313,10 +320,10 @@ public class AddCryptoExchangeController
         Ticker cryptoSold = cryptos.stream()
                                 .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
                                 .findFirst()
-                                .orElseThrow(
-                                    ()
-                                        -> new RuntimeException("Crypto not found with symbol: " +
-                                                                cryptoSoldSymbol));
+                                .orElseThrow(()
+                                                 -> new EntityNotFoundException(
+                                                     "Crypto not found with symbol: " +
+                                                     cryptoSoldSymbol));
 
         if (cryptoSold.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -349,8 +356,8 @@ public class AddCryptoExchangeController
                 .findFirst()
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Crypto not found with symbol: " +
-                                                cryptoReceivedSymbol));
+                        -> new EntityNotFoundException(
+                            "Crypto not found with symbol: " + cryptoReceivedSymbol));
 
         if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -390,13 +397,14 @@ public class AddCryptoExchangeController
                 return;
             }
 
-            Ticker cryptoSold = cryptos.stream()
-                                    .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
-                                    .findFirst()
-                                    .orElseThrow(
-                                        ()
-                                            -> new RuntimeException("Crypto not found with symbol: " +
-                                                                    cryptoSoldSymbol));
+            Ticker cryptoSold =
+                cryptos.stream()
+                    .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
+                    .findFirst()
+                    .orElseThrow(
+                        ()
+                            -> new EntityNotFoundException(
+                                "Crypto not found with symbol: " + cryptoSoldSymbol));
 
             BigDecimal cryptoSoldAfterBalance =
                 cryptoSold.getCurrentQuantity().subtract(exchangeQuantity);
@@ -448,10 +456,10 @@ public class AddCryptoExchangeController
                 cryptos.stream()
                     .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
                     .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new RuntimeException("Crypto not found with symbol: " +
-                                                    cryptoReceivedSymbol));
+                    .orElseThrow(()
+                                     -> new EntityNotFoundException(
+                                         "Crypto not found with symbol: " +
+                                         cryptoReceivedSymbol));
 
             BigDecimal cryptoReceivedAfterBalance =
                 cryptoReceived.getCurrentQuantity().add(exchangeQuantity);

@@ -6,6 +6,7 @@
 
 package org.moinex.ui.common;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.charts.CircularProgressBar;
 import org.moinex.entities.Goal;
+import org.moinex.exceptions.IncompleteGoalException;
 import org.moinex.services.GoalService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.ui.dialog.AddExpenseController;
@@ -328,13 +330,12 @@ public class GoalFullPaneController
             return;
         }
 
-        WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
-            "Add new transfer",
-            springContext,
-            (AddTransferController controller)
-                -> controller.setReceiverWalletComboBox(goal),
-            List.of(() -> goalController.updateDisplay()));
+        WindowUtils.openModalWindow(Constants.ADD_TRANSFER_FXML,
+                                    "Add new transfer",
+                                    springContext,
+                                    (AddTransferController controller)
+                                        -> controller.setReceiverWalletComboBox(goal),
+                                    List.of(() -> goalController.updateDisplay()));
     }
 
     @FXML
@@ -375,7 +376,7 @@ public class GoalFullPaneController
                 {
                     goalService.completeGoal(goal.getId());
                 }
-                catch (RuntimeException e)
+                catch (EntityNotFoundException | IncompleteGoalException e)
                 {
                     WindowUtils.showErrorDialog("Error",
                                                 "Error completing goal",
@@ -465,7 +466,7 @@ public class GoalFullPaneController
                 goalController.updateDisplay();
             }
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalStateException e)
         {
             WindowUtils.showErrorDialog("Error", "Error deleting goal", e.getMessage());
         }

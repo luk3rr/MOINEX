@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -197,7 +198,7 @@ public class EditDividendController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 
@@ -206,7 +207,7 @@ public class EditDividendController
                     .filter(c -> c.getName().equals(categoryString))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Category with name: " + categoryString +
                                          " not found"));
 
@@ -257,7 +258,7 @@ public class EditDividendController
                                         "Invalid dividend value",
                                         "Dividend value must be a number.");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while updating dividend",
@@ -324,7 +325,7 @@ public class EditDividendController
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
@@ -368,7 +369,7 @@ public class EditDividendController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 

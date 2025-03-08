@@ -6,6 +6,8 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import javafx.fxml.FXML;
@@ -131,7 +133,8 @@ public class AddGoalController
                                         "Invalid balance",
                                         "Please enter a valid balance.");
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException | EntityExistsException |
+               EntityNotFoundException e)
         {
             WindowUtils.showErrorDialog("Error", "Error creating goal", e.getMessage());
         }

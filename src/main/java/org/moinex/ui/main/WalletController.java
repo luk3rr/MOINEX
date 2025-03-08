@@ -140,7 +140,8 @@ public class WalletController
 
     private Integer itemsPerPage = 3;
 
-    private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(WalletController.class);
 
     /**
      * Constructor
@@ -289,7 +290,7 @@ public class WalletController
     private void loadAllDataFromDatabase()
     {
         loadWalletTransactionsFromDatabase();
-        loadwallettypesfromdatabase();
+        loadWalletTypesFromDatabase();
         loadWalletsFromDatabase();
     }
 
@@ -314,7 +315,7 @@ public class WalletController
     /**
      * Load the wallet types
      */
-    private void loadwallettypesfromdatabase()
+    private void loadWalletTypesFromDatabase()
     {
         walletTypes = walletService.getAllWalletTypes();
 
@@ -330,7 +331,8 @@ public class WalletController
                 walletTypes.stream()
                     .filter(n -> n.getName().equals(nameToMove))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Wallet type not found"));
+                    .orElseThrow(
+                        () -> new IllegalStateException("Wallet type not found"));
 
             walletTypes.remove(wt);
             walletTypes.add(wt);

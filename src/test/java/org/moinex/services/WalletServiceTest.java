@@ -14,6 +14,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,6 +30,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletType;
+import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.TransferRepository;
 import org.moinex.repositories.WalletRepository;
@@ -115,7 +118,7 @@ class WalletServiceTest
     {
         when(m_walletRepository.existsByName(m_wallet1.getName())).thenReturn(true);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityExistsException.class,
                      ()
                          -> m_walletService.addWallet(m_wallet1.getName(),
                                                       m_wallet1.getBalance()));
@@ -144,7 +147,7 @@ class WalletServiceTest
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_walletService.deleteWallet(m_wallet1.getId()));
 
         // Verify that the wallet was not deleted
@@ -176,7 +179,7 @@ class WalletServiceTest
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_walletService.archiveWallet(m_wallet1.getId()));
 
         // Verify that the wallet was not archived
@@ -211,7 +214,7 @@ class WalletServiceTest
             .thenReturn(Optional.empty());
 
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             () -> m_walletService.renameWallet(m_wallet1.getId(), "NewWalletName"));
 
         // Verify that the wallet was not renamed
@@ -230,7 +233,7 @@ class WalletServiceTest
         when(m_walletRepository.existsByName(m_wallet2.getName())).thenReturn(true);
 
         assertThrows(
-            RuntimeException.class,
+            EntityExistsException.class,
             () -> m_walletService.renameWallet(m_wallet1.getId(), m_wallet2.getName()));
 
         // Verify that the wallet was not renamed
@@ -268,7 +271,7 @@ class WalletServiceTest
             .thenReturn(Optional.empty());
 
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             () -> m_walletService.changeWalletType(m_wallet1.getId(), m_walletType2));
 
         // Verify that the wallet type was not updated
@@ -288,10 +291,10 @@ class WalletServiceTest
             .thenReturn(false);
 
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             () -> m_walletService.changeWalletType(m_wallet1.getId(), m_walletType2));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_walletService.changeWalletType(m_wallet1.getId(), null));
 
         // Verify that the wallet type was not updated
@@ -313,7 +316,7 @@ class WalletServiceTest
         when(m_walletTypeRepository.existsById(m_wallet1.getType().getId()))
             .thenReturn(true);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(AttributeAlreadySetException.class,
                      ()
                          -> m_walletService.changeWalletType(m_wallet1.getId(),
                                                              m_wallet1.getType()));
@@ -351,7 +354,7 @@ class WalletServiceTest
             .thenReturn(Optional.empty());
 
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             ()
                 -> m_walletService.updateWalletBalance(m_wallet1.getId(),
                                                        new BigDecimal("1000.0")));

@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -31,6 +33,9 @@ import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
+import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.exceptions.InvalidTickerTypeException;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.repositories.CryptoExchangeRepository;
 import org.moinex.repositories.DividendRepository;
 import org.moinex.repositories.TickerPurchaseRepository;
@@ -232,7 +237,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.existsBySymbol(m_ticker1.getSymbol())).thenReturn(true);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityExistsException.class,
                      ()
                          -> m_tickerService.addTicker(m_ticker1.getName(),
                                                       m_ticker1.getSymbol(),
@@ -251,7 +256,7 @@ class TickerServiceTest
     testRegisterTickerEmptyName()
     {
         // Test with empty name
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker("",
                                                       m_ticker1.getSymbol(),
@@ -260,7 +265,7 @@ class TickerServiceTest
                                                       m_ticker1.getAverageUnitValue(),
                                                       m_ticker1.getCurrentQuantity()));
         // Test with blank name
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker(" ",
                                                       m_ticker1.getSymbol(),
@@ -279,7 +284,7 @@ class TickerServiceTest
     testRegisterTickerEmptySymbol()
     {
         // Test with empty symbol
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker(m_ticker1.getName(),
                                                       "",
@@ -289,7 +294,7 @@ class TickerServiceTest
                                                       m_ticker1.getCurrentQuantity()));
 
         // Test with blank symbol
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker(m_ticker1.getName(),
                                                       " ",
@@ -311,7 +316,7 @@ class TickerServiceTest
             .thenReturn(false);
 
         // Test with price less than zero
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker(m_ticker1.getName(),
                                                       m_ticker1.getSymbol(),
@@ -321,7 +326,7 @@ class TickerServiceTest
                                                       m_ticker1.getCurrentQuantity()));
 
         // Test with price equal to zero
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker(m_ticker1.getName(),
                                                       m_ticker1.getSymbol(),
@@ -344,7 +349,7 @@ class TickerServiceTest
             .thenReturn(false);
 
         // Test with average unit price less than zero
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_tickerService.addTicker(m_ticker1.getName(),
                                                       m_ticker1.getSymbol(),
@@ -383,7 +388,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
@@ -404,7 +409,7 @@ class TickerServiceTest
         when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalStateException.class,
                      () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
@@ -425,7 +430,7 @@ class TickerServiceTest
         when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalStateException.class,
                      () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
@@ -446,7 +451,7 @@ class TickerServiceTest
         when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(0L);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalStateException.class,
                      () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
@@ -469,7 +474,7 @@ class TickerServiceTest
         when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(1L);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalStateException.class,
                      () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
@@ -490,7 +495,7 @@ class TickerServiceTest
         when(m_tickerRepository.getCryptoExchangeCountByTicker(m_ticker1.getId()))
             .thenReturn(4L);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalStateException.class,
                      () -> m_tickerService.deleteTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).delete(any(Ticker.class));
@@ -516,7 +521,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_tickerService.archiveTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -542,7 +547,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(m_ticker1.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_tickerService.unarchiveTicker(m_ticker1.getId()));
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -596,7 +601,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_tickerService.addPurchase(1L,
                                         1L,
                                         new BigDecimal("10"),
@@ -619,7 +624,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_tickerService.addPurchase(1L,
                                         1L,
                                         BigDecimal.ZERO,
@@ -642,7 +647,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_tickerService.addPurchase(1L,
                                         1L,
                                         new BigDecimal("10"),
@@ -705,7 +710,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("10"),
@@ -729,7 +734,7 @@ class TickerServiceTest
         m_ticker1.setCurrentQuantity(new BigDecimal("5"));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(InsufficientResourcesException.class, () -> {
             m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("10"),
@@ -753,7 +758,7 @@ class TickerServiceTest
         m_ticker1.setCurrentQuantity(new BigDecimal("10"));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("5"),
@@ -808,7 +813,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_tickerService.addDividend(1L,
                                         1L,
                                         m_category,
@@ -834,7 +839,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_tickerService.addDividend(1L,
                                         1L,
                                         m_category,
@@ -911,7 +916,7 @@ class TickerServiceTest
     void
     testAddCryptoExchangeSameTicker()
     {
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(SameSourceDestionationException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               1L,
                                               new BigDecimal("1"),
@@ -932,7 +937,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
@@ -954,7 +959,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
@@ -980,7 +985,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(InvalidTickerTypeException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
@@ -1005,7 +1010,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               BigDecimal.ZERO,
@@ -1030,7 +1035,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
@@ -1058,7 +1063,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(InsufficientResourcesException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("10"),
@@ -1095,7 +1100,7 @@ class TickerServiceTest
     {
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1111,7 +1116,7 @@ class TickerServiceTest
 
         m_ticker1.setName("");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1125,7 +1130,7 @@ class TickerServiceTest
 
         m_ticker1.setName(" ");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1139,7 +1144,7 @@ class TickerServiceTest
 
         m_ticker1.setName(null);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1173,7 +1178,7 @@ class TickerServiceTest
 
         m_ticker1.setSymbol("");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1189,7 +1194,7 @@ class TickerServiceTest
 
         m_ticker1.setSymbol(" ");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1203,7 +1208,7 @@ class TickerServiceTest
 
         m_ticker1.setSymbol(null);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1278,7 +1283,7 @@ class TickerServiceTest
 
         m_ticker1.setCurrentUnitValue(new BigDecimal("-0.05"));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1294,7 +1299,7 @@ class TickerServiceTest
 
         m_ticker1.setCurrentUnitValue(BigDecimal.ZERO);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1340,7 +1345,7 @@ class TickerServiceTest
 
         m_ticker1.setCurrentQuantity(new BigDecimal("-0.05"));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1391,7 +1396,7 @@ class TickerServiceTest
 
         m_ticker1.setAverageUnitValue(new BigDecimal("-0.05"));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updateTicker(m_ticker1); });
 
         verify(m_tickerRepository, never()).save(any(Ticker.class));
@@ -1472,7 +1477,7 @@ class TickerServiceTest
     {
         when(m_tickerPurchaseRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
@@ -1490,7 +1495,7 @@ class TickerServiceTest
 
         m_purchase.setQuantity(new BigDecimal("-0.05"));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
@@ -1508,7 +1513,7 @@ class TickerServiceTest
 
         m_purchase.setQuantity(BigDecimal.ZERO);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
@@ -1565,7 +1570,7 @@ class TickerServiceTest
 
         m_purchase.setUnitPrice(new BigDecimal("-0.05"));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
@@ -1583,7 +1588,7 @@ class TickerServiceTest
 
         m_purchase.setUnitPrice(BigDecimal.ZERO);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> { m_tickerService.updatePurchase(m_purchase); });
 
         verify(m_tickerPurchaseRepository, never()).save(any(TickerPurchase.class));

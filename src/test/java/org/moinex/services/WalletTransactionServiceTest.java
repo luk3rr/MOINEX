@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -31,6 +32,8 @@ import org.moinex.entities.Category;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.TransferRepository;
 import org.moinex.repositories.WalletRepository;
@@ -214,7 +217,7 @@ class WalletTransactionServiceTest
         when(m_walletRepository.findById(m_wallet1.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_walletTransactionService.transferMoney(m_wallet1.getId(),
                                                                      m_wallet2.getId(),
@@ -236,7 +239,7 @@ class WalletTransactionServiceTest
         when(m_walletRepository.findById(m_wallet2.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_walletTransactionService.transferMoney(m_wallet1.getId(),
                                                                      m_wallet2.getId(),
@@ -255,7 +258,7 @@ class WalletTransactionServiceTest
     void
     testTransferMoneySameWallet()
     {
-        assertThrows(RuntimeException.class,
+        assertThrows(SameSourceDestionationException.class,
                      ()
                          -> m_walletTransactionService.transferMoney(m_wallet1.getId(),
                                                                      m_wallet1.getId(),
@@ -274,7 +277,7 @@ class WalletTransactionServiceTest
     testTransferMoneyAmountZero()
     {
         assertThrows(
-            RuntimeException.class,
+            IllegalArgumentException.class,
             ()
                 -> m_walletTransactionService.transferMoney(m_wallet1.getId(),
                                                             m_wallet2.getId(),
@@ -366,7 +369,7 @@ class WalletTransactionServiceTest
 
         // Check for confirmed income
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             ()
                 -> m_walletTransactionService.addIncome(m_wallet1.getId(),
                                                         m_category,
@@ -377,7 +380,7 @@ class WalletTransactionServiceTest
 
         // Check for pending income
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             ()
                 -> m_walletTransactionService.addIncome(m_wallet1.getId(),
                                                         m_category,
@@ -471,7 +474,7 @@ class WalletTransactionServiceTest
 
         // Check for confirmed expense
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             ()
                 -> m_walletTransactionService.addExpense(m_wallet1.getId(),
                                                          m_category,
@@ -482,7 +485,7 @@ class WalletTransactionServiceTest
 
         // Check for pending expense
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             ()
                 -> m_walletTransactionService.addExpense(m_wallet1.getId(),
                                                          m_category,
@@ -806,8 +809,12 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
+        when(m_walletTransactionRepository.findWalletByTransactionId(
+                 m_wallet1ExpenseTransaction.getId()))
+            .thenReturn(Optional.of(m_wallet1));
+
         assertThrows(
-            RuntimeException.class,
+            IllegalArgumentException.class,
             () -> m_walletTransactionService.updateTransaction(updatedTransaction));
 
         // Verify repository interactions
@@ -835,7 +842,7 @@ class WalletTransactionServiceTest
             .thenReturn(Optional.empty());
 
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             ()
                 -> m_walletTransactionService.updateTransaction(nonExistentTransaction),
             "Transaction with id " + nonExistentTransaction.getId() + " not found");
@@ -949,7 +956,7 @@ class WalletTransactionServiceTest
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_walletTransactionService.deleteTransaction(
                              m_wallet1IncomeTransaction.getId()));
@@ -1015,7 +1022,7 @@ class WalletTransactionServiceTest
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_walletTransactionService.confirmTransaction(
                              m_wallet1IncomeTransaction.getId()));
@@ -1028,7 +1035,7 @@ class WalletTransactionServiceTest
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1IncomeTransaction));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(AttributeAlreadySetException.class,
                      ()
                          -> m_walletTransactionService.confirmTransaction(
                              m_wallet1IncomeTransaction.getId()));

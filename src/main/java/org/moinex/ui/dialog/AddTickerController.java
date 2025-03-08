@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
 import java.math.BigDecimal;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -143,7 +144,7 @@ public class AddTickerController
                                         "Invalid number",
                                         "Invalid price or quantity");
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException | EntityExistsException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while adding ticker",

@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
@@ -101,7 +102,7 @@ public class ArchivedTickersController
                 archivedTickers.remove(selectedTicker);
                 updateTickerTableView();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving ticker",
@@ -153,7 +154,7 @@ public class ArchivedTickersController
                 archivedTickers.remove(selectedTicker);
                 updateTickerTableView();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalStateException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing ticker",

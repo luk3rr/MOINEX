@@ -6,6 +6,7 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
 import org.json.JSONObject;
 import org.moinex.entities.investment.BrazilianMarketIndicators;
 import org.moinex.entities.investment.MarketQuotesAndCommodities;
+import org.moinex.exceptions.APIFetchException;
+import org.moinex.exceptions.ResourceAlreadyUpdatingException;
 import org.moinex.repositories.BrazilianMarketIndicatorsRepository;
 import org.moinex.repositories.MarketQuotesAndCommoditiesRepository;
 import org.moinex.util.APIUtils;
@@ -42,7 +45,7 @@ public class MarketService
     /**
      * Get the Brazilian market indicators
      * @return The Brazilian market indicators
-     * @throws RuntimeException If no Brazilian market indicators are found
+     * @throws EntityNotFoundException If no Brazilian market indicators are found
      */
     @Transactional
     public BrazilianMarketIndicators getBrazilianMarketIndicators()
@@ -52,7 +55,7 @@ public class MarketService
 
         if (indicatorsList.isEmpty())
         {
-            throw new RuntimeException("No Brazilian market indicators found");
+            throw new EntityNotFoundException("No Brazilian market indicators found");
         }
         else
         {
@@ -73,7 +76,7 @@ public class MarketService
     /**
      * Get the market quotes and commodities
      * @return The market quotes and commodities
-     * @throws RuntimeException If no market quotes and commodities are found
+     * @throws EntityNotFoundException If no market quotes and commodities are found
      */
     @Transactional
     public MarketQuotesAndCommodities getMarketQuotesAndCommodities()
@@ -83,7 +86,7 @@ public class MarketService
 
         if (marketQuotesAndCommoditiesList.isEmpty())
         {
-            throw new RuntimeException("No market quotes and commodities found");
+            throw new EntityNotFoundException("No market quotes and commodities found");
         }
         else
         {
@@ -104,8 +107,10 @@ public class MarketService
 
     /**
      * Update the Brazilian market indicators from the API asynchronously
-     *
      * @return A CompletableFuture with the Brazilian market indicators
+     * @throws ResourceAlreadyUpdatingException If the Brazilian market indicators are
+     *     already being updated
+     * @throws APIFetchException If the API fetch fails
      */
     @Transactional
     public CompletableFuture<BrazilianMarketIndicators>
@@ -116,7 +121,7 @@ public class MarketService
             CompletableFuture<BrazilianMarketIndicators> failedFuture =
                 new CompletableFuture<>();
 
-            failedFuture.completeExceptionally(new RuntimeException(
+            failedFuture.completeExceptionally(new ResourceAlreadyUpdatingException(
                 "Brazilian market indicators are already being updated"));
 
             return failedFuture;
@@ -134,7 +139,7 @@ public class MarketService
                     {
                         bmi = getBrazilianMarketIndicators();
                     }
-                    catch (RuntimeException e)
+                    catch (EntityNotFoundException e)
                     {
                         // Create a new indicator if none is found
                         bmi = BrazilianMarketIndicators.builder().build();
@@ -169,23 +174,24 @@ public class MarketService
                 }
                 else
                 {
-                    throw new RuntimeException(
+                    throw new APIFetchException(
                         "Failed to fetch Brazilian market indicators");
                 }
             })
             .whenComplete((result, e) -> isBrazilianMarketIndicatorsUpdating = false)
             .exceptionally(e -> {
                 isBrazilianMarketIndicatorsUpdating = false;
-                throw new RuntimeException(
-                    "Failed to fetch Brazilian market indicators",
-                    e);
+                throw new APIFetchException(
+                    "Failed to fetch Brazilian market indicators: " + e);
             });
     }
 
     /**
      * Update the market quotes and commodities from the API asynchronously
-     *
      * @return A CompletableFuture with the market quotes and commodities
+     * @throws ResourceAlreadyUpdatingException If the market quotes and commodities are
+     *     already being updated
+     * @throws APIFetchException If the API fetch fails
      */
     public CompletableFuture<MarketQuotesAndCommodities>
     updateMarketQuotesAndCommoditiesFromApiAsync()
@@ -195,7 +201,7 @@ public class MarketService
             CompletableFuture<MarketQuotesAndCommodities> failedFuture =
                 new CompletableFuture<>();
 
-            failedFuture.completeExceptionally(new RuntimeException(
+            failedFuture.completeExceptionally(new ResourceAlreadyUpdatingException(
                 "Market quotes and commodities are already being updated"));
 
             return failedFuture;
@@ -219,7 +225,7 @@ public class MarketService
                     {
                         mqac = getMarketQuotesAndCommodities();
                     }
-                    catch (RuntimeException e)
+                    catch (EntityNotFoundException e)
                     {
                         // Create a new indicator if none is found
                         mqac = MarketQuotesAndCommodities.builder().build();
@@ -264,17 +270,15 @@ public class MarketService
                 }
                 else
                 {
-                    throw new RuntimeException(
+                    throw new APIFetchException(
                         "Failed to fetch market quotes and commodities");
                 }
             })
-            .whenComplete(
-                (result, e) -> isMarketQuotesAndCommoditiesUpdating = false)
+            .whenComplete((result, e) -> isMarketQuotesAndCommoditiesUpdating = false)
             .exceptionally(e -> {
                 isMarketQuotesAndCommoditiesUpdating = false;
-                throw new RuntimeException(
-                    "Failed to fetch market quotes and commodities",
-                    e);
+                throw new APIFetchException(
+                    "Failed to fetch market quotes and commodities" + e);
             });
     }
 }

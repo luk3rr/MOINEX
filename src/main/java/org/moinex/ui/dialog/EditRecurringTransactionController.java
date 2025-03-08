@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -215,7 +216,7 @@ public class EditRecurringTransactionController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name: " + walletName +
                                                      " not found"));
 
@@ -224,7 +225,7 @@ public class EditRecurringTransactionController
                     .filter(c -> c.getName().equals(categoryString))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Category with name: " + categoryString +
                                          " not found"));
 
@@ -296,7 +297,7 @@ public class EditRecurringTransactionController
                                         "Invalid transaction value",
                                         "Transaction value must be a number.");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while editing recurring transaction",
@@ -335,7 +336,7 @@ public class EditRecurringTransactionController
                                                                            endDate,
                                                                            frequency);
                 }
-                catch (RuntimeException e)
+                catch (IllegalArgumentException | IllegalStateException e)
                 {
                     // Do nothing
                 }

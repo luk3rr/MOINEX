@@ -6,6 +6,8 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -83,15 +85,17 @@ public class RenameWalletController
             wallets.stream()
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
-                .orElseThrow((()
-                                  -> new RuntimeException("Wallet with name " +
-                                                          walletName + " not found")));
+                .orElseThrow(
+                    (()
+                         -> new EntityNotFoundException("Wallet with name " +
+                                                        walletName + " not found")));
 
         try
         {
             walletService.renameWallet(wallet.getId(), walletNewName);
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException | EntityNotFoundException |
+               EntityExistsException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error renaming wallet",

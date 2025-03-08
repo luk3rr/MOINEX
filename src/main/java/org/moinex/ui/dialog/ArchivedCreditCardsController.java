@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -97,7 +98,7 @@ public class ArchivedCreditCardsController
                 archivedCreditCards.remove(selectedCrc);
                 updateCreditCardTableView();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error unarchiving credit card",
@@ -148,7 +149,7 @@ public class ArchivedCreditCardsController
                 archivedCreditCards.remove(selectedCrc);
                 updateCreditCardTableView();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalStateException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error removing credit card",

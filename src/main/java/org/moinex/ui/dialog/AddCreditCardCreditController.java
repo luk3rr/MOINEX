@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -141,7 +142,8 @@ public class AddCreditCardCreditController
                 creditCards.stream()
                     .filter(c -> c.getName().equals(crcName))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Credit card not found"));
+                    .orElseThrow(
+                        () -> new EntityNotFoundException("Credit card not found"));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);
@@ -165,7 +167,7 @@ public class AddCreditCardCreditController
                                         "Invalid expense value",
                                         "Credit value must be a number");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error", "Error creating debt", e.getMessage());
         }

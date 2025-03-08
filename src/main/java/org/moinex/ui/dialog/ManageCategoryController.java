@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -139,9 +140,19 @@ public class ManageCategoryController
                 "Remove category " + selectedCategory.getName(),
                 "Are you sure you want to remove this category?"))
         {
-            categoryService.deleteCategory(selectedCategory.getId());
-            loadCategoryFromDatabase();
-            updateCategoryTableView();
+            try
+            {
+                categoryService.deleteCategory(selectedCategory.getId());
+
+                loadCategoryFromDatabase();
+                updateCategoryTableView();
+            }
+            catch (EntityNotFoundException | IllegalStateException e)
+            {
+                WindowUtils.showErrorDialog("Error",
+                                            "Error removing category",
+                                            e.getMessage());
+            }
         }
     }
 

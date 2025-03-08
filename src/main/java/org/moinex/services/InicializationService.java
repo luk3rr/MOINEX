@@ -26,7 +26,8 @@ public class InicializationService
     @Autowired
     private MarketService marketService;
 
-    private static final Logger logger = LoggerFactory.getLogger(InicializationService.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(InicializationService.class);
 
     @PostConstruct
     public void initialize()

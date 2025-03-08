@@ -14,6 +14,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -130,7 +132,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(true);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityExistsException.class, () -> {
             m_goalService.addGoal(m_goal.getName(),
                                   m_goal.getInitialBalance(),
                                   m_goal.getTargetBalance(),
@@ -147,7 +149,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.addGoal(m_goal.getName(),
                                   BigDecimal.valueOf(-1.0),
                                   m_goal.getTargetBalance(),
@@ -164,7 +166,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.addGoal(m_goal.getName(),
                                   m_goal.getInitialBalance(),
                                   BigDecimal.valueOf(-1.0),
@@ -181,7 +183,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.addGoal(m_goal.getName(),
                                   BigDecimal.valueOf(0.0),
                                   BigDecimal.valueOf(0.0),
@@ -198,7 +200,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.addGoal(m_goal.getName(),
                                   m_goal.getInitialBalance(),
                                   m_goal.getTargetBalance(),
@@ -217,7 +219,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.existsByName(m_goal.getName())).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.addGoal(
                 m_goal.getName(),
                 m_goal.getInitialBalance(),
@@ -238,7 +240,7 @@ class GoalServiceTest
         when(m_walletTypeRepository.findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_goalService.addGoal(m_goal.getName(),
                                   m_goal.getInitialBalance(),
                                   m_goal.getTargetBalance(),
@@ -283,7 +285,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> { m_goalService.archiveGoal(m_goal.getId()); });
 
         verify(m_goalRepository, never()).save(any());
@@ -295,7 +297,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> { m_goalService.unarchiveGoal(m_goal.getId()); });
 
         verify(m_goalRepository, never()).save(any());
@@ -320,7 +322,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> { m_goalService.renameGoal(m_goal.getId(), "New Name"); });
 
         verify(m_goalRepository, never()).save(any());
@@ -335,7 +337,7 @@ class GoalServiceTest
         when(m_goalRepository.existsByName(m_goal.getName() + " Renamed"))
             .thenReturn(true);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityExistsException.class, () -> {
             m_goalService.renameGoal(m_goal.getId(), m_goal.getName() + " Renamed");
         });
 
@@ -364,7 +366,7 @@ class GoalServiceTest
     void
     testUpdateInitialBalanceNegative()
     {
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.changeInitialBalance(m_goal.getId(),
                                                BigDecimal.valueOf(-1.0));
         });
@@ -378,7 +380,7 @@ class GoalServiceTest
     void
     testUpdateInitialBalanceDoesNotExist()
     {
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_goalService.changeInitialBalance(m_goal.getId(),
                                                BigDecimal.valueOf(100.0));
         });
@@ -406,7 +408,7 @@ class GoalServiceTest
     void
     testUpdateTargetBalanceNegative()
     {
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.changeTargetBalance(m_goal.getId(), BigDecimal.valueOf(-1.0));
         });
 
@@ -421,7 +423,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_goalService.changeTargetBalance(m_goal.getId(),
                                               BigDecimal.valueOf(100.0));
         });
@@ -448,7 +450,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_goalService.changeTargetDate(m_goal.getId(), LocalDateTime.now());
         });
 
@@ -463,7 +465,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.of(m_goal));
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             m_goalService.changeTargetDate(m_goal.getId(),
                                            LocalDateTime.now().minusDays(1));
         });
@@ -490,7 +492,7 @@ class GoalServiceTest
     {
         when(m_goalRepository.findById(m_goal.getId())).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(EntityNotFoundException.class, () -> {
             m_goalService.changeMotivation(m_goal.getId(), "New Motivation");
         });
 

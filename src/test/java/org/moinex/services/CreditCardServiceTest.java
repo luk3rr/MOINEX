@@ -14,6 +14,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -34,6 +36,7 @@ import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardDebt;
 import org.moinex.entities.CreditCardOperator;
 import org.moinex.entities.CreditCardPayment;
+import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.CreditCardDebtRepository;
 import org.moinex.repositories.CreditCardOperatorRepository;
@@ -139,7 +142,7 @@ class CreditCardServiceTest
         when(m_creditCardRepository.existsByName(m_creditCard.getName()))
             .thenReturn(true);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityExistsException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -165,7 +168,7 @@ class CreditCardServiceTest
         // Case when the billing due day is less than 1
         m_creditCard.setBillingDueDay(0);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -178,7 +181,7 @@ class CreditCardServiceTest
         // Case when the billing due day is greater than Constants.MAX_BILLING_DUE_DAY
         m_creditCard.setBillingDueDay(Constants.MAX_BILLING_DUE_DAY + 1);
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -202,7 +205,7 @@ class CreditCardServiceTest
         // Case when the max debt is negative
         m_creditCard.setMaxDebt(new BigDecimal("-1.0"));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -229,7 +232,7 @@ class CreditCardServiceTest
         // Case when the last four digits is blank
         m_creditCard.setLastFourDigits("");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -242,7 +245,7 @@ class CreditCardServiceTest
         // Case when the last four digits has less than 4 digits
         m_creditCard.setLastFourDigits("123");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -255,7 +258,7 @@ class CreditCardServiceTest
         // Case when the last four digits has more than 4 digits
         m_creditCard.setLastFourDigits("12345");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -281,7 +284,7 @@ class CreditCardServiceTest
         when(m_creditCardOperatorRepository.findById(m_operator.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_creditCardService.addCreditCard(
                              m_creditCard.getName(),
@@ -315,7 +318,7 @@ class CreditCardServiceTest
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      () -> m_creditCardService.deleteCreditCard(m_creditCard.getId()));
 
         // Verify that the credit card was not deleted
@@ -399,7 +402,7 @@ class CreditCardServiceTest
             .thenReturn(Optional.empty());
 
         assertThrows(
-            RuntimeException.class,
+            EntityNotFoundException.class,
             () -> m_creditCardService.getAvailableCredit(m_creditCard.getId()));
     }
 
@@ -441,7 +444,7 @@ class CreditCardServiceTest
         when(m_creditCardRepository.findById(m_creditCard.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,
@@ -465,7 +468,7 @@ class CreditCardServiceTest
         when(m_categoryRepository.findById(m_category.getId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(EntityNotFoundException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,
@@ -493,7 +496,7 @@ class CreditCardServiceTest
         when(m_categoryRepository.findById(m_category.getId()))
             .thenReturn(Optional.of(m_category));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,
@@ -521,7 +524,7 @@ class CreditCardServiceTest
         when(m_categoryRepository.findById(m_category.getId()))
             .thenReturn(Optional.of(m_category));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,
@@ -551,7 +554,7 @@ class CreditCardServiceTest
         when(m_categoryRepository.findById(m_category.getId()))
             .thenReturn(Optional.of(m_category));
 
-        assertThrows(RuntimeException.class,
+        assertThrows(IllegalArgumentException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,
@@ -584,7 +587,11 @@ class CreditCardServiceTest
         when(m_categoryRepository.findById(m_category.getId()))
             .thenReturn(Optional.of(m_category));
 
-        assertThrows(RuntimeException.class,
+        when(
+            m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+            .thenReturn(new BigDecimal("0.0"));
+
+        assertThrows(InsufficientResourcesException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,

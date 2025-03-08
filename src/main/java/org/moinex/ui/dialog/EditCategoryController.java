@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -16,6 +17,7 @@ import org.moinex.entities.Category;
 import org.moinex.services.CategoryService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -75,7 +77,8 @@ public class EditCategoryController
 
                 nameChanged = true;
             }
-            catch (RuntimeException e)
+            catch (IllegalArgumentException | EntityExistsException |
+                   EntityNotFoundException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error updating category name",
@@ -92,7 +95,7 @@ public class EditCategoryController
 
                 archivedChanged = true;
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error updating category",
@@ -108,7 +111,7 @@ public class EditCategoryController
 
                 archivedChanged = true;
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error updating category",

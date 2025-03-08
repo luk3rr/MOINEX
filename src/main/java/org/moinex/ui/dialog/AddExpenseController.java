@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -196,7 +197,7 @@ public class AddExpenseController
                     .filter(w -> w.getName().equals(walletName))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Wallet not found with name: " + walletName));
 
             Category category =
@@ -205,8 +206,8 @@ public class AddExpenseController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException("Category not found with name: " +
-                                                    categoryString));
+                            -> new EntityNotFoundException(
+                                "Category not found with name: " + categoryString));
 
             TransactionStatus status = TransactionStatus.valueOf(statusString);
 
@@ -233,7 +234,7 @@ public class AddExpenseController
                                         "Invalid expense value",
                                         "Expense value must be a number");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error creating expense",
@@ -300,7 +301,7 @@ public class AddExpenseController
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Wallet not found with name: " + walletName));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
@@ -345,7 +346,7 @@ public class AddExpenseController
                     .filter(w -> w.getName().equals(walletName))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Wallet not found with name: " + walletName));
 
             BigDecimal walletAfterBalanceValue =

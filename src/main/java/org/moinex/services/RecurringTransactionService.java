@@ -6,6 +6,7 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ import org.moinex.entities.Category;
 import org.moinex.entities.RecurringTransaction;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.exceptions.RecurringTransactionAlreadyStoppedException;
 import org.moinex.repositories.RecurringTransactionRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.util.Constants;
@@ -55,11 +58,13 @@ public class RecurringTransactionService
 
     /**
      * Validate start and end dates for editing a recurring transaction
-     *
      * @param startDate The start date
      * @param endDate The end date
      * @param frequency The frequency of the recurring transaction
-     * @throws RuntimeException If dates or intervals are invalid
+     * @throws IllegalArgumentException If end date is before start date
+     * @throws IllegalArgumentException If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval
+     *    after the start date
      */
     private void validateDateAndIntervalForEdit(LocalDate                     startDate,
                                                 LocalDate                     endDate,
@@ -67,7 +72,7 @@ public class RecurringTransactionService
     {
         if (endDate.isBefore(startDate))
         {
-            throw new RuntimeException("End date cannot be before start date.");
+            throw new IllegalArgumentException("End date cannot be before start date");
         }
 
         Map<RecurringTransactionFrequency, TemporalUnit> frequencyUnits =
@@ -83,14 +88,14 @@ public class RecurringTransactionService
         TemporalUnit unit = frequencyUnits.get(frequency);
         if (unit == null)
         {
-            throw new RuntimeException("Invalid frequency type.");
+            throw new IllegalArgumentException("Invalid frequency type");
         }
 
         LocalDate minimumEndDate = startDate.plus(1, unit);
         if (!minimumEndDate.isBefore(endDate) && !minimumEndDate.equals(endDate))
         {
-            throw new RuntimeException(
-                String.format("End date must be at least one %s after the start date.",
+            throw new IllegalArgumentException(
+                String.format("End date must be at least one %s after the start date",
                               frequency.name().toLowerCase()));
         }
     }
@@ -102,7 +107,11 @@ public class RecurringTransactionService
      * @param startDate The start date
      * @param endDate The end date
      * @param frequency The frequency of the recurring transaction
-     * @throws RuntimeException If dates or intervals are invalid
+     * @throws IllegalArgumentException If the start date is before today
+     * @throws IllegalArgumentException If end date is before start date
+     * @throws IllegalArgumentException If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval
+     *     after the start date
      */
     private void
     validateDateAndIntervalForCreate(LocalDate                     startDate,
@@ -111,7 +120,7 @@ public class RecurringTransactionService
     {
         if (startDate.isBefore(LocalDate.now()))
         {
-            throw new RuntimeException("Start date cannot be before today.");
+            throw new IllegalArgumentException("Start date cannot be before today");
         }
 
         validateDateAndIntervalForEdit(startDate, endDate, frequency);
@@ -127,12 +136,14 @@ public class RecurringTransactionService
      * @param description The description of the transaction
      * @param frequency The frequency of the recurring transaction
      * @return The id of the recurring transaction
-     * @throws RuntimeException If the wallet is not found
-     * @throws RuntimeException If the start date or end date is null
-     * @throws RuntimeException If the amount is less than or equal to zero
-     * @throws RuntimeException If the date and interval between start and end date is
-     *     invalid
-     * @throws RuntimeException If the frequency is invalid
+     * @throws EntityNotFoundException If the wallet is not found
+     * @throws IllegalArgumentException If the start date or end date is null
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
+     * @throws IllegalArgumentException If the start date is before today
+     * @throws IllegalArgumentException If end date is before start date
+     * @throws IllegalArgumentException If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval
+     *     after the start date
      */
     @Transactional
     public Long addRecurringTransaction(Long                          walletId,
@@ -165,13 +176,15 @@ public class RecurringTransactionService
      * @param description The description of the transaction
      * @param frequency The frequency of the recurring transaction
      * @return The id of the recurring transaction
-     * @throws RuntimeException If the wallet is not found
-     * @throws RuntimeException If the start date or end date is null
-     * @throws RuntimeException If the amount is less than or equal to zero
-     * @throws RuntimeException If the date and interval between start and end date is
-     *     invalid
-     * @throws RuntimeException If the frequency is invalid
-     */
+     * @throws EntityNotFoundException If the wallet is not found
+     * @throws IllegalArgumentException If the start date or end date is null
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
+     * @throws IllegalArgumentException If the start date is before today
+     * @throws IllegalArgumentException If end date is before start date
+     * @throws IllegalArgumentException If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval
+     *     after the start date
+     **/
     @Transactional
     public Long addRecurringTransaction(Long                          walletId,
                                         Category                      category,
@@ -183,16 +196,18 @@ public class RecurringTransactionService
                                         RecurringTransactionFrequency frequency)
     {
         Wallet wt = walletRepository.findById(walletId).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + walletId + " not found"));
+            ()
+                -> new EntityNotFoundException("Wallet with id " + walletId +
+                                               " not found"));
 
         if (startDate == null || endDate == null)
         {
-            throw new RuntimeException("Start and end date cannot be null");
+            throw new IllegalArgumentException("Start and end date cannot be null");
         }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount must be greater than zero");
+            throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
         // Define the end date as the last second of the day
@@ -227,21 +242,25 @@ public class RecurringTransactionService
     /**
      * Stops a recurring transaction
      * @param recurringTransactionId The id of the recurring transaction
-     * @throws RuntimeException If the recurring transaction is not found
+     * @throws EntityNotFoundException If the recurring transaction is not found
+     * @throws RecurringTransactionAlreadyStoppedException If the recurring transaction
+     *    has already ended
      */
     @Transactional
     public void stopRecurringTransaction(Long recurringTransactionId)
     {
         RecurringTransaction recurringTransaction =
             recurringTransactionRepository.findById(recurringTransactionId)
-                .orElseThrow(
-                    () -> new RuntimeException("Recurring transaction not found"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Recurring transaction not found"));
 
         // Check if the recurring transaction has already ended
         if (recurringTransaction.getStatus().equals(
                 RecurringTransactionStatus.INACTIVE))
         {
-            throw new RuntimeException("Recurring transaction has already ended");
+            throw new AttributeAlreadySetException(
+                "Recurring transaction has already ended");
         }
 
         recurringTransaction.setStatus(RecurringTransactionStatus.INACTIVE);
@@ -253,17 +272,17 @@ public class RecurringTransactionService
     /**
      * Delete a recurring transaction
      * @param recurringTransactionId The id of the recurring transaction
-     * @throws RuntimeException If the recurring transaction is not found
+     * @throws EntityNotFoundException If the recurring transaction is not found
      */
     @Transactional
     public void deleteRecurringTransaction(Long recurringTransactionId)
     {
         RecurringTransaction recurringTransaction =
             recurringTransactionRepository.findById(recurringTransactionId)
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("Recurring transaction with id " +
-                                                recurringTransactionId + " not found"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Recurring transaction with id " +
+                                     recurringTransactionId + " not found"));
 
         recurringTransactionRepository.delete(recurringTransaction);
 
@@ -273,30 +292,32 @@ public class RecurringTransactionService
     /**
      * Update a recurring transaction
      * @param rt The recurring transaction
-     * @throws RuntimeException If the recurring transaction is not found
-     * @throws RuntimeException If the start date or end date is null
-     * @throws RuntimeException If the amount is less than or equal to zero
-     * @throws RuntimeException If the date and interval between start and end date is
-     *     invalid
+     * @throws EntityNotFoundException If the recurring transaction is not found
+     * @throws IllegalArgumentException If the start date or end date is null
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
+     * @throws IllegalArgumentException If end date is before start date
+     * @throws IllegalArgumentException If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval
+     *     after the start date
      */
     @Transactional
     public void updateRecurringTransaction(RecurringTransaction rt)
     {
         RecurringTransaction rtToUpdate =
             recurringTransactionRepository.findById(rt.getId())
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("Recurring transaction with id " +
-                                                rt.getId() + " not found"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Recurring transaction with id " + rt.getId() +
+                                     " not found"));
 
         if (rt.getStartDate() == null || rt.getEndDate() == null)
         {
-            throw new RuntimeException("Start and end date cannot be null");
+            throw new IllegalArgumentException("Start and end date cannot be null");
         }
 
         if (rt.getAmount().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount must be greater than zero");
+            throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
         rt.setEndDate(
@@ -369,6 +390,7 @@ public class RecurringTransactionService
      * Create a wallet transaction for a recurring transaction
      * @param recurring The recurring transaction
      * @param dueDate The due date of the transaction
+     * @throws IllegalStateException If the transaction type is invalid
      */
     private void createTransactionForDate(RecurringTransaction recurring,
                                           LocalDateTime        dueDate)
@@ -395,13 +417,13 @@ public class RecurringTransactionService
             }
             else
             {
-                throw new RuntimeException("Invalid transaction type");
+                throw new IllegalStateException("Invalid transaction type");
             }
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException e)
         {
             m_logger.warn("Failed to create transaction for recurring transaction " +
-                             recurring.getId() + ": " + e.getMessage());
+                          recurring.getId() + ": " + e.getMessage());
         }
     }
 
@@ -410,6 +432,7 @@ public class RecurringTransactionService
      * @param currentDueDate The current due date
      * @param frequency The frequency of the recurring transaction
      * @return The next due date with the time set to 23:59
+     * @throws IllegalStateException If the frequency is invalid
      */
     private LocalDateTime calculateNextDueDate(LocalDateTime currentDueDate,
                                                RecurringTransactionFrequency frequency)
@@ -431,7 +454,7 @@ public class RecurringTransactionService
                 nextDueDate = currentDueDate.plusYears(1);
                 break;
             default:
-                throw new RuntimeException("Invalid frequency");
+                throw new IllegalStateException("Invalid frequency");
         }
 
         return nextDueDate.with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
@@ -443,7 +466,12 @@ public class RecurringTransactionService
      * @param endDate The end date
      * @param frequency The frequency of the recurring transaction
      * @return The date of the last transaction
-     * @throws RuntimeException If the frequency is invalid
+     * @throws IllegalArgumentException If the start date is before today
+     * @throws IllegalArgumentException If end date is before start date
+     * @throws IllegalArgumentException If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval
+     *     after the start date
+     * @throws IllegalStateException If the frequency is invalid
      */
     public LocalDate getLastTransactionDate(LocalDate                     startDate,
                                             LocalDate                     endDate,
@@ -487,7 +515,7 @@ public class RecurringTransactionService
      * @param interval The interval
      * @param frequency The frequency
      * @return The new date
-     * @throws RuntimeException If the frequency is invalid
+     * @throws IllegalStateException If the frequency is invalid
      */
     private LocalDate addFrequencyToDate(LocalDate                     date,
                                          long                          interval,
@@ -504,7 +532,7 @@ public class RecurringTransactionService
             case YEARLY:
                 return date.plusYears(interval);
             default:
-                throw new RuntimeException("Invalid frequency");
+                throw new IllegalStateException("Invalid frequency");
         }
     }
 
@@ -626,11 +654,17 @@ public class RecurringTransactionService
         return futureTransactions;
     }
 
+    /**
+     * Calculate the expected remaining amount of a recurring transaction
+     * @param rtId The id of the recurring transaction
+     * @return The expected remaining amount
+     * @throws EntityNotFoundException If the recurring transaction is not found
+     */
     public Double calculateExpectedRemainingAmount(Long rtId)
     {
         RecurringTransaction rt =
             recurringTransactionRepository.findById(rtId).orElseThrow(
-                () -> new RuntimeException("Recurring transaction not found"));
+                () -> new EntityNotFoundException("Recurring transaction not found"));
 
         if (rt.getEndDate().toLocalDate().equals(
                 Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE))

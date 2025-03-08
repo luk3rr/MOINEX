@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -29,6 +30,8 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
+import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
@@ -201,8 +204,8 @@ public class AddTransferController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException("Wallet not found with name: " +
-                                                    senderWalletName));
+                            -> new EntityNotFoundException(
+                                "Wallet not found with name: " + senderWalletName));
 
             Wallet receiverWallet =
                 wallets.stream()
@@ -210,8 +213,8 @@ public class AddTransferController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException("Wallet not found with name: " +
-                                                    receiverWalletName));
+                            -> new EntityNotFoundException(
+                                "Wallet not found with name: " + receiverWalletName));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transferDate.atTime(currentTime);
@@ -235,7 +238,8 @@ public class AddTransferController
                                         "Invalid transfer value",
                                         "Transfer value must be a number.");
         }
-        catch (RuntimeException e)
+        catch (SameSourceDestionationException | IllegalArgumentException |
+               EntityNotFoundException | InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while creating transfer",
@@ -301,7 +305,7 @@ public class AddTransferController
                                   .filter(w -> w.getName().equals(senderWalletName))
                                   .findFirst()
                                   .orElseThrow(()
-                                                   -> new RuntimeException(
+                                                   -> new EntityNotFoundException(
                                                        "Wallet not found with name: " +
                                                        senderWalletName));
 
@@ -335,8 +339,8 @@ public class AddTransferController
                 .findFirst()
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Wallet not found with name: " +
-                                                receiverWalletName));
+                        -> new EntityNotFoundException("Wallet not found with name: " +
+                                                       receiverWalletName));
 
         if (receiverWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -381,8 +385,8 @@ public class AddTransferController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException("Wallet not found with name: " +
-                                                    senderWalletName));
+                            -> new EntityNotFoundException(
+                                "Wallet not found with name: " + senderWalletName));
 
             BigDecimal senderWalletAfterBalance =
                 senderWallet.getBalance().subtract(transferValue);
@@ -438,8 +442,8 @@ public class AddTransferController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException("Wallet not found with name: " +
-                                                    receiverWalletName));
+                            -> new EntityNotFoundException(
+                                "Wallet not found with name: " + receiverWalletName));
 
             BigDecimal receiverWalletAfterBalance =
                 receiverWallet.getBalance().add(transferValue);

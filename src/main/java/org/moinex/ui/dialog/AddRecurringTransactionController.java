@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.hibernate.proxy.EntityNotFoundDelegate;
 import org.moinex.entities.Category;
 import org.moinex.entities.Wallet;
 import org.moinex.services.CategoryService;
@@ -177,7 +179,7 @@ public class AddRecurringTransactionController
                     .filter(w -> w.getName().equals(walletName))
                     .findFirst()
                     .orElseThrow(()
-                                     -> new RuntimeException(
+                                     -> new EntityNotFoundException(
                                          "Wallet not found with name: " + walletName));
 
             Category category =
@@ -186,8 +188,8 @@ public class AddRecurringTransactionController
                     .findFirst()
                     .orElseThrow(
                         ()
-                            -> new RuntimeException("Category not found with name: " +
-                                                    categoryString));
+                            -> new EntityNotFoundException(
+                                "Category not found with name: " + categoryString));
 
             TransactionType type = TransactionType.valueOf(typeString);
 
@@ -230,7 +232,7 @@ public class AddRecurringTransactionController
                                         "Invalid transaction value",
                                         "Transaction value must be a number.");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error while creating recurring transaction",
@@ -265,7 +267,7 @@ public class AddRecurringTransactionController
                                                                            endDate,
                                                                            frequency);
                 }
-                catch (RuntimeException e)
+                catch (IllegalArgumentException | IllegalStateException e)
                 {
                     // Do nothing
                 }

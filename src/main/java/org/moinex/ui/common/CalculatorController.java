@@ -97,7 +97,7 @@ public class CalculatorController
 
             calculatorService.setResult(result.toString());
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException e)
         {
             expressionDisplay.setText("Error");
             mainDisplay.setText("");

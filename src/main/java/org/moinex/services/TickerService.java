@@ -6,6 +6,8 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.NoArgsConstructor;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.moinex.entities.Category;
 import org.moinex.entities.WalletTransaction;
@@ -21,6 +24,9 @@ import org.moinex.entities.investment.Dividend;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
+import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.exceptions.InvalidTickerTypeException;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.repositories.CryptoExchangeRepository;
 import org.moinex.repositories.DividendRepository;
 import org.moinex.repositories.TickerPurchaseRepository;
@@ -75,8 +81,12 @@ public class TickerService
      * @param price The price of the ticker
      * @param avgUnitPrice The average unit price of the ticker
      * @param quantity The quantity of the ticker
-     * @throws RuntimeException If the ticker already exists
      * @return The id of the registered ticker
+     * @throws IllegalArgumentException If the name or symbol is empty
+     * @throws EntityExistsException If the ticker already exists
+     * @throws IllegalArgumentException If the price is less than or equal to zero
+     * @throws IllegalArgumentException If the quantity is less than zero
+     * @throws IllegalArgumentException If the average unit price is less than zero
      */
     @Transactional
     public Long addTicker(String     name,
@@ -92,31 +102,31 @@ public class TickerService
 
         if (name.isBlank() || symbol.isBlank())
         {
-            throw new RuntimeException("Name and symbol must not be empty");
+            throw new IllegalArgumentException("Name and symbol must not be empty");
         }
 
         if (tickerRepository.existsBySymbol(symbol))
         {
             logger.warn("Ticker with symbol " + symbol + " already exists");
 
-            throw new RuntimeException("Ticker with symbol " + symbol +
-                                       " already exists");
+            throw new EntityExistsException("Ticker with symbol " + symbol +
+                                            " already exists");
         }
 
         if (price.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Price must be greater than zero");
+            throw new IllegalArgumentException("Price must be greater than zero");
         }
 
         if (quantity.compareTo(BigDecimal.ZERO) < 0)
         {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                 "Quantity must be greater than or equal to zero");
         }
 
         if (avgUnitPrice.compareTo(BigDecimal.ZERO) < 0)
         {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                 "Average unit price must be greater than or equal to zero");
         }
 
@@ -143,21 +153,22 @@ public class TickerService
     /**
      * Deletes a ticker
      * @param id The id of the ticker
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the ticker has transactions associated with it
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalStateException If the ticker has transactions associated with it
+     *
      */
     @Transactional
     public void deleteTicker(Long id)
     {
         Ticker ticker = tickerRepository.findById(id).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + id +
-                                        " not found and cannot be deleted"));
+                -> new EntityNotFoundException("Ticker with id " + id +
+                                               " not found and cannot be deleted"));
 
         // Check if the ticker has transactions associated with it
         if (getTransactionCountByTicker(id) > 0)
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                 "Ticker with id " + id +
                 " has transactions associated with it and cannot be deleted. Remove "
                 + "the transactions first or archive the ticker");
@@ -171,7 +182,7 @@ public class TickerService
     /**
      * Archives a ticker
      * @param id The id of the ticker
-     * @throws RuntimeException If the ticker does not exist
+     * @throws EntityNotFoundExeception If the ticker does not exist
      * @note This method is used to archive a ticker, which means that the ticker
      * will not be deleted from the database, but it will not used in the application
      * anymore
@@ -181,8 +192,8 @@ public class TickerService
     {
         Ticker ticker = tickerRepository.findById(id).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + id +
-                                        " not found and cannot be archived"));
+                -> new EntityNotFoundException("Ticker with id " + id +
+                                               " not found and cannot be archived"));
 
         ticker.setArchived(true);
         tickerRepository.save(ticker);
@@ -193,7 +204,7 @@ public class TickerService
     /**
      * Unarchives a ticker
      * @param id The id of the ticker
-     * @throws RuntimeException If the ticker does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
      * @note This method is used to unarchive a ticker, which means that the ticker
      * will be used in the application again
      */
@@ -202,8 +213,8 @@ public class TickerService
     {
         Ticker ticker = tickerRepository.findById(id).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + id +
-                                        " not found and cannot be unarchived"));
+                -> new EntityNotFoundException(
+                    "Ticker with id " + id + " not found and cannot be unarchived"));
 
         ticker.setArchived(false);
         tickerRepository.save(ticker);
@@ -214,45 +225,46 @@ public class TickerService
     /**
      * Update a ticker
      * @param tk The ticker to be updated
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the name or symbol is empty
-     * @throws RuntimeException If the price is less than or equal to zero
-     * @throws RuntimeException If the quantity is less than zero
-     * @throws RuntimeException If the average unit price is less than zero
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the name or symbol is empty
+     * @throws IllegalArgumentException If the price is less than or equal to zero
+     * @throws IllegalArgumentException If the quantity is less than zero
+     * @throws IllegalArgumentException If the average unit price is less than zero
      */
     @Transactional
     public void updateTicker(Ticker tk)
     {
         Ticker oldTicker =
             tickerRepository.findById(tk.getId())
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("Ticker with id " + tk.getId() +
-                                                " not found and cannot be updated"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Ticker with id " + tk.getId() +
+                                     " not found and cannot be updated"));
 
         // Remove leading and trailing whitespaces
-        tk.setName(tk.getName().strip());
-        tk.setSymbol(tk.getSymbol().strip());
+        tk.setName(tk.getName() != null ? tk.getName().strip() : null);
+        tk.setSymbol(tk.getSymbol() != null ? tk.getSymbol().strip() : null);
 
-        if (tk.getName().isBlank() || tk.getSymbol().isBlank())
+        if (tk.getName() == null || tk.getName().isBlank() || tk.getSymbol() == null ||
+            tk.getSymbol().isBlank())
         {
-            throw new RuntimeException("Name and symbol must not be empty");
+            throw new IllegalArgumentException("Name and symbol must not be empty");
         }
 
         if (tk.getCurrentUnitValue().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Price must be greater than zero");
+            throw new IllegalArgumentException("Price must be greater than zero");
         }
 
         if (tk.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                 "Quantity must be greater than or equal to zero");
         }
 
         if (tk.getAverageUnitValue().compareTo(BigDecimal.ZERO) < 0)
         {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                 "Average unit price must be greater than or equal to zero");
         }
 
@@ -284,6 +296,7 @@ public class TickerService
      * Update tickers price from API asynchronously
      * @param tickers The list of tickers to update
      * @return A completable future with a list with tickers that failed to update
+     * @throws IllegalArgumentException If the list of tickers is empty
      */
     @Transactional
     public CompletableFuture<List<Ticker>>
@@ -293,7 +306,8 @@ public class TickerService
         {
             CompletableFuture<List<Ticker>> failedFuture = new CompletableFuture<>();
             failedFuture.completeExceptionally(
-                new RuntimeException("No tickers to update"));
+                new IllegalArgumentException("No tickers to update"));
+
             return failedFuture;
         }
 
@@ -315,13 +329,14 @@ public class TickerService
                     ticker.setLastUpdate(LocalDateTime.now());
                     tickerRepository.save(ticker);
                 }
-                catch (Exception e)
+                catch (JSONException e)
                 {
-                    logger.warn("Failed to update ticker " + ticker.getSymbol() +
-                                   ": " + e.getMessage());
+                    logger.warn("Failed to update ticker " + ticker.getSymbol() + ": " +
+                                e.getMessage());
                     failed.add(ticker);
                 }
             });
+
             return failed;
         });
     }
@@ -332,9 +347,9 @@ public class TickerService
      * @param quantity The quantity of the purchase
      * @param unitPrice The unit price of the purchase
      * @param purchaseDate The purchase date
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the quantity is less than or equal to zero
-     * @throws RuntimeException If the unit price is less than or equal to zero
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
+     * @throws IllegalArgumentException If the unit price is less than or equal to zero
      */
     @Transactional
     public void addPurchase(Long              tickerId,
@@ -348,17 +363,17 @@ public class TickerService
     {
         Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + tickerId +
-                                        " not found and cannot add purchase"));
+                -> new EntityNotFoundException("Ticker with id " + tickerId +
+                                               " not found and cannot add purchase"));
 
         if (quantity.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
         if (unitPrice.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Unit price must be greater than zero");
+            throw new IllegalArgumentException("Unit price must be greater than zero");
         }
 
         BigDecimal amount = unitPrice.multiply(quantity);
@@ -412,10 +427,12 @@ public class TickerService
      * @param quantity The quantity of the sale
      * @param unitPrice The unit price of the sale
      * @param saleDate The sale date
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the quantity is less than or equal to zero
-     * @throws RuntimeException If the unit price is less than or equal to zero
-     * @throws RuntimeException If the quantity is greater than the current quantity
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
+     * @throws IllegalArgumentException If the unit price is less than or equal to zero
+     * @throws InsufficientResourcesException If the quantity is greater than the
+     *     current
+     *    quantity
      */
     @Transactional
     public void addSale(Long              tickerId,
@@ -429,23 +446,23 @@ public class TickerService
     {
         Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + tickerId +
-                                        " not found and cannot add sale"));
+                -> new EntityNotFoundException("Ticker with id " + tickerId +
+                                               " not found and cannot add sale"));
 
         if (quantity.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
         if (unitPrice.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Unit price must be greater than zero");
+            throw new IllegalArgumentException("Unit price must be greater than zero");
         }
 
         // Check if the quantity is greater than the current quantity
         if (quantity.compareTo(ticker.getCurrentQuantity()) > 0)
         {
-            throw new RuntimeException(
+            throw new InsufficientResourcesException(
                 "Quantity must be less than or equal to the current "
                 + "quantity");
         }
@@ -492,8 +509,10 @@ public class TickerService
      * @param category The category of the dividend
      * @param amount The amount of the dividend
      * @param date The date of the dividend
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the wallet transaction does not exist
+     * @param description The description of the dividend
+     * @param status The status of the dividend
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
     public void addDividend(Long              tickerId,
@@ -506,12 +525,12 @@ public class TickerService
     {
         Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + tickerId +
-                                        " not found and cannot add dividend"));
+                -> new EntityNotFoundException("Ticker with id " + tickerId +
+                                               " not found and cannot add dividend"));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount must be greater than zero");
+            throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
         // Create a wallet transaction for the dividend
@@ -543,10 +562,14 @@ public class TickerService
      * @param receivedQuantity The quantity of the target ticker
      * @param date The date of the exchange
      * @param description The description of the exchange
-     * @throws RuntimeException If the sold ticker does not exist
-     * @throws RuntimeException If the target ticker does not exist
-     * @throws RuntimeException If the quantities are less than or equal to zero
-     * @throws RuntimeException If the sold quantity is greater than the current
+     * @throws SameSourceDestionationException If the source and target tickers are the
+     *     same
+     * @throws EntityNotFoundException If the source ticker does not exist
+     * @throws EntityNotFoundException If the target ticker does not exist
+     * @throws InvalidTickerTypeException If the tickers are not of type CRYPTO
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
+     * @throws InsufficientResourcesException If the quantity is greater than the
+     *     current
      *    quantity
      */
     @Transactional
@@ -559,40 +582,41 @@ public class TickerService
     {
         if (sourceTickerId.equals(targetTickerId))
         {
-            throw new RuntimeException("Source and target tickers must be different");
+            throw new SameSourceDestionationException(
+                "Source and target tickers must be different");
         }
 
         Ticker soldCrypto =
             tickerRepository.findById(sourceTickerId)
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Ticker with id " + sourceTickerId +
                                      " not found and cannot exchange crypto"));
 
         Ticker receivedCrypto =
             tickerRepository.findById(targetTickerId)
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "Ticker with id " + targetTickerId +
                                      " not found and cannot exchange crypto"));
 
         if (soldCrypto.getType() != TickerType.CRYPTOCURRENCY ||
             receivedCrypto.getType() != TickerType.CRYPTOCURRENCY)
         {
-            throw new RuntimeException(
+            throw new InvalidTickerTypeException(
                 "Both tickers must be of type CRYPTO to exchange crypto");
         }
 
         if (soldQuantity.compareTo(BigDecimal.ZERO) <= 0 ||
             receivedQuantity.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
         // Check if the quantity is greater than the current quantity
         if (soldQuantity.compareTo(soldCrypto.getCurrentQuantity()) > 0)
         {
-            throw new RuntimeException(
+            throw new InsufficientResourcesException(
                 "Source quantity must be less than or equal to the current "
                 + "quantity");
         }
@@ -631,17 +655,17 @@ public class TickerService
     /**
      * Delete a purchase
      * @param purchaseId The id of the purchase
-     * @throws RuntimeException If the purchase does not exist
+     * @throws EntityNotFoundException If the purchase does not exist
      */
     @Transactional
     public void deletePurchase(Long purchaseId)
     {
         TickerPurchase purchase =
             tickerPurchaseRepository.findById(purchaseId)
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("TickerPurchase with id " + purchaseId +
-                                                " not found and cannot be deleted"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "TickerPurchase with id " + purchaseId +
+                                     " not found and cannot be deleted"));
 
         // Delete purchase before deleting wallet transaction to avoid
         // foreign key constraint violation
@@ -656,15 +680,15 @@ public class TickerService
     /**
      * Delete a sale
      * @param saleId The id of the sale
-     * @throws RuntimeException If the sale does not exist
+     * @throws EntityNotFoundException If the sale does not exist
      */
     @Transactional
     public void deleteSale(Long saleId)
     {
         TickerSale sale = tickerSaleRepository.findById(saleId).orElseThrow(
             ()
-                -> new RuntimeException("TickerSale with id " + saleId +
-                                        " not found and cannot be deleted"));
+                -> new EntityNotFoundException("TickerSale with id " + saleId +
+                                               " not found and cannot be deleted"));
 
         // Delete sale before deleting wallet transaction to avoid
         // foreign key constraint violation
@@ -678,17 +702,17 @@ public class TickerService
     /**
      * Delete a dividend
      * @param dividendId The id of the dividend
-     * @throws RuntimeException If the dividend does not exist
+     * @throws EntityNotFoundException If the dividend does not exist
      */
     @Transactional
     public void deleteDividend(Long dividendId)
     {
         Dividend dividend =
             dividendRepository.findById(dividendId)
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("Dividend with id " + dividendId +
-                                                " not found and cannot be deleted"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Dividend with id " + dividendId +
+                                     " not found and cannot be deleted"));
 
         // Delete dividend before deleting wallet transaction to avoid
         // foreign key constraint violation
@@ -703,17 +727,17 @@ public class TickerService
     /**
      * Delete a crypto exchange
      * @param exchangeId The id of the crypto exchange
-     * @throws RuntimeException If the crypto exchange does not exist
+     * @throws EntityNotFoundException If the crypto exchange does not exist
      */
     @Transactional
     public void deleteCryptoExchange(Long exchangeId)
     {
         CryptoExchange exchange =
             cryptoExchangeRepository.findById(exchangeId)
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("CryptoExchange with id " + exchangeId +
-                                                " not found and cannot be deleted"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "CryptoExchange with id " + exchangeId +
+                                     " not found and cannot be deleted"));
 
         // Adjust holdings quantity
         exchange.getSoldCrypto().setCurrentQuantity(
@@ -735,10 +759,10 @@ public class TickerService
     /**
      * Update a purchase
      * @param purchase The purchase to be updated
-     * @throws RuntimeException If the purchase does not exist
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the quantity is less than or equal to zero
-     * @throws RuntimeException If the unit price is less than or equal to zero
+     * @throws EntityNotFoundException If the purchase does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
+     * @throws IllegalArgumentException If the unit price is less than or equal to zero
      */
     @Transactional
     public void updatePurchase(TickerPurchase purchase)
@@ -746,25 +770,25 @@ public class TickerService
         TickerPurchase oldPurchase =
             tickerPurchaseRepository.findById(purchase.getId())
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "TickerPurchase with id " + purchase.getId() +
                                      " not found and cannot be updated"));
 
         if (!tickerRepository.existsById(purchase.getTicker().getId()))
         {
-            throw new RuntimeException("Ticker with id " +
-                                       purchase.getTicker().getId() +
-                                       " not found and cannot update purchase");
+            throw new EntityNotFoundException(
+                "Ticker with id " + purchase.getTicker().getId() +
+                " not found and cannot update purchase");
         }
 
         if (purchase.getQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
         if (purchase.getUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Unit price must be greater than zero");
+            throw new IllegalArgumentException("Unit price must be greater than zero");
         }
 
         oldPurchase.setQuantity(purchase.getQuantity());
@@ -783,35 +807,36 @@ public class TickerService
     /**
      * Update a sale
      * @param sale The sale to be updated
-     * @throws RuntimeException If the sale does not exist
-     * @throws RuntimeException If the ticker does not exist
-     * @throws RuntimeException If the quantity is less than or equal to zero
-     * @throws RuntimeException If the unit price is less than or equal to zero
+     * @throws EntityNotFoundException If the sale does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
+     * @throws IllegalArgumentException If the unit price is less than or equal to zero
      */
     @Transactional
     public void updateSale(TickerSale sale)
     {
         TickerSale oldSale =
             tickerSaleRepository.findById(sale.getId())
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("TickerSale with id " + sale.getId() +
-                                                " not found and cannot be updated"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "TickerSale with id " + sale.getId() +
+                                     " not found and cannot be updated"));
 
         if (!tickerRepository.existsById(sale.getTicker().getId()))
         {
-            throw new RuntimeException("Ticker with id " + sale.getTicker().getId() +
-                                       " not found and cannot update sale");
+            throw new EntityNotFoundException("Ticker with id " +
+                                              sale.getTicker().getId() +
+                                              " not found and cannot update sale");
         }
 
         if (sale.getQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
         if (sale.getUnitPrice().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Unit price must be greater than zero");
+            throw new IllegalArgumentException("Unit price must be greater than zero");
         }
 
         oldSale.setQuantity(sale.getQuantity());
@@ -830,24 +855,24 @@ public class TickerService
     /**
      * Update a dividend
      * @param dividend The dividend to be updated
-     * @throws RuntimeException If the dividend does not exist
-     * @throws RuntimeException If the ticker does not exist
+     * @throws EntityNotFoundException If the dividend does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
      */
     @Transactional
     public void updateDividend(Dividend dividend)
     {
         Dividend oldDividend =
             dividendRepository.findById(dividend.getId())
-                .orElseThrow(
-                    ()
-                        -> new RuntimeException("Dividend with id " + dividend.getId() +
-                                                " not found and cannot be updated"));
+                .orElseThrow(()
+                                 -> new EntityNotFoundException(
+                                     "Dividend with id " + dividend.getId() +
+                                     " not found and cannot be updated"));
 
         if (!tickerRepository.existsById(dividend.getTicker().getId()))
         {
-            throw new RuntimeException("Ticker with id " +
-                                       dividend.getTicker().getId() +
-                                       " not found and cannot update dividend");
+            throw new EntityNotFoundException(
+                "Ticker with id " + dividend.getTicker().getId() +
+                " not found and cannot update dividend");
         }
 
         walletTransactionService.updateTransaction(dividend.getWalletTransaction());
@@ -860,9 +885,12 @@ public class TickerService
     /**
      * Update a crypto exchange
      * @param exchange The crypto exchange to be updated
-     * @throws RuntimeException If the crypto exchange does not exist
-     * @throws RuntimeException If the tickers do not exist
-     * @throws RuntimeException If the quantities are less than or equal to zero
+     * @throws EntityNotFoundException If the crypto exchange does not exist
+     * @throws EntityNotFoundException If the source ticker does not exist
+     * @throws EntityNotFoundException If the target ticker does not exist
+     * @throws SameSourceDestionationException If the source and target tickers are the
+     *    same
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
      */
     @Transactional
     public void updateCryptoExchange(CryptoExchange exchange)
@@ -870,33 +898,34 @@ public class TickerService
         CryptoExchange oldExchange =
             cryptoExchangeRepository.findById(exchange.getId())
                 .orElseThrow(()
-                                 -> new RuntimeException(
+                                 -> new EntityNotFoundException(
                                      "CryptoExchange with id " + exchange.getId() +
                                      " not found and cannot be updated"));
 
         tickerRepository.findById(exchange.getSoldCrypto().getId())
             .orElseThrow(()
-                             -> new RuntimeException(
+                             -> new EntityNotFoundException(
                                  "Source ticker with id " +
                                  exchange.getSoldCrypto().getId() +
                                  " not found and cannot update crypto exchange"));
 
         tickerRepository.findById(exchange.getReceivedCrypto().getId())
             .orElseThrow(()
-                             -> new RuntimeException(
+                             -> new EntityNotFoundException(
                                  "Target ticker with id " +
                                  exchange.getReceivedCrypto().getId() +
                                  " not found and cannot update crypto exchange"));
 
         if (exchange.getSoldCrypto().getId() == exchange.getReceivedCrypto().getId())
         {
-            throw new RuntimeException("Source and target tickers must be different");
+            throw new SameSourceDestionationException(
+                "Source and target tickers must be different");
         }
 
         if (exchange.getSoldQuantity().compareTo(BigDecimal.ZERO) <= 0 ||
             exchange.getReceivedQuantity().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
         // Complex update operations
@@ -1001,12 +1030,18 @@ public class TickerService
         oldExchange.setReceivedCrypto(receivedCrypto);
     }
 
+    /**
+     * Reset the average price of a ticker to zero
+     * @param tickerId The id of the ticker
+     * @throws EntityNotFoundException If the ticker does not exist
+     */
     public void resetAveragePrice(Long tickerId)
     {
         Ticker ticker = tickerRepository.findById(tickerId).orElseThrow(
             ()
-                -> new RuntimeException("Ticker with id " + tickerId +
-                                        " not found and cannot reset average price"));
+                -> new EntityNotFoundException(
+                    "Ticker with id " + tickerId +
+                    " not found and cannot reset average price"));
 
         ticker.setAverageUnitValue(BigDecimal.ZERO);
         ticker.setAverageUnitValueCount(BigDecimal.ZERO);

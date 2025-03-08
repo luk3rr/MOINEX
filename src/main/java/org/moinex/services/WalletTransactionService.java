@@ -6,23 +6,27 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.moinex.entities.Category;
 import org.moinex.entities.Transfer;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletTransaction;
+import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.exceptions.SameSourceDestionationException;
 import org.moinex.repositories.TransferRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.repositories.WalletTransactionRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.TransactionStatus;
 import org.moinex.util.TransactionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -47,7 +51,8 @@ public class WalletTransactionService
     @Autowired
     private WalletTransactionRepository walletTransactionRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(WalletTransactionService.class);
+    private static final Logger logger =
+        LoggerFactory.getLogger(WalletTransactionService.class);
 
     /**
      * Transfer money between two wallets
@@ -56,12 +61,12 @@ public class WalletTransactionService
      * @param amount The amount of money to be transferred
      * @param description A description of the transfer
      * @return The id of the created transfer
-     * @throws RuntimeException If the sender and receiver wallets are the same
-     * @throws RuntimeException If the amount to transfer is less than or equal to zero
-     * @throws RuntimeException If the sender wallet does not exist
-     * @throws RuntimeException If the receiver wallet does not exist
-     * @throws RuntimeException If the sender wallet does not have enough balance
-     * to transfer
+     * @throws SameSourceDestionationException If the sender and receiver wallets are
+     *     the
+     *    same
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
+     * @throws EntityNotFoundException If the sender or receiver wallet does not exist
+     * @throws InsufficientResourcesException If the sender wallet does not have enough
      */
     @Transactional
     public Long transferMoney(Long          senderId,
@@ -72,12 +77,14 @@ public class WalletTransactionService
     {
         if (senderId.equals(receiverId))
         {
-            throw new RuntimeException("Sender and receiver wallets must be different");
+            throw new SameSourceDestionationException(
+                "Sender and receiver wallets must be different");
         }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount to transfer must be greater than zero");
+            throw new IllegalArgumentException(
+                "Amount to transfer must be greater than zero");
         }
 
         // Round the amount to two decimal places
@@ -85,19 +92,19 @@ public class WalletTransactionService
 
         Wallet senderWallet = walletRepository.findById(senderId).orElseThrow(
             ()
-                -> new RuntimeException(
+                -> new EntityNotFoundException(
                     "Sender wallet not found and cannot transfer money"));
 
         Wallet receiverWallet =
             walletRepository.findById(receiverId)
                 .orElseThrow(
                     ()
-                        -> new RuntimeException(
+                        -> new EntityNotFoundException(
                             "Receiver wallet not found and cannot transfer money"));
 
         if (senderWallet.getBalance().compareTo(amount) < 0)
         {
-            throw new RuntimeException(
+            throw new InsufficientResourcesException(
                 "Sender wallet does not have enough balance to transfer");
         }
 
@@ -130,8 +137,8 @@ public class WalletTransactionService
      * @param description A description of the income
      * @param status The status of the transaction
      * @return The id of the created transaction
-     * @throws RuntimeException If the wallet does not exist
-     * @throws RuntimeException If the amount is less than or equal to zero
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
     public Long addIncome(Long              walletId,
@@ -142,11 +149,13 @@ public class WalletTransactionService
                           TransactionStatus status)
     {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + walletId + " not found"));
+            ()
+                -> new EntityNotFoundException("Wallet with id " + walletId +
+                                               " not found"));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount must be greater than zero");
+            throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
         // Round the amount to two decimal places
@@ -185,8 +194,8 @@ public class WalletTransactionService
      * @param description A description of the expense
      * @param status The status of the transaction
      * @return The id of the created transaction
-     * @throws RuntimeException If the wallet does not exist
-     * @throws RuntimeException If the amount is less than or equal to zero
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
     public Long addExpense(Long              walletId,
@@ -197,11 +206,13 @@ public class WalletTransactionService
                            TransactionStatus status)
     {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(
-            () -> new RuntimeException("Wallet with id " + walletId + " not found"));
+            ()
+                -> new EntityNotFoundException("Wallet with id " + walletId +
+                                               " not found"));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount must be greater than zero");
+            throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
         // Round the amount to two decimal places
@@ -234,9 +245,11 @@ public class WalletTransactionService
     /**
      * Update a transaction
      * @param transaction The transaction to be updated
-     * @throws RuntimeException If the transaction does not exist
-     * @throws RuntimeException If the wallet does not exist
-     * @throws RuntimeException If the amount is less than or equal to zero
+     * @throws EntityNotFoundException If the transaction does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
+     * @throws IllegalStateException If the transaction type does not exist
+     * @throws IllegalStateException If the transaction status does not exist
      */
     @Transactional
     public void updateTransaction(WalletTransaction transaction)
@@ -245,21 +258,22 @@ public class WalletTransactionService
         WalletTransaction oldTransaction =
             walletTransactionRepository.findById(transaction.getId())
                 .orElseThrow(()
-                                 -> new RuntimeException("Transaction with id " +
-                                                         transaction.getId() +
-                                                         " not found"));
+                                 -> new EntityNotFoundException("Transaction with id " +
+                                                                transaction.getId() +
+                                                                " not found"));
 
         // Check if the wallet exists
         walletTransactionRepository.findWalletByTransactionId(transaction.getId())
             .orElseThrow(()
-                             -> new RuntimeException("Wallet with name " +
-                                                     transaction.getWallet().getName() +
-                                                     " not found"));
+                             -> new EntityNotFoundException(
+                                 "Wallet with name " +
+                                 transaction.getWallet().getName() + " not found"));
 
         // Check if the amount is greater than zero
         if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
         {
-            throw new RuntimeException("Amount must be greater than or equal to zero");
+            throw new IllegalArgumentException(
+                "Amount must be greater than or equal to zero");
         }
 
         // Round the amount to two decimal places
@@ -287,8 +301,7 @@ public class WalletTransactionService
      * Change the type of a transaction
      * @param transaction The transaction to be updated
      * @param newType The new type of the transaction
-     * @throws RuntimeException If the transaction type does not exist
-     *
+     * @throws IllegalStateException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
@@ -323,7 +336,7 @@ public class WalletTransactionService
             {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
-                throw new RuntimeException("Transaction type not recognized");
+                throw new IllegalStateException("Transaction type not recognized");
             }
 
             // Apply the new transaction
@@ -340,7 +353,7 @@ public class WalletTransactionService
             {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
-                throw new RuntimeException("Transaction type not recognized");
+                throw new IllegalStateException("Transaction type not recognized");
             }
 
             walletRepository.save(wallet);
@@ -357,8 +370,7 @@ public class WalletTransactionService
      * Change the wallet of a transaction
      * @param transaction The transaction to be updated
      * @param newWallet The new wallet of the transaction
-     * @throws RuntimeException If the transaction type does not exist
-     *
+     * @throws IllegalStateException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
@@ -401,7 +413,7 @@ public class WalletTransactionService
             {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
-                throw new RuntimeException("Transaction type not recognized");
+                throw new IllegalStateException("Transaction type not recognized");
             }
 
             walletRepository.save(oldWallet);
@@ -419,7 +431,7 @@ public class WalletTransactionService
      * Change the amount of a transaction
      * @param oldTransaction The transaction to be updated
      * @param newAmount The new amount of the transaction
-     * @throws RuntimeException If the transaction type does not exist
+     * @throws IllegalStateException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
@@ -472,7 +484,7 @@ public class WalletTransactionService
             {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
-                throw new RuntimeException("Transaction type not recognized");
+                throw new IllegalStateException("Transaction type not recognized");
             }
 
             logger.info("Wallet with id " + wallet.getId() + " balance changed to " +
@@ -492,8 +504,8 @@ public class WalletTransactionService
      * Change the status of a transaction
      * @param transaction The transaction to be updated
      * @param newStatus The new status of the transaction
-     * @throws RuntimeException If the transaction type does not exist
-     *
+     * @throws IllegalStateException If the transaction status does not exist
+     * @throws IllegalStateException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
@@ -534,7 +546,7 @@ public class WalletTransactionService
             {
                 // WARNING for the case of new status being added to the enum
                 // and not being handled here
-                throw new RuntimeException("Transaction status not recognized");
+                throw new IllegalStateException("Transaction status not recognized");
             }
         }
         else if (transaction.getType().equals(TransactionType.INCOME))
@@ -558,14 +570,14 @@ public class WalletTransactionService
             {
                 // WARNING for the case of new status being added to the enum
                 // and not being handled here
-                throw new RuntimeException("Transaction status not recognized");
+                throw new IllegalStateException("Transaction status not recognized");
             }
         }
         else
         {
             // WARNING for the case of new types being added to the enum
             // and not being handled here
-            throw new RuntimeException("Transaction type not recognized");
+            throw new IllegalStateException("Transaction type not recognized");
         }
 
         transaction.setStatus(newStatus);
@@ -583,7 +595,7 @@ public class WalletTransactionService
     /**
      * Delete a transaction from a wallet
      * @param transactionId The id of the transaction to be removed
-     * @throws RuntimeException If the transaction does not exist
+     * @throws EntityNotFoundException If the transaction does not exist
      */
     @Transactional
     public void deleteTransaction(Long transactionId)
@@ -591,8 +603,9 @@ public class WalletTransactionService
         WalletTransaction transaction =
             walletTransactionRepository.findById(transactionId)
                 .orElseThrow(()
-                                 -> new RuntimeException("Transaction with id " +
-                                                         transactionId + " not found"));
+                                 -> new EntityNotFoundException("Transaction with id " +
+                                                                transactionId +
+                                                                " not found"));
 
         Wallet wallet = transaction.getWallet();
 
@@ -621,8 +634,8 @@ public class WalletTransactionService
     /**
      * Confirm a pending transaction
      * @param transactionId The id of the transaction to be confirmed
-     * @throws RuntimeException If the transaction does not exist
-     * @throws RuntimeException If the transaction is already confirmed
+     * @throws EntityNotFoundException If the transaction does not exist
+     * @throws AttributeAlreadySetException If the transaction is already confirmed
      */
     @Transactional
     public void confirmTransaction(Long transactionId)
@@ -630,13 +643,14 @@ public class WalletTransactionService
         WalletTransaction transaction =
             walletTransactionRepository.findById(transactionId)
                 .orElseThrow(()
-                                 -> new RuntimeException("Transaction with id " +
-                                                         transactionId + " not found"));
+                                 -> new EntityNotFoundException("Transaction with id " +
+                                                                transactionId +
+                                                                " not found"));
 
         if (transaction.getStatus() == TransactionStatus.CONFIRMED)
         {
-            throw new RuntimeException("Transaction with id " + transactionId +
-                                       " is already confirmed");
+            throw new AttributeAlreadySetException(
+                "Transaction with id " + transactionId + " is already confirmed");
         }
 
         Wallet wallet = transaction.getWallet();
@@ -669,12 +683,14 @@ public class WalletTransactionService
      * Get transaction by id
      * @param id The id of the transaction
      * @return The transaction with the provided id
-     * @throws RuntimeException If the transaction does not exist
+     * @throws EntityNotFoundException If the transaction does not exist
      */
     public WalletTransaction getTransactionById(Long id)
     {
         return walletTransactionRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Transaction with id " + id + " not found"));
+            ()
+                -> new EntityNotFoundException("Transaction with id " + id +
+                                               " not found"));
     }
 
     /**

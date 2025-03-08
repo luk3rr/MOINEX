@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Wallet;
 import org.moinex.entities.WalletType;
+import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -113,14 +115,14 @@ public class ChangeWalletTypeController
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException("Wallet with name " +
-                                                         walletName + " not found"));
+                                 -> new EntityNotFoundException(
+                                     "Wallet with name " + walletName + " not found"));
 
         WalletType walletNewType =
             walletTypes.stream()
                 .filter(wt -> wt.getName().equals(walletNewTypeStr))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Invalid wallet type"));
+                .orElseThrow(() -> new EntityNotFoundException("Invalid wallet type"));
 
         try
         {
@@ -130,7 +132,7 @@ public class ChangeWalletTypeController
                                           "Wallet type changed",
                                           "The wallet type was successfully changed.");
         }
-        catch (RuntimeException e)
+        catch (EntityNotFoundException | AttributeAlreadySetException e)
         {
             WindowUtils.showErrorDialog("Error", "Invalid input", e.getMessage());
             return;
@@ -165,7 +167,8 @@ public class ChangeWalletTypeController
                 walletTypes.stream()
                     .filter(wt -> wt.getName().equals(nameToMove))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Invalid wallet type"));
+                    .orElseThrow(
+                        () -> new IllegalStateException("Invalid wallet type"));
 
             walletTypes.remove(walletType);
             walletTypes.add(walletType);

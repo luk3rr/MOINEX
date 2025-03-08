@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.services.CategoryService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -53,7 +54,7 @@ public class AddCategoryController
             Stage stage = (Stage)categoryNameField.getScene().getWindow();
             stage.close();
         }
-        catch (RuntimeException e)
+        catch (IllegalArgumentException | EntityExistsException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error adding category",

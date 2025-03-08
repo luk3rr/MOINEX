@@ -6,6 +6,8 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -133,8 +135,8 @@ public class AddCreditCardController
                 .findFirst()
                 .orElseThrow(
                     ()
-                        -> new RuntimeException("Operator not found with name: " +
-                                                crcOperatorName));
+                        -> new EntityNotFoundException(
+                            "Operator not found with name: " + crcOperatorName));
 
         try
         {
@@ -149,10 +151,10 @@ public class AddCreditCardController
                     ? wallets.stream()
                           .filter(w -> w.getName().equals(crcDefaultBillingWalletName))
                           .findFirst()
-                          .orElseThrow(
-                              ()
-                                  -> new RuntimeException("Wallet not found with name: " +
-                                                          crcDefaultBillingWalletName))
+                          .orElseThrow(()
+                                           -> new EntityNotFoundException(
+                                               "Wallet not found with name: " +
+                                               crcDefaultBillingWalletName))
                           .getId()
                     : null;
 
@@ -177,7 +179,8 @@ public class AddCreditCardController
                                         "Invalid limit",
                                         "Please enter a valid limit");
         }
-        catch (RuntimeException e)
+        catch (EntityExistsException | EntityNotFoundException |
+               IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error",
                                         "Error creating credit card",

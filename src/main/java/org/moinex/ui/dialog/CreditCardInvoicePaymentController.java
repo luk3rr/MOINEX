@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.YearMonth;
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.CreditCard;
 import org.moinex.entities.CreditCardPayment;
 import org.moinex.entities.Wallet;
+import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
@@ -219,7 +221,7 @@ public class CreditCardInvoicePaymentController
                                     .filter(w -> w.getName().equals(walletName))
                                     .findFirst()
                                     .orElseThrow(()
-                                                     -> new RuntimeException(
+                                                     -> new EntityNotFoundException(
                                                          "Wallet with name " +
                                                          walletName + " not found"));
 
@@ -236,7 +238,8 @@ public class CreditCardInvoicePaymentController
                 Stage stage = (Stage)crcNameLabel.getScene().getWindow();
                 stage.close();
             }
-            catch (RuntimeException e)
+            catch (EntityNotFoundException | IllegalArgumentException |
+                   InsufficientResourcesException e)
             {
                 WindowUtils.showErrorDialog("Error",
                                             "Error paying invoice",
@@ -307,8 +310,8 @@ public class CreditCardInvoicePaymentController
                 .filter(w -> w.getName().equals(walletName))
                 .findFirst()
                 .orElseThrow(()
-                                 -> new RuntimeException("Wallet with name " +
-                                                         walletName + " not found"));
+                                 -> new EntityNotFoundException(
+                                     "Wallet with name " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -361,7 +364,7 @@ public class CreditCardInvoicePaymentController
                                 .filter(w -> w.getName().equals(walletName))
                                 .findFirst()
                                 .orElseThrow(()
-                                                 -> new RuntimeException(
+                                                 -> new EntityNotFoundException(
                                                      "Wallet with name " + walletName +
                                                      " not found"));
 

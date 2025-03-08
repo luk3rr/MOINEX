@@ -40,7 +40,7 @@ public class CalendarService
      * @param description The description of the event
      * @param date The date of the event
      * @param eventType The type of the event
-     * @throws RuntimeException If the title is empty
+     * @throws IllegalArgumentException If the title is empty
      */
     @Transactional
     public void addEvent(String            title,
@@ -53,7 +53,7 @@ public class CalendarService
 
         if (title.isBlank())
         {
-            throw new RuntimeException("Title cannot be empty");
+            throw new IllegalArgumentException("Title cannot be empty");
         }
 
         CalendarEvent event = CalendarEvent.builder()
@@ -71,13 +71,15 @@ public class CalendarService
     /**
      * Deletes an event from the calendar
      * @param eventId The id of the event to be removed
-     * @throws RuntimeException If the event with the given id is not found
+     * @throws EntityNotFoundException If the event is not found
      */
     @Transactional
     public void deleteEvent(Long eventId)
     {
         CalendarEvent event = calendarEventRepository.findById(eventId).orElseThrow(
-            () -> new RuntimeException("Event with id " + eventId + " not found"));
+            ()
+                -> new EntityNotFoundException("Event with id " + eventId +
+                                               " not found"));
 
         calendarEventRepository.delete(event);
 
