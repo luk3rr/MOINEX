@@ -34,10 +34,10 @@ import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.repositories.RecurringTransactionRepository;
 import org.moinex.repositories.WalletRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.RecurringTransactionFrequency;
-import org.moinex.util.RecurringTransactionStatus;
-import org.moinex.util.TransactionStatus;
-import org.moinex.util.TransactionType;
+import org.moinex.util.enums.RecurringTransactionFrequency;
+import org.moinex.util.enums.RecurringTransactionStatus;
+import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 
 import jakarta.persistence.EntityNotFoundException;
 

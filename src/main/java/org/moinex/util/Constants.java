@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import org.moinex.util.enums.TickerType;
 
 /**
  * Constants used in the application

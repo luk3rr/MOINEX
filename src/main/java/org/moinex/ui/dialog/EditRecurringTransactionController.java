@@ -26,11 +26,11 @@ import org.moinex.services.CategoryService;
 import org.moinex.services.RecurringTransactionService;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
-import org.moinex.util.RecurringTransactionFrequency;
-import org.moinex.util.RecurringTransactionStatus;
-import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.RecurringTransactionFrequency;
+import org.moinex.util.enums.RecurringTransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

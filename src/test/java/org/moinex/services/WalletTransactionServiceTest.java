@@ -40,8 +40,8 @@ import org.moinex.repositories.WalletRepository;
 import org.moinex.repositories.WalletTransactionRepository;
 import org.moinex.repositories.WalletTypeRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.TransactionStatus;
-import org.moinex.util.TransactionType;
+import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class WalletTransactionServiceTest

@@ -47,14 +47,14 @@ import org.moinex.services.WalletTransactionService;
 import org.moinex.ui.common.ResumePaneController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
-import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
+import org.moinex.util.enums.TransactionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Controller for the home view

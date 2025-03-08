@@ -24,9 +24,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
-import org.moinex.util.RecurringTransactionFrequency;
-import org.moinex.util.RecurringTransactionStatus;
-import org.moinex.util.TransactionType;
+import org.moinex.util.enums.RecurringTransactionFrequency;
+import org.moinex.util.enums.RecurringTransactionStatus;
+import org.moinex.util.enums.TransactionType;
 
 @Entity
 @Inheritance

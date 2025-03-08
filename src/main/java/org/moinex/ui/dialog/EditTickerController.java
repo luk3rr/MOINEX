@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
-import org.moinex.util.TickerType;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

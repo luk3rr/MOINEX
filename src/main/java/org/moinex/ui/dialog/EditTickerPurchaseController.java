@@ -27,9 +27,9 @@ import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
-import org.moinex.util.TransactionStatus;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

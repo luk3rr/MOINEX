@@ -12,7 +12,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.CalendarEvent;
 import org.moinex.repositories.CalendarEventRepository;
-import org.moinex.util.CalendarEventType;
+import org.moinex.util.enums.CalendarEventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

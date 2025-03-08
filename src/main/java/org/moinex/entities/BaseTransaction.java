@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.moinex.util.TransactionType;
+import org.moinex.util.enums.TransactionType;
 
 /**
  * Base class for transactions

@@ -4,7 +4,7 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.util;
+package org.moinex.util.enums;
 
 /**
  * Represents different types of events in the calendar

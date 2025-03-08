@@ -16,7 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.services.CalendarService;
-import org.moinex.util.CalendarEventType;
+import org.moinex.util.enums.CalendarEventType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;

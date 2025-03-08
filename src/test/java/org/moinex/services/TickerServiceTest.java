@@ -42,9 +42,9 @@ import org.moinex.repositories.TickerPurchaseRepository;
 import org.moinex.repositories.TickerRepository;
 import org.moinex.repositories.TickerSaleRepository;
 import org.moinex.repositories.WalletRepository;
-import org.moinex.util.TickerType;
-import org.moinex.util.TransactionStatus;
-import org.moinex.util.TransactionType;
+import org.moinex.util.enums.TickerType;
+import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class TickerServiceTest

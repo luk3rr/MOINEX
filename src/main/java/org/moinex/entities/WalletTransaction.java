@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
-import org.moinex.util.TransactionStatus;
+import org.moinex.util.enums.TransactionStatus;
 
 /**
  * Represents a transaction in a wallet

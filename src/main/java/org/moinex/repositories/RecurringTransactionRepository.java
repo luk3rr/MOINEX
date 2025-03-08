@@ -9,7 +9,7 @@ package org.moinex.repositories;
 import java.util.List;
 
 import org.moinex.entities.RecurringTransaction;
-import org.moinex.util.RecurringTransactionStatus;
+import org.moinex.util.enums.RecurringTransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

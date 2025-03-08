@@ -27,10 +27,10 @@ import org.moinex.services.CategoryService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.util.Constants;
-import org.moinex.util.TransactionStatus;
-import org.moinex.util.TransactionType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -253,9 +253,8 @@ public class EditTransactionController
         catch (EntityNotFoundException | IllegalArgumentException |
                IllegalStateException e)
         {
-            WindowUtils.showErrorDialog(
-                "Error while updating transaction",
-                e.getMessage());
+            WindowUtils.showErrorDialog("Error while updating transaction",
+                                        e.getMessage());
         }
     }
 

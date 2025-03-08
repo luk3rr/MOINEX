@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
-import org.moinex.util.TickerType;
+import org.moinex.util.enums.TickerType;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

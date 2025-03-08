@@ -28,7 +28,7 @@ import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
-import org.moinex.util.TickerType;
+import org.moinex.util.enums.TickerType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;

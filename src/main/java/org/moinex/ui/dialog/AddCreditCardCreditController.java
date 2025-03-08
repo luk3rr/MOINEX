@@ -34,7 +34,7 @@ import org.moinex.services.CalculatorService;
 import org.moinex.services.CreditCardService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
-import org.moinex.util.CreditCardCreditType;
+import org.moinex.util.enums.CreditCardCreditType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
