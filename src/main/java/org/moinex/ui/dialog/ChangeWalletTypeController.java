@@ -18,6 +18,7 @@ import org.moinex.entities.WalletType;
 import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,10 +31,10 @@ import org.springframework.stereotype.Controller;
 public class ChangeWalletTypeController
 {
     @FXML
-    private ComboBox<String> walletComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> newTypeComboBox;
+    private ComboBox<WalletType> newTypeComboBox;
 
     @FXML
     private Label currentTypeLabel;
@@ -43,6 +44,8 @@ public class ChangeWalletTypeController
     private List<WalletType> walletTypes;
 
     private WalletService walletService;
+
+    private Wallet wallet = null;
 
     /**
      * Constructor
@@ -62,36 +65,24 @@ public class ChangeWalletTypeController
             return;
         }
 
-        walletComboBox.setValue(wt.getName());
-
-        updateCurrentTypeLabel(wt);
+        this.wallet = wt;
+        walletComboBox.setValue(wallet);
+        updateCurrentTypeLabel(wallet);
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadWalletTypesFromDatabase();
 
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
-
-        // Add wallet types, but remove the default goal wallet type
-        newTypeComboBox.getItems().addAll(
-            walletTypes.stream()
-                .filter(
-                    wt -> !wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
-                .map(WalletType::getName)
-                .toList());
+        populateComboBoxes();
 
         // Set the current type label
         walletComboBox.setOnAction(e -> {
-            String walletName = walletComboBox.getValue();
-            Wallet wallet     = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .get();
-
+            Wallet wallet = walletComboBox.getValue();
             updateCurrentTypeLabel(wallet);
         });
     }
@@ -99,30 +90,16 @@ public class ChangeWalletTypeController
     @FXML
     private void handleSave()
     {
-        String walletName       = walletComboBox.getValue();
-        String walletNewTypeStr = newTypeComboBox.getValue();
+        Wallet     wallet        = walletComboBox.getValue();
+        WalletType walletNewType = newTypeComboBox.getValue();
 
-        if (walletName == null || walletNewTypeStr == null)
+        if (wallet == null || walletNewType == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
                 "Please fill all required fields before saving");
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(()
-                                 -> new EntityNotFoundException(
-                                     "Wallet with name " + walletName + " not found"));
-
-        WalletType walletNewType =
-            walletTypes.stream()
-                .filter(wt -> wt.getName().equals(walletNewTypeStr))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Invalid wallet type"));
 
         try
         {
@@ -156,6 +133,11 @@ public class ChangeWalletTypeController
     private void loadWalletTypesFromDatabase()
     {
         walletTypes = walletService.getAllWalletTypes();
+    }
+
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().addAll(wallets);
 
         String nameToMove = "Others";
 
@@ -172,6 +154,19 @@ public class ChangeWalletTypeController
             walletTypes.remove(walletType);
             walletTypes.add(walletType);
         }
+
+        // Add wallet types, but remove the default goal wallet type
+        newTypeComboBox.getItems().addAll(
+            walletTypes.stream()
+                .filter(
+                    wt -> !wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
+                .toList());
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(newTypeComboBox, WalletType::getName);
     }
 
     private void updateCurrentTypeLabel(Wallet wt)

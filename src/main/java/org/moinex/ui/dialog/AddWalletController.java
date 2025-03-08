@@ -7,7 +7,6 @@
 package org.moinex.ui.dialog;
 
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -18,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.WalletType;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,7 +36,7 @@ public class AddWalletController
     private TextField walletBalanceField;
 
     @FXML
-    private ComboBox<String> walletTypeComboBox;
+    private ComboBox<WalletType> walletTypeComboBox;
 
     private WalletService walletService;
 
@@ -56,10 +56,11 @@ public class AddWalletController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletTypes();
 
-        walletTypeComboBox.getItems().addAll(
-            walletTypes.stream().map(WalletType::getName).toList());
+        populateWalletTypeComboBox();
 
         walletBalanceField.textProperty().addListener(
             (observable, oldValue, newValue) -> {
@@ -83,25 +84,16 @@ public class AddWalletController
         String walletName = walletNameField.getText();
         walletName = walletName.strip(); // Remove leading and trailing whitespaces
 
-        String walletBalanceStr = walletBalanceField.getText();
-        String walletTypeStr    = walletTypeComboBox.getValue();
+        String     walletBalanceStr = walletBalanceField.getText();
+        WalletType walletType       = walletTypeComboBox.getValue();
 
-        if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletTypeStr == null)
+        if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletType == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
                 "Please fill all required fields before saving");
             return;
         }
-
-        WalletType walletType =
-            walletTypes.stream()
-                .filter(wt -> wt.getName().equals(walletTypeStr))
-                .findFirst()
-                .orElseThrow(
-                    (()
-                         -> new EntityNotFoundException("Wallet type with name " +
-                                                        walletTypeStr + " not found")));
 
         try
         {
@@ -132,7 +124,13 @@ public class AddWalletController
     private void loadWalletTypes()
     {
         walletTypes = walletService.getAllWalletTypes();
+    }
 
+    /**
+     * Populate the wallet type combo box
+     */
+    private void populateWalletTypeComboBox()
+    {
         String nameToMove = "Others";
 
         // Move the "Others" wallet type to the end of the list
@@ -153,5 +151,12 @@ public class AddWalletController
         // Goal wallets are created through the Add Goal dialog.
         walletTypes.removeIf(
             wt -> wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME));
+
+        walletTypeComboBox.getItems().setAll(walletTypes);
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletTypeComboBox, WalletType::getName);
     }
 }

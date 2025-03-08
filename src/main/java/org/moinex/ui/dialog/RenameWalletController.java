@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Wallet;
 import org.moinex.services.WalletService;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Controller;
 public class RenameWalletController
 {
     @FXML
-    private ComboBox<String> walletComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
     private TextField walletNewNameField;
@@ -36,6 +37,8 @@ public class RenameWalletController
     private List<Wallet> wallets;
 
     private WalletService walletService;
+
+    private Wallet wallet = null;
 
     /**
      * Constructor
@@ -55,40 +58,31 @@ public class RenameWalletController
             return;
         }
 
-        walletComboBox.setValue(wt.getName());
+        this.wallet = wt;
+        walletComboBox.setValue(wallet);
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
         loadWalletsFromDatabase();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
+        populateWalletComboBox();
     }
 
     @FXML
     private void handleSave()
     {
-        String walletName    = walletComboBox.getValue();
+        Wallet wallet        = walletComboBox.getValue();
         String walletNewName = walletNewNameField.getText();
 
-        if (walletName == null || walletNewName.isBlank())
+        if (wallet == null || walletNewName.isBlank())
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
                 "Please fill all required fields before saving");
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(
-                    (()
-                         -> new EntityNotFoundException("Wallet with name " +
-                                                        walletName + " not found")));
 
         try
         {
@@ -115,5 +109,15 @@ public class RenameWalletController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
+    }
+
+    private void populateWalletComboBox()
+    {
+        walletComboBox.getItems().addAll(wallets);
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
     }
 }

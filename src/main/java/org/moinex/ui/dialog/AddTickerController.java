@@ -15,8 +15,9 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.TickerType;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -43,7 +44,7 @@ public class AddTickerController
     private TextField avgUnitPriceField;
 
     @FXML
-    private ComboBox<String> typeComboBox;
+    private ComboBox<TickerType> typeComboBox;
 
     private TickerService tickerService;
 
@@ -61,7 +62,8 @@ public class AddTickerController
     @FXML
     private void initialize()
     {
-        configureTypeComboBox();
+        configureComboBoxes();
+        populateTypeComboBox();
         configureListeners();
     }
 
@@ -75,15 +77,15 @@ public class AddTickerController
     @FXML
     private void handleSave()
     {
-        String name            = nameField.getText();
-        String symbol          = symbolField.getText();
-        String currentPriceStr = currentPriceField.getText();
-        String typeStr         = typeComboBox.getValue();
-        String quantityStr     = quantityField.getText();
-        String avgUnitPriceStr = avgUnitPriceField.getText();
+        String     name            = nameField.getText();
+        String     symbol          = symbolField.getText();
+        String     currentPriceStr = currentPriceField.getText();
+        TickerType type            = typeComboBox.getValue();
+        String     quantityStr     = quantityField.getText();
+        String     avgUnitPriceStr = avgUnitPriceField.getText();
 
-        if (name == null || symbol == null || currentPriceStr == null ||
-            typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
+        if (name == null || symbol == null || currentPriceStr == null || type == null ||
+            name.strip().isEmpty() || symbol.strip().isEmpty() ||
             currentPriceStr.strip().isEmpty())
         {
             WindowUtils.showInformationDialog(
@@ -109,8 +111,6 @@ public class AddTickerController
         try
         {
             BigDecimal currentPrice = new BigDecimal(currentPriceStr);
-
-            TickerType type = TickerType.valueOf(typeStr);
 
             BigDecimal quantity;
             BigDecimal avgUnitPrice;
@@ -145,12 +145,14 @@ public class AddTickerController
         }
     }
 
-    private void configureTypeComboBox()
+    private void populateTypeComboBox()
     {
-        for (TickerType type : TickerType.values())
-        {
-            typeComboBox.getItems().add(type.toString());
-        }
+        typeComboBox.getItems().setAll(TickerType.values());
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(typeComboBox, TickerType::name);
     }
 
     private void configureListeners()

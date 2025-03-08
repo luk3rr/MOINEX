@@ -63,10 +63,10 @@ public class AddTransferController
     private Label receiverWalletCurrentBalanceValueLabel;
 
     @FXML
-    private ComboBox<String> senderWalletComboBox;
+    private ComboBox<Wallet> senderWalletComboBox;
 
     @FXML
-    private ComboBox<String> receiverWalletComboBox;
+    private ComboBox<Wallet> receiverWalletComboBox;
 
     @FXML
     private TextField transferValueField;
@@ -96,6 +96,10 @@ public class AddTransferController
 
     private ChangeListener<String> descriptionFieldListener;
 
+    private Wallet senderWallet = null;
+
+    private Wallet receiverWallet = null;
+
     /**
      * Constructor
      * @param walletService WalletService
@@ -120,8 +124,8 @@ public class AddTransferController
             return;
         }
 
-        senderWalletComboBox.setValue(wt.getName());
-
+        this.senderWallet = wt;
+        senderWalletComboBox.setValue(senderWallet);
         updateSenderWalletBalance();
     }
 
@@ -132,16 +136,20 @@ public class AddTransferController
             return;
         }
 
-        receiverWalletComboBox.setValue(wt.getName());
-
+        this.receiverWallet = wt;
+        receiverWalletComboBox.setValue(receiverWallet);
         updateReceiverWalletBalance();
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadSuggestionsFromDatabase();
+
+        populateComboBoxes();
 
         // Configure the date picker
         UIUtils.setDatePickerFormat(transferDatePicker);
@@ -177,13 +185,13 @@ public class AddTransferController
     @FXML
     private void handleSave()
     {
-        String    senderWalletName    = senderWalletComboBox.getValue();
-        String    receiverWalletName  = receiverWalletComboBox.getValue();
+        Wallet    senderWallet        = senderWalletComboBox.getValue();
+        Wallet    receiverWallet      = receiverWalletComboBox.getValue();
         String    transferValueString = transferValueField.getText();
         String    description         = descriptionField.getText();
         LocalDate transferDate        = transferDatePicker.getValue();
 
-        if (senderWalletName == null || receiverWalletName == null ||
+        if (senderWallet == null || receiverWallet == null ||
             transferValueString == null || transferValueString.strip().isEmpty() ||
             description == null || description.strip().isEmpty() ||
             transferDate == null)
@@ -197,24 +205,6 @@ public class AddTransferController
         try
         {
             BigDecimal transferValue = new BigDecimal(transferValueString);
-
-            Wallet senderWallet =
-                wallets.stream()
-                    .filter(w -> w.getName().equals(senderWalletName))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Wallet not found with name: " + senderWalletName));
-
-            Wallet receiverWallet =
-                wallets.stream()
-                    .filter(w -> w.getName().equals(receiverWalletName))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Wallet not found with name: " + receiverWalletName));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transferDate.atTime(currentTime);
@@ -281,29 +271,20 @@ public class AddTransferController
             catch (NumberFormatException e)
             {
                 // Must be unreachable
-                WindowUtils.showErrorDialog(
-                    "Invalid value",
-                    "The value must be a number");
+                WindowUtils.showErrorDialog("Invalid value",
+                                            "The value must be a number");
             }
         }
     }
 
     private void updateSenderWalletBalance()
     {
-        String senderWalletName = senderWalletComboBox.getValue();
+        Wallet senderWallet = senderWalletComboBox.getValue();
 
-        if (senderWalletName == null)
+        if (senderWallet == null)
         {
             return;
         }
-
-        Wallet senderWallet = wallets.stream()
-                                  .filter(w -> w.getName().equals(senderWalletName))
-                                  .findFirst()
-                                  .orElseThrow(()
-                                                   -> new EntityNotFoundException(
-                                                       "Wallet not found with name: " +
-                                                       senderWalletName));
 
         if (senderWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -322,21 +303,12 @@ public class AddTransferController
 
     private void updateReceiverWalletBalance()
     {
-        String receiverWalletName = receiverWalletComboBox.getValue();
+        Wallet receiverWallet = receiverWalletComboBox.getValue();
 
-        if (receiverWalletName == null)
+        if (receiverWallet == null)
         {
             return;
         }
-
-        Wallet receiverWallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(receiverWalletName))
-                .findFirst()
-                .orElseThrow(
-                    ()
-                        -> new EntityNotFoundException("Wallet not found with name: " +
-                                                       receiverWalletName));
 
         if (receiverWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -356,10 +328,10 @@ public class AddTransferController
     private void updateSenderWalletAfterBalance()
     {
         String transferValueString = transferValueField.getText();
-        String senderWalletName    = senderWalletComboBox.getValue();
+        Wallet senderWallet        = senderWalletComboBox.getValue();
 
         if (transferValueString == null || transferValueString.strip().isEmpty() ||
-            senderWalletName == null)
+            senderWallet == null)
         {
             UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
             return;
@@ -374,15 +346,6 @@ public class AddTransferController
                 UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
                 return;
             }
-
-            Wallet senderWallet =
-                wallets.stream()
-                    .filter(w -> w.getName().equals(senderWalletName))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Wallet not found with name: " + senderWalletName));
 
             BigDecimal senderWalletAfterBalance =
                 senderWallet.getBalance().subtract(transferValue);
@@ -413,10 +376,10 @@ public class AddTransferController
     private void updateReceiverWalletAfterBalance()
     {
         String transferValueString = transferValueField.getText();
-        String receiverWalletName  = receiverWalletComboBox.getValue();
+        Wallet receiverWallet      = receiverWalletComboBox.getValue();
 
         if (transferValueString == null || transferValueString.strip().isEmpty() ||
-            receiverWalletName == null)
+            receiverWallet == null)
         {
             UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
             return;
@@ -431,15 +394,6 @@ public class AddTransferController
                 UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
                 return;
             }
-
-            Wallet receiverWallet =
-                wallets.stream()
-                    .filter(w -> w.getName().equals(receiverWalletName))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Wallet not found with name: " + receiverWalletName));
 
             BigDecimal receiverWalletAfterBalance =
                 receiverWallet.getBalance().add(transferValue);
@@ -539,17 +493,23 @@ public class AddTransferController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        senderWalletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
-
-        receiverWalletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
-    public void loadSuggestionsFromDatabase()
+    private void loadSuggestionsFromDatabase()
     {
         suggestions = walletTransactionService.getTransferSuggestions();
+    }
+
+    private void populateComboBoxes()
+    {
+        senderWalletComboBox.getItems().setAll(wallets);
+        receiverWalletComboBox.getItems().setAll(wallets);
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(senderWalletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(receiverWalletComboBox, Wallet::getName);
     }
 
     private void configureSuggestionsPopup()
@@ -647,8 +607,8 @@ public class AddTransferController
 
     private void fillFieldsWithTransaction(Transfer t)
     {
-        senderWalletComboBox.setValue(t.getSenderWallet().getName());
-        receiverWalletComboBox.setValue(t.getReceiverWallet().getName());
+        senderWalletComboBox.setValue(t.getSenderWallet());
+        receiverWalletComboBox.setValue(t.getReceiverWallet());
 
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,

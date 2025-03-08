@@ -28,9 +28,9 @@ import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.TickerType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -55,10 +55,10 @@ public class AddCryptoExchangeController
     private Label cryptoReceivedCurrentBalanceValueLabel;
 
     @FXML
-    private ComboBox<String> cryptoSoldComboBox;
+    private ComboBox<Ticker> cryptoSoldComboBox;
 
     @FXML
-    private ComboBox<String> cryptoReceivedComboBox;
+    private ComboBox<Ticker> cryptoReceivedComboBox;
 
     @FXML
     private TextField descriptionField;
@@ -81,6 +81,8 @@ public class AddCryptoExchangeController
 
     private List<Ticker> cryptos;
 
+    private Ticker fromCrypto = null;
+
     /**
      * Constructor
      * @param tickerService TickerService
@@ -102,15 +104,18 @@ public class AddCryptoExchangeController
             return;
         }
 
-        cryptoSoldComboBox.setValue(tk.getSymbol());
-
+        this.fromCrypto = tk;
+        cryptoSoldComboBox.setValue(fromCrypto);
         updateFromCryptoCurrentQuantity();
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadCryptosFromDatabase();
+        populateCryptoComboBoxes();
 
         // Configure the date picker
         UIUtils.setDatePickerFormat(exchangeDatePicker);
@@ -169,14 +174,14 @@ public class AddCryptoExchangeController
     @FXML
     private void handleSave()
     {
-        String    cryptoSoldSymbol          = cryptoSoldComboBox.getValue();
-        String    cryptoReceivedSymbol      = cryptoReceivedComboBox.getValue();
+        Ticker    cryptoSold                = cryptoSoldComboBox.getValue();
+        Ticker    cryptoReceived            = cryptoReceivedComboBox.getValue();
         String    cryptoSoldQuantityStr     = cryptoSoldQuantityField.getText();
         String    cryptoReceivedQuantityStr = cryptoReceivedQuantityField.getText();
         String    description               = descriptionField.getText();
         LocalDate exchangeDate              = exchangeDatePicker.getValue();
 
-        if (cryptoSoldSymbol == null || cryptoReceivedSymbol == null ||
+        if (cryptoSold == null || cryptoReceived == null ||
             cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.strip().isEmpty() ||
             cryptoReceivedQuantityStr == null ||
             cryptoReceivedQuantityStr.strip().isEmpty() || description == null ||
@@ -193,24 +198,6 @@ public class AddCryptoExchangeController
             BigDecimal cryptoSoldQuantity = new BigDecimal(cryptoSoldQuantityStr);
             BigDecimal cryptoReceivedQuantity =
                 new BigDecimal(cryptoReceivedQuantityStr);
-
-            Ticker cryptoSold =
-                cryptos.stream()
-                    .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Crypto not found with symbol: " + cryptoSoldSymbol));
-
-            Ticker cryptoReceived =
-                cryptos.stream()
-                    .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Crypto not found with symbol: " +
-                                         cryptoReceivedSymbol));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = exchangeDate.atTime(currentTime);
@@ -304,20 +291,12 @@ public class AddCryptoExchangeController
 
     private void updateFromCryptoCurrentQuantity()
     {
-        String cryptoSoldSymbol = cryptoSoldComboBox.getValue();
+        Ticker cryptoSold = cryptoSoldComboBox.getValue();
 
-        if (cryptoSoldSymbol == null)
+        if (cryptoSold == null)
         {
             return;
         }
-
-        Ticker cryptoSold = cryptos.stream()
-                                .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Crypto not found with symbol: " +
-                                                     cryptoSoldSymbol));
 
         if (cryptoSold.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -337,21 +316,12 @@ public class AddCryptoExchangeController
 
     private void updateToCryptoCurrentQuantity()
     {
-        String cryptoReceivedSymbol = cryptoReceivedComboBox.getValue();
+        Ticker cryptoReceived = cryptoReceivedComboBox.getValue();
 
-        if (cryptoReceivedSymbol == null)
+        if (cryptoReceived == null)
         {
             return;
         }
-
-        Ticker cryptoReceived =
-            cryptos.stream()
-                .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
-                .findFirst()
-                .orElseThrow(
-                    ()
-                        -> new EntityNotFoundException(
-                            "Crypto not found with symbol: " + cryptoReceivedSymbol));
 
         if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -372,10 +342,10 @@ public class AddCryptoExchangeController
     private void updateFromCryptoQuantityAfterExchange()
     {
         String cryptoSoldQuantityStr = cryptoSoldQuantityField.getText();
-        String cryptoSoldSymbol      = cryptoSoldComboBox.getValue();
+        Ticker cryptoSold            = cryptoSoldComboBox.getValue();
 
         if (cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.strip().isEmpty() ||
-            cryptoSoldSymbol == null)
+            cryptoSold == null)
         {
             UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
             return;
@@ -390,15 +360,6 @@ public class AddCryptoExchangeController
                 UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
                 return;
             }
-
-            Ticker cryptoSold =
-                cryptos.stream()
-                    .filter(c -> c.getSymbol().equals(cryptoSoldSymbol))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Crypto not found with symbol: " + cryptoSoldSymbol));
 
             BigDecimal cryptoSoldAfterBalance =
                 cryptoSold.getCurrentQuantity().subtract(exchangeQuantity);
@@ -427,10 +388,10 @@ public class AddCryptoExchangeController
     private void updateToCryptoQuantityAfterExchange()
     {
         String cryptoReceivedQuantityStr = cryptoReceivedQuantityField.getText();
-        String cryptoReceivedSymbol      = cryptoReceivedComboBox.getValue();
+        Ticker cryptoReceived            = cryptoReceivedComboBox.getValue();
 
         if (cryptoReceivedQuantityStr == null ||
-            cryptoReceivedQuantityStr.strip().isEmpty() || cryptoReceivedSymbol == null)
+            cryptoReceivedQuantityStr.strip().isEmpty() || cryptoReceived == null)
         {
             UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
             return;
@@ -445,15 +406,6 @@ public class AddCryptoExchangeController
                 UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
                 return;
             }
-
-            Ticker cryptoReceived =
-                cryptos.stream()
-                    .filter(c -> c.getSymbol().equals(cryptoReceivedSymbol))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Crypto not found with symbol: " +
-                                         cryptoReceivedSymbol));
 
             BigDecimal cryptoReceivedAfterBalance =
                 cryptoReceived.getCurrentQuantity().add(exchangeQuantity);
@@ -484,11 +436,17 @@ public class AddCryptoExchangeController
     {
         cryptos =
             tickerService.getAllNonArchivedTickersByType(TickerType.CRYPTOCURRENCY);
+    }
 
-        cryptoSoldComboBox.getItems().addAll(
-            cryptos.stream().map(Ticker::getSymbol).toList());
+    private void populateCryptoComboBoxes()
+    {
+        cryptoSoldComboBox.getItems().setAll(cryptos);
+        cryptoReceivedComboBox.getItems().setAll(cryptos);
+    }
 
-        cryptoReceivedComboBox.getItems().addAll(
-            cryptos.stream().map(Ticker::getSymbol).toList());
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(cryptoSoldComboBox, Ticker::getName);
+        UIUtils.configureComboBox(cryptoReceivedComboBox, Ticker::getName);
     }
 }

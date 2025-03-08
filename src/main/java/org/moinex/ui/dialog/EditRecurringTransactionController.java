@@ -42,22 +42,22 @@ import org.springframework.stereotype.Controller;
 public class EditRecurringTransactionController
 {
     @FXML
-    private ComboBox<String> walletComboBox;
-
-    @FXML
     private TextField descriptionField;
 
     @FXML
     private TextField valueField;
 
     @FXML
-    private ComboBox<String> typeComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<TransactionType> typeComboBox;
 
     @FXML
-    private ComboBox<String> frequencyComboBox;
+    private ComboBox<Category> categoryComboBox;
+
+    @FXML
+    private ComboBox<RecurringTransactionFrequency> frequencyComboBox;
 
     @FXML
     private DatePicker nextDueDatePicker;
@@ -81,7 +81,7 @@ public class EditRecurringTransactionController
 
     private List<Category> categories;
 
-    private RecurringTransaction rtToUpdate;
+    private RecurringTransaction rt = null;
 
     /**
      * Constructor
@@ -103,13 +103,12 @@ public class EditRecurringTransactionController
 
     public void setRecurringTransaction(RecurringTransaction rt)
     {
-        rtToUpdate = rt;
-
-        walletComboBox.setValue(rt.getWallet().getName());
+        this.rt = rt;
+        walletComboBox.setValue(rt.getWallet());
         descriptionField.setText(rt.getDescription());
         valueField.setText(rt.getAmount().toString());
-        typeComboBox.setValue(rt.getType().name());
-        categoryComboBox.setValue(rt.getCategory().getName());
+        typeComboBox.setValue(rt.getType());
+        categoryComboBox.setValue(rt.getCategory());
 
         nextDueDatePicker.setValue(rt.getNextDueDate().toLocalDate());
 
@@ -123,7 +122,7 @@ public class EditRecurringTransactionController
             endDatePicker.setValue(rt.getEndDate().toLocalDate());
         }
 
-        frequencyComboBox.setValue(rt.getFrequency().name());
+        frequencyComboBox.setValue(rt.getFrequency());
 
         activeCheckBox.setSelected(rt.getStatus() == RecurringTransactionStatus.ACTIVE);
 
@@ -133,24 +132,16 @@ public class EditRecurringTransactionController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadCategoriesFromDatabase();
+
+        populateComboBoxes();
 
         // Configure date picker
         UIUtils.setDatePickerFormat(nextDueDatePicker);
         UIUtils.setDatePickerFormat(endDatePicker);
-
-        // For each element in enum RecurringTransactionStatus, add its name to the
-        // typeComboBox
-        typeComboBox.getItems().addAll(
-            Arrays.stream(TransactionType.values()).map(Enum::name).toList());
-
-        // For each element in enum RecurringTransactionFrequency, add its name to the
-        // frequencyComboBox
-        frequencyComboBox.getItems().addAll(
-            Arrays.stream(RecurringTransactionFrequency.values())
-                .map(Enum::name)
-                .toList());
 
         nextDueDatePicker.setOnAction(e -> updateInfoLabel());
 
@@ -188,19 +179,18 @@ public class EditRecurringTransactionController
     @FXML
     private void handleSave()
     {
-        String    walletName      = walletComboBox.getValue();
-        String    description     = descriptionField.getText();
-        String    valueString     = valueField.getText();
-        String    typeString      = typeComboBox.getValue();
-        String    categoryString  = categoryComboBox.getValue();
-        LocalDate nextDueDate     = nextDueDatePicker.getValue();
-        LocalDate endDate         = endDatePicker.getValue();
-        String    frequencyString = frequencyComboBox.getValue();
+        Wallet                        wallet      = walletComboBox.getValue();
+        String                        description = descriptionField.getText();
+        String                        valueString = valueField.getText();
+        TransactionType               type        = typeComboBox.getValue();
+        Category                      category    = categoryComboBox.getValue();
+        LocalDate                     nextDueDate = nextDueDatePicker.getValue();
+        LocalDate                     endDate     = endDatePicker.getValue();
+        RecurringTransactionFrequency frequency   = frequencyComboBox.getValue();
 
-        if (walletName == null || description == null ||
-            description.strip().isEmpty() || valueString == null ||
-            valueString.strip().isEmpty() || typeString == null ||
-            categoryString == null || nextDueDate == null || frequencyString == null)
+        if (wallet == null || description == null || description.strip().isEmpty() ||
+            valueString == null || valueString.strip().isEmpty() || type == null ||
+            category == null || nextDueDate == null || frequency == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -212,46 +202,23 @@ public class EditRecurringTransactionController
         {
             BigDecimal transactionAmount = new BigDecimal(valueString);
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryString))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Category with name: " + categoryString +
-                                         " not found"));
-
-            TransactionType type = TransactionType.valueOf(typeString);
-
-            RecurringTransactionFrequency frequency =
-                RecurringTransactionFrequency.valueOf(frequencyString);
-
             boolean endDateChanged =
-                (endDate != null &&
-                 !endDate.equals(rtToUpdate.getEndDate().toLocalDate())) ||
+                (endDate != null && !endDate.equals(rt.getEndDate().toLocalDate())) ||
                 (endDate == null &&
-                 !rtToUpdate.getEndDate().toLocalDate().equals(
+                 !rt.getEndDate().toLocalDate().equals(
                      Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE));
 
             // Check if has any modification
-            if (rtToUpdate.getWallet().getName().equals(walletName) &&
-                rtToUpdate.getDescription().equals(description) &&
-                rtToUpdate.getAmount().compareTo(transactionAmount) == 0 &&
-                rtToUpdate.getType().equals(type) &&
-                rtToUpdate.getCategory().getName().equals(categoryString) &&
-                rtToUpdate.getNextDueDate().toLocalDate().equals(nextDueDate) &&
-                !endDateChanged && rtToUpdate.getFrequency().equals(frequency) &&
-                rtToUpdate.getStatus().equals(
-                    activeCheckBox.isSelected() ? RecurringTransactionStatus.ACTIVE
-                                                : RecurringTransactionStatus.INACTIVE))
+            if (rt.getWallet().getId().equals(wallet.getId()) &&
+                rt.getDescription().equals(description) &&
+                rt.getAmount().compareTo(transactionAmount) == 0 &&
+                rt.getType().equals(type) &&
+                rt.getCategory().getId().equals(category.getId()) &&
+                rt.getNextDueDate().toLocalDate().equals(nextDueDate) &&
+                !endDateChanged && rt.getFrequency().equals(frequency) &&
+                rt.getStatus().equals(activeCheckBox.isSelected()
+                                          ? RecurringTransactionStatus.ACTIVE
+                                          : RecurringTransactionStatus.INACTIVE))
             {
                 WindowUtils.showInformationDialog(
                     "No changes",
@@ -259,12 +226,12 @@ public class EditRecurringTransactionController
             }
             else // If there is any modification, update the transaction
             {
-                rtToUpdate.setWallet(wallet);
-                rtToUpdate.setDescription(description);
-                rtToUpdate.setAmount(transactionAmount);
-                rtToUpdate.setType(type);
-                rtToUpdate.setCategory(category);
-                rtToUpdate.setNextDueDate(
+                rt.setWallet(wallet);
+                rt.setDescription(description);
+                rt.setAmount(transactionAmount);
+                rt.setType(type);
+                rt.setCategory(category);
+                rt.setNextDueDate(
                     nextDueDate.atTime(Constants.RECURRING_TRANSACTION_DEFAULT_TIME));
 
                 // If the end date not set, set the default end date
@@ -272,14 +239,14 @@ public class EditRecurringTransactionController
                               ? Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE
                               : endDate;
 
-                rtToUpdate.setEndDate(
+                rt.setEndDate(
                     endDate.atTime(Constants.RECURRING_TRANSACTION_DEFAULT_TIME));
-                rtToUpdate.setFrequency(frequency);
-                rtToUpdate.setStatus(activeCheckBox.isSelected()
-                                         ? RecurringTransactionStatus.ACTIVE
-                                         : RecurringTransactionStatus.INACTIVE);
+                rt.setFrequency(frequency);
+                rt.setStatus(activeCheckBox.isSelected()
+                                 ? RecurringTransactionStatus.ACTIVE
+                                 : RecurringTransactionStatus.INACTIVE);
 
-                recurringTransactionService.updateRecurringTransaction(rtToUpdate);
+                recurringTransactionService.updateRecurringTransaction(rt);
 
                 WindowUtils.showSuccessDialog(
                     "Recurring transaction updated",
@@ -303,9 +270,9 @@ public class EditRecurringTransactionController
 
     private void updateInfoLabel()
     {
-        LocalDate nextDueDate     = nextDueDatePicker.getValue();
-        LocalDate endDate         = endDatePicker.getValue();
-        String    frequencyString = frequencyComboBox.getValue();
+        LocalDate                     nextDueDate = nextDueDatePicker.getValue();
+        LocalDate                     endDate     = endDatePicker.getValue();
+        RecurringTransactionFrequency frequency   = frequencyComboBox.getValue();
 
         String msg = "";
 
@@ -313,15 +280,12 @@ public class EditRecurringTransactionController
         {
             msg = "Recurring transaction is inactive";
         }
-        else if (nextDueDate != null && frequencyString != null)
+        else if (nextDueDate != null && frequency != null)
         {
-            RecurringTransactionFrequency frequency =
-                RecurringTransactionFrequency.valueOf(frequencyString);
-
             if (endDate != null)
             {
                 msg = "Starts on " + nextDueDate + ", ends on " + endDate +
-                      ", frequency " + frequencyString;
+                      ", frequency " + frequency.toString();
 
                 try
                 {
@@ -339,7 +303,8 @@ public class EditRecurringTransactionController
             }
             else
             {
-                msg = "Starts on " + nextDueDate + ", frequency " + frequencyString;
+                msg =
+                    "Starts on " + nextDueDate + ", frequency " + frequency.toString();
             }
         }
 
@@ -349,25 +314,28 @@ public class EditRecurringTransactionController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
     private void loadCategoriesFromDatabase()
     {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
 
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().addAll(wallets);
+        categoryComboBox.getItems().addAll(categories);
+        typeComboBox.getItems().addAll(Arrays.asList(TransactionType.values()));
+        frequencyComboBox.getItems().addAll(
+            Arrays.asList(RecurringTransactionFrequency.values()));
+    }
 
-        // If there are no categories, add a tooltip to the categoryComboBox
-        // to inform the user that a category is needed
-        if (categories.isEmpty())
-        {
-            UIUtils.addTooltipToNode(
-                categoryComboBox,
-                "You need to add a category before adding an transaction");
-        }
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
+        UIUtils.configureComboBox(typeComboBox, TransactionType::name);
+        UIUtils.configureComboBox(frequencyComboBox,
+                                  RecurringTransactionFrequency::name);
     }
 }

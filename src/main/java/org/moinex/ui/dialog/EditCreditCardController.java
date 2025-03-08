@@ -20,6 +20,7 @@ import org.moinex.entities.Wallet;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,10 +48,10 @@ public class EditCreditCardController
     private ComboBox<String> dueDayComboBox;
 
     @FXML
-    private ComboBox<String> operatorComboBox;
+    private ComboBox<CreditCardOperator> operatorComboBox;
 
     @FXML
-    private ComboBox<String> defaultBillingWalletComboBox;
+    private ComboBox<Wallet> defaultBillingWalletComboBox;
 
     private CreditCardService creditCardService;
 
@@ -60,7 +61,7 @@ public class EditCreditCardController
 
     private List<Wallet> wallets;
 
-    private CreditCard crcToUpdate;
+    private CreditCard creditCard = null;
 
     /**
      * Constructor
@@ -78,29 +79,24 @@ public class EditCreditCardController
 
     public void setCreditCard(CreditCard crc)
     {
-        crcToUpdate = crc;
-
-        nameField.setText(crc.getName());
-        limitField.setText(crc.getMaxDebt().toString());
-        lastFourDigitsField.setText(crc.getLastFourDigits());
-        operatorComboBox.setValue(crc.getOperator().getName());
-        closingDayComboBox.setValue(crc.getClosingDay().toString());
-        dueDayComboBox.setValue(crc.getBillingDueDay().toString());
-
-        if (crc.getDefaultBillingWallet() != null)
-        {
-            defaultBillingWalletComboBox.setValue(
-                crc.getDefaultBillingWallet().getName());
-        }
-        else
-        {
-            defaultBillingWalletComboBox.setValue(null);
-        }
+        creditCard = crc;
+        nameField.setText(creditCard.getName());
+        limitField.setText(creditCard.getMaxDebt().toString());
+        lastFourDigitsField.setText(creditCard.getLastFourDigits());
+        operatorComboBox.setValue(creditCard.getOperator());
+        closingDayComboBox.setValue(creditCard.getClosingDay().toString());
+        dueDayComboBox.setValue(creditCard.getBillingDueDay().toString());
+        defaultBillingWalletComboBox.setValue(creditCard.getDefaultBillingWallet());
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
+        loadCreditCardOperatorsFromDatabase();
+        loadWalletsFromDatabase();
+
         populateComboBoxes();
 
         // Ensure that the limit field only accepts numbers and has a maximum of 4
@@ -134,15 +130,15 @@ public class EditCreditCardController
         String crcName = nameField.getText();
         crcName        = crcName.strip(); // Remove leading and trailing whitespaces
 
-        String crcLimitStr                 = limitField.getText();
-        String crcLastFourDigitsStr        = lastFourDigitsField.getText();
-        String crcClosingDayStr            = closingDayComboBox.getValue();
-        String crcDueDayStr                = dueDayComboBox.getValue();
-        String crcOperatorName             = operatorComboBox.getValue();
-        String crcDefaultBillingWalletName = defaultBillingWalletComboBox.getValue();
+        String             crcLimitStr          = limitField.getText();
+        String             crcLastFourDigitsStr = lastFourDigitsField.getText();
+        String             crcClosingDayStr     = closingDayComboBox.getValue();
+        String             crcDueDayStr         = dueDayComboBox.getValue();
+        CreditCardOperator crcOperator          = operatorComboBox.getValue();
+        Wallet crcDefaultBillingWallet = defaultBillingWalletComboBox.getValue();
 
         if (crcName.isEmpty() || crcLimitStr.isEmpty() ||
-            crcLastFourDigitsStr.isEmpty() || crcOperatorName == null ||
+            crcLastFourDigitsStr.isEmpty() || crcOperator == null ||
             crcClosingDayStr == null || crcDueDayStr == null)
         {
             WindowUtils.showInformationDialog(
@@ -152,49 +148,27 @@ public class EditCreditCardController
             return;
         }
 
-        CreditCardOperator crcOperator =
-            operators.stream()
-                .filter(op -> op.getName().equals(crcOperatorName))
-                .findFirst()
-                .orElseThrow(
-                    ()
-                        -> new EntityNotFoundException(
-                            "Operator with name: " + crcOperatorName + " not found"));
-
         try
         {
             BigDecimal crcLimit      = new BigDecimal(crcLimitStr);
             Integer    crcClosingDay = Integer.parseInt(crcClosingDayStr);
             Integer    crcDueDay     = Integer.parseInt(crcDueDayStr);
 
-            Wallet crcDefaultBillingWallet =
-                crcDefaultBillingWalletName != null &&
-                        !crcDefaultBillingWalletName.isEmpty()
-                    ? wallets.stream()
-                          .filter(w -> w.getName().equals(crcDefaultBillingWalletName))
-                          .findFirst()
-                          .orElseThrow(()
-                                           -> new EntityNotFoundException(
-                                               "Wallet with name: " +
-                                               crcDefaultBillingWalletName +
-                                               " not found"))
-                    : null;
-
             boolean defaultWalletChanged =
                 (crcDefaultBillingWallet != null &&
-                 crcToUpdate.getDefaultBillingWallet() != null &&
+                 creditCard.getDefaultBillingWallet() != null &&
                  crcDefaultBillingWallet.getId().equals(
-                     crcToUpdate.getDefaultBillingWallet().getId())) ||
+                     creditCard.getDefaultBillingWallet().getId())) ||
                 (crcDefaultBillingWallet == null &&
-                 crcToUpdate.getDefaultBillingWallet() == null);
+                 creditCard.getDefaultBillingWallet() == null);
 
             // Check if has any modification
-            if (crcToUpdate.getName().equals(crcName) &&
-                crcLimit.compareTo(crcToUpdate.getMaxDebt()) == 0 &&
-                crcToUpdate.getLastFourDigits().equals(crcLastFourDigitsStr) &&
-                crcToUpdate.getClosingDay().equals(crcClosingDay) &&
-                crcToUpdate.getBillingDueDay().equals(crcDueDay) &&
-                crcToUpdate.getOperator().getId().equals(crcOperator.getId()) &&
+            if (creditCard.getName().equals(crcName) &&
+                crcLimit.compareTo(creditCard.getMaxDebt()) == 0 &&
+                creditCard.getLastFourDigits().equals(crcLastFourDigitsStr) &&
+                creditCard.getClosingDay().equals(crcClosingDay) &&
+                creditCard.getBillingDueDay().equals(crcDueDay) &&
+                creditCard.getOperator().getId().equals(crcOperator.getId()) &&
                 defaultWalletChanged)
             {
                 WindowUtils.showInformationDialog(
@@ -203,15 +177,15 @@ public class EditCreditCardController
             }
             else // If there is any modification, update the credit card
             {
-                crcToUpdate.setName(crcName);
-                crcToUpdate.setMaxDebt(crcLimit);
-                crcToUpdate.setLastFourDigits(crcLastFourDigitsStr);
-                crcToUpdate.setClosingDay(crcClosingDay);
-                crcToUpdate.setBillingDueDay(crcDueDay);
-                crcToUpdate.setOperator(crcOperator);
-                crcToUpdate.setDefaultBillingWallet(crcDefaultBillingWallet);
+                creditCard.setName(crcName);
+                creditCard.setMaxDebt(crcLimit);
+                creditCard.setLastFourDigits(crcLastFourDigitsStr);
+                creditCard.setClosingDay(crcClosingDay);
+                creditCard.setBillingDueDay(crcDueDay);
+                creditCard.setOperator(crcOperator);
+                creditCard.setDefaultBillingWallet(crcDefaultBillingWallet);
 
-                creditCardService.updateCreditCard(crcToUpdate);
+                creditCardService.updateCreditCard(creditCard);
 
                 WindowUtils.showSuccessDialog("Credit card updated",
                                               "The credit card updated successfully.");
@@ -249,21 +223,13 @@ public class EditCreditCardController
             dueDayComboBox.getItems().add(String.valueOf(i));
         }
 
-        loadCreditCardOperatorsFromDatabase();
+        operatorComboBox.getItems().addAll(operators);
+        defaultBillingWalletComboBox.getItems().addAll(wallets);
+    }
 
-        for (CreditCardOperator operator : operators)
-        {
-            operatorComboBox.getItems().add(operator.getName());
-        }
-
-        loadWalletsFromDatabase();
-
-        for (Wallet wallet : wallets)
-        {
-            defaultBillingWalletComboBox.getItems().add(wallet.getName());
-        }
-
-        // Add blank option to the default billing wallet combo box
-        defaultBillingWalletComboBox.getItems().add("");
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(operatorComboBox, CreditCardOperator::getName);
+        UIUtils.configureComboBox(defaultBillingWalletComboBox, Wallet::getName);
     }
 }

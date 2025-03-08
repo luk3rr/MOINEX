@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import org.moinex.entities.Wallet;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,10 +49,10 @@ public class AddCreditCardController
     private ComboBox<String> dueDayComboBox;
 
     @FXML
-    private ComboBox<String> operatorComboBox;
+    private ComboBox<CreditCardOperator> operatorComboBox;
 
     @FXML
-    private ComboBox<String> defaultBillingWalletComboBox;
+    private ComboBox<Wallet> defaultBillingWalletComboBox;
 
     private CreditCardService creditCardService;
 
@@ -77,6 +79,11 @@ public class AddCreditCardController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
+        loadCreditCardOperators();
+        loadWallets();
+
         populateComboBoxes();
 
         // Ensure that the limit field only accepts numbers and has a maximum of 4
@@ -111,15 +118,15 @@ public class AddCreditCardController
         String crcName = nameField.getText();
         crcName        = crcName.strip(); // Remove leading and trailing whitespaces
 
-        String crcLimitStr                 = limitField.getText();
-        String crcLastFourDigitsStr        = lastFourDigitsField.getText();
-        String crcClosingDayStr            = closingDayComboBox.getValue();
-        String crcDueDayStr                = dueDayComboBox.getValue();
-        String crcOperatorName             = operatorComboBox.getValue();
-        String crcDefaultBillingWalletName = defaultBillingWalletComboBox.getValue();
+        String             crcLimitStr          = limitField.getText();
+        String             crcLastFourDigitsStr = lastFourDigitsField.getText();
+        String             crcClosingDayStr     = closingDayComboBox.getValue();
+        String             crcDueDayStr         = dueDayComboBox.getValue();
+        CreditCardOperator crcOperator          = operatorComboBox.getValue();
+        Wallet crcDefaultBillingWallet = defaultBillingWalletComboBox.getValue();
 
         if (crcName.isEmpty() || crcLimitStr.isEmpty() ||
-            crcLastFourDigitsStr.isEmpty() || crcOperatorName == null ||
+            crcLastFourDigitsStr.isEmpty() || crcOperator == null ||
             crcClosingDayStr == null || crcDueDayStr == null)
         {
             WindowUtils.showInformationDialog(
@@ -129,15 +136,6 @@ public class AddCreditCardController
             return;
         }
 
-        CreditCardOperator crcOperator =
-            operators.stream()
-                .filter(op -> op.getName().equals(crcOperatorName))
-                .findFirst()
-                .orElseThrow(
-                    ()
-                        -> new EntityNotFoundException(
-                            "Operator not found with name: " + crcOperatorName));
-
         try
         {
             BigDecimal crcLimit = new BigDecimal(crcLimitStr);
@@ -145,18 +143,9 @@ public class AddCreditCardController
             Integer crcClosingDay = Integer.parseInt(crcClosingDayStr);
             Integer crcDueDay     = Integer.parseInt(crcDueDayStr);
 
-            Long crcDefaultBillingWalletId =
-                crcDefaultBillingWalletName != null &&
-                        !crcDefaultBillingWalletName.isEmpty()
-                    ? wallets.stream()
-                          .filter(w -> w.getName().equals(crcDefaultBillingWalletName))
-                          .findFirst()
-                          .orElseThrow(()
-                                           -> new EntityNotFoundException(
-                                               "Wallet not found with name: " +
-                                               crcDefaultBillingWalletName))
-                          .getId()
-                    : null;
+            Long crcDefaultBillingWalletId = crcDefaultBillingWallet != null
+                                                 ? crcDefaultBillingWallet.getId()
+                                                 : null;
 
             creditCardService.addCreditCard(crcName,
                                             crcDueDay,
@@ -201,21 +190,16 @@ public class AddCreditCardController
             dueDayComboBox.getItems().add(String.valueOf(i));
         }
 
-        loadCreditCardOperators();
-
-        for (CreditCardOperator operator : operators)
-        {
-            operatorComboBox.getItems().add(operator.getName());
-        }
-
-        loadWallets();
-
-        for (Wallet wallet : wallets)
-        {
-            defaultBillingWalletComboBox.getItems().add(wallet.getName());
-        }
+        operatorComboBox.getItems().setAll(operators);
+        defaultBillingWalletComboBox.getItems().setAll(wallets);
 
         // Add blank option to the default billing wallet combo box
-        defaultBillingWalletComboBox.getItems().add("");
+        defaultBillingWalletComboBox.getItems().add(0, null);
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(operatorComboBox, CreditCardOperator::getName);
+        UIUtils.configureComboBox(defaultBillingWalletComboBox, Wallet::getName);
     }
 }

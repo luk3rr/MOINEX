@@ -33,7 +33,7 @@
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <ComboBox fx:id="transactionTypeComboBox" minWidth="130.0" stylesheets="@../../css/component/combo-box.css" />
+                  <ComboBox fx:id="typeComboBox" minWidth="130.0" stylesheets="@../../css/component/combo-box.css" />
                </children>
             </VBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">

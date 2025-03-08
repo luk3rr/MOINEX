@@ -24,10 +24,10 @@ import org.moinex.services.CategoryService;
 import org.moinex.services.RecurringTransactionService;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.RecurringTransactionFrequency;
-import org.moinex.util.enums.TransactionType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.RecurringTransactionFrequency;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -39,22 +39,22 @@ import org.springframework.stereotype.Controller;
 public class AddRecurringTransactionController
 {
     @FXML
-    private ComboBox<String> walletComboBox;
-
-    @FXML
     private TextField descriptionField;
 
     @FXML
     private TextField valueField;
 
     @FXML
-    private ComboBox<String> typeComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<TransactionType> typeComboBox;
 
     @FXML
-    private ComboBox<String> frequencyComboBox;
+    private ComboBox<Category> categoryComboBox;
+
+    @FXML
+    private ComboBox<RecurringTransactionFrequency> frequencyComboBox;
 
     @FXML
     private DatePicker startDatePicker;
@@ -96,24 +96,16 @@ public class AddRecurringTransactionController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadCategoriesFromDatabase();
+
+        populateComboBoxes();
 
         // Configure date picker
         UIUtils.setDatePickerFormat(startDatePicker);
         UIUtils.setDatePickerFormat(endDatePicker);
-
-        // For each element in enum RecurringTransactionStatus, add its name to the
-        // typeComboBox
-        typeComboBox.getItems().addAll(
-            Arrays.stream(TransactionType.values()).map(Enum::name).toList());
-
-        // For each element in enum RecurringTransactionFrequency, add its name to the
-        // frequencyComboBox
-        frequencyComboBox.getItems().addAll(
-            Arrays.stream(RecurringTransactionFrequency.values())
-                .map(Enum::name)
-                .toList());
 
         startDatePicker.setOnAction(e -> updateInfoLabel());
 
@@ -149,19 +141,18 @@ public class AddRecurringTransactionController
     @FXML
     private void handleSave()
     {
-        String    walletName      = walletComboBox.getValue();
-        String    description     = descriptionField.getText();
-        String    valueString     = valueField.getText();
-        String    typeString      = typeComboBox.getValue();
-        String    categoryString  = categoryComboBox.getValue();
-        LocalDate startDate       = startDatePicker.getValue();
-        LocalDate endDate         = endDatePicker.getValue();
-        String    frequencyString = frequencyComboBox.getValue();
+        Wallet                        wallet      = walletComboBox.getValue();
+        String                        description = descriptionField.getText();
+        String                        valueString = valueField.getText();
+        TransactionType               type        = typeComboBox.getValue();
+        Category                      category    = categoryComboBox.getValue();
+        LocalDate                     startDate   = startDatePicker.getValue();
+        LocalDate                     endDate     = endDatePicker.getValue();
+        RecurringTransactionFrequency frequency   = frequencyComboBox.getValue();
 
-        if (walletName == null || description == null ||
-            description.strip().isEmpty() || valueString == null ||
-            valueString.strip().isEmpty() || typeString == null ||
-            categoryString == null || startDate == null || frequencyString == null)
+        if (wallet == null || description == null || description.strip().isEmpty() ||
+            valueString == null || valueString.strip().isEmpty() || type == null ||
+            category == null || startDate == null || frequency == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -172,28 +163,6 @@ public class AddRecurringTransactionController
         try
         {
             BigDecimal transactionAmount = new BigDecimal(valueString);
-
-            Wallet wallet =
-                wallets.stream()
-                    .filter(w -> w.getName().equals(walletName))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Wallet not found with name: " + walletName));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryString))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Category not found with name: " + categoryString));
-
-            TransactionType type = TransactionType.valueOf(typeString);
-
-            RecurringTransactionFrequency frequency =
-                RecurringTransactionFrequency.valueOf(frequencyString);
 
             if (endDate == null)
             {
@@ -238,21 +207,18 @@ public class AddRecurringTransactionController
 
     private void updateInfoLabel()
     {
-        LocalDate startDate       = startDatePicker.getValue();
-        LocalDate endDate         = endDatePicker.getValue();
-        String    frequencyString = frequencyComboBox.getValue();
+        LocalDate                     startDate = startDatePicker.getValue();
+        LocalDate                     endDate   = endDatePicker.getValue();
+        RecurringTransactionFrequency frequency = frequencyComboBox.getValue();
 
         String msg = "";
 
-        if (startDate != null && frequencyString != null)
+        if (startDate != null && frequency != null)
         {
-            RecurringTransactionFrequency frequency =
-                RecurringTransactionFrequency.valueOf(frequencyString);
-
             if (endDate != null)
             {
                 msg = "Starts on " + startDate + ", ends on " + endDate +
-                      ", frequency " + frequencyString;
+                      ", frequency " + frequency.toString();
 
                 try
                 {
@@ -270,7 +236,7 @@ public class AddRecurringTransactionController
             }
             else
             {
-                msg = "Starts on " + startDate + ", frequency " + frequencyString;
+                msg = "Starts on " + startDate + ", frequency " + frequency.toString();
             }
         }
 
@@ -280,17 +246,20 @@ public class AddRecurringTransactionController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
     private void loadCategoriesFromDatabase()
     {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
 
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().setAll(wallets);
+        typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
+        frequencyComboBox.getItems().setAll(
+            Arrays.asList(RecurringTransactionFrequency.values()));
+        categoryComboBox.getItems().setAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
@@ -298,7 +267,14 @@ public class AddRecurringTransactionController
         {
             UIUtils.addTooltipToNode(
                 categoryComboBox,
-                "You need to add a category before adding an transaction");
+                "You need to add a category before adding an recurring transaction");
         }
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(typeComboBox, TransactionType::name);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 }

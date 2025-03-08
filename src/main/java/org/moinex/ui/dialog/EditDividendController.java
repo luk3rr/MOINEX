@@ -18,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
@@ -54,13 +55,13 @@ public class EditDividendController
     private Label walletCurrentBalanceValueLabel;
 
     @FXML
-    private ComboBox<String> walletComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<TransactionStatus> statusComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<Category> categoryComboBox;
 
     @FXML
     private TextField dividendValueField;
@@ -86,7 +87,9 @@ public class EditDividendController
 
     private List<Category> categories;
 
-    private Dividend dividend;
+    private Dividend dividend = null;
+
+    private Wallet wallet = null;
 
     /**
      * Constructor
@@ -115,40 +118,40 @@ public class EditDividendController
             return;
         }
 
-        walletComboBox.setValue(wt.getName());
-
+        this.wallet = wt;
+        walletComboBox.setValue(wallet);
         updateWalletBalance();
     }
 
     public void setDividend(Dividend d)
     {
         this.dividend = d;
+        tickerNameLabel.setText(dividend.getTicker().getName() + " (" +
+                                dividend.getTicker().getSymbol() + ")");
 
-        tickerNameLabel.setText(d.getTicker().getName() + " (" +
-                                d.getTicker().getSymbol() + ")");
+        setWalletComboBox(dividend.getWalletTransaction().getWallet());
 
-        setWalletComboBox(d.getWalletTransaction().getWallet());
-
-        descriptionField.setText(d.getWalletTransaction().getDescription());
-        dividendValueField.setText(d.getWalletTransaction().getAmount().toString());
-        statusComboBox.setValue(d.getWalletTransaction().getStatus().name());
-        categoryComboBox.setValue(d.getWalletTransaction().getCategory().getName());
-        dividendDatePicker.setValue(d.getWalletTransaction().getDate().toLocalDate());
+        descriptionField.setText(dividend.getWalletTransaction().getDescription());
+        dividendValueField.setText(
+            dividend.getWalletTransaction().getAmount().toString());
+        statusComboBox.setValue(dividend.getWalletTransaction().getStatus());
+        categoryComboBox.setValue(dividend.getWalletTransaction().getCategory());
+        dividendDatePicker.setValue(
+            dividend.getWalletTransaction().getDate().toLocalDate());
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadCategoriesFromDatabase();
 
+        populateComboBoxes();
+
         // Configure date picker
         UIUtils.setDatePickerFormat(dividendDatePicker);
-
-        // For each element in enum TransactionStatus, add its name to the
-        // statusComboBox
-        statusComboBox.getItems().addAll(
-            Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -172,17 +175,16 @@ public class EditDividendController
     @FXML
     private void handleSave()
     {
-        String    walletName          = walletComboBox.getValue();
-        String    description         = descriptionField.getText();
-        String    dividendValueString = dividendValueField.getText();
-        String    statusString        = statusComboBox.getValue();
-        String    categoryString      = categoryComboBox.getValue();
-        LocalDate dividendDate        = dividendDatePicker.getValue();
+        Wallet            wallet              = walletComboBox.getValue();
+        String            description         = descriptionField.getText();
+        String            dividendValueString = dividendValueField.getText();
+        TransactionStatus status              = statusComboBox.getValue();
+        Category          category            = categoryComboBox.getValue();
+        LocalDate         dividendDate        = dividendDatePicker.getValue();
 
-        if (walletName == null || description == null ||
-            description.strip().isEmpty() || dividendValueString == null ||
-            dividendValueString.strip().isEmpty() || statusString == null ||
-            categoryString == null || dividendDate == null)
+        if (wallet == null || description == null || description.strip().isEmpty() ||
+            dividendValueString == null || dividendValueString.strip().isEmpty() ||
+            status == null || category == null || dividendDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -193,25 +195,6 @@ public class EditDividendController
         try
         {
             BigDecimal dividendValue = new BigDecimal(dividendValueString);
-
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryString))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Category with name: " + categoryString +
-                                         " not found"));
-
-            TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             // Check if has any modification
             if (dividend.getWalletTransaction().getAmount().compareTo(dividendValue) ==
@@ -307,20 +290,12 @@ public class EditDividendController
 
     private void updateWalletBalance()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(()
-                                 -> new EntityNotFoundException(
-                                     "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -340,10 +315,10 @@ public class EditDividendController
     private void walletAfterBalance()
     {
         String dividendValueString = dividendValueField.getText();
-        String walletName          = walletComboBox.getValue();
+        Wallet wallet              = walletComboBox.getValue();
 
         if (dividendValueString == null || dividendValueString.strip().isEmpty() ||
-            walletName == null)
+            wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -358,14 +333,6 @@ public class EditDividendController
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
-
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
@@ -412,17 +379,18 @@ public class EditDividendController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
     private void loadCategoriesFromDatabase()
     {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
 
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().addAll(wallets);
+        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        categoryComboBox.getItems().addAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
@@ -432,6 +400,13 @@ public class EditDividendController
                 categoryComboBox,
                 "You need to add a category before adding an dividend");
         }
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(statusComboBox, TransactionStatus::name);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 
     private void configureListeners()

@@ -315,12 +315,18 @@ public class SavingsController
     @FXML
     private void handleAddCryptoExchange()
     {
+        Ticker selectedTicker =
+            stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
 
         WindowUtils.openModalWindow(Constants.ADD_CRYPTO_EXCHANGE_FXML,
                                     "Add Crypto Exchange",
                                     springContext,
                                     (AddCryptoExchangeController controller)
-                                        -> {},
+                                        -> {
+                                        if (selectedTicker != null)
+                                            controller.setFromCryptoComboBox(
+                                                selectedTicker);
+                                    },
                                     List.of(() -> {
                                         updateTransactionTableView();
                                         updatePortfolioIndicators();

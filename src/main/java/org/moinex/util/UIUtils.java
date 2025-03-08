@@ -9,9 +9,12 @@ package org.moinex.util;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.function.Function;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -188,5 +191,47 @@ public final class UIUtils
                                         Constants.NEUTRAL_BALANCE_STYLE);
 
         label.getStyleClass().add(style);
+    }
+
+    /**
+     * Configure a ComboBox with a display function
+     * @param comboBox        The ComboBox to configure
+     * @param displayFunction The function to display the items
+     * @param <T>             The type of the ComboBox items
+     */
+    public static <T> void configureComboBox(ComboBox<T>         comboBox,
+                                             Function<T, String> displayFunction)
+    {
+        comboBox.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(T item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                setText((item == null || empty) ? null : displayFunction.apply(item));
+            }
+        });
+
+        comboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(T item, boolean empty)
+            {
+                super.updateItem(item, empty);
+                setText((item == null || empty) ? null : displayFunction.apply(item));
+            }
+        });
+
+        comboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(T item)
+            {
+                return (item == null) ? null : displayFunction.apply(item);
+            }
+
+            @Override
+            public T fromString(String string)
+            {
+                return null;
+            }
+        });
     }
 }

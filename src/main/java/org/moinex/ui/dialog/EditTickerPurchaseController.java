@@ -44,9 +44,6 @@ public class EditTickerPurchaseController
     private Label tickerNameLabel;
 
     @FXML
-    private ComboBox<String> walletComboBox;
-
-    @FXML
     private Label walletAfterBalanceValueLabel;
 
     @FXML
@@ -65,10 +62,13 @@ public class EditTickerPurchaseController
     private Label totalPriceLabel;
 
     @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<TransactionStatus> statusComboBox;
+
+    @FXML
+    private ComboBox<Category> categoryComboBox;
 
     @FXML
     private DatePicker buyDatePicker;
@@ -83,7 +83,9 @@ public class EditTickerPurchaseController
 
     private List<Category> categories;
 
-    private TickerPurchase purchase;
+    private TickerPurchase purchase = null;
+
+    private Wallet wallet = null;
 
     /**
      * Constructor
@@ -109,45 +111,43 @@ public class EditTickerPurchaseController
             return;
         }
 
-        walletComboBox.setValue(wt.getName());
-
+        this.wallet = wt;
+        walletComboBox.setValue(wallet);
         updateWalletBalance();
     }
 
     public void setPurchase(TickerPurchase p)
     {
         this.purchase = p;
+        tickerNameLabel.setText(purchase.getTicker().getName() + " (" +
+                                purchase.getTicker().getSymbol() + ")");
+        unitPriceField.setText(purchase.getTicker().getCurrentUnitValue().toString());
 
-        tickerNameLabel.setText(p.getTicker().getName() + " (" +
-                                p.getTicker().getSymbol() + ")");
-        unitPriceField.setText(p.getTicker().getCurrentUnitValue().toString());
+        setWalletComboBox(purchase.getWalletTransaction().getWallet());
 
-        setWalletComboBox(p.getWalletTransaction().getWallet());
-
-        descriptionField.setText(p.getWalletTransaction().getDescription());
-        unitPriceField.setText(p.getUnitPrice().toString());
-        quantityField.setText(p.getQuantity().toString());
-        statusComboBox.setValue(p.getWalletTransaction().getStatus().name());
-        categoryComboBox.setValue(p.getWalletTransaction().getCategory().getName());
-        buyDatePicker.setValue(p.getWalletTransaction().getDate().toLocalDate());
+        descriptionField.setText(purchase.getWalletTransaction().getDescription());
+        unitPriceField.setText(purchase.getUnitPrice().toString());
+        quantityField.setText(purchase.getQuantity().toString());
+        statusComboBox.setValue(purchase.getWalletTransaction().getStatus());
+        categoryComboBox.setValue(purchase.getWalletTransaction().getCategory());
+        buyDatePicker.setValue(purchase.getWalletTransaction().getDate().toLocalDate());
 
         totalPriceLabel.setText(
-            UIUtils.formatCurrency(p.getWalletTransaction().getAmount()));
+            UIUtils.formatCurrency(purchase.getWalletTransaction().getAmount()));
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadCategoriesFromDatabase();
 
+        populateComboBoxes();
+
         // Configure date picker
         UIUtils.setDatePickerFormat(buyDatePicker);
-
-        // For each element in enum TransactionStatus, add its name to the
-        // statusComboBox
-        statusComboBox.getItems().addAll(
-            Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -171,17 +171,16 @@ public class EditTickerPurchaseController
     @FXML
     private void handleSave()
     {
-        String    walletName     = walletComboBox.getValue();
-        String    description    = descriptionField.getText();
-        String    statusString   = statusComboBox.getValue();
-        String    categoryString = categoryComboBox.getValue();
-        String    unitPriceStr   = unitPriceField.getText();
-        String    quantityStr    = quantityField.getText();
-        LocalDate buyDate        = buyDatePicker.getValue();
+        Wallet            wallet       = walletComboBox.getValue();
+        String            description  = descriptionField.getText();
+        TransactionStatus status       = statusComboBox.getValue();
+        Category          category     = categoryComboBox.getValue();
+        String            unitPriceStr = unitPriceField.getText();
+        String            quantityStr  = quantityField.getText();
+        LocalDate         buyDate      = buyDatePicker.getValue();
 
-        if (walletName == null || walletName.strip().isEmpty() || description == null ||
-            description.strip().isEmpty() || statusString == null ||
-            categoryString == null || unitPriceStr == null ||
+        if (wallet == null || description == null || description.strip().isEmpty() ||
+            status == null || category == null || unitPriceStr == null ||
             unitPriceStr.strip().isEmpty() || quantityStr == null ||
             quantityStr.strip().isEmpty() || buyDate == null)
         {
@@ -197,25 +196,6 @@ public class EditTickerPurchaseController
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
 
             BigDecimal quantity = new BigDecimal(quantityStr);
-
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryString))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Category with name: " + categoryString +
-                                         " not found"));
-
-            TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             // Check if has any modification
             if (purchase.getWalletTransaction().getWallet().getId().equals(
@@ -300,20 +280,12 @@ public class EditTickerPurchaseController
 
     private void updateWalletBalance()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(()
-                                 -> new EntityNotFoundException(
-                                     "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -334,10 +306,10 @@ public class EditTickerPurchaseController
     {
         String unitPriceStr = unitPriceField.getText();
         String quantityStr  = quantityField.getText();
-        String walletName   = walletComboBox.getValue();
+        Wallet wallet       = walletComboBox.getValue();
 
         if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
-            quantityStr == null || quantityStr.strip().isEmpty() || walletName == null)
+            quantityStr == null || quantityStr.strip().isEmpty() || wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -353,14 +325,6 @@ public class EditTickerPurchaseController
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
-
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
@@ -407,17 +371,18 @@ public class EditTickerPurchaseController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
     private void loadCategoriesFromDatabase()
     {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
 
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().addAll(wallets);
+        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        categoryComboBox.getItems().addAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
@@ -427,6 +392,13 @@ public class EditTickerPurchaseController
                 categoryComboBox,
                 "You need to add a category before adding an dividend");
         }
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(statusComboBox, TransactionStatus::name);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 
     private void configureListeners()

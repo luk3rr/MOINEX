@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.Ticker;
 import org.moinex.services.TickerService;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +46,14 @@ public class EditTickerController
     private TextField avgUnitPriceField;
 
     @FXML
-    private ComboBox<String> typeComboBox;
+    private ComboBox<TickerType> typeComboBox;
 
     @FXML
     private CheckBox archivedCheckBox;
 
     private TickerService tickerService;
 
-    private Ticker tickerToUpdate;
+    private Ticker ticker = null;
 
     /**
      * Constructor
@@ -67,22 +68,22 @@ public class EditTickerController
 
     public void setTicker(Ticker tk)
     {
-        this.tickerToUpdate = tk;
+        this.ticker = tk;
+        nameField.setText(ticker.getName());
+        symbolField.setText(ticker.getSymbol());
+        currentPriceField.setText(ticker.getCurrentUnitValue().toString());
+        quantityField.setText(ticker.getCurrentQuantity().toString());
+        avgUnitPriceField.setText(ticker.getAverageUnitValue().toString());
+        typeComboBox.setValue(ticker.getType());
 
-        nameField.setText(tk.getName());
-        symbolField.setText(tk.getSymbol());
-        currentPriceField.setText(tk.getCurrentUnitValue().toString());
-        quantityField.setText(tk.getCurrentQuantity().toString());
-        avgUnitPriceField.setText(tk.getAverageUnitValue().toString());
-        typeComboBox.setValue(tk.getType().toString());
-
-        archivedCheckBox.setSelected(tk.isArchived());
+        archivedCheckBox.setSelected(ticker.isArchived());
     }
 
     @FXML
     private void initialize()
     {
-        configureTypeComboBox();
+        configureComboBoxes();
+        populateTypeComboBox();
         configureListeners();
     }
 
@@ -100,13 +101,13 @@ public class EditTickerController
         String name   = nameField.getText().strip();
         String symbol = symbolField.getText().strip();
 
-        String currentPriceStr = currentPriceField.getText();
-        String typeStr         = typeComboBox.getValue();
-        String quantityStr     = quantityField.getText();
-        String avgUnitPriceStr = avgUnitPriceField.getText();
+        String     currentPriceStr = currentPriceField.getText();
+        TickerType type            = typeComboBox.getValue();
+        String     quantityStr     = quantityField.getText();
+        String     avgUnitPriceStr = avgUnitPriceField.getText();
 
-        if (name == null || symbol == null || currentPriceStr == null ||
-            typeStr == null || name.strip().isEmpty() || symbol.strip().isEmpty() ||
+        if (name == null || symbol == null || currentPriceStr == null || type == null ||
+            name.strip().isEmpty() || symbol.strip().isEmpty() ||
             currentPriceStr.strip().isEmpty())
         {
             WindowUtils.showInformationDialog(
@@ -133,8 +134,6 @@ public class EditTickerController
         {
             BigDecimal currentPrice = new BigDecimal(currentPriceStr);
 
-            TickerType type = TickerType.valueOf(typeStr);
-
             BigDecimal quantity;
             BigDecimal avgUnitPrice;
 
@@ -153,13 +152,12 @@ public class EditTickerController
             boolean archived = archivedCheckBox.isSelected();
 
             // Check if has any modification
-            if (tickerToUpdate.getName().equals(name) &&
-                tickerToUpdate.getSymbol().equals(symbol) &&
-                tickerToUpdate.getCurrentUnitValue().compareTo(currentPrice) == 0 &&
-                tickerToUpdate.getType().equals(type) &&
-                tickerToUpdate.getCurrentQuantity().compareTo(quantity) == 0 &&
-                tickerToUpdate.getAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
-                tickerToUpdate.isArchived() == archived)
+            if (ticker.getName().equals(name) && ticker.getSymbol().equals(symbol) &&
+                ticker.getCurrentUnitValue().compareTo(currentPrice) == 0 &&
+                ticker.getType().equals(type) &&
+                ticker.getCurrentQuantity().compareTo(quantity) == 0 &&
+                ticker.getAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
+                ticker.isArchived() == archived)
             {
                 WindowUtils.showInformationDialog("No changes",
                                                   "No changes were to the ticker");
@@ -168,15 +166,15 @@ public class EditTickerController
             }
             else // If there is any modification, update the ticker
             {
-                tickerToUpdate.setName(name);
-                tickerToUpdate.setSymbol(symbol);
-                tickerToUpdate.setCurrentUnitValue(currentPrice);
-                tickerToUpdate.setType(type);
-                tickerToUpdate.setCurrentQuantity(quantity);
-                tickerToUpdate.setAverageUnitValue(avgUnitPrice);
-                tickerToUpdate.setArchived(archived);
+                ticker.setName(name);
+                ticker.setSymbol(symbol);
+                ticker.setCurrentUnitValue(currentPrice);
+                ticker.setType(type);
+                ticker.setCurrentQuantity(quantity);
+                ticker.setAverageUnitValue(avgUnitPrice);
+                ticker.setArchived(archived);
 
-                tickerService.updateTicker(tickerToUpdate);
+                tickerService.updateTicker(ticker);
 
                 WindowUtils.showSuccessDialog("Ticker updated",
                                               "The ticker updated successfully.");
@@ -195,12 +193,14 @@ public class EditTickerController
         }
     }
 
-    private void configureTypeComboBox()
+    private void populateTypeComboBox()
     {
-        for (TickerType type : TickerType.values())
-        {
-            typeComboBox.getItems().add(type.toString());
-        }
+        typeComboBox.getItems().addAll(TickerType.values());
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(typeComboBox, TickerType::name);
     }
 
     private void configureListeners()

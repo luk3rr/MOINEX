@@ -34,9 +34,9 @@ import org.moinex.services.CalculatorService;
 import org.moinex.services.CreditCardService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.CreditCardCreditType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.CreditCardCreditType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Controller;
 public class AddCreditCardCreditController
 {
     @FXML
-    private ComboBox<String> crcComboBox;
+    private ComboBox<CreditCard> crcComboBox;
 
     @FXML
     private TextField descriptionField;
@@ -80,6 +80,8 @@ public class AddCreditCardCreditController
 
     private CalculatorService calculatorService;
 
+    private CreditCard creditCard = null;
+
     @Autowired
     public AddCreditCardCreditController(CreditCardService creditCardService,
                                          CalculatorService calculatorService)
@@ -95,20 +97,23 @@ public class AddCreditCardCreditController
             return;
         }
 
-        crcComboBox.setValue(crc.getName());
+        this.creditCard = crc;
+        crcComboBox.setValue(creditCard);
     }
 
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadCreditCardsFromDatabase();
         loadSuggestionsFromDatabase();
 
-        // Configure date picker
-        UIUtils.setDatePickerFormat(datePicker);
-
         populateCreditCardCreditTypeComboBox();
         populateCreditCardCombobox();
+
+        // Configure date picker
+        UIUtils.setDatePickerFormat(datePicker);
 
         configureSuggestionsListView();
         configureSuggestionsPopup();
@@ -118,14 +123,14 @@ public class AddCreditCardCreditController
     @FXML
     private void handleSave()
     {
-        String               crcName     = crcComboBox.getValue();
+        CreditCard           crc         = crcComboBox.getValue();
         String               description = descriptionField.getText().strip();
         String               valueStr    = valueField.getText();
         CreditCardCreditType creditType  = creditTypeComboBox.getValue();
         LocalDate            date        = datePicker.getValue();
 
-        if (crcName == null || crcName.isEmpty() || creditType == null ||
-            date == null || description.isEmpty() || valueStr.isEmpty())
+        if (crc == null || creditType == null || date == null ||
+            description.isEmpty() || valueStr.isEmpty())
 
         {
             WindowUtils.showInformationDialog(
@@ -137,13 +142,6 @@ public class AddCreditCardCreditController
         try
         {
             BigDecimal creditValue = new BigDecimal(valueStr);
-
-            CreditCard crc =
-                creditCards.stream()
-                    .filter(c -> c.getName().equals(crcName))
-                    .findFirst()
-                    .orElseThrow(
-                        () -> new EntityNotFoundException("Credit card not found"));
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);
@@ -239,8 +237,12 @@ public class AddCreditCardCreditController
 
     private void populateCreditCardCombobox()
     {
-        crcComboBox.getItems().addAll(
-            creditCards.stream().map(CreditCard::getName).toList());
+        crcComboBox.getItems().addAll(creditCards);
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
     }
 
     private void configureListeners()
@@ -399,7 +401,7 @@ public class AddCreditCardCreditController
 
     private void fillFieldsWithTransaction(CreditCardCredit ccd)
     {
-        crcComboBox.setValue(ccd.getCreditCard().getName());
+        crcComboBox.setValue(ccd.getCreditCard());
 
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,

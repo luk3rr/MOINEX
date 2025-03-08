@@ -53,9 +53,6 @@ public class SaleTickerController
     private Label tickerNameLabel;
 
     @FXML
-    private ComboBox<String> walletComboBox;
-
-    @FXML
     private Label walletAfterBalanceValueLabel;
 
     @FXML
@@ -74,10 +71,13 @@ public class SaleTickerController
     private Label totalPriceLabel;
 
     @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<TransactionStatus> statusComboBox;
+
+    @FXML
+    private ComboBox<Category> categoryComboBox;
 
     @FXML
     private DatePicker saleDatePicker;
@@ -102,7 +102,9 @@ public class SaleTickerController
 
     private ChangeListener<String> descriptionFieldListener;
 
-    private Ticker ticker;
+    private Ticker ticker = null;
+
+    private Wallet wallet = null;
 
     /**
      * Constructor
@@ -131,15 +133,14 @@ public class SaleTickerController
             return;
         }
 
-        walletComboBox.setValue(wt.getName());
-
+        this.wallet = wt;
+        walletComboBox.setValue(wallet);
         updateWalletBalance();
     }
 
     public void setTicker(Ticker ticker)
     {
         this.ticker = ticker;
-
         tickerNameLabel.setText(ticker.getName() + " (" + ticker.getSymbol() + ")");
         unitPriceField.setText(ticker.getCurrentUnitValue().toString());
     }
@@ -147,17 +148,16 @@ public class SaleTickerController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadCategoriesFromDatabase();
         loadSuggestionsFromDatabase();
 
+        populateComboBoxes();
+
         // Configure date picker
         UIUtils.setDatePickerFormat(saleDatePicker);
-
-        // For each element in enum TransactionStatus, add its name to the
-        // statusComboBox
-        statusComboBox.getItems().addAll(
-            Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -183,17 +183,16 @@ public class SaleTickerController
     @FXML
     private void handleSave()
     {
-        String    walletName     = walletComboBox.getValue();
-        String    description    = descriptionField.getText();
-        String    statusString   = statusComboBox.getValue();
-        String    categoryString = categoryComboBox.getValue();
-        String    unitPriceStr   = unitPriceField.getText();
-        String    quantityStr    = quantityField.getText();
-        LocalDate buyDate        = saleDatePicker.getValue();
+        Wallet            wallet       = walletComboBox.getValue();
+        String            description  = descriptionField.getText();
+        TransactionStatus status       = statusComboBox.getValue();
+        Category          category     = categoryComboBox.getValue();
+        String            unitPriceStr = unitPriceField.getText();
+        String            quantityStr  = quantityField.getText();
+        LocalDate         buyDate      = saleDatePicker.getValue();
 
-        if (walletName == null || walletName.strip().isEmpty() || description == null ||
-            description.strip().isEmpty() || statusString == null ||
-            categoryString == null || unitPriceStr == null ||
+        if (wallet == null || description == null || description.strip().isEmpty() ||
+            status == null || category == null || unitPriceStr == null ||
             unitPriceStr.strip().isEmpty() || quantityStr == null ||
             quantityStr.strip().isEmpty() || buyDate == null)
         {
@@ -209,25 +208,6 @@ public class SaleTickerController
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
 
             BigDecimal quantity = new BigDecimal(quantityStr);
-
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryString))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Category with name: " + categoryString +
-                                         " not found"));
-
-            TransactionStatus status = TransactionStatus.valueOf(statusString);
 
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
@@ -292,20 +272,12 @@ public class SaleTickerController
 
     private void updateWalletBalance()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(()
-                                 -> new EntityNotFoundException(
-                                     "Wallet with name: " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -326,10 +298,10 @@ public class SaleTickerController
     {
         String unitPriceStr = unitPriceField.getText();
         String quantityStr  = quantityField.getText();
-        String walletName   = walletComboBox.getValue();
+        Wallet wallet       = walletComboBox.getValue();
 
         if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
-            quantityStr == null || quantityStr.strip().isEmpty() || walletName == null)
+            quantityStr == null || quantityStr.strip().isEmpty() || wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -345,14 +317,6 @@ public class SaleTickerController
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
-
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
 
             BigDecimal walletAfterBalanceValue = wallet.getBalance().add(buyValue);
 
@@ -382,17 +346,23 @@ public class SaleTickerController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
     private void loadCategoriesFromDatabase()
     {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
 
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+    private void loadSuggestionsFromDatabase()
+    {
+        suggestions = walletTransactionService.getIncomeSuggestions();
+    }
+
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().addAll(wallets);
+        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        categoryComboBox.getItems().addAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
@@ -400,13 +370,15 @@ public class SaleTickerController
         {
             UIUtils.addTooltipToNode(
                 categoryComboBox,
-                "You need to add a category before adding an dividend");
+                "You need to add a category before editing a transaction");
         }
     }
 
-    private void loadSuggestionsFromDatabase()
+    private void configureComboBoxes()
     {
-        suggestions = walletTransactionService.getIncomeSuggestions();
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(statusComboBox, TransactionStatus::name);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 
     private void configureListeners()
@@ -584,7 +556,7 @@ public class SaleTickerController
 
     private void fillFieldsWithTransaction(WalletTransaction wt)
     {
-        walletComboBox.setValue(wt.getWallet().getName());
+        walletComboBox.setValue(wt.getWallet());
 
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
@@ -595,8 +567,8 @@ public class SaleTickerController
 
         descriptionField.textProperty().addListener(descriptionFieldListener);
 
-        statusComboBox.setValue(wt.getStatus().name());
-        categoryComboBox.setValue(wt.getCategory().getName());
+        statusComboBox.setValue(wt.getStatus());
+        categoryComboBox.setValue(wt.getCategory());
 
         updateWalletBalance();
         walletAfterBalance();

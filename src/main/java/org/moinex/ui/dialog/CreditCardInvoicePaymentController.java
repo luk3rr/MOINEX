@@ -15,6 +15,7 @@ import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
@@ -62,7 +63,7 @@ public class CreditCardInvoicePaymentController
     private Label totalToPayLabel;
 
     @FXML
-    private ComboBox<String> walletComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
     private TextField useRebateValueField;
@@ -78,9 +79,9 @@ public class CreditCardInvoicePaymentController
 
     private List<Wallet> wallets;
 
-    private CreditCard creditCard;
+    private CreditCard creditCard = null;
 
-    private YearMonth invoiceDate;
+    private YearMonth invoiceDate = null;
 
     /**
      * Constructor
@@ -103,12 +104,13 @@ public class CreditCardInvoicePaymentController
     {
         this.creditCard  = crc;
         this.invoiceDate = invoiceDate;
+        configureComboBoxes();
 
-        crcNameLabel.setText(crc.getName());
+        crcNameLabel.setText(creditCard.getName());
 
         BigDecimal invoiceAmount =
             creditCardService
-                .getPendingCreditCardPayments(crc.getId(),
+                .getPendingCreditCardPayments(creditCard.getId(),
                                               invoiceDate.getMonthValue(),
                                               invoiceDate.getYear())
                 .stream()
@@ -124,9 +126,9 @@ public class CreditCardInvoicePaymentController
         crcInvoiceMonthLabel.setText(invoiceDate.format(formatter));
 
         crcAvailableRebateLabel.setText(
-            UIUtils.formatCurrency(crc.getAvailableRebate()));
+            UIUtils.formatCurrency(creditCard.getAvailableRebate()));
 
-        if (crc.getAvailableRebate().compareTo(BigDecimal.ZERO) > 0)
+        if (creditCard.getAvailableRebate().compareTo(BigDecimal.ZERO) > 0)
         {
             crcAvailableRebateLabel.setStyle("-fx-text-fill: green;");
         }
@@ -135,9 +137,9 @@ public class CreditCardInvoicePaymentController
             crcAvailableRebateLabel.setStyle("-fx-text-fill: black;");
         }
 
-        if (crc.getDefaultBillingWallet() != null)
+        if (creditCard.getDefaultBillingWallet() != null)
         {
-            walletComboBox.setValue(crc.getDefaultBillingWallet().getName());
+            walletComboBox.setValue(creditCard.getDefaultBillingWallet());
             updateWalletBalance();
             walletAfterBalance();
         }
@@ -146,7 +148,11 @@ public class CreditCardInvoicePaymentController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
+
+        populateWalletComboBox();
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceLabel);
@@ -184,9 +190,9 @@ public class CreditCardInvoicePaymentController
     @FXML
     private void handleSave()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             WindowUtils.showInformationDialog("Wallet not selected",
                                               "Please select a wallet");
@@ -215,14 +221,6 @@ public class CreditCardInvoicePaymentController
         {
             try
             {
-                Wallet wallet = wallets.stream()
-                                    .filter(w -> w.getName().equals(walletName))
-                                    .findFirst()
-                                    .orElseThrow(()
-                                                     -> new EntityNotFoundException(
-                                                         "Wallet with name " +
-                                                         walletName + " not found"));
-
                 creditCardService.payInvoice(creditCard.getId(),
                                              wallet.getId(),
                                              invoiceDate.getMonthValue(),
@@ -291,20 +289,12 @@ public class CreditCardInvoicePaymentController
 
     private void updateWalletBalance()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(()
-                                 -> new EntityNotFoundException(
-                                     "Wallet with name " + walletName + " not found"));
 
         if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
@@ -322,9 +312,9 @@ public class CreditCardInvoicePaymentController
 
     private void walletAfterBalance()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceLabel);
             return;
@@ -353,14 +343,6 @@ public class CreditCardInvoicePaymentController
 
         try
         {
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name " + walletName +
-                                                     " not found"));
-
             BigDecimal walletAfterBalanceValue =
                 wallet.getBalance().subtract(invoiceAmount);
 
@@ -390,8 +372,15 @@ public class CreditCardInvoicePaymentController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
+    }
 
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
+    private void populateWalletComboBox()
+    {
+        walletComboBox.getItems().addAll(wallets);
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
     }
 }

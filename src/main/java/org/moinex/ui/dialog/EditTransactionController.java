@@ -48,15 +48,16 @@ public class EditTransactionController
     private Label walletCurrentBalanceValueLabel;
 
     @FXML
-    private ComboBox<String> walletComboBox;
+    private ComboBox<Wallet> walletComboBox;
 
     @FXML
-    private ComboBox<String> transactionTypeComboBox;
-    @FXML
-    private ComboBox<String> statusComboBox;
+    private ComboBox<TransactionType> typeComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<TransactionStatus> statusComboBox;
+
+    @FXML
+    private ComboBox<Category> categoryComboBox;
 
     @FXML
     private TextField transactionValueField;
@@ -77,7 +78,7 @@ public class EditTransactionController
 
     private List<Category> categories;
 
-    private WalletTransaction transactionToUpdate;
+    private WalletTransaction walletTransaction = null;
 
     /**
      * Constructor
@@ -98,15 +99,14 @@ public class EditTransactionController
 
     public void setTransaction(WalletTransaction wt)
     {
-        transactionToUpdate = wt;
-
-        walletComboBox.setValue(wt.getWallet().getName());
-        statusComboBox.setValue(wt.getStatus().toString());
-        categoryComboBox.setValue(wt.getCategory().getName());
-        transactionValueField.setText(wt.getAmount().toString());
-        descriptionField.setText(wt.getDescription());
-        transactionDatePicker.setValue(wt.getDate().toLocalDate());
-        transactionTypeComboBox.setValue(wt.getType().toString());
+        walletTransaction = wt;
+        walletComboBox.setValue(walletTransaction.getWallet());
+        statusComboBox.setValue(walletTransaction.getStatus());
+        categoryComboBox.setValue(walletTransaction.getCategory());
+        transactionValueField.setText(walletTransaction.getAmount().toString());
+        descriptionField.setText(walletTransaction.getDescription());
+        transactionDatePicker.setValue(walletTransaction.getDate().toLocalDate());
+        typeComboBox.setValue(walletTransaction.getType());
 
         updateWalletBalance();
         walletAfterBalance();
@@ -115,20 +115,14 @@ public class EditTransactionController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
+
         loadWalletsFromDatabase();
         loadCategoriesFromDatabase();
 
+        populateComboBoxes();
+
         UIUtils.setDatePickerFormat(transactionDatePicker);
-
-        // For each element in enum TransactionStatus, add its name to the
-        // statusComboBox
-        statusComboBox.getItems().addAll(
-            Arrays.stream(TransactionStatus.values()).map(Enum::name).toList());
-
-        // For each element in enum TransactionType, add its name to the
-        // transactionTypeComboBox
-        transactionTypeComboBox.getItems().addAll(
-            Arrays.stream(TransactionType.values()).map(Enum::name).toList());
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -139,7 +133,7 @@ public class EditTransactionController
             walletAfterBalance();
         });
 
-        transactionTypeComboBox.setOnAction(e -> walletAfterBalance());
+        typeComboBox.setOnAction(e -> walletAfterBalance());
 
         statusComboBox.setOnAction(e -> walletAfterBalance());
 
@@ -166,17 +160,17 @@ public class EditTransactionController
     @FXML
     private void handleSave()
     {
-        String    walletName             = walletComboBox.getValue();
-        String    transactionTypeString  = transactionTypeComboBox.getValue();
-        String    description            = descriptionField.getText().trim();
-        String    transactionValueString = transactionValueField.getText();
-        String    statusString           = statusComboBox.getValue();
-        String    categoryString         = categoryComboBox.getValue();
-        LocalDate transactionDate        = transactionDatePicker.getValue();
+        Wallet            wallet                 = walletComboBox.getValue();
+        TransactionType   type                   = typeComboBox.getValue();
+        String            description            = descriptionField.getText().trim();
+        String            transactionValueString = transactionValueField.getText();
+        TransactionStatus status                 = statusComboBox.getValue();
+        Category          category               = categoryComboBox.getValue();
+        LocalDate         transactionDate        = transactionDatePicker.getValue();
 
-        if (walletName == null || transactionTypeString == null ||
-            description == null || transactionValueString == null ||
-            statusString == null || categoryString == null || transactionDate == null)
+        if (wallet == null || type == null || description == null ||
+            transactionValueString == null || status == null || category == null ||
+            transactionDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -188,39 +182,18 @@ public class EditTransactionController
         {
             BigDecimal transactionValue = new BigDecimal(transactionValueString);
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryString))
-                    .findFirst()
-                    .orElseThrow(()
-                                     -> new EntityNotFoundException(
-                                         "Category with name: " + categoryString +
-                                         " not found"));
-
-            TransactionStatus status = TransactionStatus.valueOf(statusString);
-            TransactionType   type   = TransactionType.valueOf(transactionTypeString);
-
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transactionDate.atTime(currentTime);
 
             // Check if has any modification
-            if (wallet.getName().equals(transactionToUpdate.getWallet().getName()) &&
-                category.getName().equals(
-                    transactionToUpdate.getCategory().getName()) &&
-                transactionValue.compareTo(transactionToUpdate.getAmount()) == 0 &&
-                description.equals(transactionToUpdate.getDescription()) &&
-                status == transactionToUpdate.getStatus() &&
-                type == transactionToUpdate.getType() &&
+            if (wallet.getName().equals(walletTransaction.getWallet().getName()) &&
+                category.getName().equals(walletTransaction.getCategory().getName()) &&
+                transactionValue.compareTo(walletTransaction.getAmount()) == 0 &&
+                description.equals(walletTransaction.getDescription()) &&
+                status == walletTransaction.getStatus() &&
+                type == walletTransaction.getType() &&
                 dateTimeWithCurrentHour.toLocalDate().equals(
-                    transactionToUpdate.getDate().toLocalDate()))
+                    walletTransaction.getDate().toLocalDate()))
             {
                 WindowUtils.showInformationDialog(
                     "No changes",
@@ -228,15 +201,15 @@ public class EditTransactionController
             }
             else // If there is any modification, update the transaction
             {
-                transactionToUpdate.setWallet(wallet);
-                transactionToUpdate.setCategory(category);
-                transactionToUpdate.setDate(dateTimeWithCurrentHour);
-                transactionToUpdate.setAmount(transactionValue);
-                transactionToUpdate.setDescription(description);
-                transactionToUpdate.setStatus(status);
-                transactionToUpdate.setType(type);
+                walletTransaction.setWallet(wallet);
+                walletTransaction.setCategory(category);
+                walletTransaction.setDate(dateTimeWithCurrentHour);
+                walletTransaction.setAmount(transactionValue);
+                walletTransaction.setDescription(description);
+                walletTransaction.setStatus(status);
+                walletTransaction.setType(type);
 
-                walletTransactionService.updateTransaction(transactionToUpdate);
+                walletTransactionService.updateTransaction(walletTransaction);
 
                 WindowUtils.showSuccessDialog("Transaction updated",
                                               "Transaction updated successfully.");
@@ -260,20 +233,12 @@ public class EditTransactionController
 
     private void updateWalletBalance()
     {
-        String walletName = walletComboBox.getValue();
+        Wallet wallet = walletComboBox.getValue();
 
-        if (walletName == null)
+        if (wallet == null)
         {
             return;
         }
-
-        Wallet wallet =
-            wallets.stream()
-                .filter(w -> w.getName().equals(walletName))
-                .findFirst()
-                .orElseThrow(()
-                                 -> new EntityNotFoundException(
-                                     "Wallet with name: " + walletName + " not found"));
 
         walletCurrentBalanceValueLabel.setText(
             UIUtils.formatCurrency(wallet.getBalance()));
@@ -281,12 +246,12 @@ public class EditTransactionController
 
     private void walletAfterBalance()
     {
-        String transactionValueString = transactionValueField.getText();
-        String transactionTypeString  = transactionTypeComboBox.getValue();
-        String walletName             = walletComboBox.getValue();
+        String          transactionValueString = transactionValueField.getText();
+        TransactionType type                   = typeComboBox.getValue();
+        Wallet          wallet                 = walletComboBox.getValue();
 
         if (transactionValueString == null || transactionValueString.trim().isEmpty() ||
-            walletName == null || transactionTypeString == null)
+            wallet == null || type == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -302,29 +267,20 @@ public class EditTransactionController
                 return;
             }
 
-            Wallet wallet = wallets.stream()
-                                .filter(w -> w.getName().equals(walletName))
-                                .findFirst()
-                                .orElseThrow(()
-                                                 -> new EntityNotFoundException(
-                                                     "Wallet with name: " + walletName +
-                                                     " not found"));
-
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
-            if (transactionToUpdate.getStatus().equals(TransactionStatus.CONFIRMED))
+            if (walletTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
             {
                 // If the transaction is confirmed, the balance will be updated
                 // based on the difference between the new and the old value
                 BigDecimal diff =
-                    transactionValue.subtract(transactionToUpdate.getAmount());
+                    transactionValue.subtract(walletTransaction.getAmount());
 
-                if (transactionTypeString.equals(TransactionType.EXPENSE.toString()))
+                if (type.equals(TransactionType.EXPENSE))
                 {
                     walletAfterBalanceValue = wallet.getBalance().subtract(diff);
                 }
-                else if (transactionTypeString.equals(
-                             TransactionType.INCOME.toString()))
+                else if (type.equals(TransactionType.INCOME))
                 {
                     walletAfterBalanceValue = wallet.getBalance().add(diff);
                 }
@@ -338,13 +294,12 @@ public class EditTransactionController
             {
                 // If the transaction is not confirmed, the balance will be
                 // updated based on the new value
-                if (transactionTypeString.equals(TransactionType.EXPENSE.toString()))
+                if (type.equals(TransactionType.EXPENSE))
                 {
                     walletAfterBalanceValue =
                         wallet.getBalance().subtract(transactionValue);
                 }
-                else if (transactionTypeString.equals(
-                             TransactionType.INCOME.toString()))
+                else if (type.equals(TransactionType.INCOME))
                 {
                     walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
                 }
@@ -381,16 +336,35 @@ public class EditTransactionController
     private void loadWalletsFromDatabase()
     {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-
-        walletComboBox.getItems().addAll(
-            wallets.stream().map(Wallet::getName).toList());
     }
 
     private void loadCategoriesFromDatabase()
     {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
 
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
+    private void populateComboBoxes()
+    {
+        walletComboBox.getItems().addAll(wallets);
+        typeComboBox.getItems().addAll(Arrays.asList(TransactionType.values()));
+        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        categoryComboBox.getItems().addAll(categories);
+
+        // If there are no categories, add a tooltip to the categoryComboBox
+        // to inform the user that a category is needed
+        if (categories.isEmpty())
+        {
+            UIUtils.addTooltipToNode(
+                categoryComboBox,
+                "You need to add a category before editing a transaction");
+        }
+    }
+
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(typeComboBox, TransactionType::name);
+        UIUtils.configureComboBox(statusComboBox, TransactionStatus::name);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 }

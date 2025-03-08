@@ -17,7 +17,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.CreditCard;
@@ -39,10 +38,10 @@ import org.springframework.stereotype.Controller;
 public class EditCreditCardDebtController
 {
     @FXML
-    private ComboBox<String> crcComboBox;
+    private ComboBox<CreditCard> crcComboBox;
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<Category> categoryComboBox;
 
     @FXML
     private ComboBox<YearMonth> invoiceComboBox;
@@ -76,7 +75,7 @@ public class EditCreditCardDebtController
 
     private CreditCardService creditCardService;
 
-    private CreditCardDebt debtToUpdate;
+    private CreditCardDebt crcDebt = null;
 
     @Autowired
     public EditCreditCardDebtController(CategoryService   categoryService,
@@ -88,10 +87,10 @@ public class EditCreditCardDebtController
 
     public void setCreditCardDebt(CreditCardDebt crcDebt)
     {
-        debtToUpdate = crcDebt;
+        this.crcDebt = crcDebt;
 
         // Set the values of the expense to the fields
-        crcComboBox.setValue(crcDebt.getCreditCard().getName());
+        crcComboBox.setValue(crcDebt.getCreditCard());
         crcLimitLabel.setText(
             UIUtils.formatCurrency(crcDebt.getCreditCard().getMaxDebt()));
 
@@ -101,15 +100,15 @@ public class EditCreditCardDebtController
         crcAvailableLimitLabel.setText(UIUtils.formatCurrency(availableLimit));
 
         // The debt value has already been subtracted from the available limit, so
-        // unless the user changes the debt value, the available limit after the debt
-        // will be the same
+        // unless the user changes the debt value, the available limit after the
+        // debt will be the same
         crcLimitAvailableAfterDebtLabel.setText(UIUtils.formatCurrency(availableLimit));
 
         descriptionField.setText(crcDebt.getDescription());
         valueField.setText(crcDebt.getAmount().toString());
         installmentsField.setText(crcDebt.getInstallments().toString());
 
-        categoryComboBox.setValue(crcDebt.getCategory().getName());
+        categoryComboBox.setValue(crcDebt.getCategory());
 
         CreditCardPayment firstPayment =
             creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
@@ -121,14 +120,12 @@ public class EditCreditCardDebtController
     @FXML
     private void initialize()
     {
-        configureInvoiceComboBox();
-        populateInvoiceComboBox();
+        configureComboBoxes();
 
         loadCategoriesFromDatabase();
         loadCreditCardsFromDatabase();
 
-        populateCategoryComboBox();
-        populateCreditCardComboBox();
+        populateComboBoxes();
 
         // Reset all labels
         UIUtils.resetLabel(crcLimitLabel);
@@ -170,16 +167,15 @@ public class EditCreditCardDebtController
     @FXML
     private void handleSave()
     {
-        String    crcName         = crcComboBox.getValue();
-        String    categoryName    = categoryComboBox.getValue();
-        YearMonth invoiceMonth    = invoiceComboBox.getValue();
-        String    description     = descriptionField.getText().strip();
-        String    valueStr        = valueField.getText();
-        String    installmentsStr = installmentsField.getText();
+        CreditCard crc             = crcComboBox.getValue();
+        Category   category        = categoryComboBox.getValue();
+        YearMonth  invoiceMonth    = invoiceComboBox.getValue();
+        String     description     = descriptionField.getText().strip();
+        String     valueStr        = valueField.getText();
+        String     installmentsStr = installmentsField.getText();
 
-        if (crcName == null || crcName.isEmpty() || categoryName == null ||
-            categoryName.isEmpty() || description.isEmpty() || valueStr.isEmpty() ||
-            invoiceMonth == null)
+        if (crc == null || category == null || description.isEmpty() ||
+            valueStr.isEmpty() || invoiceMonth == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -194,38 +190,20 @@ public class EditCreditCardDebtController
             Integer installments =
                 installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
-            CreditCard crc =
-                creditCards.stream()
-                    .filter(c -> c.getName().equals(crcName))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Credit card with name: " + crcName + " not found"));
-
-            Category category =
-                categories.stream()
-                    .filter(c -> c.getName().equals(categoryName))
-                    .findFirst()
-                    .orElseThrow(
-                        ()
-                            -> new EntityNotFoundException(
-                                "Category with name: " + categoryName + " not found"));
-
             // Get the date of the first payment to check if the invoice month is the
             // same
             CreditCardPayment firstPayment =
-                creditCardService.getPaymentsByDebtId(debtToUpdate.getId()).getFirst();
+                creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
 
             YearMonth invoice = YearMonth.of(firstPayment.getDate().getYear(),
                                              firstPayment.getDate().getMonth());
 
             // Check if has any modification
-            if (debtToUpdate.getCreditCard().getId().equals(crc.getId()) &&
-                debtToUpdate.getCategory().getId().equals(category.getId()) &&
-                debtValue.compareTo(debtToUpdate.getAmount()) == 0 &&
-                debtToUpdate.getInstallments().equals(installments) &&
-                debtToUpdate.getDescription().equals(description) &&
+            if (crcDebt.getCreditCard().getId().equals(crc.getId()) &&
+                crcDebt.getCategory().getId().equals(category.getId()) &&
+                debtValue.compareTo(crcDebt.getAmount()) == 0 &&
+                crcDebt.getInstallments().equals(installments) &&
+                crcDebt.getDescription().equals(description) &&
                 invoice.equals(invoiceMonth))
             {
                 WindowUtils.showInformationDialog("No changes",
@@ -233,13 +211,13 @@ public class EditCreditCardDebtController
             }
             else // If there is any modification, update the debt
             {
-                debtToUpdate.setCreditCard(crc);
-                debtToUpdate.setCategory(category);
-                debtToUpdate.setDescription(description);
-                debtToUpdate.setAmount(debtValue);
-                debtToUpdate.setInstallments(installments);
+                crcDebt.setCreditCard(crc);
+                crcDebt.setCategory(category);
+                crcDebt.setDescription(description);
+                crcDebt.setAmount(debtValue);
+                crcDebt.setInstallments(installments);
 
-                creditCardService.updateCreditCardDebt(debtToUpdate, invoiceMonth);
+                creditCardService.updateCreditCardDebt(crcDebt, invoiceMonth);
 
                 WindowUtils.showSuccessDialog("Transaction updated",
                                               "Transaction updated successfully.");
@@ -278,10 +256,11 @@ public class EditCreditCardDebtController
 
     private void updateCreditCardLimitLabels()
     {
-        CreditCard crc = creditCards.stream()
-                             .filter(c -> c.getName().equals(crcComboBox.getValue()))
-                             .findFirst()
-                             .orElse(null);
+        CreditCard crc =
+            creditCards.stream()
+                .filter(c -> c.getId().equals(crcComboBox.getValue().getId()))
+                .findFirst()
+                .orElse(null);
 
         if (crc == null)
         {
@@ -297,10 +276,11 @@ public class EditCreditCardDebtController
 
     private void updateAvailableLimitAfterDebtLabel()
     {
-        CreditCard crc = creditCards.stream()
-                             .filter(c -> c.getName().equals(crcComboBox.getValue()))
-                             .findFirst()
-                             .orElse(null);
+        CreditCard crc =
+            creditCards.stream()
+                .filter(c -> c.getId().equals(crcComboBox.getValue().getId()))
+                .findFirst()
+                .orElse(null);
 
         if (crc == null)
         {
@@ -325,7 +305,7 @@ public class EditCreditCardDebtController
                 return;
             }
 
-            BigDecimal diff = debtValue.subtract(debtToUpdate.getAmount());
+            BigDecimal diff = debtValue.subtract(crcDebt.getAmount());
 
             BigDecimal availableLimitAfterDebt =
                 creditCardService.getAvailableCredit(crc.getId()).subtract(diff);
@@ -419,7 +399,7 @@ public class EditCreditCardDebtController
         }
     }
 
-    private void populateInvoiceComboBox()
+    private void populateComboBoxes()
     {
         YearMonth currentYearMonth = YearMonth.now();
         YearMonth startYearMonth   = currentYearMonth.minusMonths(12);
@@ -436,34 +416,12 @@ public class EditCreditCardDebtController
         invoiceComboBox.setValue(currentYearMonth.plusMonths(1));
     }
 
-    private void populateCategoryComboBox()
+    private void configureComboBoxes()
     {
-        categoryComboBox.getItems().addAll(
-            categories.stream().map(Category::getName).toList());
-    }
-
-    private void populateCreditCardComboBox()
-    {
-        crcComboBox.getItems().addAll(
-            creditCards.stream().map(CreditCard::getName).toList());
-    }
-
-    private void configureInvoiceComboBox()
-    {
-        // Set the format to display the month and year
-        invoiceComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(YearMonth yearMonth)
-            {
-                return yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"));
-            }
-
-            @Override
-            public YearMonth fromString(String string)
-            {
-                return YearMonth.parse(string,
-                                       DateTimeFormatter.ofPattern("MMMM yyyy"));
-            }
-        });
+        UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
+        UIUtils.configureComboBox(
+            invoiceComboBox,
+            yearMonth -> yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
     }
 }
