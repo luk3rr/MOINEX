@@ -247,11 +247,11 @@ public class EditTransactionController
     private void walletAfterBalance()
     {
         String          transactionValueString = transactionValueField.getText();
-        TransactionType type                   = typeComboBox.getValue();
+        TransactionType currentType            = typeComboBox.getValue();
         Wallet          wallet                 = walletComboBox.getValue();
 
         if (transactionValueString == null || transactionValueString.trim().isEmpty() ||
-            wallet == null || type == null)
+            wallet == null || currentType == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -259,9 +259,9 @@ public class EditTransactionController
 
         try
         {
-            BigDecimal transactionValue = new BigDecimal(transactionValueString);
+            BigDecimal newAmount = new BigDecimal(transactionValueString);
 
-            if (transactionValue.compareTo(BigDecimal.ZERO) < 0)
+            if (newAmount.compareTo(BigDecimal.ZERO) < 0)
             {
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
@@ -269,42 +269,93 @@ public class EditTransactionController
 
             BigDecimal walletAfterBalanceValue = BigDecimal.ZERO;
 
-            if (walletTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
-            {
-                // If the transaction is confirmed, the balance will be updated
-                // based on the difference between the new and the old value
-                BigDecimal diff =
-                    transactionValue.subtract(walletTransaction.getAmount());
+            BigDecimal        oldAmount = walletTransaction.getAmount();
+            BigDecimal        diff      = newAmount.subtract(oldAmount).abs();
+            BigDecimal        balance   = wallet.getBalance();
+            TransactionType   oldType   = walletTransaction.getType();
+            TransactionStatus oldStatus = walletTransaction.getStatus();
+            Wallet            oldWallet = walletTransaction.getWallet();
 
-                if (type.equals(TransactionType.EXPENSE))
+            if (wallet.equals(oldWallet))
+            {
+                if (oldStatus.equals(TransactionStatus.CONFIRMED))
                 {
-                    walletAfterBalanceValue = wallet.getBalance().subtract(diff);
-                }
-                else if (type.equals(TransactionType.INCOME))
-                {
-                    walletAfterBalanceValue = wallet.getBalance().add(diff);
+                    if (oldType.equals(TransactionType.EXPENSE))
+                    {
+                        if (currentType.equals(TransactionType.EXPENSE))
+                        {
+                            if (oldAmount.compareTo(newAmount) > 0)
+                            {
+                                walletAfterBalanceValue = balance.add(diff);
+                            }
+                            else
+                            {
+                                walletAfterBalanceValue = balance.subtract(diff);
+                            }
+                        }
+                        else if (currentType.equals(TransactionType.INCOME))
+                        {
+                            walletAfterBalanceValue =
+                                balance.add(oldAmount).add(newAmount);
+                        }
+                    }
+                    else if (oldType.equals(TransactionType.INCOME))
+                    {
+                        if (currentType.equals(TransactionType.INCOME))
+                        {
+                            if (oldAmount.compareTo(newAmount) > 0)
+                            {
+                                walletAfterBalanceValue = balance.subtract(diff);
+                            }
+                            else
+                            {
+                                walletAfterBalanceValue = balance.add(diff);
+                            }
+                        }
+                        else if (currentType.equals(TransactionType.EXPENSE))
+                        {
+                            walletAfterBalanceValue =
+                                balance.subtract(oldAmount).subtract(newAmount);
+                        }
+                    }
+                    else
+                    {
+                        // Type not mapped. Never should reach here
+                        UIUtils.resetLabel(walletAfterBalanceValueLabel);
+                        return;
+                    }
                 }
                 else
                 {
-                    UIUtils.resetLabel(walletAfterBalanceValueLabel);
-                    return;
+                    if (currentType.equals(TransactionType.EXPENSE))
+                    {
+                        walletAfterBalanceValue = balance.subtract(newAmount);
+                    }
+                    else if (currentType.equals(TransactionType.INCOME))
+                    {
+                        walletAfterBalanceValue = balance.add(newAmount);
+                    }
+                    else
+                    {
+                        // Type not mapped. Never should reach here
+                        UIUtils.resetLabel(walletAfterBalanceValueLabel);
+                        return;
+                    }
                 }
             }
-            else
+            else // Wallet changed
             {
-                // If the transaction is not confirmed, the balance will be
-                // updated based on the new value
-                if (type.equals(TransactionType.EXPENSE))
+                if (currentType.equals(TransactionType.EXPENSE))
                 {
-                    walletAfterBalanceValue =
-                        wallet.getBalance().subtract(transactionValue);
+                    walletAfterBalanceValue = balance.subtract(newAmount);
                 }
-                else if (type.equals(TransactionType.INCOME))
+                else if (currentType.equals(TransactionType.INCOME))
                 {
-                    walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
+                    walletAfterBalanceValue = balance.add(newAmount);
                 }
                 else
                 {
+                    // Type not mapped. Never should reach here
                     UIUtils.resetLabel(walletAfterBalanceValueLabel);
                     return;
                 }
