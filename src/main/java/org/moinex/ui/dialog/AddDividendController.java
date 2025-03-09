@@ -198,8 +198,8 @@ public class AddDividendController
 
         if (wallet == null || description == null || description.strip().isEmpty() ||
             dividendValueString == null || status == null ||
-            dividendValueString.strip().isEmpty() || status == null ||
-            category == null || dividendDate == null)
+            dividendValueString.strip().isEmpty() || category == null ||
+            dividendDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
