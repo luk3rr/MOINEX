@@ -10,15 +10,14 @@ import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.services.CalendarService;
-import org.moinex.util.enums.CalendarEventType;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.CalendarEventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -57,6 +56,7 @@ public class AddCalendarEventController
     @FXML
     private void initialize()
     {
+        configureComboBoxes();
         UIUtils.setDatePickerFormat(datePicker);
         populateComboBoxes();
     }
@@ -109,24 +109,10 @@ public class AddCalendarEventController
     private void populateComboBoxes()
     {
         typeComboBox.getItems().setAll(CalendarEventType.values());
+    }
 
-        // Show the description of the CalendarEventType in the ComboBox
-        typeComboBox.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(CalendarEventType type, boolean empty)
-            {
-                super.updateItem(type, empty);
-                setText((type == null || empty) ? null : type.getDescription());
-            }
-        });
-
-        typeComboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(CalendarEventType type, boolean empty)
-            {
-                super.updateItem(type, empty);
-                setText((type == null || empty) ? null : type.getDescription());
-            }
-        });
+    private void configureComboBoxes()
+    {
+        UIUtils.configureComboBox(typeComboBox, CalendarEventType::getDescription);
     }
 }

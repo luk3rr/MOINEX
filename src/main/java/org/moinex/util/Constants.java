@@ -41,12 +41,20 @@ public final class Constants
 
     public static final String UI_MAIN_PATH   = "/ui/main/";
     public static final String UI_DIALOG_PATH = "/ui/dialog/";
+    public static final String UI_DIALOG_CREDITCARD_PATH =
+        UI_DIALOG_PATH + "creditcard/";
+    public static final String UI_DIALOG_GOAL_PATH = UI_DIALOG_PATH + "goal/";
+    public static final String UI_DIALOG_INVESTMENT_PATH =
+        UI_DIALOG_PATH + "investment/";
+    public static final String UI_DIALOG_WALLETTRANSACTION_PATH =
+        UI_DIALOG_PATH + "wallettransaction/";
+
     public static final String UI_COMMON_PATH = "/ui/common/";
 
     public static final String CSS_SCENE_PATH  = "/css/scene/";
     public static final String CSS_COMMON_PATH = "/css/common/";
 
-    // FXML
+    // UI main package
     public static final String MAIN_FXML          = UI_MAIN_PATH + "main.fxml";
     public static final String HOME_FXML          = UI_MAIN_PATH + "home.fxml";
     public static final String WALLET_FXML        = UI_MAIN_PATH + "wallet.fxml";
@@ -59,93 +67,99 @@ public final class Constants
     public static final String SPLASH_SCREEN_FXML = UI_MAIN_PATH + ("splash_screen."
                                                                     + "fxml");
 
-    public static final String ADD_WALLET_FXML   = UI_DIALOG_PATH + "add_wallet.fxml";
-    public static final String ADD_INCOME_FXML   = UI_DIALOG_PATH + "add_income.fxml";
-    public static final String ADD_TRANSFER_FXML = UI_DIALOG_PATH + ("add_transfer."
-                                                                     + "fxml");
-    public static final String ADD_EXPENSE_FXML  = UI_DIALOG_PATH + "add_expense.fxml";
-    public static final String ADD_CATEGORY_FXML = UI_DIALOG_PATH + ("add_category."
-                                                                     + "fxml");
-
-    public static final String ADD_CREDIT_CARD_DEBT_FXML =
-        UI_DIALOG_PATH + "add_credit_card_debt.fxml";
-
-    public static final String ADD_CREDIT_CARD_CREDIT_FXML =
-        UI_DIALOG_PATH + "add_credit_card_credit.fxml";
-
-    public static final String CREDIT_CARD_CREDITS_FXML =
-        UI_DIALOG_PATH + "credit_card_credits.fxml";
-
-    public static final String ADD_CREDIT_CARD_FXML =
-        UI_DIALOG_PATH + "add_credit_card.fxml";
-
-    public static final String BUY_TICKER_FXML   = UI_DIALOG_PATH + "buy_ticker.fxml";
-    public static final String SALE_TICKER_FXML  = UI_DIALOG_PATH + "sale_ticker.fxml";
-    public static final String ADD_TICKER_FXML   = UI_DIALOG_PATH + "add_ticker.fxml";
-    public static final String ADD_DIVIDEND_FXML = UI_DIALOG_PATH + ("add_dividend."
-                                                                     + "fxml");
-    public static final String ADD_CRYPTO_EXCHANGE_FXML =
-        UI_DIALOG_PATH + "add_crypto_exchange.fxml";
-
+    // UI wallettransaction package
+    public static final String ADD_WALLET_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "add_wallet.fxml";
+    public static final String ADD_INCOME_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "add_income.fxml";
+    public static final String ADD_TRANSFER_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + ("add_transfer."
+                                            + "fxml");
+    public static final String ADD_EXPENSE_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "add_expense.fxml";
+    public static final String ADD_CATEGORY_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + ("add_category."
+                                            + "fxml");
     public static final String ARCHIVED_WALLETS_FXML =
-        UI_DIALOG_PATH + "archived_wallets.fxml";
-
-    public static final String ARCHIVED_CREDIT_CARDS_FXML =
-        UI_DIALOG_PATH + "archived_credit_cards.fxml";
-
-    public static final String ARCHIVED_TICKERS_FXML =
-        UI_DIALOG_PATH + "archived_tickers.fxml";
-
+        UI_DIALOG_WALLETTRANSACTION_PATH + "archived_wallets.fxml";
+    public static final String EDIT_TRANSACTION_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "edit_transaction.fxml";
     public static final String REMOVE_TRANSACTION_FXML =
-        UI_DIALOG_PATH + "remove_transaction.fxml";
+        UI_DIALOG_WALLETTRANSACTION_PATH + "remove_transaction.fxml";
+    public static final String CHANGE_WALLET_TYPE_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "change_wallet_type.fxml";
+    public static final String CHANGE_WALLET_BALANCE_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "change_wallet_balance.fxml";
+    public static final String RENAME_WALLET_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "rename_wallet.fxml";
+    public static final String RECURRING_TRANSACTIONS_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "recurring_transaction.fxml";
+    public static final String ADD_RECURRING_TRANSACTION_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "add_recurring_transaction.fxml";
+    public static final String EDIT_RECURRING_TRANSACTION_FXML =
+        UI_DIALOG_WALLETTRANSACTION_PATH + "edit_recurring_transaction.fxml";
+
+    // UI creditcard package
+    public static final String ADD_CREDIT_CARD_DEBT_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "add_credit_card_debt.fxml";
+    public static final String ADD_CREDIT_CARD_CREDIT_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "add_credit_card_credit.fxml";
+    public static final String CREDIT_CARD_CREDITS_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "credit_card_credits.fxml";
+    public static final String ADD_CREDIT_CARD_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "add_credit_card.fxml";
+    public static final String ARCHIVED_CREDIT_CARDS_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "archived_credit_cards.fxml";
+    public static final String EDIT_CREDIT_CARD_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "edit_credit_card.fxml";
+    public static final String EDIT_CREDIT_CARD_DEBT_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "edit_credit_card_debt.fxml";
+    public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
+        UI_DIALOG_CREDITCARD_PATH + "credit_card_invoice_payment.fxml";
+
+    // UI goal package
+    public static final String EDIT_GOAL_FXML = UI_DIALOG_GOAL_PATH + ("edit_goal." +
+                                                                       "fxml");
+    public static final String ADD_GOAL_FXML  = UI_DIALOG_GOAL_PATH + "add_goal.fxml";
+
+    // UI investment package
+    public static final String BUY_TICKER_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "buy_ticker.fxml";
+    public static final String SALE_TICKER_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "sale_ticker.fxml";
+    public static final String ADD_TICKER_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "add_ticker.fxml";
+    public static final String ADD_DIVIDEND_FXML =
+        UI_DIALOG_INVESTMENT_PATH + ("add_dividend."
+                                     + "fxml");
+    public static final String ADD_CRYPTO_EXCHANGE_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "add_crypto_exchange.fxml";
+    public static final String ARCHIVED_TICKERS_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "archived_tickers.fxml";
+    public static final String EDIT_TICKER_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "edit_ticker.fxml";
+    public static final String EDIT_TICKER_PURCHASE_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "edit_ticker_purchase.fxml";
+    public static final String EDIT_TICKER_SALE_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "edit_ticker_sale.fxml";
+    public static final String EDIT_DIVIDEND_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "edit_dividend.fxml";
+    public static final String EDIT_CRYPTO_EXCHANGE_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "edit_crypto_exchange.fxml";
+    public static final String INVESTMENT_TRANSACTIONS_FXML =
+        UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
+
+    // UI dialog package
     public static final String REMOVE_CATEGORY_FXML =
         UI_DIALOG_PATH + "remove_category.fxml";
-
-    public static final String CHANGE_WALLET_TYPE_FXML =
-        UI_DIALOG_PATH + "change_wallet_type.fxml";
-    public static final String CHANGE_WALLET_BALANCE_FXML =
-        UI_DIALOG_PATH + "change_wallet_balance.fxml";
-    public static final String RENAME_WALLET_FXML =
-        UI_DIALOG_PATH + "rename_wallet.fxml";
     public static final String MANAGE_CATEGORY_FXML =
         UI_DIALOG_PATH + "manage_category.fxml";
     public static final String EDIT_CATEGORY_FXML =
         UI_DIALOG_PATH + "edit_category.fxml";
-    public static final String EDIT_TRANSACTION_FXML =
-        UI_DIALOG_PATH + "edit_transaction.fxml";
-    public static final String EDIT_CREDIT_CARD_FXML =
-        UI_DIALOG_PATH + "edit_credit_card.fxml";
-    public static final String EDIT_CREDIT_CARD_DEBT_FXML =
-        UI_DIALOG_PATH + "edit_credit_card_debt.fxml";
-
-    public static final String EDIT_GOAL_FXML   = UI_DIALOG_PATH + "edit_goal.fxml";
-    public static final String EDIT_TICKER_FXML = UI_DIALOG_PATH + "edit_ticker.fxml";
-    public static final String EDIT_TICKER_PURCHASE_FXML =
-        UI_DIALOG_PATH + "edit_ticker_purchase.fxml";
-    public static final String EDIT_TICKER_SALE_FXML =
-        UI_DIALOG_PATH + "edit_ticker_sale.fxml";
-    public static final String EDIT_DIVIDEND_FXML =
-        UI_DIALOG_PATH + "edit_dividend.fxml";
-    public static final String EDIT_CRYPTO_EXCHANGE_FXML =
-        UI_DIALOG_PATH + "edit_crypto_exchange.fxml";
-
-    public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
-        UI_DIALOG_PATH + "credit_card_invoice_payment.fxml";
-
-    public static final String RECURRING_TRANSACTIONS_FXML =
-        UI_DIALOG_PATH + "recurring_transaction.fxml";
-    public static final String INVESTMENT_TRANSACTIONS_FXML =
-        UI_DIALOG_PATH + "investment_transactions.fxml";
-    public static final String ADD_RECURRING_TRANSACTION_FXML =
-        UI_DIALOG_PATH + "add_recurring_transaction.fxml";
-    public static final String EDIT_RECURRING_TRANSACTION_FXML =
-        UI_DIALOG_PATH + "edit_recurring_transaction.fxml";
-
-    public static final String ADD_GOAL_FXML = UI_DIALOG_PATH + "add_goal.fxml";
-
     public static final String ADD_CALENDAR_EVENT_FXML =
         UI_DIALOG_PATH + "add_calendar_event.fxml";
 
+    // UI common package
     public static final String WALLET_FULL_PANE_FXML =
         UI_COMMON_PATH + "wallet_full_pane.fxml";
     public static final String GOAL_FULL_PANE_FXML =

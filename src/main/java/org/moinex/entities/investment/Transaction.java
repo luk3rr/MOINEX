@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.moinex.entities.WalletTransaction;
+import org.moinex.entities.wallettransaction.WalletTransaction;
 
 /**
  * Base class for transactions in the investment domain

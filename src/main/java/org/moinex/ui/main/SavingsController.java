@@ -39,14 +39,14 @@ import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
 import org.moinex.services.MarketService;
 import org.moinex.services.TickerService;
-import org.moinex.ui.dialog.AddCryptoExchangeController;
-import org.moinex.ui.dialog.AddDividendController;
-import org.moinex.ui.dialog.AddTickerController;
-import org.moinex.ui.dialog.ArchivedTickersController;
-import org.moinex.ui.dialog.BuyTickerController;
-import org.moinex.ui.dialog.EditTickerController;
-import org.moinex.ui.dialog.InvestmentTransactionsController;
-import org.moinex.ui.dialog.SaleTickerController;
+import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
+import org.moinex.ui.dialog.investment.AddDividendController;
+import org.moinex.ui.dialog.investment.AddTickerController;
+import org.moinex.ui.dialog.investment.ArchivedTickersController;
+import org.moinex.ui.dialog.investment.AddTickerPurchaseController;
+import org.moinex.ui.dialog.investment.EditTickerController;
+import org.moinex.ui.dialog.investment.InvestmentTransactionsController;
+import org.moinex.ui.dialog.investment.AddTickerSaleController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -255,7 +255,7 @@ public class SavingsController
         WindowUtils.openModalWindow(Constants.BUY_TICKER_FXML,
                                     "Buy Ticker",
                                     springContext,
-                                    (BuyTickerController controller)
+                                    (AddTickerPurchaseController controller)
                                         -> controller.setTicker(selectedTicker),
                                     List.of(() -> {
                                         updateTransactionTableView();
@@ -279,7 +279,7 @@ public class SavingsController
         WindowUtils.openModalWindow(Constants.SALE_TICKER_FXML,
                                     "Sell Ticker",
                                     springContext,
-                                    (SaleTickerController controller)
+                                    (AddTickerSaleController controller)
                                         -> controller.setTicker(selectedTicker),
                                     List.of(() -> {
                                         updateTransactionTableView();

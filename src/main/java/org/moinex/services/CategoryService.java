@@ -11,7 +11,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.repositories.CategoryRepository;
-import org.moinex.repositories.CreditCardDebtRepository;
+import org.moinex.repositories.creditcard.CreditCardDebtRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

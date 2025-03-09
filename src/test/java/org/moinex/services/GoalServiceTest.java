@@ -30,11 +30,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.moinex.entities.Goal;
-import org.moinex.entities.WalletType;
-import org.moinex.repositories.GoalRepository;
-import org.moinex.repositories.WalletRepository;
-import org.moinex.repositories.WalletTypeRepository;
+import org.moinex.entities.goal.Goal;
+import org.moinex.entities.wallettransaction.WalletType;
+import org.moinex.repositories.goal.GoalRepository;
+import org.moinex.repositories.wallettransaction.WalletRepository;
+import org.moinex.repositories.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)

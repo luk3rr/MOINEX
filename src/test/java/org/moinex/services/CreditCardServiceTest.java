@@ -32,16 +32,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.entities.Category;
-import org.moinex.entities.CreditCard;
-import org.moinex.entities.CreditCardDebt;
-import org.moinex.entities.CreditCardOperator;
-import org.moinex.entities.CreditCardPayment;
+import org.moinex.entities.creditcard.CreditCard;
+import org.moinex.entities.creditcard.CreditCardDebt;
+import org.moinex.entities.creditcard.CreditCardOperator;
+import org.moinex.entities.creditcard.CreditCardPayment;
 import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.repositories.CategoryRepository;
-import org.moinex.repositories.CreditCardDebtRepository;
-import org.moinex.repositories.CreditCardOperatorRepository;
-import org.moinex.repositories.CreditCardPaymentRepository;
-import org.moinex.repositories.CreditCardRepository;
+import org.moinex.repositories.creditcard.CreditCardDebtRepository;
+import org.moinex.repositories.creditcard.CreditCardOperatorRepository;
+import org.moinex.repositories.creditcard.CreditCardPaymentRepository;
+import org.moinex.repositories.creditcard.CreditCardRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)

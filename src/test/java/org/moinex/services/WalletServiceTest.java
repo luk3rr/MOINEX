@@ -28,14 +28,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.moinex.entities.Wallet;
-import org.moinex.entities.WalletType;
+import org.moinex.entities.wallettransaction.Wallet;
+import org.moinex.entities.wallettransaction.WalletType;
 import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.repositories.CategoryRepository;
-import org.moinex.repositories.TransferRepository;
-import org.moinex.repositories.WalletRepository;
-import org.moinex.repositories.WalletTransactionRepository;
-import org.moinex.repositories.WalletTypeRepository;
+import org.moinex.repositories.wallettransaction.TransferRepository;
+import org.moinex.repositories.wallettransaction.WalletRepository;
+import org.moinex.repositories.wallettransaction.WalletTransactionRepository;
+import org.moinex.repositories.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)

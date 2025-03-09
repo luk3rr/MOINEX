@@ -6,6 +6,7 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,27 +16,26 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
-import org.moinex.entities.CreditCard;
-import org.moinex.entities.CreditCardCredit;
-import org.moinex.entities.CreditCardDebt;
-import org.moinex.entities.CreditCardOperator;
-import org.moinex.entities.CreditCardPayment;
-import org.moinex.entities.Wallet;
+import org.moinex.entities.creditcard.CreditCard;
+import org.moinex.entities.creditcard.CreditCardCredit;
+import org.moinex.entities.creditcard.CreditCardDebt;
+import org.moinex.entities.creditcard.CreditCardOperator;
+import org.moinex.entities.creditcard.CreditCardPayment;
+import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.repositories.CategoryRepository;
-import org.moinex.repositories.CreditCardCreditRepository;
-import org.moinex.repositories.CreditCardDebtRepository;
-import org.moinex.repositories.CreditCardOperatorRepository;
-import org.moinex.repositories.CreditCardPaymentRepository;
-import org.moinex.repositories.CreditCardRepository;
-import org.moinex.repositories.WalletRepository;
+import org.moinex.repositories.creditcard.CreditCardCreditRepository;
+import org.moinex.repositories.creditcard.CreditCardDebtRepository;
+import org.moinex.repositories.creditcard.CreditCardOperatorRepository;
+import org.moinex.repositories.creditcard.CreditCardPaymentRepository;
+import org.moinex.repositories.creditcard.CreditCardRepository;
+import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.enums.CreditCardCreditType;
 import org.moinex.util.enums.CreditCardInvoiceStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -810,7 +810,7 @@ public class CreditCardService
         CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
             ()
                 -> new EntityNotFoundException("Credit card with id " + id +
-                                        " does not exist"));
+                                               " does not exist"));
 
         BigDecimal totalPendingPayments =
             creditCardPaymentRepository.getTotalPendingPayments(id);
@@ -1128,7 +1128,7 @@ public class CreditCardService
             CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
                 ()
                     -> new EntityNotFoundException("Credit card with id " + crcId +
-                                            " does not exist"));
+                                                   " does not exist"));
 
             Integer currentDay = now.getDayOfMonth();
             Integer closingDay = creditCard.getClosingDay();
@@ -1265,7 +1265,9 @@ public class CreditCardService
     {
         CreditCardPayment payment =
             creditCardPaymentRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Payment with id " + id + " not found"));
+                ()
+                    -> new EntityNotFoundException("Payment with id " + id +
+                                                   " not found"));
 
         // If payment was made with a wallet, add the amount back to the
         // wallet balance

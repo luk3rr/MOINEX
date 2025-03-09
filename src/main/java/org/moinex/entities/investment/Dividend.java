@@ -19,7 +19,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.moinex.entities.WalletTransaction;
+import org.moinex.entities.wallettransaction.WalletTransaction;
 
 @Entity
 @Table(name = "dividend")
