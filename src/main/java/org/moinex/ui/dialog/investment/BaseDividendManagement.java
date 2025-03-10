@@ -112,7 +112,7 @@ public abstract class BaseDividendManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseDividendManagement(
+    protected BaseDividendManagement(
         WalletService            walletService,
         WalletTransactionService walletTransactionService,
         CategoryService          categoryService,

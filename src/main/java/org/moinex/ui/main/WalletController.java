@@ -388,15 +388,15 @@ public class WalletController
 
             walletsCurrentBalance =
                 wallets.stream()
-                    .filter(w -> w.getType().getId() == selectedWalletType.getId())
+                    .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
                     .map(Wallet::getBalance)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             pendingExpenses =
                 transactions.stream()
                     .filter(t
-                            -> t.getWallet().getType().getId() ==
-                                   selectedWalletType.getId())
+                            -> t.getWallet().getType().getId().equals(
+                                selectedWalletType.getId()))
                     .filter(t -> t.getType().equals(TransactionType.EXPENSE))
                     .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
                     .map(WalletTransaction::getAmount)
@@ -405,8 +405,8 @@ public class WalletController
             pendingIncomes =
                 transactions.stream()
                     .filter(t
-                            -> t.getWallet().getType().getId() ==
-                                   selectedWalletType.getId())
+                            -> t.getWallet().getType().getId().equals(
+                                selectedWalletType.getId()))
                     .filter(t -> t.getType().equals(TransactionType.INCOME))
                     .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
                     .map(WalletTransaction::getAmount)
@@ -414,7 +414,7 @@ public class WalletController
 
             totalWallets =
                 wallets.stream()
-                    .filter(w -> w.getType().getId() == selectedWalletType.getId())
+                    .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
                     .map(w -> w.getId())
                     .distinct()
                     .count();
@@ -541,7 +541,7 @@ public class WalletController
                 {
                     BigDecimal totalBalance =
                         wallets.stream()
-                            .filter(w -> w.getType().getId() == wt.getId())
+                            .filter(w -> w.getType().getId().equals(wt.getId()))
                             .map(Wallet::getBalance)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -624,10 +624,11 @@ public class WalletController
             if (selectedIndex == 0)
             {
                 // Calculate total expenses for the month
-                totalExpenses = transactions.stream()
-                                    .filter(t -> t.getType() == TransactionType.EXPENSE)
-                                    .map(WalletTransaction::getAmount)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalExpenses =
+                    transactions.stream()
+                        .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                        .map(WalletTransaction::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 totalExpenses =
                     totalExpenses.add(crcPayments.stream()
@@ -635,41 +636,44 @@ public class WalletController
                                           .reduce(BigDecimal.ZERO, BigDecimal::add));
 
                 // Calculate total incomes for the month
-                totalIncomes = transactions.stream()
-                                   .filter(t -> t.getType() == TransactionType.INCOME)
-                                   .map(WalletTransaction::getAmount)
-                                   .reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalIncomes =
+                    transactions.stream()
+                        .filter(t -> t.getType().equals(TransactionType.INCOME))
+                        .map(WalletTransaction::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
             else if (selectedIndex > 0 && selectedIndex - 1 < walletTypes.size())
             {
                 WalletType selectedWalletType = walletTypes.get(selectedIndex - 1);
 
                 // Calculate total expenses for the month
-                totalExpenses = transactions.stream()
-                                    .filter(t
-                                            -> t.getWallet().getType().getId() ==
-                                                   selectedWalletType.getId())
-                                    .filter(t -> t.getType() == TransactionType.EXPENSE)
-                                    .map(WalletTransaction::getAmount)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalExpenses =
+                    transactions.stream()
+                        .filter(t
+                                -> t.getWallet().getType().getId().equals(
+                                    selectedWalletType.getId()))
+                        .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                        .map(WalletTransaction::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 totalExpenses = totalExpenses.add(
                     crcPayments.stream()
                         .filter(p -> {
                             if (p.getWallet() != null)
                             {
-                                return p.getWallet().getType().getId() ==
-                                    selectedWalletType.getId();
+                                return p.getWallet().getType().getId().equals(
+                                    selectedWalletType.getId());
                             }
                             else if (p.getCreditCardDebt()
                                          .getCreditCard()
                                          .getDefaultBillingWallet() != null)
                             {
                                 return p.getCreditCardDebt()
-                                           .getCreditCard()
-                                           .getDefaultBillingWallet()
-                                           .getType()
-                                           .getId() == selectedWalletType.getId();
+                                    .getCreditCard()
+                                    .getDefaultBillingWallet()
+                                    .getType()
+                                    .getId()
+                                    .equals(selectedWalletType.getId());
                             }
                             else
                             {
@@ -680,13 +684,14 @@ public class WalletController
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
 
                 // Calculate total incomes for the month
-                totalIncomes = transactions.stream()
-                                   .filter(t
-                                           -> t.getWallet().getType().getId() ==
-                                                  selectedWalletType.getId())
-                                   .filter(t -> t.getType() == TransactionType.INCOME)
-                                   .map(WalletTransaction::getAmount)
-                                   .reduce(BigDecimal.ZERO, BigDecimal::add);
+                totalIncomes =
+                    transactions.stream()
+                        .filter(t
+                                -> t.getWallet().getType().getId().equals(
+                                    selectedWalletType.getId()))
+                        .filter(t -> t.getType().equals(TransactionType.INCOME))
+                        .map(WalletTransaction::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
             else
             {

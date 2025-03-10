@@ -60,7 +60,7 @@ public class ChangeWalletTypeController
 
     public void setWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }

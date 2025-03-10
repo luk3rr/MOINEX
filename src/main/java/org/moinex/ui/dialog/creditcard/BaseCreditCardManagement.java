@@ -62,7 +62,7 @@ public abstract class BaseCreditCardManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseCreditCardManagement(CreditCardService creditCardService,
+    protected BaseCreditCardManagement(CreditCardService creditCardService,
                                    WalletService     walletService)
     {
         this.creditCardService = creditCardService;

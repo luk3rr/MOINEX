@@ -81,7 +81,7 @@ public abstract class BaseCryptoExchangeManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseCryptoExchangeManagement(TickerService     tickerService,
+    protected BaseCryptoExchangeManagement(TickerService     tickerService,
                                         CalculatorService calculatorService)
     {
         this.tickerService     = tickerService;

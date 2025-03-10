@@ -49,7 +49,7 @@ public abstract class BaseTickerManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseTickerManagement(TickerService tickerService)
+    protected BaseTickerManagement(TickerService tickerService)
     {
         this.tickerService = tickerService;
     }

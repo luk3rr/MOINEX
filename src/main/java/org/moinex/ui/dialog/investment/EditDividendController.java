@@ -15,8 +15,8 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
-import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.investment.Dividend;
+import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
@@ -104,13 +104,14 @@ public final class EditDividendController extends BaseDividendManagement
             // Check if has any modification
             if (dividend.getWalletTransaction().getAmount().compareTo(dividendValue) ==
                     0 &&
-                dividend.getWalletTransaction().getCategory().getId() ==
-                    category.getId() &&
+                dividend.getWalletTransaction().getCategory().getId().equals(
+                    category.getId()) &&
                 dividend.getWalletTransaction().getStatus().equals(status) &&
                 dividend.getWalletTransaction().getDate().toLocalDate().equals(
                     dividendDate) &&
                 dividend.getWalletTransaction().getDescription().equals(description) &&
-                dividend.getWalletTransaction().getWallet().getId() == wallet.getId())
+                dividend.getWalletTransaction().getWallet().getId().equals(
+                    wallet.getId()))
             {
                 WindowUtils.showInformationDialog(
                     "No changes",

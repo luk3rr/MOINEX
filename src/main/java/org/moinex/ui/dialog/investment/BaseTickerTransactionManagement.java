@@ -110,7 +110,7 @@ public abstract class BaseTickerTransactionManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseTickerTransactionManagement(
+    protected BaseTickerTransactionManagement(
         WalletService            walletService,
         WalletTransactionService walletTransactionService,
         CategoryService          categoryService,

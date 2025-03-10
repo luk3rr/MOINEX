@@ -80,7 +80,7 @@ public abstract class BaseRecurringTransactionManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseRecurringTransactionManagement(
+    protected BaseRecurringTransactionManagement(
         WalletService               walletService,
         RecurringTransactionService recurringTransactionService,
         CategoryService             categoryService)

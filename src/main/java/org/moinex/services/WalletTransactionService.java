@@ -263,11 +263,12 @@ public class WalletTransactionService
                                                                 " not found"));
 
         // Check if the wallet exists
-        walletTransactionRepository.findWalletByTransactionId(transaction.getId())
-            .orElseThrow(()
-                             -> new EntityNotFoundException(
-                                 "Wallet with name " +
-                                 transaction.getWallet().getName() + " not found"));
+        if (!walletTransactionRepository.existsWalletByTransactionId(
+                transaction.getId()))
+        {
+            throw new EntityNotFoundException(
+                "Wallet with name " + transaction.getWallet().getName() + " not found");
+        }
 
         // Check if the amount is greater than zero
         if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
@@ -377,7 +378,7 @@ public class WalletTransactionService
     private void changeTransactionWallet(WalletTransaction oldTransaction,
                                          Wallet            newWallet)
     {
-        if (oldTransaction.getWallet().getId() == newWallet.getId())
+        if (oldTransaction.getWallet().getId().equals(newWallet.getId()))
         {
             logger.info("Transaction with id " + oldTransaction.getId() +
                         " has the same wallet as before");
@@ -610,10 +611,10 @@ public class WalletTransactionService
         Wallet wallet = transaction.getWallet();
 
         // Update the wallet balance if the transaction is confirmed
-        if (transaction.getStatus() == TransactionStatus.CONFIRMED)
+        if (transaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
             BigDecimal amount = transaction.getAmount();
-            if (transaction.getType() == TransactionType.INCOME)
+            if (transaction.getType().equals(TransactionType.INCOME))
             {
                 wallet.setBalance(wallet.getBalance().subtract(amount));
             }
@@ -647,7 +648,7 @@ public class WalletTransactionService
                                                                 transactionId +
                                                                 " not found"));
 
-        if (transaction.getStatus() == TransactionStatus.CONFIRMED)
+        if (transaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
             throw new AttributeAlreadySetException(
                 "Transaction with id " + transactionId + " is already confirmed");
@@ -655,7 +656,7 @@ public class WalletTransactionService
 
         Wallet wallet = transaction.getWallet();
 
-        if (transaction.getType() == TransactionType.EXPENSE)
+        if (transaction.getType().equals(TransactionType.EXPENSE))
         {
             wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
         }

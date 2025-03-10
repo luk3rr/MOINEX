@@ -104,7 +104,7 @@ public abstract class BaseWalletTransactionManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseWalletTransactionManagement(WalletService            walletService,
+    protected BaseWalletTransactionManagement(WalletService            walletService,
                                 WalletTransactionService walletTransactionService,
                                 CategoryService          categoryService,
                                 CalculatorService        calculatorService)

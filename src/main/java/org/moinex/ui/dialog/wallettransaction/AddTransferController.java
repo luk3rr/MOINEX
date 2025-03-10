@@ -119,7 +119,7 @@ public class AddTransferController
 
     public void setSenderWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }
@@ -131,7 +131,7 @@ public class AddTransferController
 
     public void setReceiverWalletComboBox(Wallet wt)
     {
-        if (wallets.stream().noneMatch(w -> w.getId() == wt.getId()))
+        if (wallets.stream().noneMatch(w -> w.getId().equals(wt.getId())))
         {
             return;
         }

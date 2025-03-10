@@ -103,9 +103,9 @@ public abstract class BaseCreditCardDebtManagement
         LoggerFactory.getLogger(BaseCreditCardDebtManagement.class);
 
     @Autowired
-    public BaseCreditCardDebtManagement(CategoryService   categoryService,
-                                        CreditCardService creditCardService,
-                                        CalculatorService calculatorService)
+    protected BaseCreditCardDebtManagement(CategoryService   categoryService,
+                                           CreditCardService creditCardService,
+                                           CalculatorService calculatorService)
     {
         this.categoryService   = categoryService;
         this.creditCardService = creditCardService;

@@ -422,6 +422,16 @@ public interface WalletTransactionRepository
     findWalletByTransactionId(@Param("transactionId") Long transactionId);
 
     /**
+     * Check if a wallet exists by transaction id
+     * @param transactionId The id of the transaction
+     * @return True if the wallet exists, false otherwise
+     */
+    @Query(
+        "SELECT COUNT(wt) > 0 FROM WalletTransaction wt WHERE wt.id = :transactionId")
+    boolean
+    existsWalletByTransactionId(@Param("transactionId") Long transactionId);
+
+    /**
      * Get suggestions. Suggestions are transactions with distinct descriptions
      * and most recent date
      * @param transactionType The type of the transaction

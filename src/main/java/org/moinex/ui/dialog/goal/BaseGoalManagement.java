@@ -46,7 +46,7 @@ public abstract class BaseGoalManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public BaseGoalManagement(GoalService goalService)
+    protected BaseGoalManagement(GoalService goalService)
     {
         this.goalService = goalService;
     }

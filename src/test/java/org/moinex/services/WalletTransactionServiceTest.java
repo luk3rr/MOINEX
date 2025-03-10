@@ -523,9 +523,9 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
 
@@ -567,9 +567,9 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
 
@@ -613,9 +613,9 @@ class WalletTransactionServiceTest
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1IncomeTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
 
@@ -669,9 +669,9 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
 
@@ -718,9 +718,9 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
 
@@ -766,9 +766,9 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
             .thenReturn(updatedTransaction);
@@ -809,9 +809,9 @@ class WalletTransactionServiceTest
             m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.findWalletByTransactionId(
+        when(m_walletTransactionRepository.existsWalletByTransactionId(
                  m_wallet1ExpenseTransaction.getId()))
-            .thenReturn(Optional.of(m_wallet1));
+            .thenReturn(true);
 
         assertThrows(
             IllegalArgumentException.class,

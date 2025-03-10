@@ -195,7 +195,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
 
         try
         {
-            BigDecimal availableLimitAfterDebt = BigDecimal.ZERO;
+            BigDecimal availableLimitAfterDebt;
 
             if (oldCrc.getId().equals(newCrc.getId()))
             {
