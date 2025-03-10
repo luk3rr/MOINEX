@@ -117,16 +117,17 @@ public class ManageCategoryController
 
         if (selectedCategory == null)
         {
-            WindowUtils.showErrorDialog("No category selected",
-                                        "Please select a category to remove");
+            WindowUtils.showInformationDialog("No category selected",
+                                              "Please select a category to remove");
             return;
         }
 
         // Prevent the removal of categories with associated transactions
         if (categoryService.getCountTransactions(selectedCategory.getId()) > 0)
         {
-            WindowUtils.showErrorDialog("Category has transactions",
-                                        "Cannot remove a category with transactions");
+            WindowUtils.showInformationDialog(
+                "Category has transactions",
+                "Cannot remove a category with transactions");
             // TODO: Implement a way to change the category of the transactions
             // TODO: Implement a way to archive the category
             return;

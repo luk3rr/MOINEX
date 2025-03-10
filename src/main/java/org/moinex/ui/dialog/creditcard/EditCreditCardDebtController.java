@@ -9,6 +9,7 @@ package org.moinex.ui.dialog.creditcard;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.YearMonth;
+import java.util.List;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import org.moinex.entities.creditcard.CreditCardPayment;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
+import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,13 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         // debt will be the same
         crcLimitAvailableAfterDebtLabel.setText(UIUtils.formatCurrency(availableLimit));
 
+        // Deactivate the listener to avoid the event of changing the text of
+        // the descriptionField from being triggered. After changing the text,
+        // the listener is activated again
+        descriptionField.textProperty().removeListener(descriptionFieldListener);
         descriptionField.setText(crcDebt.getDescription());
+        descriptionField.textProperty().addListener(descriptionFieldListener);
+
         valueField.setText(crcDebt.getAmount().toString());
         installmentsField.setText(crcDebt.getInstallments().toString());
 
@@ -144,6 +152,103 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         catch (EntityNotFoundException | IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
+        }
+    }
+
+    @Override
+    protected void updateAvailableLimitAfterDebtLabel()
+    {
+        if (crcComboBox.getValue() == null)
+        {
+            return;
+        }
+
+        CreditCard newCrc =
+            creditCards.stream()
+                .filter(c -> c.getId().equals(crcComboBox.getValue().getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (newCrc == null)
+        {
+            return;
+        }
+
+        String value = valueField.getText();
+
+        if (value.isEmpty())
+        {
+            UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
+            return;
+        }
+
+        BigDecimal newAmount = new BigDecimal(valueField.getText());
+
+        if (newAmount.compareTo(BigDecimal.ZERO) <= 0)
+        {
+            UIUtils.resetLabel(msgLabel);
+            return;
+        }
+
+        CreditCard oldCrc    = crcDebt.getCreditCard();
+        BigDecimal oldAmount = crcDebt.getAmount();
+
+        try
+        {
+            BigDecimal availableLimitAfterDebt = BigDecimal.ZERO;
+
+            if (oldCrc.getId().equals(newCrc.getId()))
+            {
+                if (oldAmount.compareTo(newAmount) < 0) // Amount increased
+                {
+                    BigDecimal diff = newAmount.subtract(oldAmount).abs();
+
+                    availableLimitAfterDebt =
+                        creditCardService.getAvailableCredit(newCrc.getId())
+                            .subtract(diff);
+                }
+                else // Amount decreased
+                {
+                    availableLimitAfterDebt =
+                        creditCardService.getAvailableCredit(newCrc.getId())
+                            .add(oldAmount.subtract(newAmount));
+                }
+            }
+            else
+            {
+                List<CreditCardPayment> payments =
+                    creditCardService.getPaymentsByDebtId(crcDebt.getId());
+
+                BigDecimal paidAmount = payments.stream()
+                                            .filter(p -> p.getWallet() != null)
+                                            .map(CreditCardPayment::getAmount)
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal remainingAmountToPay = newAmount.subtract(paidAmount);
+
+                availableLimitAfterDebt =
+                    creditCardService.getAvailableCredit(newCrc.getId())
+                        .subtract(remainingAmountToPay);
+            }
+
+            // Set the style according to the balance value after the expense
+            if (availableLimitAfterDebt.compareTo(BigDecimal.ZERO) < 0)
+            {
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel,
+                                      Constants.NEGATIVE_BALANCE_STYLE);
+            }
+            else
+            {
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel,
+                                      Constants.NEUTRAL_BALANCE_STYLE);
+            }
+
+            crcLimitAvailableAfterDebtLabel.setText(
+                UIUtils.formatCurrency(availableLimitAfterDebt));
+        }
+        catch (NumberFormatException e)
+        {
+            UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
         }
     }
 }

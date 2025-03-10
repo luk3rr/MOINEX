@@ -35,6 +35,8 @@ import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -96,6 +98,9 @@ public abstract class BaseCreditCardDebtManagement
     protected CalculatorService calculatorService;
 
     protected CreditCard creditCard = null;
+
+    protected static final Logger logger =
+        LoggerFactory.getLogger(BaseCreditCardDebtManagement.class);
 
     @Autowired
     public BaseCreditCardDebtManagement(CategoryService   categoryService,
@@ -230,6 +235,11 @@ public abstract class BaseCreditCardDebtManagement
 
     protected void updateAvailableLimitAfterDebtLabel()
     {
+        if (crcComboBox.getValue() == null)
+        {
+            return;
+        }
+
         CreditCard crc =
             creditCards.stream()
                 .filter(c -> c.getId().equals(crcComboBox.getValue().getId()))
@@ -443,24 +453,31 @@ public abstract class BaseCreditCardDebtManagement
 
             suggestionListView.getItems().addAll(filteredSuggestions);
 
-            if (!filteredSuggestions.isEmpty())
+            try
             {
-                adjustPopupWidth();
-                adjustPopupHeight();
+                if (!filteredSuggestions.isEmpty())
+                {
+                    adjustPopupWidth();
+                    adjustPopupHeight();
 
-                suggestionsPopup.show(
-                    descriptionField,
-                    descriptionField.localToScene(0, 0).getX() +
-                        descriptionField.getScene().getWindow().getX() +
-                        descriptionField.getScene().getX(),
-                    descriptionField.localToScene(0, 0).getY() +
-                        descriptionField.getScene().getWindow().getY() +
-                        descriptionField.getScene().getY() +
-                        descriptionField.getHeight());
+                    suggestionsPopup.show(
+                        descriptionField,
+                        descriptionField.localToScene(0, 0).getX() +
+                            descriptionField.getScene().getWindow().getX() +
+                            descriptionField.getScene().getX(),
+                        descriptionField.localToScene(0, 0).getY() +
+                            descriptionField.getScene().getWindow().getY() +
+                            descriptionField.getScene().getY() +
+                            descriptionField.getHeight());
+                }
+                else
+                {
+                    suggestionsPopup.hide();
+                }
             }
-            else
+            catch (NullPointerException e)
             {
-                suggestionsPopup.hide();
+                logger.error("Error showing suggestions popup");
             }
         };
 

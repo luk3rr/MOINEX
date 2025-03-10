@@ -77,9 +77,6 @@ public final class Constants
                                             + "fxml");
     public static final String ADD_EXPENSE_FXML =
         UI_DIALOG_WALLETTRANSACTION_PATH + "add_expense.fxml";
-    public static final String ADD_CATEGORY_FXML =
-        UI_DIALOG_WALLETTRANSACTION_PATH + ("add_category."
-                                            + "fxml");
     public static final String ARCHIVED_WALLETS_FXML =
         UI_DIALOG_WALLETTRANSACTION_PATH + "archived_wallets.fxml";
     public static final String EDIT_TRANSACTION_FXML =
@@ -118,8 +115,8 @@ public final class Constants
         UI_DIALOG_CREDITCARD_PATH + "credit_card_invoice_payment.fxml";
 
     // UI goal package
-    public static final String EDIT_GOAL_FXML = UI_DIALOG_GOAL_PATH + ("edit_goal." +
-                                                                       "fxml");
+    public static final String EDIT_GOAL_FXML = UI_DIALOG_GOAL_PATH + ("edit_goal."
+                                                                       + "fxml");
     public static final String ADD_GOAL_FXML  = UI_DIALOG_GOAL_PATH + "add_goal.fxml";
 
     // UI investment package
@@ -150,6 +147,8 @@ public final class Constants
         UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
 
     // UI dialog package
+    public static final String ADD_CATEGORY_FXML = UI_DIALOG_PATH + ("add_category."
+                                                                     + "fxml");
     public static final String REMOVE_CATEGORY_FXML =
         UI_DIALOG_PATH + "remove_category.fxml";
     public static final String MANAGE_CATEGORY_FXML =

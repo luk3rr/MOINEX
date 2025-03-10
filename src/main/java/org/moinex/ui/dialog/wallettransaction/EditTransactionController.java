@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
@@ -69,7 +71,14 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         statusComboBox.setValue(walletTransaction.getStatus());
         categoryComboBox.setValue(walletTransaction.getCategory());
         transactionValueField.setText(walletTransaction.getAmount().toString());
+
+        // Deactivate the listener to avoid the event of changing the text of
+        // the descriptionField from being triggered. After changing the text,
+        // the listener is activated again
+        descriptionField.textProperty().removeListener(descriptionFieldListener);
         descriptionField.setText(walletTransaction.getDescription());
+        descriptionField.textProperty().addListener(descriptionFieldListener);
+
         transactionDatePicker.setValue(walletTransaction.getDate().toLocalDate());
         typeComboBox.setValue(walletTransaction.getType());
 
@@ -83,6 +92,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         super.initialize();
 
         typeComboBox.setOnAction(e -> walletAfterBalance());
+
+        typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
+        UIUtils.configureComboBox(typeComboBox, TransactionType::name);
     }
 
     @FXML

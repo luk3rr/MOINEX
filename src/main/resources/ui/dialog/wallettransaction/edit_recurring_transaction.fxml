@@ -92,7 +92,7 @@
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <DatePicker fx:id="nextDueDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../../css/component/data-picker.css" />
+                  <DatePicker fx:id="startDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../../css/component/data-picker.css" />
                </children>
             </VBox>
             <VBox alignment="CENTER">
