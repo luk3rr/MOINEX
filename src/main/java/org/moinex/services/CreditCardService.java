@@ -1302,7 +1302,7 @@ public class CreditCardService
     {
         List<CreditCardPayment> payments = getPaymentsByDebtId(oldDebt.getId());
 
-        CreditCardPayment firstPayment = payments.getFirst();
+        CreditCardPayment firstPayment = payments.get(0);
 
         // If the first payment is in the same month and year of the invoice, do not
         // update
@@ -1397,7 +1397,7 @@ public class CreditCardService
             {
                 if (i > oldDebt.getInstallments())
                 {
-                    CreditCardPayment lastPayment = payments.getLast();
+                    CreditCardPayment lastPayment = payments.get(payments.size() - 1);
 
                     // Calculate the payment date
                     LocalDateTime paymentDate = lastPayment.getDate().plusMonths(1);
