@@ -8,7 +8,6 @@ package org.moinex.ui.dialog.creditcard;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -246,44 +245,15 @@ public class CreditCardInvoicePaymentController
     @FXML
     private void handleOpenCalculator()
     {
-        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
-                                    "Calculator",
-                                    springContext,
-                                    (CalculatorController controller)
-                                        -> {},
-                                    List.of(() -> getResultFromCalculator()));
-    }
-
-    private void getResultFromCalculator()
-    {
-        // If the user saved the result, set it in the incomeValueField
-        String result = calculatorService.getResult();
-
-        if (result != null)
-        {
-            try
-            {
-                BigDecimal resultValue = new BigDecimal(result);
-
-                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
-                {
-                    WindowUtils.showInformationDialog("Invalid value",
-                                                      "The value must be positive");
-                    return;
-                }
-
-                // Round the result to 2 decimal places
-                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
-
-                useRebateValueField.setText(result);
-            }
-            catch (NumberFormatException e)
-            {
-                // Must be unreachable
-                WindowUtils.showErrorDialog("Invalid value",
-                                            "The value must be a number");
-            }
-        }
+        WindowUtils.openPopupWindow(
+            Constants.CALCULATOR_FXML,
+            "Calculator",
+            springContext,
+            (CalculatorController controller)
+                -> {},
+            List.of(()
+                        -> calculatorService.updateComponentWithResult(
+                            useRebateValueField)));
     }
 
     private void updateWalletBalance()

@@ -7,7 +7,6 @@
 package org.moinex.ui.dialog.investment;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -82,7 +81,7 @@ public abstract class BaseCryptoExchangeManagement
      */
     @Autowired
     protected BaseCryptoExchangeManagement(TickerService     tickerService,
-                                        CalculatorService calculatorService)
+                                           CalculatorService calculatorService)
     {
         this.tickerService     = tickerService;
         this.calculatorService = calculatorService;
@@ -149,7 +148,9 @@ public abstract class BaseCryptoExchangeManagement
             springContext,
             (CalculatorController controller)
                 -> {},
-            List.of(() -> getResultFromCalculator(cryptoSoldQuantityField)));
+            List.of(()
+                        -> calculatorService.updateComponentWithResult(
+                            cryptoSoldQuantityField)));
     }
 
     @FXML
@@ -161,43 +162,9 @@ public abstract class BaseCryptoExchangeManagement
             springContext,
             (CalculatorController controller)
                 -> {},
-            List.of(() -> getResultFromCalculator(cryptoReceivedQuantityField)));
-    }
-
-    protected void getResultFromCalculator(TextField field)
-    {
-        // If the user saved the result, set it in the field
-        String result = calculatorService.getResult();
-
-        if (result != null)
-        {
-            try
-            {
-                BigDecimal resultValue = new BigDecimal(result);
-
-                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
-                {
-                    WindowUtils.showInformationDialog("Invalid quantity",
-                                                      "The quantity must be positive");
-                    return;
-                }
-
-                // Ensure that the result has the correct precision
-                result = resultValue
-                             .setScale(Constants.INVESTMENT_CALCULATION_PRECISION,
-                                       RoundingMode.HALF_UP)
-                             .stripTrailingZeros()
-                             .toString();
-
-                field.setText(result);
-            }
-            catch (NumberFormatException e)
-            {
-                // Must be unreachable
-                WindowUtils.showErrorDialog("Invalid quantity",
-                                            "The quantity must be a number");
-            }
-        }
+            List.of(()
+                        -> calculatorService.updateComponentWithResult(
+                            cryptoReceivedQuantityField)));
     }
 
     protected void updateFromCryptoCurrentQuantity()

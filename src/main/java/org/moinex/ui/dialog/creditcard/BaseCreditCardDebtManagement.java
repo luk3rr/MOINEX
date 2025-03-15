@@ -158,44 +158,13 @@ public abstract class BaseCreditCardDebtManagement
     @FXML
     protected void handleOpenCalculator()
     {
-        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
-                                    "Calculator",
-                                    springContext,
-                                    (CalculatorController controller)
-                                        -> {},
-                                    List.of(() -> getResultFromCalculator()));
-    }
-
-    protected void getResultFromCalculator()
-    {
-        // If the user saved the result, set it in the incomeValueField
-        String result = calculatorService.getResult();
-
-        if (result != null)
-        {
-            try
-            {
-                BigDecimal resultValue = new BigDecimal(result);
-
-                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
-                {
-                    WindowUtils.showInformationDialog("Invalid value",
-                                                      "The value must be positive");
-                    return;
-                }
-
-                // Round the result to 2 decimal places
-                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
-
-                valueField.setText(result);
-            }
-            catch (NumberFormatException e)
-            {
-                // Must be unreachable
-                WindowUtils.showErrorDialog("Invalid value",
-                                            "The value must be a number");
-            }
-        }
+        WindowUtils.openPopupWindow(
+            Constants.CALCULATOR_FXML,
+            "Calculator",
+            springContext,
+            (CalculatorController controller)
+                -> {},
+            List.of(() -> calculatorService.updateComponentWithResult(valueField)));
     }
 
     protected void loadCategoriesFromDatabase()

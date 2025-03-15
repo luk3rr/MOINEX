@@ -7,7 +7,6 @@
 package org.moinex.ui.dialog.investment;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import javafx.beans.value.ChangeListener;
@@ -24,9 +23,9 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
+import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.entities.investment.Ticker;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
@@ -112,12 +111,11 @@ public abstract class BaseDividendManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseDividendManagement(
-        WalletService            walletService,
-        WalletTransactionService walletTransactionService,
-        CategoryService          categoryService,
-        CalculatorService        calculatorService,
-        TickerService            tickerService)
+    protected BaseDividendManagement(WalletService            walletService,
+                                     WalletTransactionService walletTransactionService,
+                                     CategoryService          categoryService,
+                                     CalculatorService        calculatorService,
+                                     TickerService            tickerService)
     {
         this.walletService            = walletService;
         this.walletTransactionService = walletTransactionService;
@@ -187,44 +185,14 @@ public abstract class BaseDividendManagement
     @FXML
     protected void handleOpenCalculator()
     {
-        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
-                                    "Calculator",
-                                    springContext,
-                                    (CalculatorController controller)
-                                        -> {},
-                                    List.of(() -> getResultFromCalculator()));
-    }
-
-    protected void getResultFromCalculator()
-    {
-        // If the user saved the result, set it in the dividendValueField
-        String result = calculatorService.getResult();
-
-        if (result != null)
-        {
-            try
-            {
-                BigDecimal resultValue = new BigDecimal(result);
-
-                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
-                {
-                    WindowUtils.showInformationDialog("Invalid value",
-                                                      "The value must be positive");
-                    return;
-                }
-
-                // Round the result to 2 decimal places
-                result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
-
-                dividendValueField.setText(result);
-            }
-            catch (NumberFormatException e)
-            {
-                // Must be unreachable
-                WindowUtils.showErrorDialog("Invalid value",
-                                            "The value must be a number");
-            }
-        }
+        WindowUtils.openPopupWindow(
+            Constants.CALCULATOR_FXML,
+            "Calculator",
+            springContext,
+            (CalculatorController controller)
+                -> {},
+            List.of(
+                () -> calculatorService.updateComponentWithResult(dividendValueField)));
     }
 
     protected void updateWalletBalance()
