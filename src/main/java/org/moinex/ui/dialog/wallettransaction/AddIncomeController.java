@@ -22,6 +22,7 @@ import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -47,6 +48,8 @@ public final class AddIncomeController extends BaseWalletTransactionManagement
                                CalculatorService        calculatorService)
     {
         super(walletService, walletTransactionService, categoryService, calculatorService);
+
+        transactionType = TransactionType.INCOME;
     }
 
     @FXML
@@ -99,5 +102,11 @@ public final class AddIncomeController extends BaseWalletTransactionManagement
         {
             WindowUtils.showErrorDialog("Error while creating income", e.getMessage());
         }
+    }
+
+    @Override
+    protected void loadSuggestionsFromDatabase()
+    {
+        suggestions = walletTransactionService.getIncomeSuggestions();
     }
 }

@@ -37,6 +37,7 @@ import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -95,6 +96,13 @@ public abstract class BaseWalletTransactionManagement
 
     protected Wallet wallet = null;
 
+    protected TransactionType transactionType;
+
+    @FXML
+    protected abstract void handleSave();
+
+    protected abstract void loadSuggestionsFromDatabase();
+
     /**
      * Constructor
      * @param walletService WalletService
@@ -104,10 +112,11 @@ public abstract class BaseWalletTransactionManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseWalletTransactionManagement(WalletService            walletService,
-                                WalletTransactionService walletTransactionService,
-                                CategoryService          categoryService,
-                                CalculatorService        calculatorService)
+    protected BaseWalletTransactionManagement(
+        WalletService            walletService,
+        WalletTransactionService walletTransactionService,
+        CategoryService          categoryService,
+        CalculatorService        calculatorService)
     {
         this.walletService            = walletService;
         this.walletTransactionService = walletTransactionService;
@@ -162,9 +171,6 @@ public abstract class BaseWalletTransactionManagement
         Stage stage = (Stage)descriptionField.getScene().getWindow();
         stage.close();
     }
-
-    @FXML
-    protected abstract void handleSave();
 
     @FXML
     protected void handleOpenCalculator()
@@ -235,11 +241,11 @@ public abstract class BaseWalletTransactionManagement
 
     protected void walletAfterBalance()
     {
-        String expenseValueString = transactionValueField.getText();
-        Wallet wallet             = walletComboBox.getValue();
+        String transactionValueString = transactionValueField.getText();
+        Wallet wallet                 = walletComboBox.getValue();
 
-        if (expenseValueString == null || expenseValueString.strip().isEmpty() ||
-            wallet == null)
+        if (transactionValueString == null ||
+            transactionValueString.strip().isEmpty() || wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -247,18 +253,31 @@ public abstract class BaseWalletTransactionManagement
 
         try
         {
-            BigDecimal expenseValue = new BigDecimal(expenseValueString);
+            BigDecimal transactionValue = new BigDecimal(transactionValueString);
 
-            if (expenseValue.compareTo(BigDecimal.ZERO) < 0)
+            if (transactionValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
 
-            BigDecimal walletAfterBalanceValue =
-                wallet.getBalance().subtract(expenseValue);
+            BigDecimal walletAfterBalanceValue;
 
-            // Set the style according to the balance value after the expense
+            if (transactionType == TransactionType.EXPENSE)
+            {
+                walletAfterBalanceValue =
+                    wallet.getBalance().subtract(transactionValue);
+            }
+            else if (transactionType == TransactionType.INCOME)
+            {
+                walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
+            }
+            else
+            {
+                throw new IllegalStateException("Invalid transaction type");
+            }
+
+            // Set the style according to the balance value after the transaction
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
@@ -291,11 +310,6 @@ public abstract class BaseWalletTransactionManagement
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
     }
 
-    protected void loadSuggestionsFromDatabase()
-    {
-        suggestions = walletTransactionService.getExpenseSuggestions();
-    }
-
     protected void populateComboBoxes()
     {
         walletComboBox.getItems().setAll(wallets);
@@ -308,7 +322,7 @@ public abstract class BaseWalletTransactionManagement
         {
             UIUtils.addTooltipToNode(
                 categoryComboBox,
-                "You need to add a category before adding an expense");
+                "You need to add a category before adding a transaction");
         }
     }
 

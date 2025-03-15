@@ -22,6 +22,7 @@ import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -50,6 +51,8 @@ public final class AddExpenseController extends BaseWalletTransactionManagement
               walletTransactionService,
               categoryService,
               calculatorService);
+
+        transactionType = TransactionType.EXPENSE;
     }
 
     @FXML
@@ -102,5 +105,11 @@ public final class AddExpenseController extends BaseWalletTransactionManagement
         {
             WindowUtils.showErrorDialog("Error creating expense", e.getMessage());
         }
+    }
+
+    @Override
+    protected void loadSuggestionsFromDatabase()
+    {
+        suggestions = walletTransactionService.getExpenseSuggestions();
     }
 }

@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
@@ -29,6 +28,8 @@ import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
 import org.moinex.util.enums.TransactionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -43,6 +44,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     private ComboBox<TransactionType> typeComboBox;
 
     private WalletTransaction walletTransaction = null;
+
+    private static final Logger logger =
+        LoggerFactory.getLogger(EditTransactionController.class);
 
     /**
      * Constructor
@@ -91,7 +95,11 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     {
         super.initialize();
 
-        typeComboBox.setOnAction(e -> walletAfterBalance());
+        typeComboBox.setOnAction(e -> {
+            transactionType = typeComboBox.getValue();
+            loadSuggestionsFromDatabase();
+            walletAfterBalance();
+        });
 
         typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
         UIUtils.configureComboBox(typeComboBox, TransactionType::name);
@@ -310,6 +318,29 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         catch (NumberFormatException e)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
+        }
+    }
+
+    @Override
+    protected void loadSuggestionsFromDatabase()
+    {
+        if (typeComboBox.getValue() == TransactionType.EXPENSE)
+        {
+            suggestions = walletTransactionService.getExpenseSuggestions();
+        }
+        else if (typeComboBox.getValue() == TransactionType.INCOME)
+        {
+            suggestions = walletTransactionService.getIncomeSuggestions();
+        }
+        else if (typeComboBox.getValue() == null)
+        {
+            suggestions = null;
+        }
+        else
+        {
+            logger.warn("Type not mapped. Suggestions will not be loaded. Consider "
+                        + "mapping the type");
+            suggestions = null;
         }
     }
 }
