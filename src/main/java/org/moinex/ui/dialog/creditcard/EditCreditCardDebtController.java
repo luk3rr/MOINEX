@@ -65,9 +65,9 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
-        descriptionField.textProperty().removeListener(descriptionFieldListener);
+        suggestionsHandler.disable();
         descriptionField.setText(crcDebt.getDescription());
-        descriptionField.textProperty().addListener(descriptionFieldListener);
+        suggestionsHandler.enable();
 
         valueField.setText(crcDebt.getAmount().toString());
         installmentsField.setText(crcDebt.getInstallments().toString());

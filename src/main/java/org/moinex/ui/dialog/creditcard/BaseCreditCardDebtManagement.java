@@ -11,18 +11,12 @@ import java.math.RoundingMode;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javafx.beans.value.ChangeListener;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
@@ -33,6 +27,7 @@ import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
+import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.slf4j.Logger;
@@ -79,13 +74,7 @@ public abstract class BaseCreditCardDebtManagement
     @Autowired
     protected ConfigurableApplicationContext springContext;
 
-    protected Popup suggestionsPopup;
-
-    protected ListView<CreditCardDebt> suggestionListView;
-
-    protected List<CreditCardDebt> suggestions;
-
-    protected ChangeListener<String> descriptionFieldListener;
+    protected SuggestionsHandlerHelper<CreditCardDebt> suggestionsHandler;
 
     protected List<Category> categories;
 
@@ -127,6 +116,8 @@ public abstract class BaseCreditCardDebtManagement
     @FXML
     protected void initialize()
     {
+        configureListeners();
+        configureSuggestions();
         configureComboBoxes();
 
         loadCategoriesFromDatabase();
@@ -139,10 +130,6 @@ public abstract class BaseCreditCardDebtManagement
         UIUtils.resetLabel(crcLimitLabel);
         UIUtils.resetLabel(crcAvailableLimitLabel);
         UIUtils.resetLabel(crcLimitAvailableAfterDebtLabel);
-
-        configureSuggestionsListView();
-        configureSuggestionsPopup();
-        configureListeners();
     }
 
     @FXML
@@ -179,7 +166,8 @@ public abstract class BaseCreditCardDebtManagement
 
     protected void loadSuggestionsFromDatabase()
     {
-        suggestions = creditCardService.getCreditCardDebtSuggestions();
+        suggestionsHandler.setSuggestions(
+            creditCardService.getCreditCardDebtSuggestions());
     }
 
     protected void updateCreditCardLimitLabels()
@@ -361,6 +349,33 @@ public abstract class BaseCreditCardDebtManagement
             yearMonth -> yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
     }
 
+    protected void configureSuggestions()
+    {
+        Function<CreditCardDebt, String> filterFunction =
+            CreditCardDebt::getDescription;
+
+        // Format:
+        //    Description
+        //    Amount | CreditCard | Category | Installments
+        Function<CreditCardDebt, String> displayFunction = ccd
+            -> String.format("%s\n%s | %s | %s | %sx",
+                             ccd.getDescription(),
+                             UIUtils.formatCurrency(ccd.getAmount()),
+                             ccd.getCreditCard().getName(),
+                             ccd.getCategory().getName(),
+                             ccd.getInstallments());
+
+        Consumer<CreditCardDebt> onSelectCallback =
+            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
+
+        suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
+                                                            filterFunction,
+                                                            displayFunction,
+                                                            onSelectCallback);
+
+        suggestionsHandler.enable();
+    }
+
     protected void configureListeners()
     {
         crcComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -392,158 +407,6 @@ public abstract class BaseCreditCardDebtManagement
                     updateMsgLabel();
                 }
             });
-
-        // Store the listener in a variable to be able to disable and enable it
-        // when needed
-        descriptionFieldListener = (observable, oldValue, newValue) ->
-        {
-            if (newValue.strip().isEmpty())
-            {
-                suggestionsPopup.hide();
-                return;
-            }
-
-            suggestionListView.getItems().clear();
-
-            // Filter the suggestions list to show only the transfers that
-            // contain similar descriptions to the one typed by the user
-            List<CreditCardDebt> filteredSuggestions =
-                suggestions.stream()
-                    .filter(tx
-                            -> tx.getDescription().toLowerCase().contains(
-                                newValue.toLowerCase()))
-                    .toList();
-
-            if (filteredSuggestions.size() > Constants.SUGGESTIONS_MAX_ITEMS)
-            {
-                filteredSuggestions =
-                    filteredSuggestions.subList(0, Constants.SUGGESTIONS_MAX_ITEMS);
-            }
-
-            suggestionListView.getItems().addAll(filteredSuggestions);
-
-            try
-            {
-                if (!filteredSuggestions.isEmpty())
-                {
-                    adjustPopupWidth();
-                    adjustPopupHeight();
-
-                    suggestionsPopup.show(
-                        descriptionField,
-                        descriptionField.localToScene(0, 0).getX() +
-                            descriptionField.getScene().getWindow().getX() +
-                            descriptionField.getScene().getX(),
-                        descriptionField.localToScene(0, 0).getY() +
-                            descriptionField.getScene().getWindow().getY() +
-                            descriptionField.getScene().getY() +
-                            descriptionField.getHeight());
-                }
-                else
-                {
-                    suggestionsPopup.hide();
-                }
-            }
-            catch (NullPointerException e)
-            {
-                logger.error("Error showing suggestions popup");
-            }
-        };
-
-        descriptionField.textProperty().addListener(descriptionFieldListener);
-    }
-
-    protected void configureSuggestionsPopup()
-    {
-        if (suggestionsPopup == null)
-        {
-            configureSuggestionsListView();
-        }
-
-        suggestionsPopup = new Popup();
-        suggestionsPopup.setAutoHide(true);
-        suggestionsPopup.setHideOnEscape(true);
-        suggestionsPopup.getContent().add(suggestionListView);
-    }
-
-    protected void adjustPopupWidth()
-    {
-        suggestionListView.setPrefWidth(descriptionField.getWidth());
-    }
-
-    protected void adjustPopupHeight()
-    {
-        Integer itemCount = suggestionListView.getItems().size();
-
-        Double cellHeight = 45.0;
-
-        itemCount = Math.min(itemCount, Constants.SUGGESTIONS_MAX_ITEMS);
-
-        Double totalHeight = itemCount * cellHeight;
-
-        suggestionListView.setPrefHeight(totalHeight);
-    }
-
-    protected void configureSuggestionsListView()
-    {
-        suggestionListView = new ListView<>();
-
-        // Set the cell factory to display the description, amount, wallet and
-        // category of the transaction
-        // Format:
-        //    Description
-        //    Amount | CreditCard | Category | Installments
-        suggestionListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(CreditCardDebt item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (empty || item == null)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    VBox cellContent = new VBox();
-                    cellContent.setSpacing(2);
-
-                    Label descriptionLabel = new Label(item.getDescription());
-
-                    String infoString = UIUtils.formatCurrency(item.getAmount()) +
-                                        " | " + item.getCreditCard().getName() +
-                                        " | " + item.getCategory().getName() + " | " +
-                                        item.getInstallments() + "x";
-
-                    Label infoLabel = new Label(infoString);
-
-                    cellContent.getChildren().addAll(descriptionLabel, infoLabel);
-
-                    setGraphic(cellContent);
-                }
-            }
-        });
-
-        suggestionListView.setPrefWidth(Region.USE_COMPUTED_SIZE);
-        suggestionListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-
-        // By default, the SPACE key is used to select an item in the ListView.
-        // This behavior is not desired in this case, so the event is consumed
-        suggestionListView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.SPACE)
-            {
-                event.consume(); // Do not propagate the event
-            }
-        });
-
-        // Add a listener to the ListView to fill the fields with the selected
-        suggestionListView.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (newValue != null)
-                {
-                    fillFieldsWithTransaction(newValue);
-                    suggestionsPopup.hide();
-                }
-            });
     }
 
     protected void fillFieldsWithTransaction(CreditCardDebt ccd)
@@ -553,11 +416,11 @@ public abstract class BaseCreditCardDebtManagement
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
-        descriptionField.textProperty().removeListener(descriptionFieldListener);
+        suggestionsHandler.disable();
 
         descriptionField.setText(ccd.getDescription());
 
-        descriptionField.textProperty().addListener(descriptionFieldListener);
+        suggestionsHandler.enable();
 
         valueField.setText(ccd.getAmount().toString());
         installmentsField.setText(ccd.getInstallments().toString());

@@ -9,31 +9,29 @@ package org.moinex.ui.dialog.investment;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import javafx.beans.value.ChangeListener;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
+import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.entities.investment.Ticker;
 import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.util.Constants;
+import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -77,9 +75,7 @@ public abstract class BaseTickerTransactionManagement
     @FXML
     protected DatePicker transactionDatePicker;
 
-    protected Popup suggestionsPopup;
-
-    protected ListView<WalletTransaction> suggestionListView;
+    protected SuggestionsHandlerHelper<WalletTransaction> suggestionsHandler;
 
     protected WalletService walletService;
 
@@ -93,13 +89,11 @@ public abstract class BaseTickerTransactionManagement
 
     protected List<Category> categories;
 
-    protected List<WalletTransaction> suggestions;
-
-    protected ChangeListener<String> descriptionFieldListener;
-
     protected Ticker ticker = null;
 
     protected Wallet wallet = null;
+
+    protected TransactionType transactionType;
 
     /**
      * Constructor
@@ -144,6 +138,9 @@ public abstract class BaseTickerTransactionManagement
     @FXML
     protected void initialize()
     {
+
+        configureSuggestions();
+        configureListeners();
         configureComboBoxes();
 
         loadWalletsFromDatabase();
@@ -163,10 +160,6 @@ public abstract class BaseTickerTransactionManagement
             updateWalletBalance();
             walletAfterBalance();
         });
-
-        configureSuggestionsListView();
-        configureSuggestionsPopup();
-        configureListeners();
     }
 
     @FXML
@@ -251,18 +244,32 @@ public abstract class BaseTickerTransactionManagement
 
         try
         {
-            BigDecimal buyValue =
+            BigDecimal transactionValue =
                 new BigDecimal(unitPriceStr).multiply(new BigDecimal(quantityStr));
 
-            if (buyValue.compareTo(BigDecimal.ZERO) < 0)
+            if (transactionValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
 
-            BigDecimal walletAfterBalanceValue = wallet.getBalance().subtract(buyValue);
+            BigDecimal walletAfterBalanceValue;
 
-            // Episilon is used to avoid floating point arithmetic errors
+            if (transactionType == TransactionType.EXPENSE)
+            {
+                walletAfterBalanceValue =
+                    wallet.getBalance().subtract(transactionValue);
+            }
+            else if (transactionType == TransactionType.INCOME)
+            {
+                walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
+            }
+            else
+            {
+                throw new IllegalStateException("Invalid transaction type");
+            }
+
+            // Set the style according to the balance value after the transaction
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
@@ -297,7 +304,8 @@ public abstract class BaseTickerTransactionManagement
 
     protected void loadSuggestionsFromDatabase()
     {
-        suggestions = walletTransactionService.getExpenseSuggestions();
+        suggestionsHandler.setSuggestions(
+            walletTransactionService.getExpenseSuggestions());
     }
 
     protected void populateComboBoxes()
@@ -325,58 +333,6 @@ public abstract class BaseTickerTransactionManagement
 
     protected void configureListeners()
     {
-        // Store the listener in a variable to be able to disable and enable it
-        // when needed
-        descriptionFieldListener = (observable, oldValue, newValue) ->
-        {
-            if (newValue.strip().isEmpty())
-            {
-                suggestionsPopup.hide();
-                return;
-            }
-
-            suggestionListView.getItems().clear();
-
-            // Filter the suggestions list to show only the transactions that
-            // contain similar descriptions to the one typed by the user
-            List<WalletTransaction> filteredSuggestions =
-                suggestions.stream()
-                    .filter(tx
-                            -> tx.getDescription().toLowerCase().contains(
-                                newValue.toLowerCase()))
-                    .toList();
-
-            if (filteredSuggestions.size() > Constants.SUGGESTIONS_MAX_ITEMS)
-            {
-                filteredSuggestions =
-                    filteredSuggestions.subList(0, Constants.SUGGESTIONS_MAX_ITEMS);
-            }
-
-            suggestionListView.getItems().addAll(filteredSuggestions);
-
-            if (!filteredSuggestions.isEmpty())
-            {
-                adjustPopupWidth();
-                adjustPopupHeight();
-
-                suggestionsPopup.show(
-                    descriptionField,
-                    descriptionField.localToScene(0, 0).getX() +
-                        descriptionField.getScene().getWindow().getX() +
-                        descriptionField.getScene().getX(),
-                    descriptionField.localToScene(0, 0).getY() +
-                        descriptionField.getScene().getWindow().getY() +
-                        descriptionField.getScene().getY() +
-                        descriptionField.getHeight());
-            }
-            else
-            {
-                suggestionsPopup.hide();
-            }
-        };
-
-        descriptionField.textProperty().addListener(descriptionFieldListener);
-
         // Update wallet after balance when the value field changes
         unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
@@ -413,87 +369,30 @@ public abstract class BaseTickerTransactionManagement
         });
     }
 
-    protected void configureSuggestionsListView()
+    protected void configureSuggestions()
     {
-        suggestionListView = new ListView<>();
+        Function<WalletTransaction, String> filterFunction =
+            WalletTransaction::getDescription;
 
-        // Set the cell factory to display the description, amount, wallet and
-        // category of the transaction
         // Format:
         //    Description
         //    Amount | Wallet | Category
-        suggestionListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(WalletTransaction item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (empty || item == null)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    VBox cellContent = new VBox();
-                    cellContent.setSpacing(2);
+        Function<WalletTransaction, String> displayFunction = wt
+            -> String.format("%s\n%s | %s | %s ",
+                             wt.getDescription(),
+                             UIUtils.formatCurrency(wt.getAmount()),
+                             wt.getWallet().getName(),
+                             wt.getCategory().getName());
 
-                    Label descriptionLabel = new Label(item.getDescription());
+        Consumer<WalletTransaction> onSelectCallback =
+            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
 
-                    String infoString = UIUtils.formatCurrency(item.getAmount()) +
-                                        " | " + item.getWallet().getName() + " | " +
-                                        item.getCategory().getName();
+        suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
+                                                            filterFunction,
+                                                            displayFunction,
+                                                            onSelectCallback);
 
-                    Label infoLabel = new Label(infoString);
-
-                    cellContent.getChildren().addAll(descriptionLabel, infoLabel);
-
-                    setGraphic(cellContent);
-                }
-            }
-        });
-
-        suggestionListView.setPrefWidth(Region.USE_COMPUTED_SIZE);
-        suggestionListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-
-        // Add a listener to the ListView to fill the fields with the selected
-        suggestionListView.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (newValue != null)
-                {
-                    fillFieldsWithTransaction(newValue);
-                    suggestionsPopup.hide();
-                }
-            });
-    }
-
-    protected void configureSuggestionsPopup()
-    {
-        if (suggestionsPopup == null)
-        {
-            configureSuggestionsListView();
-        }
-
-        suggestionsPopup = new Popup();
-        suggestionsPopup.setAutoHide(true);
-        suggestionsPopup.setHideOnEscape(true);
-        suggestionsPopup.getContent().add(suggestionListView);
-    }
-
-    protected void adjustPopupWidth()
-    {
-        suggestionListView.setPrefWidth(descriptionField.getWidth());
-    }
-
-    protected void adjustPopupHeight()
-    {
-        Integer itemCount = suggestionListView.getItems().size();
-
-        Double cellHeight = 45.0;
-
-        itemCount = Math.min(itemCount, Constants.SUGGESTIONS_MAX_ITEMS);
-
-        Double totalHeight = itemCount * cellHeight;
-
-        suggestionListView.setPrefHeight(totalHeight);
+        suggestionsHandler.enable();
     }
 
     protected void fillFieldsWithTransaction(WalletTransaction wt)
@@ -503,11 +402,9 @@ public abstract class BaseTickerTransactionManagement
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
-        descriptionField.textProperty().removeListener(descriptionFieldListener);
-
+        suggestionsHandler.disable();
         descriptionField.setText(wt.getDescription());
-
-        descriptionField.textProperty().addListener(descriptionFieldListener);
+        suggestionsHandler.enable();
 
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());

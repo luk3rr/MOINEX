@@ -23,6 +23,7 @@ import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -48,6 +49,8 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
                                    TickerService            tickerService)
     {
         super(walletService, walletTransactionService, categoryService, tickerService);
+
+        transactionType = TransactionType.INCOME;
     }
 
     @FXML

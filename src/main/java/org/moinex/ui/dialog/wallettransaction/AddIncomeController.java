@@ -47,7 +47,10 @@ public final class AddIncomeController extends BaseWalletTransactionManagement
                                CategoryService          categoryService,
                                CalculatorService        calculatorService)
     {
-        super(walletService, walletTransactionService, categoryService, calculatorService);
+        super(walletService,
+              walletTransactionService,
+              categoryService,
+              calculatorService);
 
         transactionType = TransactionType.INCOME;
     }
@@ -107,6 +110,7 @@ public final class AddIncomeController extends BaseWalletTransactionManagement
     @Override
     protected void loadSuggestionsFromDatabase()
     {
-        suggestions = walletTransactionService.getIncomeSuggestions();
+        suggestionsHandler.setSuggestions(
+            walletTransactionService.getIncomeSuggestions());
     }
 }

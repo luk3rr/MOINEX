@@ -8,24 +8,17 @@ package org.moinex.ui.dialog.wallettransaction;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import javafx.beans.value.ChangeListener;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.wallettransaction.Transfer;
@@ -37,6 +30,7 @@ import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
+import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,9 +74,7 @@ public class AddTransferController
     @Autowired
     private ConfigurableApplicationContext springContext;
 
-    private Popup suggestionsPopup;
-
-    private ListView<Transfer> suggestionListView;
+    private SuggestionsHandlerHelper<Transfer> suggestionsHandler;
 
     private WalletService walletService;
 
@@ -91,10 +83,6 @@ public class AddTransferController
     private CalculatorService calculatorService;
 
     private List<Wallet> wallets;
-
-    private List<Transfer> suggestions;
-
-    private ChangeListener<String> descriptionFieldListener;
 
     private Wallet senderWallet = null;
 
@@ -144,6 +132,8 @@ public class AddTransferController
     @FXML
     private void initialize()
     {
+        configureSuggestions();
+        configureListeners();
         configureComboBoxes();
 
         loadWalletsFromDatabase();
@@ -169,10 +159,6 @@ public class AddTransferController
             updateReceiverWalletBalance();
             updateReceiverWalletAfterBalance();
         });
-
-        configureSuggestionsListView();
-        configureSuggestionsPopup();
-        configureListeners();
     }
 
     @FXML
@@ -406,58 +392,6 @@ public class AddTransferController
                     updateReceiverWalletAfterBalance();
                 }
             });
-
-        // Store the listener in a variable to be able to disable and enable it
-        // when needed
-        descriptionFieldListener = (observable, oldValue, newValue) ->
-        {
-            if (newValue.strip().isEmpty())
-            {
-                suggestionsPopup.hide();
-                return;
-            }
-
-            suggestionListView.getItems().clear();
-
-            // Filter the suggestions list to show only the transfers that
-            // contain similar descriptions to the one typed by the user
-            List<Transfer> filteredSuggestions =
-                suggestions.stream()
-                    .filter(tx
-                            -> tx.getDescription().toLowerCase().contains(
-                                newValue.toLowerCase()))
-                    .toList();
-
-            if (filteredSuggestions.size() > Constants.SUGGESTIONS_MAX_ITEMS)
-            {
-                filteredSuggestions =
-                    filteredSuggestions.subList(0, Constants.SUGGESTIONS_MAX_ITEMS);
-            }
-
-            suggestionListView.getItems().addAll(filteredSuggestions);
-
-            if (!filteredSuggestions.isEmpty())
-            {
-                adjustPopupWidth();
-                adjustPopupHeight();
-
-                suggestionsPopup.show(
-                    descriptionField,
-                    descriptionField.localToScene(0, 0).getX() +
-                        descriptionField.getScene().getWindow().getX() +
-                        descriptionField.getScene().getX(),
-                    descriptionField.localToScene(0, 0).getY() +
-                        descriptionField.getScene().getWindow().getY() +
-                        descriptionField.getScene().getY() +
-                        descriptionField.getHeight());
-            }
-            else
-            {
-                suggestionsPopup.hide();
-            }
-        };
-
-        descriptionField.textProperty().addListener(descriptionFieldListener);
     }
 
     private void loadWalletsFromDatabase()
@@ -467,7 +401,8 @@ public class AddTransferController
 
     private void loadSuggestionsFromDatabase()
     {
-        suggestions = walletTransactionService.getTransferSuggestions();
+        suggestionsHandler.setSuggestions(
+            walletTransactionService.getTransferSuggestions());
     }
 
     private void populateComboBoxes()
@@ -482,97 +417,29 @@ public class AddTransferController
         UIUtils.configureComboBox(receiverWalletComboBox, Wallet::getName);
     }
 
-    private void configureSuggestionsPopup()
+    private void configureSuggestions()
     {
-        if (suggestionsPopup == null)
-        {
-            configureSuggestionsListView();
-        }
+        Function<Transfer, String> filterFunction = Transfer::getDescription;
 
-        suggestionsPopup = new Popup();
-        suggestionsPopup.setAutoHide(true);
-        suggestionsPopup.setHideOnEscape(true);
-        suggestionsPopup.getContent().add(suggestionListView);
-    }
-
-    private void adjustPopupWidth()
-    {
-        suggestionListView.setPrefWidth(descriptionField.getWidth());
-    }
-
-    private void adjustPopupHeight()
-    {
-        Integer itemCount = suggestionListView.getItems().size();
-
-        Double cellHeight = 45.0;
-
-        itemCount = Math.min(itemCount, Constants.SUGGESTIONS_MAX_ITEMS);
-
-        Double totalHeight = itemCount * cellHeight;
-
-        suggestionListView.setPrefHeight(totalHeight);
-    }
-
-    private void configureSuggestionsListView()
-    {
-        suggestionListView = new ListView<>();
-
-        // Set the cell factory to display the description, amount, wallet and
-        // category of the transaction
         // Format:
         //    Description
         //    Amount | From: Wallet | To: Wallet
-        suggestionListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(Transfer item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (empty || item == null)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    VBox cellContent = new VBox();
-                    cellContent.setSpacing(2);
+        Function<Transfer, String> displayFunction = tf
+            -> String.format("%s\n%s | From: %s | To: %s ",
+                             tf.getDescription(),
+                             UIUtils.formatCurrency(tf.getAmount()),
+                             tf.getSenderWallet().getName(),
+                             tf.getReceiverWallet().getName());
 
-                    Label descriptionLabel = new Label(item.getDescription());
+        Consumer<Transfer> onSelectCallback =
+            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
 
-                    String infoString =
-                        UIUtils.formatCurrency(item.getAmount()) +
-                        " | From: " + item.getSenderWallet().getName() +
-                        " | To: " + item.getReceiverWallet().getName();
+        suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
+                                                            filterFunction,
+                                                            displayFunction,
+                                                            onSelectCallback);
 
-                    Label infoLabel = new Label(infoString);
-
-                    cellContent.getChildren().addAll(descriptionLabel, infoLabel);
-
-                    setGraphic(cellContent);
-                }
-            }
-        });
-
-        suggestionListView.setPrefWidth(Region.USE_COMPUTED_SIZE);
-        suggestionListView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-
-        // By default, the SPACE key is used to select an item in the ListView.
-        // This behavior is not desired in this case, so the event is consumed
-        suggestionListView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.SPACE)
-            {
-                event.consume(); // Do not propagate the event
-            }
-        });
-
-        // Add a listener to the ListView to fill the fields with the selected
-        suggestionListView.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (newValue != null)
-                {
-                    fillFieldsWithTransaction(newValue);
-                    suggestionsPopup.hide();
-                }
-            });
+        suggestionsHandler.enable();
     }
 
     private void fillFieldsWithTransaction(Transfer t)
@@ -583,11 +450,9 @@ public class AddTransferController
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
-        descriptionField.textProperty().removeListener(descriptionFieldListener);
-
+        suggestionsHandler.disable();
         descriptionField.setText(t.getDescription());
-
-        descriptionField.textProperty().addListener(descriptionFieldListener);
+        suggestionsHandler.enable();
 
         transferValueField.setText(t.getAmount().toString());
 

@@ -23,6 +23,7 @@ import org.moinex.services.WalletService;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -50,6 +51,8 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
         this.walletService   = walletService;
         this.categoryService = categoryService;
         this.tickerService   = tickerService;
+
+        transactionType = TransactionType.EXPENSE;
     }
 
     public void setPurchase(TickerPurchase p)

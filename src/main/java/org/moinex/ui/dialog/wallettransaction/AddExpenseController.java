@@ -110,6 +110,7 @@ public final class AddExpenseController extends BaseWalletTransactionManagement
     @Override
     protected void loadSuggestionsFromDatabase()
     {
-        suggestions = walletTransactionService.getExpenseSuggestions();
+        suggestionsHandler.setSuggestions(
+            walletTransactionService.getExpenseSuggestions());
     }
 }

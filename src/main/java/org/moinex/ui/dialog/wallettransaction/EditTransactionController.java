@@ -79,15 +79,17 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         // Deactivate the listener to avoid the event of changing the text of
         // the descriptionField from being triggered. After changing the text,
         // the listener is activated again
-        descriptionField.textProperty().removeListener(descriptionFieldListener);
+        suggestionsHandler.disable();
         descriptionField.setText(walletTransaction.getDescription());
-        descriptionField.textProperty().addListener(descriptionFieldListener);
+        suggestionsHandler.enable();
 
         transactionDatePicker.setValue(walletTransaction.getDate().toLocalDate());
         typeComboBox.setValue(walletTransaction.getType());
+        transactionType = walletTransaction.getType();
 
         updateWalletBalance();
         walletAfterBalance();
+        loadSuggestionsFromDatabase();
     }
 
     @FXML
@@ -326,21 +328,24 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     {
         if (typeComboBox.getValue() == TransactionType.EXPENSE)
         {
-            suggestions = walletTransactionService.getExpenseSuggestions();
+            suggestionsHandler.setSuggestions(
+                walletTransactionService.getExpenseSuggestions());
         }
         else if (typeComboBox.getValue() == TransactionType.INCOME)
         {
-            suggestions = walletTransactionService.getIncomeSuggestions();
+            suggestionsHandler.setSuggestions(
+                walletTransactionService.getIncomeSuggestions());
         }
         else if (typeComboBox.getValue() == null)
         {
-            suggestions = null;
+            logger.warn("Type not selected. Suggestions will not be loaded.");
+            suggestionsHandler.setSuggestions(null);
         }
         else
         {
             logger.warn("Type not mapped. Suggestions will not be loaded. Consider "
                         + "mapping the type");
-            suggestions = null;
+            suggestionsHandler.setSuggestions(null);
         }
     }
 }
