@@ -556,6 +556,20 @@ public class TransactionController
         // Set the Y-axis properties only if maxTotal is greater than 0
         Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
+        numberAxis.setTickLabelFormatter(new StringConverter<Number>() {
+            @Override
+            public String toString(Number value)
+            {
+                return UIUtils.formatCurrency(value);
+            }
+
+            @Override
+            public Number fromString(String string)
+            {
+                return 0;
+            }
+        });
+
         for (XYChart.Series<String, Number> series : moneyFlowStackedBarChart.getData())
         {
             for (XYChart.Data<String, Number> data : series.getData())

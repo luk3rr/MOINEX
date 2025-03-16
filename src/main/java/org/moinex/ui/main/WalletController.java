@@ -33,6 +33,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.charts.DoughnutChart;
 import org.moinex.entities.creditcard.CreditCardPayment;
@@ -732,6 +733,20 @@ public class WalletController
         {
             NumberAxis numberAxis = (NumberAxis)yAxis;
             Animation.setDynamicYAxisBounds(numberAxis, maxValue);
+
+            numberAxis.setTickLabelFormatter(new StringConverter<Number>() {
+                @Override
+                public String toString(Number value)
+                {
+                    return UIUtils.formatCurrency(value);
+                }
+
+                @Override
+                public Number fromString(String string)
+                {
+                    return 0;
+                }
+            });
         }
 
         moneyFlowBarChart.setVerticalGridLinesVisible(false);

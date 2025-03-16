@@ -177,6 +177,8 @@ public final class Constants
     public static final String SUCCESS_ICON      = COMMON_ICONS_PATH + "success.png";
     public static final String DEFAULT_ICON      = COMMON_ICONS_PATH + "default.png";
     public static final String TROPHY_ICON       = COMMON_ICONS_PATH + "trophy.png";
+    public static final String HIDE_ICON         = COMMON_ICONS_PATH + "hide.png";
+    public static final String SHOW_ICON         = COMMON_ICONS_PATH + "show.png";
 
     // GIFs
     public static final String LOADING_GIF = GIF_PATH + "loading.gif";

@@ -582,6 +582,20 @@ public class CreditCardController
         // Set the maximum total as the upper bound of the y-axis
         Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
+        numberAxis.setTickLabelFormatter(new StringConverter<Number>() {
+            @Override
+            public String toString(Number value)
+            {
+                return UIUtils.formatCurrency(value);
+            }
+
+            @Override
+            public Number fromString(String string)
+            {
+                return 0;
+            }
+        });
+
         for (XYChart.Series<String, Number> series : debtsFlowStackedBarChart.getData())
         {
             for (XYChart.Data<String, Number> data : series.getData())

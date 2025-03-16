@@ -16,11 +16,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import lombok.NoArgsConstructor;
+import org.moinex.services.UserPreferencesService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.ui.common.CalendarController;
 import org.moinex.util.Constants;
@@ -77,8 +81,16 @@ public class MainController
     @FXML
     private AnchorPane contentArea;
 
+    @FXML
+    private ImageView toggleMonetaryValuesIcon;
+
     @Autowired
     private ConfigurableApplicationContext springContext;
+
+    @Autowired
+    private UserPreferencesService userPreferencesService;
+
+    private Pair<String, String> currentContent;
 
     private boolean  isMenuExpanded = false;
     private Button[] sidebarButtons;
@@ -171,6 +183,19 @@ public class MainController
                                     List.of(() -> {}));
     }
 
+    @FXML
+    private void handleToggleMonetaryValues()
+    {
+        userPreferencesService.toggleHideMonetaryValues();
+
+        toggleMonetaryValuesIcon.setImage(new Image(
+            userPreferencesService.showMonetaryValues() ? Constants.SHOW_ICON
+                                                        : Constants.HIDE_ICON));
+
+        // Reload all the interface
+        loadContent(currentContent.getKey(), currentContent.getValue());
+    }
+
     /**
      * Load the content of the main window with the content of the FXML file
      * passed as parameter
@@ -197,6 +222,8 @@ public class MainController
 
             contentArea.getChildren().clear();
             contentArea.getChildren().add(newContent);
+
+            currentContent = new Pair<>(fxmlFile, styleSheet);
         }
         catch (IOException e)
         {

@@ -20,10 +20,14 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.NonNull;
 import org.moinex.entities.wallettransaction.Wallet;
+import org.moinex.services.UserPreferencesService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class for UI-related functionalities
  */
+@Component
 public final class UIUtils
 {
     private static final DecimalFormat currencyFormat =
@@ -32,10 +36,13 @@ public final class UIUtils
     private static final DecimalFormat percentageFormat =
         new DecimalFormat(Constants.PERCENTAGE_FORMAT);
 
-    /**
-     * Prevent instantiation
-     */
-    private UIUtils() { }
+    private static UserPreferencesService userPreferencesService;
+
+    @Autowired
+    public UIUtils(UserPreferencesService userPreferencesService)
+    {
+        UIUtils.userPreferencesService = userPreferencesService;
+    }
 
     /**
      * Add a tooltip to a XYChart node
@@ -68,10 +75,17 @@ public final class UIUtils
     /**
      * Format a number to a currency string
      * @param value The value to be formatted
+     * @param hideValues Whether to hide the values
      * @note Automatically formats to 2 fraction digits, rounding half up
      */
     public static String formatCurrency(Number value)
     {
+        if (userPreferencesService != null &&
+            userPreferencesService.hideMonetaryValues())
+        {
+            return "****";
+        }
+
         return currencyFormat.format(value);
     }
 
@@ -81,6 +95,12 @@ public final class UIUtils
      */
     public static String formatCurrencyDynamic(Number value)
     {
+        if (userPreferencesService != null &&
+            userPreferencesService.hideMonetaryValues())
+        {
+            return "****";
+        }
+
         DecimalFormat dynamicFormat = new DecimalFormat(Constants.CURRENCY_FORMAT);
 
         // Determine the number of fraction digits dynamically
