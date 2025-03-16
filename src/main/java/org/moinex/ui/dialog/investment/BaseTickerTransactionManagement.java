@@ -125,7 +125,7 @@ public abstract class BaseTickerTransactionManagement
 
         this.wallet = wt;
         walletComboBox.setValue(wallet);
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(wt, walletCurrentBalanceValueLabel);
     }
 
     public void setTicker(Ticker ticker)
@@ -157,7 +157,8 @@ public abstract class BaseTickerTransactionManagement
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
         walletComboBox.setOnAction(e -> {
-            updateWalletBalance();
+            UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                        walletCurrentBalanceValueLabel);
             walletAfterBalance();
         });
     }
@@ -203,30 +204,6 @@ public abstract class BaseTickerTransactionManagement
 
             totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
         }
-    }
-
-    protected void updateWalletBalance()
-    {
-        Wallet wallet = walletComboBox.getValue();
-
-        if (wallet == null)
-        {
-            return;
-        }
-
-        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
-                                  Constants.NEGATIVE_BALANCE_STYLE);
-        }
-        else
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
-                                  Constants.NEUTRAL_BALANCE_STYLE);
-        }
-
-        walletCurrentBalanceValueLabel.setText(
-            UIUtils.formatCurrency(wallet.getBalance()));
     }
 
     protected void walletAfterBalance()
@@ -409,7 +386,8 @@ public abstract class BaseTickerTransactionManagement
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                    walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 }

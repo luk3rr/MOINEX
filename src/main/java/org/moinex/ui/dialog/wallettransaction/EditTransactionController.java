@@ -87,7 +87,8 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         typeComboBox.setValue(walletTransaction.getType());
         transactionType = walletTransaction.getType();
 
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                    walletAfterBalanceValueLabel);
         walletAfterBalance();
         loadSuggestionsFromDatabase();
     }

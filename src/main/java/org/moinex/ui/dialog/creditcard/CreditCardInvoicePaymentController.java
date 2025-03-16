@@ -138,7 +138,8 @@ public class CreditCardInvoicePaymentController
         if (creditCard.getDefaultBillingWallet() != null)
         {
             walletComboBox.setValue(creditCard.getDefaultBillingWallet());
-            updateWalletBalance();
+            UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                        walletCurrentBalanceLabel);
             walletAfterBalance();
         }
     }
@@ -160,7 +161,8 @@ public class CreditCardInvoicePaymentController
         UIUtils.resetLabel(crcInvoiceMonthLabel);
 
         walletComboBox.setOnAction(e -> {
-            updateWalletBalance();
+            UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                        walletCurrentBalanceLabel);
             walletAfterBalance();
         });
 
@@ -254,29 +256,6 @@ public class CreditCardInvoicePaymentController
             List.of(()
                         -> calculatorService.updateComponentWithResult(
                             useRebateValueField)));
-    }
-
-    private void updateWalletBalance()
-    {
-        Wallet wallet = walletComboBox.getValue();
-
-        if (wallet == null)
-        {
-            return;
-        }
-
-        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceLabel,
-                                  Constants.NEGATIVE_BALANCE_STYLE);
-        }
-        else
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceLabel,
-                                  Constants.NEUTRAL_BALANCE_STYLE);
-        }
-
-        walletCurrentBalanceLabel.setText(UIUtils.formatCurrency(wallet.getBalance()));
     }
 
     private void walletAfterBalance()

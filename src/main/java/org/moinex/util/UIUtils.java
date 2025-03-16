@@ -18,6 +18,8 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import lombok.NonNull;
+import org.moinex.entities.wallettransaction.Wallet;
 
 /**
  * Utility class for UI-related functionalities
@@ -40,7 +42,7 @@ public final class UIUtils
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
-    static public void addTooltipToXYChartNode(Node node, String text)
+    public static void addTooltipToXYChartNode(Node node, String text)
     {
         node.setOnMouseEntered(event -> { node.setStyle("-fx-opacity: 0.7;"); });
         node.setOnMouseExited(event -> { node.setStyle("-fx-opacity: 1;"); });
@@ -53,7 +55,7 @@ public final class UIUtils
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
-    static public void addTooltipToNode(Node node, String text)
+    public static void addTooltipToNode(Node node, String text)
     {
         Tooltip tooltip = new Tooltip(text);
         tooltip.getStyleClass().add(Constants.TOOLTIP_STYLE);
@@ -125,7 +127,7 @@ public final class UIUtils
      * Format a number to percentage string
      * @param value The value to be formatted
      */
-    static public String formatPercentage(Number value)
+    public static String formatPercentage(Number value)
     {
         return percentageFormat.format(value) + " %";
     }
@@ -134,7 +136,7 @@ public final class UIUtils
      * Format the date picker to display the date in a specific format
      * @param datePicker The date picker to format
      */
-    static public void setDatePickerFormat(DatePicker datePicker)
+    public static void setDatePickerFormat(DatePicker datePicker)
     {
         // Set how the date is displayed in the date picker
         datePicker.setConverter(new StringConverter<LocalDate>() {
@@ -158,7 +160,7 @@ public final class UIUtils
      * @param lastFourDigits The last four digits of the credit card number
      * @return Formatted credit card number string
      */
-    static public String formatCreditCardNumber(String lastFourDigits)
+    public static String formatCreditCardNumber(String lastFourDigits)
     {
         if (lastFourDigits.length() != 4)
         {
@@ -173,7 +175,7 @@ public final class UIUtils
      * Reset the text of a label to "-"
      * @param label The label to reset
      */
-    static public void resetLabel(Label label)
+    public static void resetLabel(Label label)
     {
         label.setText("-");
         setLabelStyle(label, Constants.NEUTRAL_BALANCE_STYLE);
@@ -184,7 +186,7 @@ public final class UIUtils
      * @param label The label to set the style
      * @param style The style to set
      */
-    static public void setLabelStyle(Label label, String style)
+    public static void setLabelStyle(Label label, String style)
     {
         label.getStyleClass().removeAll(Constants.NEGATIVE_BALANCE_STYLE,
                                         Constants.POSITIVE_BALANCE_STYLE,
@@ -233,5 +235,21 @@ public final class UIUtils
                 return null;
             }
         });
+    }
+
+    public static void updateWalletBalance(@NonNull Wallet wt,
+                                           @NonNull Label  balanceLabel)
+    {
+        BigDecimal balance = wt.getBalance();
+        balanceLabel.setText(formatCurrencyDynamic(balance));
+
+        if (balance.compareTo(BigDecimal.ZERO) < 0)
+        {
+            setLabelStyle(balanceLabel, Constants.NEGATIVE_BALANCE_STYLE);
+        }
+        else
+        {
+            setLabelStyle(balanceLabel, Constants.NEUTRAL_BALANCE_STYLE);
+        }
     }
 }

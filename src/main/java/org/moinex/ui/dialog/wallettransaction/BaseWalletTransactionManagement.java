@@ -122,7 +122,7 @@ public abstract class BaseWalletTransactionManagement
         wallet = wt;
 
         walletComboBox.setValue(wallet);
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(wallet, walletCurrentBalanceValueLabel);
     }
 
     @FXML
@@ -146,7 +146,8 @@ public abstract class BaseWalletTransactionManagement
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
         walletComboBox.setOnAction(e -> {
-            updateWalletBalance();
+            UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                        walletCurrentBalanceValueLabel);
             walletAfterBalance();
         });
     }
@@ -170,30 +171,6 @@ public abstract class BaseWalletTransactionManagement
             List.of(()
                         -> calculatorService.updateComponentWithResult(
                             transactionValueField)));
-    }
-
-    protected void updateWalletBalance()
-    {
-        Wallet wallet = walletComboBox.getValue();
-
-        if (wallet == null)
-        {
-            return;
-        }
-
-        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
-                                  Constants.NEGATIVE_BALANCE_STYLE);
-        }
-        else
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
-                                  Constants.NEUTRAL_BALANCE_STYLE);
-        }
-
-        walletCurrentBalanceValueLabel.setText(
-            UIUtils.formatCurrency(wallet.getBalance()));
     }
 
     protected void walletAfterBalance()
@@ -347,7 +324,8 @@ public abstract class BaseWalletTransactionManagement
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                    walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 }

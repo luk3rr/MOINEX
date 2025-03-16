@@ -125,7 +125,7 @@ public abstract class BaseDividendManagement
         this.wallet = wt;
 
         walletComboBox.setValue(wallet);
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(wallet, walletCurrentBalanceValueLabel);
     }
 
     public void setTicker(Ticker tk)
@@ -156,7 +156,8 @@ public abstract class BaseDividendManagement
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
         walletComboBox.setOnAction(e -> {
-            updateWalletBalance();
+            UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                        walletCurrentBalanceValueLabel);
             walletAfterBalance();
         });
     }
@@ -182,30 +183,6 @@ public abstract class BaseDividendManagement
                 -> {},
             List.of(
                 () -> calculatorService.updateComponentWithResult(dividendValueField)));
-    }
-
-    protected void updateWalletBalance()
-    {
-        Wallet wallet = walletComboBox.getValue();
-
-        if (wallet == null)
-        {
-            return;
-        }
-
-        if (wallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
-                                  Constants.NEGATIVE_BALANCE_STYLE);
-        }
-        else
-        {
-            UIUtils.setLabelStyle(walletCurrentBalanceValueLabel,
-                                  Constants.NEUTRAL_BALANCE_STYLE);
-        }
-
-        walletCurrentBalanceValueLabel.setText(
-            UIUtils.formatCurrency(wallet.getBalance()));
     }
 
     protected void walletAfterBalance()
@@ -353,7 +330,8 @@ public abstract class BaseDividendManagement
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        updateWalletBalance();
+        UIUtils.updateWalletBalance(walletComboBox.getValue(),
+                                    walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 }
