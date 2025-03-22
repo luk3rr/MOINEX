@@ -5,31 +5,22 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 print_success() {
-    echo -e "\033[0;32m$1\033[0m"
+    echo "\033[0;32m$1\033[0m"
 }
 
 print_error() {
-    echo -e "\033[0;31m$1\033[0m"
+    echo "\033[0;31m$1\033[0m"
 }
 
 MOINEX_DIR="$HOME/.moinex"
 DOT_LOCAL_DIR="$HOME/.local"
 
 # Instala dependências pip
-if grep -qi arch /etc/os-release; then
-    if pip install --break-system-packages -r requirements.txt; then
-        print_success ">> Dependências Python instaladas"
-    else
-        print_error "Erro ao instalar as dependências Python"
-        exit 1
-    fi
+if pip install --break-system-packages -r requirements.txt; then
+    print_success ">> Dependências Python instaladas"
 else
-    if pip install -r requirements.txt; then
-        print_success ">> Dependências Python instaladas"
-    else
-        print_error "Erro ao instalar as dependências Python"
-        exit 1
-    fi
+    print_error "Erro ao instalar as dependências Python"
+    exit 1
 fi
 
 # Criar diretórios
@@ -106,12 +97,12 @@ print_success ">> Permissões de execução concedidas ao arquivo .desktop"
 if mvn clean package; then
     print_success ">> JAR criado com sucesso"
 else
-    print_error "Erro ao criar o JAR"
+    print_error "Erro ao criar o JAR. Verifique se o maven e o java 21 estão instalados"
     exit 1
 fi
 
 # Copiar JAR e script de execução
-if cp target/Moinex-1.0-SNAPSHOT.jar "$MOINEX_DIR/bin/moinex.jar"; then
+if cp target/moinex.jar "$MOINEX_DIR/bin/moinex.jar"; then
     print_success ">> JAR copiado para $MOINEX_DIR/bin"
 else
     print_error "Erro ao copiar o JAR para $MOINEX_DIR/bin"

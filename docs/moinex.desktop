@@ -7,3 +7,4 @@ Icon=moinex-icon
 Terminal=false
 Type=Application
 Categories=Utility;
+StartupWMClass=org.moinex.app.JavaFXApp

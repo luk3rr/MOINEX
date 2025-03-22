@@ -163,6 +163,7 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>moinex</finalName>
     <plugins>
       <!-- Spring Boot Maven Plugin -->
       <plugin>
@@ -177,6 +178,11 @@
                 <goals>
                     <goal>repackage</goal>
                 </goals>
+                <configuration>
+                    <name>Moinex</name>
+                    <appVersion>1.0</appVersion>
+                    <vendor>luk3rr</vendor>
+                </configuration>
             </execution>
         </executions>
       </plugin>

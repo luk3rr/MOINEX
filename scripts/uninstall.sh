@@ -5,11 +5,11 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 print_success() {
-    echo -e "\033[0;32m$1\033[0m"
+    echo "\033[0;32m$1\033[0m"
 }
 
 print_error() {
-    echo -e "\033[0;31m$1\033[0m"
+    echo "\033[0;31m$1\033[0m"
 }
 
 MOINEX_DIR="$HOME/.moinex"
