@@ -66,8 +66,8 @@ public final class AddExpenseController extends BaseWalletTransactionManagement
         Category          category           = categoryComboBox.getValue();
         LocalDate         expenseDate        = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
-            expenseValueString == null || expenseValueString.strip().isEmpty() ||
+        if (wallet == null || description == null || description.isBlank() ||
+            expenseValueString == null || expenseValueString.isBlank() ||
             status == null || category == null || expenseDate == null)
         {
             WindowUtils.showInformationDialog(

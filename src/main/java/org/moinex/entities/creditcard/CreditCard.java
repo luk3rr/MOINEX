@@ -52,8 +52,8 @@ public class CreditCard
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     @JoinColumn(name                 = "default_billing_wallet_id",
-                referencedColumnName = "id",
-                nullable             = true)
+                referencedColumnName = "id"
+                )
     private Wallet defaultBillingWallet = null;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)
@@ -72,7 +72,7 @@ public class CreditCard
     @Column(name = "available_rebate", nullable = false, scale = 2)
     private BigDecimal availableRebate = BigDecimal.ZERO;
 
-    @Column(name = "last_four_digits", nullable = true, length = 4)
+    @Column(name = "last_four_digits",  length = 4)
     private String lastFourDigits;
 
     @Builder.Default

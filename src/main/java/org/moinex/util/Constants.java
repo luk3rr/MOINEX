@@ -277,7 +277,7 @@ public final class Constants
 
     public static final Double FADE_IN_ANIMATION_DURATION  = 1.0; // s
     public static final Double FADE_OUT_ANIMATION_DURATION = 1.0; // s
-    public static final Double SLIDE_ANIMATION_DURANTION   = 1.0; // s
+    public static final Double SLIDE_ANIMATION_DURATION = 1.0; // s
 
     public static final Double  MENU_ANIMATION_DURATION        = 200.0; // ms
     public static final Integer XYBAR_CHART_ANIMATION_FRAMES   = 30;
@@ -292,7 +292,7 @@ public final class Constants
     public static final Integer NON_LEAP_YEAR_FEBRUARY_DAYS = 28;
     public static final Integer WEEK_DAYS                   = 7;
 
-    public static final String[] WEEKDAY_ABREVIATIONS = { "Sun", "Mon", "Tue", "Wed",
+    public static final String[] WEEKDAY_ABBREVIATIONS = { "Sun", "Mon", "Tue", "Wed",
                                                           "Thu", "Fri", "Sat" };
 
     public static final Font CALENDAR_WEEKDAY_FONT_CONFIG =
@@ -395,7 +395,7 @@ public final class Constants
 
     /**
      * Calculate the number of months until the target date
-     * @param beginDate The begin date
+     * @param beginDate The start date
      * @param targetDate The target date
      * @return The number of months until the target date
      */

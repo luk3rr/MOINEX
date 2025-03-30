@@ -39,7 +39,6 @@ public class CreditCardCreditsController
     @FXML
     private TextField searchField;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private List<CreditCardCredit> creditCardCredits;
@@ -52,9 +51,10 @@ public class CreditCardCreditsController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public CreditCardCreditsController(CreditCardService creditCardService)
+    public CreditCardCreditsController(CreditCardService creditCardService, ConfigurableApplicationContext springContext)
     {
         this.creditCardService = creditCardService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -159,17 +159,13 @@ public class CreditCardCreditsController
         idColumn.setCellValueFactory(
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
-        idColumn.setCellFactory(column -> new TableCell<CreditCardCredit, Long>() {
+        idColumn.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(Long item, boolean empty)
-            {
+            protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || empty)
-                {
+                if (item == null || empty) {
                     setText(null);
-                }
-                else
-                {
+                } else {
                     setText(item.toString());
                     setAlignment(Pos.CENTER);
                     setStyle("-fx-padding: 0;");

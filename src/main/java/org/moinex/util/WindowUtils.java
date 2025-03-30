@@ -8,6 +8,7 @@ package org.moinex.util;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -99,7 +100,7 @@ public final class WindowUtils
 
         // Set the success icon
         alert.setGraphic(new ImageView(new Image(
-            WindowUtils.class.getResource(Constants.SUCCESS_ICON).toString())));
+            Objects.requireNonNull(WindowUtils.class.getResource(Constants.SUCCESS_ICON)).toString())));
 
         setAlertAttributes(alert, "Success", header, message);
         alert.showAndWait();
@@ -164,7 +165,7 @@ public final class WindowUtils
             modalStage.setScene(scene);
 
             // Execute the actions when the window is hidden
-            modalStage.setOnHidden(e -> { onHiddenActions.forEach(Runnable::run); });
+            modalStage.setOnHidden(e -> onHiddenActions.forEach(Runnable::run));
 
             modalStage.showAndWait();
         }
@@ -213,7 +214,7 @@ public final class WindowUtils
             Stage popupStage = new Stage();
             Scene scene      = new Scene(root);
             scene.getStylesheets().add(
-                WindowUtils.class.getResource(Constants.COMMON_STYLE_SHEET)
+                Objects.requireNonNull(WindowUtils.class.getResource(Constants.COMMON_STYLE_SHEET))
                     .toExternalForm());
 
             T controller = loader.getController();
@@ -223,7 +224,7 @@ public final class WindowUtils
             popupStage.setScene(scene);
 
             // Execute the actions when the window is hidden
-            popupStage.setOnHidden(e -> { onHiddenActions.forEach(Runnable::run); });
+            popupStage.setOnHidden(e -> onHiddenActions.forEach(Runnable::run));
 
             popupStage.showAndWait();
         }

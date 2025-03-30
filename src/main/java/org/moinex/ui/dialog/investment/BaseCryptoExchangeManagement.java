@@ -222,7 +222,7 @@ public abstract class BaseCryptoExchangeManagement
         String cryptoSoldQuantityStr = cryptoSoldQuantityField.getText();
         Ticker cryptoSold            = cryptoSoldComboBox.getValue();
 
-        if (cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.strip().isEmpty() ||
+        if (cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.isBlank() ||
             cryptoSold == null)
         {
             UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
@@ -269,7 +269,7 @@ public abstract class BaseCryptoExchangeManagement
         Ticker cryptoReceived            = cryptoReceivedComboBox.getValue();
 
         if (cryptoReceivedQuantityStr == null ||
-            cryptoReceivedQuantityStr.strip().isEmpty() || cryptoReceived == null)
+            cryptoReceivedQuantityStr.isBlank() || cryptoReceived == null)
         {
             UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
             return;

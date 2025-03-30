@@ -93,7 +93,7 @@ public final class EditCreditCardController extends BaseCreditCardManagement
                 (crcDefaultBillingWallet == null &&
                  creditCard.getDefaultBillingWallet() == null);
 
-            // Check if has any modification
+            // Check if it has any modification
             if (creditCard.getName().equals(crcName) &&
                 crcLimit.compareTo(creditCard.getMaxDebt()) == 0 &&
                 creditCard.getLastFourDigits().equals(crcLastFourDigitsStr) &&

@@ -6,9 +6,12 @@
 
 package org.moinex.util.enums;
 
+import lombok.Getter;
+
 /**
  * Represents different types of events in the calendar
  */
+@Getter
 public enum CalendarEventType
 {
     CREDIT_CARD_STATEMENT_CLOSING("Credit Card Statement Closing", "#FF9800"),
@@ -25,13 +28,4 @@ public enum CalendarEventType
         this.colorHex    = colorHex;
     }
 
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public String getColorHex()
-    {
-        return colorHex;
-    }
 }

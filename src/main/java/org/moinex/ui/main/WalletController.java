@@ -13,10 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -112,7 +110,6 @@ public class WalletController
     @FXML
     private ComboBox<String> moneyFlowPaneWalletTypeComboBox;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private BarChart<String, Number> moneyFlowBarChart;
@@ -139,7 +136,7 @@ public class WalletController
 
     private Integer walletPaneCurrentPage = 0;
 
-    private Integer itemsPerPage = 3;
+    private final Integer itemsPerPage = 3;
 
     private static final Logger logger =
         LoggerFactory.getLogger(WalletController.class);
@@ -156,13 +153,14 @@ public class WalletController
     public WalletController(WalletService               walletService,
                             CreditCardService           creditCardService,
                             WalletTransactionService    walletTransactionService,
-                            RecurringTransactionService recurringTransactionService)
+                            RecurringTransactionService recurringTransactionService, ConfigurableApplicationContext springContext)
 
     {
         this.walletService               = walletService;
         this.creditCardService           = creditCardService;
         this.walletTransactionService    = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -179,11 +177,11 @@ public class WalletController
         moneyFlowPaneWalletTypeComboBox.getItems().addAll(
             walletTypes.stream().map(WalletType::getName).toList());
 
-        // Add default wallet type and select it
-        totalBalancePaneWalletTypeComboBox.getItems().add(0, "All Wallets");
+        // Add the default wallet type and select it
+        totalBalancePaneWalletTypeComboBox.getItems().addFirst("All Wallets");
         totalBalancePaneWalletTypeComboBox.getSelectionModel().selectFirst();
 
-        moneyFlowPaneWalletTypeComboBox.getItems().add(0, "All Wallets");
+        moneyFlowPaneWalletTypeComboBox.getItems().addFirst("All Wallets");
         moneyFlowPaneWalletTypeComboBox.getSelectionModel().selectFirst();
 
         createDoughnutChartCheckBoxes();
@@ -269,7 +267,7 @@ public class WalletController
     {
         totalBalancePaneWalletTypeComboBox.setOnAction(e -> updateTotalBalanceView());
         moneyFlowPaneWalletTypeComboBox.setOnAction(
-            e -> { updateMoneyFlowBarChart(); });
+            e -> updateMoneyFlowBarChart());
 
         walletPrevButton.setOnAction(event -> {
             if (walletPaneCurrentPage > 0)
@@ -324,9 +322,7 @@ public class WalletController
 
         // Move the "Others" wallet type to the end of the list
         if (walletTypes.stream()
-                .filter(n -> n.getName().equals(nameToMove))
-                .findFirst()
-                .isPresent())
+                .anyMatch(n -> n.getName().equals(nameToMove)))
         {
             WalletType wt =
                 walletTypes.stream()
@@ -348,18 +344,17 @@ public class WalletController
         BigDecimal pendingExpenses       = BigDecimal.ZERO;
         BigDecimal pendingIncomes        = BigDecimal.ZERO;
         BigDecimal walletsCurrentBalance = BigDecimal.ZERO;
-        Long       totalWallets          = 0L;
+        long totalWallets          = 0L;
 
-        // Filter wallet type according to the selected item
+        // Filter wallet types, according to the selected item,
         // If "All Wallets" is selected, show all transactions
-        Integer selectedIndex =
+        int selectedIndex =
             totalBalancePaneWalletTypeComboBox.getSelectionModel().getSelectedIndex();
 
         if (selectedIndex == 0)
         {
-            logger.info("Selected: " +
-                        totalBalancePaneWalletTypeComboBox.getSelectionModel()
-                            .getSelectedIndex());
+            logger.info("Selected: {}", totalBalancePaneWalletTypeComboBox.getSelectionModel()
+                    .getSelectedIndex());
 
             walletsCurrentBalance = wallets.stream()
                                         .map(Wallet::getBalance)
@@ -379,13 +374,13 @@ public class WalletController
                     .map(WalletTransaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            totalWallets = wallets.stream().map(w -> w.getId()).distinct().count();
+            totalWallets = wallets.stream().map(Wallet::getId).distinct().count();
         }
         else if (selectedIndex > 0 && selectedIndex - 1 < walletTypes.size())
         {
             WalletType selectedWalletType = walletTypes.get(selectedIndex - 1);
 
-            logger.info("Selected: " + selectedWalletType.getName());
+            logger.info("Selected: {}", selectedWalletType.getName());
 
             walletsCurrentBalance =
                 wallets.stream()
@@ -416,13 +411,13 @@ public class WalletController
             totalWallets =
                 wallets.stream()
                     .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
-                    .map(w -> w.getId())
+                    .map(Wallet::getId)
                     .distinct()
                     .count();
         }
         else
         {
-            logger.warn("Invalid index: " + selectedIndex);
+            logger.warn("Invalid index: {}", selectedIndex);
         }
 
         BigDecimal foreseenBalance =
@@ -461,7 +456,7 @@ public class WalletController
         walletPane3.getChildren().clear();
 
         Integer start = walletPaneCurrentPage * itemsPerPage;
-        Integer end   = Math.min(start + itemsPerPage, wallets.size());
+        int end   = Math.min(start + itemsPerPage, wallets.size());
 
         for (Integer i = start; i < end; i++)
         {
@@ -476,8 +471,8 @@ public class WalletController
 
                 // Add style class to the wallet pane
                 newContent.getStylesheets().add(
-                    getClass()
-                        .getResource(Constants.COMMON_STYLE_SHEET)
+                    Objects.requireNonNull(getClass()
+                                    .getResource(Constants.COMMON_STYLE_SHEET))
                         .toExternalForm());
 
                 WalletFullPaneController walletFullPaneController =
@@ -508,7 +503,6 @@ public class WalletController
             catch (IOException e)
             {
                 logger.error("Error while loading wallet full pane");
-                continue;
             }
         }
 
@@ -584,21 +578,21 @@ public class WalletController
             LocalDateTime.now().plusMonths(Constants.XYBAR_CHART_FUTURE_MONTHS);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
-        Integer totalMonths =
+        int totalMonths =
             Constants.XYBAR_CHART_MONTHS + Constants.XYBAR_CHART_FUTURE_MONTHS;
 
-        // Filter wallet type according to the selected item
+        // Filter wallet types, according to the selected item,
         // If "All Wallets" is selected, show all transactions
-        Integer selectedIndex =
+        int selectedIndex =
             moneyFlowPaneWalletTypeComboBox.getSelectionModel().getSelectedIndex();
 
         // Collect data for the last months
-        for (Integer i = 0; i < totalMonths; i++)
+        for (int i = 0; i < totalMonths; i++)
         {
             // Get the data from the oldest month to the most recent, to keep the order
-            LocalDateTime date  = maxMonth.minusMonths((long)(totalMonths - i - 1));
-            Integer       month = date.getMonthValue();
-            Integer       year  = date.getYear();
+            LocalDateTime date  = maxMonth.minusMonths(totalMonths - i - 1);
+            int month = date.getMonthValue();
+            int year  = date.getYear();
 
             // Get transactions
             List<WalletTransaction> transactions =
@@ -615,9 +609,7 @@ public class WalletController
 
             transactions.addAll(futureTransactions);
 
-            logger.info("Found " + transactions.size() + " (" +
-                        futureTransactions.size() + " future) transactions for " +
-                        month + "/" + year);
+            logger.info("Found {} ({} future) transactions for {}/{}", transactions.size(), futureTransactions.size(), month, year);
 
             BigDecimal totalExpenses = BigDecimal.ZERO;
             BigDecimal totalIncomes  = BigDecimal.ZERO;
@@ -696,7 +688,7 @@ public class WalletController
             }
             else
             {
-                logger.warn("Invalid index: " + selectedIndex);
+                logger.warn("Invalid index: {}", selectedIndex);
             }
 
             monthlyExpenses.put(date.format(formatter), totalExpenses.doubleValue());
@@ -710,7 +702,7 @@ public class WalletController
         XYChart.Series<String, Number> incomesSeries = new XYChart.Series<>();
         incomesSeries.setName("Incomes");
 
-        Double maxValue = 0.0;
+        double maxValue = 0.0;
 
         // Add data to each series
         for (Map.Entry<String, Double> entry : monthlyExpenses.entrySet())
@@ -729,21 +721,18 @@ public class WalletController
 
         // Set Y-axis limits based on the maximum value found
         Axis<?> yAxis = moneyFlowBarChart.getYAxis();
-        if (yAxis instanceof NumberAxis)
+        if (yAxis instanceof NumberAxis numberAxis)
         {
-            NumberAxis numberAxis = (NumberAxis)yAxis;
             Animation.setDynamicYAxisBounds(numberAxis, maxValue);
 
-            numberAxis.setTickLabelFormatter(new StringConverter<Number>() {
+            numberAxis.setTickLabelFormatter(new StringConverter<>() {
                 @Override
-                public String toString(Number value)
-                {
+                public String toString(Number value) {
                     return UIUtils.formatCurrency(value);
                 }
 
                 @Override
-                public Number fromString(String string)
-                {
+                public Number fromString(String string) {
                     return 0;
                 }
             });
@@ -754,7 +743,7 @@ public class WalletController
         moneyFlowBarChart.getData().add(expensesSeries);
         moneyFlowBarChart.getData().add(incomesSeries);
 
-        for (Integer i = 0; i < expensesSeries.getData().size(); i++)
+        for (int i = 0; i < expensesSeries.getData().size(); i++)
         {
             XYChart.Data<String, Number> expenseData = expensesSeries.getData().get(i);
             XYChart.Data<String, Number> incomeData  = incomesSeries.getData().get(i);
@@ -798,7 +787,7 @@ public class WalletController
 
             // Add listener to the checkbox
             checkBox.selectedProperty().addListener(
-                (obs, wasSelected, isNowSelected) -> { updateDoughnutChart(); });
+                (obs, wasSelected, isNowSelected) -> updateDoughnutChart());
         }
     }
 

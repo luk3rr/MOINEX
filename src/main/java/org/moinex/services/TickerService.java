@@ -26,13 +26,12 @@ import org.moinex.entities.investment.TickerSale;
 import org.moinex.entities.wallettransaction.WalletTransaction;
 import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.exceptions.InvalidTickerTypeException;
-import org.moinex.exceptions.SameSourceDestionationException;
+import org.moinex.exceptions.SameSourceDestinationException;
 import org.moinex.repositories.investment.CryptoExchangeRepository;
 import org.moinex.repositories.investment.DividendRepository;
 import org.moinex.repositories.investment.TickerPurchaseRepository;
 import org.moinex.repositories.investment.TickerRepository;
 import org.moinex.repositories.investment.TickerSaleRepository;
-import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.moinex.util.enums.TickerType;
@@ -50,28 +49,29 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class TickerService
 {
-    @Autowired
     private TickerRepository tickerRepository;
 
-    @Autowired
     private TickerPurchaseRepository tickerPurchaseRepository;
 
-    @Autowired
     private TickerSaleRepository tickerSaleRepository;
 
-    @Autowired
     private DividendRepository dividendRepository;
 
-    @Autowired
     private CryptoExchangeRepository cryptoExchangeRepository;
 
-    @Autowired
-    private WalletRepository walletRepository;
-
-    @Autowired
     private WalletTransactionService walletTransactionService;
 
     private static final Logger logger = LoggerFactory.getLogger(TickerService.class);
+
+    @Autowired
+    public TickerService(TickerRepository tickerRepository, TickerPurchaseRepository tickerPurchaseRepository, TickerSaleRepository tickerSaleRepository, DividendRepository dividendRepository, CryptoExchangeRepository cryptoExchangeRepository, WalletTransactionService walletTransactionService) {
+        this.tickerRepository = tickerRepository;
+        this.tickerPurchaseRepository = tickerPurchaseRepository;
+        this.tickerSaleRepository = tickerSaleRepository;
+        this.dividendRepository = dividendRepository;
+        this.cryptoExchangeRepository = cryptoExchangeRepository;
+        this.walletTransactionService = walletTransactionService;
+    }
 
     /**
      * Registers a new ticker
@@ -86,7 +86,7 @@ public class TickerService
      * @throws EntityExistsException If the ticker already exists
      * @throws IllegalArgumentException If the price is less than or equal to zero
      * @throws IllegalArgumentException If the quantity is less than zero
-     * @throws IllegalArgumentException If the average unit price is less than zero
+     * @throws IllegalArgumentException If the average unit price is lower than zero
      */
     @Transactional
     public Long addTicker(String     name,
@@ -182,9 +182,9 @@ public class TickerService
     /**
      * Archives a ticker
      * @param id The id of the ticker
-     * @throws EntityNotFoundExeception If the ticker does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
      * @note This method is used to archive a ticker, which means that the ticker
-     * will not be deleted from the database, but it will not used in the application
+     * will not be deleted from the database, but it will not use in the application
      * anymore
      */
     @Transactional
@@ -229,7 +229,7 @@ public class TickerService
      * @throws IllegalArgumentException If the name or symbol is empty
      * @throws IllegalArgumentException If the price is less than or equal to zero
      * @throws IllegalArgumentException If the quantity is less than zero
-     * @throws IllegalArgumentException If the average unit price is less than zero
+     * @throws IllegalArgumentException If the average unit price is lower than zero
      */
     @Transactional
     public void updateTicker(Ticker tk)
@@ -281,7 +281,7 @@ public class TickerService
         oldTicker.setAverageUnitValue(tk.getAverageUnitValue());
         oldTicker.setArchived(tk.isArchived());
 
-        // If sold all holdings, reset average price
+        // If sold all holdings, reset the average price
         if (oldTicker.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
         {
             resetAveragePrice(oldTicker.getId());
@@ -293,7 +293,7 @@ public class TickerService
     }
 
     /**
-     * Update tickers price from API asynchronously
+     * Update ticker price from API asynchronously
      * @param tickers The list of tickers to update
      * @return A completable future with a list with tickers that failed to update
      * @throws IllegalArgumentException If the list of tickers is empty
@@ -346,7 +346,7 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @param quantity The quantity of the purchase
      * @param unitPrice The unit price of the purchase
-     * @param purchaseDate The purchase date
+     * @param date The purchase date
      * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the quantity is less than or equal to zero
      * @throws IllegalArgumentException If the unit price is less than or equal to zero
@@ -398,7 +398,7 @@ public class TickerService
 
         tickerPurchaseRepository.save(purchase);
 
-        // Update holdings quantity
+        // Update holding quantity
         ticker.setCurrentQuantity(ticker.getCurrentQuantity().add(quantity));
 
         // Update average price
@@ -426,7 +426,7 @@ public class TickerService
      * @param tickerId The id of the ticker
      * @param quantity The quantity of the sale
      * @param unitPrice The unit price of the sale
-     * @param saleDate The sale date
+     * @param date The sale date
      * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the quantity is less than or equal to zero
      * @throws IllegalArgumentException If the unit price is less than or equal to zero
@@ -486,10 +486,10 @@ public class TickerService
 
         tickerSaleRepository.save(sale);
 
-        // Update holdings quantity
+        // Update holding quantity
         ticker.setCurrentQuantity(ticker.getCurrentQuantity().subtract(quantity));
 
-        // If sold all holdings, reset average price
+        // If sold all holdings, reset the average price
         if (ticker.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
         {
             resetAveragePrice(tickerId);
@@ -562,7 +562,7 @@ public class TickerService
      * @param receivedQuantity The quantity of the target ticker
      * @param date The date of the exchange
      * @param description The description of the exchange
-     * @throws SameSourceDestionationException If the source and target tickers are the
+     * @throws SameSourceDestinationException If the source and target tickers are the
      *     same
      * @throws EntityNotFoundException If the source ticker does not exist
      * @throws EntityNotFoundException If the target ticker does not exist
@@ -582,7 +582,7 @@ public class TickerService
     {
         if (sourceTickerId.equals(targetTickerId))
         {
-            throw new SameSourceDestionationException(
+            throw new SameSourceDestinationException(
                 "Source and target tickers must be different");
         }
 
@@ -632,13 +632,13 @@ public class TickerService
 
         cryptoExchangeRepository.save(exchange);
 
-        // Update holdings quantity
+        // Update holding quantity
         soldCrypto.setCurrentQuantity(
             soldCrypto.getCurrentQuantity().subtract(soldQuantity));
         receivedCrypto.setCurrentQuantity(
             receivedCrypto.getCurrentQuantity().add(receivedQuantity));
 
-        // If sold all holdings, reset average price
+        // If sold all holdings, reset the average price
         if (soldCrypto.getCurrentQuantity().compareTo(BigDecimal.ZERO) == 0)
         {
             resetAveragePrice(sourceTickerId);
@@ -739,7 +739,7 @@ public class TickerService
                                      "CryptoExchange with id " + exchangeId +
                                      " not found and cannot be deleted"));
 
-        // Adjust holdings quantity
+        // Adjust holding quantity
         exchange.getSoldCrypto().setCurrentQuantity(
             exchange.getSoldCrypto().getCurrentQuantity().add(
                 exchange.getSoldQuantity()));
@@ -888,7 +888,7 @@ public class TickerService
      * @throws EntityNotFoundException If the crypto exchange does not exist
      * @throws EntityNotFoundException If the source ticker does not exist
      * @throws EntityNotFoundException If the target ticker does not exist
-     * @throws SameSourceDestionationException If the source and target tickers are the
+     * @throws SameSourceDestinationException If the source and target tickers are the
      *    same
      * @throws IllegalArgumentException If the quantity is less than or equal to zero
      */
@@ -916,9 +916,9 @@ public class TickerService
                                  exchange.getReceivedCrypto().getId() +
                                  " not found and cannot update crypto exchange"));
 
-        if (exchange.getSoldCrypto().getId() == exchange.getReceivedCrypto().getId())
+        if (exchange.getSoldCrypto().getId().equals(exchange.getReceivedCrypto().getId()))
         {
-            throw new SameSourceDestionationException(
+            throw new SameSourceDestinationException(
                 "Source and target tickers must be different");
         }
 
@@ -950,7 +950,7 @@ public class TickerService
      */
     public void changeSoldQuantity(CryptoExchange oldExchange, BigDecimal soldQuantity)
     {
-        // Adjust holdings quantity
+        // Adjust holding quantity
         oldExchange.getSoldCrypto().setCurrentQuantity(
             oldExchange.getSoldCrypto().getCurrentQuantity().add(
                 oldExchange.getSoldQuantity().subtract(soldQuantity)));
@@ -968,7 +968,7 @@ public class TickerService
     public void changeReceivedQuantity(CryptoExchange oldExchange,
                                        BigDecimal     receivedQuantity)
     {
-        // Adjust holdings quantity
+        // Adjust holding quantity
         oldExchange.getReceivedCrypto().setCurrentQuantity(
             oldExchange.getReceivedCrypto().getCurrentQuantity().subtract(
                 oldExchange.getReceivedQuantity().subtract(receivedQuantity)));
@@ -980,17 +980,17 @@ public class TickerService
 
     /**
      * Change the sold ticker of a crypto exchange
-     * @param exchange The crypto exchange
+     * @param oldExchange The crypto exchange
      * @param soldCrypto The new sold ticker
      */
     private void changeSoldCrypto(CryptoExchange oldExchange, Ticker soldCrypto)
     {
-        if (oldExchange.getSoldCrypto().getId() == soldCrypto.getId())
+        if (oldExchange.getSoldCrypto().getId().equals(soldCrypto.getId()))
         {
             return;
         }
 
-        // Adjust holdings quantity
+        // Adjust holding quantity
         oldExchange.getSoldCrypto().setCurrentQuantity(
             oldExchange.getSoldCrypto().getCurrentQuantity().add(
                 oldExchange.getSoldQuantity()));
@@ -1006,17 +1006,17 @@ public class TickerService
 
     /**
      * Change the received ticker of a crypto exchange
-     * @param exchange The crypto exchange
+     * @param oldExchange The crypto exchange
      * @param receivedCrypto The new target ticker
      */
     private void changeReceivedCrypto(CryptoExchange oldExchange, Ticker receivedCrypto)
     {
-        if (oldExchange.getReceivedCrypto().getId() == receivedCrypto.getId())
+        if (oldExchange.getReceivedCrypto().getId().equals(receivedCrypto.getId()))
         {
             return;
         }
 
-        // Adjust holdings quantity
+        // Adjust holding quantity
         oldExchange.getReceivedCrypto().setCurrentQuantity(
             oldExchange.getReceivedCrypto().getCurrentQuantity().subtract(
                 oldExchange.getReceivedQuantity()));

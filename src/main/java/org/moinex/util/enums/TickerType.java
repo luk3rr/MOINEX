@@ -7,7 +7,7 @@
 package org.moinex.util.enums;
 
 /**
- * ENUM that represents the type of an ticker
+ * ENUM that represents the type of a ticker
  */
 public enum TickerType
 {

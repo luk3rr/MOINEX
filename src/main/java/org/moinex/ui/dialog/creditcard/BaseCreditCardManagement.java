@@ -129,8 +129,8 @@ public abstract class BaseCreditCardManagement
         operatorComboBox.getItems().setAll(operators);
         defaultBillingWalletComboBox.getItems().setAll(wallets);
 
-        // Add blank option to the default billing wallet combo box
-        defaultBillingWalletComboBox.getItems().add(0, null);
+        // Add a blank option to the default billing wallet combo box
+        defaultBillingWalletComboBox.getItems().addFirst(null);
     }
 
     protected void configureComboBoxes()

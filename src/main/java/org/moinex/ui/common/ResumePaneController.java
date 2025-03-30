@@ -302,7 +302,7 @@ public class ResumePaneController
         }
 
         // Mensal Economies
-        Double savingsPercentage = 0.0;
+        double savingsPercentage = 0.0;
 
         if (totalConfirmedIncome.compareTo(BigDecimal.ZERO) <= 0)
         {
@@ -353,7 +353,7 @@ public class ResumePaneController
             savingsCurrentSign.getStyleClass().add(Constants.NEUTRAL_BALANCE_STYLE);
         }
 
-        Double foreseenSavingsPercentage = 0.0;
+        double foreseenSavingsPercentage = 0.0;
 
         if (totalForeseenIncome.compareTo(BigDecimal.ZERO) > 0)
         {

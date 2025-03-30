@@ -19,5 +19,5 @@ public enum InterestIndex
     // International Indices
     LIBOR, // London Interbank Offered Rate
     SOFR,  // Secured Overnight Financing Rate
-    OTHER  // Other indices not specified
+    OTHER  // Other indices aren't specified
 }

@@ -65,10 +65,10 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
         String            quantityStr  = quantityField.getText();
         LocalDate         buyDate      = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
+        if (wallet == null || description == null || description.isBlank() ||
             status == null || category == null || unitPriceStr == null ||
-            unitPriceStr.strip().isEmpty() || quantityStr == null ||
-            quantityStr.strip().isEmpty() || buyDate == null)
+            unitPriceStr.isBlank() || quantityStr == null ||
+            quantityStr.isBlank() || buyDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",

@@ -56,31 +56,31 @@ public class CalculatorController
     }
 
     @FXML
-    private void addAction(ActionEvent event)
+    private void addAction(ActionEvent ignoredEvent)
     {
         addOperator("+");
     }
 
     @FXML
-    private void minusAction(ActionEvent event)
+    private void minusAction(ActionEvent ignoredEvent)
     {
         addOperator("-");
     }
 
     @FXML
-    private void divideAction(ActionEvent event)
+    private void divideAction(ActionEvent ignoredEvent)
     {
         addOperator("/");
     }
 
     @FXML
-    private void multiplicationAction(ActionEvent event)
+    private void multiplicationAction(ActionEvent ignoredEvent)
     {
         addOperator("*");
     }
 
     @FXML
-    private void calculate(ActionEvent event)
+    private void calculate(ActionEvent ignoredEvent)
     {
         if (expression.isEmpty())
         {
@@ -115,7 +115,7 @@ public class CalculatorController
     }
 
     @FXML
-    private void clearTextField(ActionEvent event)
+    private void clearTextField(ActionEvent ignoredEvent)
     {
         expression.setLength(0);
         expressionDisplay.setText("");
@@ -132,11 +132,11 @@ public class CalculatorController
     }
 
     @FXML
-    private void buttonDotClicked(ActionEvent event)
+    private void buttonDotClicked(ActionEvent ignoredEvent)
     {
         if (!expression.toString().endsWith(".") && !currentToken().contains("."))
         {
-            if (expression.length() == 0 ||
+            if (expression.isEmpty() ||
                 isOperator(expression.charAt(expression.length() - 1)))
             {
                 expression.append("0.");
@@ -151,61 +151,61 @@ public class CalculatorController
     }
 
     @FXML
-    private void button0Clicked(ActionEvent event)
+    private void button0Clicked(ActionEvent ignoredEvent)
     {
         addNumber("0");
     }
 
     @FXML
-    private void button1Clicked(ActionEvent event)
+    private void button1Clicked(ActionEvent ignoredEvent)
     {
         addNumber("1");
     }
 
     @FXML
-    private void button2Clicked(ActionEvent event)
+    private void button2Clicked(ActionEvent ignoredEvent)
     {
         addNumber("2");
     }
 
     @FXML
-    private void button3Clicked(ActionEvent event)
+    private void button3Clicked(ActionEvent ignoredEvent)
     {
         addNumber("3");
     }
 
     @FXML
-    private void button4Clicked(ActionEvent event)
+    private void button4Clicked(ActionEvent ignoredEvent)
     {
         addNumber("4");
     }
 
     @FXML
-    private void button5Clicked(ActionEvent event)
+    private void button5Clicked(ActionEvent ignoredEvent)
     {
         addNumber("5");
     }
 
     @FXML
-    private void button6Clicked(ActionEvent event)
+    private void button6Clicked(ActionEvent ignoredEvent)
     {
         addNumber("6");
     }
 
     @FXML
-    private void button7Clicked(ActionEvent event)
+    private void button7Clicked(ActionEvent ignoredEvent)
     {
         addNumber("7");
     }
 
     @FXML
-    private void button8Clicked(ActionEvent event)
+    private void button8Clicked(ActionEvent ignoredEvent)
     {
         addNumber("8");
     }
 
     @FXML
-    private void button9Clicked(ActionEvent event)
+    private void button9Clicked(ActionEvent ignoredEvent)
     {
         addNumber("9");
     }
@@ -232,7 +232,7 @@ public class CalculatorController
 
     public void addOperator(String operator)
     {
-        if (expression.length() > 0 &&
+        if (!expression.isEmpty() &&
             !isOperator(expression.charAt(expression.length() - 1)))
         {
             expression.append(operator);

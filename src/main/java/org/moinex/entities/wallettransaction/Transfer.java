@@ -59,7 +59,7 @@ public class Transfer
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description" )
     private String description;
 
     public abstract static class TransferBuilder<C extends   Transfer, B

@@ -46,7 +46,7 @@ public class CalendarEvent
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description" )
     private String description;
 
     @Enumerated(EnumType.STRING)

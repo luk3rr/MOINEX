@@ -87,8 +87,8 @@ public final class EditDividendController extends BaseDividendManagement
         Category          category            = categoryComboBox.getValue();
         LocalDate         dividendDate        = dividendDatePicker.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
-            dividendValueString == null || dividendValueString.strip().isEmpty() ||
+        if (wallet == null || description == null || description.isBlank() ||
+            dividendValueString == null || dividendValueString.isBlank() ||
             status == null || category == null || dividendDate == null)
         {
             WindowUtils.showInformationDialog(
@@ -101,7 +101,7 @@ public final class EditDividendController extends BaseDividendManagement
         {
             BigDecimal dividendValue = new BigDecimal(dividendValueString);
 
-            // Check if has any modification
+            // Check if it has any modification
             if (dividend.getWalletTransaction().getAmount().compareTo(dividendValue) ==
                     0 &&
                 dividend.getWalletTransaction().getCategory().getId().equals(

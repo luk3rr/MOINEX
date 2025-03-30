@@ -203,27 +203,7 @@ public class ArchivedWalletsController
      */
     private void configureTableView()
     {
-        TableColumn<Wallet, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        idColumn.setCellFactory(column -> new TableCell<Wallet, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        TableColumn<Wallet, Long> idColumn = getWalletLongTableColumn();
 
         TableColumn<Wallet, String> walletColumn = new TableColumn<>("Wallet");
         walletColumn.setCellValueFactory(
@@ -233,6 +213,15 @@ public class ArchivedWalletsController
         typeColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getType().getName()));
 
+        TableColumn<Wallet, Long> numOfTransactionsColumn = getLongTableColumn();
+
+        walletTableView.getColumns().add(idColumn);
+        walletTableView.getColumns().add(walletColumn);
+        walletTableView.getColumns().add(typeColumn);
+        walletTableView.getColumns().add(numOfTransactionsColumn);
+    }
+
+    private TableColumn<Wallet, Long> getLongTableColumn() {
         TableColumn<Wallet, Long> numOfTransactionsColumn =
             new TableColumn<>("Associated Transactions");
         numOfTransactionsColumn.setCellValueFactory(
@@ -241,27 +230,40 @@ public class ArchivedWalletsController
                 walletTransactionService.getTransactionCountByWallet(
                     param.getValue().getId())));
 
-        numOfTransactionsColumn.setCellFactory(column -> new TableCell<Wallet, Long>() {
+        numOfTransactionsColumn.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(Long item, boolean empty)
-            {
+            protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || empty)
-                {
+                if (item == null || empty) {
                     setText(null);
-                }
-                else
-                {
+                } else {
                     setText(item.toString());
                     setAlignment(Pos.CENTER);
                     setStyle("-fx-padding: 0;");
                 }
             }
         });
+        return numOfTransactionsColumn;
+    }
 
-        walletTableView.getColumns().add(idColumn);
-        walletTableView.getColumns().add(walletColumn);
-        walletTableView.getColumns().add(typeColumn);
-        walletTableView.getColumns().add(numOfTransactionsColumn);
+    private static TableColumn<Wallet, Long> getWalletLongTableColumn() {
+        TableColumn<Wallet, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;");
+                }
+            }
+        });
+        return idColumn;
     }
 }

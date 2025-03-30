@@ -120,9 +120,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         Category          category               = categoryComboBox.getValue();
         LocalDate         transactionDate        = transactionDatePicker.getValue();
 
-        if (wallet == null || type == null || description == null ||
-            transactionValueString == null || status == null || category == null ||
-            transactionDate == null)
+        if (wallet == null || type == null || transactionValueString == null || status == null || category == null || transactionDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -137,7 +135,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transactionDate.atTime(currentTime);
 
-            // Check if has any modification
+            // Check if it has any modification
             if (wallet.getName().equals(walletTransaction.getWallet().getName()) &&
                 category.getName().equals(walletTransaction.getCategory().getName()) &&
                 transactionValue.compareTo(walletTransaction.getAmount()) == 0 &&
@@ -260,7 +258,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                     }
                     else
                     {
-                        // Type not mapped. Never should reach here
+                        // Type isn't mapped. Never should reach here
                         UIUtils.resetLabel(walletAfterBalanceValueLabel);
                         return;
                     }
@@ -277,7 +275,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                     }
                     else
                     {
-                        // Type not mapped. Never should reach here
+                        // Type isn't mapped. Never should reach here
                         UIUtils.resetLabel(walletAfterBalanceValueLabel);
                         return;
                     }
@@ -295,13 +293,13 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 }
                 else
                 {
-                    // Type not mapped. Never should reach here
+                    // Type isn't mapped. Never should reach here
                     UIUtils.resetLabel(walletAfterBalanceValueLabel);
                     return;
                 }
             }
 
-            // Episilon is used to avoid floating point arithmetic errors
+            // Epsilon is used to avoid floating point arithmetic errors
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style

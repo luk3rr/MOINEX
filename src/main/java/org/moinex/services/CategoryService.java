@@ -6,6 +6,7 @@
 
 package org.moinex.services;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,6 @@ import org.moinex.repositories.creditcard.CreditCardDebtRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +26,19 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class CategoryService
 {
-    @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
     private CreditCardDebtRepository creditCardDebtRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+
+    @Autowired
+    public CategoryService(CategoryRepository       categoryRepository,
+                           CreditCardDebtRepository creditCardDebtRepository)
+    {
+        this.categoryRepository       = categoryRepository;
+        this.creditCardDebtRepository = creditCardDebtRepository;
+    }
 
     /**
      * Add a new category
@@ -164,16 +170,6 @@ public class CategoryService
         categoryRepository.save(category);
 
         logger.info("Category with id " + id + " was unarchived");
-    }
-
-    /**
-     * Get a category by its name
-     * @param name Category name
-     * @return Category
-     */
-    public Category getCategoryByName(String name)
-    {
-        return categoryRepository.findByName(name);
     }
 
     /**

@@ -74,7 +74,7 @@ public final class Animation
         // Increments for each part of the stacked bar
         Double[] increments = new Double[data.size()];
 
-        for (Integer i = 0; i < data.size(); i++)
+        for (int i = 0; i < data.size(); i++)
         {
             increments[i] =
                 targetValues.get(i) / Constants.XYBAR_CHART_ANIMATION_FRAMES;
@@ -84,7 +84,7 @@ public final class Animation
         Timeline timeline = new Timeline();
 
         // For each frame, update the value of each part of the stacked bar
-        for (Integer frame = 0; frame < Constants.XYBAR_CHART_ANIMATION_FRAMES; frame++)
+        for (int frame = 0; frame < Constants.XYBAR_CHART_ANIMATION_FRAMES; frame++)
         {
             KeyFrame keyFrame = new KeyFrame(
                 Duration.seconds(Constants.XYBAR_CHART_ANIMATION_DURATION /
@@ -93,7 +93,7 @@ public final class Animation
                     Double accumulatedValue = 0.0;
 
                     // Update the value of each part of the stacked bar
-                    for (Integer i = 0; i < data.size(); i++)
+                    for (int i = 0; i < data.size(); i++)
                     {
                         XYChart.Data<String, Number> item = data.get(i);
 
@@ -117,7 +117,7 @@ public final class Animation
 
         // Set the final value of each part of the stacked bar
         timeline.setOnFinished(event -> {
-            for (Integer i = 0; i < data.size(); i++)
+            for (int i = 0; i < data.size(); i++)
             {
                 XYChart.Data<String, Number> item = data.get(i);
                 item.setYValue(targetValues.get(i));
@@ -138,10 +138,10 @@ public final class Animation
         // Define the lower bound as 0
         numberAxis.setLowerBound(0);
 
-        Double upperBound = Math.ceil(maxValue / 10) * 10;
+        double upperBound = Math.ceil(maxValue / 10) * 10;
         numberAxis.setUpperBound(upperBound);
 
-        Double tickUnit = Math.ceil(upperBound / Constants.XYBAR_CHART_TICKS / 10) * 10;
+        double tickUnit = Math.ceil(upperBound / Constants.XYBAR_CHART_TICKS / 10) * 10;
         numberAxis.setTickUnit(tickUnit);
     }
 
@@ -180,7 +180,7 @@ public final class Animation
     public static void applySlideInAnimation(Stage stage)
     {
         TranslateTransition slideIn = new TranslateTransition(
-            Duration.seconds(Constants.SLIDE_ANIMATION_DURANTION),
+            Duration.seconds(Constants.SLIDE_ANIMATION_DURATION),
             stage.getScene().getRoot());
         slideIn.setFromX(-stage.getWidth());
         slideIn.setToX(0);

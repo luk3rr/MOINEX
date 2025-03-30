@@ -190,7 +190,7 @@ public abstract class BaseDividendManagement
         String dividendValueString = dividendValueField.getText();
         Wallet wallet              = walletComboBox.getValue();
 
-        if (dividendValueString == null || dividendValueString.strip().isEmpty() ||
+        if (dividendValueString == null || dividendValueString.isBlank() ||
             wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -209,7 +209,7 @@ public abstract class BaseDividendManagement
 
             BigDecimal walletAfterBalanceValue = wallet.getBalance().add(dividendValue);
 
-            // Episilon is used to avoid floating point arithmetic errors
+            // Epsilon is used to avoid floating point arithmetic errors
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
@@ -280,7 +280,7 @@ public abstract class BaseDividendManagement
                              wt.getCategory().getName());
 
         Consumer<WalletTransaction> onSelectCallback =
-            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
+                this::fillFieldsWithTransaction;
 
         suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
                                                             filterFunction,

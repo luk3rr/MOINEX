@@ -51,7 +51,6 @@ public class CalendarController
     @FXML
     private GridPane calendar;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private LocalDate dateFocus;
@@ -67,9 +66,10 @@ public class CalendarController
      * @param calendarService The service for the calendar
      */
     @Autowired
-    public CalendarController(CalendarService calendarService)
+    public CalendarController(CalendarService calendarService, ConfigurableApplicationContext springContext)
     {
         this.calendarService = calendarService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -107,7 +107,7 @@ public class CalendarController
                                     springContext,
                                     (AddCalendarEventController controller)
                                         -> {},
-                                    List.of(() -> drawCalendar()));
+                                    List.of(this::drawCalendar));
     }
 
     /**
@@ -138,15 +138,15 @@ public class CalendarController
                 .getDayOfWeek()
                 .getValue();
 
-        // Adjust the date offset to start from Sunday at first line of the calendar
+        // Adjust the date offset to start from Sunday at the first line of the calendar
         if (dateOffset.equals(Constants.WEEK_DAYS))
         {
             dateOffset = 0;
         }
 
         Integer currentDate    = 1;
-        Integer totalGridCells = dateOffset + monthMaxDate;
-        Integer totalRows =
+        int totalGridCells = dateOffset + monthMaxDate;
+        int totalRows =
             (int)Math.ceil(totalGridCells / Constants.WEEK_DAYS.doubleValue());
 
         Map<Integer, List<CalendarEvent>> calendarEventMap =
@@ -155,12 +155,12 @@ public class CalendarController
         calendar.getChildren().clear();
 
         Double calendarWidth  = calendar.getPrefWidth();
-        Double calendarHeight = calendar.getPrefHeight();
+        double calendarHeight = calendar.getPrefHeight();
 
         // Create the weekday labels
-        for (Integer j = 0; j < Constants.WEEKDAY_ABREVIATIONS.length; j++)
+        for (int j = 0; j < Constants.WEEKDAY_ABBREVIATIONS.length; j++)
         {
-            Text dayLabel = new Text(Constants.WEEKDAY_ABREVIATIONS[j]);
+            Text dayLabel = new Text(Constants.WEEKDAY_ABBREVIATIONS[j]);
             dayLabel.setFont(Constants.CALENDAR_WEEKDAY_FONT_CONFIG);
 
             StackPane dayContainer = new StackPane(dayLabel);
@@ -172,9 +172,9 @@ public class CalendarController
         }
 
         // Create the calendar cells for each day of the month
-        for (Integer i = 0; i < totalRows; i++)
+        for (int i = 0; i < totalRows; i++)
         {
-            for (Integer j = 0; j < Constants.WEEK_DAYS; j++)
+            for (int j = 0; j < Constants.WEEK_DAYS; j++)
             {
                 VBox cell = new VBox();
                 cell.setMinSize(calendarWidth / Constants.WEEK_DAYS,

@@ -66,8 +66,8 @@ public final class AddIncomeController extends BaseWalletTransactionManagement
         Category          category          = categoryComboBox.getValue();
         LocalDate         incomeDate        = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
-            incomeValueString == null || incomeValueString.strip().isEmpty() ||
+        if (wallet == null || description == null || description.isBlank() ||
+            incomeValueString == null || incomeValueString.isBlank() ||
             status == null || category == null || incomeDate == null)
         {
             WindowUtils.showInformationDialog(

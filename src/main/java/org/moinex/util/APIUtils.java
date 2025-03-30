@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import org.moinex.exceptions.APIFetchException;
 import org.moinex.exceptions.ApplicationShuttingDownException;
 import org.moinex.exceptions.ScriptNotFoundException;
-import org.moinex.services.InicializationService;
+import org.moinex.services.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +104,7 @@ public class APIUtils
                         "Process did not terminate in time. Forcing shutdown...");
                     process.destroyForcibly();
                 }
-                logger.info("Process terminated: " + process.toString());
+                logger.info("Process terminated: {}", process);
             }
             catch (InterruptedException e)
             {
@@ -115,7 +115,7 @@ public class APIUtils
             }
             catch (Exception e)
             {
-                logger.warn("Error during process shutdown: " + e.getMessage());
+                logger.warn("Error during process shutdown: {}", e.getMessage());
             }
         }
 
@@ -160,9 +160,7 @@ public class APIUtils
      */
     public static CompletableFuture<JSONObject> fetchStockPricesAsync(String[] symbols)
     {
-        return CompletableFuture.supplyAsync(() -> {
-            return runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols);
-        }, executorService);
+        return CompletableFuture.supplyAsync(() -> runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols), executorService);
     }
 
     /**
@@ -172,10 +170,8 @@ public class APIUtils
      */
     public static CompletableFuture<JSONObject> fetchBrazilianMarketIndicatorsAsync()
     {
-        return CompletableFuture.supplyAsync(() -> {
-            return runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
-                                   new String[0]);
-        }, executorService);
+        return CompletableFuture.supplyAsync(() -> runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
+                               new String[0]), executorService);
     }
 
     /**
@@ -186,7 +182,7 @@ public class APIUtils
     public static JSONObject runPythonScript(String script, String[] args)
     {
         try (InputStream scriptInputStream =
-                 InicializationService.class.getResourceAsStream(Constants.SCRIPT_PATH +
+                 InitializationService.class.getResourceAsStream(Constants.SCRIPT_PATH +
                                                                  script))
         {
             if (scriptInputStream == null)
@@ -219,7 +215,7 @@ public class APIUtils
 
             String[] command = commandList.toArray(new String[0]);
 
-            logger.info("Running Python script as: " + String.join(" ", command));
+            logger.info("Running Python script as: {}", String.join(" ", command));
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             Process        process        = processBuilder.start();
@@ -239,8 +235,8 @@ public class APIUtils
 
                 JSONObject jsonObject = new JSONObject(output);
 
-                logger.info("Script " + script + " run successfully");
-                logger.info("Output: " + jsonObject.toString());
+                logger.info("Script {} run successfully", script);
+                logger.info("Output: {}", jsonObject);
 
                 return jsonObject;
             }

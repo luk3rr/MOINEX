@@ -32,19 +32,23 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class WalletService
 {
-    @Autowired
     private WalletRepository walletRepository;
 
-    @Autowired
     private TransferRepository transfersRepository;
 
-    @Autowired
     private WalletTransactionRepository walletTransactionRepository;
 
-    @Autowired
     private WalletTypeRepository walletTypeRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(WalletService.class);
+
+    @Autowired
+    public WalletService(WalletRepository walletRepository, TransferRepository transfersRepository, WalletTransactionRepository walletTransactionRepository, WalletTypeRepository walletTypeRepository) {
+        this.walletRepository = walletRepository;
+        this.transfersRepository = transfersRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
+        this.walletTypeRepository = walletTypeRepository;
+    }
 
     /**
      * TODO: Check if a wallet can have no type
@@ -223,7 +227,7 @@ public class WalletService
     }
 
     /**
-     * Change wallet type
+     * Change the wallet type
      * @param id The id of the wallet to change the type
      * @param newType The new type of the wallet
      * @throws EntityNotFoundException If the wallet does not exist
@@ -270,38 +274,6 @@ public class WalletService
         walletRepository.save(wallet);
 
         logger.info("Wallet with id " + id + " balance updated to " + newBalance);
-    }
-
-    /**
-     * Get all wallets
-     * @return A list with all wallets
-     */
-    public List<Wallet> getAllWallets()
-    {
-        return walletRepository.findAll();
-    }
-
-    /**
-     * Get all wallets ordered by name
-     * @return A list with all wallets ordered by name
-     */
-    public List<Wallet> getAllWalletsOrderedByName()
-    {
-        return walletRepository.findAllByOrderByNameAsc();
-    }
-
-    /**
-     * Get wallet by name
-     * @param name The name of the wallet
-     * @return The wallet with the provided name
-     * @throws EntityNotFoundException If the wallet does not exist
-     */
-    public Wallet getWalletByName(String name)
-    {
-        return walletRepository.findByName(name).orElseThrow(
-            ()
-                -> new EntityNotFoundException("Wallet with name " + name +
-                                               " not found"));
     }
 
     /**

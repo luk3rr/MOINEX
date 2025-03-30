@@ -6,7 +6,6 @@
 
 package org.moinex.ui.common;
 
-import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -87,16 +86,7 @@ public class CreditCardPaneController
     private Label invoiceMonthLabel;
 
     @FXML
-    private Label invoiceCreditLabel;
-
-    @FXML
     private Label limitProgressLabel;
-
-    @FXML
-    private JFXButton prevButton;
-
-    @FXML
-    private JFXButton nextButton;
 
     @FXML
     private Label invoiceMonthNavigatorBarLabel;
@@ -104,10 +94,8 @@ public class CreditCardPaneController
     @FXML
     private ProgressBar limitProgressBar;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
-    @Autowired
     private CreditCardController creditCardController;
 
     private YearMonth currentDisplayedMonth;
@@ -122,9 +110,11 @@ public class CreditCardPaneController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public CreditCardPaneController(CreditCardService creditCardService)
+    public CreditCardPaneController(CreditCardService creditCardService, ConfigurableApplicationContext springContext, CreditCardController creditCardController)
     {
         this.creditCardService = creditCardService;
+        this.springContext = springContext;
+        this.creditCardController = creditCardController;
     }
 
     @FXML
@@ -272,7 +262,8 @@ public class CreditCardPaneController
 
     /**
      * Load the Credit Card Pane
-     * @param creditCard Credit Card to load
+     * @param crc Credit Card to load
+     * @param month year and month to display
      * @return The updated VBox
      */
     public VBox updateCreditCardPane(CreditCard crc, YearMonth month)
@@ -333,7 +324,7 @@ public class CreditCardPaneController
 
         closureDayLabel.setText(creditCard.getClosingDay().toString());
 
-        // Fromat LocalDateTime to MM/YYYY
+        // Format LocalDateTime to MM/YYYY
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
         nextInvoiceLabel.setText(

@@ -105,8 +105,8 @@ public final class EditRecurringTransactionController
         LocalDate                     endDate     = endDatePicker.getValue();
         RecurringTransactionFrequency frequency   = frequencyComboBox.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
-            valueString == null || valueString.strip().isEmpty() || type == null ||
+        if (wallet == null || description == null || description.isBlank() ||
+            valueString == null || valueString.isBlank() || type == null ||
             category == null || nextDueDate == null || frequency == null)
         {
             WindowUtils.showInformationDialog(
@@ -125,7 +125,7 @@ public final class EditRecurringTransactionController
                  !rt.getEndDate().toLocalDate().equals(
                      Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE));
 
-            // Check if has any modification
+            // Check if it has any modification
             if (rt.getWallet().getId().equals(wallet.getId()) &&
                 rt.getDescription().equals(description) &&
                 rt.getAmount().compareTo(transactionAmount) == 0 &&

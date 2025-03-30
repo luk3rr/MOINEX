@@ -47,8 +47,8 @@ public final class AddTickerController extends BaseTickerManagement
         String     avgUnitPriceStr = avgUnitPriceField.getText();
 
         if (name == null || symbol == null || currentPriceStr == null || type == null ||
-            name.strip().isEmpty() || symbol.strip().isEmpty() ||
-            currentPriceStr.strip().isEmpty())
+            name.isBlank() || symbol.isBlank() ||
+            currentPriceStr.isBlank())
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -57,11 +57,11 @@ public final class AddTickerController extends BaseTickerManagement
             return;
         }
 
-        // If quantity is set, then avgUnitPrice must be set or vice-versa
-        if ((quantityStr == null || quantityStr.strip().isEmpty()) &&
-                !(avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()) ||
-            (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()) &&
-                !(quantityStr == null || quantityStr.strip().isEmpty()))
+        // If quantity is set, then avgUnitPrice must be set or vice versa
+        if ((quantityStr == null || quantityStr.isBlank()) &&
+                !(avgUnitPriceStr == null || avgUnitPriceStr.isBlank()) ||
+            (avgUnitPriceStr == null || avgUnitPriceStr.isBlank()) &&
+                !(quantityStr == null || quantityStr.isBlank()))
         {
             WindowUtils.showInformationDialog(
                 "Invalid fields",
@@ -77,15 +77,17 @@ public final class AddTickerController extends BaseTickerManagement
             BigDecimal quantity;
             BigDecimal avgUnitPrice;
 
-            if ((quantityStr == null || quantityStr.strip().isEmpty()) &&
-                (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()))
+            if ((quantityStr == null || quantityStr.isBlank()) &&
+                (avgUnitPriceStr == null || avgUnitPriceStr.isBlank()))
             {
                 quantity     = BigDecimal.ZERO;
                 avgUnitPrice = BigDecimal.ZERO;
             }
             else
             {
+                assert quantityStr != null;
                 quantity     = new BigDecimal(quantityStr);
+                assert avgUnitPriceStr != null;
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 

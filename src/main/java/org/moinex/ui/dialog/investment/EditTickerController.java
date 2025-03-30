@@ -68,9 +68,7 @@ public final class EditTickerController extends BaseTickerManagement
         String     quantityStr     = quantityField.getText();
         String     avgUnitPriceStr = avgUnitPriceField.getText();
 
-        if (name == null || symbol == null || currentPriceStr == null || type == null ||
-            name.strip().isEmpty() || symbol.strip().isEmpty() ||
-            currentPriceStr.strip().isEmpty())
+        if (currentPriceStr == null || type == null || name.isBlank() || symbol.isBlank() || currentPriceStr.isBlank())
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -79,11 +77,11 @@ public final class EditTickerController extends BaseTickerManagement
             return;
         }
 
-        // If quantity is set, then avgUnitPrice must be set or vice-versa
-        if ((quantityStr == null || quantityStr.strip().isEmpty()) &&
-                !(avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()) ||
-            (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()) &&
-                !(quantityStr == null || quantityStr.strip().isEmpty()))
+        // If quantity is set, then avgUnitPrice must be set or vice versa
+        if ((quantityStr == null || quantityStr.isBlank()) &&
+                !(avgUnitPriceStr == null || avgUnitPriceStr.isBlank()) ||
+            (avgUnitPriceStr == null || avgUnitPriceStr.isBlank()) &&
+                !(quantityStr == null || quantityStr.isBlank()))
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -99,21 +97,23 @@ public final class EditTickerController extends BaseTickerManagement
             BigDecimal quantity;
             BigDecimal avgUnitPrice;
 
-            if ((quantityStr == null || quantityStr.strip().isEmpty()) &&
-                (avgUnitPriceStr == null || avgUnitPriceStr.strip().isEmpty()))
+            if ((quantityStr == null || quantityStr.isBlank()) &&
+                (avgUnitPriceStr == null || avgUnitPriceStr.isBlank()))
             {
                 quantity     = BigDecimal.ZERO;
                 avgUnitPrice = BigDecimal.ZERO;
             }
             else
             {
+                assert quantityStr != null;
                 quantity     = new BigDecimal(quantityStr);
+                assert avgUnitPriceStr != null;
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 
             boolean archived = archivedCheckBox.isSelected();
 
-            // Check if has any modification
+            // Check if it has any modification
             if (ticker.getName().equals(name) && ticker.getSymbol().equals(symbol) &&
                 ticker.getCurrentUnitValue().compareTo(currentPrice) == 0 &&
                 ticker.getType().equals(type) &&

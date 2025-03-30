@@ -35,7 +35,7 @@ import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
 import org.moinex.exceptions.InsufficientResourcesException;
 import org.moinex.exceptions.InvalidTickerTypeException;
-import org.moinex.exceptions.SameSourceDestionationException;
+import org.moinex.exceptions.SameSourceDestinationException;
 import org.moinex.repositories.investment.CryptoExchangeRepository;
 import org.moinex.repositories.investment.DividendRepository;
 import org.moinex.repositories.investment.TickerPurchaseRepository;
@@ -916,7 +916,7 @@ class TickerServiceTest
     void
     testAddCryptoExchangeSameTicker()
     {
-        assertThrows(SameSourceDestionationException.class, () -> {
+        assertThrows(SameSourceDestinationException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               1L,
                                               new BigDecimal("1"),

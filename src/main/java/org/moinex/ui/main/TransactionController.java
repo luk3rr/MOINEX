@@ -12,11 +12,8 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -103,7 +100,6 @@ public class TransactionController
     @FXML
     private TextField transactionsSearchField;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private StackedBarChart<String, Number> moneyFlowStackedBarChart;
@@ -127,11 +123,12 @@ public class TransactionController
     @Autowired
     public TransactionController(WalletTransactionService walletTransactionService,
                                  CreditCardService        creditCardService,
-                                 CategoryService          categoryService)
+                                 CategoryService          categoryService, ConfigurableApplicationContext springContext)
     {
         this.walletTransactionService = walletTransactionService;
         this.creditCardService        = creditCardService;
         this.categoryService          = categoryService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -175,24 +172,24 @@ public class TransactionController
         updateTransactionTableView();
 
         // Add a listener to handle user selection
-        monthResumeComboBox.setOnAction(event -> { updateMonthResume(); });
+        monthResumeComboBox.setOnAction(event -> updateMonthResume());
 
-        yearResumeComboBox.setOnAction(event -> { updateYearResume(); });
+        yearResumeComboBox.setOnAction(event -> updateYearResume());
 
-        moneyFlowComboBox.setOnAction(event -> { updateMoneyFlow(); });
+        moneyFlowComboBox.setOnAction(event -> updateMoneyFlow());
 
         transactionsTypeComboBox.setOnAction(
-            event -> { updateTransactionTableView(); });
+            event -> updateTransactionTableView());
 
         transactionsStartDatePicker.setOnAction(
-            event -> { updateTransactionTableView(); });
+            event -> updateTransactionTableView());
 
         transactionsEndDatePicker.setOnAction(
-            event -> { updateTransactionTableView(); });
+            event -> updateTransactionTableView());
 
         // Add listener to the search field
         transactionsSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { updateTransactionTableView(); });
+            (observable, oldValue, newValue) -> updateTransactionTableView());
     }
 
     @FXML
@@ -383,7 +380,8 @@ public class TransactionController
         transactionsTableView.getItems().clear();
 
         // Fetch all transactions within the selected range and filter by transaction
-        // type. If transaction type is null, all transactions are fetched
+        // type.
+        // If the transaction type is null, all transactions are fetched
         if (similarTextOrId.isEmpty())
         {
             walletTransactionService
@@ -456,11 +454,11 @@ public class TransactionController
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
 
         // Loop through the last few months
-        for (Integer i = 0; i < Constants.XYBAR_CHART_MONTHS; i++)
+        for (int i = 0; i < Constants.XYBAR_CHART_MONTHS; i++)
         {
             // Get the date for the current month
             LocalDateTime date =
-                currentDate.minusMonths((long)(Constants.XYBAR_CHART_MONTHS - i - 1));
+                currentDate.minusMonths(Constants.XYBAR_CHART_MONTHS - i - 1);
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
 
             // Get confirmed transactions for the month
@@ -534,7 +532,7 @@ public class TransactionController
                 }
             }
 
-            // Only add series to the chart if it has data greater than zero
+            // Only add a series to the chart if it has data greater than zero
             if (series.getData().stream().anyMatch(
                     data -> (Double)data.getYValue() > 0))
             {
@@ -556,16 +554,14 @@ public class TransactionController
         // Set the Y-axis properties only if maxTotal is greater than 0
         Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
-        numberAxis.setTickLabelFormatter(new StringConverter<Number>() {
+        numberAxis.setTickLabelFormatter(new StringConverter<>() {
             @Override
-            public String toString(Number value)
-            {
+            public String toString(Number value) {
                 return UIUtils.formatCurrency(value);
             }
 
             @Override
-            public Number fromString(String string)
-            {
+            public Number fromString(String string) {
                 return 0;
             }
         });
@@ -574,7 +570,7 @@ public class TransactionController
         {
             for (XYChart.Data<String, Number> data : series.getData())
             {
-                // Calculate total for the month to find the percentage
+                // Calculate the total for the month to find the percentage
                 YearMonth yearMonth = YearMonth.parse(data.getXValue(), formatter);
                 Double    monthTotal =
                     monthlyTotals.getOrDefault(yearMonth, new LinkedHashMap<>())
@@ -616,7 +612,7 @@ public class TransactionController
             Parent newContent = loader.load();
 
             newContent.getStylesheets().add(
-                getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
+                Objects.requireNonNull(getClass().getResource(Constants.COMMON_STYLE_SHEET)).toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
             resumePaneController.updateResumePane(selectedYear.getValue());
@@ -631,7 +627,7 @@ public class TransactionController
         }
         catch (Exception e)
         {
-            logger.error("Error updating year resume: " + e.getMessage());
+            logger.error("Error updating year resume: {}", e.getMessage());
         }
     }
 
@@ -650,7 +646,7 @@ public class TransactionController
             Parent newContent = loader.load();
 
             newContent.getStylesheets().add(
-                getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
+                Objects.requireNonNull(getClass().getResource(Constants.COMMON_STYLE_SHEET)).toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
             resumePaneController.updateResumePane(selectedYearMonth.getMonthValue(),
@@ -666,7 +662,7 @@ public class TransactionController
         }
         catch (Exception e)
         {
-            logger.error("Error updating month resume: " + e.getMessage());
+            logger.error("Error updating month resume: {}", e.getMessage());
         }
     }
 
@@ -705,19 +701,17 @@ public class TransactionController
         yearResumeComboBox.setItems(yearList);
 
         // Custom string converter to format the Year as "Year"
-        yearResumeComboBox.setConverter(new StringConverter<Year>() {
+        yearResumeComboBox.setConverter(new StringConverter<>() {
             private final DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy");
+                    DateTimeFormatter.ofPattern("yyyy");
 
             @Override
-            public String toString(Year year)
-            {
+            public String toString(Year year) {
                 return year != null ? year.format(formatter) : "";
             }
 
             @Override
-            public Year fromString(String string)
-            {
+            public Year fromString(String string) {
                 return Year.parse(string, formatter);
             }
         });
@@ -738,41 +732,37 @@ public class TransactionController
         // All is the first element in the list and is represented by a null value
         ObservableList<TransactionType> transactionTypesWithNull =
             FXCollections.observableArrayList(TransactionType.values());
-        transactionTypesWithNull.add(0, null);
+        transactionTypesWithNull.addFirst(null);
 
         transactionsTypeComboBox.setItems(transactionTypesWithNull);
 
         // Custom string converter to format the TransactionType as
         // "TransactionType"
-        moneyFlowComboBox.setConverter(new StringConverter<TransactionType>() {
+        moneyFlowComboBox.setConverter(new StringConverter<>() {
             @Override
-            public String toString(TransactionType transactionType)
-            {
+            public String toString(TransactionType transactionType) {
                 return transactionType != null ? transactionType.toString() : "";
             }
 
             @Override
-            public TransactionType fromString(String string)
-            {
+            public TransactionType fromString(String string) {
                 return TransactionType.valueOf(string);
             }
         });
 
-        transactionsTypeComboBox.setConverter(new StringConverter<TransactionType>() {
+        transactionsTypeComboBox.setConverter(new StringConverter<>() {
             @Override
-            public String toString(TransactionType transactionType)
-            {
+            public String toString(TransactionType transactionType) {
                 return transactionType != null ? transactionType.toString()
-                                               : "ALL"; // Show "All" instead of null
+                        : "ALL"; // Show "All" instead of null
             }
 
             @Override
-            public TransactionType fromString(String string)
-            {
+            public TransactionType fromString(String string) {
                 return string.equals("ALL")
-                    ? null
-                    : TransactionType.valueOf(
-                          string); // Return null if "All" is selected
+                        ? null
+                        : TransactionType.valueOf(
+                        string); // Return null if "All" is selected
             }
         });
     }
@@ -813,19 +803,17 @@ public class TransactionController
         monthResumeComboBox.setItems(monthYearList);
 
         // Custom string converter to format the YearMonth as "Month/Year"
-        monthResumeComboBox.setConverter(new StringConverter<YearMonth>() {
+        monthResumeComboBox.setConverter(new StringConverter<>() {
             private final DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy MMM");
+                    DateTimeFormatter.ofPattern("yyyy MMM");
 
             @Override
-            public String toString(YearMonth yearMonth)
-            {
+            public String toString(YearMonth yearMonth) {
                 return yearMonth != null ? yearMonth.format(formatter) : "";
             }
 
             @Override
-            public YearMonth fromString(String string)
-            {
+            public YearMonth fromString(String string) {
                 return YearMonth.parse(string, formatter);
             }
         });
@@ -836,31 +824,7 @@ public class TransactionController
      */
     private void configureTableView()
     {
-        TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<WalletTransaction, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
-                }
-            };
-        });
+        TableColumn<WalletTransaction, Long> idColumn = getWalletTransactionLongTableColumn();
 
         TableColumn<WalletTransaction, String> categoryColumn =
             new TableColumn<>("Category");
@@ -908,5 +872,28 @@ public class TransactionController
         transactionsTableView.getColumns().add(typeColumn);
         transactionsTableView.getColumns().add(categoryColumn);
         transactionsTableView.getColumns().add(statusColumn);
+    }
+
+    private static TableColumn<WalletTransaction, Long> getWalletTransactionLongTableColumn() {
+        TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
     }
 }

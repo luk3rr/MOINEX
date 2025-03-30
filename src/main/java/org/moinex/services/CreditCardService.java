@@ -46,34 +46,45 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class CreditCardService
 {
-    @Autowired
     private CreditCardDebtRepository creditCardDebtRepository;
 
-    @Autowired
     private CreditCardCreditRepository creditCardCreditRepository;
 
-    @Autowired
     private CreditCardPaymentRepository creditCardPaymentRepository;
 
-    @Autowired
     private CreditCardRepository creditCardRepository;
 
-    @Autowired
     private CreditCardOperatorRepository creditCardOperatorRepository;
 
-    @Autowired
     private WalletRepository walletRepository;
 
-    @Autowired
     private CategoryRepository categoryRepository;
 
     private static final Logger logger =
         LoggerFactory.getLogger(CreditCardService.class);
 
+    @Autowired
+    public CreditCardService(CreditCardDebtRepository     creditCardDebtRepository,
+                             CreditCardCreditRepository   creditCardCreditRepository,
+                             CreditCardPaymentRepository  creditCardPaymentRepository,
+                             CreditCardRepository         creditCardRepository,
+                             CreditCardOperatorRepository creditCardOperatorRepository,
+                             WalletRepository             walletRepository,
+                             CategoryRepository           categoryRepository)
+    {
+        this.creditCardDebtRepository     = creditCardDebtRepository;
+        this.creditCardCreditRepository   = creditCardCreditRepository;
+        this.creditCardPaymentRepository  = creditCardPaymentRepository;
+        this.creditCardRepository         = creditCardRepository;
+        this.creditCardOperatorRepository = creditCardOperatorRepository;
+        this.walletRepository             = walletRepository;
+        this.categoryRepository           = categoryRepository;
+    }
+
     /**
      * Creates a new credit card
      * @param name The name of the credit card
-     * @param billingDueDay The day of the month the credit card bill is due
+     * @param dueDate The day of the month the credit card bill is due
      * @param closingDay The day of the month the credit card bill is closed
      * @param maxDebt The maximum debt of the credit card
      * @param lastFourDigits The last four digits of the credit card
@@ -110,7 +121,7 @@ public class CreditCardService
     /**
      * Creates a new credit card
      * @param name The name of the credit card
-     * @param billingDueDay The day of the month the credit card bill is due
+     * @param dueDate The day of the month the credit card bill is due
      * @param closingDay The day of the month the credit card bill is closed
      * @param maxDebt The maximum debt of the credit card
      * @param lastFourDigits The last four digits of the credit card
@@ -289,7 +300,7 @@ public class CreditCardService
 
     /**
      * Register a debt on the credit card and its respective future payment
-     * @param creditCardName The name of the credit card
+     * @param crcId The name of the credit card
      * @param category The category of the debt
      * @param registerDate The date the debt was registered
      * @param invoiceMonth The month of the invoice
@@ -383,7 +394,7 @@ public class CreditCardService
             exactInstallmentValue.multiply(new BigDecimal(installments)));
 
         // Iterate through the installments
-        for (Integer i = 0; i < installments; i++)
+        for (int i = 0; i < installments; i++)
         {
             // If there is a remainder, add it to the first installment
             BigDecimal currentInstallmentValue = exactInstallmentValue;
@@ -684,8 +695,7 @@ public class CreditCardService
         {
             BigDecimal rebateForThisPayment;
 
-            if (payment.getId().equals(
-                    pendingPayments.get(pendingPayments.size() - 1).getId()))
+            if (payment.getId().equals(pendingPayments.getLast().getId()))
             {
                 // Last payment gets the remaining rebate
                 rebateForThisPayment = remainingRebate;
@@ -1032,7 +1042,7 @@ public class CreditCardService
 
     /**
      * Get the invoice amount of a credit card in a specified month and year
-     * @param creditCardId The credit card id
+     * @param crcId The credit card id
      * @param month The month
      * @param year The year
      * @return The invoice amount of the credit card in the specified month and year
@@ -1083,7 +1093,7 @@ public class CreditCardService
     /**
      * Get the invoice status of a credit card in a specified month and year
      * The invoice status can be either 'Open' or 'Closed'
-     * @param creditCardId The credit card id
+     * @param crcId The credit card id
      * @param month The month
      * @param year The year
      * @return The invoice status of the credit card in the specified month and year
@@ -1130,7 +1140,7 @@ public class CreditCardService
                     -> new EntityNotFoundException("Credit card with id " + crcId +
                                                    " does not exist"));
 
-            Integer currentDay = now.getDayOfMonth();
+            int     currentDay = now.getDayOfMonth();
             Integer closingDay = creditCard.getClosingDay();
 
             if (currentDay > closingDay)
@@ -1295,14 +1305,14 @@ public class CreditCardService
 
     /**
      * Update invoice month of a debt
-     * @param debt The debt to be updated
-     * @param invoiceMonth The new invoice month
+     * @param oldDebt The debt to be updated
+     * @param invoice The new invoice month
      */
     private void changeInvoiceMonth(CreditCardDebt oldDebt, YearMonth invoice)
     {
         List<CreditCardPayment> payments = getPaymentsByDebtId(oldDebt.getId());
 
-        CreditCardPayment firstPayment = payments.get(0);
+        CreditCardPayment firstPayment = payments.getFirst();
 
         // If the first payment is in the same month and year of the invoice, do not
         // update
@@ -1313,7 +1323,7 @@ public class CreditCardService
             return;
         }
 
-        for (Integer i = 0; i < oldDebt.getInstallments(); i++)
+        for (int i = 0; i < oldDebt.getInstallments(); i++)
         {
             CreditCardPayment payment = payments.get(i);
 
@@ -1335,7 +1345,7 @@ public class CreditCardService
 
     /**
      * Change the number of installments of a debt
-     * @param debt The debt to be updated
+     * @param oldDebt The debt to be updated
      * @param newInstallments The new number of installments
      */
     private void changeDebtInstallments(CreditCardDebt oldDebt, Integer newInstallments)
@@ -1365,7 +1375,7 @@ public class CreditCardService
         // Delete and update payments
         if (newInstallments < oldDebt.getInstallments())
         {
-            for (Integer i = 0; i < oldDebt.getInstallments(); i++)
+            for (int i = 0; i < oldDebt.getInstallments(); i++)
             {
                 CreditCardPayment payment = payments.get(i);
 
@@ -1393,11 +1403,11 @@ public class CreditCardService
         }
         else // Insert and update payments
         {
-            for (Integer i = 1; i <= newInstallments; i++)
+            for (int i = 1; i <= newInstallments; i++)
             {
                 if (i > oldDebt.getInstallments())
                 {
-                    CreditCardPayment lastPayment = payments.get(payments.size() - 1);
+                    CreditCardPayment lastPayment = payments.getLast();
 
                     // Calculate the payment date
                     LocalDateTime paymentDate = lastPayment.getDate().plusMonths(1);
@@ -1467,7 +1477,7 @@ public class CreditCardService
             exactInstallmentValue.multiply(new BigDecimal(installments)));
 
         // Update payments
-        for (Integer i = 0; i < oldDebt.getInstallments(); i++)
+        for (int i = 0; i < oldDebt.getInstallments(); i++)
         {
             CreditCardPayment payment = payments.get(i);
 

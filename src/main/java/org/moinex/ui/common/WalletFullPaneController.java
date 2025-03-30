@@ -112,10 +112,8 @@ public class WalletFullPaneController
     @FXML
     private MenuItem changeWalletTypeMenuItem;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
-    @Autowired
     private WalletController walletController;
 
     private WalletService walletService;
@@ -144,16 +142,17 @@ public class WalletFullPaneController
     @Autowired
     public WalletFullPaneController(WalletService            walletService,
                                     CreditCardService        creditCardService,
-                                    WalletTransactionService walletTransactionService)
+                                    WalletTransactionService walletTransactionService, ConfigurableApplicationContext springContext, WalletController walletController)
     {
         this.walletService            = walletService;
         this.creditCardService        = creditCardService;
         this.walletTransactionService = walletTransactionService;
+        this.springContext = springContext;
+        this.walletController = walletController;
     }
 
     /**
      * Load wallet information from the database
-     * @param wtName Wallet name to find in the database
      */
     public void loadWalletInfo()
     {
@@ -203,7 +202,7 @@ public class WalletFullPaneController
 
     /**
      * Load wallet information
-     * @param wtName Wallet name to find in the database
+     * @param wt Wallet name to find in the database
      * @return The updated VBox
      */
     public VBox updateWalletPane(Wallet wt)
@@ -288,7 +287,7 @@ public class WalletFullPaneController
         setLabelValue(currentBalanceSign, currentBalanceValue, wallet.getBalance());
         setLabelValue(foreseenBalanceSign, foreseenBalanceValue, foreseenBalance);
 
-        // If wallet type is Goal, remove the option to change the wallet type to
+        // If the wallet type is Goal, remove the option to change the wallet type to
         // prevent changing the wallet type of a Goal wallet
         if (wallet.getType().getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
         {

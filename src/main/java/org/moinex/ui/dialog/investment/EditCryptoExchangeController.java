@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Ticker;
-import org.moinex.exceptions.SameSourceDestionationException;
+import org.moinex.exceptions.SameSourceDestinationException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.util.WindowUtils;
@@ -75,11 +75,7 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
         String    description               = descriptionField.getText().trim();
         LocalDate exchangeDate              = exchangeDatePicker.getValue();
 
-        if (soldCrypto == null || receivedCrypto == null ||
-            cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.strip().isEmpty() ||
-            cryptoReceivedQuantityStr == null ||
-            cryptoReceivedQuantityStr.strip().isEmpty() || description == null ||
-            description.strip().isEmpty() || exchangeDate == null)
+        if (soldCrypto == null || receivedCrypto == null || cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.isBlank() || cryptoReceivedQuantityStr == null || cryptoReceivedQuantityStr.isBlank() || description.isBlank() || exchangeDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -96,7 +92,7 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = exchangeDate.atTime(currentTime);
 
-            // Check if has any modification
+            // Check if it has any modification
             if (cryptoExchange.getSoldCrypto().getSymbol().equals(
                     soldCrypto.getSymbol()) &&
                 cryptoExchange.getReceivedCrypto().getSymbol().equals(
@@ -135,7 +131,7 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
             WindowUtils.showErrorDialog("Invalid exchange quantity",
                                         "The quantity must be a number");
         }
-        catch (EntityNotFoundException | SameSourceDestionationException |
+        catch (EntityNotFoundException | SameSourceDestinationException |
                IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error while creating exchange",

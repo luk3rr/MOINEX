@@ -37,7 +37,7 @@ public class TickerSale extends Transaction
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "ticker_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "ticker_id", referencedColumnName = "id" )
     private Ticker ticker;
 
     @Column(name = "average_cost", nullable = false)

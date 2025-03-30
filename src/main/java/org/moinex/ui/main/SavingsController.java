@@ -10,6 +10,7 @@ import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -142,7 +143,6 @@ public class SavingsController
     @FXML
     private Label overviewTabCommoditiesLastUpdate;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private boolean isUpdatingPortfolioPrices = false;
@@ -150,7 +150,7 @@ public class SavingsController
     private final ScheduledExecutorService scheduler =
         Executors.newScheduledThreadPool(1);
 
-    private Integer scheduleDelayInSeconds = 30;
+    private final Integer scheduleDelayInSeconds = 30;
 
     private Integer scheduledUpdatingMarketQuotesRetries = 0;
 
@@ -193,10 +193,11 @@ public class SavingsController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public SavingsController(TickerService tickerService, MarketService marketService)
+    public SavingsController(TickerService tickerService, MarketService marketService, ConfigurableApplicationContext springContext)
     {
         this.tickerService = tickerService;
         this.marketService = marketService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -368,33 +369,31 @@ public class SavingsController
 
         tickerService
             .updateTickersPriceFromApiAsync(stocksFundsTabTickerTable.getItems())
-            .thenAccept(failed -> {
-                Platform.runLater(() -> {
-                    if (failed.isEmpty())
-                    {
-                        WindowUtils.showSuccessDialog(
-                            "Finished updating prices",
-                            "All tickers were successfully updated");
-                    }
-                    else if (failed.size() ==
-                             stocksFundsTabTickerTable.getItems().size())
-                    {
-                        WindowUtils.showInformationDialog(
-                            "Finished updating prices with errors",
-                            "Failed to update all tickers");
-                    }
-                    else
-                    {
-                        WindowUtils.showInformationDialog(
-                            "Finished updating prices with errors",
-                            "Failed to update tickers:\n" +
-                                failed.stream()
-                                    .map(Ticker::getSymbol)
-                                    .reduce((a, b) -> a + ", " + b)
-                                    .orElse(""));
-                    }
-                });
-            })
+            .thenAccept(failed -> Platform.runLater(() -> {
+                if (failed.isEmpty())
+                {
+                    WindowUtils.showSuccessDialog(
+                        "Finished updating prices",
+                        "All tickers were successfully updated");
+                }
+                else if (failed.size() ==
+                         stocksFundsTabTickerTable.getItems().size())
+                {
+                    WindowUtils.showInformationDialog(
+                        "Finished updating prices with errors",
+                        "Failed to update all tickers");
+                }
+                else
+                {
+                    WindowUtils.showInformationDialog(
+                        "Finished updating prices with errors",
+                        "Failed to update tickers:\n" +
+                            failed.stream()
+                                .map(Ticker::getSymbol)
+                                .reduce((a, b) -> a + ", " + b)
+                                .orElse(""));
+                }
+            }))
             .exceptionally(e -> {
                 Platform.runLater(() -> {
                     WindowUtils.showErrorDialog("Error updating prices",
@@ -531,7 +530,7 @@ public class SavingsController
                 })
                 .exceptionally(ex -> {
                     Platform.runLater(
-                        () -> { schedulerEtryForUpdatingBrazilianIndicators(); });
+                            this::schedulerEtryForUpdatingBrazilianIndicators);
                     logger.error(ex.getMessage());
                     return null;
                 });
@@ -563,7 +562,7 @@ public class SavingsController
                 })
                 .exceptionally(ex -> {
                     Platform.runLater(
-                        () -> { schedulerEntryForUpdatingMarketQuotes(); });
+                            this::schedulerEntryForUpdatingMarketQuotes);
                     logger.error(ex.getMessage());
                     return null;
                 });
@@ -708,28 +707,26 @@ public class SavingsController
         ObservableList<TickerType> tickerTypesWithNull =
             FXCollections.observableArrayList(TickerType.values());
 
-        tickerTypesWithNull.add(0, null);
+        tickerTypesWithNull.addFirst(null);
 
         stocksFundsTabTickerTypeComboBox.setItems(tickerTypesWithNull);
 
         stocksFundsTabTickerTypeComboBox.setConverter(
-            new StringConverter<TickerType>() {
-                @Override
-                public String toString(TickerType tickerType)
-                {
-                    return tickerType != null ? tickerType.toString()
-                                              : "ALL"; // Show "All" instead of null
-                }
+                new StringConverter<>() {
+                    @Override
+                    public String toString(TickerType tickerType) {
+                        return tickerType != null ? tickerType.toString()
+                                : "ALL"; // Show "All" instead of null
+                    }
 
-                @Override
-                public TickerType fromString(String string)
-                {
-                    return string.equals("ALL")
-                        ? null
-                        : TickerType.valueOf(
-                              string); // Return null if "All" is selected
-                }
-            });
+                    @Override
+                    public TickerType fromString(String string) {
+                        return string.equals("ALL")
+                                ? null
+                                : TickerType.valueOf(
+                                string); // Return null if "All" is selected
+                    }
+                });
     }
 
     /**
@@ -756,25 +753,19 @@ public class SavingsController
             param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<Ticker, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
                 }
-            };
+            }
         });
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
@@ -828,7 +819,7 @@ public class SavingsController
     private void setOffUpdatePortfolioPricesButton()
     {
         updatePricesButtonIcon.setImage(
-            new Image(getClass().getResource(Constants.LOADING_GIF).toExternalForm()));
+            new Image(Objects.requireNonNull(getClass().getResource(Constants.LOADING_GIF)).toExternalForm()));
         updatePortfolioPricesButton.setDisable(true);
         updatePortfolioPricesButton.setText("Updating...");
 
@@ -839,8 +830,8 @@ public class SavingsController
     {
         updatePortfolioPricesButton.setDisable(false);
         updatePricesButtonIcon.setImage(new Image(
-            getClass()
-                .getResource(Constants.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)
+            Objects.requireNonNull(getClass()
+                            .getResource(Constants.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON))
                 .toExternalForm()));
         updatePortfolioPricesButton.setText("Update Prices");
 

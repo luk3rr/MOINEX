@@ -59,7 +59,7 @@ public class CryptoExchange
     @Column(name = "date", nullable = false)
     private String date;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description" )
     private String description;
 
     public abstract static class CryptoExchangeBuilder<

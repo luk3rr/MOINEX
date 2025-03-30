@@ -99,7 +99,7 @@ public class ChangeWalletBalanceController
         {
             BigDecimal newBalance = new BigDecimal(newBalanceStr);
 
-            // Check if has modification
+            // Check if it has modification
             if (wallet.getBalance().compareTo(newBalance) == 0)
             {
                 WindowUtils.showInformationDialog("No changes",

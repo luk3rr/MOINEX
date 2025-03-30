@@ -96,7 +96,7 @@ public final class EditGoalController extends BaseGoalManagement
             BigDecimal currentBalance = new BigDecimal(currentBalanceStr);
             BigDecimal targetBalance  = new BigDecimal(targetBalanceStr);
 
-            // Check if has any modification
+            // Check if it has any modification
             if (goal.getName().equals(goalName) &&
                 goal.getInitialBalance().equals(initialBalance) &&
                 goal.getBalance().equals(currentBalance) &&
@@ -120,7 +120,7 @@ public final class EditGoalController extends BaseGoalManagement
 
                 // If the goal was completed and the user unchecked the completed
                 // checkbox, set the completion date to null, otherwise set the
-                // completion date to the current date This is necessary for UpdateGoal
+                // completion date to the current date, This is necessary for UpdateGoal
                 // identify if the completed field was changed
                 if (completed && !goal.isCompleted())
                 {

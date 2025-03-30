@@ -181,7 +181,7 @@ public abstract class BaseTickerTransactionManagement
         BigDecimal totalPrice = new BigDecimal("0.00");
 
         if (unitPriceStr == null || quantityStr == null ||
-            unitPriceStr.strip().isEmpty() || quantityStr.strip().isEmpty())
+            unitPriceStr.isBlank() || quantityStr.isBlank())
         {
             totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
             return;
@@ -212,8 +212,8 @@ public abstract class BaseTickerTransactionManagement
         String quantityStr  = quantityField.getText();
         Wallet wallet       = walletComboBox.getValue();
 
-        if (unitPriceStr == null || unitPriceStr.strip().isEmpty() ||
-            quantityStr == null || quantityStr.strip().isEmpty() || wallet == null)
+        if (unitPriceStr == null || unitPriceStr.isBlank() ||
+            quantityStr == null || quantityStr.isBlank() || wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -230,21 +230,7 @@ public abstract class BaseTickerTransactionManagement
                 return;
             }
 
-            BigDecimal walletAfterBalanceValue;
-
-            if (transactionType == TransactionType.EXPENSE)
-            {
-                walletAfterBalanceValue =
-                    wallet.getBalance().subtract(transactionValue);
-            }
-            else if (transactionType == TransactionType.INCOME)
-            {
-                walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
-            }
-            else
-            {
-                throw new IllegalStateException("Invalid transaction type");
-            }
+            BigDecimal walletAfterBalanceValue = getBigDecimal(wallet, transactionValue);
 
             // Set the style according to the balance value after the transaction
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
@@ -267,6 +253,25 @@ public abstract class BaseTickerTransactionManagement
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
+    }
+
+    private BigDecimal getBigDecimal(Wallet wallet, BigDecimal transactionValue) {
+        BigDecimal walletAfterBalanceValue;
+
+        if (transactionType == TransactionType.EXPENSE)
+        {
+            walletAfterBalanceValue =
+                wallet.getBalance().subtract(transactionValue);
+        }
+        else if (transactionType == TransactionType.INCOME)
+        {
+            walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
+        }
+        else
+        {
+            throw new IllegalStateException("Invalid transaction type");
+        }
+        return walletAfterBalanceValue;
     }
 
     protected void loadWalletsFromDatabase()
@@ -362,7 +367,7 @@ public abstract class BaseTickerTransactionManagement
                              wt.getCategory().getName());
 
         Consumer<WalletTransaction> onSelectCallback =
-            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
+                this::fillFieldsWithTransaction;
 
         suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
                                                             filterFunction,

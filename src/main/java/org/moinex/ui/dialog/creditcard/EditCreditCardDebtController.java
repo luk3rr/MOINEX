@@ -75,7 +75,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         categoryComboBox.setValue(crcDebt.getCategory());
 
         CreditCardPayment firstPayment =
-            creditCardService.getPaymentsByDebtId(crcDebt.getId()).get(0);
+            creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
 
         invoiceComboBox.setValue(YearMonth.of(firstPayment.getDate().getYear(),
                                               firstPayment.getDate().getMonth()));
@@ -111,12 +111,12 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
             // Get the date of the first payment to check if the invoice month is the
             // same
             CreditCardPayment firstPayment =
-                creditCardService.getPaymentsByDebtId(crcDebt.getId()).get(0);
+                creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
 
             YearMonth invoice = YearMonth.of(firstPayment.getDate().getYear(),
                                              firstPayment.getDate().getMonth());
 
-            // Check if has any modification
+            // Check if it has any modification
             if (crcDebt.getCreditCard().getId().equals(crc.getId()) &&
                 crcDebt.getCategory().getId().equals(category.getId()) &&
                 debtValue.compareTo(crcDebt.getAmount()) == 0 &&

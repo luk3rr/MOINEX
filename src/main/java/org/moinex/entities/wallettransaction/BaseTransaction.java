@@ -47,6 +47,6 @@ public abstract class BaseTransaction
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description" )
     private String description;
 }

@@ -60,7 +60,6 @@ public class InvestmentTransactionsController
     @FXML
     private TabPane tabPane;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private List<TickerPurchase> purchases;
@@ -75,14 +74,15 @@ public class InvestmentTransactionsController
 
     /**
      * Constructor
-     * @param TickerService tickerService
+     * @param tickerService tickerService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public InvestmentTransactionsController(TickerService tickerService)
+    public InvestmentTransactionsController(TickerService tickerService, ConfigurableApplicationContext springContext)
 
     {
         this.tickerService = tickerService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -127,28 +127,28 @@ public class InvestmentTransactionsController
             TickerPurchase selectedPurchase =
                 purchaseTableView.getSelectionModel().getSelectedItem();
 
-            editpurchase(selectedPurchase);
+            editPurchase(selectedPurchase);
         }
         else if (selectedTab == tabPane.getTabs().get(1))
         {
             TickerSale selectedSale =
                 saleTableView.getSelectionModel().getSelectedItem();
 
-            editsale(selectedSale);
+            editSale(selectedSale);
         }
         else if (selectedTab == tabPane.getTabs().get(2))
         {
             Dividend selectedDividend =
                 dividendTableView.getSelectionModel().getSelectedItem();
 
-            editdividend(selectedDividend);
+            editDividend(selectedDividend);
         }
         else if (selectedTab == tabPane.getTabs().get(3))
         {
             CryptoExchange selectedCryptoExchange =
                 cryptoExchangeTableView.getSelectionModel().getSelectedItem();
 
-            editcryptoexchange(selectedCryptoExchange);
+            editCryptoExchange(selectedCryptoExchange);
         }
     }
 
@@ -415,29 +415,7 @@ public class InvestmentTransactionsController
      */
     private void configurePurchaseTableView()
     {
-        TableColumn<TickerPurchase, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<TickerPurchase, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                 // ensure the text is centered
-                }
-            }
-        });
+        TableColumn<TickerPurchase, Long> idColumn = getTickerPurchaseLongTableColumn();
 
         TableColumn<TickerPurchase, String> tickerNameColumn =
             new TableColumn<>("Ticker");
@@ -505,34 +483,35 @@ public class InvestmentTransactionsController
         purchaseTableView.getColumns().add(statusColumn);
     }
 
+    private static TableColumn<TickerPurchase, Long> getTickerPurchaseLongTableColumn() {
+        TableColumn<TickerPurchase, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
+    }
+
     /**
      * Configure the sale table view columns
      */
     private void configureSaleTableView()
     {
-        TableColumn<TickerSale, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<TickerSale, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                 // ensure the text is centered
-                }
-            }
-        });
+        TableColumn<TickerSale, Long> idColumn = getTickerSaleLongTableColumn();
 
         TableColumn<TickerSale, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
@@ -596,34 +575,35 @@ public class InvestmentTransactionsController
         saleTableView.getColumns().add(statusColumn);
     }
 
+    private static TableColumn<TickerSale, Long> getTickerSaleLongTableColumn() {
+        TableColumn<TickerSale, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
+    }
+
     /**
      * Configure the table view columns
      */
     private void configureDividendTableView()
     {
-        TableColumn<Dividend, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<Dividend, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                 // ensure the text is centered
-                }
-            }
-        });
+        TableColumn<Dividend, Long> idColumn = getDividendLongTableColumn();
 
         TableColumn<Dividend, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
@@ -672,34 +652,35 @@ public class InvestmentTransactionsController
         dividendTableView.getColumns().add(statusColumn);
     }
 
+    private static TableColumn<Dividend, Long> getDividendLongTableColumn() {
+        TableColumn<Dividend, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
+    }
+
     /**
      * Configure the table view columns
      */
     private void configureCryptoExchangeTableView()
     {
-        TableColumn<CryptoExchange, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<CryptoExchange, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                 // ensure the text is centered
-                }
-            }
-        });
+        TableColumn<CryptoExchange, Long> idColumn = getCryptoExchangeLongTableColumn();
 
         TableColumn<CryptoExchange, String> soldCryptoNameColumn =
             new TableColumn<>("Sold");
@@ -749,7 +730,30 @@ public class InvestmentTransactionsController
         cryptoExchangeTableView.getColumns().add(descriptionColumn);
     }
 
-    private void editpurchase(TickerPurchase purchase)
+    private static TableColumn<CryptoExchange, Long> getCryptoExchangeLongTableColumn() {
+        TableColumn<CryptoExchange, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
+    }
+
+    private void editPurchase(TickerPurchase purchase)
     {
         if (purchase == null)
         {
@@ -770,7 +774,7 @@ public class InvestmentTransactionsController
                                     }));
     }
 
-    private void editsale(TickerSale sale)
+    private void editSale(TickerSale sale)
     {
         if (sale == null)
         {
@@ -791,7 +795,7 @@ public class InvestmentTransactionsController
                                     }));
     }
 
-    private void editdividend(Dividend dividend)
+    private void editDividend(Dividend dividend)
     {
         if (dividend == null)
         {
@@ -812,7 +816,7 @@ public class InvestmentTransactionsController
                                     }));
     }
 
-    private void editcryptoexchange(CryptoExchange cryptoExchange)
+    private void editCryptoExchange(CryptoExchange cryptoExchange)
     {
         if (cryptoExchange == null)
         {

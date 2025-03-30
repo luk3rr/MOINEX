@@ -18,7 +18,7 @@ import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
 import org.moinex.exceptions.AttributeAlreadySetException;
 import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.SameSourceDestionationException;
+import org.moinex.exceptions.SameSourceDestinationException;
 import org.moinex.repositories.wallettransaction.TransferRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.repositories.wallettransaction.WalletTransactionRepository;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This class is responsible for the business logic of the wallet transactions
- *
+ * <p>
  * Each method to get transactions has a version that returns only transactions
  * that have a category that is not archived
  */
@@ -42,17 +42,21 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class WalletTransactionService
 {
-    @Autowired
     private WalletRepository walletRepository;
 
-    @Autowired
     private TransferRepository transferRepository;
 
-    @Autowired
     private WalletTransactionRepository walletTransactionRepository;
 
     private static final Logger logger =
         LoggerFactory.getLogger(WalletTransactionService.class);
+
+    @Autowired
+    public WalletTransactionService(WalletRepository walletRepository, TransferRepository transferRepository, WalletTransactionRepository walletTransactionRepository) {
+        this.walletRepository = walletRepository;
+        this.transferRepository = transferRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
+    }
 
     /**
      * Transfer money between two wallets
@@ -61,7 +65,7 @@ public class WalletTransactionService
      * @param amount The amount of money to be transferred
      * @param description A description of the transfer
      * @return The id of the created transfer
-     * @throws SameSourceDestionationException If the sender and receiver wallets are
+     * @throws SameSourceDestinationException If the sender and receiver wallets are
      *     the
      *    same
      * @throws IllegalArgumentException If the amount is less than or equal to zero
@@ -77,7 +81,7 @@ public class WalletTransactionService
     {
         if (senderId.equals(receiverId))
         {
-            throw new SameSourceDestionationException(
+            throw new SameSourceDestinationException(
                 "Sender and receiver wallets must be different");
         }
 
@@ -236,7 +240,7 @@ public class WalletTransactionService
             walletRepository.save(wallet);
         }
 
-        logger.info("Expense with status " + status.toString() + " of " + amount +
+        logger.info("Expense with status " + status + " of " + amount +
                     " added to wallet with id " + walletId);
 
         return wt.getId();
@@ -299,8 +303,8 @@ public class WalletTransactionService
     }
 
     /**
-     * Change the type of a transaction
-     * @param transaction The transaction to be updated
+     * Change the type of transaction
+     * @param oldTransaction The transaction to be updated
      * @param newType The new type of the transaction
      * @throws IllegalStateException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances
@@ -369,7 +373,7 @@ public class WalletTransactionService
 
     /**
      * Change the wallet of a transaction
-     * @param transaction The transaction to be updated
+     * @param oldTransaction The transaction to be updated
      * @param newWallet The new wallet of the transaction
      * @throws IllegalStateException If the transaction type does not exist
      * @note This method persists the changes in the wallet balances
@@ -590,7 +594,7 @@ public class WalletTransactionService
         walletTransactionRepository.save(transaction);
 
         logger.info("Transaction with id " + transaction.getId() +
-                    " status changed to " + newStatus.toString());
+                    " status changed to " + newStatus);
     }
 
     /**
@@ -672,15 +676,6 @@ public class WalletTransactionService
     }
 
     /**
-     * Get all transactions
-     * @return A list with all transactions
-     */
-    public List<WalletTransaction> getAllTransactions()
-    {
-        return walletTransactionRepository.findAll();
-    }
-
-    /**
      * Get transaction by id
      * @param id The id of the transaction
      * @return The transaction with the provided id
@@ -695,39 +690,12 @@ public class WalletTransactionService
     }
 
     /**
-     * Get all transactions where both wallet and category are not archived
-     * @return A list with all transactions
-     */
-    public List<WalletTransaction> getNonArchivedTransactions()
-    {
-        return walletTransactionRepository.findNonArchivedTransactions();
-    }
-
-    /**
-     * Get all income transactions
-     * @return A list with all income transactions
-     */
-    public List<WalletTransaction> getIncomes()
-    {
-        return walletTransactionRepository.findIncomeTransactions();
-    }
-
-    /**
      * Get all income transactions where both wallet and category are not archived
      * @return A list with all income transactions
      */
     public List<WalletTransaction> getNonArchivedIncomes()
     {
         return walletTransactionRepository.findNonArchivedIncomeTransactions();
-    }
-
-    /**
-     * Get all expense transactions
-     * @return A list with all expense transactions
-     */
-    public List<WalletTransaction> getExpenses()
-    {
-        return walletTransactionRepository.findExpenseTransactions();
     }
 
     /**
@@ -750,7 +718,7 @@ public class WalletTransactionService
     }
 
     /**
-     * Get all transactions by month where both wallet and category are not archived
+     * Get all transactions by month when both wallet and category are not archived
      * @param month The month of the transactions
      * @param year The year of the transactions
      */
@@ -762,37 +730,13 @@ public class WalletTransactionService
     }
 
     /**
-     * Get all transactions by year
-     * @param year The year of the transactions
-     * @return A list with all transactions of the year
-     */
-    public List<WalletTransaction> getTransactionsByYear(Integer year)
-    {
-        return walletTransactionRepository.findTransactionsByYear(year);
-    }
-
-    /**
-     * Get all transactions by year where both wallet and category are not archived
+     * Get all transactions by year when both wallet and category are not archived
      * @param year The year of the transactions
      * @return A list with all transactions of the year
      */
     public List<WalletTransaction> getNonArchivedTransactionsByYear(Integer year)
     {
         return walletTransactionRepository.findNonArchivedTransactionsByYear(year);
-    }
-
-    /**
-     * Get all transactions by wallet and month
-     * @param walletId The id of the wallet
-     * @param month The month of the transactions
-     * @param year The year of the transactions
-     */
-    public List<WalletTransaction>
-    getTransactionsByWalletAndMonth(Long walletId, Integer month, Integer year)
-    {
-        return walletTransactionRepository.findTransactionsByWalletAndMonth(walletId,
-                                                                            month,
-                                                                            year);
     }
 
     /**
@@ -810,22 +754,6 @@ public class WalletTransactionService
             walletId,
             month,
             year);
-    }
-
-    /**
-     * Get all transactions between two dates
-     * @param startDate The start date
-     * @param endDate The end date
-     * @return A list with all transactions between the two dates
-     */
-    public List<WalletTransaction> getTransactionsBetweenDates(LocalDateTime startDate,
-                                                               LocalDateTime endDate)
-    {
-        String startDateStr = startDate.format(Constants.DB_DATE_FORMATTER);
-        String endDateStr   = endDate.format(Constants.DB_DATE_FORMATTER);
-
-        return walletTransactionRepository.findTransactionsBetweenDates(startDateStr,
-                                                                        endDateStr);
     }
 
     /**
@@ -848,19 +776,7 @@ public class WalletTransactionService
     }
 
     /**
-     * Get all confirmed transactions by month
-     * @param month The month of the transactions
-     * @param year The year of the transactions
-     */
-    public List<WalletTransaction> getConfirmedTransactionsByMonth(Integer month,
-                                                                   Integer year)
-    {
-        return walletTransactionRepository.findConfirmedTransactionsByMonth(month,
-                                                                            year);
-    }
-
-    /**
-     * Get all confirmed transactions by month where both wallet and category are not
+     * Get all confirmed transactions by month when both wallet and category are not
      * archived
      * @param month The month of the transactions
      * @param year The year of the transactions
@@ -874,41 +790,6 @@ public class WalletTransactionService
     }
 
     /**
-     * Get all pending transactions by month
-     * @param month The month of the transactions
-     * @param year The year of the transactions
-     */
-    public List<WalletTransaction> getPendingTransactionsByMonth(Integer month,
-                                                                 Integer year)
-    {
-        return walletTransactionRepository.findPendingTransactionsByMonth(month, year);
-    }
-
-    /**
-     * Get all pending transactions by month where both wallet and category are not
-     * archived
-     * @param month The month of the transactions
-     * @param year The year of the transactions
-     */
-    public List<WalletTransaction>
-    getNonArchivedPendingTransactionsByMonth(Integer month, Integer year)
-    {
-        return walletTransactionRepository.findNonArchivedPendingTransactionsByMonth(
-            month,
-            year);
-    }
-
-    /**
-     * Get the last n transactions of all wallets
-     * @param n The number of transactions to get
-     * @return A list with the last n transactions of all wallets
-     */
-    public List<WalletTransaction> getLastTransactions(Integer n)
-    {
-        return walletTransactionRepository.findLastTransactions(PageRequest.ofSize(n));
-    }
-
-    /**
      * Get the last n transactions of all wallets both wallet and category are not
      * archived
      * @param n The number of transactions to get
@@ -917,34 +798,6 @@ public class WalletTransactionService
     public List<WalletTransaction> getNonArchivedLastTransactions(Integer n)
     {
         return walletTransactionRepository.findNonArchivedLastTransactions(
-            PageRequest.ofSize(n));
-    }
-
-    /**
-     * Get the last n transactions of a wallet
-     * @param walletId The id of the wallet
-     * @param n The number of transactions to get
-     * @return A list with the last n transactions of the wallet
-     */
-    public List<WalletTransaction> getLastTransactionsByWallet(Long walletId, Integer n)
-    {
-        return walletTransactionRepository.findLastTransactionsByWallet(
-            walletId,
-            PageRequest.ofSize(n));
-    }
-
-    /**
-     * Get the last n transactions of a wallet where both wallet and category are not
-     * archived
-     * @param walletId The id of the wallet
-     * @param n The number of transactions to get
-     * @return A list with the last n transactions of the wallet
-     */
-    public List<WalletTransaction> getNonArchivedLastTransactionsByWallet(Long walletId,
-                                                                          Integer n)
-    {
-        return walletTransactionRepository.findNonArchivedLastTransactionsByWallet(
-            walletId,
             PageRequest.ofSize(n));
     }
 
@@ -966,61 +819,6 @@ public class WalletTransactionService
     }
 
     /**
-     * Get the date of the oldest transaction where both wallet and category are not
-     * archived
-     * @return The date of the oldest transaction or the current date if there are no
-     *    transactions
-     */
-    public LocalDateTime getNonArchivedOldestTransactionDate()
-    {
-        String date =
-            walletTransactionRepository.findNonArchivedOldestTransactionDate();
-
-        if (date == null)
-        {
-            return LocalDateTime.now();
-        }
-
-        return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
-    }
-
-    /**
-     * Get the date of the newest transaction
-     * @return The date of the newest transaction or the current date if there are no
-     *     transactions
-     */
-    public LocalDateTime getNewestTransactionDate()
-    {
-        String date = walletTransactionRepository.findNewestTransactionDate();
-
-        if (date == null)
-        {
-            return LocalDateTime.now();
-        }
-
-        return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
-    }
-
-    /**
-     * Get the date of the newest transaction where both wallet and category are not
-     * archived
-     * @return The date of the newest transaction or the current date if there are no
-     *     transactions
-     */
-    public LocalDateTime getNonArchivedNewestTransactionDate()
-    {
-        String date =
-            walletTransactionRepository.findNonArchivedNewestTransactionDate();
-
-        if (date == null)
-        {
-            return LocalDateTime.now();
-        }
-
-        return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
-    }
-
-    /**
      * Get count of transactions by wallet
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
@@ -1029,39 +827,6 @@ public class WalletTransactionService
     {
         return walletTransactionRepository.getTransactionCountByWallet(walletId) +
             transferRepository.getTransferCountByWallet(walletId);
-    }
-
-    /**
-     * Get count of transactions by wallet where both wallet and category are not
-     * archived
-     * @param walletId The id of the wallet
-     * @return The count of transactions in the wallet
-     */
-    public Long getNonArchivedTransactionCountByWallet(Long walletId)
-    {
-        return walletTransactionRepository.getCountNonArchivedTransactionsByWallet(
-            walletId);
-    }
-
-    /**
-     * Get the transfers by wallet
-     * @param walletId The id of the wallet
-     * @return A list with the transfers in the wallet
-     */
-    public List<Transfer> getTransfersByWallet(Long walletId)
-    {
-        return transferRepository.findTransfersByWallet(walletId);
-    }
-
-    /**
-     * Get the transfers by month and year
-     * @param month The month
-     * @param year The year
-     * @return A list with the transfers by month and year
-     */
-    public List<Transfer> getTransfersByMonthAndYear(Integer month, Integer year)
-    {
-        return transferRepository.findTransferByMonthAndYear(month, year);
     }
 
     /**
@@ -1079,7 +844,7 @@ public class WalletTransactionService
 
     /**
      * Get income suggestions. Suggestions are transactions with distinct descriptions
-     * and most recent date
+     * and the most recent date
      * @return A list with the suggestions
      */
     public List<WalletTransaction> getIncomeSuggestions()
@@ -1089,7 +854,7 @@ public class WalletTransactionService
 
     /**
      * Get expense suggestions. Suggestions are transactions with distinct descriptions
-     * and most recent date
+     * and the most recent date
      * @return A list with the suggestions
      */
     public List<WalletTransaction> getExpenseSuggestions()
@@ -1099,7 +864,7 @@ public class WalletTransactionService
 
     /**
      * Get transfer suggestions. Suggestions are transactions with distinct descriptions
-     * and most recent date
+     * and the most recent date
      * @return A list with the suggestions
      */
     public List<Transfer> getTransferSuggestions()

@@ -8,6 +8,8 @@ package org.moinex.ui.main;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -84,10 +86,8 @@ public class MainController
     @FXML
     private ImageView toggleMonetaryValuesIcon;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
-    @Autowired
     private UserPreferencesService userPreferencesService;
 
     private Pair<String, String> currentContent;
@@ -96,6 +96,12 @@ public class MainController
     private Button[] sidebarButtons;
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+
+    @Autowired
+    public MainController(ConfigurableApplicationContext springContext, UserPreferencesService userPreferencesService) {
+        this.springContext = springContext;
+        this.userPreferencesService = userPreferencesService;
+    }
 
     @FXML
     public void initialize()
@@ -109,10 +115,10 @@ public class MainController
                            savingsButton,    importButton,      settingsButton };
 
         rootPane.getStylesheets().add(
-            getClass().getResource(Constants.MAIN_STYLE_SHEET).toExternalForm());
+            Objects.requireNonNull(getClass().getResource(Constants.MAIN_STYLE_SHEET)).toExternalForm());
 
         footbarArea.getStylesheets().add(
-            getClass().getResource(Constants.MAIN_STYLE_SHEET).toExternalForm());
+            Objects.requireNonNull(getClass().getResource(Constants.MAIN_STYLE_SHEET)).toExternalForm());
 
         menuButton.setOnAction(event -> toggleMenu());
 
@@ -210,10 +216,10 @@ public class MainController
             Parent newContent = loader.load();
 
             newContent.getStylesheets().add(
-                getClass().getResource(styleSheet).toExternalForm());
+                Objects.requireNonNull(getClass().getResource(styleSheet)).toExternalForm());
 
             newContent.getStylesheets().add(
-                getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
+                Objects.requireNonNull(getClass().getResource(Constants.COMMON_STYLE_SHEET)).toExternalForm());
 
             AnchorPane.setTopAnchor(newContent, 0.0);
             AnchorPane.setRightAnchor(newContent, 0.0);
@@ -261,7 +267,8 @@ public class MainController
         timeline.getKeyFrames().add(keyFrame);
 
         // If the menu is being expanded, hide the text of the buttons
-        // before the animation starts. This encreses the visual quality
+        // before the animation starts.
+        // This increases the visual quality
         // of the animation
         if (isMenuExpanded)
         {

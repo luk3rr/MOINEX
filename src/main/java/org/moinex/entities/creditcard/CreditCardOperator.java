@@ -41,7 +41,7 @@ public class CreditCardOperator
     @Column(name = "name", nullable = false, length = 50, unique = true)
     private String name;
 
-    @Column(name = "icon", nullable = true, length = 30)
+    @Column(name = "icon",  length = 30)
     private String icon;
 
     /**

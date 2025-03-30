@@ -11,7 +11,7 @@ package org.moinex.util.enums;
  */
 public enum PaymentFrequency
 {
-    DAYLY,      // Pagamentos diários
+    DAILY,      // Pagamentos diários
     MONTHLY,    // Pagamentos mensais
     QUARTERLY,  // Pagamentos trimestrais
     SEMIANNUAL, // Pagamentos semestrais

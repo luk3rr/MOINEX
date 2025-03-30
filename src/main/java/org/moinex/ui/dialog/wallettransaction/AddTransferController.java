@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.wallettransaction.Transfer;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.SameSourceDestionationException;
+import org.moinex.exceptions.SameSourceDestinationException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
@@ -71,7 +71,6 @@ public class AddTransferController
     @FXML
     private DatePicker transferDatePicker;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private SuggestionsHandlerHelper<Transfer> suggestionsHandler;
@@ -98,11 +97,12 @@ public class AddTransferController
     @Autowired
     public AddTransferController(WalletService            walletService,
                                  WalletTransactionService walletTransactionService,
-                                 CalculatorService        calculatorService)
+                                 CalculatorService        calculatorService, ConfigurableApplicationContext springContext)
     {
         this.walletService            = walletService;
         this.walletTransactionService = walletTransactionService;
         this.calculatorService        = calculatorService;
+        this.springContext = springContext;
     }
 
     public void setSenderWalletComboBox(Wallet wt)
@@ -178,8 +178,8 @@ public class AddTransferController
         LocalDate transferDate        = transferDatePicker.getValue();
 
         if (senderWallet == null || receiverWallet == null ||
-            transferValueString == null || transferValueString.strip().isEmpty() ||
-            description == null || description.strip().isEmpty() ||
+            transferValueString == null || transferValueString.isBlank() ||
+            description == null || description.isBlank() ||
             transferDate == null)
         {
             WindowUtils.showInformationDialog(
@@ -212,7 +212,7 @@ public class AddTransferController
             WindowUtils.showErrorDialog("Invalid transfer value",
                                         "Transfer value must be a number.");
         }
-        catch (SameSourceDestionationException | IllegalArgumentException |
+        catch (SameSourceDestinationException | IllegalArgumentException |
                EntityNotFoundException | InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error while creating transfer",
@@ -286,7 +286,7 @@ public class AddTransferController
         String transferValueString = transferValueField.getText();
         Wallet senderWallet        = senderWalletComboBox.getValue();
 
-        if (transferValueString == null || transferValueString.strip().isEmpty() ||
+        if (transferValueString == null || transferValueString.isBlank() ||
             senderWallet == null)
         {
             UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
@@ -306,7 +306,7 @@ public class AddTransferController
             BigDecimal senderWalletAfterBalance =
                 senderWallet.getBalance().subtract(transferValue);
 
-            // Episilon is used to avoid floating point arithmetic errors
+            // Epsilon is used to avoid floating point arithmetic errors
             if (senderWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
@@ -334,7 +334,7 @@ public class AddTransferController
         String transferValueString = transferValueField.getText();
         Wallet receiverWallet      = receiverWalletComboBox.getValue();
 
-        if (transferValueString == null || transferValueString.strip().isEmpty() ||
+        if (transferValueString == null || transferValueString.isBlank() ||
             receiverWallet == null)
         {
             UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
@@ -354,7 +354,7 @@ public class AddTransferController
             BigDecimal receiverWalletAfterBalance =
                 receiverWallet.getBalance().add(transferValue);
 
-            // Episilon is used to avoid floating point arithmetic errors
+            // Epsilon is used to avoid floating point arithmetic errors
             if (receiverWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0)
             {
                 // Remove old style and add negative style
@@ -432,7 +432,7 @@ public class AddTransferController
                              tf.getReceiverWallet().getName());
 
         Consumer<Transfer> onSelectCallback =
-            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
+                this::fillFieldsWithTransaction;
 
         suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
                                                             filterFunction,

@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.CalendarEvent;
 import org.moinex.repositories.CalendarEventRepository;
 import org.moinex.util.enums.CalendarEventType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for the Calendar interface
- *
+ * <p>
  * Stores the events of the calendar and allows them to be accessed by other
  * classes
  */
@@ -29,10 +29,15 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class CalendarService
 {
-    @Autowired
     private CalendarEventRepository calendarEventRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
+
+    @Autowired
+    public CalendarService(CalendarEventRepository calendarEventRepository)
+    {
+        this.calendarEventRepository = calendarEventRepository;
+    }
 
     /**
      * Adds an event to the calendar

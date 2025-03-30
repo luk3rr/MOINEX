@@ -7,7 +7,7 @@
 package org.moinex.util.enums;
 
 /**
- * ENUM that represents the type of a bond
+ * ENUM that represents the type of bond
  */
 public enum BondType
 {

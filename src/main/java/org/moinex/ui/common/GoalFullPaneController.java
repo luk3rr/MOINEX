@@ -70,13 +70,7 @@ public class GoalFullPaneController
     private Label goalCurrentAmount;
 
     @FXML
-    private Label currentTitleLabel;
-
-    @FXML
     private Label dateTitleLabel;
-
-    @FXML
-    private Label idealPerMonthTitleLabel;
 
     @FXML
     private Label daysTitleLabel;
@@ -105,10 +99,8 @@ public class GoalFullPaneController
     @FXML
     private HBox idealPerMonthHBox;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
-    @Autowired
     private GoalController goalController;
 
     private GoalService goalService;
@@ -119,16 +111,18 @@ public class GoalFullPaneController
 
     /**
      * Constructor
-     * @param GoalService Goal service
-     * @param WalletTransactionService Wallet transaction service
+     * @param goalService Goal service
+     * @param walletTransactionService Wallet transaction service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public GoalFullPaneController(GoalService              goalService,
-                                  WalletTransactionService walletTransactionService)
+                                  WalletTransactionService walletTransactionService, ConfigurableApplicationContext springContext, GoalController goalController)
     {
         this.goalService              = goalService;
         this.walletTransactionService = walletTransactionService;
+        this.springContext = springContext;
+        this.goalController = goalController;
     }
 
     /**
@@ -189,7 +183,7 @@ public class GoalFullPaneController
             new CircularProgressBar(Constants.GOAL_PANE_PROGRESS_BAR_RADIUS,
                                     Constants.GOAL_PANE_PROGRESS_BAR_WIDTH);
 
-        Double percentage;
+        double percentage;
 
         if (goal.isArchived())
         {
@@ -473,17 +467,16 @@ public class GoalFullPaneController
         goalTargetDate.setText("YY-MM-DD");
         missingDays.setText("0");
 
-        setlabelvalue(goalTargetAmount, BigDecimal.ZERO);
-        setlabelvalue(goalIdealAMountPerMonth, BigDecimal.ZERO);
+        setLabelValue(goalTargetAmount, BigDecimal.ZERO);
+        setLabelValue(goalIdealAMountPerMonth, BigDecimal.ZERO);
     }
 
     /**
      * Set the value of a label
-     * @param signLabel Label to set the sign
      * @param valueLabel Label to set the value
      * @param value Value to set
      */
-    private void setlabelvalue(Label valueLabel, BigDecimal value)
+    private void setLabelValue(Label valueLabel, BigDecimal value)
     {
         valueLabel.setText(UIUtils.formatCurrency(value));
         UIUtils.setLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE);

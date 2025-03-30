@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Repository for the RecurringTransaction entity
- *
  * This repository provides methods to query the database for RecurringTransaction
  */
 @Repository

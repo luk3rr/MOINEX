@@ -48,7 +48,6 @@ public class RecurringTransactionController
     @FXML
     private TextField searchField;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private List<RecurringTransaction> recurringTransactions;
@@ -61,21 +60,22 @@ public class RecurringTransactionController
      */
     @Autowired
     public RecurringTransactionController(
-        RecurringTransactionService recurringTransactionService)
+            RecurringTransactionService recurringTransactionService, ConfigurableApplicationContext springContext)
     {
         this.recurringTransactionService = recurringTransactionService;
+        this.springContext = springContext;
     }
 
     @FXML
     public void initialize()
     {
-        loadRecurringTransactionsFromdatabase();
+        loadRecurringTransactionsFromDatabase();
 
         configureTableView();
 
         populateRecurringTransactionStatusComboBox();
 
-        // Set default value for the status combo box (null = All)
+        // Set the default value for the status combo box (null = All)
         statusComboBox.setValue(null);
 
         updateRecurringTransactionTableView();
@@ -96,7 +96,7 @@ public class RecurringTransactionController
                                     (AddRecurringTransactionController controller)
                                         -> {},
                                     List.of(() -> {
-                                        loadRecurringTransactionsFromdatabase();
+                                        loadRecurringTransactionsFromDatabase();
                                         updateRecurringTransactionTableView();
                                     }));
     }
@@ -122,7 +122,7 @@ public class RecurringTransactionController
             (EditRecurringTransactionController controller)
                 -> controller.setRecurringTransaction(selectedRt),
             List.of(() -> {
-                loadRecurringTransactionsFromdatabase();
+                loadRecurringTransactionsFromDatabase();
                 updateRecurringTransactionTableView();
             }));
     }
@@ -146,7 +146,7 @@ public class RecurringTransactionController
                 "Are you sure you want to delete this recurring transaction?"))
         {
             recurringTransactionService.deleteRecurringTransaction(selectedRt.getId());
-            loadRecurringTransactionsFromdatabase();
+            loadRecurringTransactionsFromDatabase();
             updateRecurringTransactionTableView();
         }
     }
@@ -161,7 +161,7 @@ public class RecurringTransactionController
     /**
      * Loads the categories from the database
      */
-    private void loadRecurringTransactionsFromdatabase()
+    private void loadRecurringTransactionsFromDatabase()
     {
         recurringTransactions =
             recurringTransactionService.getAllRecurringTransactions();
@@ -222,27 +222,7 @@ public class RecurringTransactionController
      */
     private void configureTableView()
     {
-        TableColumn<RecurringTransaction, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        idColumn.setCellFactory(column -> new TableCell<RecurringTransaction, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        TableColumn<RecurringTransaction, Long> idColumn = getRecurringTransactionLongTableColumn();
 
         TableColumn<RecurringTransaction, String> descriptionColumn =
             new TableColumn<>("Description");
@@ -289,75 +269,27 @@ public class RecurringTransactionController
             -> new SimpleStringProperty(param.getValue().getStartDate().format(
                 Constants.DATE_FORMATTER_NO_TIME)));
 
-        TableColumn<RecurringTransaction, String> endDateColumn =
-            new TableColumn<>("End Date");
-        endDateColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(param.getValue().getEndDate().format(
-                Constants.DATE_FORMATTER_NO_TIME)));
+        TableColumn<RecurringTransaction, String> endDateColumn = getRecurringTransactionStringTableColumn();
 
-        // If the end date is the default date, show "Indefinite"
-        endDateColumn.setCellFactory(
-            column -> new TableCell<RecurringTransaction, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        if (item.equals(
-                                Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.format(
-                                    Constants.DATE_FORMATTER_NO_TIME)))
-                        {
-                            setText("Indefinite");
-                        }
-                        else
-                        {
-                            setText(item);
-                        }
-                    }
-                }
-            });
+        TableColumn<RecurringTransaction, String> nextDueDateColumn = getTransactionStringTableColumn();
 
-        TableColumn<RecurringTransaction, String> nextDueDateColumn =
-            new TableColumn<>("Next Due Date");
-        nextDueDateColumn.setCellValueFactory(param -> {
-            if (param.getValue().getStatus().equals(
-                    RecurringTransactionStatus.INACTIVE))
-            {
-                return new SimpleStringProperty("-");
-            }
-            else
-            {
-                return new SimpleStringProperty(
-                    param.getValue().getNextDueDate().format(
-                        Constants.DATE_FORMATTER_NO_TIME));
-            }
-        });
+        TableColumn<RecurringTransaction, String> expectedRemainingAmountColumn = getStringTableColumn();
 
-        nextDueDateColumn.setCellFactory(
-            column -> new TableCell<RecurringTransaction, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item);
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;");
-                    }
-                }
-            });
+        recurringTransactionTableView.getColumns().add(idColumn);
+        recurringTransactionTableView.getColumns().add(descriptionColumn);
+        recurringTransactionTableView.getColumns().add(amountColumn);
+        recurringTransactionTableView.getColumns().add(walletColumn);
+        recurringTransactionTableView.getColumns().add(typeColumn);
+        recurringTransactionTableView.getColumns().add(categoryColumn);
+        recurringTransactionTableView.getColumns().add(statusColumn);
+        recurringTransactionTableView.getColumns().add(frequencyColumn);
+        recurringTransactionTableView.getColumns().add(startDateColumn);
+        recurringTransactionTableView.getColumns().add(endDateColumn);
+        recurringTransactionTableView.getColumns().add(nextDueDateColumn);
+        recurringTransactionTableView.getColumns().add(expectedRemainingAmountColumn);
+    }
 
+    private TableColumn<RecurringTransaction, String> getStringTableColumn() {
         TableColumn<RecurringTransaction, String> expectedRemainingAmountColumn =
             new TableColumn<>("Expected Remaining Amount");
         expectedRemainingAmountColumn.setCellValueFactory(param -> {
@@ -379,19 +311,92 @@ public class RecurringTransactionController
             return new SimpleStringProperty(
                 UIUtils.formatCurrency(expectedRemainingAmount));
         });
+        return expectedRemainingAmountColumn;
+    }
 
-        recurringTransactionTableView.getColumns().add(idColumn);
-        recurringTransactionTableView.getColumns().add(descriptionColumn);
-        recurringTransactionTableView.getColumns().add(amountColumn);
-        recurringTransactionTableView.getColumns().add(walletColumn);
-        recurringTransactionTableView.getColumns().add(typeColumn);
-        recurringTransactionTableView.getColumns().add(categoryColumn);
-        recurringTransactionTableView.getColumns().add(statusColumn);
-        recurringTransactionTableView.getColumns().add(frequencyColumn);
-        recurringTransactionTableView.getColumns().add(startDateColumn);
-        recurringTransactionTableView.getColumns().add(endDateColumn);
-        recurringTransactionTableView.getColumns().add(nextDueDateColumn);
-        recurringTransactionTableView.getColumns().add(expectedRemainingAmountColumn);
+    private static TableColumn<RecurringTransaction, String> getTransactionStringTableColumn() {
+        TableColumn<RecurringTransaction, String> nextDueDateColumn =
+            new TableColumn<>("Next Due Date");
+        nextDueDateColumn.setCellValueFactory(param -> {
+            if (param.getValue().getStatus().equals(
+                    RecurringTransactionStatus.INACTIVE))
+            {
+                return new SimpleStringProperty("-");
+            }
+            else
+            {
+                return new SimpleStringProperty(
+                    param.getValue().getNextDueDate().format(
+                        Constants.DATE_FORMATTER_NO_TIME));
+            }
+        });
+
+        nextDueDateColumn.setCellFactory(
+            column -> new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        setText(item);
+                        setAlignment(Pos.CENTER);
+                        setStyle("-fx-padding: 0;");
+                    }
+                }
+            });
+        return nextDueDateColumn;
+    }
+
+    private static TableColumn<RecurringTransaction, String> getRecurringTransactionStringTableColumn() {
+        TableColumn<RecurringTransaction, String> endDateColumn =
+            new TableColumn<>("End Date");
+        endDateColumn.setCellValueFactory(
+            param
+            -> new SimpleStringProperty(param.getValue().getEndDate().format(
+                Constants.DATE_FORMATTER_NO_TIME)));
+
+        // If the end date is the default date, show "Indefinite"
+        endDateColumn.setCellFactory(
+            column -> new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        if (item.equals(
+                                Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.format(
+                                        Constants.DATE_FORMATTER_NO_TIME))) {
+                            setText("Indefinite");
+                        } else {
+                            setText(item);
+                        }
+                    }
+                }
+            });
+        return endDateColumn;
+    }
+
+    private static TableColumn<RecurringTransaction, Long> getRecurringTransactionLongTableColumn() {
+        TableColumn<RecurringTransaction, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;");
+                }
+            }
+        });
+        return idColumn;
     }
 
     /**
@@ -404,25 +409,23 @@ public class RecurringTransactionController
         // All is the first element in the list and is represented by a null value
         ObservableList<RecurringTransactionStatus> transactionTypesWithNull =
             FXCollections.observableArrayList(RecurringTransactionStatus.values());
-        transactionTypesWithNull.add(0, null);
+        transactionTypesWithNull.addFirst(null);
 
         statusComboBox.setItems(transactionTypesWithNull);
 
-        statusComboBox.setConverter(new StringConverter<RecurringTransactionStatus>() {
+        statusComboBox.setConverter(new StringConverter<>() {
             @Override
-            public String toString(RecurringTransactionStatus transactionType)
-            {
+            public String toString(RecurringTransactionStatus transactionType) {
                 return transactionType != null ? transactionType.toString()
-                                               : "ALL"; // Show "All" instead of null
+                        : "ALL"; // Show "All" instead of null
             }
 
             @Override
-            public RecurringTransactionStatus fromString(String string)
-            {
+            public RecurringTransactionStatus fromString(String string) {
                 return string.equals("ALL")
-                    ? null
-                    : RecurringTransactionStatus.valueOf(
-                          string); // Return null if "All" is selected
+                        ? null
+                        : RecurringTransactionStatus.valueOf(
+                        string); // Return null if "All" is selected
             }
         });
     }

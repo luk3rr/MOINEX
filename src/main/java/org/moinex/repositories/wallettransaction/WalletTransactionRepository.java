@@ -7,8 +7,6 @@
 package org.moinex.repositories.wallettransaction;
 
 import java.util.List;
-import java.util.Optional;
-import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
 import org.moinex.util.enums.TransactionType;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +17,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Repository for the WalletTransaction entity
- *
  * This repository provides methods to query the database for WalletTransaction
- *
  * Each method to get transactions has a version that returns only transactions
  * that have a category that is not archived
  */
@@ -104,7 +100,7 @@ public interface WalletTransactionRepository
     findTransactionsByMonth(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Get the all transactions by month and year where both the category and wallet are
+     * Get the all transactions by month and year when both the category and wallet are
      * not archived
      * @param month The month
      * @param year The year
@@ -134,7 +130,7 @@ public interface WalletTransactionRepository
     findTransactionsByYear(@Param("year") Integer year);
 
     /**
-     * Get the all transactions by year where both the category and wallet are not
+     * Get the all transactions by year when both the category and wallet are not
      * archived
      * @param year The year
      * @return A list with the transactions by year
@@ -167,7 +163,7 @@ public interface WalletTransactionRepository
                                      @Param("year") Integer  year);
 
     /**
-     * Get the transactions by wallet and month where both the category and wallet are
+     * Get the transactions by wallet and month when both the category and wallet are
      * not
      * @param walletId The id of the wallet
      * @param month The month
@@ -237,7 +233,7 @@ public interface WalletTransactionRepository
                                      @Param("year") Integer  year);
 
     /**
-     * Get the confirmed transactions by month and year where both the category and
+     * Get the confirmed transactions by month and year when both the category and
      * wallet are not archived
      * @param month The month
      * @param year The year
@@ -272,7 +268,7 @@ public interface WalletTransactionRepository
                                    @Param("year") Integer  year);
 
     /**
-     * Get the pending transactions by month and year where both the category and wallet
+     * Get the pending transactions by month and year when both the category and wallet
      * are not archived
      * @param month The month
      * @param year The year
@@ -410,16 +406,6 @@ public interface WalletTransactionRepository
            + "AND wt.wallet.isArchived = false")
     Long
     getCountNonArchivedTransactionsByWallet(@Param("walletId") Long walletId);
-
-    /**
-     * Get the wallet by transaction id
-     * @param transactionId The id of the transaction
-     */
-    @Query("SELECT wt.wallet "
-           + "FROM WalletTransaction wt "
-           + "WHERE wt.id = :transactionId")
-    Optional<Wallet>
-    findWalletByTransactionId(@Param("transactionId") Long transactionId);
 
     /**
      * Check if a wallet exists by transaction id

@@ -151,7 +151,7 @@ public abstract class BaseRecurringTransactionManagement
             if (endDate != null)
             {
                 msg = "Starts on " + startDate + ", ends on " + endDate +
-                      ", frequency " + frequency.toString();
+                      ", frequency " + frequency;
 
                 try
                 {
@@ -169,7 +169,7 @@ public abstract class BaseRecurringTransactionManagement
             }
             else
             {
-                msg = "Starts on " + startDate + ", frequency " + frequency.toString();
+                msg = "Starts on " + startDate + ", frequency " + frequency;
             }
         }
 

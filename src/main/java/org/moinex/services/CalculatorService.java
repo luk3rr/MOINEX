@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service class for the Calculator interface
- *
+ * <p>
  * Stores the result of the last calculation and allows it to be accessed by other
  * classes
  */

@@ -147,7 +147,7 @@ public class AddWalletController
             walletTypes.add(walletType);
         }
 
-        // Remove Goals wallet type to prevent the user from creating a goal wallet.
+        // Remove the Goals wallet type to prevent the user from creating a goal wallet.
         // Goal wallets are created through the Add Goal dialog.
         walletTypes.removeIf(
             wt -> wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME));

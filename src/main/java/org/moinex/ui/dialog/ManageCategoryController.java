@@ -39,7 +39,6 @@ public class ManageCategoryController
     @FXML
     private TextField searchField;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private List<Category> categories;
@@ -52,9 +51,10 @@ public class ManageCategoryController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ManageCategoryController(CategoryService categoryService)
+    public ManageCategoryController(CategoryService categoryService, ConfigurableApplicationContext springContext)
     {
         this.categoryService = categoryService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -203,32 +203,45 @@ public class ManageCategoryController
      */
     private void configureTableView()
     {
-        TableColumn<Category, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        idColumn.setCellFactory(column -> new TableCell<Category, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        TableColumn<Category, Long> idColumn = getCategoryLongTableColumn();
 
         TableColumn<Category, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getName()));
 
+        TableColumn<Category, Long> numOfTransactionsColumn = getLongTableColumn();
+
+        TableColumn<Category, String> archivedColumn = getCategoryStringTableColumn();
+
+        categoryTableView.getColumns().add(idColumn);
+        categoryTableView.getColumns().add(categoryColumn);
+        categoryTableView.getColumns().add(archivedColumn);
+        categoryTableView.getColumns().add(numOfTransactionsColumn);
+    }
+
+    private static TableColumn<Category, String> getCategoryStringTableColumn() {
+        TableColumn<Category, String> archivedColumn = new TableColumn<>("Archived");
+        archivedColumn.setCellValueFactory(
+            param
+            -> new SimpleStringProperty(param.getValue().isArchived() ? "Yes" : "No"));
+
+        archivedColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;");
+                }
+            }
+        });
+        return archivedColumn;
+    }
+
+    private TableColumn<Category, Long> getLongTableColumn() {
         TableColumn<Category, Long> numOfTransactionsColumn =
             new TableColumn<>("Associated Transactions");
         numOfTransactionsColumn.setCellValueFactory(
@@ -237,50 +250,40 @@ public class ManageCategoryController
                 categoryService.getCountTransactions(param.getValue().getId())));
 
         numOfTransactionsColumn.setCellFactory(
-            column -> new TableCell<Category, Long>() {
+            column -> new TableCell<>() {
                 @Override
-                protected void updateItem(Long item, boolean empty)
-                {
+                protected void updateItem(Long item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
+                    if (item == null || empty) {
                         setText(null);
-                    }
-                    else
-                    {
+                    } else {
                         setText(item.toString());
                         setAlignment(Pos.CENTER);
                         setStyle("-fx-padding: 0;");
                     }
                 }
             });
+        return numOfTransactionsColumn;
+    }
 
-        TableColumn<Category, String> archivedColumn = new TableColumn<>("Archived");
-        archivedColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(param.getValue().isArchived() ? "Yes" : "No"));
+    private static TableColumn<Category, Long> getCategoryLongTableColumn() {
+        TableColumn<Category, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
-        archivedColumn.setCellFactory(column -> new TableCell<Category, String>() {
+        idColumn.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(String item, boolean empty)
-            {
+            protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || empty)
-                {
+                if (item == null || empty) {
                     setText(null);
-                }
-                else
-                {
-                    setText(item);
+                } else {
+                    setText(item.toString());
                     setAlignment(Pos.CENTER);
                     setStyle("-fx-padding: 0;");
                 }
             }
         });
-
-        categoryTableView.getColumns().add(idColumn);
-        categoryTableView.getColumns().add(categoryColumn);
-        categoryTableView.getColumns().add(archivedColumn);
-        categoryTableView.getColumns().add(numOfTransactionsColumn);
+        return idColumn;
     }
 }

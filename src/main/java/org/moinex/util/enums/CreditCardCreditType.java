@@ -7,7 +7,7 @@
 package org.moinex.util.enums;
 
 /**
- * ENUM that represents the type of a credit card credit
+ * ENUM that represents the type of credit card credit
  */
 public enum CreditCardCreditType
 {

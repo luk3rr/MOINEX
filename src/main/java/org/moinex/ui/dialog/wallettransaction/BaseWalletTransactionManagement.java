@@ -179,7 +179,7 @@ public abstract class BaseWalletTransactionManagement
         Wallet wallet                 = walletComboBox.getValue();
 
         if (transactionValueString == null ||
-            transactionValueString.strip().isEmpty() || wallet == null)
+            transactionValueString.isBlank() || wallet == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -195,21 +195,7 @@ public abstract class BaseWalletTransactionManagement
                 return;
             }
 
-            BigDecimal walletAfterBalanceValue;
-
-            if (transactionType == TransactionType.EXPENSE)
-            {
-                walletAfterBalanceValue =
-                    wallet.getBalance().subtract(transactionValue);
-            }
-            else if (transactionType == TransactionType.INCOME)
-            {
-                walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
-            }
-            else
-            {
-                throw new IllegalStateException("Invalid transaction type");
-            }
+            BigDecimal walletAfterBalanceValue = getBigDecimal(wallet, transactionValue);
 
             // Set the style according to the balance value after the transaction
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
@@ -232,6 +218,25 @@ public abstract class BaseWalletTransactionManagement
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
+    }
+
+    private BigDecimal getBigDecimal(Wallet wallet, BigDecimal transactionValue) {
+        BigDecimal walletAfterBalanceValue;
+
+        if (transactionType == TransactionType.EXPENSE)
+        {
+            walletAfterBalanceValue =
+                wallet.getBalance().subtract(transactionValue);
+        }
+        else if (transactionType == TransactionType.INCOME)
+        {
+            walletAfterBalanceValue = wallet.getBalance().add(transactionValue);
+        }
+        else
+        {
+            throw new IllegalStateException("Invalid transaction type");
+        }
+        return walletAfterBalanceValue;
     }
 
     protected void loadWalletsFromDatabase()
@@ -283,7 +288,7 @@ public abstract class BaseWalletTransactionManagement
                              wt.getCategory().getName());
 
         Consumer<WalletTransaction> onSelectCallback =
-            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
+                this::fillFieldsWithTransaction;
 
         suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
                                                             filterFunction,

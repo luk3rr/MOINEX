@@ -88,10 +88,10 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
         String            quantityStr  = quantityField.getText();
         LocalDate         buyDate      = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
+        if (wallet == null || description == null || description.isBlank() ||
             status == null || category == null || unitPriceStr == null ||
-            unitPriceStr.strip().isEmpty() || quantityStr == null ||
-            quantityStr.strip().isEmpty() || buyDate == null)
+            unitPriceStr.isBlank() || quantityStr == null ||
+            quantityStr.isBlank() || buyDate == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -106,7 +106,7 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
 
             BigDecimal quantity = new BigDecimal(quantityStr);
 
-            // Check if has any modification
+            // Check if it has any modification
             if (purchase.getWalletTransaction().getWallet().getId().equals(
                     wallet.getId()) &&
                 purchase.getWalletTransaction().getDescription().equals(description) &&

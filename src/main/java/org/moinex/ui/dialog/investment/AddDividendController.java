@@ -67,9 +67,9 @@ public final class AddDividendController extends BaseDividendManagement
         Category          category            = categoryComboBox.getValue();
         LocalDate         dividendDate        = dividendDatePicker.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
+        if (wallet == null || description == null || description.isBlank() ||
             dividendValueString == null || status == null ||
-            dividendValueString.strip().isEmpty() || category == null ||
+            dividendValueString.isBlank() || category == null ||
             dividendDate == null)
         {
             WindowUtils.showInformationDialog(

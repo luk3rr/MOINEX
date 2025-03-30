@@ -60,8 +60,8 @@ public final class AddRecurringTransactionController
         LocalDate                     endDate     = endDatePicker.getValue();
         RecurringTransactionFrequency frequency   = frequencyComboBox.getValue();
 
-        if (wallet == null || description == null || description.strip().isEmpty() ||
-            valueString == null || valueString.strip().isEmpty() || type == null ||
+        if (wallet == null || description == null || description.isBlank() ||
+            valueString == null || valueString.isBlank() || type == null ||
             category == null || startDate == null || frequency == null)
         {
             WindowUtils.showInformationDialog(

@@ -16,10 +16,10 @@ import org.moinex.util.UIUtils;
 
 public class CircularProgressBar extends Canvas
 {
-    private Color  progressColor;
-    private Color  backgroundColor;
-    private Color  fontColor;
-    private Double progressWidth;
+    private final Color  progressColor;
+    private final Color  backgroundColor;
+    private final Color  fontColor;
+    private final Double progressWidth;
 
     public CircularProgressBar(Double radius, Double progressWidth)
     {

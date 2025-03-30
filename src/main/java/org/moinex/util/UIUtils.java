@@ -45,14 +45,14 @@ public final class UIUtils
     }
 
     /**
-     * Add a tooltip to a XYChart node
+     * Add a tooltip to the XYChart node
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
     public static void addTooltipToXYChartNode(Node node, String text)
     {
-        node.setOnMouseEntered(event -> { node.setStyle("-fx-opacity: 0.7;"); });
-        node.setOnMouseExited(event -> { node.setStyle("-fx-opacity: 1;"); });
+        node.setOnMouseEntered(event -> node.setStyle("-fx-opacity: 0.7;"));
+        node.setOnMouseExited(event -> node.setStyle("-fx-opacity: 1;"));
 
         addTooltipToNode(node, text);
     }
@@ -75,7 +75,6 @@ public final class UIUtils
     /**
      * Format a number to a currency string
      * @param value The value to be formatted
-     * @param hideValues Whether to hide the values
      * @note Automatically formats to 2 fraction digits, rounding half up
      */
     public static String formatCurrency(Number value)
@@ -104,10 +103,9 @@ public final class UIUtils
         DecimalFormat dynamicFormat = new DecimalFormat(Constants.CURRENCY_FORMAT);
 
         // Determine the number of fraction digits dynamically
-        Integer fractionDigits;
-        if (value instanceof BigDecimal)
+        int fractionDigits;
+        if (value instanceof BigDecimal bigDecimalValue)
         {
-            BigDecimal bigDecimalValue = (BigDecimal)value;
             fractionDigits             = determineFractionDigits(bigDecimalValue);
         }
         else
@@ -138,9 +136,9 @@ public final class UIUtils
         }
 
         BigDecimal absValue = value.stripTrailingZeros().abs();
-        Integer    scale    = absValue.scale();
+        int scale    = absValue.scale();
 
-        return scale <= 2 ? 2 : scale;
+        return Math.max(scale, 2);
     }
 
     /**
@@ -159,17 +157,15 @@ public final class UIUtils
     public static void setDatePickerFormat(DatePicker datePicker)
     {
         // Set how the date is displayed in the date picker
-        datePicker.setConverter(new StringConverter<LocalDate>() {
+        datePicker.setConverter(new StringConverter<>() {
             @Override
-            public String toString(LocalDate date)
-            {
+            public String toString(LocalDate date) {
                 return date != null ? date.format(Constants.DATE_FORMATTER_NO_TIME)
-                                    : "";
+                        : "";
             }
 
             @Override
-            public LocalDate fromString(String string)
-            {
+            public LocalDate fromString(String string) {
                 return LocalDate.parse(string, Constants.DATE_FORMATTER_NO_TIME);
             }
         });

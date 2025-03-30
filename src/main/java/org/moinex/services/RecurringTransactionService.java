@@ -44,17 +44,21 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class RecurringTransactionService
 {
-    @Autowired
     private RecurringTransactionRepository recurringTransactionRepository;
 
-    @Autowired
     private WalletTransactionService walletTransactionService;
 
-    @Autowired
     private WalletRepository walletRepository;
 
     private static final Logger m_logger =
         LoggerFactory.getLogger(RecurringTransactionService.class);
+
+    @Autowired
+    public RecurringTransactionService(RecurringTransactionRepository recurringTransactionRepository, WalletTransactionService walletTransactionService, WalletRepository walletRepository) {
+        this.recurringTransactionRepository = recurringTransactionRepository;
+        this.walletTransactionService = walletTransactionService;
+        this.walletRepository = walletRepository;
+    }
 
     /**
      * Validate start and end dates for editing a recurring transaction
@@ -102,7 +106,7 @@ public class RecurringTransactionService
 
     /**
      * Validate start and end dates for creating a recurring transaction.
-     * Ensures start date is not in the past and reuses edit validation.
+     * Ensures the start date is not in the past and reuses edit validation.
      *
      * @param startDate The start date
      * @param endDate The end date
@@ -437,25 +441,12 @@ public class RecurringTransactionService
     private LocalDateTime calculateNextDueDate(LocalDateTime currentDueDate,
                                                RecurringTransactionFrequency frequency)
     {
-        LocalDateTime nextDueDate;
-
-        switch (frequency)
-        {
-            case DAILY:
-                nextDueDate = currentDueDate.plusDays(1);
-                break;
-            case WEEKLY:
-                nextDueDate = currentDueDate.plusWeeks(1);
-                break;
-            case MONTHLY:
-                nextDueDate = currentDueDate.plusMonths(1);
-                break;
-            case YEARLY:
-                nextDueDate = currentDueDate.plusYears(1);
-                break;
-            default:
-                throw new IllegalStateException("Invalid frequency");
-        }
+        LocalDateTime nextDueDate = switch (frequency) {
+            case DAILY -> currentDueDate.plusDays(1);
+            case WEEKLY -> currentDueDate.plusWeeks(1);
+            case MONTHLY -> currentDueDate.plusMonths(1);
+            case YEARLY -> currentDueDate.plusYears(1);
+        };
 
         return nextDueDate.with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
     }
@@ -479,23 +470,12 @@ public class RecurringTransactionService
     {
         validateDateAndIntervalForCreate(startDate, endDate, frequency);
 
-        Long interval = 0L;
-
-        switch (frequency)
-        {
-            case DAILY:
-                interval = ChronoUnit.DAYS.between(startDate, endDate);
-                break;
-            case WEEKLY:
-                interval = ChronoUnit.DAYS.between(startDate, endDate) / 7;
-                break;
-            case MONTHLY:
-                interval = ChronoUnit.MONTHS.between(startDate, endDate);
-                break;
-            case YEARLY:
-                interval = ChronoUnit.YEARS.between(startDate, endDate);
-                break;
-        }
+        long interval = switch (frequency) {
+            case DAILY -> ChronoUnit.DAYS.between(startDate, endDate);
+            case WEEKLY -> ChronoUnit.DAYS.between(startDate, endDate) / 7;
+            case MONTHLY -> ChronoUnit.MONTHS.between(startDate, endDate);
+            case YEARLY -> ChronoUnit.YEARS.between(startDate, endDate);
+        };
 
         LocalDate lastTransactionDate =
             addFrequencyToDate(startDate, interval, frequency);
@@ -521,19 +501,12 @@ public class RecurringTransactionService
                                          long                          interval,
                                          RecurringTransactionFrequency frequency)
     {
-        switch (frequency)
-        {
-            case DAILY:
-                return date.plusDays(interval);
-            case WEEKLY:
-                return date.plusWeeks(interval);
-            case MONTHLY:
-                return date.plusMonths(interval);
-            case YEARLY:
-                return date.plusYears(interval);
-            default:
-                throw new IllegalStateException("Invalid frequency");
-        }
+        return switch (frequency) {
+            case DAILY -> date.plusDays(interval);
+            case WEEKLY -> date.plusWeeks(interval);
+            case MONTHLY -> date.plusMonths(interval);
+            case YEARLY -> date.plusYears(interval);
+        };
     }
 
     /**
@@ -680,7 +653,7 @@ public class RecurringTransactionService
             return 0.0;
         }
 
-        Double expectedAmount = 0.0;
+        double expectedAmount = 0.0;
 
         while (nextDueDate.isBefore(rt.getEndDate()) ||
                nextDueDate.equals(rt.getEndDate()))

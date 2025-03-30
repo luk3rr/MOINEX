@@ -23,7 +23,6 @@ import org.moinex.repositories.investment.BrazilianMarketIndicatorsRepository;
 import org.moinex.repositories.investment.MarketQuotesAndCommoditiesRepository;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,15 +31,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class MarketService
 {
-    @Autowired
-    private BrazilianMarketIndicatorsRepository brazilianMarketIndicatorsRepository;
+    private final BrazilianMarketIndicatorsRepository
+        brazilianMarketIndicatorsRepository;
 
-    @Autowired
-    private MarketQuotesAndCommoditiesRepository marketQuotesAndCommoditiesRepository;
+    private final MarketQuotesAndCommoditiesRepository
+        marketQuotesAndCommoditiesRepository;
 
     private boolean isBrazilianMarketIndicatorsUpdating = false;
 
     private boolean isMarketQuotesAndCommoditiesUpdating = false;
+
+    public MarketService(
+        BrazilianMarketIndicatorsRepository  brazilianMarketIndicatorsRepository,
+        MarketQuotesAndCommoditiesRepository marketQuotesAndCommoditiesRepository)
+    {
+        this.brazilianMarketIndicatorsRepository = brazilianMarketIndicatorsRepository;
+        this.marketQuotesAndCommoditiesRepository =
+            marketQuotesAndCommoditiesRepository;
+    }
 
     /**
      * Get the Brazilian market indicators
@@ -62,14 +70,14 @@ public class MarketService
             if (indicatorsList.size() > 1)
             {
                 // If there are more than one indicator, delete the others
-                for (Integer i = 1; i < indicatorsList.size(); i++)
+                for (int i = 1; i < indicatorsList.size(); i++)
                 {
                     brazilianMarketIndicatorsRepository.delete(indicatorsList.get(i));
                 }
             }
 
             // Return the first indicator
-            return indicatorsList.get(0);
+            return indicatorsList.getFirst();
         }
     }
 
@@ -93,7 +101,7 @@ public class MarketService
             if (marketQuotesAndCommoditiesList.size() > 1)
             {
                 // If there are more than one indicator, delete the others
-                for (Integer i = 1; i < marketQuotesAndCommoditiesList.size(); i++)
+                for (int i = 1; i < marketQuotesAndCommoditiesList.size(); i++)
                 {
                     marketQuotesAndCommoditiesRepository.delete(
                         marketQuotesAndCommoditiesList.get(i));
@@ -101,7 +109,7 @@ public class MarketService
             }
 
             // Return the first indicator
-            return marketQuotesAndCommoditiesList.get(0);
+            return marketQuotesAndCommoditiesList.getFirst();
         }
     }
 

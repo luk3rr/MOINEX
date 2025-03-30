@@ -56,7 +56,6 @@ public class AddCreditCardCreditController
     @FXML
     private ComboBox<CreditCardCreditType> creditTypeComboBox;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private SuggestionsHandlerHelper<CreditCardCredit> suggestionsHandler;
@@ -71,10 +70,11 @@ public class AddCreditCardCreditController
 
     @Autowired
     public AddCreditCardCreditController(CreditCardService creditCardService,
-                                         CalculatorService calculatorService)
+                                         CalculatorService calculatorService, ConfigurableApplicationContext springContext)
     {
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
+        this.springContext = springContext;
     }
 
     public void setCreditCard(CreditCard crc)
@@ -215,8 +215,7 @@ public class AddCreditCardCreditController
                              ccc.getCreditCard().getName(),
                              ccc.getType());
 
-        Consumer<CreditCardCredit> onSelectCallback = selectedCreditCardCredit
-            -> fillFieldsWithTransaction(selectedCreditCardCredit);
+        Consumer<CreditCardCredit> onSelectCallback = this::fillFieldsWithTransaction;
 
         suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
                                                             filterFunction,

@@ -192,29 +192,7 @@ public class RemoveTransactionController
      */
     private void configureTableView()
     {
-        TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<WalletTransaction, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to ensure
-                                                 // the text is centered
-                }
-            }
-        });
+        TableColumn<WalletTransaction, Long> idColumn = getWalletTransactionLongTableColumn();
 
         TableColumn<WalletTransaction, String> categoryColumn =
             new TableColumn<>("Category");
@@ -257,5 +235,28 @@ public class RemoveTransactionController
         transactionsTableView.getColumns().add(dateColumn);
         transactionsTableView.getColumns().add(categoryColumn);
         transactionsTableView.getColumns().add(statusColumn);
+    }
+
+    private static TableColumn<WalletTransaction, Long> getWalletTransactionLongTableColumn() {
+        TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to ensure
+                    // the text is centered
+                }
+            }
+        });
+        return idColumn;
     }
 }

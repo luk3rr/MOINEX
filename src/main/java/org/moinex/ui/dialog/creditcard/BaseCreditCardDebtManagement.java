@@ -103,7 +103,7 @@ public abstract class BaseCreditCardDebtManagement
 
     public void setCreditCard(CreditCard crc)
     {
-        if (creditCards.stream().noneMatch(c -> c.getId() == crc.getId()))
+        if (creditCards.stream().noneMatch(c -> c.getId().equals(crc.getId())))
         {
             return;
         }
@@ -252,7 +252,7 @@ public abstract class BaseCreditCardDebtManagement
 
     protected void updateMsgLabel()
     {
-        Integer installments = installmentsField.getText().isEmpty()
+        int installments = installmentsField.getText().isEmpty()
                                    ? 1
                                    : Integer.parseInt(installmentsField.getText());
 
@@ -280,7 +280,7 @@ public abstract class BaseCreditCardDebtManagement
                 return;
             }
 
-            // Show mensage according to the value of each installment
+            // Show a message according to the value of each installment
             BigDecimal exactInstallmentValue =
                 debtValue.divide(new BigDecimal(installments), 2, RoundingMode.FLOOR);
 
@@ -366,7 +366,7 @@ public abstract class BaseCreditCardDebtManagement
                              ccd.getInstallments());
 
         Consumer<CreditCardDebt> onSelectCallback =
-            selectedTransaction -> fillFieldsWithTransaction(selectedTransaction);
+                this::fillFieldsWithTransaction;
 
         suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
                                                             filterFunction,

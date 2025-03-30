@@ -45,7 +45,7 @@ public class ArchivedTickersController
 
     /**
      * Constructor
-     * @param TickerService tickerService
+     * @param tickerService tickerService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -169,7 +169,7 @@ public class ArchivedTickersController
     }
 
     /**
-     * Updates the archived tickers table view
+     * Updates the archived ticker table view
      */
     private void updateTickerTableView()
     {
@@ -215,29 +215,7 @@ public class ArchivedTickersController
      */
     private void configureTableView()
     {
-        TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<Ticker, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                 // ensure the text is centered
-                }
-            }
-        });
+        TableColumn<Ticker, Long> idColumn = getTickerLongTableColumn();
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
@@ -285,5 +263,28 @@ public class ArchivedTickersController
         tickerTableView.getColumns().add(unitColumn);
         tickerTableView.getColumns().add(totalColumn);
         tickerTableView.getColumns().add(avgUnitColumn);
+    }
+
+    private static TableColumn<Ticker, Long> getTickerLongTableColumn() {
+        TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
     }
 }

@@ -40,7 +40,7 @@ public abstract class CreditCardTransaction
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description" )
     private String description;
 
     public abstract static class CreditCardTransactionBuilder<

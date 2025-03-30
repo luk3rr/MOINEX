@@ -20,8 +20,9 @@ public interface CreditCardCreditRepository
 
     /**
      * Get credits card credits by credit card ID and month
-     * @param creditCardId The ID of the credit card
+     * @param crcId The ID of the credit card
      * @param month The month
+     * @param year The year
      * @return List of credit card credits
      */
     @Query("SELECT ccc FROM CreditCardCredit ccc "
@@ -35,8 +36,9 @@ public interface CreditCardCreditRepository
 
     /**
      * Get the total credits of a credit card by month
-     * @param creditCardId The ID of the credit card
+     * @param crcId The ID of the credit card
      * @param month The month
+     * @param year The year
      * @return The total credits of a credit card by month
      */
     @Query("SELECT coalesce(sum(ccc.amount), 0) FROM CreditCardCredit ccc "

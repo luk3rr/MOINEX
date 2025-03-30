@@ -80,7 +80,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * Findall tickers and order them by symbol in ascending order
      * @return A list of tickers ordered by symbol in ascending order
      */
-    public List<Ticker> findAllByOrderBySymbolAsc();
+    List<Ticker> findAllByOrderBySymbolAsc();
 
     /**
      * Find all tickers that are not archived and order them by symbol in ascending
@@ -88,19 +88,19 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @return A list of tickers that are not archived and ordered by symbol in
      *     ascending order
      */
-    public List<Ticker> findAllByIsArchivedFalseOrderBySymbolAsc();
+    List<Ticker> findAllByIsArchivedFalseOrderBySymbolAsc();
 
     /**
      * Find all tickers that are archived and order them by symbol in ascending order
      * @return A list of tickers that are archived and ordered by symbol in ascending
      *     order
      */
-    public List<Ticker> findAllByIsArchivedTrueOrderBySymbolAsc();
+    List<Ticker> findAllByIsArchivedTrueOrderBySymbolAsc();
 
 
     /**
      * Get all non-archived tickers of a specific type
      * @param type The type of the tickers
      */
-    public List<Ticker> findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(TickerType type);
+    List<Ticker> findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(TickerType type);
 }

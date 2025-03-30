@@ -9,9 +9,9 @@ package org.moinex.exceptions;
 /**
  * Exception thrown when the source and destination are the same
  */
-public class SameSourceDestionationException extends RuntimeException
+public class SameSourceDestinationException extends RuntimeException
 {
-    public SameSourceDestionationException(String explanation)
+    public SameSourceDestinationException(String explanation)
     {
         super(explanation);
     }

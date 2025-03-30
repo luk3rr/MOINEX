@@ -45,7 +45,7 @@ public class CreditCardPayment
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "wallet_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id" )
     private Wallet wallet;
 
     @ManyToOne

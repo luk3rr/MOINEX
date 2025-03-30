@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -198,7 +198,7 @@ public class CSVImportController
             Column col = field.getAnnotation(Column.class);
             if (col != null)
             {
-                // if the anotation @Column has a name defined, use it
+                // if the annotation @Column has a name defined, use it
                 // else, use the field name
                 if (!col.name().isEmpty())
                 {
@@ -230,29 +230,13 @@ public class CSVImportController
                 return;
             }
 
-            String   headerLine = lines.get(0);
+            String   headerLine = lines.getFirst();
             String[] headers    = headerLine.split(",");
 
             // Add the columns to the TableView
             for (int i = 0; i < headers.length; i++)
             {
-                final int                                   colIndex = i;
-                TableColumn<ObservableList<String>, String> column =
-                    new TableColumn<>(headers[i]);
-
-                column.setCellValueFactory(cellData -> {
-                    // if column not exists for this row
-                    // return empty string
-                    if (colIndex < cellData.getValue().size())
-                    {
-                        return new SimpleStringProperty(
-                            cellData.getValue().get(colIndex));
-                    }
-                    else
-                    {
-                        return new SimpleStringProperty("");
-                    }
-                });
+                TableColumn<ObservableList<String>, String> column = getObservableListStringTableColumn(i, headers);
 
                 csvPreviewTableView.getColumns().add(column);
             }
@@ -279,6 +263,27 @@ public class CSVImportController
         populateMappingTable();
     }
 
+    private static TableColumn<ObservableList<String>, String> getObservableListStringTableColumn(int i, String[] headers) {
+        final int                                   colIndex = i;
+        TableColumn<ObservableList<String>, String> column =
+            new TableColumn<>(headers[i]);
+
+        column.setCellValueFactory(cellData -> {
+            // if column not exists for this row
+            // return empty string
+            if (colIndex < cellData.getValue().size())
+            {
+                return new SimpleStringProperty(
+                    cellData.getValue().get(colIndex));
+            }
+            else
+            {
+                return new SimpleStringProperty("");
+            }
+        });
+        return column;
+    }
+
     /**
      * Maps the CSV columns to the database columns
      */
@@ -302,7 +307,7 @@ public class CSVImportController
             List<String> csvColumns = csvPreviewTableView.getColumns()
                                           .stream()
                                           .map(TableColumn::getText)
-                                          .collect(Collectors.toList());
+                                          .toList();
 
             for (String csvColumn : csvColumns)
             {
@@ -369,7 +374,7 @@ public class CSVImportController
     public void mapAndInsertCategory(List<String[]>      csvData,
                                      Map<String, String> columnMapping)
     {
-        String[]       csvHeaders = csvData.get(0);                     // CSV Headers
+        String[]       csvHeaders = csvData.getFirst();                     // CSV Headers
         List<String[]> dataRows   = csvData.subList(1, csvData.size()); // Data
 
         for (String[] row : dataRows)
@@ -384,7 +389,7 @@ public class CSVImportController
                     try
                     {
                         categoryService.addCategory(
-                            getvalueforcolumn(csvHeaders, row, csvColumn));
+                            getValueForColumn(csvHeaders, row, csvColumn));
                     }
                     catch (IllegalArgumentException | EntityExistsException e)
                     {
@@ -403,7 +408,7 @@ public class CSVImportController
     public void mapAndInsertWallet(List<String[]>      csvData,
                                    Map<String, String> columnMapping)
     {
-        String[]       csvHeaders = csvData.get(0);                     // CSV Headers
+        String[]       csvHeaders = csvData.getFirst();                     // CSV Headers
         List<String[]> dataRows   = csvData.subList(1, csvData.size()); // Data
 
         for (String[] row : dataRows)
@@ -419,12 +424,12 @@ public class CSVImportController
                 {
                     if (dbColumn.equals("name"))
                     {
-                        wt.setName(getvalueforcolumn(csvHeaders, row, csvColumn));
+                        wt.setName(getValueForColumn(csvHeaders, row, csvColumn));
                     }
                     else if (dbColumn.equals("balance"))
                     {
                         wt.setBalance(new BigDecimal(
-                            getvalueforcolumn(csvHeaders, row, csvColumn)));
+                            getValueForColumn(csvHeaders, row, csvColumn)));
                     }
                 }
                 catch (IllegalArgumentException e)
@@ -446,10 +451,10 @@ public class CSVImportController
      * @param csvData the data from the CSV file
      * @param columnMapping a map that maps the CSV columns to the database columns
      */
-    public void mapandinsertcreditcard(List<String[]>      csvData,
+    public void mapAndInsertCreditCard(List<String[]>      csvData,
                                        Map<String, String> columnMapping)
     {
-        String[]       csvHeaders = csvData.get(0);                     // CSV Headers
+        String[]       csvHeaders = csvData.getFirst();                     // CSV Headers
         List<String[]> dataRows   = csvData.subList(1, csvData.size()); // Data
 
         for (String[] row : dataRows)
@@ -463,29 +468,16 @@ public class CSVImportController
 
                 try
                 {
-                    if (dbColumn.equals("name"))
-                    {
-                        crc.setName(getvalueforcolumn(csvHeaders, row, csvColumn));
-                    }
-                    else if (dbColumn.equals("max_debt"))
-                    {
-                        crc.setMaxDebt(new BigDecimal(
-                            getvalueforcolumn(csvHeaders, row, csvColumn)));
-                    }
-                    else if (dbColumn.equals("closing_day"))
-                    {
-                        crc.setClosingDay(Integer.parseInt(
-                            getvalueforcolumn(csvHeaders, row, csvColumn)));
-                    }
-                    else if (dbColumn.equals("billing_due_day"))
-                    {
-                        crc.setBillingDueDay(Integer.parseInt(
-                            getvalueforcolumn(csvHeaders, row, csvColumn)));
-                    }
-                    else if (dbColumn.equals("last_four_digits"))
-                    {
-                        crc.setLastFourDigits(
-                            getvalueforcolumn(csvHeaders, row, csvColumn));
+                    switch (dbColumn) {
+                        case "name" -> crc.setName(getValueForColumn(csvHeaders, row, csvColumn));
+                        case "max_debt" -> crc.setMaxDebt(new BigDecimal(
+                                getValueForColumn(csvHeaders, row, csvColumn)));
+                        case "closing_day" -> crc.setClosingDay(Integer.parseInt(
+                                getValueForColumn(csvHeaders, row, csvColumn)));
+                        case "billing_due_day" -> crc.setBillingDueDay(Integer.parseInt(
+                                getValueForColumn(csvHeaders, row, csvColumn)));
+                        case "last_four_digits" -> crc.setLastFourDigits(
+                                getValueForColumn(csvHeaders, row, csvColumn));
                     }
                 }
                 catch (IllegalArgumentException e)
@@ -515,7 +507,7 @@ public class CSVImportController
      * @return the value for the given column
      */
     private String
-    getvalueforcolumn(String[] csvHeaders, String[] row, String csvColumn)
+    getValueForColumn(String[] csvHeaders, String[] row, String csvColumn)
     {
         for (int i = 0; i < csvHeaders.length; i++)
         {
@@ -542,30 +534,25 @@ public class CSVImportController
             param -> new SimpleStringProperty(param.getValue().getSelectedDBColumn()));
 
         dbColumnTableColumn.setCellFactory(
-            col -> new ComboBoxTableCell<MappingRow, String>() {
+            col -> new ComboBoxTableCell<>() {
                 @Override
-                public void updateItem(String item, boolean empty)
-                {
+                public void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
 
-                    if (empty || getTableRow() == null)
-                    {
+                    if (empty || getTableRow() == null) {
                         setGraphic(null);
                         setText(null);
-                    }
-                    else
-                    {
+                    } else {
                         MappingRow row = getTableRow().getItem();
 
-                        if (row != null)
-                        {
+                        if (row != null) {
                             ComboBox<String> comboBox = new ComboBox<>();
 
                             // Get all available options, removing the already selected
                             // ones
                             ObservableList<String> availableOptions =
-                                FXCollections.observableArrayList(
-                                    getAvailableOptions(row));
+                                    FXCollections.observableArrayList(
+                                            getAvailableOptions(row));
 
                             // Configure the ComboBox
                             comboBox.setItems(availableOptions);
@@ -573,25 +560,23 @@ public class CSVImportController
                             comboBox.setMaxWidth(Double.MAX_VALUE);
 
                             comboBox.valueProperty().addListener(
-                                (obs, oldValue, newValue) -> {
-                                    if (oldValue != null && !oldValue.isEmpty())
-                                    {
-                                        // Add the old option back to the global list
-                                        availableDbColumns.add(oldValue);
-                                        FXCollections.sort(availableDbColumns);
-                                    }
+                                    (obs, oldValue, newValue) -> {
+                                        if (oldValue != null && !oldValue.isEmpty()) {
+                                            // Add the old option back to the global list
+                                            availableDbColumns.add(oldValue);
+                                            FXCollections.sort(availableDbColumns);
+                                        }
 
-                                    row.setSelectedDBColumn(newValue);
+                                        row.setSelectedDBColumn(newValue);
 
-                                    if (newValue != null && !newValue.isEmpty())
-                                    {
-                                        // Remove the new option from the global list
-                                        availableDbColumns.remove(newValue);
-                                    }
+                                        if (newValue != null && !newValue.isEmpty()) {
+                                            // Remove the new option from the global list
+                                            availableDbColumns.remove(newValue);
+                                        }
 
-                                    // Refresh the table
-                                    mappingTableView.refresh();
-                                });
+                                        // Refresh the table
+                                        mappingTableView.refresh();
+                                    });
 
                             setGraphic(comboBox);
                             setText(null);
@@ -602,18 +587,16 @@ public class CSVImportController
                 /**
                  * Get the available options for the ComboBox, removing the selections
                  * already made by other rows in the table
+                 *
                  * @param currentRow The current row
                  * @return The list of available options
                  */
-                private List<String> getAvailableOptions(MappingRow currentRow)
-                {
+                private List<String> getAvailableOptions(MappingRow currentRow) {
                     List<String> availableOptions = new ArrayList<>(availableDbColumns);
 
                     // Remove selections made by other rows, except the current row
-                    for (MappingRow row : mappingTableView.getItems())
-                    {
-                        if (row != currentRow && row.getSelectedDBColumn() != null)
-                        {
+                    for (MappingRow row : mappingTableView.getItems()) {
+                        if (row != currentRow && row.getSelectedDBColumn() != null) {
                             availableOptions.remove(row.getSelectedDBColumn());
                         }
                     }
@@ -621,9 +604,8 @@ public class CSVImportController
                     Collections.sort(availableOptions);
 
                     // Add an empty option
-                    if (!availableOptions.contains(""))
-                    {
-                        availableOptions.add(0, "");
+                    if (!availableOptions.contains("")) {
+                        availableOptions.addFirst("");
                     }
 
                     return availableOptions;

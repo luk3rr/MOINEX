@@ -47,16 +47,16 @@ public class Bond extends Asset
     private BondType type;
 
     // TODO: Fix nullable. It should be false when the investment feature is implemented
-    @Column(name = "interest_index", nullable = true)
+    @Column(name = "interest_index" )
     private InterestIndex interestIndex;
 
-    @Column(name = "interest_type", nullable = true)
+    @Column(name = "interest_type" )
     private InterestType interestType;
 
-    @Column(name = "interest_rate", nullable = true)
+    @Column(name = "interest_rate" )
     private BigDecimal interestRate;
 
-    @Column(name = "maturity_date", nullable = true)
+    @Column(name = "maturity_date" )
     private String maturityDate;
 
     @Builder.Default

@@ -20,6 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
+import lombok.Setter;
 
 public class SuggestionsHandlerHelper<T>
 {
@@ -30,6 +31,7 @@ public class SuggestionsHandlerHelper<T>
     private final Consumer<T> onSelectCallback;
     private final TextField   componentField;
     private ChangeListener<String> componentFieldListener;
+    @Setter
     private List<T>           suggestions;
 
     public SuggestionsHandlerHelper(TextField           componentField,
@@ -50,11 +52,6 @@ public class SuggestionsHandlerHelper<T>
         configureSuggestionsPopup();
     }
 
-    public void setSuggestions(List<T> suggestions)
-    {
-        this.suggestions = suggestions;
-    }
-
     public void disable()
     {
         componentField.textProperty().removeListener(componentFieldListener);
@@ -70,7 +67,7 @@ public class SuggestionsHandlerHelper<T>
         // Store the listener in a variable to be able to disable and enable it
         // when needed
         componentFieldListener = (observable, oldValue, newValue) -> {
-            if (newValue.strip().isEmpty())
+            if (newValue.isBlank())
             {
                 suggestionsPopup.hide();
                 return;

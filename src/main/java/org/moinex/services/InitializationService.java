@@ -1,5 +1,5 @@
 /*
- * Filename: InicializationService.java
+ * Filename: InitializationService.java
  * Created on: November 19, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
@@ -18,16 +18,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @NoArgsConstructor
-public class InicializationService
+public class InitializationService
 {
-    @Autowired
     private RecurringTransactionService recurringTransactionService;
 
-    @Autowired
     private MarketService marketService;
 
     private static final Logger logger =
-        LoggerFactory.getLogger(InicializationService.class);
+        LoggerFactory.getLogger(InitializationService.class);
+
+    @Autowired
+    public InitializationService(
+        RecurringTransactionService recurringTransactionService,
+        MarketService               marketService)
+    {
+        this.recurringTransactionService = recurringTransactionService;
+        this.marketService               = marketService;
+    }
 
     @PostConstruct
     public void initialize()

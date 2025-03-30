@@ -201,27 +201,7 @@ public class ArchivedCreditCardsController
      */
     private void configureTableView()
     {
-        TableColumn<CreditCard, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        idColumn.setCellFactory(column -> new TableCell<CreditCard, Long>() {
-            @Override
-            protected void updateItem(Long item, boolean empty)
-            {
-                super.updateItem(item, empty);
-                if (item == null || empty)
-                {
-                    setText(null);
-                }
-                else
-                {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        TableColumn<CreditCard, Long> idColumn = getCreditCardLongTableColumn();
 
         TableColumn<CreditCard, String> crcColumn = new TableColumn<>("Credit Card");
         crcColumn.setCellValueFactory(
@@ -239,17 +219,13 @@ public class ArchivedCreditCardsController
             -> new SimpleObjectProperty<>(
                 creditCardService.getDebtCountByCreditCard(param.getValue().getId())));
 
-        numOfDebtsColumn.setCellFactory(column -> new TableCell<CreditCard, Long>() {
+        numOfDebtsColumn.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(Long item, boolean empty)
-            {
+            protected void updateItem(Long item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null || empty)
-                {
+                if (item == null || empty) {
                     setText(null);
-                }
-                else
-                {
+                } else {
                     setText(item.toString());
                     setAlignment(Pos.CENTER);
                     setStyle("-fx-padding: 0;");
@@ -261,5 +237,26 @@ public class ArchivedCreditCardsController
         creditCardTableView.getColumns().add(crcColumn);
         creditCardTableView.getColumns().add(operatorColumn);
         creditCardTableView.getColumns().add(numOfDebtsColumn);
+    }
+
+    private static TableColumn<CreditCard, Long> getCreditCardLongTableColumn() {
+        TableColumn<CreditCard, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(
+            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;");
+                }
+            }
+        });
+        return idColumn;
     }
 }

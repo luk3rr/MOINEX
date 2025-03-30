@@ -14,11 +14,8 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -99,7 +96,6 @@ public class CreditCardController
     @FXML
     private Label invoiceMonth;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private StackedBarChart<String, Number> debtsFlowStackedBarChart;
@@ -122,10 +118,11 @@ public class CreditCardController
      */
     @Autowired
     public CreditCardController(CreditCardService creditCardService,
-                                CategoryService   categoryService)
+                                CategoryService   categoryService, ConfigurableApplicationContext springContext)
     {
         this.creditCardService = creditCardService;
         this.categoryService   = categoryService;
+        this.springContext = springContext;
     }
 
     @FXML
@@ -166,7 +163,7 @@ public class CreditCardController
                                     springContext,
                                     (AddCreditCardDebtController controller)
                                         -> {},
-                                    List.of(() -> updateDisplay()));
+                                    List.of(this::updateDisplay));
     }
 
     @FXML
@@ -177,7 +174,7 @@ public class CreditCardController
                                     springContext,
                                     (AddCreditCardController controller)
                                         -> {},
-                                    List.of(() -> updateDisplayCards()));
+                                    List.of(this::updateDisplayCards));
     }
 
     @FXML
@@ -200,7 +197,7 @@ public class CreditCardController
             springContext,
             (EditCreditCardDebtController controller)
                 -> controller.setCreditCardDebt(selectedPayment.getCreditCardDebt()),
-            List.of(() -> updateDisplay()));
+            List.of(this::updateDisplay));
     }
 
     @FXML
@@ -285,7 +282,7 @@ public class CreditCardController
                                     springContext,
                                     (ArchivedCreditCardsController controller)
                                         -> {},
-                                    List.of(() -> updateDisplay()));
+                                    List.of(this::updateDisplay));
     }
 
     @FXML
@@ -293,7 +290,7 @@ public class CreditCardController
     {
         YearMonth nowMonth = debtsListMonthFilterComboBox.getValue().minusMonths(1);
 
-        // Set previous month as current month
+        // Set the previous month as current month
         debtsListMonthFilterComboBox.setValue(nowMonth);
 
         updateDebtsTableView();
@@ -343,7 +340,7 @@ public class CreditCardController
     }
 
     /**
-     * Load credit cards from database
+     * Load credit cards from the database
      */
     private void loadCreditCardsFromDatabase()
     {
@@ -352,7 +349,7 @@ public class CreditCardController
     }
 
     /**
-     * Update the debts table view
+     * Update the debt table view
      */
     private void updateDebtsTableView()
     {
@@ -365,13 +362,13 @@ public class CreditCardController
         debtsTableView.getItems().clear();
 
         // Fetch all transactions within the selected range and filter by transaction
-        // type. If transaction type is null, all transactions are fetched
+        // type.
+        // If the transaction type is null, all transactions are fetched
         if (similarTextOrId.isEmpty())
         {
             creditCardService
                 .getCreditCardPayments(selectedMonth.getMonthValue(),
                                        selectedMonth.getYear())
-                .stream()
                 .forEach(debtsTableView.getItems()::add);
         }
         else
@@ -459,8 +456,8 @@ public class CreditCardController
 
                 // Add style class to the wallet pane
                 newContent.getStylesheets().add(
-                    getClass()
-                        .getResource(Constants.COMMON_STYLE_SHEET)
+                    Objects.requireNonNull(getClass()
+                                    .getResource(Constants.COMMON_STYLE_SHEET))
                         .toExternalForm());
 
                 CreditCardPaneController crcPaneController = loader.getController();
@@ -512,10 +509,10 @@ public class CreditCardController
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
 
         // Loop through the months
-        Integer halfMonths = Constants.CRC_XYBAR_CHART_MAX_MONTHS / 2;
+        int halfMonths = Constants.CRC_XYBAR_CHART_MAX_MONTHS / 2;
 
         // Positive to negative to keep the order of the months
-        for (Integer i = halfMonths; i >= -halfMonths; i--)
+        for (int i = halfMonths; i >= -halfMonths; i--)
         {
             // Get the date for the current month
             LocalDateTime date = currentDate.minusMonths(i);
@@ -533,8 +530,7 @@ public class CreditCardController
                 BigDecimal total =
                     payments.stream()
                         .filter(t
-                                -> t.getCreditCardDebt().getCategory().getId() ==
-                                       category.getId())
+                                -> t.getCreditCardDebt().getCategory().getId().equals(category.getId()))
                         .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -560,7 +556,7 @@ public class CreditCardController
                     new XYChart.Data<>(yearMonth.format(formatter), total));
             }
 
-            // Only add series to the chart if it has data greater than zero
+            // Only add a series to the chart if it has data greater than zero
             if (series.getData().stream().anyMatch(
                     data -> (Double)data.getYValue() > 0))
             {
@@ -582,16 +578,14 @@ public class CreditCardController
         // Set the maximum total as the upper bound of the y-axis
         Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
-        numberAxis.setTickLabelFormatter(new StringConverter<Number>() {
+        numberAxis.setTickLabelFormatter(new StringConverter<>() {
             @Override
-            public String toString(Number value)
-            {
+            public String toString(Number value) {
                 return UIUtils.formatCurrency(value);
             }
 
             @Override
-            public Number fromString(String string)
-            {
+            public Number fromString(String string) {
                 return 0;
             }
         });
@@ -600,7 +594,7 @@ public class CreditCardController
         {
             for (XYChart.Data<String, Number> data : series.getData())
             {
-                // Calculate total for the month to find the percentage
+                // Calculate the total for the month to find the percentage
                 YearMonth yearMonth = YearMonth.parse(data.getXValue(), formatter);
                 Double    monthTotal =
                     monthlyTotals.getOrDefault(yearMonth, new LinkedHashMap<>())
@@ -628,7 +622,7 @@ public class CreditCardController
     }
 
     /**
-     * Populate the debts list month filter combo box
+     * Populate the debt list month filter combo box
      */
     private void populateDebtsListMonthFilterComboBox()
     {
@@ -660,19 +654,17 @@ public class CreditCardController
         debtsListMonthFilterComboBox.setItems(yearMonthList);
 
         // Custom string converter to format the YearMonth as "MMM/yy"
-        debtsListMonthFilterComboBox.setConverter(new StringConverter<YearMonth>() {
+        debtsListMonthFilterComboBox.setConverter(new StringConverter<>() {
             private final DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("MMM/yy");
+                    DateTimeFormatter.ofPattern("MMM/yy");
 
             @Override
-            public String toString(YearMonth yearMonth)
-            {
+            public String toString(YearMonth yearMonth) {
                 return yearMonth != null ? yearMonth.format(formatter) : "";
             }
 
             @Override
-            public YearMonth fromString(String string)
-            {
+            public YearMonth fromString(String string) {
                 return YearMonth.parse(string, formatter);
             }
         });
@@ -706,19 +698,17 @@ public class CreditCardController
         totalDebtsYearFilterComboBox.setItems(yearList);
 
         // Custom string converter to format the Year as "Year"
-        totalDebtsYearFilterComboBox.setConverter(new StringConverter<Year>() {
+        totalDebtsYearFilterComboBox.setConverter(new StringConverter<>() {
             private final DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy");
+                    DateTimeFormatter.ofPattern("yyyy");
 
             @Override
-            public String toString(Year year)
-            {
+            public String toString(Year year) {
                 return year != null ? year.format(formatter) : "";
             }
 
             @Override
-            public Year fromString(String string)
-            {
+            public Year fromString(String string) {
                 return Year.parse(string, formatter);
             }
         });
@@ -752,7 +742,7 @@ public class CreditCardController
     private void configureListeners()
     {
         totalDebtsYearFilterComboBox.valueProperty().addListener(
-            (observable, oldValue, newYear) -> { updateTotalDebtsInfo(); });
+            (observable, oldValue, newYear) -> updateTotalDebtsInfo());
 
         debtsListMonthFilterComboBox.valueProperty().addListener(
             (observable, oldValue, newMonth) -> {
@@ -768,7 +758,7 @@ public class CreditCardController
             });
 
         debtSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> { updateDebtsTableView(); });
+            (observable, oldValue, newValue) -> updateDebtsTableView());
     }
 
     /**
@@ -776,32 +766,7 @@ public class CreditCardController
      */
     private void configureTableView()
     {
-        TableColumn<CreditCardPayment, Long> idColumn = new TableColumn<>("Debt ID");
-        idColumn.setCellValueFactory(param
-                                     -> new SimpleObjectProperty<>(
-                                         param.getValue().getCreditCardDebt().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(column -> {
-            return new TableCell<CreditCardPayment, Long>() {
-                @Override
-                protected void updateItem(Long item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item.toString());
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
-                }
-            };
-        });
+        TableColumn<CreditCardPayment, Long> idColumn = getCreditCardPaymentLongTableColumn();
 
         TableColumn<CreditCardPayment, String> descriptionColumn =
             new TableColumn<>("Description");
@@ -817,35 +782,7 @@ public class CreditCardController
             -> new SimpleObjectProperty<>(
                 UIUtils.formatCurrency(param.getValue().getAmount())));
 
-        TableColumn<CreditCardPayment, String> installmentColumn =
-            new TableColumn<>("Installment");
-        installmentColumn.setCellValueFactory(
-            param
-            -> new SimpleObjectProperty<>(
-                param.getValue().getInstallment().toString() + "/" +
-                param.getValue().getCreditCardDebt().getInstallments()));
-
-        // Align the installment column to the center
-        installmentColumn.setCellFactory(column -> {
-            return new TableCell<CreditCardPayment, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty)
-                {
-                    super.updateItem(item, empty);
-                    if (item == null || empty)
-                    {
-                        setText(null);
-                    }
-                    else
-                    {
-                        setText(item);
-                        setAlignment(Pos.CENTER);
-                        setStyle("-fx-padding: 0;"); // set padding to zero to
-                                                     // ensure the text is centered
-                    }
-                }
-            };
-        });
+        TableColumn<CreditCardPayment, String> installmentColumn = getCreditCardPaymentStringTableColumn();
 
         TableColumn<CreditCardPayment, String> crcColumn =
             new TableColumn<>("Credit Card");
@@ -883,5 +820,56 @@ public class CreditCardController
         debtsTableView.getColumns().add(categoryColumn);
         debtsTableView.getColumns().add(dateColumn);
         debtsTableView.getColumns().add(statusColumn);
+    }
+
+    private static TableColumn<CreditCardPayment, String> getCreditCardPaymentStringTableColumn() {
+        TableColumn<CreditCardPayment, String> installmentColumn =
+            new TableColumn<>("Installment");
+        installmentColumn.setCellValueFactory(
+            param
+            -> new SimpleObjectProperty<>(
+                param.getValue().getInstallment().toString() + "/" +
+                param.getValue().getCreditCardDebt().getInstallments()));
+
+        // Align the installment column to the center
+        installmentColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return installmentColumn;
+    }
+
+    private static TableColumn<CreditCardPayment, Long> getCreditCardPaymentLongTableColumn() {
+        TableColumn<CreditCardPayment, Long> idColumn = new TableColumn<>("Debt ID");
+        idColumn.setCellValueFactory(param
+                                     -> new SimpleObjectProperty<>(
+                                         param.getValue().getCreditCardDebt().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setAlignment(Pos.CENTER);
+                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                    // ensure the text is centered
+                }
+            }
+        });
+        return idColumn;
     }
 }

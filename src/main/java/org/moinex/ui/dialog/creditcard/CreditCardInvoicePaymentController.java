@@ -66,7 +66,6 @@ public class CreditCardInvoicePaymentController
     @FXML
     private TextField useRebateValueField;
 
-    @Autowired
     private ConfigurableApplicationContext springContext;
 
     private WalletService walletService;
@@ -91,11 +90,12 @@ public class CreditCardInvoicePaymentController
     @Autowired
     public CreditCardInvoicePaymentController(WalletService     walletService,
                                               CreditCardService creditCardService,
-                                              CalculatorService calculatorService)
+                                              CalculatorService calculatorService, ConfigurableApplicationContext springContext)
     {
         this.walletService     = walletService;
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
+        this.springContext = springContext;
     }
 
     public void setCreditCard(CreditCard crc, YearMonth invoiceDate)

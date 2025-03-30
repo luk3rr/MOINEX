@@ -35,22 +35,31 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class GoalService
 {
-    @Autowired
     private GoalRepository goalRepository;
 
-    @Autowired
     private WalletRepository walletRepository;
 
-    @Autowired
     private TransferRepository transfersRepository;
 
-    @Autowired
     private WalletTransactionRepository walletTransactionRepository;
 
-    @Autowired
     private WalletTypeRepository walletTypeRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(GoalService.class);
+
+    @Autowired
+    public GoalService(GoalRepository              goalRepository,
+                       WalletRepository            walletRepository,
+                       TransferRepository          transfersRepository,
+                       WalletTransactionRepository walletTransactionRepository,
+                       WalletTypeRepository        walletTypeRepository)
+    {
+        this.goalRepository              = goalRepository;
+        this.walletRepository            = walletRepository;
+        this.transfersRepository         = transfersRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
+        this.walletTypeRepository        = walletTypeRepository;
+    }
 
     /**
      * Validates the date and balances of a goal
@@ -143,7 +152,7 @@ public class GoalService
 
         validateDateAndBalances(initialBalance, targetBalance, targetDateTime);
 
-        // All goals has the same wallet type
+        // All goals have the same wallet type
         WalletType walletType =
             walletTypeRepository.findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME)
                 .orElseThrow(
