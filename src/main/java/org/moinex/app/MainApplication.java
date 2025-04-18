@@ -15,8 +15,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 /**
  * Main application class
  */
-@EntityScan(basePackages = "org.moinex.entities")
-@EnableJpaRepositories(basePackages = "org.moinex.repositories")
+@EntityScan(basePackages = "org.moinex.model")
+@EnableJpaRepositories(basePackages = "org.moinex.repository")
 @SpringBootApplication(scanBasePackages = "org.moinex")
 public class MainApplication
 {

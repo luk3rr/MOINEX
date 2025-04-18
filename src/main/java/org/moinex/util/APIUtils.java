@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
-import org.moinex.services.InitializationService;
+import org.moinex.service.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

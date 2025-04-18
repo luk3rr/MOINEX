@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.services.GoalService;
+import org.moinex.service.GoalService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

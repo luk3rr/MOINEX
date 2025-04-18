@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
-import org.moinex.services.CalculatorService;
+import org.moinex.service.CalculatorService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

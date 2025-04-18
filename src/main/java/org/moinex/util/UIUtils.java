@@ -19,8 +19,8 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.NonNull;
-import org.moinex.entities.wallettransaction.Wallet;
-import org.moinex.services.UserPreferencesService;
+import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.service.UserPreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

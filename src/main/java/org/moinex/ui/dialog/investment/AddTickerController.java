@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.services.TickerService;
+import org.moinex.service.TickerService;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;

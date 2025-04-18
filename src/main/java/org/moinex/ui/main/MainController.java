@@ -26,7 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.NoArgsConstructor;
-import org.moinex.services.UserPreferencesService;
+import org.moinex.service.UserPreferencesService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.ui.common.CalendarController;
 import org.moinex.util.Constants;
