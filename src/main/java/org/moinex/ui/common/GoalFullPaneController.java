@@ -22,7 +22,7 @@ import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.charts.CircularProgressBar;
 import org.moinex.entities.goal.Goal;
-import org.moinex.exceptions.IncompleteGoalException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.GoalService;
 import org.moinex.services.WalletTransactionService;
 import org.moinex.ui.dialog.wallettransaction.AddExpenseController;
@@ -367,7 +367,7 @@ public class GoalFullPaneController
                 {
                     goalService.completeGoal(goal.getId());
                 }
-                catch (EntityNotFoundException | IncompleteGoalException e)
+                catch (EntityNotFoundException | MoinexException.IncompleteGoalException e)
                 {
                     WindowUtils.showErrorDialog("Error completing goal",
                                                 e.getMessage());

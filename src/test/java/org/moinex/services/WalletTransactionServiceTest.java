@@ -32,8 +32,7 @@ import org.moinex.entities.Category;
 import org.moinex.entities.wallettransaction.Transfer;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.exceptions.AttributeAlreadySetException;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.wallettransaction.TransferRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
@@ -258,7 +257,7 @@ class WalletTransactionServiceTest
     void
     testTransferMoneySameWallet()
     {
-        assertThrows(SameSourceDestinationException.class,
+        assertThrows(MoinexException.SameSourceDestinationException.class,
                      ()
                          -> m_walletTransactionService.transferMoney(m_wallet1.getId(),
                                                                      m_wallet1.getId(),
@@ -1035,7 +1034,7 @@ class WalletTransactionServiceTest
         when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
             .thenReturn(Optional.of(m_wallet1IncomeTransaction));
 
-        assertThrows(AttributeAlreadySetException.class,
+        assertThrows(MoinexException.AttributeAlreadySetException.class,
                      ()
                          -> m_walletTransactionService.confirmTransaction(
                              m_wallet1IncomeTransaction.getId()));

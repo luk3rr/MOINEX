@@ -22,8 +22,7 @@ import org.moinex.entities.Category;
 import org.moinex.entities.wallettransaction.RecurringTransaction;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.exceptions.AttributeAlreadySetException;
-import org.moinex.exceptions.RecurringTransactionAlreadyStoppedException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.wallettransaction.RecurringTransactionRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.util.Constants;
@@ -263,7 +262,7 @@ public class RecurringTransactionService
         if (recurringTransaction.getStatus().equals(
                 RecurringTransactionStatus.INACTIVE))
         {
-            throw new AttributeAlreadySetException(
+            throw new MoinexException.AttributeAlreadySetException(
                 "Recurring transaction has already ended");
         }
 

@@ -36,7 +36,7 @@ import org.moinex.entities.creditcard.CreditCard;
 import org.moinex.entities.creditcard.CreditCardDebt;
 import org.moinex.entities.creditcard.CreditCardOperator;
 import org.moinex.entities.creditcard.CreditCardPayment;
-import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.creditcard.CreditCardDebtRepository;
 import org.moinex.repositories.creditcard.CreditCardOperatorRepository;
@@ -591,7 +591,7 @@ class CreditCardServiceTest
             m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
             .thenReturn(new BigDecimal("0.0"));
 
-        assertThrows(InsufficientResourcesException.class,
+        assertThrows(MoinexException.InsufficientResourcesException.class,
                      ()
                          -> m_creditCardService.addDebt(m_creditCard.getId(),
                                                         m_category,

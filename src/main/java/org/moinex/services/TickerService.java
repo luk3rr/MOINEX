@@ -24,9 +24,7 @@ import org.moinex.entities.investment.Ticker;
 import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.InvalidTickerTypeException;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.investment.CryptoExchangeRepository;
 import org.moinex.repositories.investment.DividendRepository;
 import org.moinex.repositories.investment.TickerPurchaseRepository;
@@ -462,7 +460,7 @@ public class TickerService
         // Check if the quantity is greater than the current quantity
         if (quantity.compareTo(ticker.getCurrentQuantity()) > 0)
         {
-            throw new InsufficientResourcesException(
+            throw new MoinexException.InsufficientResourcesException(
                 "Quantity must be less than or equal to the current "
                 + "quantity");
         }
@@ -582,7 +580,7 @@ public class TickerService
     {
         if (sourceTickerId.equals(targetTickerId))
         {
-            throw new SameSourceDestinationException(
+            throw new MoinexException.SameSourceDestinationException(
                 "Source and target tickers must be different");
         }
 
@@ -603,7 +601,7 @@ public class TickerService
         if (soldCrypto.getType() != TickerType.CRYPTOCURRENCY ||
             receivedCrypto.getType() != TickerType.CRYPTOCURRENCY)
         {
-            throw new InvalidTickerTypeException(
+            throw new MoinexException.InvalidTickerTypeException(
                 "Both tickers must be of type CRYPTO to exchange crypto");
         }
 
@@ -616,7 +614,7 @@ public class TickerService
         // Check if the quantity is greater than the current quantity
         if (soldQuantity.compareTo(soldCrypto.getCurrentQuantity()) > 0)
         {
-            throw new InsufficientResourcesException(
+            throw new MoinexException.InsufficientResourcesException(
                 "Source quantity must be less than or equal to the current "
                 + "quantity");
         }
@@ -918,7 +916,7 @@ public class TickerService
 
         if (exchange.getSoldCrypto().getId().equals(exchange.getReceivedCrypto().getId()))
         {
-            throw new SameSourceDestinationException(
+            throw new MoinexException.SameSourceDestinationException(
                 "Source and target tickers must be different");
         }
 

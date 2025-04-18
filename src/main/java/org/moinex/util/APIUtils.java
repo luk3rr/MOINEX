@@ -24,9 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
-import org.moinex.exceptions.APIFetchException;
-import org.moinex.exceptions.ApplicationShuttingDownException;
-import org.moinex.exceptions.ScriptNotFoundException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +130,7 @@ public class APIUtils
     {
         if (shuttingDown)
         {
-            throw new ApplicationShuttingDownException("Application is shutting down");
+            throw new MoinexException.ApplicationShuttingDownException("Application is shutting down");
         }
 
         runningProcesses.add(process);
@@ -146,7 +144,7 @@ public class APIUtils
     {
         if (shuttingDown)
         {
-            throw new ApplicationShuttingDownException("Application is shutting down");
+            throw new MoinexException.ApplicationShuttingDownException("Application is shutting down");
         }
 
         runningProcesses.remove(process);
@@ -187,13 +185,13 @@ public class APIUtils
         {
             if (scriptInputStream == null)
             {
-                throw new ScriptNotFoundException("Python " + script +
+                throw new MoinexException.ScriptNotFoundException("Python " + script +
                                                   " script not found");
             }
 
             if (shuttingDown)
             {
-                throw new ApplicationShuttingDownException(
+                throw new MoinexException.ApplicationShuttingDownException(
                     "Application is shutting down");
             }
 
@@ -229,7 +227,7 @@ public class APIUtils
 
                 if (exitCode != 0)
                 {
-                    throw new APIFetchException(
+                    throw new MoinexException.APIFetchException(
                         "Error executing Python script. Exit code: " + exitCode);
                 }
 
@@ -252,13 +250,13 @@ public class APIUtils
         {
             // Handle the case where the thread is interrupted
             Thread.currentThread().interrupt();
-            throw new APIFetchException("Python script execution was interrupted: " +
+            throw new MoinexException.APIFetchException("Python script execution was interrupted: " +
                                         e);
         }
         catch (Exception e)
         {
             // Handle general errors and exceptions
-            throw new APIFetchException("Error running Python script: " +
+            throw new MoinexException.APIFetchException("Error running Python script: " +
                                         e.getMessage());
         }
     }

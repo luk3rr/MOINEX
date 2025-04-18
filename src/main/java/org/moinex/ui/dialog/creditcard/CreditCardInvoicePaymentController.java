@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.entities.creditcard.CreditCard;
 import org.moinex.entities.creditcard.CreditCardPayment;
 import org.moinex.entities.wallettransaction.Wallet;
-import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CreditCardService;
 import org.moinex.services.WalletService;
@@ -234,7 +234,7 @@ public class CreditCardInvoicePaymentController
                 stage.close();
             }
             catch (EntityNotFoundException | IllegalArgumentException |
-                   InsufficientResourcesException e)
+                   MoinexException.InsufficientResourcesException e)
             {
                 WindowUtils.showErrorDialog("Error paying invoice", e.getMessage());
             }

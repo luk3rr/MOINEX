@@ -33,9 +33,7 @@ import org.moinex.entities.investment.TickerPurchase;
 import org.moinex.entities.investment.TickerSale;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.InvalidTickerTypeException;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.investment.CryptoExchangeRepository;
 import org.moinex.repositories.investment.DividendRepository;
 import org.moinex.repositories.investment.TickerPurchaseRepository;
@@ -734,7 +732,7 @@ class TickerServiceTest
         m_ticker1.setCurrentQuantity(new BigDecimal("5"));
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
 
-        assertThrows(InsufficientResourcesException.class, () -> {
+        assertThrows(MoinexException.InsufficientResourcesException.class, () -> {
             m_tickerService.addSale(1L,
                                     1L,
                                     new BigDecimal("10"),
@@ -916,7 +914,7 @@ class TickerServiceTest
     void
     testAddCryptoExchangeSameTicker()
     {
-        assertThrows(SameSourceDestinationException.class, () -> {
+        assertThrows(MoinexException.SameSourceDestinationException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               1L,
                                               new BigDecimal("1"),
@@ -985,7 +983,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
-        assertThrows(InvalidTickerTypeException.class, () -> {
+        assertThrows(MoinexException.InvalidTickerTypeException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("1"),
@@ -1063,7 +1061,7 @@ class TickerServiceTest
         when(m_tickerRepository.findById(1L)).thenReturn(Optional.of(m_ticker1));
         when(m_tickerRepository.findById(2L)).thenReturn(Optional.of(m_ticker2));
 
-        assertThrows(InsufficientResourcesException.class, () -> {
+        assertThrows(MoinexException.InsufficientResourcesException.class, () -> {
             m_tickerService.addCryptoExchange(1L,
                                               2L,
                                               new BigDecimal("10"),

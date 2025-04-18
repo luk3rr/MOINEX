@@ -30,7 +30,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletType;
-import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.wallettransaction.TransferRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
@@ -316,7 +316,7 @@ class WalletServiceTest
         when(m_walletTypeRepository.existsById(m_wallet1.getType().getId()))
             .thenReturn(true);
 
-        assertThrows(AttributeAlreadySetException.class,
+        assertThrows(MoinexException.AttributeAlreadySetException.class,
                      ()
                          -> m_walletService.changeWalletType(m_wallet1.getId(),
                                                              m_wallet1.getType()));

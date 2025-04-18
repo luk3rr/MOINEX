@@ -22,7 +22,7 @@ import org.moinex.entities.creditcard.CreditCardDebt;
 import org.moinex.entities.creditcard.CreditCardOperator;
 import org.moinex.entities.creditcard.CreditCardPayment;
 import org.moinex.entities.wallettransaction.Wallet;
-import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.CategoryRepository;
 import org.moinex.repositories.creditcard.CreditCardCreditRepository;
 import org.moinex.repositories.creditcard.CreditCardDebtRepository;
@@ -367,7 +367,7 @@ public class CreditCardService
 
         if (value.compareTo(availableCredit) > 0)
         {
-            throw new InsufficientResourcesException("Credit card with id " + crcId +
+            throw new MoinexException.InsufficientResourcesException("Credit card with id " + crcId +
                                                      " does not have enough credit");
         }
 
@@ -664,7 +664,7 @@ public class CreditCardService
 
         if (creditCard.getAvailableRebate().compareTo(rebate) < 0)
         {
-            throw new InsufficientResourcesException(
+            throw new MoinexException.InsufficientResourcesException(
                 "Credit card with id " + crcId +
                 " does not have enough rebate to pay the invoice");
         }

@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletType;
-import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -108,7 +108,7 @@ public class ChangeWalletTypeController
             WindowUtils.showSuccessDialog("Wallet type changed",
                                           "The wallet type was successfully changed.");
         }
-        catch (EntityNotFoundException | AttributeAlreadySetException e)
+        catch (EntityNotFoundException | MoinexException.AttributeAlreadySetException e)
         {
             WindowUtils.showErrorDialog("Invalid input", e.getMessage());
             return;

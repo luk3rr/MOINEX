@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.creditcard.CreditCard;
-import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.CategoryService;
 import org.moinex.services.CreditCardService;
@@ -84,7 +84,7 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                                         "Debt value must be a number");
         }
         catch (EntityNotFoundException | IllegalArgumentException |
-               InsufficientResourcesException e)
+               MoinexException.InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
         }

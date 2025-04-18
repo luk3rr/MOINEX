@@ -16,9 +16,7 @@ import org.moinex.entities.Category;
 import org.moinex.entities.wallettransaction.Transfer;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.exceptions.AttributeAlreadySetException;
-import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.wallettransaction.TransferRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.repositories.wallettransaction.WalletTransactionRepository;
@@ -81,7 +79,7 @@ public class WalletTransactionService
     {
         if (senderId.equals(receiverId))
         {
-            throw new SameSourceDestinationException(
+            throw new MoinexException.SameSourceDestinationException(
                 "Sender and receiver wallets must be different");
         }
 
@@ -108,7 +106,7 @@ public class WalletTransactionService
 
         if (senderWallet.getBalance().compareTo(amount) < 0)
         {
-            throw new InsufficientResourcesException(
+            throw new MoinexException.InsufficientResourcesException(
                 "Sender wallet does not have enough balance to transfer");
         }
 
@@ -654,7 +652,7 @@ public class WalletTransactionService
 
         if (transaction.getStatus().equals(TransactionStatus.CONFIRMED))
         {
-            throw new AttributeAlreadySetException(
+            throw new MoinexException.AttributeAlreadySetException(
                 "Transaction with id " + transactionId + " is already confirmed");
         }
 

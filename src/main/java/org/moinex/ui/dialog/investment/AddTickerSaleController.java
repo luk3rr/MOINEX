@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.Category;
 import org.moinex.entities.wallettransaction.Wallet;
-import org.moinex.exceptions.InsufficientResourcesException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.CategoryService;
 import org.moinex.services.TickerService;
 import org.moinex.services.WalletService;
@@ -105,7 +105,7 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
             WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
         }
         catch (EntityNotFoundException | IllegalArgumentException |
-               InsufficientResourcesException e)
+               MoinexException.InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error while selling ticker", e.getMessage());
         }

@@ -30,7 +30,7 @@ import org.moinex.entities.Category;
 import org.moinex.entities.wallettransaction.RecurringTransaction;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletTransaction;
-import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.wallettransaction.RecurringTransactionRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.util.Constants;
@@ -279,7 +279,7 @@ class RecurringTransactionServiceTest
         // Change the end date to a date in the past
         dailyRT.setStatus(RecurringTransactionStatus.INACTIVE);
 
-        assertThrows(AttributeAlreadySetException.class,
+        assertThrows(MoinexException.AttributeAlreadySetException.class,
                      ()
                          -> recurringTransactionService.stopRecurringTransaction(
                              dailyRT.getId()));

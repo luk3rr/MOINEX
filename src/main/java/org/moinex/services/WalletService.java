@@ -14,7 +14,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.wallettransaction.Wallet;
 import org.moinex.entities.wallettransaction.WalletType;
-import org.moinex.exceptions.AttributeAlreadySetException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.wallettransaction.TransferRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
 import org.moinex.repositories.wallettransaction.WalletTransactionRepository;
@@ -247,7 +247,7 @@ public class WalletService
 
         if (wallet.getType().getId().equals(newType.getId()))
         {
-            throw new AttributeAlreadySetException(
+            throw new MoinexException.AttributeAlreadySetException(
                 "Wallet with name " + wallet.getName() + " already has type " +
                 newType.getName());
         }

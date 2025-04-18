@@ -23,8 +23,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.wallettransaction.Transfer;
 import org.moinex.entities.wallettransaction.Wallet;
-import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.WalletService;
 import org.moinex.services.WalletTransactionService;
@@ -212,8 +211,8 @@ public class AddTransferController
             WindowUtils.showErrorDialog("Invalid transfer value",
                                         "Transfer value must be a number.");
         }
-        catch (SameSourceDestinationException | IllegalArgumentException |
-               EntityNotFoundException | InsufficientResourcesException e)
+        catch (MoinexException.SameSourceDestinationException | IllegalArgumentException |
+               EntityNotFoundException | MoinexException.InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error while creating transfer",
                                         e.getMessage());

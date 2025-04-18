@@ -17,8 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import org.json.JSONObject;
 import org.moinex.entities.investment.BrazilianMarketIndicators;
 import org.moinex.entities.investment.MarketQuotesAndCommodities;
-import org.moinex.exceptions.APIFetchException;
-import org.moinex.exceptions.ResourceAlreadyUpdatingException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.investment.BrazilianMarketIndicatorsRepository;
 import org.moinex.repositories.investment.MarketQuotesAndCommoditiesRepository;
 import org.moinex.util.APIUtils;
@@ -129,7 +128,7 @@ public class MarketService
             CompletableFuture<BrazilianMarketIndicators> failedFuture =
                 new CompletableFuture<>();
 
-            failedFuture.completeExceptionally(new ResourceAlreadyUpdatingException(
+            failedFuture.completeExceptionally(new MoinexException.ResourceAlreadyUpdatingException(
                 "Brazilian market indicators are already being updated"));
 
             return failedFuture;
@@ -182,14 +181,14 @@ public class MarketService
                 }
                 else
                 {
-                    throw new APIFetchException(
+                    throw new MoinexException.APIFetchException(
                         "Failed to fetch Brazilian market indicators");
                 }
             })
             .whenComplete((result, e) -> isBrazilianMarketIndicatorsUpdating = false)
             .exceptionally(e -> {
                 isBrazilianMarketIndicatorsUpdating = false;
-                throw new APIFetchException(
+                throw new MoinexException.APIFetchException(
                     "Failed to fetch Brazilian market indicators: " + e);
             });
     }
@@ -209,7 +208,7 @@ public class MarketService
             CompletableFuture<MarketQuotesAndCommodities> failedFuture =
                 new CompletableFuture<>();
 
-            failedFuture.completeExceptionally(new ResourceAlreadyUpdatingException(
+            failedFuture.completeExceptionally(new MoinexException.ResourceAlreadyUpdatingException(
                 "Market quotes and commodities are already being updated"));
 
             return failedFuture;
@@ -278,14 +277,14 @@ public class MarketService
                 }
                 else
                 {
-                    throw new APIFetchException(
+                    throw new MoinexException.APIFetchException(
                         "Failed to fetch market quotes and commodities");
                 }
             })
             .whenComplete((result, e) -> isMarketQuotesAndCommoditiesUpdating = false)
             .exceptionally(e -> {
                 isMarketQuotesAndCommoditiesUpdating = false;
-                throw new APIFetchException(
+                throw new MoinexException.APIFetchException(
                     "Failed to fetch market quotes and commodities" + e);
             });
     }

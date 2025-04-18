@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.CryptoExchange;
 import org.moinex.entities.investment.Ticker;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.util.WindowUtils;
@@ -131,7 +131,7 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
             WindowUtils.showErrorDialog("Invalid exchange quantity",
                                         "The quantity must be a number");
         }
-        catch (EntityNotFoundException | SameSourceDestinationException |
+        catch (EntityNotFoundException | MoinexException.SameSourceDestinationException |
                IllegalArgumentException e)
         {
             WindowUtils.showErrorDialog("Error while creating exchange",

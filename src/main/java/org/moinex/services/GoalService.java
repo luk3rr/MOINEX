@@ -15,7 +15,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.goal.Goal;
 import org.moinex.entities.wallettransaction.WalletType;
-import org.moinex.exceptions.IncompleteGoalException;
+import org.moinex.error.MoinexException;
 import org.moinex.repositories.goal.GoalRepository;
 import org.moinex.repositories.wallettransaction.TransferRepository;
 import org.moinex.repositories.wallettransaction.WalletRepository;
@@ -334,7 +334,7 @@ public class GoalService
 
         if (goal.getBalance().compareTo(goal.getTargetBalance()) < 0)
         {
-            throw new IncompleteGoalException(
+            throw new MoinexException.IncompleteGoalException(
                 "The goal has not been completed yet. The "
                 + "balance is less than the target balance. "
                 + "Deposit more money to complete the "

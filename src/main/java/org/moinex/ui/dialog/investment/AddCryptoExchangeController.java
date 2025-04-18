@@ -15,9 +15,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.entities.investment.Ticker;
-import org.moinex.exceptions.InsufficientResourcesException;
-import org.moinex.exceptions.InvalidTickerTypeException;
-import org.moinex.exceptions.SameSourceDestinationException;
+import org.moinex.error.MoinexException;
 import org.moinex.services.CalculatorService;
 import org.moinex.services.TickerService;
 import org.moinex.util.WindowUtils;
@@ -94,9 +92,9 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement
             WindowUtils.showErrorDialog("Invalid exchange quantity",
                                         "The quantity must be a number");
         }
-        catch (SameSourceDestinationException | EntityNotFoundException |
-               InvalidTickerTypeException | IllegalArgumentException |
-               InsufficientResourcesException e)
+        catch (MoinexException.SameSourceDestinationException | EntityNotFoundException |
+               MoinexException.InvalidTickerTypeException | IllegalArgumentException |
+               MoinexException.InsufficientResourcesException e)
         {
             WindowUtils.showErrorDialog("Error while creating exchange",
                                         e.getMessage());
