@@ -47,6 +47,9 @@ public class WalletTransaction extends BaseTransaction
     @Column(name = "status", nullable = false)
     private TransactionStatus status;
 
+    @Column(name = "consider_in_totals", nullable = false)
+    private boolean considerInTotals;
+
     public abstract static class WalletTransactionBuilder<
         C extends   WalletTransaction, B
             extends WalletTransactionBuilder<C, B>>
