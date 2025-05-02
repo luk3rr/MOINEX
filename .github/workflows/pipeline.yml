@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  pipeline:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +20,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Run tests with Maven
-      run: mvn clean test
+      run: mvn clean test jacoco:report
 
     - name: Cache SonarQube packages
       uses: actions/cache@v4
@@ -37,4 +37,4 @@ jobs:
     - name: Build and analyze
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=luk3rr_MOINEX
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Pcoverage -Dsonar.projectKey=luk3rr_MOINEX
