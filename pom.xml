@@ -13,10 +13,10 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <junit.jupiter.version>5.11.2</junit.jupiter.version>
-        <spring.boot.version>3.1.2</spring.boot.version>
+        <spring.boot.version>3.4.5</spring.boot.version>
         <mockito.version>5.14.2</mockito.version>
         <h2.version>2.3.232</h2.version>
-        <sqlite.version>3.41.2.1</sqlite.version>
+        <sqlite.version>3.49.1.0</sqlite.version>
         <hibernate.dialects.version>6.2.6.Final</hibernate.dialects.version>
         <javafx.version>23.0.1</javafx.version>
         <jfoenix.version>9.0.10</jfoenix.version>
@@ -29,6 +29,7 @@
         <lombok.version>1.18.36</lombok.version>
         <flyway.version>11.3.4</flyway.version>
         <jacoco.version>0.8.13</jacoco.version>
+        <jsonsmart.version>2.5.2</jsonsmart.version>
         <sonar.organization>luk3rr</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -159,6 +160,12 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-maven-plugin</artifactId>
             <version>${flyway.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.minidev/json-smart -->
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>${jsonsmart.version}</version>
         </dependency>
     </dependencies>
     <build>
