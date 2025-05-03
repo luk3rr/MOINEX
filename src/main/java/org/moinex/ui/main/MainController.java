@@ -9,7 +9,6 @@ package org.moinex.ui.main;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -42,49 +41,34 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class MainController
-{
-    @FXML
-    private VBox sidebar;
+public class MainController {
+    @FXML private VBox sidebar;
 
-    @FXML
-    private AnchorPane rootPane;
+    @FXML private AnchorPane rootPane;
 
-    @FXML
-    private HBox footbarArea;
+    @FXML private HBox footbarArea;
 
-    @FXML
-    private Button menuButton;
+    @FXML private Button menuButton;
 
-    @FXML
-    private Button homeButton;
+    @FXML private Button homeButton;
 
-    @FXML
-    private Button walletButton;
+    @FXML private Button walletButton;
 
-    @FXML
-    private Button creditCardButton;
+    @FXML private Button creditCardButton;
 
-    @FXML
-    private Button transactionButton;
+    @FXML private Button transactionButton;
 
-    @FXML
-    private Button goalsButton;
+    @FXML private Button goalsButton;
 
-    @FXML
-    private Button savingsButton;
+    @FXML private Button savingsButton;
 
-    @FXML
-    private Button importButton;
+    @FXML private Button importButton;
 
-    @FXML
-    private Button settingsButton;
+    @FXML private Button settingsButton;
 
-    @FXML
-    private AnchorPane contentArea;
+    @FXML private AnchorPane contentArea;
 
-    @FXML
-    private ImageView toggleMonetaryValuesIcon;
+    @FXML private ImageView toggleMonetaryValuesIcon;
 
     private ConfigurableApplicationContext springContext;
 
@@ -92,75 +76,91 @@ public class MainController
 
     private Pair<String, String> currentContent;
 
-    private boolean  isMenuExpanded = false;
+    private boolean isMenuExpanded = false;
     private Button[] sidebarButtons;
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @Autowired
-    public MainController(ConfigurableApplicationContext springContext, UserPreferencesService userPreferencesService) {
+    public MainController(
+            ConfigurableApplicationContext springContext,
+            UserPreferencesService userPreferencesService) {
         this.springContext = springContext;
         this.userPreferencesService = userPreferencesService;
     }
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         // Create an array with all the buttons in the sidebar
         // This is used to update the style of the selected button
         // when the user clicks on it or when the sidebar is toggled
         sidebarButtons =
-            new Button[] { menuButton,       homeButton,        walletButton,
-                           creditCardButton, transactionButton, goalsButton,
-                           savingsButton,    importButton,      settingsButton };
+                new Button[] {
+                    menuButton, homeButton, walletButton,
+                    creditCardButton, transactionButton, goalsButton,
+                    savingsButton, importButton, settingsButton
+                };
 
-        rootPane.getStylesheets().add(
-            Objects.requireNonNull(getClass().getResource(Constants.MAIN_STYLE_SHEET)).toExternalForm());
+        rootPane.getStylesheets()
+                .add(
+                        Objects.requireNonNull(getClass().getResource(Constants.MAIN_STYLE_SHEET))
+                                .toExternalForm());
 
-        footbarArea.getStylesheets().add(
-            Objects.requireNonNull(getClass().getResource(Constants.MAIN_STYLE_SHEET)).toExternalForm());
+        footbarArea
+                .getStylesheets()
+                .add(
+                        Objects.requireNonNull(getClass().getResource(Constants.MAIN_STYLE_SHEET))
+                                .toExternalForm());
 
         menuButton.setOnAction(event -> toggleMenu());
 
-        homeButton.setOnAction(event -> {
-            loadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET);
-            updateSelectedButton(homeButton);
-        });
+        homeButton.setOnAction(
+                event -> {
+                    loadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET);
+                    updateSelectedButton(homeButton);
+                });
 
-        walletButton.setOnAction(event -> {
-            loadContent(Constants.WALLET_FXML, Constants.WALLET_STYLE_SHEET);
-            updateSelectedButton(walletButton);
-        });
+        walletButton.setOnAction(
+                event -> {
+                    loadContent(Constants.WALLET_FXML, Constants.WALLET_STYLE_SHEET);
+                    updateSelectedButton(walletButton);
+                });
 
-        creditCardButton.setOnAction(event -> {
-            loadContent(Constants.CREDIT_CARD_FXML, Constants.CREDIT_CARD_STYLE_SHEET);
-            updateSelectedButton(creditCardButton);
-        });
+        creditCardButton.setOnAction(
+                event -> {
+                    loadContent(Constants.CREDIT_CARD_FXML, Constants.CREDIT_CARD_STYLE_SHEET);
+                    updateSelectedButton(creditCardButton);
+                });
 
-        transactionButton.setOnAction(event -> {
-            loadContent(Constants.TRANSACTION_FXML, Constants.TRANSACTION_STYLE_SHEET);
-            updateSelectedButton(transactionButton);
-        });
+        transactionButton.setOnAction(
+                event -> {
+                    loadContent(Constants.TRANSACTION_FXML, Constants.TRANSACTION_STYLE_SHEET);
+                    updateSelectedButton(transactionButton);
+                });
 
-        goalsButton.setOnAction(event -> {
-            loadContent(Constants.GOALS_FXML, Constants.GOALS_STYLE_SHEET);
-            updateSelectedButton(goalsButton);
-        });
+        goalsButton.setOnAction(
+                event -> {
+                    loadContent(Constants.GOALS_FXML, Constants.GOALS_STYLE_SHEET);
+                    updateSelectedButton(goalsButton);
+                });
 
-        savingsButton.setOnAction(event -> {
-            loadContent(Constants.SAVINGS_FXML, Constants.SAVINGS_STYLE_SHEET);
-            updateSelectedButton(savingsButton);
-        });
+        savingsButton.setOnAction(
+                event -> {
+                    loadContent(Constants.SAVINGS_FXML, Constants.SAVINGS_STYLE_SHEET);
+                    updateSelectedButton(savingsButton);
+                });
 
-        importButton.setOnAction(event -> {
-            loadContent(Constants.CSV_IMPORT_FXML, Constants.CSV_IMPORT_STYLE_SHEET);
-            updateSelectedButton(importButton);
-        });
+        importButton.setOnAction(
+                event -> {
+                    loadContent(Constants.CSV_IMPORT_FXML, Constants.CSV_IMPORT_STYLE_SHEET);
+                    updateSelectedButton(importButton);
+                });
 
-        settingsButton.setOnAction(event -> {
-            loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET);
-            updateSelectedButton(settingsButton);
-        });
+        settingsButton.setOnAction(
+                event -> {
+                    loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET);
+                    updateSelectedButton(settingsButton);
+                });
 
         // Load start page
         loadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET);
@@ -168,35 +168,34 @@ public class MainController
     }
 
     @FXML
-    private void handleOpenCalculator()
-    {
-        WindowUtils.openPopupWindow(Constants.CALCULATOR_FXML,
-                                    "Calculator",
-                                    springContext,
-                                    (CalculatorController controller)
-                                        -> {},
-                                    List.of(() -> {}));
+    private void handleOpenCalculator() {
+        WindowUtils.openPopupWindow(
+                Constants.CALCULATOR_FXML,
+                "Calculator",
+                springContext,
+                (CalculatorController controller) -> {},
+                List.of(() -> {}));
     }
 
     @FXML
-    private void handleOpenCalendar()
-    {
-        WindowUtils.openPopupWindow(Constants.CALENDAR_FXML,
-                                    "Calendar",
-                                    springContext,
-                                    (CalendarController controller)
-                                        -> {},
-                                    List.of(() -> {}));
+    private void handleOpenCalendar() {
+        WindowUtils.openPopupWindow(
+                Constants.CALENDAR_FXML,
+                "Calendar",
+                springContext,
+                (CalendarController controller) -> {},
+                List.of(() -> {}));
     }
 
     @FXML
-    private void handleToggleMonetaryValues()
-    {
+    private void handleToggleMonetaryValues() {
         userPreferencesService.toggleHideMonetaryValues();
 
-        toggleMonetaryValuesIcon.setImage(new Image(
-            userPreferencesService.showMonetaryValues() ? Constants.SHOW_ICON
-                                                        : Constants.HIDE_ICON));
+        toggleMonetaryValuesIcon.setImage(
+                new Image(
+                        userPreferencesService.showMonetaryValues()
+                                ? Constants.SHOW_ICON
+                                : Constants.HIDE_ICON));
 
         // Reload all the interface
         loadContent(currentContent.getKey(), currentContent.getValue());
@@ -207,19 +206,24 @@ public class MainController
      * passed as parameter
      * @param fxmlFile The path to the FXML file to be loaded
      */
-    public void loadContent(String fxmlFile, String styleSheet)
-    {
-        try
-        {
+    public void loadContent(String fxmlFile, String styleSheet) {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
-            newContent.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource(styleSheet)).toExternalForm());
+            newContent
+                    .getStylesheets()
+                    .add(
+                            Objects.requireNonNull(getClass().getResource(styleSheet))
+                                    .toExternalForm());
 
-            newContent.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource(Constants.COMMON_STYLE_SHEET)).toExternalForm());
+            newContent
+                    .getStylesheets()
+                    .add(
+                            Objects.requireNonNull(
+                                            getClass().getResource(Constants.COMMON_STYLE_SHEET))
+                                    .toExternalForm());
 
             AnchorPane.setTopAnchor(newContent, 0.0);
             AnchorPane.setRightAnchor(newContent, 0.0);
@@ -230,17 +234,13 @@ public class MainController
             contentArea.getChildren().add(newContent);
 
             currentContent = new Pair<>(fxmlFile, styleSheet);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             logger.error("Error loading content: '{}'", e.getMessage());
         }
     }
 
-    private void updateSelectedButton(Button selectedButton)
-    {
-        for (Button button : sidebarButtons)
-        {
+    private void updateSelectedButton(Button selectedButton) {
+        for (Button button : sidebarButtons) {
             button.getStyleClass().remove(Constants.SIDEBAR_SELECTED_BUTTON_STYLE);
         }
 
@@ -250,19 +250,17 @@ public class MainController
     /**
      * Toggle the visibility of the sidebar menu
      */
-    private void toggleMenu()
-    {
-        double targetWidth = isMenuExpanded ? Constants.MENU_COLLAPSED_WIDTH
-                                            : Constants.MENU_EXPANDED_WIDTH;
+    private void toggleMenu() {
+        double targetWidth =
+                isMenuExpanded ? Constants.MENU_COLLAPSED_WIDTH : Constants.MENU_EXPANDED_WIDTH;
 
         Timeline timeline = new Timeline();
 
-        KeyValue keyValueSidebarWidth =
-            new KeyValue(sidebar.prefWidthProperty(), targetWidth);
+        KeyValue keyValueSidebarWidth = new KeyValue(sidebar.prefWidthProperty(), targetWidth);
 
         KeyFrame keyFrame =
-            new KeyFrame(Duration.millis(Constants.MENU_ANIMATION_DURATION),
-                         keyValueSidebarWidth);
+                new KeyFrame(
+                        Duration.millis(Constants.MENU_ANIMATION_DURATION), keyValueSidebarWidth);
 
         timeline.getKeyFrames().add(keyFrame);
 
@@ -270,15 +268,15 @@ public class MainController
         // before the animation starts.
         // This increases the visual quality
         // of the animation
-        if (isMenuExpanded)
-        {
+        if (isMenuExpanded) {
             setButtonTextVisibility(false);
         }
 
-        timeline.setOnFinished(event -> {
-            setButtonTextVisibility(isMenuExpanded);
-            setButtonWidth(targetWidth);
-        });
+        timeline.setOnFinished(
+                event -> {
+                    setButtonTextVisibility(isMenuExpanded);
+                    setButtonWidth(targetWidth);
+                });
 
         timeline.play();
 
@@ -289,12 +287,9 @@ public class MainController
      * Set the visibility of the text of the sidebarButtons
      * @param visible True if the text should be visible, false otherwise
      */
-    private void setButtonTextVisibility(boolean visible)
-    {
-        for (Button button : sidebarButtons)
-        {
-            button.setContentDisplay(visible ? ContentDisplay.LEFT
-                                             : ContentDisplay.GRAPHIC_ONLY);
+    private void setButtonTextVisibility(boolean visible) {
+        for (Button button : sidebarButtons) {
+            button.setContentDisplay(visible ? ContentDisplay.LEFT : ContentDisplay.GRAPHIC_ONLY);
         }
     }
 
@@ -302,10 +297,8 @@ public class MainController
      * Set the width of the sidebarButtons
      * @param width The width to be set
      */
-    private void setButtonWidth(double width)
-    {
-        for (Button button : sidebarButtons)
-        {
+    private void setButtonWidth(double width) {
+        for (Button button : sidebarButtons) {
             button.setPrefWidth(width);
         }
     }

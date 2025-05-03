@@ -12,4 +12,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MarketQuotesAndCommoditiesRepository
-    extends JpaRepository<MarketQuotesAndCommodities, Long> { }
+        extends JpaRepository<MarketQuotesAndCommodities, Long> {}

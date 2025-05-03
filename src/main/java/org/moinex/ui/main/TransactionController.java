@@ -13,7 +13,6 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -64,40 +63,28 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class TransactionController
-{
-    @FXML
-    private AnchorPane monthResumeView;
+public class TransactionController {
+    @FXML private AnchorPane monthResumeView;
 
-    @FXML
-    private AnchorPane yearResumeView;
+    @FXML private AnchorPane yearResumeView;
 
-    @FXML
-    private ComboBox<YearMonth> monthResumeComboBox;
+    @FXML private ComboBox<YearMonth> monthResumeComboBox;
 
-    @FXML
-    private ComboBox<Year> yearResumeComboBox;
+    @FXML private ComboBox<Year> yearResumeComboBox;
 
-    @FXML
-    private ComboBox<TransactionType> moneyFlowComboBox;
+    @FXML private ComboBox<TransactionType> moneyFlowComboBox;
 
-    @FXML
-    private ComboBox<TransactionType> transactionsTypeComboBox;
+    @FXML private ComboBox<TransactionType> transactionsTypeComboBox;
 
-    @FXML
-    private DatePicker transactionsEndDatePicker;
+    @FXML private DatePicker transactionsEndDatePicker;
 
-    @FXML
-    private DatePicker transactionsStartDatePicker;
+    @FXML private DatePicker transactionsStartDatePicker;
 
-    @FXML
-    private TableView<WalletTransaction> transactionsTableView;
+    @FXML private TableView<WalletTransaction> transactionsTableView;
 
-    @FXML
-    private AnchorPane moneyFlowView;
+    @FXML private AnchorPane moneyFlowView;
 
-    @FXML
-    private TextField transactionsSearchField;
+    @FXML private TextField transactionsSearchField;
 
     private ConfigurableApplicationContext springContext;
 
@@ -109,8 +96,7 @@ public class TransactionController
 
     private CategoryService categoryService;
 
-    private static final Logger logger =
-        LoggerFactory.getLogger(TransactionController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     /**
      * Constructor
@@ -120,19 +106,19 @@ public class TransactionController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public TransactionController(WalletTransactionService walletTransactionService,
-                                 CreditCardService        creditCardService,
-                                 CategoryService          categoryService, ConfigurableApplicationContext springContext)
-    {
+    public TransactionController(
+            WalletTransactionService walletTransactionService,
+            CreditCardService creditCardService,
+            CategoryService categoryService,
+            ConfigurableApplicationContext springContext) {
         this.walletTransactionService = walletTransactionService;
-        this.creditCardService        = creditCardService;
-        this.categoryService          = categoryService;
+        this.creditCardService = creditCardService;
+        this.categoryService = categoryService;
         this.springContext = springContext;
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         configureTableView();
 
         populateMonthResumeComboBox();
@@ -147,7 +133,7 @@ public class TransactionController
 
         // Select the default values
         monthResumeComboBox.setValue(
-            YearMonth.of(currentDate.getYear(), currentDate.getMonthValue()));
+                YearMonth.of(currentDate.getYear(), currentDate.getMonthValue()));
 
         yearResumeComboBox.setValue(Year.of(currentDate.getYear()));
 
@@ -158,8 +144,9 @@ public class TransactionController
         // Set the start and end date pickers to the first and last day of the current
         // month
         LocalDateTime firstDayOfMonth = currentDate.withDayOfMonth(1);
-        LocalDateTime lastDayOfMonth  = currentDate.withDayOfMonth(
-            currentDate.getMonth().length(currentDate.toLocalDate().isLeapYear()));
+        LocalDateTime lastDayOfMonth =
+                currentDate.withDayOfMonth(
+                        currentDate.getMonth().length(currentDate.toLocalDate().isLeapYear()));
 
         transactionsStartDatePicker.setValue(firstDayOfMonth.toLocalDate());
         transactionsEndDatePicker.setValue(lastDayOfMonth.toLocalDate());
@@ -177,90 +164,85 @@ public class TransactionController
 
         moneyFlowComboBox.setOnAction(event -> updateMoneyFlow());
 
-        transactionsTypeComboBox.setOnAction(
-            event -> updateTransactionTableView());
+        transactionsTypeComboBox.setOnAction(event -> updateTransactionTableView());
 
-        transactionsStartDatePicker.setOnAction(
-            event -> updateTransactionTableView());
+        transactionsStartDatePicker.setOnAction(event -> updateTransactionTableView());
 
-        transactionsEndDatePicker.setOnAction(
-            event -> updateTransactionTableView());
+        transactionsEndDatePicker.setOnAction(event -> updateTransactionTableView());
 
         // Add listener to the search field
-        transactionsSearchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> updateTransactionTableView());
+        transactionsSearchField
+                .textProperty()
+                .addListener((observable, oldValue, newValue) -> updateTransactionTableView());
     }
 
     @FXML
-    private void handleAddIncome()
-    {
-        WindowUtils.openModalWindow(Constants.ADD_INCOME_FXML,
-                                    "Add new income",
-                                    springContext,
-                                    (AddIncomeController controller)
-                                        -> {},
-                                    List.of(() -> {
-                                        updateMonthResume();
-                                        updateYearResume();
-                                        updateTransactionTableView();
-                                        updateMoneyFlow();
-                                    }));
+    private void handleAddIncome() {
+        WindowUtils.openModalWindow(
+                Constants.ADD_INCOME_FXML,
+                "Add new income",
+                springContext,
+                (AddIncomeController controller) -> {},
+                List.of(
+                        () -> {
+                            updateMonthResume();
+                            updateYearResume();
+                            updateTransactionTableView();
+                            updateMoneyFlow();
+                        }));
     }
 
     @FXML
-    private void handleAddExpense()
-    {
-        WindowUtils.openModalWindow(Constants.ADD_EXPENSE_FXML,
-                                    "Add new expense",
-                                    springContext,
-                                    (AddExpenseController controller)
-                                        -> {},
-                                    List.of(() -> {
-                                        updateMonthResume();
-                                        updateYearResume();
-                                        updateTransactionTableView();
-                                        updateMoneyFlow();
-                                    }));
+    private void handleAddExpense() {
+        WindowUtils.openModalWindow(
+                Constants.ADD_EXPENSE_FXML,
+                "Add new expense",
+                springContext,
+                (AddExpenseController controller) -> {},
+                List.of(
+                        () -> {
+                            updateMonthResume();
+                            updateYearResume();
+                            updateTransactionTableView();
+                            updateMoneyFlow();
+                        }));
     }
 
     @FXML
-    private void handleEditTransaction()
-    {
+    private void handleEditTransaction() {
         WalletTransaction selectedTransaction =
-            transactionsTableView.getSelectionModel().getSelectedItem();
+                transactionsTableView.getSelectionModel().getSelectedItem();
 
-        if (selectedTransaction == null)
-        {
-            WindowUtils.showInformationDialog("No transaction selected",
-                                              "Please select a transaction to edit.");
+        if (selectedTransaction == null) {
+            WindowUtils.showInformationDialog(
+                    "No transaction selected", "Please select a transaction to edit.");
 
             return;
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_TRANSACTION_FXML,
-            "Edit transaction",
-            springContext,
-            (EditTransactionController controller)
-                -> controller.setTransaction(selectedTransaction),
-            List.of(() -> {
-                updateMonthResume();
-                updateYearResume();
-                updateTransactionTableView();
-                updateMoneyFlow();
-            }));
+                Constants.EDIT_TRANSACTION_FXML,
+                "Edit transaction",
+                springContext,
+                (EditTransactionController controller) ->
+                        controller.setTransaction(selectedTransaction),
+                List.of(
+                        () -> {
+                            updateMonthResume();
+                            updateYearResume();
+                            updateTransactionTableView();
+                            updateMoneyFlow();
+                        }));
     }
 
     @FXML
-    private void handleDeleteTransaction()
-    {
+    private void handleDeleteTransaction() {
         WalletTransaction selectedTransaction =
-            transactionsTableView.getSelectionModel().getSelectedItem();
+                transactionsTableView.getSelectionModel().getSelectedItem();
 
-        if (selectedTransaction == null)
-        {
-            WindowUtils.showInformationDialog("No transaction selected",
-                                              "Please select a transaction to remove.");
+        if (selectedTransaction == null) {
+            WindowUtils.showInformationDialog(
+                    "No transaction selected", "Please select a transaction to remove.");
 
             return;
         }
@@ -268,60 +250,54 @@ public class TransactionController
         // Create a message to show to the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(selectedTransaction.getDescription())
-            .append("\n")
-            .append("Amount: ")
-            .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
-            .append("\n")
-            .append("Date: ")
-            .append(selectedTransaction.getDate().format(
-                Constants.DATE_FORMATTER_WITH_TIME))
-            .append("\n")
-            .append("Status: ")
-            .append(selectedTransaction.getStatus().toString())
-            .append("\n")
-            .append("Wallet: ")
-            .append(selectedTransaction.getWallet().getName())
-            .append("\n")
-            .append("Wallet balance: ")
-            .append(
-                UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
-            .append("\n")
-            .append("Wallet balance after deletion: ");
+                .append(selectedTransaction.getDescription())
+                .append("\n")
+                .append("Amount: ")
+                .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
+                .append("\n")
+                .append("Date: ")
+                .append(selectedTransaction.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+                .append("\n")
+                .append("Status: ")
+                .append(selectedTransaction.getStatus().toString())
+                .append("\n")
+                .append("Wallet: ")
+                .append(selectedTransaction.getWallet().getName())
+                .append("\n")
+                .append("Wallet balance: ")
+                .append(UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
+                .append("\n")
+                .append("Wallet balance after deletion: ");
 
-        if (selectedTransaction.getStatus().equals(TransactionStatus.CONFIRMED))
-        {
-            if (selectedTransaction.getType().equals(TransactionType.EXPENSE))
-            {
-                message
-                    .append(UIUtils.formatCurrency(
-                        selectedTransaction.getWallet().getBalance().add(
-                            selectedTransaction.getAmount())))
-                    .append("\n");
+        if (selectedTransaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
+            if (selectedTransaction.getType().equals(TransactionType.EXPENSE)) {
+                message.append(
+                                UIUtils.formatCurrency(
+                                        selectedTransaction
+                                                .getWallet()
+                                                .getBalance()
+                                                .add(selectedTransaction.getAmount())))
+                        .append("\n");
+            } else {
+                message.append(
+                                UIUtils.formatCurrency(
+                                        selectedTransaction
+                                                .getWallet()
+                                                .getBalance()
+                                                .subtract(selectedTransaction.getAmount())))
+                        .append("\n");
             }
-            else
-            {
-                message
-                    .append(UIUtils.formatCurrency(
-                        selectedTransaction.getWallet().getBalance().subtract(
-                            selectedTransaction.getAmount())))
+        } else {
+            message.append(UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
                     .append("\n");
-            }
-        }
-        else
-        {
-            message
-                .append(UIUtils.formatCurrency(
-                    selectedTransaction.getWallet().getBalance()))
-                .append("\n");
         }
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Are you sure you want to remove this " +
-                    selectedTransaction.getType().toString().toLowerCase() + "?",
-                message.toString()))
-        {
+                "Are you sure you want to remove this "
+                        + selectedTransaction.getType().toString().toLowerCase()
+                        + "?",
+                message.toString())) {
             walletTransactionService.deleteTransaction(selectedTransaction.getId());
 
             updateMonthResume();
@@ -332,40 +308,39 @@ public class TransactionController
     }
 
     @FXML
-    private void handleRecurringTransactions()
-    {
-        WindowUtils.openModalWindow(Constants.RECURRING_TRANSACTIONS_FXML,
-                                    "Recurring transactions",
-                                    springContext,
-                                    (RecurringTransactionController controller)
-                                        -> {},
-                                    List.of(() -> {
-                                        updateMonthResume();
-                                        updateYearResume();
-                                        updateTransactionTableView();
-                                        updateMoneyFlow();
-                                    }));
+    private void handleRecurringTransactions() {
+        WindowUtils.openModalWindow(
+                Constants.RECURRING_TRANSACTIONS_FXML,
+                "Recurring transactions",
+                springContext,
+                (RecurringTransactionController controller) -> {},
+                List.of(
+                        () -> {
+                            updateMonthResume();
+                            updateYearResume();
+                            updateTransactionTableView();
+                            updateMoneyFlow();
+                        }));
     }
 
     @FXML
-    private void handleManageCategories()
-    {
-        WindowUtils.openModalWindow(Constants.MANAGE_CATEGORY_FXML,
-                                    "Manage categories",
-                                    springContext,
-                                    (ManageCategoryController controller)
-                                        -> {},
-                                    List.of(() -> {
-                                        updateTransactionTableView();
-                                        updateMoneyFlow();
-                                    }));
+    private void handleManageCategories() {
+        WindowUtils.openModalWindow(
+                Constants.MANAGE_CATEGORY_FXML,
+                "Manage categories",
+                springContext,
+                (ManageCategoryController controller) -> {},
+                List.of(
+                        () -> {
+                            updateTransactionTableView();
+                            updateMoneyFlow();
+                        }));
     }
 
     /**
      * Update the transaction table view
      */
-    private void updateTransactionTableView()
-    {
+    private void updateTransactionTableView() {
         // Get the search text
         String similarTextOrId = transactionsSearchField.getText().toLowerCase();
 
@@ -381,42 +356,42 @@ public class TransactionController
         // Fetch all transactions within the selected range and filter by transaction
         // type.
         // If the transaction type is null, all transactions are fetched
-        if (similarTextOrId.isEmpty())
-        {
+        if (similarTextOrId.isEmpty()) {
             walletTransactionService
-                .getNonArchivedTransactionsBetweenDates(startDate, endDate)
-                .stream()
-                .filter(t
-                        -> selectedTransactionType == null ||
-                               t.getType().equals(selectedTransactionType))
-                .forEach(transactionsTableView.getItems()::add);
-        }
-        else
-        {
+                    .getNonArchivedTransactionsBetweenDates(startDate, endDate)
+                    .stream()
+                    .filter(
+                            t ->
+                                    selectedTransactionType == null
+                                            || t.getType().equals(selectedTransactionType))
+                    .forEach(transactionsTableView.getItems()::add);
+        } else {
             walletTransactionService
-                .getNonArchivedTransactionsBetweenDates(startDate, endDate)
-                .stream()
-                .filter(t
-                        -> selectedTransactionType == null ||
-                               t.getType().equals(selectedTransactionType))
-                .filter(t -> {
-                    String description = t.getDescription().toLowerCase();
-                    String id          = t.getId().toString();
-                    String category    = t.getCategory().getName().toLowerCase();
-                    String wallet      = t.getWallet().getName().toLowerCase();
-                    String amount      = t.getAmount().toString();
-                    String type        = t.getType().toString().toLowerCase();
-                    String status      = t.getStatus().toString().toLowerCase();
+                    .getNonArchivedTransactionsBetweenDates(startDate, endDate)
+                    .stream()
+                    .filter(
+                            t ->
+                                    selectedTransactionType == null
+                                            || t.getType().equals(selectedTransactionType))
+                    .filter(
+                            t -> {
+                                String description = t.getDescription().toLowerCase();
+                                String id = t.getId().toString();
+                                String category = t.getCategory().getName().toLowerCase();
+                                String wallet = t.getWallet().getName().toLowerCase();
+                                String amount = t.getAmount().toString();
+                                String type = t.getType().toString().toLowerCase();
+                                String status = t.getStatus().toString().toLowerCase();
 
-                    return description.contains(similarTextOrId) ||
-                        id.contains(similarTextOrId) ||
-                        category.contains(similarTextOrId) ||
-                        wallet.contains(similarTextOrId) ||
-                        amount.contains(similarTextOrId) ||
-                        type.contains(similarTextOrId) ||
-                        status.contains(similarTextOrId);
-                })
-                .forEach(transactionsTableView.getItems()::add);
+                                return description.contains(similarTextOrId)
+                                        || id.contains(similarTextOrId)
+                                        || category.contains(similarTextOrId)
+                                        || wallet.contains(similarTextOrId)
+                                        || amount.contains(similarTextOrId)
+                                        || type.contains(similarTextOrId)
+                                        || status.contains(similarTextOrId);
+                            })
+                    .forEach(transactionsTableView.getItems()::add);
         }
 
         transactionsTableView.refresh();
@@ -425,14 +400,13 @@ public class TransactionController
     /**
      * Update the money flow bar chart
      */
-    private void updateMoneyFlow()
-    {
+    private void updateMoneyFlow() {
         // Get the selected transaction type
         TransactionType selectedTransactionType = moneyFlowComboBox.getValue();
 
         CategoryAxis categoryAxis = new CategoryAxis();
-        NumberAxis   numberAxis   = new NumberAxis();
-        moneyFlowStackedBarChart  = new StackedBarChart<>(categoryAxis, numberAxis);
+        NumberAxis numberAxis = new NumberAxis();
+        moneyFlowStackedBarChart = new StackedBarChart<>(categoryAxis, numberAxis);
 
         moneyFlowStackedBarChart.setVerticalGridLinesVisible(false);
         moneyFlowView.getChildren().clear();
@@ -445,59 +419,56 @@ public class TransactionController
 
         moneyFlowStackedBarChart.getData().clear();
 
-        LocalDateTime     currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter   = DateTimeFormatter.ofPattern("MMM/yy");
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
-        List<Category> categories =
-            categoryService.getNonArchivedCategoriesOrderedByName();
+        List<Category> categories = categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
 
         // Loop through the last few months
-        for (int i = 0; i < Constants.XYBAR_CHART_MONTHS; i++)
-        {
+        for (int i = 0; i < Constants.XYBAR_CHART_MONTHS; i++) {
             // Get the date for the current month
-            LocalDateTime date =
-                currentDate.minusMonths(Constants.XYBAR_CHART_MONTHS - i - 1L);
+            LocalDateTime date = currentDate.minusMonths(Constants.XYBAR_CHART_MONTHS - i - 1L);
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
 
             // Get confirmed transactions for the month
             List<WalletTransaction> transactions =
-                walletTransactionService.getNonArchivedConfirmedTransactionsByMonth(
-                    date.getMonthValue(),
-                    date.getYear());
+                    walletTransactionService.getNonArchivedConfirmedTransactionsByMonth(
+                            date.getMonthValue(), date.getYear());
 
             // Get paid credit card payments for the month
             // Only get paid payments if the selected transaction type is expense
             // Otherwise, create an empty list
             List<CreditCardPayment> creditCardPayments =
-                selectedTransactionType.equals(TransactionType.EXPENSE)
-                    ? creditCardService.getAllPaidPaymentsByMonth(date.getMonthValue(),
-                                                                  date.getYear())
-                    : new ArrayList<>();
+                    selectedTransactionType.equals(TransactionType.EXPENSE)
+                            ? creditCardService.getAllPaidPaymentsByMonth(
+                                    date.getMonthValue(), date.getYear())
+                            : new ArrayList<>();
 
             // Calculate total for each category
-            for (Category category : categories)
-            {
+            for (Category category : categories) {
                 BigDecimal totalWalletTransaction =
-                    transactions.stream()
-                        .filter(t -> t.getType().equals(selectedTransactionType))
-                        .filter(t -> t.getCategory().getId().equals(category.getId()))
-                        .map(WalletTransaction::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        transactions.stream()
+                                .filter(t -> t.getType().equals(selectedTransactionType))
+                                .filter(t -> t.getCategory().getId().equals(category.getId()))
+                                .map(WalletTransaction::getAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal totalCreditCardPayment =
-                    creditCardPayments.stream()
-                        .filter(p
-                                -> p.getCreditCardDebt().getCategory().getId().equals(
-                                    category.getId()))
-                        .map(CreditCardPayment::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        creditCardPayments.stream()
+                                .filter(
+                                        p ->
+                                                p.getCreditCardDebt()
+                                                        .getCategory()
+                                                        .getId()
+                                                        .equals(category.getId()))
+                                .map(CreditCardPayment::getAmount)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal total = totalWalletTransaction.add(totalCreditCardPayment);
 
                 // Store total if it's greater than zero
-                if (total.compareTo(BigDecimal.ZERO) > 0)
-                {
+                if (total.compareTo(BigDecimal.ZERO) > 0) {
                     monthlyTotals.putIfAbsent(yearMonth, new LinkedHashMap<>());
                     monthlyTotals.get(yearMonth).put(category, total.doubleValue());
                 }
@@ -505,93 +476,89 @@ public class TransactionController
         }
 
         // Add series to the chart
-        for (Category category : categories)
-        {
+        for (Category category : categories) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName(category.getName());
 
             // Loop through the months in the order they were added
-            for (YearMonth yearMonth : monthlyTotals.keySet())
-            {
+            for (YearMonth yearMonth : monthlyTotals.keySet()) {
                 Double total =
-                    monthlyTotals.getOrDefault(yearMonth, new LinkedHashMap<>())
-                        .getOrDefault(category, 0.0);
+                        monthlyTotals
+                                .getOrDefault(yearMonth, new LinkedHashMap<>())
+                                .getOrDefault(category, 0.0);
 
                 // Add total to the series if it's greater than zero
-                if (total > 0)
-                {
-                    series.getData().add(
-                        new XYChart.Data<>(yearMonth.format(formatter), total));
-                }
-                else
-                {
+                if (total > 0) {
+                    series.getData().add(new XYChart.Data<>(yearMonth.format(formatter), total));
+                } else {
                     // Add zero value to keep the structure and order of the series
-                    series.getData().add(
-                        new XYChart.Data<>(yearMonth.format(formatter), 0.0));
+                    series.getData().add(new XYChart.Data<>(yearMonth.format(formatter), 0.0));
                 }
             }
 
             // Only add a series to the chart if it has data greater than zero
-            if (series.getData().stream().anyMatch(
-                    data -> (Double)data.getYValue() > 0))
-            {
+            if (series.getData().stream().anyMatch(data -> (Double) data.getYValue() > 0)) {
                 moneyFlowStackedBarChart.getData().add(series);
             }
         }
 
         // Calculate the maximum total for each month
-        Double maxTotal = monthlyTotals.values()
-                              .stream()
-                              .map(monthData
-                                   -> monthData.values()
-                                          .stream()
-                                          .mapToDouble(Double::doubleValue)
-                                          .sum())
-                              .max(Double::compare)
-                              .orElse(0.0);
+        Double maxTotal =
+                monthlyTotals.values().stream()
+                        .map(
+                                monthData ->
+                                        monthData.values().stream()
+                                                .mapToDouble(Double::doubleValue)
+                                                .sum())
+                        .max(Double::compare)
+                        .orElse(0.0);
 
         // Set the Y-axis properties only if maxTotal is greater than 0
         Animation.setDynamicYAxisBounds(numberAxis, maxTotal);
 
-        numberAxis.setTickLabelFormatter(new StringConverter<>() {
-            @Override
-            public String toString(Number value) {
-                return UIUtils.formatCurrency(value);
-            }
+        numberAxis.setTickLabelFormatter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(Number value) {
+                        return UIUtils.formatCurrency(value);
+                    }
 
-            @Override
-            public Number fromString(String string) {
-                return 0;
-            }
-        });
+                    @Override
+                    public Number fromString(String string) {
+                        return 0;
+                    }
+                });
 
-        for (XYChart.Series<String, Number> series : moneyFlowStackedBarChart.getData())
-        {
-            for (XYChart.Data<String, Number> data : series.getData())
-            {
+        for (XYChart.Series<String, Number> series : moneyFlowStackedBarChart.getData()) {
+            for (XYChart.Data<String, Number> data : series.getData()) {
                 // Calculate the total for the month to find the percentage
                 YearMonth yearMonth = YearMonth.parse(data.getXValue(), formatter);
-                Double    monthTotal =
-                    monthlyTotals.getOrDefault(yearMonth, new LinkedHashMap<>())
-                        .values()
-                        .stream()
-                        .mapToDouble(Double::doubleValue)
-                        .sum();
+                Double monthTotal =
+                        monthlyTotals
+                                .getOrDefault(yearMonth, new LinkedHashMap<>())
+                                .values()
+                                .stream()
+                                .mapToDouble(Double::doubleValue)
+                                .sum();
 
                 // Calculate the percentage
-                Double value      = (Double)data.getYValue();
+                Double value = (Double) data.getYValue();
                 Double percentage = (monthTotal > 0) ? (value / monthTotal) * 100 : 0;
 
                 // Add tooltip with value and percentage
                 UIUtils.addTooltipToXYChartNode(
-                    data.getNode(),
-                    series.getName() + ": " + UIUtils.formatCurrency(value) + " (" +
-                        UIUtils.formatPercentage(percentage) +
-                        ")\nTotal: " + UIUtils.formatCurrency(monthTotal));
+                        data.getNode(),
+                        series.getName()
+                                + ": "
+                                + UIUtils.formatCurrency(value)
+                                + " ("
+                                + UIUtils.formatPercentage(percentage)
+                                + ")\nTotal: "
+                                + UIUtils.formatCurrency(monthTotal));
 
                 // Animate the data after setting up the tooltip
-                Animation.stackedXYChartAnimation(Collections.singletonList(data),
-                                                  Collections.singletonList(value));
+                Animation.stackedXYChartAnimation(
+                        Collections.singletonList(data), Collections.singletonList(value));
             }
         }
     }
@@ -599,19 +566,20 @@ public class TransactionController
     /**
      * Update the year resume view
      */
-    private void updateYearResume()
-    {
+    private void updateYearResume() {
         Year selectedYear = yearResumeComboBox.getValue();
 
-        try
-        {
-            FXMLLoader loader =
-                new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
-            newContent.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource(Constants.COMMON_STYLE_SHEET)).toExternalForm());
+            newContent
+                    .getStylesheets()
+                    .add(
+                            Objects.requireNonNull(
+                                            getClass().getResource(Constants.COMMON_STYLE_SHEET))
+                                    .toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
             resumePaneController.updateResumePane(selectedYear.getValue());
@@ -623,9 +591,7 @@ public class TransactionController
 
             yearResumeView.getChildren().clear();
             yearResumeView.getChildren().add(newContent);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error updating year resume: {}", e.getMessage());
         }
     }
@@ -633,23 +599,24 @@ public class TransactionController
     /**
      * Update the month resume view
      */
-    private void updateMonthResume()
-    {
+    private void updateMonthResume() {
         YearMonth selectedYearMonth = monthResumeComboBox.getValue();
 
-        try
-        {
-            FXMLLoader loader =
-                new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
-            newContent.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource(Constants.COMMON_STYLE_SHEET)).toExternalForm());
+            newContent
+                    .getStylesheets()
+                    .add(
+                            Objects.requireNonNull(
+                                            getClass().getResource(Constants.COMMON_STYLE_SHEET))
+                                    .toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
-            resumePaneController.updateResumePane(selectedYearMonth.getMonthValue(),
-                                                  selectedYearMonth.getYear());
+            resumePaneController.updateResumePane(
+                    selectedYearMonth.getMonthValue(), selectedYearMonth.getYear());
 
             AnchorPane.setTopAnchor(newContent, 0.0);
             AnchorPane.setBottomAnchor(newContent, 0.0);
@@ -658,9 +625,7 @@ public class TransactionController
 
             monthResumeView.getChildren().clear();
             monthResumeView.getChildren().add(newContent);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error updating month resume: {}", e.getMessage());
         }
     }
@@ -669,28 +634,25 @@ public class TransactionController
      * Populate the year combo box with the years between the oldest transaction
      * date and the current date
      */
-    private void populateYearComboBox()
-    {
-        LocalDateTime oldestWalletTransaction =
-            walletTransactionService.getOldestTransactionDate();
+    private void populateYearComboBox() {
+        LocalDateTime oldestWalletTransaction = walletTransactionService.getOldestTransactionDate();
         LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
 
-        LocalDateTime oldest = oldestCreditCard.isBefore(oldestWalletTransaction)
-                                   ? oldestCreditCard
-                                   : oldestWalletTransaction;
+        LocalDateTime oldest =
+                oldestCreditCard.isBefore(oldestWalletTransaction)
+                        ? oldestCreditCard
+                        : oldestWalletTransaction;
 
-        LocalDate youngest =
-            LocalDate.now().plusYears(Constants.YEAR_RESUME_FUTURE_YEARS);
+        LocalDate youngest = LocalDate.now().plusYears(Constants.YEAR_RESUME_FUTURE_YEARS);
 
         // Generate a list of Year objects from the oldest transaction date to the
         // current date
-        Year startYear   = Year.from(oldest);
+        Year startYear = Year.from(oldest);
         Year currentYear = Year.from(youngest);
 
         // Generate the list of years between the oldest and the current date
         List<Year> years = new ArrayList<>();
-        while (!startYear.isAfter(currentYear))
-        {
+        while (!startYear.isAfter(currentYear)) {
             years.add(currentYear);
             currentYear = currentYear.minusYears(1);
         }
@@ -700,29 +662,28 @@ public class TransactionController
         yearResumeComboBox.setItems(yearList);
 
         // Custom string converter to format the Year as "Year"
-        yearResumeComboBox.setConverter(new StringConverter<>() {
-            private final DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("yyyy");
+        yearResumeComboBox.setConverter(
+                new StringConverter<>() {
+                    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
 
-            @Override
-            public String toString(Year year) {
-                return year != null ? year.format(formatter) : "";
-            }
+                    @Override
+                    public String toString(Year year) {
+                        return year != null ? year.format(formatter) : "";
+                    }
 
-            @Override
-            public Year fromString(String string) {
-                return Year.parse(string, formatter);
-            }
-        });
+                    @Override
+                    public Year fromString(String string) {
+                        return Year.parse(string, formatter);
+                    }
+                });
     }
 
     /**
      * Populate the transaction type combo box with the available transaction types
      */
-    private void populateTransactionTypeComboBox()
-    {
+    private void populateTransactionTypeComboBox() {
         ObservableList<TransactionType> transactionTypes =
-            FXCollections.observableArrayList(TransactionType.values());
+                FXCollections.observableArrayList(TransactionType.values());
 
         moneyFlowComboBox.setItems(transactionTypes);
 
@@ -730,138 +691,133 @@ public class TransactionController
         // Add 'All' option to the transaction type combo box
         // All is the first element in the list and is represented by a null value
         ObservableList<TransactionType> transactionTypesWithNull =
-            FXCollections.observableArrayList(TransactionType.values());
+                FXCollections.observableArrayList(TransactionType.values());
         transactionTypesWithNull.addFirst(null);
 
         transactionsTypeComboBox.setItems(transactionTypesWithNull);
 
         // Custom string converter to format the TransactionType as
         // "TransactionType"
-        moneyFlowComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(TransactionType transactionType) {
-                return transactionType != null ? transactionType.toString() : "";
-            }
+        moneyFlowComboBox.setConverter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(TransactionType transactionType) {
+                        return transactionType != null ? transactionType.toString() : "";
+                    }
 
-            @Override
-            public TransactionType fromString(String string) {
-                return TransactionType.valueOf(string);
-            }
-        });
+                    @Override
+                    public TransactionType fromString(String string) {
+                        return TransactionType.valueOf(string);
+                    }
+                });
 
-        transactionsTypeComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(TransactionType transactionType) {
-                return transactionType != null ? transactionType.toString()
-                        : "ALL"; // Show "All" instead of null
-            }
+        transactionsTypeComboBox.setConverter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(TransactionType transactionType) {
+                        return transactionType != null
+                                ? transactionType.toString()
+                                : "ALL"; // Show "All" instead of null
+                    }
 
-            @Override
-            public TransactionType fromString(String string) {
-                return string.equals("ALL")
-                        ? null
-                        : TransactionType.valueOf(
-                        string); // Return null if "All" is selected
-            }
-        });
+                    @Override
+                    public TransactionType fromString(String string) {
+                        return string.equals("ALL")
+                                ? null
+                                : TransactionType.valueOf(
+                                        string); // Return null if "All" is selected
+                    }
+                });
     }
 
     /**
      * Populate the month resume combo box with the months between the oldest
      * transaction date and the current date
      */
-    private void populateMonthResumeComboBox()
-    {
-        LocalDateTime oldestWalletTransaction =
-            walletTransactionService.getOldestTransactionDate();
+    private void populateMonthResumeComboBox() {
+        LocalDateTime oldestWalletTransaction = walletTransactionService.getOldestTransactionDate();
 
         LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
 
-        LocalDateTime oldest = oldestCreditCard.isBefore(oldestWalletTransaction)
-                                   ? oldestCreditCard
-                                   : oldestWalletTransaction;
+        LocalDateTime oldest =
+                oldestCreditCard.isBefore(oldestWalletTransaction)
+                        ? oldestCreditCard
+                        : oldestWalletTransaction;
 
-        LocalDate future =
-            LocalDate.now().plusMonths(Constants.MONTH_RESUME_FUTURE_MONTHS);
+        LocalDate future = LocalDate.now().plusMonths(Constants.MONTH_RESUME_FUTURE_MONTHS);
 
         // Generate a list of YearMonth objects from the oldest transaction date to
         // the current date
-        YearMonth startMonth   = YearMonth.from(oldest);
+        YearMonth startMonth = YearMonth.from(oldest);
         YearMonth currentMonth = YearMonth.from(future);
 
         // Generate the list of months between the oldest and the current date
         List<YearMonth> months = new ArrayList<>();
-        while (!startMonth.isAfter(currentMonth))
-        {
+        while (!startMonth.isAfter(currentMonth)) {
             months.add(currentMonth);
             currentMonth = currentMonth.minusMonths(1);
         }
 
-        ObservableList<YearMonth> monthYearList =
-            FXCollections.observableArrayList(months);
+        ObservableList<YearMonth> monthYearList = FXCollections.observableArrayList(months);
         monthResumeComboBox.setItems(monthYearList);
 
         // Custom string converter to format the YearMonth as "Month/Year"
-        monthResumeComboBox.setConverter(new StringConverter<>() {
-            private final DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("yyyy MMM");
+        monthResumeComboBox.setConverter(
+                new StringConverter<>() {
+                    private final DateTimeFormatter formatter =
+                            DateTimeFormatter.ofPattern("yyyy MMM");
 
-            @Override
-            public String toString(YearMonth yearMonth) {
-                return yearMonth != null ? yearMonth.format(formatter) : "";
-            }
+                    @Override
+                    public String toString(YearMonth yearMonth) {
+                        return yearMonth != null ? yearMonth.format(formatter) : "";
+                    }
 
-            @Override
-            public YearMonth fromString(String string) {
-                return YearMonth.parse(string, formatter);
-            }
-        });
+                    @Override
+                    public YearMonth fromString(String string) {
+                        return YearMonth.parse(string, formatter);
+                    }
+                });
     }
 
     /**
      * Configure the table view columns
      */
-    private void configureTableView()
-    {
+    private void configureTableView() {
         TableColumn<WalletTransaction, Long> idColumn = getWalletTransactionLongTableColumn();
 
-        TableColumn<WalletTransaction, String> categoryColumn =
-            new TableColumn<>("Category");
+        TableColumn<WalletTransaction, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(param.getValue().getCategory().getName()));
+                param -> new SimpleStringProperty(param.getValue().getCategory().getName()));
 
         TableColumn<WalletTransaction, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getType().name()));
+                param -> new SimpleStringProperty(param.getValue().getType().name()));
 
-        TableColumn<WalletTransaction, String> statusColumn =
-            new TableColumn<>("Status");
+        TableColumn<WalletTransaction, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getStatus().name()));
+                param -> new SimpleStringProperty(param.getValue().getStatus().name()));
 
         TableColumn<WalletTransaction, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(
-                param.getValue().getDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
+                param ->
+                        new SimpleStringProperty(
+                                param.getValue()
+                                        .getDate()
+                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
 
-        TableColumn<WalletTransaction, String> amountColumn =
-            new TableColumn<>("Amount");
+        TableColumn<WalletTransaction, String> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
-            param
-            -> new SimpleObjectProperty<>(
-                UIUtils.formatCurrency(param.getValue().getAmount())));
+                param ->
+                        new SimpleObjectProperty<>(
+                                UIUtils.formatCurrency(param.getValue().getAmount())));
 
-        TableColumn<WalletTransaction, String> descriptionColumn =
-            new TableColumn<>("Description");
+        TableColumn<WalletTransaction, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getDescription()));
+                param -> new SimpleStringProperty(param.getValue().getDescription()));
 
-        TableColumn<WalletTransaction, String> walletNameColumn =
-            new TableColumn<>("Wallet");
+        TableColumn<WalletTransaction, String> walletNameColumn = new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
+                param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
 
         transactionsTableView.getColumns().add(idColumn);
         transactionsTableView.getColumns().add(descriptionColumn);
@@ -875,24 +831,25 @@ public class TransactionController
 
     private static TableColumn<WalletTransaction, Long> getWalletTransactionLongTableColumn() {
         TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Long item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                } else {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                    // ensure the text is centered
-                }
-            }
-        });
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Long item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                    // ensure the text is centered
+                                }
+                            }
+                        });
         return idColumn;
     }
 }

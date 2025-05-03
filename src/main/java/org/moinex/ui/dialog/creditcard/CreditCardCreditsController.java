@@ -31,13 +31,10 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class CreditCardCreditsController
-{
-    @FXML
-    private TableView<CreditCardCredit> creditCardCreditsTableView;
+public class CreditCardCreditsController {
+    @FXML private TableView<CreditCardCredit> creditCardCreditsTableView;
 
-    @FXML
-    private TextField searchField;
+    @FXML private TextField searchField;
 
     private ConfigurableApplicationContext springContext;
 
@@ -51,15 +48,14 @@ public class CreditCardCreditsController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public CreditCardCreditsController(CreditCardService creditCardService, ConfigurableApplicationContext springContext)
-    {
+    public CreditCardCreditsController(
+            CreditCardService creditCardService, ConfigurableApplicationContext springContext) {
         this.creditCardService = creditCardService;
         this.springContext = springContext;
     }
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         loadCreditCardCreditsFromDatabase();
 
         configureTableView();
@@ -67,84 +63,79 @@ public class CreditCardCreditsController
         updateCreditCardCreditsTableView();
 
         // Add listener to the search field
-        searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> updateCreditCardCreditsTableView());
+        searchField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> updateCreditCardCreditsTableView());
     }
 
     @FXML
-    private void handleDelete()
-    {
+    private void handleDelete() {
         // TODO: Implement this method
     }
 
     @FXML
-    private void handleAdd()
-    {
-        WindowUtils.openModalWindow(Constants.ADD_CREDIT_CARD_CREDIT_FXML,
-                                    "Add Credit Card Credit",
-                                    springContext,
-                                    (AddCreditCardCreditController controller)
-                                        -> {},
-                                    List.of(() -> {
-                                        loadCreditCardCreditsFromDatabase();
-                                        updateCreditCardCreditsTableView();
-                                    }));
+    private void handleAdd() {
+        WindowUtils.openModalWindow(
+                Constants.ADD_CREDIT_CARD_CREDIT_FXML,
+                "Add Credit Card Credit",
+                springContext,
+                (AddCreditCardCreditController controller) -> {},
+                List.of(
+                        () -> {
+                            loadCreditCardCreditsFromDatabase();
+                            updateCreditCardCreditsTableView();
+                        }));
     }
 
     @FXML
-    private void handleEdit()
-    {
+    private void handleEdit() {
         // TODO: Implement this method
     }
 
     @FXML
-    private void handleCancel()
-    {
-        Stage stage = (Stage)searchField.getScene().getWindow();
+    private void handleCancel() {
+        Stage stage = (Stage) searchField.getScene().getWindow();
         stage.close();
     }
 
     /**
      * Loads the credit cards from the database
      */
-    private void loadCreditCardCreditsFromDatabase()
-    {
+    private void loadCreditCardCreditsFromDatabase() {
         creditCardCredits = creditCardService.getAllCreditCardCredits();
     }
 
     /**
      * Updates the credit card table view
      */
-    private void updateCreditCardCreditsTableView()
-    {
+    private void updateCreditCardCreditsTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
         creditCardCreditsTableView.getItems().clear();
 
         // Populate the table view
-        if (similarTextOrId.isEmpty())
-        {
+        if (similarTextOrId.isEmpty()) {
             creditCardCreditsTableView.getItems().setAll(creditCardCredits);
-        }
-        else
-        {
+        } else {
             creditCardCredits.stream()
-                .filter(c -> {
-                    String id          = c.getId().toString();
-                    String type        = c.getType().name().toLowerCase();
-                    String crcName     = c.getCreditCard().getName().toLowerCase();
-                    String date        = c.getDate().toString().toLowerCase();
-                    String amount      = c.getAmount().toString().toLowerCase();
-                    String description = c.getDescription().toLowerCase();
+                    .filter(
+                            c -> {
+                                String id = c.getId().toString();
+                                String type = c.getType().name().toLowerCase();
+                                String crcName = c.getCreditCard().getName().toLowerCase();
+                                String date = c.getDate().toString().toLowerCase();
+                                String amount = c.getAmount().toString().toLowerCase();
+                                String description = c.getDescription().toLowerCase();
 
-                    return id.contains(similarTextOrId) ||
-                        type.contains(similarTextOrId) ||
-                        crcName.contains(similarTextOrId) ||
-                        date.contains(similarTextOrId) ||
-                        amount.contains(similarTextOrId) ||
-                        description.contains(similarTextOrId);
-                })
-                .forEach(creditCardCreditsTableView.getItems()::add);
+                                return id.contains(similarTextOrId)
+                                        || type.contains(similarTextOrId)
+                                        || crcName.contains(similarTextOrId)
+                                        || date.contains(similarTextOrId)
+                                        || amount.contains(similarTextOrId)
+                                        || description.contains(similarTextOrId);
+                            })
+                    .forEach(creditCardCreditsTableView.getItems()::add);
         }
 
         creditCardCreditsTableView.refresh();
@@ -153,53 +144,51 @@ public class CreditCardCreditsController
     /**
      * Configures the table view columns
      */
-    private void configureTableView()
-    {
+    private void configureTableView() {
         TableColumn<CreditCardCredit, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
-        idColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Long item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                } else {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Long item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;");
+                                }
+                            }
+                        });
 
-        TableColumn<CreditCardCredit, String> descriptionColumn =
-            new TableColumn<>("Description");
+        TableColumn<CreditCardCredit, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getDescription()));
+                param -> new SimpleStringProperty(param.getValue().getDescription()));
 
-        TableColumn<CreditCardCredit, String> amountColumn =
-            new TableColumn<>("Amount");
+        TableColumn<CreditCardCredit, String> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(
-                UIUtils.formatCurrency(param.getValue().getAmount())));
+                param ->
+                        new SimpleStringProperty(
+                                UIUtils.formatCurrency(param.getValue().getAmount())));
 
         TableColumn<CreditCardCredit, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getType().name()));
+                param -> new SimpleStringProperty(param.getValue().getType().name()));
 
-        TableColumn<CreditCardCredit, String> crcColumn =
-            new TableColumn<>("Credit Card");
+        TableColumn<CreditCardCredit, String> crcColumn = new TableColumn<>("Credit Card");
         crcColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(param.getValue().getCreditCard().getName()));
+                param -> new SimpleStringProperty(param.getValue().getCreditCard().getName()));
 
         TableColumn<CreditCardCredit, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(
-                param.getValue().getDate().format(Constants.DATE_FORMATTER_NO_TIME)));
+                param ->
+                        new SimpleStringProperty(
+                                param.getValue()
+                                        .getDate()
+                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
 
         creditCardCreditsTableView.getColumns().add(idColumn);
         creditCardCreditsTableView.getColumns().add(descriptionColumn);

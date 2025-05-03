@@ -21,22 +21,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Base class to implement the common behavior of the Add and Edit Goal
  */
 @NoArgsConstructor
-public abstract class BaseGoalManagement
-{
-    @FXML
-    protected TextField nameField;
+public abstract class BaseGoalManagement {
+    @FXML protected TextField nameField;
 
-    @FXML
-    protected TextField initialBalanceField;
+    @FXML protected TextField initialBalanceField;
 
-    @FXML
-    protected TextField targetBalanceField;
+    @FXML protected TextField targetBalanceField;
 
-    @FXML
-    protected DatePicker targetDatePicker;
+    @FXML protected DatePicker targetDatePicker;
 
-    @FXML
-    protected TextArea motivationTextArea;
+    @FXML protected TextArea motivationTextArea;
 
     protected GoalService goalService;
 
@@ -46,41 +40,40 @@ public abstract class BaseGoalManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseGoalManagement(GoalService goalService)
-    {
+    protected BaseGoalManagement(GoalService goalService) {
         this.goalService = goalService;
     }
 
     @FXML
-    protected void initialize()
-    {
+    protected void initialize() {
         UIUtils.setDatePickerFormat(targetDatePicker);
 
         // Ensure that the balance fields only accept monetary values
-        initialBalanceField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-                {
-                    initialBalanceField.setText(oldValue);
-                }
-            });
+        initialBalanceField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                initialBalanceField.setText(oldValue);
+                            }
+                        });
 
-        targetBalanceField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-                {
-                    targetBalanceField.setText(oldValue);
-                }
-            });
+        targetBalanceField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                targetBalanceField.setText(oldValue);
+                            }
+                        });
     }
 
     @FXML
     protected abstract void handleSave();
 
     @FXML
-    protected void handleCancel()
-    {
-        Stage stage = (Stage)nameField.getScene().getWindow();
+    protected void handleCancel() {
+        Stage stage = (Stage) nameField.getScene().getWindow();
         stage.close();
     }
 }

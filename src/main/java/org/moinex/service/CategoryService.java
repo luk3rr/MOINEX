@@ -24,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @NoArgsConstructor
-public class CategoryService
-{
+public class CategoryService {
     private CategoryRepository categoryRepository;
 
     private CreditCardDebtRepository creditCardDebtRepository;
@@ -33,10 +32,10 @@ public class CategoryService
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
     @Autowired
-    public CategoryService(CategoryRepository       categoryRepository,
-                           CreditCardDebtRepository creditCardDebtRepository)
-    {
-        this.categoryRepository       = categoryRepository;
+    public CategoryService(
+            CategoryRepository categoryRepository,
+            CreditCardDebtRepository creditCardDebtRepository) {
+        this.categoryRepository = categoryRepository;
         this.creditCardDebtRepository = creditCardDebtRepository;
     }
 
@@ -48,20 +47,16 @@ public class CategoryService
      * @throws IllegalArgumentException If the category name is empty
      */
     @Transactional
-    public Long addCategory(String name)
-    {
+    public Long addCategory(String name) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
-        if (name.isBlank())
-        {
+        if (name.isBlank()) {
             throw new IllegalArgumentException("Category name cannot be empty");
         }
 
-        if (categoryRepository.existsByName(name))
-        {
-            throw new EntityExistsException(
-                String.format("Category '%s' already exists", name));
+        if (categoryRepository.existsByName(name)) {
+            throw new EntityExistsException(String.format("Category '%s' already exists", name));
         }
 
         Category category = Category.builder().name(name).build();
@@ -80,16 +75,21 @@ public class CategoryService
      * @throws IllegalStateException If the category has associated transactions
      */
     @Transactional
-    public void deleteCategory(Long id)
-    {
-        Category category = categoryRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException(String.format("Category with ID %d not found", id)));
+    public void deleteCategory(Long id) {
+        Category category =
+                categoryRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Category with ID %d not found", id)));
 
-        if (getCountTransactions(id) > 0)
-        {
+        if (getCountTransactions(id) > 0) {
             throw new IllegalStateException(
-                "Category " + category.getName() +
-                " cannot be deleted because it has associated transactions");
+                    "Category "
+                            + category.getName()
+                            + " cannot be deleted because it has associated transactions");
         }
 
         categoryRepository.delete(category);
@@ -106,24 +106,26 @@ public class CategoryService
      * @throws IllegalArgumentException If the new name is empty
      */
     @Transactional
-    public void renameCategory(Long id, String newName)
-    {
+    public void renameCategory(Long id, String newName) {
         // Remove leading and trailing whitespaces
         newName = newName.strip();
 
-        if (newName.isBlank())
-        {
+        if (newName.isBlank()) {
             throw new IllegalArgumentException("Category name cannot be empty");
         }
 
-        if (categoryRepository.existsByName(newName))
-        {
-            throw new EntityExistsException("Category with name " + newName +
-                                            " already exists");
+        if (categoryRepository.existsByName(newName)) {
+            throw new EntityExistsException("Category with name " + newName + " already exists");
         }
 
-        Category category = categoryRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException(String.format("Category with ID %d not found", id)));
+        Category category =
+                categoryRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Category with ID %d not found", id)));
 
         category.setName(newName);
 
@@ -138,12 +140,16 @@ public class CategoryService
      * @throws EntityNotFoundException If the category not found
      */
     @Transactional
-    public void archiveCategory(Long id)
-    {
-        Category category = categoryRepository.findById(id).orElseThrow(
-            ()
-                -> new EntityNotFoundException("Category with ID " + id +
-                                               " not found and cannot be archived"));
+    public void archiveCategory(Long id) {
+        Category category =
+                categoryRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Category with ID "
+                                                        + id
+                                                        + " not found and cannot be archived"));
 
         category.setArchived(true);
 
@@ -158,12 +164,16 @@ public class CategoryService
      * @throws EntityNotFoundException If the category not found
      */
     @Transactional
-    public void unarchiveCategory(Long id)
-    {
-        Category category = categoryRepository.findById(id).orElseThrow(
-            ()
-                -> new EntityNotFoundException(
-                    "Category with ID " + id + " not found and cannot be unarchived"));
+    public void unarchiveCategory(Long id) {
+        Category category =
+                categoryRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Category with ID "
+                                                        + id
+                                                        + " not found and cannot be unarchived"));
 
         category.setArchived(false);
 
@@ -176,8 +186,7 @@ public class CategoryService
      * Get all categories
      * @return List of categories
      */
-    public List<Category> getCategories()
-    {
+    public List<Category> getCategories() {
         return categoryRepository.findAll();
     }
 
@@ -185,8 +194,7 @@ public class CategoryService
      * Get all non-archived categories ordered by name
      * @return List of categories
      */
-    public List<Category> getNonArchivedCategoriesOrderedByName()
-    {
+    public List<Category> getNonArchivedCategoriesOrderedByName() {
         return categoryRepository.findAllByIsArchivedFalseOrderByNameAsc();
     }
 
@@ -195,9 +203,8 @@ public class CategoryService
      * @param categoryId Category ID
      * @return Number of transactions
      */
-    public Long getCountTransactions(Long categoryId)
-    {
-        return categoryRepository.getCountTransactions(categoryId) +
-            creditCardDebtRepository.getCountTransactions(categoryId);
+    public Long getCountTransactions(Long categoryId) {
+        return categoryRepository.getCountTransactions(categoryId)
+                + creditCardDebtRepository.getCountTransactions(categoryId);
     }
 }

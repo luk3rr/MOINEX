@@ -28,9 +28,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddRecurringTransactionController
-    extends BaseRecurringTransactionManagement
-{
+public final class AddRecurringTransactionController extends BaseRecurringTransactionManagement {
     /**
      * Constructor
      * @param walletService WalletService
@@ -40,78 +38,73 @@ public final class AddRecurringTransactionController
      */
     @Autowired
     public AddRecurringTransactionController(
-        WalletService               walletService,
-        RecurringTransactionService recurringTransactionService,
-        CategoryService             categoryService)
-    {
+            WalletService walletService,
+            RecurringTransactionService recurringTransactionService,
+            CategoryService categoryService) {
         super(walletService, recurringTransactionService, categoryService);
     }
 
     @FXML
     @Override
-    protected void handleSave()
-    {
-        Wallet                        wallet      = walletComboBox.getValue();
-        String                        description = descriptionField.getText();
-        String                        valueString = valueField.getText();
-        TransactionType               type        = typeComboBox.getValue();
-        Category                      category    = categoryComboBox.getValue();
-        LocalDate                     startDate   = startDatePicker.getValue();
-        LocalDate                     endDate     = endDatePicker.getValue();
-        RecurringTransactionFrequency frequency   = frequencyComboBox.getValue();
+    protected void handleSave() {
+        Wallet wallet = walletComboBox.getValue();
+        String description = descriptionField.getText();
+        String valueString = valueField.getText();
+        TransactionType type = typeComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+        RecurringTransactionFrequency frequency = frequencyComboBox.getValue();
 
-        if (wallet == null || description == null || description.isBlank() ||
-            valueString == null || valueString.isBlank() || type == null ||
-            category == null || startDate == null || frequency == null)
-        {
+        if (wallet == null
+                || description == null
+                || description.isBlank()
+                || valueString == null
+                || valueString.isBlank()
+                || type == null
+                || category == null
+                || startDate == null
+                || frequency == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal transactionAmount = new BigDecimal(valueString);
 
-            if (endDate == null)
-            {
-                recurringTransactionService.addRecurringTransaction(wallet.getId(),
-                                                                    category,
-                                                                    type,
-                                                                    transactionAmount,
-                                                                    startDate,
-                                                                    description,
-                                                                    frequency);
-            }
-            else
-            {
-                recurringTransactionService.addRecurringTransaction(wallet.getId(),
-                                                                    category,
-                                                                    type,
-                                                                    transactionAmount,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    description,
-                                                                    frequency);
+            if (endDate == null) {
+                recurringTransactionService.addRecurringTransaction(
+                        wallet.getId(),
+                        category,
+                        type,
+                        transactionAmount,
+                        startDate,
+                        description,
+                        frequency);
+            } else {
+                recurringTransactionService.addRecurringTransaction(
+                        wallet.getId(),
+                        category,
+                        type,
+                        transactionAmount,
+                        startDate,
+                        endDate,
+                        description,
+                        frequency);
             }
 
             WindowUtils.showSuccessDialog(
-                "Recurring transaction created",
-                "Recurring transaction created successfully.");
+                    "Recurring transaction created", "Recurring transaction created successfully.");
 
-            Stage stage = (Stage)descriptionField.getScene().getWindow();
+            Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid transaction value",
-                                        "Transaction value must be a number.");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
-            WindowUtils.showErrorDialog("Error while creating recurring transaction",
-                                        e.getMessage());
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog(
+                    "Invalid transaction value", "Transaction value must be a number.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            WindowUtils.showErrorDialog(
+                    "Error while creating recurring transaction", e.getMessage());
         }
     }
 }

@@ -34,8 +34,7 @@ import org.moinex.util.enums.InterestType;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class Bond extends Asset
-{
+public class Bond extends Asset {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -46,21 +45,19 @@ public class Bond extends Asset
     @Column(name = "type", nullable = false)
     private BondType type;
 
-    @Column(name = "interest_index" )
+    @Column(name = "interest_index")
     private InterestIndex interestIndex;
 
-    @Column(name = "interest_type" )
+    @Column(name = "interest_type")
     private InterestType interestType;
 
-    @Column(name = "interest_rate" )
+    @Column(name = "interest_rate")
     private BigDecimal interestRate;
 
-    @Column(name = "maturity_date" )
+    @Column(name = "maturity_date")
     private String maturityDate;
 
     @Builder.Default
-    @Column(name             = "archived",
-            nullable         = false,
-            columnDefinition = "boolean default false")
+    @Column(name = "archived", nullable = false, columnDefinition = "boolean default false")
     private boolean archived = false; // Default value is false
 }

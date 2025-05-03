@@ -39,22 +39,16 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class AddCreditCardCreditController
-{
-    @FXML
-    private ComboBox<CreditCard> crcComboBox;
+public class AddCreditCardCreditController {
+    @FXML private ComboBox<CreditCard> crcComboBox;
 
-    @FXML
-    private TextField descriptionField;
+    @FXML private TextField descriptionField;
 
-    @FXML
-    private TextField valueField;
+    @FXML private TextField valueField;
 
-    @FXML
-    private DatePicker datePicker;
+    @FXML private DatePicker datePicker;
 
-    @FXML
-    private ComboBox<CreditCardCreditType> creditTypeComboBox;
+    @FXML private ComboBox<CreditCardCreditType> creditTypeComboBox;
 
     private ConfigurableApplicationContext springContext;
 
@@ -69,18 +63,17 @@ public class AddCreditCardCreditController
     private CreditCard creditCard = null;
 
     @Autowired
-    public AddCreditCardCreditController(CreditCardService creditCardService,
-                                         CalculatorService calculatorService, ConfigurableApplicationContext springContext)
-    {
+    public AddCreditCardCreditController(
+            CreditCardService creditCardService,
+            CalculatorService calculatorService,
+            ConfigurableApplicationContext springContext) {
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
         this.springContext = springContext;
     }
 
-    public void setCreditCard(CreditCard crc)
-    {
-        if (creditCards.stream().noneMatch(c -> c.getId().equals(crc.getId())))
-        {
+    public void setCreditCard(CreditCard crc) {
+        if (creditCards.stream().noneMatch(c -> c.getId().equals(crc.getId()))) {
             return;
         }
 
@@ -89,8 +82,7 @@ public class AddCreditCardCreditController
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         configureSuggestions();
         configureListeners();
         configureComboBoxes();
@@ -106,137 +98,117 @@ public class AddCreditCardCreditController
     }
 
     @FXML
-    private void handleSave()
-    {
-        CreditCard           crc         = crcComboBox.getValue();
-        String               description = descriptionField.getText().strip();
-        String               valueStr    = valueField.getText();
-        CreditCardCreditType creditType  = creditTypeComboBox.getValue();
-        LocalDate            date        = datePicker.getValue();
+    private void handleSave() {
+        CreditCard crc = crcComboBox.getValue();
+        String description = descriptionField.getText().strip();
+        String valueStr = valueField.getText();
+        CreditCardCreditType creditType = creditTypeComboBox.getValue();
+        LocalDate date = datePicker.getValue();
 
-        if (crc == null || creditType == null || date == null ||
-            description.isEmpty() || valueStr.isEmpty())
+        if (crc == null
+                || creditType == null
+                || date == null
+                || description.isEmpty()
+                || valueStr.isEmpty()) {
 
-        {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal creditValue = new BigDecimal(valueStr);
 
-            LocalTime     currentTime             = LocalTime.now();
+            LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);
 
-            creditCardService.addCredit(crc.getId(),
-                                        dateTimeWithCurrentHour,
-                                        creditValue,
-                                        creditType,
-                                        description);
+            creditCardService.addCredit(
+                    crc.getId(), dateTimeWithCurrentHour, creditValue, creditType, description);
 
-            WindowUtils.showSuccessDialog("Credit created",
-                                          "Credit created successfully");
+            WindowUtils.showSuccessDialog("Credit created", "Credit created successfully");
 
-            Stage stage = (Stage)crcComboBox.getScene().getWindow();
+            Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid expense value",
-                                        "Credit value must be a number");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog("Invalid expense value", "Credit value must be a number");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
         }
     }
 
     @FXML
-    private void handleCancel()
-    {
-        Stage stage = (Stage)crcComboBox.getScene().getWindow();
+    private void handleCancel() {
+        Stage stage = (Stage) crcComboBox.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    private void handleOpenCalculator()
-    {
+    private void handleOpenCalculator() {
 
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
-            "Calculator",
-            springContext,
-            (CalculatorController controller)
-                -> {},
-            List.of(() -> calculatorService.updateComponentWithResult(valueField)));
+                Constants.CALCULATOR_FXML,
+                "Calculator",
+                springContext,
+                (CalculatorController controller) -> {},
+                List.of(() -> calculatorService.updateComponentWithResult(valueField)));
     }
 
-    private void loadCreditCardsFromDatabase()
-    {
+    private void loadCreditCardsFromDatabase() {
         creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByName();
     }
 
-    private void loadSuggestionsFromDatabase()
-    {
-        suggestionsHandler.setSuggestions(
-            creditCardService.getCreditCardCreditSuggestions());
+    private void loadSuggestionsFromDatabase() {
+        suggestionsHandler.setSuggestions(creditCardService.getCreditCardCreditSuggestions());
     }
 
-    private void populateCreditCardCreditTypeComboBox()
-    {
+    private void populateCreditCardCreditTypeComboBox() {
         creditTypeComboBox.getItems().addAll(CreditCardCreditType.values());
     }
 
-    private void populateCreditCardCombobox()
-    {
+    private void populateCreditCardCombobox() {
         crcComboBox.getItems().addAll(creditCards);
     }
 
-    private void configureComboBoxes()
-    {
+    private void configureComboBoxes() {
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
     }
 
-    private void configureSuggestions()
-    {
-        Function<CreditCardCredit, String> filterFunction =
-            CreditCardCredit::getDescription;
+    private void configureSuggestions() {
+        Function<CreditCardCredit, String> filterFunction = CreditCardCredit::getDescription;
 
         // Format:
         //    Description
         //    Amount | CreditCard | Rebate Type
-        Function<CreditCardCredit, String> displayFunction = ccc
-            -> String.format("%s%n%s | %s | %s",
-                             ccc.getDescription(),
-                             UIUtils.formatCurrency(ccc.getAmount()),
-                             ccc.getCreditCard().getName(),
-                             ccc.getType());
+        Function<CreditCardCredit, String> displayFunction =
+                ccc ->
+                        String.format(
+                                "%s%n%s | %s | %s",
+                                ccc.getDescription(),
+                                UIUtils.formatCurrency(ccc.getAmount()),
+                                ccc.getCreditCard().getName(),
+                                ccc.getType());
 
         Consumer<CreditCardCredit> onSelectCallback = this::fillFieldsWithTransaction;
 
-        suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
-                                                            filterFunction,
-                                                            displayFunction,
-                                                            onSelectCallback);
+        suggestionsHandler =
+                new SuggestionsHandlerHelper<>(
+                        descriptionField, filterFunction, displayFunction, onSelectCallback);
 
         suggestionsHandler.enable();
     }
 
-    private void configureListeners()
-    {
-        valueField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-            {
-                valueField.setText(oldValue);
-            }
-        });
+    private void configureListeners() {
+        valueField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                valueField.setText(oldValue);
+                            }
+                        });
     }
 
-    private void fillFieldsWithTransaction(CreditCardCredit ccc)
-    {
+    private void fillFieldsWithTransaction(CreditCardCredit ccc) {
         crcComboBox.setValue(ccc.getCreditCard());
 
         // Deactivate the listener to avoid the event of changing the text of

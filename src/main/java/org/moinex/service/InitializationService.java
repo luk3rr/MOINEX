@@ -18,38 +18,37 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @NoArgsConstructor
-public class InitializationService
-{
+public class InitializationService {
     private RecurringTransactionService recurringTransactionService;
 
     private MarketService marketService;
 
-    private static final Logger logger =
-        LoggerFactory.getLogger(InitializationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(InitializationService.class);
 
     @Autowired
     public InitializationService(
-        RecurringTransactionService recurringTransactionService,
-        MarketService               marketService)
-    {
+            RecurringTransactionService recurringTransactionService, MarketService marketService) {
         this.recurringTransactionService = recurringTransactionService;
-        this.marketService               = marketService;
+        this.marketService = marketService;
     }
 
     @PostConstruct
-    public void initialize()
-    {
+    public void initialize() {
         recurringTransactionService.processRecurringTransactions();
-        marketService.updateBrazilianMarketIndicatorsFromApiAsync().exceptionally(
-            ex -> {
-                logger.error(ex.getMessage());
-                return null;
-            });
+        marketService
+                .updateBrazilianMarketIndicatorsFromApiAsync()
+                .exceptionally(
+                        ex -> {
+                            logger.error(ex.getMessage());
+                            return null;
+                        });
 
-        marketService.updateMarketQuotesAndCommoditiesFromApiAsync().exceptionally(
-            ex -> {
-                logger.error(ex.getMessage());
-                return null;
-            });
+        marketService
+                .updateMarketQuotesAndCommoditiesFromApiAsync()
+                .exceptionally(
+                        ex -> {
+                            logger.error(ex.getMessage());
+                            return null;
+                        });
     }
 }

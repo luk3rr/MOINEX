@@ -28,8 +28,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MarketQuotesAndCommodities
-{
+public class MarketQuotesAndCommodities {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

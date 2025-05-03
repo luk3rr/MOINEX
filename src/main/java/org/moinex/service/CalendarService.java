@@ -27,15 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @NoArgsConstructor
-public class CalendarService
-{
+public class CalendarService {
     private CalendarEventRepository calendarEventRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
 
     @Autowired
-    public CalendarService(CalendarEventRepository calendarEventRepository)
-    {
+    public CalendarService(CalendarEventRepository calendarEventRepository) {
         this.calendarEventRepository = calendarEventRepository;
     }
 
@@ -48,30 +46,26 @@ public class CalendarService
      * @throws IllegalArgumentException If the title is empty
      */
     @Transactional
-    public void addEvent(String            title,
-                         String            description,
-                         LocalDateTime     date,
-                         CalendarEventType eventType)
-    {
+    public void addEvent(
+            String title, String description, LocalDateTime date, CalendarEventType eventType) {
         // Remove leading and trailing whitespaces
         title = title.strip();
 
-        if (title.isBlank())
-        {
+        if (title.isBlank()) {
             throw new IllegalArgumentException("Title cannot be empty");
         }
 
-        CalendarEvent event = CalendarEvent.builder()
-                                  .title(title)
-                                  .description(description)
-                                  .date(date)
-                                  .eventType(eventType)
-                                  .build();
+        CalendarEvent event =
+                CalendarEvent.builder()
+                        .title(title)
+                        .description(description)
+                        .date(date)
+                        .eventType(eventType)
+                        .build();
 
         calendarEventRepository.save(event);
 
         logger.info("Event '{}' added to the calendar", title);
-
     }
 
     /**
@@ -80,12 +74,14 @@ public class CalendarService
      * @throws EntityNotFoundException If the event is not found
      */
     @Transactional
-    public void deleteEvent(Long eventId)
-    {
-        CalendarEvent event = calendarEventRepository.findById(eventId).orElseThrow(
-            ()
-                -> new EntityNotFoundException("Event with id " + eventId +
-                                               " not found"));
+    public void deleteEvent(Long eventId) {
+        CalendarEvent event =
+                calendarEventRepository
+                        .findById(eventId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Event with id " + eventId + " not found"));
 
         calendarEventRepository.delete(event);
 
@@ -97,8 +93,7 @@ public class CalendarService
      * @param event The event to be updated
      */
     @Transactional
-    public void updateEvent(CalendarEvent event)
-    {
+    public void updateEvent(CalendarEvent event) {
         calendarEventRepository.save(event);
 
         logger.info("Event '{}' updated", event.getTitle());
@@ -108,8 +103,7 @@ public class CalendarService
      * Gets all events in the calendar
      * @return A list with all events in the calendar
      */
-    public List<CalendarEvent> getAllEvents()
-    {
+    public List<CalendarEvent> getAllEvents() {
         return calendarEventRepository.findAll();
     }
 }

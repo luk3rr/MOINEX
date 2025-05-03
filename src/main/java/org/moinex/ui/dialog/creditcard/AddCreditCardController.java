@@ -25,8 +25,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddCreditCardController extends BaseCreditCardManagement
-{
+public final class AddCreditCardController extends BaseCreditCardManagement {
     /**
      * Constructor
      * @param creditCardService The credit card service
@@ -34,69 +33,62 @@ public final class AddCreditCardController extends BaseCreditCardManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddCreditCardController(CreditCardService creditCardService,
-                                   WalletService     walletService)
-    {
+    public AddCreditCardController(
+            CreditCardService creditCardService, WalletService walletService) {
         super(creditCardService, walletService);
     }
 
     @FXML
     @Override
-    protected void handleSave()
-    {
+    protected void handleSave() {
         String crcName = nameField.getText();
-        crcName        = crcName.strip(); // Remove leading and trailing whitespaces
+        crcName = crcName.strip(); // Remove leading and trailing whitespaces
 
-        String             crcLimitStr          = limitField.getText();
-        String             crcLastFourDigitsStr = lastFourDigitsField.getText();
-        String             crcClosingDayStr     = closingDayComboBox.getValue();
-        String             crcDueDayStr         = dueDayComboBox.getValue();
-        CreditCardOperator crcOperator          = operatorComboBox.getValue();
+        String crcLimitStr = limitField.getText();
+        String crcLastFourDigitsStr = lastFourDigitsField.getText();
+        String crcClosingDayStr = closingDayComboBox.getValue();
+        String crcDueDayStr = dueDayComboBox.getValue();
+        CreditCardOperator crcOperator = operatorComboBox.getValue();
         Wallet crcDefaultBillingWallet = defaultBillingWalletComboBox.getValue();
 
-        if (crcName.isEmpty() || crcLimitStr.isEmpty() ||
-            crcLastFourDigitsStr.isEmpty() || crcOperator == null ||
-            crcClosingDayStr == null || crcDueDayStr == null)
-        {
+        if (crcName.isEmpty()
+                || crcLimitStr.isEmpty()
+                || crcLastFourDigitsStr.isEmpty()
+                || crcOperator == null
+                || crcClosingDayStr == null
+                || crcDueDayStr == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal crcLimit = new BigDecimal(crcLimitStr);
 
             Integer crcClosingDay = Integer.parseInt(crcClosingDayStr);
-            Integer crcDueDay     = Integer.parseInt(crcDueDayStr);
+            Integer crcDueDay = Integer.parseInt(crcDueDayStr);
 
-            Long crcDefaultBillingWalletId = crcDefaultBillingWallet != null
-                                                 ? crcDefaultBillingWallet.getId()
-                                                 : null;
+            Long crcDefaultBillingWalletId =
+                    crcDefaultBillingWallet != null ? crcDefaultBillingWallet.getId() : null;
 
-            creditCardService.addCreditCard(crcName,
-                                            crcDueDay,
-                                            crcClosingDay,
-                                            crcLimit,
-                                            crcLastFourDigitsStr,
-                                            crcOperator.getId(),
-                                            crcDefaultBillingWalletId);
+            creditCardService.addCreditCard(
+                    crcName,
+                    crcDueDay,
+                    crcClosingDay,
+                    crcLimit,
+                    crcLastFourDigitsStr,
+                    crcOperator.getId(),
+                    crcDefaultBillingWalletId);
 
-            WindowUtils.showSuccessDialog("Credit card created",
-                                          "The credit card was successfully created");
+            WindowUtils.showSuccessDialog(
+                    "Credit card created", "The credit card was successfully created");
 
-            Stage stage = (Stage)nameField.getScene().getWindow();
+            Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid limit", "Please enter a valid limit");
-        }
-        catch (EntityExistsException | EntityNotFoundException |
-               IllegalArgumentException e)
-        {
+        } catch (EntityExistsException | EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error creating credit card", e.getMessage());
         }
     }

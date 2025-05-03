@@ -9,8 +9,7 @@ package org.moinex.util.enums;
 /**
  * ENUM that represents the type of a ticker
  */
-public enum TickerType
-{
+public enum TickerType {
     STOCK,
     FUND,
     CRYPTOCURRENCY

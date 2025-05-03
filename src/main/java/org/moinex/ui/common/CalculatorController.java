@@ -23,13 +23,10 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class CalculatorController
-{
-    @FXML
-    private TextField mainDisplay;
+public class CalculatorController {
+    @FXML private TextField mainDisplay;
 
-    @FXML
-    private TextField expressionDisplay;
+    @FXML private TextField expressionDisplay;
 
     private CalculatorService calculatorService;
 
@@ -40,14 +37,12 @@ public class CalculatorController
      * @param calculatorService The service for the calculator
      */
     @Autowired
-    public CalculatorController(CalculatorService calculatorService)
-    {
+    public CalculatorController(CalculatorService calculatorService) {
         this.calculatorService = calculatorService;
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         // Clear the result when the calculator is opened
         calculatorService.setResult(null);
         expression.setLength(0);
@@ -56,54 +51,45 @@ public class CalculatorController
     }
 
     @FXML
-    private void addAction(ActionEvent ignoredEvent)
-    {
+    private void addAction(ActionEvent ignoredEvent) {
         addOperator("+");
     }
 
     @FXML
-    private void minusAction(ActionEvent ignoredEvent)
-    {
+    private void minusAction(ActionEvent ignoredEvent) {
         addOperator("-");
     }
 
     @FXML
-    private void divideAction(ActionEvent ignoredEvent)
-    {
+    private void divideAction(ActionEvent ignoredEvent) {
         addOperator("/");
     }
 
     @FXML
-    private void multiplicationAction(ActionEvent ignoredEvent)
-    {
+    private void multiplicationAction(ActionEvent ignoredEvent) {
         addOperator("*");
     }
 
     @FXML
-    private void calculate(ActionEvent ignoredEvent)
-    {
-        if (expression.isEmpty())
-        {
+    private void calculate(ActionEvent ignoredEvent) {
+        if (expression.isEmpty()) {
             return;
         }
 
-        try
-        {
+        try {
             Double result = evaluateExpression(expression.toString());
 
             expressionDisplay.setText(
-                expression.toString().replaceAll("([+\\-*/])", " $1 ") + " = " +
-                result);
+                    expression.toString().replaceAll("([+\\-*/])", " $1 ") + " = " + result);
 
             mainDisplay.setText(String.valueOf(result));
 
-            expression = new StringBuilder(
-                String.valueOf(result)); // Save the result for further calculations
+            expression =
+                    new StringBuilder(
+                            String.valueOf(result)); // Save the result for further calculations
 
             calculatorService.setResult(result.toString());
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             expressionDisplay.setText("Error");
             mainDisplay.setText("");
             expression.setLength(0); // Clear the expression
@@ -115,34 +101,26 @@ public class CalculatorController
     }
 
     @FXML
-    private void clearTextField(ActionEvent ignoredEvent)
-    {
+    private void clearTextField(ActionEvent ignoredEvent) {
         expression.setLength(0);
         expressionDisplay.setText("");
         mainDisplay.setText("");
     }
 
     @FXML
-    private void finish(ActionEvent event)
-    {
+    private void finish(ActionEvent event) {
         calculate(event);
 
-        Stage stage = (Stage)mainDisplay.getScene().getWindow();
+        Stage stage = (Stage) mainDisplay.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    private void buttonDotClicked(ActionEvent ignoredEvent)
-    {
-        if (!expression.toString().endsWith(".") && !currentToken().contains("."))
-        {
-            if (expression.isEmpty() ||
-                isOperator(expression.charAt(expression.length() - 1)))
-            {
+    private void buttonDotClicked(ActionEvent ignoredEvent) {
+        if (!expression.toString().endsWith(".") && !currentToken().contains(".")) {
+            if (expression.isEmpty() || isOperator(expression.charAt(expression.length() - 1))) {
                 expression.append("0.");
-            }
-            else
-            {
+            } else {
                 expression.append(".");
             }
 
@@ -151,132 +129,113 @@ public class CalculatorController
     }
 
     @FXML
-    private void button0Clicked(ActionEvent ignoredEvent)
-    {
+    private void button0Clicked(ActionEvent ignoredEvent) {
         addNumber("0");
     }
 
     @FXML
-    private void button1Clicked(ActionEvent ignoredEvent)
-    {
+    private void button1Clicked(ActionEvent ignoredEvent) {
         addNumber("1");
     }
 
     @FXML
-    private void button2Clicked(ActionEvent ignoredEvent)
-    {
+    private void button2Clicked(ActionEvent ignoredEvent) {
         addNumber("2");
     }
 
     @FXML
-    private void button3Clicked(ActionEvent ignoredEvent)
-    {
+    private void button3Clicked(ActionEvent ignoredEvent) {
         addNumber("3");
     }
 
     @FXML
-    private void button4Clicked(ActionEvent ignoredEvent)
-    {
+    private void button4Clicked(ActionEvent ignoredEvent) {
         addNumber("4");
     }
 
     @FXML
-    private void button5Clicked(ActionEvent ignoredEvent)
-    {
+    private void button5Clicked(ActionEvent ignoredEvent) {
         addNumber("5");
     }
 
     @FXML
-    private void button6Clicked(ActionEvent ignoredEvent)
-    {
+    private void button6Clicked(ActionEvent ignoredEvent) {
         addNumber("6");
     }
 
     @FXML
-    private void button7Clicked(ActionEvent ignoredEvent)
-    {
+    private void button7Clicked(ActionEvent ignoredEvent) {
         addNumber("7");
     }
 
     @FXML
-    private void button8Clicked(ActionEvent ignoredEvent)
-    {
+    private void button8Clicked(ActionEvent ignoredEvent) {
         addNumber("8");
     }
 
     @FXML
-    private void button9Clicked(ActionEvent ignoredEvent)
-    {
+    private void button9Clicked(ActionEvent ignoredEvent) {
         addNumber("9");
     }
 
-    public void updateExpressionDisplay()
-    {
+    public void updateExpressionDisplay() {
         // Show expression with spaces between operators
-        expressionDisplay.setText(
-            expression.toString().replaceAll("([+\\-*/])", " $1 "));
+        expressionDisplay.setText(expression.toString().replaceAll("([+\\-*/])", " $1 "));
     }
 
-    public void updateMainDisplay()
-    {
+    public void updateMainDisplay() {
         // Get the last number in the expression or a result
         mainDisplay.setText(currentToken());
     }
 
-    public void addNumber(String number)
-    {
+    public void addNumber(String number) {
         expression.append(number);
         updateExpressionDisplay();
         updateMainDisplay();
     }
 
-    public void addOperator(String operator)
-    {
-        if (!expression.isEmpty() &&
-            !isOperator(expression.charAt(expression.length() - 1)))
-        {
+    public void addOperator(String operator) {
+        if (!expression.isEmpty() && !isOperator(expression.charAt(expression.length() - 1))) {
             expression.append(operator);
             updateExpressionDisplay();
         }
     }
 
-    private boolean isOperator(char c)
-    {
+    private boolean isOperator(char c) {
         return c == '+' || c == '-' || c == '*' || c == '/';
     }
 
-    private String currentToken()
-    {
+    private String currentToken() {
         // Find the last operator in the expression and get the token after it
         int lastOperatorIndex =
-            Math.max(expression.lastIndexOf("+"),
-                     Math.max(expression.lastIndexOf("-"),
-                              Math.max(expression.lastIndexOf("*"),
-                                       expression.lastIndexOf("/"))));
+                Math.max(
+                        expression.lastIndexOf("+"),
+                        Math.max(
+                                expression.lastIndexOf("-"),
+                                Math.max(
+                                        expression.lastIndexOf("*"), expression.lastIndexOf("/"))));
 
         String token = expression.substring(lastOperatorIndex + 1);
 
         // If the token starts with "-" and is the first character of the expression or
         // after an operator, it is a negative number
-        if (token.startsWith("-") && lastOperatorIndex == -1)
-        {
+        if (token.startsWith("-") && lastOperatorIndex == -1) {
             return token;
         }
 
         // If the token starts with "-" and the previous operator was also a subtraction
         // operator, treat it as a negative number
-        if (token.startsWith("-") && expression.charAt(lastOperatorIndex) != '-' &&
-            lastOperatorIndex != -1)
-        {
+        if (token.startsWith("-")
+                && expression.charAt(lastOperatorIndex) != '-'
+                && lastOperatorIndex != -1) {
             return token;
         }
 
         return !token.isEmpty() ? token : "";
     }
 
-    private Double evaluateExpression(String expression)
-    {
-        Expression exp    = new ExpressionBuilder(expression).build();
+    private Double evaluateExpression(String expression) {
+        Expression exp = new ExpressionBuilder(expression).build();
         Double result = exp.evaluate();
 
         // If the result is a number, return it. Otherwise, return 0

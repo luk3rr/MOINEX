@@ -13,9 +13,9 @@ import java.time.YearMonth;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
-import org.moinex.error.MoinexException;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
@@ -28,64 +28,59 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddCreditCardDebtController extends BaseCreditCardDebtManagement
-{
+public final class AddCreditCardDebtController extends BaseCreditCardDebtManagement {
     @Autowired
-    public AddCreditCardDebtController(CategoryService   categoryService,
-                                       CreditCardService creditCardService,
-                                       CalculatorService calculatorService)
-    {
+    public AddCreditCardDebtController(
+            CategoryService categoryService,
+            CreditCardService creditCardService,
+            CalculatorService calculatorService) {
         super(categoryService, creditCardService, calculatorService);
     }
 
     @Override
     @FXML
-    protected void handleSave()
-    {
-        CreditCard crc             = crcComboBox.getValue();
-        Category   category        = categoryComboBox.getValue();
-        YearMonth  invoiceMonth    = invoiceComboBox.getValue();
-        String     description     = descriptionField.getText().strip();
-        String     valueStr        = valueField.getText();
-        String     installmentsStr = installmentsField.getText();
+    protected void handleSave() {
+        CreditCard crc = crcComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        YearMonth invoiceMonth = invoiceComboBox.getValue();
+        String description = descriptionField.getText().strip();
+        String valueStr = valueField.getText();
+        String installmentsStr = installmentsField.getText();
 
-        if (crc == null || category == null || description.isEmpty() ||
-            valueStr.isEmpty() || invoiceMonth == null)
-        {
+        if (crc == null
+                || category == null
+                || description.isEmpty()
+                || valueStr.isEmpty()
+                || invoiceMonth == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal debtValue = new BigDecimal(valueStr);
 
             Integer installments =
-                installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
+                    installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
-            creditCardService.addDebt(crc.getId(),
-                                      category,
-                                      LocalDateTime.now(), // register date
-                                      invoiceMonth,
-                                      debtValue,
-                                      installments,
-                                      description);
+            creditCardService.addDebt(
+                    crc.getId(),
+                    category,
+                    LocalDateTime.now(), // register date
+                    invoiceMonth,
+                    debtValue,
+                    installments,
+                    description);
 
             WindowUtils.showSuccessDialog("Debt created", "Debt created successfully");
 
-            Stage stage = (Stage)crcComboBox.getScene().getWindow();
+            Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid expense value",
-                                        "Debt value must be a number");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException |
-               MoinexException.InsufficientResourcesException e)
-        {
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog("Invalid expense value", "Debt value must be a number");
+        } catch (EntityNotFoundException
+                | IllegalArgumentException
+                | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
         }
     }

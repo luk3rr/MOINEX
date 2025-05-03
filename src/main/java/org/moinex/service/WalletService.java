@@ -8,6 +8,9 @@ package org.moinex.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
@@ -22,10 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.List;
-
 /**
  * This class is responsible for the business logic of the Wallet entity
  */
@@ -39,7 +38,11 @@ public class WalletService {
     private WalletTypeRepository walletTypeRepository;
 
     @Autowired
-    public WalletService(WalletRepository walletRepository, TransferRepository transfersRepository, WalletTransactionRepository walletTransactionRepository, WalletTypeRepository walletTypeRepository) {
+    public WalletService(
+            WalletRepository walletRepository,
+            TransferRepository transfersRepository,
+            WalletTransactionRepository walletTransactionRepository,
+            WalletTypeRepository walletTypeRepository) {
         this.walletRepository = walletRepository;
         this.transfersRepository = transfersRepository;
         this.walletTransactionRepository = walletTransactionRepository;
@@ -65,8 +68,7 @@ public class WalletService {
         }
 
         if (walletRepository.existsByName(name)) {
-            throw new EntityExistsException("Wallet with name " + name +
-                    " already exists");
+            throw new EntityExistsException("Wallet with name " + name + " already exists");
         }
 
         logger.info("Wallet {} created with balance {}", name, balance);
@@ -98,14 +100,12 @@ public class WalletService {
         }
 
         if (walletRepository.existsByName(name)) {
-            throw new EntityExistsException("Wallet with name " + name +
-                    " already exists");
+            throw new EntityExistsException("Wallet with name " + name + " already exists");
         }
 
         logger.info("Wallet {} created with balance {}", name, balance);
 
-        Wallet wt =
-                Wallet.builder().name(name).balance(balance).type(walletType).build();
+        Wallet wt = Wallet.builder().name(name).balance(balance).type(walletType).build();
 
         walletRepository.save(wt);
 
@@ -121,15 +121,24 @@ public class WalletService {
      */
     @Transactional
     public void deleteWallet(Long id) {
-        Wallet wallet = walletRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Wallet with id %d not found and cannot be deleted", id)));
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Wallet with id %d not found and cannot be"
+                                                                + " deleted",
+                                                        id)));
 
-        if (walletTransactionRepository.getTransactionCountByWallet(id) > 0 ||
-                transfersRepository.getTransferCountByWallet(id) > 0) {
+        if (walletTransactionRepository.getTransactionCountByWallet(id) > 0
+                || transfersRepository.getTransferCountByWallet(id) > 0) {
             throw new IllegalStateException(
-                    String.format("Wallet with id %d has transactions and cannot be deleted." +
-                            "Remove the transactions first or archive the wallet", id));
+                    String.format(
+                            "Wallet with id %d has transactions and cannot be deleted."
+                                    + "Remove the transactions first or archive the wallet",
+                            id));
         }
 
         walletRepository.delete(wallet);
@@ -148,9 +157,16 @@ public class WalletService {
      */
     @Transactional
     public void archiveWallet(Long id) {
-        Wallet wallet = walletRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Wallet with id %d not found and cannot be archived", id)));
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Wallet with id %d not found and cannot be"
+                                                                + " archived",
+                                                        id)));
         wallet.setArchived(true);
         walletRepository.save(wallet);
 
@@ -167,9 +183,16 @@ public class WalletService {
      */
     @Transactional
     public void unarchiveWallet(Long id) {
-        Wallet wallet = walletRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Wallet with id %d not found and cannot be unarchived", id)));
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Wallet with id %d not found and cannot be"
+                                                                + " unarchived",
+                                                        id)));
 
         wallet.setArchived(false);
         walletRepository.save(wallet);
@@ -195,12 +218,16 @@ public class WalletService {
             throw new IllegalArgumentException("Wallet name cannot be empty");
         }
 
-        Wallet wallet = walletRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Wallet with id %d not found", id)));
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format("Wallet with id %d not found", id)));
 
         if (walletRepository.existsByName(newName)) {
-            throw new EntityExistsException("Wallet with name " + newName +
-                    " already exists");
+            throw new EntityExistsException("Wallet with name " + newName + " already exists");
         }
 
         wallet.setName(newName);
@@ -220,8 +247,13 @@ public class WalletService {
      */
     @Transactional
     public void changeWalletType(Long id, WalletType newType) {
-        Wallet wallet = walletRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Wallet with id %d not found", id)));
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format("Wallet with id %d not found", id)));
 
         if (newType == null || !walletTypeRepository.existsById(newType.getId())) {
             throw new EntityNotFoundException("Wallet type not found");
@@ -229,8 +261,10 @@ public class WalletService {
 
         if (wallet.getType().getId().equals(newType.getId())) {
             throw new MoinexException.AttributeAlreadySetException(
-                    "Wallet with name " + wallet.getName() + " already has type " +
-                            newType.getName());
+                    "Wallet with name "
+                            + wallet.getName()
+                            + " already has type "
+                            + newType.getName());
         }
 
         wallet.setType(newType);
@@ -248,8 +282,13 @@ public class WalletService {
      */
     @Transactional
     public void updateWalletBalance(Long id, BigDecimal newBalance) {
-        Wallet wallet = walletRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Wallet with id %d not found", id)));
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format("Wallet with id %d not found", id)));
 
         wallet.setBalance(newBalance);
         walletRepository.save(wallet);
@@ -265,8 +304,10 @@ public class WalletService {
      * @throws EntityNotFoundException If the wallet does not exist
      */
     public Wallet getWalletById(Long id) {
-        return walletRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Wallet with id " + id + " not found"));
+        return walletRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Wallet with id " + id + " not found"));
     }
 
     /**
@@ -303,16 +344,16 @@ public class WalletService {
      * @return A list with all wallets that are not archived
      */
     public List<Wallet> getAllNonArchivedWalletsOrderedByTransactionCountDesc() {
-        return walletRepository.findAllByIsArchivedFalse()
-                .stream()
+        return walletRepository.findAllByIsArchivedFalse().stream()
                 .sorted(
-                        Comparator
-                                .comparingLong(
-                                        (Wallet w)
-                                                -> walletTransactionRepository.getTransactionCountByWallet(
-                                                w.getId()) +
-                                                transfersRepository.getTransferCountByWallet(
-                                                        w.getId()))
+                        Comparator.comparingLong(
+                                        (Wallet w) ->
+                                                walletTransactionRepository
+                                                                .getTransactionCountByWallet(
+                                                                        w.getId())
+                                                        + transfersRepository
+                                                                .getTransferCountByWallet(
+                                                                        w.getId()))
                                 .reversed())
                 .toList();
     }

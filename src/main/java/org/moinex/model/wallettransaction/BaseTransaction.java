@@ -30,8 +30,7 @@ import org.moinex.util.enums.TransactionType;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseTransaction
-{
+public abstract class BaseTransaction {
     @ManyToOne
     @JoinColumn(name = "wallet_id", referencedColumnName = "id", nullable = false)
     private Wallet wallet;
@@ -47,6 +46,6 @@ public abstract class BaseTransaction
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "description" )
+    @Column(name = "description")
     private String description;
 }

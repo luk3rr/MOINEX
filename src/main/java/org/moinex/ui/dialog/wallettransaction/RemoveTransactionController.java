@@ -36,13 +36,10 @@ import org.springframework.stereotype.Controller;
 @Controller
 @Scope("prototype") // Create a new instance each time it is requested
 @NoArgsConstructor
-public class RemoveTransactionController
-{
-    @FXML
-    private TableView<WalletTransaction> transactionsTableView;
+public class RemoveTransactionController {
+    @FXML private TableView<WalletTransaction> transactionsTableView;
 
-    @FXML
-    private TextField searchField;
+    @FXML private TextField searchField;
 
     private List<WalletTransaction> incomes;
 
@@ -56,15 +53,12 @@ public class RemoveTransactionController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public RemoveTransactionController(
-        WalletTransactionService walletTransactionService)
-    {
+    public RemoveTransactionController(WalletTransactionService walletTransactionService) {
         this.walletTransactionService = walletTransactionService;
     }
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         // TODO: Implement this method
     }
 
@@ -72,12 +66,10 @@ public class RemoveTransactionController
      * Initializes the controller with the transaction type
      * @param transactionType TransactionType
      */
-    public void initializeWithTransactionType(TransactionType transactionType)
-    {
+    public void initializeWithTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
 
-        if (transactionType == null)
-        {
+        if (transactionType == null) {
             throw new IllegalStateException("Transaction type not set");
         }
 
@@ -87,104 +79,100 @@ public class RemoveTransactionController
         updateTransactionTableView();
 
         // Add listener to the search field
-        searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> updateTransactionTableView());
+        searchField
+                .textProperty()
+                .addListener((observable, oldValue, newValue) -> updateTransactionTableView());
     }
 
     @FXML
-    public void handleDelete()
-    {
+    public void handleDelete() {
         WalletTransaction selectedTransaction =
-            transactionsTableView.getSelectionModel().getSelectedItem();
+                transactionsTableView.getSelectionModel().getSelectedItem();
 
         // If no income is selected, do nothing
-        if (selectedTransaction == null)
-        {
+        if (selectedTransaction == null) {
             return;
         }
 
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
         message.append("Description: ")
-            .append(selectedTransaction.getDescription())
-            .append("\n")
-            .append("Amount: ")
-            .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
-            .append("\n")
-            .append("Date: ")
-            .append(selectedTransaction.getDate().format(
-                Constants.DATE_FORMATTER_WITH_TIME))
-            .append("\n")
-            .append("Status: ")
-            .append(selectedTransaction.getStatus().toString())
-            .append("\n")
-            .append("Wallet: ")
-            .append(selectedTransaction.getWallet().getName())
-            .append("\n")
-            .append("Wallet balance: ")
-            .append(
-                UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
-            .append("\n")
-            .append("Wallet balance after deletion: ");
+                .append(selectedTransaction.getDescription())
+                .append("\n")
+                .append("Amount: ")
+                .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
+                .append("\n")
+                .append("Date: ")
+                .append(selectedTransaction.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+                .append("\n")
+                .append("Status: ")
+                .append(selectedTransaction.getStatus().toString())
+                .append("\n")
+                .append("Wallet: ")
+                .append(selectedTransaction.getWallet().getName())
+                .append("\n")
+                .append("Wallet balance: ")
+                .append(UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
+                .append("\n")
+                .append("Wallet balance after deletion: ");
 
         // if the transaction is confirmed, add the amount to the wallet balance
         // otherwise, the wallet balance remains the same
-        message
-            .append(
-                UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance().add(
-                    selectedTransaction.getStatus().equals(TransactionStatus.CONFIRMED)
-                        ? selectedTransaction.getAmount()
-                        : BigDecimal.ZERO)))
-            .append("\n");
+        message.append(
+                        UIUtils.formatCurrency(
+                                selectedTransaction
+                                        .getWallet()
+                                        .getBalance()
+                                        .add(
+                                                selectedTransaction
+                                                                .getStatus()
+                                                                .equals(TransactionStatus.CONFIRMED)
+                                                        ? selectedTransaction.getAmount()
+                                                        : BigDecimal.ZERO)))
+                .append("\n");
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Are you sure you want to remove this " +
-                    transactionType.toString().toLowerCase() + "?",
-                message.toString()))
-        {
+                "Are you sure you want to remove this "
+                        + transactionType.toString().toLowerCase()
+                        + "?",
+                message.toString())) {
             walletTransactionService.deleteTransaction(selectedTransaction.getId());
             transactionsTableView.getItems().remove(selectedTransaction);
         }
     }
 
     @FXML
-    public void handleCancel()
-    {
-        Stage stage = (Stage)searchField.getScene().getWindow();
+    public void handleCancel() {
+        Stage stage = (Stage) searchField.getScene().getWindow();
         stage.close();
     }
 
-    private void loadTransactionFromDatabase()
-    {
-        if (transactionType == TransactionType.EXPENSE)
-        {
+    private void loadTransactionFromDatabase() {
+        if (transactionType == TransactionType.EXPENSE) {
             incomes = walletTransactionService.getNonArchivedExpenses();
-        }
-        else
-        {
+        } else {
             incomes = walletTransactionService.getNonArchivedIncomes();
         }
     }
 
-    private void updateTransactionTableView()
-    {
+    private void updateTransactionTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
         transactionsTableView.getItems().clear();
 
-        if (similarTextOrId.isEmpty())
-        {
+        if (similarTextOrId.isEmpty()) {
             transactionsTableView.getItems().addAll(incomes);
             transactionsTableView.refresh();
             return;
         }
 
         incomes.stream()
-            .filter(t
-                    -> t.getDescription().toLowerCase().contains(similarTextOrId) ||
-                           t.getId().toString().contains(similarTextOrId))
-            .forEach(transactionsTableView.getItems()::add);
+                .filter(
+                        t ->
+                                t.getDescription().toLowerCase().contains(similarTextOrId)
+                                        || t.getId().toString().contains(similarTextOrId))
+                .forEach(transactionsTableView.getItems()::add);
 
         transactionsTableView.refresh();
     }
@@ -192,43 +180,38 @@ public class RemoveTransactionController
     /**
      * Configures the TableView to display the incomes.
      */
-    private void configureTableView()
-    {
+    private void configureTableView() {
         TableColumn<WalletTransaction, Long> idColumn = getWalletTransactionLongTableColumn();
 
-        TableColumn<WalletTransaction, String> categoryColumn =
-            new TableColumn<>("Category");
+        TableColumn<WalletTransaction, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(param.getValue().getCategory().getName()));
+                param -> new SimpleStringProperty(param.getValue().getCategory().getName()));
 
-        TableColumn<WalletTransaction, String> statusColumn =
-            new TableColumn<>("Status");
+        TableColumn<WalletTransaction, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getStatus().name()));
+                param -> new SimpleStringProperty(param.getValue().getStatus().name()));
 
         TableColumn<WalletTransaction, String> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(
-            param
-            -> new SimpleStringProperty(
-                param.getValue().getDate().format(Constants.DATE_FORMATTER_WITH_TIME)));
+                param ->
+                        new SimpleStringProperty(
+                                param.getValue()
+                                        .getDate()
+                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
 
-        TableColumn<WalletTransaction, String> walletNameColumn =
-            new TableColumn<>("Wallet");
+        TableColumn<WalletTransaction, String> walletNameColumn = new TableColumn<>("Wallet");
         walletNameColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
+                param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
 
-        TableColumn<WalletTransaction, String> amountColumn =
-            new TableColumn<>("Amount");
+        TableColumn<WalletTransaction, String> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(
-            param
-            -> new SimpleObjectProperty<>(
-                UIUtils.formatCurrency(param.getValue().getAmount())));
+                param ->
+                        new SimpleObjectProperty<>(
+                                UIUtils.formatCurrency(param.getValue().getAmount())));
 
-        TableColumn<WalletTransaction, String> descriptionColumn =
-            new TableColumn<>("Description");
+        TableColumn<WalletTransaction, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getDescription()));
+                param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         transactionsTableView.getColumns().add(idColumn);
         transactionsTableView.getColumns().add(descriptionColumn);
@@ -241,24 +224,25 @@ public class RemoveTransactionController
 
     private static TableColumn<WalletTransaction, Long> getWalletTransactionLongTableColumn() {
         TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
-        idColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Long item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                } else {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;"); // set padding to zero to ensure
-                    // the text is centered
-                }
-            }
-        });
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Long item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;"); // set padding to zero to ensure
+                                    // the text is centered
+                                }
+                            }
+                        });
         return idColumn;
     }
 }

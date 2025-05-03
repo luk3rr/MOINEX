@@ -35,8 +35,7 @@ import org.moinex.model.wallettransaction.Wallet;
 @Getter
 @Setter
 @Builder
-public class CreditCard
-{
+public class CreditCard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -51,9 +50,7 @@ public class CreditCard
     @Builder.Default
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.NO_ACTION)
-    @JoinColumn(name                 = "default_billing_wallet_id",
-                referencedColumnName = "id"
-                )
+    @JoinColumn(name = "default_billing_wallet_id", referencedColumnName = "id")
     private Wallet defaultBillingWallet = null;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)
@@ -72,12 +69,10 @@ public class CreditCard
     @Column(name = "available_rebate", nullable = false, scale = 2)
     private BigDecimal availableRebate = BigDecimal.ZERO;
 
-    @Column(name = "last_four_digits",  length = 4)
+    @Column(name = "last_four_digits", length = 4)
     private String lastFourDigits;
 
     @Builder.Default
-    @Column(name             = "archived",
-            nullable         = false,
-            columnDefinition = "boolean default false")
+    @Column(name = "archived", nullable = false, columnDefinition = "boolean default false")
     private boolean isArchived = false; // Default value is false
 }

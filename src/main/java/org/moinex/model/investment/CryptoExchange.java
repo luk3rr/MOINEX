@@ -32,8 +32,7 @@ import org.moinex.util.Constants;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class CryptoExchange
-{
+public class CryptoExchange {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -45,9 +44,7 @@ public class CryptoExchange
     private Ticker soldCrypto;
 
     @ManyToOne
-    @JoinColumn(name                 = "received_crypto_id",
-                referencedColumnName = "id",
-                nullable             = false)
+    @JoinColumn(name = "received_crypto_id", referencedColumnName = "id", nullable = false)
     private Ticker receivedCrypto;
 
     @Column(name = "sold_quantity", nullable = false)
@@ -59,14 +56,12 @@ public class CryptoExchange
     @Column(name = "date", nullable = false)
     private String date;
 
-    @Column(name = "description" )
+    @Column(name = "description")
     private String description;
 
     public abstract static class CryptoExchangeBuilder<
-        C extends CryptoExchange, B extends CryptoExchangeBuilder<C, B>>
-    {
-        public B date(LocalDateTime date)
-        {
+            C extends CryptoExchange, B extends CryptoExchangeBuilder<C, B>> {
+        public B date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
@@ -75,30 +70,28 @@ public class CryptoExchange
     /**
      * Constructor for testing purposes
      */
-    public CryptoExchange(Long          id,
-                          Ticker        soldCrypto,
-                          Ticker        receivedCrypto,
-                          BigDecimal    soldQuantity,
-                          BigDecimal    receivedQuantity,
-                          LocalDateTime date,
-                          String        description)
-    {
-        this.id               = id;
-        this.soldCrypto       = soldCrypto;
-        this.receivedCrypto   = receivedCrypto;
-        this.soldQuantity     = soldQuantity;
+    public CryptoExchange(
+            Long id,
+            Ticker soldCrypto,
+            Ticker receivedCrypto,
+            BigDecimal soldQuantity,
+            BigDecimal receivedQuantity,
+            LocalDateTime date,
+            String description) {
+        this.id = id;
+        this.soldCrypto = soldCrypto;
+        this.receivedCrypto = receivedCrypto;
+        this.soldQuantity = soldQuantity;
         this.receivedQuantity = receivedQuantity;
-        this.date             = date.format(Constants.DB_DATE_FORMATTER);
-        this.description      = description;
+        this.date = date.format(Constants.DB_DATE_FORMATTER);
+        this.description = description;
     }
 
-    public LocalDateTime getDate()
-    {
+    public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setDate(LocalDateTime date)
-    {
+    public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
     }
 }

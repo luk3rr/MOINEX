@@ -28,8 +28,7 @@ import org.moinex.util.Constants;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class CreditCardTransaction
-{
+public abstract class CreditCardTransaction {
     @ManyToOne
     @JoinColumn(name = "crc_id", referencedColumnName = "id", nullable = false)
     private CreditCard creditCard;
@@ -40,26 +39,22 @@ public abstract class CreditCardTransaction
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "description" )
+    @Column(name = "description")
     private String description;
 
     public abstract static class CreditCardTransactionBuilder<
-        C extends CreditCardTransaction, B extends CreditCardTransactionBuilder<C, B>>
-    {
-        public B date(LocalDateTime date)
-        {
+            C extends CreditCardTransaction, B extends CreditCardTransactionBuilder<C, B>> {
+        public B date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
     }
 
-    public LocalDateTime getDate()
-    {
+    public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setDate(LocalDateTime date)
-    {
+    public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
     }
 }

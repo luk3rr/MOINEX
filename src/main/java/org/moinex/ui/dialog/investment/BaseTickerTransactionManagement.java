@@ -6,6 +6,11 @@
 
 package org.moinex.ui.dialog.investment;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -29,51 +34,33 @@ import org.moinex.util.enums.TransactionStatus;
 import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 /**
  * Base class to implement common methods for BuyTickerController and
  * SaleTickerController
  */
 @NoArgsConstructor
-
 public abstract class BaseTickerTransactionManagement {
-    @FXML
-    protected Label tickerNameLabel;
+    @FXML protected Label tickerNameLabel;
 
-    @FXML
-    protected Label walletAfterBalanceValueLabel;
+    @FXML protected Label walletAfterBalanceValueLabel;
 
-    @FXML
-    protected Label walletCurrentBalanceValueLabel;
+    @FXML protected Label walletCurrentBalanceValueLabel;
 
-    @FXML
-    protected TextField descriptionField;
+    @FXML protected TextField descriptionField;
 
-    @FXML
-    protected TextField unitPriceField;
+    @FXML protected TextField unitPriceField;
 
-    @FXML
-    protected TextField quantityField;
+    @FXML protected TextField quantityField;
 
-    @FXML
-    protected Label totalPriceLabel;
+    @FXML protected Label totalPriceLabel;
 
-    @FXML
-    protected ComboBox<Wallet> walletComboBox;
+    @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML
-    protected ComboBox<TransactionStatus> statusComboBox;
+    @FXML protected ComboBox<TransactionStatus> statusComboBox;
 
-    @FXML
-    protected ComboBox<Category> categoryComboBox;
+    @FXML protected ComboBox<Category> categoryComboBox;
 
-    @FXML
-    protected DatePicker transactionDatePicker;
+    @FXML protected DatePicker transactionDatePicker;
 
     protected SuggestionsHandlerHelper<WalletTransaction> suggestionsHandler;
 
@@ -152,11 +139,12 @@ public abstract class BaseTickerTransactionManagement {
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
-        walletComboBox.setOnAction(e -> {
-            UIUtils.updateWalletBalance(walletComboBox.getValue(),
-                    walletCurrentBalanceValueLabel);
-            walletAfterBalance();
-        });
+        walletComboBox.setOnAction(
+                e -> {
+                    UIUtils.updateWalletBalance(
+                            walletComboBox.getValue(), walletCurrentBalanceValueLabel);
+                    walletAfterBalance();
+                });
     }
 
     @FXML
@@ -174,8 +162,10 @@ public abstract class BaseTickerTransactionManagement {
 
         BigDecimal totalPrice = new BigDecimal("0.00");
 
-        if (unitPriceStr == null || quantityStr == null ||
-                unitPriceStr.isBlank() || quantityStr.isBlank()) {
+        if (unitPriceStr == null
+                || quantityStr == null
+                || unitPriceStr.isBlank()
+                || quantityStr.isBlank()) {
             totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
             return;
         }
@@ -201,8 +191,11 @@ public abstract class BaseTickerTransactionManagement {
         String quantityStr = quantityField.getText();
         Wallet wt = walletComboBox.getValue();
 
-        if (unitPriceStr == null || unitPriceStr.isBlank() ||
-                quantityStr == null || quantityStr.isBlank() || wt == null) {
+        if (unitPriceStr == null
+                || unitPriceStr.isBlank()
+                || quantityStr == null
+                || quantityStr.isBlank()
+                || wt == null) {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
         }
@@ -221,16 +214,15 @@ public abstract class BaseTickerTransactionManagement {
             // Set the style according to the balance value after the transaction
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0) {
                 // Remove old style and add negative style
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
-                        Constants.NEGATIVE_BALANCE_STYLE);
+                UIUtils.setLabelStyle(
+                        walletAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
             } else {
                 // Remove old style and add neutral style
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
-                        Constants.NEUTRAL_BALANCE_STYLE);
+                UIUtils.setLabelStyle(
+                        walletAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
             }
 
-            walletAfterBalanceValueLabel.setText(
-                    UIUtils.formatCurrency(walletAfterBalanceValue));
+            walletAfterBalanceValueLabel.setText(UIUtils.formatCurrency(walletAfterBalanceValue));
         } catch (NumberFormatException e) {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
@@ -255,8 +247,7 @@ public abstract class BaseTickerTransactionManagement {
     }
 
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(
-                walletTransactionService.getExpenseSuggestions());
+        suggestionsHandler.setSuggestions(walletTransactionService.getExpenseSuggestions());
     }
 
     protected void populateComboBoxes() {
@@ -268,8 +259,7 @@ public abstract class BaseTickerTransactionManagement {
         // to inform the user that a category is needed
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
-                    categoryComboBox,
-                    "You need to add a category before adding a transaction");
+                    categoryComboBox, "You need to add a category before adding a transaction");
         }
     }
 
@@ -281,56 +271,67 @@ public abstract class BaseTickerTransactionManagement {
 
     protected void configureListeners() {
         // Update wallet after balance when the value field changes
-        unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX)) {
-                unitPriceField.setText(oldValue);
-            } else {
-                updateTotalPrice();
-                walletAfterBalance();
-            }
-        });
+        unitPriceField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX)) {
+                                unitPriceField.setText(oldValue);
+                            } else {
+                                updateTotalPrice();
+                                walletAfterBalance();
+                            }
+                        });
 
-        quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX)) {
-                quantityField.setText(oldValue);
-            } else {
-                updateTotalPrice();
-                walletAfterBalance();
-            }
-        });
+        quantityField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX)) {
+                                quantityField.setText(oldValue);
+                            } else {
+                                updateTotalPrice();
+                                walletAfterBalance();
+                            }
+                        });
 
-        unitPriceField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateTotalPrice();
-            walletAfterBalance();
-        });
+        unitPriceField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            updateTotalPrice();
+                            walletAfterBalance();
+                        });
 
-        quantityField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateTotalPrice();
-            walletAfterBalance();
-        });
+        quantityField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            updateTotalPrice();
+                            walletAfterBalance();
+                        });
     }
 
     protected void configureSuggestions() {
-        Function<WalletTransaction, String> filterFunction =
-                WalletTransaction::getDescription;
+        Function<WalletTransaction, String> filterFunction = WalletTransaction::getDescription;
 
         // Format:
         //    Description
         //    Amount | Wallet | Category
-        Function<WalletTransaction, String> displayFunction = wt
-                -> String.format("%s%n%s | %s | %s ",
-                wt.getDescription(),
-                UIUtils.formatCurrency(wt.getAmount()),
-                wt.getWallet().getName(),
-                wt.getCategory().getName());
+        Function<WalletTransaction, String> displayFunction =
+                wt ->
+                        String.format(
+                                "%s%n%s | %s | %s ",
+                                wt.getDescription(),
+                                UIUtils.formatCurrency(wt.getAmount()),
+                                wt.getWallet().getName(),
+                                wt.getCategory().getName());
 
-        Consumer<WalletTransaction> onSelectCallback =
-                this::fillFieldsWithTransaction;
+        Consumer<WalletTransaction> onSelectCallback = this::fillFieldsWithTransaction;
 
-        suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
-                filterFunction,
-                displayFunction,
-                onSelectCallback);
+        suggestionsHandler =
+                new SuggestionsHandlerHelper<>(
+                        descriptionField, filterFunction, displayFunction, onSelectCallback);
 
         suggestionsHandler.enable();
     }
@@ -348,8 +349,7 @@ public abstract class BaseTickerTransactionManagement {
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        UIUtils.updateWalletBalance(walletComboBox.getValue(),
-                walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 }

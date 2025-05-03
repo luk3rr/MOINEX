@@ -25,8 +25,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class EditCreditCardController extends BaseCreditCardManagement
-{
+public final class EditCreditCardController extends BaseCreditCardManagement {
     private CreditCard creditCard = null;
 
     /**
@@ -36,14 +35,12 @@ public final class EditCreditCardController extends BaseCreditCardManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditCreditCardController(CreditCardService creditCardService,
-                                    WalletService     walletService)
-    {
+    public EditCreditCardController(
+            CreditCardService creditCardService, WalletService walletService) {
         super(creditCardService, walletService);
     }
 
-    public void setCreditCard(CreditCard crc)
-    {
+    public void setCreditCard(CreditCard crc) {
         creditCard = crc;
         nameField.setText(creditCard.getName());
         limitField.setText(creditCard.getMaxDebt().toString());
@@ -56,57 +53,54 @@ public final class EditCreditCardController extends BaseCreditCardManagement
 
     @FXML
     @Override
-    protected void handleSave()
-    {
+    protected void handleSave() {
         String crcName = nameField.getText();
-        crcName        = crcName.strip(); // Remove leading and trailing whitespaces
+        crcName = crcName.strip(); // Remove leading and trailing whitespaces
 
-        String             crcLimitStr          = limitField.getText();
-        String             crcLastFourDigitsStr = lastFourDigitsField.getText();
-        String             crcClosingDayStr     = closingDayComboBox.getValue();
-        String             crcDueDayStr         = dueDayComboBox.getValue();
-        CreditCardOperator crcOperator          = operatorComboBox.getValue();
+        String crcLimitStr = limitField.getText();
+        String crcLastFourDigitsStr = lastFourDigitsField.getText();
+        String crcClosingDayStr = closingDayComboBox.getValue();
+        String crcDueDayStr = dueDayComboBox.getValue();
+        CreditCardOperator crcOperator = operatorComboBox.getValue();
         Wallet crcDefaultBillingWallet = defaultBillingWalletComboBox.getValue();
 
-        if (crcName.isEmpty() || crcLimitStr.isEmpty() ||
-            crcLastFourDigitsStr.isEmpty() || crcOperator == null ||
-            crcClosingDayStr == null || crcDueDayStr == null)
-        {
+        if (crcName.isEmpty()
+                || crcLimitStr.isEmpty()
+                || crcLastFourDigitsStr.isEmpty()
+                || crcOperator == null
+                || crcClosingDayStr == null
+                || crcDueDayStr == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
-            BigDecimal crcLimit      = new BigDecimal(crcLimitStr);
-            Integer    crcClosingDay = Integer.parseInt(crcClosingDayStr);
-            Integer    crcDueDay     = Integer.parseInt(crcDueDayStr);
+        try {
+            BigDecimal crcLimit = new BigDecimal(crcLimitStr);
+            Integer crcClosingDay = Integer.parseInt(crcClosingDayStr);
+            Integer crcDueDay = Integer.parseInt(crcDueDayStr);
 
             boolean defaultWalletChanged =
-                (crcDefaultBillingWallet != null &&
-                 creditCard.getDefaultBillingWallet() != null &&
-                 crcDefaultBillingWallet.getId().equals(
-                     creditCard.getDefaultBillingWallet().getId())) ||
-                (crcDefaultBillingWallet == null &&
-                 creditCard.getDefaultBillingWallet() == null);
+                    (crcDefaultBillingWallet != null
+                                    && creditCard.getDefaultBillingWallet() != null
+                                    && crcDefaultBillingWallet
+                                            .getId()
+                                            .equals(creditCard.getDefaultBillingWallet().getId()))
+                            || (crcDefaultBillingWallet == null
+                                    && creditCard.getDefaultBillingWallet() == null);
 
             // Check if it has any modification
-            if (creditCard.getName().equals(crcName) &&
-                crcLimit.compareTo(creditCard.getMaxDebt()) == 0 &&
-                creditCard.getLastFourDigits().equals(crcLastFourDigitsStr) &&
-                creditCard.getClosingDay().equals(crcClosingDay) &&
-                creditCard.getBillingDueDay().equals(crcDueDay) &&
-                creditCard.getOperator().getId().equals(crcOperator.getId()) &&
-                defaultWalletChanged)
-            {
+            if (creditCard.getName().equals(crcName)
+                    && crcLimit.compareTo(creditCard.getMaxDebt()) == 0
+                    && creditCard.getLastFourDigits().equals(crcLastFourDigitsStr)
+                    && creditCard.getClosingDay().equals(crcClosingDay)
+                    && creditCard.getBillingDueDay().equals(crcDueDay)
+                    && creditCard.getOperator().getId().equals(crcOperator.getId())
+                    && defaultWalletChanged) {
                 WindowUtils.showInformationDialog(
-                    "No changes",
-                    "No changes were made to the credit card.");
-            }
-            else // If there is any modification, update the credit card
+                        "No changes", "No changes were made to the credit card.");
+            } else // If there is any modification, update the credit card
             {
                 creditCard.setName(crcName);
                 creditCard.setMaxDebt(crcLimit);
@@ -118,20 +112,15 @@ public final class EditCreditCardController extends BaseCreditCardManagement
 
                 creditCardService.updateCreditCard(creditCard);
 
-                WindowUtils.showSuccessDialog("Credit card updated",
-                                              "The credit card updated successfully.");
+                WindowUtils.showSuccessDialog(
+                        "Credit card updated", "The credit card updated successfully.");
             }
 
-            Stage stage = (Stage)nameField.getScene().getWindow();
+            Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid limit", "Please enter a valid limit");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException |
-               IllegalStateException e)
-        {
+        } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
             WindowUtils.showErrorDialog("Error creating credit card", e.getMessage());
         }
     }

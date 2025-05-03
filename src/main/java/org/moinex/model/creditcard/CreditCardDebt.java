@@ -33,8 +33,7 @@ import org.moinex.model.Category;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreditCardDebt extends CreditCardTransaction
-{
+public class CreditCardDebt extends CreditCardTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

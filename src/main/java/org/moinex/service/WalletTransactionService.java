@@ -7,6 +7,10 @@
 package org.moinex.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
@@ -26,11 +30,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.List;
-
 /**
  * This class is responsible for the business logic of the wallet transactions
  * <p>
@@ -40,14 +39,16 @@ import java.util.List;
 @Service
 @NoArgsConstructor
 public class WalletTransactionService {
-    private static final Logger logger =
-            LoggerFactory.getLogger(WalletTransactionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(WalletTransactionService.class);
     private WalletRepository walletRepository;
     private TransferRepository transferRepository;
     private WalletTransactionRepository walletTransactionRepository;
 
     @Autowired
-    public WalletTransactionService(WalletRepository walletRepository, TransferRepository transferRepository, WalletTransactionRepository walletTransactionRepository) {
+    public WalletTransactionService(
+            WalletRepository walletRepository,
+            TransferRepository transferRepository,
+            WalletTransactionRepository walletTransactionRepository) {
         this.walletRepository = walletRepository;
         this.transferRepository = transferRepository;
         this.walletTransactionRepository = walletTransactionRepository;
@@ -69,48 +70,56 @@ public class WalletTransactionService {
      * @throws MoinexException.InsufficientResourcesException If the sender wallet does not have enough
      */
     @Transactional
-    public Long transferMoney(Long senderId,
-                              Long receiverId,
-                              LocalDateTime date,
-                              BigDecimal amount,
-                              String description) {
+    public Long transferMoney(
+            Long senderId,
+            Long receiverId,
+            LocalDateTime date,
+            BigDecimal amount,
+            String description) {
         if (senderId.equals(receiverId)) {
             throw new MoinexException.SameSourceDestinationException(
                     "Sender and receiver wallets must be different");
         }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException(
-                    "Amount to transfer must be greater than zero");
+            throw new IllegalArgumentException("Amount to transfer must be greater than zero");
         }
 
         // Round the amount to two decimal places
         amount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        Wallet senderWallet = walletRepository.findById(senderId).orElseThrow(
-                ()
-                        -> new EntityNotFoundException(
-                        "Sender wallet not found and cannot transfer money"));
+        Wallet senderWallet =
+                walletRepository
+                        .findById(senderId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Sender wallet not found and cannot transfer"
+                                                        + " money"));
 
         Wallet receiverWallet =
-                walletRepository.findById(receiverId)
+                walletRepository
+                        .findById(receiverId)
                         .orElseThrow(
-                                ()
-                                        -> new EntityNotFoundException(
-                                        "Receiver wallet not found and cannot transfer money"));
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Receiver wallet not found and cannot transfer"
+                                                        + " money"));
 
         if (senderWallet.getBalance().compareTo(amount) < 0) {
             throw new MoinexException.InsufficientResourcesException(
                     "Sender wallet does not have enough balance to transfer");
         }
 
-        Transfer transfer = transferRepository.save(Transfer.builder()
-                .senderWallet(senderWallet)
-                .receiverWallet(receiverWallet)
-                .date(date)
-                .amount(amount)
-                .description(description)
-                .build());
+        Transfer transfer =
+                transferRepository.save(
+                        Transfer.builder()
+                                .senderWallet(senderWallet)
+                                .receiverWallet(receiverWallet)
+                                .date(date)
+                                .amount(amount)
+                                .description(description)
+                                .build());
 
         senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
         receiverWallet.setBalance(receiverWallet.getBalance().add(amount));
@@ -118,7 +127,11 @@ public class WalletTransactionService {
         walletRepository.save(senderWallet);
         walletRepository.save(receiverWallet);
 
-        logger.info("Transfer from wallet with id {} to wallet with id {} of {} was successful", senderId, receiverId, amount);
+        logger.info(
+                "Transfer from wallet with id {} to wallet with id {} of {} was successful",
+                senderId,
+                receiverId,
+                amount);
 
         return transfer.getId();
     }
@@ -137,15 +150,21 @@ public class WalletTransactionService {
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
-    public Long addIncome(Long walletId,
-                          Category category,
-                          LocalDateTime date,
-                          BigDecimal amount,
-                          String description,
-                          TransactionStatus status) {
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Wallet with id %d not found", walletId)));
+    public Long addIncome(
+            Long walletId,
+            Category category,
+            LocalDateTime date,
+            BigDecimal amount,
+            String description,
+            TransactionStatus status) {
+        Wallet wallet =
+                walletRepository
+                        .findById(walletId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Wallet with id %d not found", walletId)));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
@@ -154,15 +173,16 @@ public class WalletTransactionService {
         // Round the amount to two decimal places
         amount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        WalletTransaction wt = WalletTransaction.builder()
-                .wallet(wallet)
-                .category(category)
-                .type(TransactionType.INCOME)
-                .status(status)
-                .date(date)
-                .amount(amount)
-                .description(description)
-                .build();
+        WalletTransaction wt =
+                WalletTransaction.builder()
+                        .wallet(wallet)
+                        .category(category)
+                        .type(TransactionType.INCOME)
+                        .status(status)
+                        .date(date)
+                        .amount(amount)
+                        .description(description)
+                        .build();
 
         walletTransactionRepository.save(wt);
 
@@ -171,7 +191,8 @@ public class WalletTransactionService {
             walletRepository.save(wallet);
         }
 
-        logger.info("Income with status {} of {} added to wallet with id {}", status, amount, walletId);
+        logger.info(
+                "Income with status {} of {} added to wallet with id {}", status, amount, walletId);
 
         return wt.getId();
     }
@@ -190,15 +211,21 @@ public class WalletTransactionService {
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
-    public Long addExpense(Long walletId,
-                           Category category,
-                           LocalDateTime date,
-                           BigDecimal amount,
-                           String description,
-                           TransactionStatus status) {
-        Wallet wallet = walletRepository.findById(walletId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Wallet with id %d not found", walletId)));
+    public Long addExpense(
+            Long walletId,
+            Category category,
+            LocalDateTime date,
+            BigDecimal amount,
+            String description,
+            TransactionStatus status) {
+        Wallet wallet =
+                walletRepository
+                        .findById(walletId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Wallet with id %d not found", walletId)));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
@@ -207,15 +234,16 @@ public class WalletTransactionService {
         // Round the amount to two decimal places
         amount = amount.setScale(2, RoundingMode.HALF_UP);
 
-        WalletTransaction wt = WalletTransaction.builder()
-                .wallet(wallet)
-                .category(category)
-                .type(TransactionType.EXPENSE)
-                .status(status)
-                .date(date)
-                .amount(amount)
-                .description(description)
-                .build();
+        WalletTransaction wt =
+                WalletTransaction.builder()
+                        .wallet(wallet)
+                        .category(category)
+                        .type(TransactionType.EXPENSE)
+                        .status(status)
+                        .date(date)
+                        .amount(amount)
+                        .description(description)
+                        .build();
 
         walletTransactionRepository.save(wt);
 
@@ -224,7 +252,11 @@ public class WalletTransactionService {
             walletRepository.save(wallet);
         }
 
-        logger.info("Expense with status {} of {} added to wallet with id {}", status, amount, walletId);
+        logger.info(
+                "Expense with status {} of {} added to wallet with id {}",
+                status,
+                amount,
+                walletId);
 
         return wt.getId();
     }
@@ -241,26 +273,30 @@ public class WalletTransactionService {
      */
     @Transactional
     public void updateTransaction(WalletTransaction transaction) {
-        WalletTransaction oldTransaction = walletTransactionRepository.findById(transaction.getId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Transaction with id %d not found", transaction.getId())));
+        WalletTransaction oldTransaction =
+                walletTransactionRepository
+                        .findById(transaction.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Transaction with id %d not found",
+                                                        transaction.getId())));
 
         // Check if the wallet exists
-        if (!walletTransactionRepository.existsWalletByTransactionId(
-                transaction.getId())) {
+        if (!walletTransactionRepository.existsWalletByTransactionId(transaction.getId())) {
             throw new EntityNotFoundException(
-                    String.format("Wallet with name %s not found", transaction.getWallet().getName()));
+                    String.format(
+                            "Wallet with name %s not found", transaction.getWallet().getName()));
         }
 
         // Check if the amount is greater than zero
         if (transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException(
-                    "Amount must be greater than or equal to zero");
+            throw new IllegalArgumentException("Amount must be greater than or equal to zero");
         }
 
         // Round the amount to two decimal places
-        transaction.setAmount(
-                transaction.getAmount().setScale(2, RoundingMode.HALF_UP));
+        transaction.setAmount(transaction.getAmount().setScale(2, RoundingMode.HALF_UP));
 
         // Complex update of the transaction
         changeTransactionWallet(oldTransaction, transaction.getWallet());
@@ -287,10 +323,10 @@ public class WalletTransactionService {
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void changeTransactionType(WalletTransaction oldTransaction,
-                                       TransactionType newType) {
+    private void changeTransactionType(WalletTransaction oldTransaction, TransactionType newType) {
         if (oldTransaction.getType().equals(newType)) {
-            logger.info("Transaction with id {} has the same type as before", oldTransaction.getId());
+            logger.info(
+                    "Transaction with id {} has the same type as before", oldTransaction.getId());
 
             return;
         }
@@ -304,8 +340,7 @@ public class WalletTransactionService {
             if (oldType.equals(TransactionType.EXPENSE)) {
                 wallet.setBalance(wallet.getBalance().add(oldTransaction.getAmount()));
             } else if (oldType.equals(TransactionType.INCOME)) {
-                wallet.setBalance(
-                        wallet.getBalance().subtract(oldTransaction.getAmount()));
+                wallet.setBalance(wallet.getBalance().subtract(oldTransaction.getAmount()));
             } else {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
@@ -314,8 +349,7 @@ public class WalletTransactionService {
 
             // Apply the new transaction
             if (newType.equals(TransactionType.EXPENSE)) {
-                wallet.setBalance(
-                        wallet.getBalance().subtract(oldTransaction.getAmount()));
+                wallet.setBalance(wallet.getBalance().subtract(oldTransaction.getAmount()));
             } else if (newType.equals(TransactionType.INCOME)) {
                 wallet.setBalance(wallet.getBalance().add(oldTransaction.getAmount()));
             } else {
@@ -330,7 +364,6 @@ public class WalletTransactionService {
         oldTransaction.setType(newType);
         walletTransactionRepository.save(oldTransaction);
         logger.info("Transaction with id {} type changed to {}", oldTransaction.getId(), newType);
-
     }
 
     /**
@@ -342,10 +375,10 @@ public class WalletTransactionService {
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void changeTransactionWallet(WalletTransaction oldTransaction,
-                                         Wallet newWallet) {
+    private void changeTransactionWallet(WalletTransaction oldTransaction, Wallet newWallet) {
         if (oldTransaction.getWallet().getId().equals(newWallet.getId())) {
-            logger.info("Transaction with id {} has the same wallet as before", oldTransaction.getId());
+            logger.info(
+                    "Transaction with id {} has the same wallet as before", oldTransaction.getId());
 
             return;
         }
@@ -355,20 +388,16 @@ public class WalletTransactionService {
         if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
             if (oldTransaction.getType().equals(TransactionType.EXPENSE)) {
                 // Revert expense from old wallet
-                oldWallet.setBalance(
-                        oldWallet.getBalance().add(oldTransaction.getAmount()));
+                oldWallet.setBalance(oldWallet.getBalance().add(oldTransaction.getAmount()));
 
                 // Apply expense to new wallet
-                newWallet.setBalance(
-                        newWallet.getBalance().subtract(oldTransaction.getAmount()));
+                newWallet.setBalance(newWallet.getBalance().subtract(oldTransaction.getAmount()));
             } else if (oldTransaction.getType().equals(TransactionType.INCOME)) {
                 // Revert income from old wallet
-                oldWallet.setBalance(
-                        oldWallet.getBalance().subtract(oldTransaction.getAmount()));
+                oldWallet.setBalance(oldWallet.getBalance().subtract(oldTransaction.getAmount()));
 
                 // Apply income to new wallet
-                newWallet.setBalance(
-                        newWallet.getBalance().add(oldTransaction.getAmount()));
+                newWallet.setBalance(newWallet.getBalance().add(oldTransaction.getAmount()));
             } else {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
@@ -382,7 +411,10 @@ public class WalletTransactionService {
         oldTransaction.setWallet(newWallet);
         walletTransactionRepository.save(oldTransaction);
 
-        logger.info("Transaction with id {} wallet changed to {}", oldTransaction.getId(), newWallet.getName());
+        logger.info(
+                "Transaction with id {} wallet changed to {}",
+                oldTransaction.getId(),
+                newWallet.getName());
     }
 
     /**
@@ -394,15 +426,15 @@ public class WalletTransactionService {
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void changeTransactionAmount(WalletTransaction oldTransaction,
-                                         BigDecimal newAmount) {
+    private void changeTransactionAmount(WalletTransaction oldTransaction, BigDecimal newAmount) {
         BigDecimal oldAmount = oldTransaction.getAmount();
 
         BigDecimal diff = oldAmount.subtract(newAmount).abs();
 
         // Check if the new amount is the same as the old amount
         if (diff.compareTo(BigDecimal.ZERO) == 0) {
-            logger.info("Transaction with id {} has the same amount as before", oldTransaction.getId());
+            logger.info(
+                    "Transaction with id {} has the same amount as before", oldTransaction.getId());
 
             return;
         }
@@ -431,7 +463,8 @@ public class WalletTransactionService {
                 throw new IllegalStateException("Transaction type not recognized");
             }
 
-            logger.info("Wallet with id {} balance changed to {}", wallet.getId(), wallet.getBalance());
+            logger.info(
+                    "Wallet with id {} balance changed to {}", wallet.getId(), wallet.getBalance());
 
             walletRepository.save(wallet);
         }
@@ -439,7 +472,8 @@ public class WalletTransactionService {
         oldTransaction.setAmount(newAmount);
         walletTransactionRepository.save(oldTransaction);
 
-        logger.info("Transaction with id {} amount changed to {}", oldTransaction.getId(), newAmount);
+        logger.info(
+                "Transaction with id {} amount changed to {}", oldTransaction.getId(), newAmount);
     }
 
     /**
@@ -452,10 +486,11 @@ public class WalletTransactionService {
      * @note This method persists the changes in the wallet balances
      * and the transaction in the database
      */
-    private void changeTransactionStatus(WalletTransaction transaction,
-                                         TransactionStatus newStatus) {
+    private void changeTransactionStatus(
+            WalletTransaction transaction, TransactionStatus newStatus) {
         if (transaction.getStatus().equals(newStatus)) {
-            logger.info("Transaction with id {} has the same status as before", transaction.getId());
+            logger.info(
+                    "Transaction with id {} has the same status as before", transaction.getId());
 
             return;
         }
@@ -472,8 +507,7 @@ public class WalletTransactionService {
             } else if (oldStatus.equals(TransactionStatus.PENDING)) {
                 if (newStatus.equals(TransactionStatus.CONFIRMED)) {
                     // Apply the expense
-                    wallet.setBalance(
-                            wallet.getBalance().subtract(transaction.getAmount()));
+                    wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
                 }
             } else {
                 // WARNING for the case of new status being added to the enum
@@ -483,8 +517,7 @@ public class WalletTransactionService {
         } else if (transaction.getType().equals(TransactionType.INCOME)) {
             if (oldStatus.equals(TransactionStatus.CONFIRMED)) {
                 if (newStatus.equals(TransactionStatus.PENDING)) {
-                    wallet.setBalance(
-                            wallet.getBalance().subtract(transaction.getAmount()));
+                    wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
                 }
             } else if (oldStatus.equals(TransactionStatus.PENDING)) {
                 if (newStatus.equals(TransactionStatus.CONFIRMED)) {
@@ -519,9 +552,15 @@ public class WalletTransactionService {
      */
     @Transactional
     public void deleteTransaction(Long transactionId) {
-        WalletTransaction transaction = walletTransactionRepository.findById(transactionId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Transaction with id %d not found", transactionId)));
+        WalletTransaction transaction =
+                walletTransactionRepository
+                        .findById(transactionId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Transaction with id %d not found",
+                                                        transactionId)));
 
         Wallet wallet = transaction.getWallet();
 
@@ -552,11 +591,14 @@ public class WalletTransactionService {
     @Transactional
     public void confirmTransaction(Long transactionId) {
         WalletTransaction transaction =
-                walletTransactionRepository.findById(transactionId)
-                        .orElseThrow(()
-                                -> new EntityNotFoundException("Transaction with id " +
-                                transactionId +
-                                " not found"));
+                walletTransactionRepository
+                        .findById(transactionId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Transaction with id "
+                                                        + transactionId
+                                                        + " not found"));
 
         if (transaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
             throw new MoinexException.AttributeAlreadySetException(
@@ -585,10 +627,12 @@ public class WalletTransactionService {
      * @throws EntityNotFoundException If the transaction does not exist
      */
     public WalletTransaction getTransactionById(Long id) {
-        return walletTransactionRepository.findById(id).orElseThrow(
-                ()
-                        -> new EntityNotFoundException("Transaction with id " + id +
-                        " not found"));
+        return walletTransactionRepository
+                .findById(id)
+                .orElseThrow(
+                        () ->
+                                new EntityNotFoundException(
+                                        "Transaction with id " + id + " not found"));
     }
 
     /**
@@ -625,10 +669,8 @@ public class WalletTransactionService {
      * @param month The month of the transactions
      * @param year  The year of the transactions
      */
-    public List<WalletTransaction> getNonArchivedTransactionsByMonth(Integer month,
-                                                                     Integer year) {
-        return walletTransactionRepository.findNonArchivedTransactionsByMonth(month,
-                year);
+    public List<WalletTransaction> getNonArchivedTransactionsByMonth(Integer month, Integer year) {
+        return walletTransactionRepository.findNonArchivedTransactionsByMonth(month, year);
     }
 
     /**
@@ -648,14 +690,10 @@ public class WalletTransactionService {
      * @param month    The month of the transactions
      * @param year     The year of the transactions
      */
-    public List<WalletTransaction>
-    getNonArchivedTransactionsByWalletAndMonth(Long walletId,
-                                               Integer month,
-                                               Integer year) {
+    public List<WalletTransaction> getNonArchivedTransactionsByWalletAndMonth(
+            Long walletId, Integer month, Integer year) {
         return walletTransactionRepository.findNonArchivedTransactionsByWalletAndMonth(
-                walletId,
-                month,
-                year);
+                walletId, month, year);
     }
 
     /**
@@ -666,15 +704,13 @@ public class WalletTransactionService {
      * @param endDate   The end date
      * @return A list with all transactions between the two dates
      */
-    public List<WalletTransaction>
-    getNonArchivedTransactionsBetweenDates(LocalDateTime startDate,
-                                           LocalDateTime endDate) {
+    public List<WalletTransaction> getNonArchivedTransactionsBetweenDates(
+            LocalDateTime startDate, LocalDateTime endDate) {
         String startDateStr = startDate.format(Constants.DB_DATE_FORMATTER);
         String endDateStr = endDate.format(Constants.DB_DATE_FORMATTER);
 
         return walletTransactionRepository.findNonArchivedTransactionsBetweenDates(
-                startDateStr,
-                endDateStr);
+                startDateStr, endDateStr);
     }
 
     /**
@@ -684,11 +720,9 @@ public class WalletTransactionService {
      * @param month The month of the transactions
      * @param year  The year of the transactions
      */
-    public List<WalletTransaction>
-    getNonArchivedConfirmedTransactionsByMonth(Integer month, Integer year) {
-        return walletTransactionRepository.findNonArchivedConfirmedTransactionsByMonth(
-                month,
-                year);
+    public List<WalletTransaction> getNonArchivedConfirmedTransactionsByMonth(
+            Integer month, Integer year) {
+        return walletTransactionRepository.findNonArchivedConfirmedTransactionsByMonth(month, year);
     }
 
     /**
@@ -699,8 +733,7 @@ public class WalletTransactionService {
      * @return A list with the last n transactions of all wallets
      */
     public List<WalletTransaction> getNonArchivedLastTransactions(Integer n) {
-        return walletTransactionRepository.findNonArchivedLastTransactions(
-                PageRequest.ofSize(n));
+        return walletTransactionRepository.findNonArchivedLastTransactions(PageRequest.ofSize(n));
     }
 
     /**
@@ -726,8 +759,8 @@ public class WalletTransactionService {
      * @return The count of transactions in the wallet
      */
     public Long getTransactionCountByWallet(Long walletId) {
-        return walletTransactionRepository.getTransactionCountByWallet(walletId) +
-                transferRepository.getTransferCountByWallet(walletId);
+        return walletTransactionRepository.getTransactionCountByWallet(walletId)
+                + transferRepository.getTransferCountByWallet(walletId);
     }
 
     /**
@@ -738,8 +771,7 @@ public class WalletTransactionService {
      * @param year     The year
      * @return A list with the transfers in the wallet by month
      */
-    public List<Transfer>
-    getTransfersByWalletAndMonth(Long walletId, Integer month, Integer year) {
+    public List<Transfer> getTransfersByWalletAndMonth(Long walletId, Integer month, Integer year) {
         return transferRepository.findTransfersByWalletAndMonth(walletId, month, year);
     }
 

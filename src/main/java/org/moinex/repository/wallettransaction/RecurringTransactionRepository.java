@@ -7,7 +7,6 @@
 package org.moinex.repository.wallettransaction;
 
 import java.util.List;
-
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.util.enums.RecurringTransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,9 +17,7 @@ import org.springframework.stereotype.Repository;
  * This repository provides methods to query the database for RecurringTransaction
  */
 @Repository
-public interface RecurringTransactionRepository
-    extends JpaRepository<RecurringTransaction, Long>
-{
+public interface RecurringTransactionRepository extends JpaRepository<RecurringTransaction, Long> {
 
     /**
      * Get the recurring transaction by its status
@@ -28,5 +25,4 @@ public interface RecurringTransactionRepository
      * @return A list of recurring transactions with the given status
      */
     List<RecurringTransaction> findByStatus(RecurringTransactionStatus status);
-
 }

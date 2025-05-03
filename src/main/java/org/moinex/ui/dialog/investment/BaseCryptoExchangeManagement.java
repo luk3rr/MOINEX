@@ -30,37 +30,26 @@ import org.springframework.context.ConfigurableApplicationContext;
  * Base class to implement the common behavior of the Add and Edit Crypto Exchange
  */
 @NoArgsConstructor
-public abstract class BaseCryptoExchangeManagement
-{
-    @FXML
-    protected Label cryptoSoldAfterBalanceValueLabel;
+public abstract class BaseCryptoExchangeManagement {
+    @FXML protected Label cryptoSoldAfterBalanceValueLabel;
 
-    @FXML
-    protected Label cryptoReceivedAfterBalanceValueLabel;
+    @FXML protected Label cryptoReceivedAfterBalanceValueLabel;
 
-    @FXML
-    protected Label cryptoSoldCurrentBalanceValueLabel;
+    @FXML protected Label cryptoSoldCurrentBalanceValueLabel;
 
-    @FXML
-    protected Label cryptoReceivedCurrentBalanceValueLabel;
+    @FXML protected Label cryptoReceivedCurrentBalanceValueLabel;
 
-    @FXML
-    protected ComboBox<Ticker> cryptoSoldComboBox;
+    @FXML protected ComboBox<Ticker> cryptoSoldComboBox;
 
-    @FXML
-    protected ComboBox<Ticker> cryptoReceivedComboBox;
+    @FXML protected ComboBox<Ticker> cryptoReceivedComboBox;
 
-    @FXML
-    protected TextField descriptionField;
+    @FXML protected TextField descriptionField;
 
-    @FXML
-    protected TextField cryptoSoldQuantityField;
+    @FXML protected TextField cryptoSoldQuantityField;
 
-    @FXML
-    protected TextField cryptoReceivedQuantityField;
+    @FXML protected TextField cryptoReceivedQuantityField;
 
-    @FXML
-    protected DatePicker exchangeDatePicker;
+    @FXML protected DatePicker exchangeDatePicker;
 
     protected ConfigurableApplicationContext springContext;
 
@@ -79,17 +68,14 @@ public abstract class BaseCryptoExchangeManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseCryptoExchangeManagement(TickerService     tickerService,
-                                           CalculatorService calculatorService)
-    {
-        this.tickerService     = tickerService;
+    protected BaseCryptoExchangeManagement(
+            TickerService tickerService, CalculatorService calculatorService) {
+        this.tickerService = tickerService;
         this.calculatorService = calculatorService;
     }
 
-    public void setFromCryptoComboBox(Ticker tk)
-    {
-        if (cryptos.stream().noneMatch(c -> c.getId().equals(tk.getId())))
-        {
+    public void setFromCryptoComboBox(Ticker tk) {
+        if (cryptos.stream().noneMatch(c -> c.getId().equals(tk.getId()))) {
             return;
         }
 
@@ -99,8 +85,7 @@ public abstract class BaseCryptoExchangeManagement
     }
 
     @FXML
-    protected void initialize()
-    {
+    protected void initialize() {
         configureComboBoxes();
 
         loadCryptosFromDatabase();
@@ -115,15 +100,17 @@ public abstract class BaseCryptoExchangeManagement
         UIUtils.resetLabel(cryptoSoldCurrentBalanceValueLabel);
         UIUtils.resetLabel(cryptoReceivedCurrentBalanceValueLabel);
 
-        cryptoSoldComboBox.setOnAction(e -> {
-            updateFromCryptoCurrentQuantity();
-            updateFromCryptoQuantityAfterExchange();
-        });
+        cryptoSoldComboBox.setOnAction(
+                e -> {
+                    updateFromCryptoCurrentQuantity();
+                    updateFromCryptoQuantityAfterExchange();
+                });
 
-        cryptoReceivedComboBox.setOnAction(e -> {
-            updateToCryptoCurrentQuantity();
-            updateToCryptoQuantityAfterExchange();
-        });
+        cryptoReceivedComboBox.setOnAction(
+                e -> {
+                    updateToCryptoCurrentQuantity();
+                    updateToCryptoQuantityAfterExchange();
+                });
 
         configureListeners();
     }
@@ -132,228 +119,190 @@ public abstract class BaseCryptoExchangeManagement
     protected abstract void handleSave();
 
     @FXML
-    protected void handleCancel()
-    {
-        Stage stage = (Stage)cryptoReceivedQuantityField.getScene().getWindow();
+    protected void handleCancel() {
+        Stage stage = (Stage) cryptoReceivedQuantityField.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    protected void handleCryptoSoldOpenCalculator()
-    {
+    protected void handleCryptoSoldOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
-            "Calculator",
-            springContext,
-            (CalculatorController controller)
-                -> {},
-            List.of(()
-                        -> calculatorService.updateComponentWithResult(
-                            cryptoSoldQuantityField)));
+                Constants.CALCULATOR_FXML,
+                "Calculator",
+                springContext,
+                (CalculatorController controller) -> {},
+                List.of(
+                        () ->
+                                calculatorService.updateComponentWithResult(
+                                        cryptoSoldQuantityField)));
     }
 
     @FXML
-    protected void handleCryptoReceivedOpenCalculator()
-    {
+    protected void handleCryptoReceivedOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
-            "Calculator",
-            springContext,
-            (CalculatorController controller)
-                -> {},
-            List.of(()
-                        -> calculatorService.updateComponentWithResult(
-                            cryptoReceivedQuantityField)));
+                Constants.CALCULATOR_FXML,
+                "Calculator",
+                springContext,
+                (CalculatorController controller) -> {},
+                List.of(
+                        () ->
+                                calculatorService.updateComponentWithResult(
+                                        cryptoReceivedQuantityField)));
     }
 
-    protected void updateFromCryptoCurrentQuantity()
-    {
+    protected void updateFromCryptoCurrentQuantity() {
         Ticker cryptoSold = cryptoSoldComboBox.getValue();
 
-        if (cryptoSold == null)
-        {
+        if (cryptoSold == null) {
             return;
         }
 
-        if (cryptoSold.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
-        {
+        if (cryptoSold.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0) {
             // Must be unreachable
-            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel,
-                                  Constants.NEGATIVE_BALANCE_STYLE);
-        }
-        else
-        {
-            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel,
-                                  Constants.NEUTRAL_BALANCE_STYLE);
+            UIUtils.setLabelStyle(
+                    cryptoSoldCurrentBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
+        } else {
+            UIUtils.setLabelStyle(
+                    cryptoSoldCurrentBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
         }
 
-        cryptoSoldCurrentBalanceValueLabel.setText(
-            cryptoSold.getCurrentQuantity().toString());
+        cryptoSoldCurrentBalanceValueLabel.setText(cryptoSold.getCurrentQuantity().toString());
     }
 
-    protected void updateToCryptoCurrentQuantity()
-    {
+    protected void updateToCryptoCurrentQuantity() {
         Ticker cryptoReceived = cryptoReceivedComboBox.getValue();
 
-        if (cryptoReceived == null)
-        {
+        if (cryptoReceived == null) {
             return;
         }
 
-        if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0)
-        {
+        if (cryptoReceived.getCurrentQuantity().compareTo(BigDecimal.ZERO) < 0) {
             // Must be unreachable
-            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel,
-                                  Constants.NEGATIVE_BALANCE_STYLE);
-        }
-        else
-        {
-            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel,
-                                  Constants.NEUTRAL_BALANCE_STYLE);
+            UIUtils.setLabelStyle(
+                    cryptoReceivedCurrentBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
+        } else {
+            UIUtils.setLabelStyle(
+                    cryptoReceivedCurrentBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
         }
 
         cryptoReceivedCurrentBalanceValueLabel.setText(
-            cryptoReceived.getCurrentQuantity().toString());
+                cryptoReceived.getCurrentQuantity().toString());
     }
 
-    protected void updateFromCryptoQuantityAfterExchange()
-    {
+    protected void updateFromCryptoQuantityAfterExchange() {
         String cryptoSoldQuantityStr = cryptoSoldQuantityField.getText();
-        Ticker cryptoSold            = cryptoSoldComboBox.getValue();
+        Ticker cryptoSold = cryptoSoldComboBox.getValue();
 
-        if (cryptoSoldQuantityStr == null || cryptoSoldQuantityStr.isBlank() ||
-            cryptoSold == null)
-        {
+        if (cryptoSoldQuantityStr == null
+                || cryptoSoldQuantityStr.isBlank()
+                || cryptoSold == null) {
             UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal exchangeQuantity = new BigDecimal(cryptoSoldQuantityStr);
 
-            if (exchangeQuantity.compareTo(BigDecimal.ZERO) < 0)
-            {
+            if (exchangeQuantity.compareTo(BigDecimal.ZERO) < 0) {
                 UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
                 return;
             }
 
             BigDecimal cryptoSoldAfterBalance =
-                cryptoSold.getCurrentQuantity().subtract(exchangeQuantity);
+                    cryptoSold.getCurrentQuantity().subtract(exchangeQuantity);
 
-            if (cryptoSoldAfterBalance.compareTo(BigDecimal.ZERO) < 0)
-            {
+            if (cryptoSoldAfterBalance.compareTo(BigDecimal.ZERO) < 0) {
                 // Remove old style and add negative style
-                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel,
-                                      Constants.NEGATIVE_BALANCE_STYLE);
-            }
-            else
-            {
+                UIUtils.setLabelStyle(
+                        cryptoSoldAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
+            } else {
                 // Remove old style and add neutral style
-                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel,
-                                      Constants.NEUTRAL_BALANCE_STYLE);
+                UIUtils.setLabelStyle(
+                        cryptoSoldAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
             }
 
             cryptoSoldAfterBalanceValueLabel.setText(cryptoSoldAfterBalance.toString());
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
         }
     }
 
-    protected void updateToCryptoQuantityAfterExchange()
-    {
+    protected void updateToCryptoQuantityAfterExchange() {
         String cryptoReceivedQuantityStr = cryptoReceivedQuantityField.getText();
-        Ticker cryptoReceived            = cryptoReceivedComboBox.getValue();
+        Ticker cryptoReceived = cryptoReceivedComboBox.getValue();
 
-        if (cryptoReceivedQuantityStr == null ||
-            cryptoReceivedQuantityStr.isBlank() || cryptoReceived == null)
-        {
+        if (cryptoReceivedQuantityStr == null
+                || cryptoReceivedQuantityStr.isBlank()
+                || cryptoReceived == null) {
             UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal exchangeQuantity = new BigDecimal(cryptoReceivedQuantityStr);
 
-            if (exchangeQuantity.compareTo(BigDecimal.ZERO) < 0)
-            {
+            if (exchangeQuantity.compareTo(BigDecimal.ZERO) < 0) {
                 UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
                 return;
             }
 
             BigDecimal cryptoReceivedAfterBalance =
-                cryptoReceived.getCurrentQuantity().add(exchangeQuantity);
+                    cryptoReceived.getCurrentQuantity().add(exchangeQuantity);
 
-            if (cryptoReceivedAfterBalance.compareTo(BigDecimal.ZERO) < 0)
-            {
+            if (cryptoReceivedAfterBalance.compareTo(BigDecimal.ZERO) < 0) {
                 // Remove old style and add negative style
-                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel,
-                                      Constants.NEGATIVE_BALANCE_STYLE);
-            }
-            else
-            {
+                UIUtils.setLabelStyle(
+                        cryptoReceivedAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
+            } else {
                 // Remove old style and add neutral style
-                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel,
-                                      Constants.NEUTRAL_BALANCE_STYLE);
+                UIUtils.setLabelStyle(
+                        cryptoReceivedAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
             }
 
-            cryptoReceivedAfterBalanceValueLabel.setText(
-                cryptoReceivedAfterBalance.toString());
-        }
-        catch (NumberFormatException e)
-        {
+            cryptoReceivedAfterBalanceValueLabel.setText(cryptoReceivedAfterBalance.toString());
+        } catch (NumberFormatException e) {
             UIUtils.resetLabel(cryptoReceivedAfterBalanceValueLabel);
         }
     }
 
-    protected void loadCryptosFromDatabase()
-    {
-        cryptos =
-            tickerService.getAllNonArchivedTickersByType(TickerType.CRYPTOCURRENCY);
+    protected void loadCryptosFromDatabase() {
+        cryptos = tickerService.getAllNonArchivedTickersByType(TickerType.CRYPTOCURRENCY);
     }
 
-    protected void populateCryptoComboBoxes()
-    {
+    protected void populateCryptoComboBoxes() {
         cryptoSoldComboBox.getItems().setAll(cryptos);
         cryptoReceivedComboBox.getItems().setAll(cryptos);
     }
 
-    protected void configureComboBoxes()
-    {
+    protected void configureComboBoxes() {
         UIUtils.configureComboBox(cryptoSoldComboBox, Ticker::getName);
         UIUtils.configureComboBox(cryptoReceivedComboBox, Ticker::getName);
     }
 
-    protected void configureListeners()
-    {
+    protected void configureListeners() {
         // Ensure that the user can only input numbers in the quantity field
-        cryptoSoldQuantityField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
-                {
-                    cryptoSoldQuantityField.setText(oldValue);
-                }
-                else
-                {
-                    updateFromCryptoQuantityAfterExchange();
-                    updateToCryptoQuantityAfterExchange();
-                }
-            });
+        cryptoSoldQuantityField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX)) {
+                                cryptoSoldQuantityField.setText(oldValue);
+                            } else {
+                                updateFromCryptoQuantityAfterExchange();
+                                updateToCryptoQuantityAfterExchange();
+                            }
+                        });
 
-        cryptoReceivedQuantityField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX))
-                {
-                    cryptoReceivedQuantityField.setText(oldValue);
-                }
-                else
-                {
-                    updateFromCryptoQuantityAfterExchange();
-                    updateToCryptoQuantityAfterExchange();
-                }
-            });
+        cryptoReceivedQuantityField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.INVESTMENT_VALUE_REGEX)) {
+                                cryptoReceivedQuantityField.setText(oldValue);
+                            } else {
+                                updateFromCryptoQuantityAfterExchange();
+                                updateToCryptoQuantityAfterExchange();
+                            }
+                        });
     }
 }

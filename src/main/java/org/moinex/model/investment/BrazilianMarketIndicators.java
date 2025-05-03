@@ -28,8 +28,7 @@ import org.moinex.util.Constants;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class BrazilianMarketIndicators
-{
+public class BrazilianMarketIndicators {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -52,18 +51,14 @@ public class BrazilianMarketIndicators
     private String lastUpdate;
 
     public abstract static class BrazilianMarketIndicatorsBuilder<
-        C extends   BrazilianMarketIndicators, B
-            extends BrazilianMarketIndicatorsBuilder<C, B>>
-    {
-        public B ipcaLastMonthReference(YearMonth ipcaLastMonthReference)
-        {
+            C extends BrazilianMarketIndicators, B extends BrazilianMarketIndicatorsBuilder<C, B>> {
+        public B ipcaLastMonthReference(YearMonth ipcaLastMonthReference) {
             this.ipcaLastMonthReference =
-                ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
+                    ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
             return self();
         }
 
-        public B lastUpdate(LocalDateTime lastUpdate)
-        {
+        public B lastUpdate(LocalDateTime lastUpdate) {
             this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
@@ -73,25 +68,20 @@ public class BrazilianMarketIndicators
      * Get the reference of the IPCA of the last month
      * @return The reference of the IPCA of the last month
      */
-    public YearMonth getIpcaLastMonthReference()
-    {
-        if (ipcaLastMonthReference == null)
-        {
+    public YearMonth getIpcaLastMonthReference() {
+        if (ipcaLastMonthReference == null) {
             return null;
         }
 
-        return YearMonth.parse(ipcaLastMonthReference,
-                               Constants.DB_MONTH_YEAR_FORMATTER);
+        return YearMonth.parse(ipcaLastMonthReference, Constants.DB_MONTH_YEAR_FORMATTER);
     }
 
     /**
      * Get the last update of the Brazilian market indicators
      * @return The last update of the Brazilian market indicators
      */
-    public LocalDateTime getLastUpdate()
-    {
-        if (lastUpdate == null)
-        {
+    public LocalDateTime getLastUpdate() {
+        if (lastUpdate == null) {
             return null;
         }
 
@@ -102,26 +92,22 @@ public class BrazilianMarketIndicators
      * Set the reference of the IPCA of the last month
      * @param ipcaLastMonthReference The reference of the IPCA of the last month
      */
-    public void setIpcaLastMonthReference(YearMonth ipcaLastMonthReference)
-    {
-        if (ipcaLastMonthReference == null)
-        {
+    public void setIpcaLastMonthReference(YearMonth ipcaLastMonthReference) {
+        if (ipcaLastMonthReference == null) {
             this.ipcaLastMonthReference = null;
             return;
         }
 
         this.ipcaLastMonthReference =
-            ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
+                ipcaLastMonthReference.format(Constants.DB_MONTH_YEAR_FORMATTER);
     }
 
     /**
      * Set the last update of the Brazilian market indicators
      * @param lastUpdate The last update of the Brazilian market indicators
      */
-    public void setLastUpdate(LocalDateTime lastUpdate)
-    {
-        if (lastUpdate == null)
-        {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
+        if (lastUpdate == null) {
             this.lastUpdate = null;
             return;
         }

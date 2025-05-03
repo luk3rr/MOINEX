@@ -9,8 +9,7 @@ package org.moinex.util.enums;
 /**
  * ENUM that represents the frequency of a recurring transaction
  */
-public enum RecurringTransactionFrequency
-{
+public enum RecurringTransactionFrequency {
     DAILY,
     WEEKLY,
     MONTHLY,

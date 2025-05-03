@@ -23,27 +23,21 @@ import org.springframework.stereotype.Service;
 @Service
 @Getter
 @Setter
-public class CalculatorService
-{
+public class CalculatorService {
     private String result;
 
-    public CalculatorService()
-    {
+    public CalculatorService() {
         result = null;
     }
 
-    public void updateComponentWithResult(TextField component)
-    {
-        if (result != null)
-        {
-            try
-            {
+    public void updateComponentWithResult(TextField component) {
+        if (result != null) {
+            try {
                 BigDecimal resultValue = new BigDecimal(result);
 
-                if (resultValue.compareTo(BigDecimal.ZERO) < 0)
-                {
-                    WindowUtils.showInformationDialog("Invalid value",
-                                                      "The value must be positive");
+                if (resultValue.compareTo(BigDecimal.ZERO) < 0) {
+                    WindowUtils.showInformationDialog(
+                            "Invalid value", "The value must be positive");
                     return;
                 }
 
@@ -51,12 +45,9 @@ public class CalculatorService
                 result = resultValue.setScale(2, RoundingMode.HALF_UP).toString();
 
                 component.setText(result);
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 // Must be unreachable
-                WindowUtils.showErrorDialog("Invalid value",
-                                            "The value must be a number");
+                WindowUtils.showErrorDialog("Invalid value", "The value must be a number");
             }
         }
     }

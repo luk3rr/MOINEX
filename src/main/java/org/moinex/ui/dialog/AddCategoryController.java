@@ -21,50 +21,41 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class AddCategoryController
-{
-    @FXML
-    private TextField categoryNameField;
+public class AddCategoryController {
+    @FXML private TextField categoryNameField;
 
     private CategoryService categoryService;
 
     @Autowired
-    public AddCategoryController(CategoryService categoryService)
-    {
+    public AddCategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         // TODO: Implement this method
     }
 
     @FXML
-    public void handleSave()
-    {
+    public void handleSave() {
         String name = categoryNameField.getText();
 
-        try
-        {
+        try {
             categoryService.addCategory(name);
 
-            WindowUtils.showSuccessDialog("Category added",
-                                          "Category " + name + " added successfully");
+            WindowUtils.showSuccessDialog(
+                    "Category added", "Category " + name + " added successfully");
 
-            Stage stage = (Stage)categoryNameField.getScene().getWindow();
+            Stage stage = (Stage) categoryNameField.getScene().getWindow();
             stage.close();
-        }
-        catch (IllegalArgumentException | EntityExistsException e)
-        {
+        } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog("Error adding category", e.getMessage());
         }
     }
 
     @FXML
-    public void handleCancel()
-    {
-        Stage stage = (Stage)categoryNameField.getScene().getWindow();
+    public void handleCancel() {
+        Stage stage = (Stage) categoryNameField.getScene().getWindow();
         stage.close();
     }
 }

@@ -43,13 +43,10 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class CalendarController
-{
-    @FXML
-    private Label currentMonth;
+public class CalendarController {
+    @FXML private Label currentMonth;
 
-    @FXML
-    private GridPane calendar;
+    @FXML private GridPane calendar;
 
     private ConfigurableApplicationContext springContext;
 
@@ -66,17 +63,16 @@ public class CalendarController
      * @param calendarService The service for the calendar
      */
     @Autowired
-    public CalendarController(CalendarService calendarService, ConfigurableApplicationContext springContext)
-    {
+    public CalendarController(
+            CalendarService calendarService, ConfigurableApplicationContext springContext) {
         this.calendarService = calendarService;
         this.springContext = springContext;
     }
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         dateFocus = LocalDate.now();
-        today     = LocalDate.now();
+        today = LocalDate.now();
 
         loadCalendarEventsFromDatabase();
 
@@ -84,82 +80,72 @@ public class CalendarController
     }
 
     @FXML
-    private void handleBackOneMonth()
-    {
+    private void handleBackOneMonth() {
         dateFocus = dateFocus.minusMonths(1);
         calendar.getChildren().clear();
         drawCalendar();
     }
 
     @FXML
-    private void handleForwardOneMonth()
-    {
+    private void handleForwardOneMonth() {
         dateFocus = dateFocus.plusMonths(1);
         calendar.getChildren().clear();
         drawCalendar();
     }
 
     @FXML
-    private void handleAddEvent()
-    {
-        WindowUtils.openModalWindow(Constants.ADD_CALENDAR_EVENT_FXML,
-                                    "Add Calendar Event",
-                                    springContext,
-                                    (AddCalendarEventController controller)
-                                        -> {},
-                                    List.of(this::drawCalendar));
+    private void handleAddEvent() {
+        WindowUtils.openModalWindow(
+                Constants.ADD_CALENDAR_EVENT_FXML,
+                "Add Calendar Event",
+                springContext,
+                (AddCalendarEventController controller) -> {},
+                List.of(this::drawCalendar));
     }
 
     /**
      * Load the calendar events from the database
      */
-    private void loadCalendarEventsFromDatabase()
-    {
+    private void loadCalendarEventsFromDatabase() {
         calendarEvents = calendarService.getAllEvents();
     }
 
     /**
      * Draw the calendar grid
      */
-    private void drawCalendar()
-    {
+    private void drawCalendar() {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
         currentMonth.setText(dateFocus.format(formatter));
 
         Integer monthMaxDate = dateFocus.getMonth().maxLength();
 
-        if (!dateFocus.isLeapYear() && dateFocus.getMonth() == Month.FEBRUARY)
-        {
+        if (!dateFocus.isLeapYear() && dateFocus.getMonth() == Month.FEBRUARY) {
             monthMaxDate = Constants.NON_LEAP_YEAR_FEBRUARY_DAYS;
         }
 
         Integer dateOffset =
-            LocalDate.of(dateFocus.getYear(), dateFocus.getMonthValue(), 1)
-                .getDayOfWeek()
-                .getValue();
+                LocalDate.of(dateFocus.getYear(), dateFocus.getMonthValue(), 1)
+                        .getDayOfWeek()
+                        .getValue();
 
         // Adjust the date offset to start from Sunday at the first line of the calendar
-        if (dateOffset.equals(Constants.WEEK_DAYS))
-        {
+        if (dateOffset.equals(Constants.WEEK_DAYS)) {
             dateOffset = 0;
         }
 
-        Integer currentDate    = 1;
+        Integer currentDate = 1;
         int totalGridCells = dateOffset + monthMaxDate;
-        int totalRows =
-            (int)Math.ceil(totalGridCells / Constants.WEEK_DAYS.doubleValue());
+        int totalRows = (int) Math.ceil(totalGridCells / Constants.WEEK_DAYS.doubleValue());
 
-        Map<Integer, List<CalendarEvent>> calendarEventMap =
-            getCalendarEventsMonth(dateFocus);
+        Map<Integer, List<CalendarEvent>> calendarEventMap = getCalendarEventsMonth(dateFocus);
 
         calendar.getChildren().clear();
 
-        Double calendarWidth  = calendar.getPrefWidth();
+        Double calendarWidth = calendar.getPrefWidth();
         double calendarHeight = calendar.getPrefHeight();
 
         // Create the weekday labels
-        for (int j = 0; j < Constants.WEEKDAY_ABBREVIATIONS.length; j++)
-        {
+        for (int j = 0; j < Constants.WEEKDAY_ABBREVIATIONS.length; j++) {
             Text dayLabel = new Text(Constants.WEEKDAY_ABBREVIATIONS[j]);
             dayLabel.setFont(Constants.CALENDAR_WEEKDAY_FONT_CONFIG);
 
@@ -172,41 +158,41 @@ public class CalendarController
         }
 
         // Create the calendar cells for each day of the month
-        for (int i = 0; i < totalRows; i++)
-        {
-            for (int j = 0; j < Constants.WEEK_DAYS; j++)
-            {
+        for (int i = 0; i < totalRows; i++) {
+            for (int j = 0; j < Constants.WEEK_DAYS; j++) {
                 VBox cell = new VBox();
-                cell.setMinSize(calendarWidth / Constants.WEEK_DAYS,
-                                calendarHeight / (totalRows + 1));
+                cell.setMinSize(
+                        calendarWidth / Constants.WEEK_DAYS, calendarHeight / (totalRows + 1));
 
                 cell.setAlignment(Pos.TOP_CENTER);
 
                 // Define the border style for the cell
-                Double top    = (i == 0) ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
-                                         : Constants.CALENDAR_CELL_BORDER_WIDTH;
-                Double bottom = (i == totalRows - 1)
-                                    ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
-                                    : Constants.CALENDAR_CELL_BORDER_WIDTH;
-                Double left   = (j == 0) ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
-                                         : Constants.CALENDAR_CELL_BORDER_WIDTH;
-                Double right  = (j == Constants.WEEK_DAYS - 1)
-                                    ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
-                                    : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double top =
+                        (i == 0)
+                                ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double bottom =
+                        (i == totalRows - 1)
+                                ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double left =
+                        (j == 0)
+                                ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                : Constants.CALENDAR_CELL_BORDER_WIDTH;
+                Double right =
+                        (j == Constants.WEEK_DAYS - 1)
+                                ? Constants.CALENDAR_CELL_EXTERNAL_BORDER_WIDTH
+                                : Constants.CALENDAR_CELL_BORDER_WIDTH;
 
-                String borderStyle = String.format(
-                    "-fx-border-color: black; "
-                        + "-fx-border-width: %.1fpx %.1fpx %.1fpx %.1fpx;",
-                    top,
-                    right,
-                    bottom,
-                    left);
+                String borderStyle =
+                        String.format(
+                                "-fx-border-color: black; "
+                                        + "-fx-border-width: %.1fpx %.1fpx %.1fpx %.1fpx;",
+                                top, right, bottom, left);
 
                 cell.setStyle(borderStyle);
 
-                if ((i == 0 && j >= dateOffset) ||
-                    (i > 0 && currentDate <= monthMaxDate))
-                {
+                if ((i == 0 && j >= dateOffset) || (i > 0 && currentDate <= monthMaxDate)) {
                     Text dateText = new Text(String.valueOf(currentDate));
                     dateText.setFont(Constants.CALENDAR_DATE_FONT_CONFIG);
 
@@ -214,15 +200,11 @@ public class CalendarController
                     HBox eventIndicators = new HBox(3);
                     eventIndicators.setAlignment(Pos.CENTER);
 
-                    List<CalendarEvent> calendarEventsList =
-                        calendarEventMap.get(currentDate);
-                    if (calendarEventsList != null)
-                    {
-                        for (CalendarEvent event : calendarEventsList)
-                        {
-                            Circle indicator = new Circle(
-                                4,
-                                Color.web(event.getEventType().getColorHex()));
+                    List<CalendarEvent> calendarEventsList = calendarEventMap.get(currentDate);
+                    if (calendarEventsList != null) {
+                        for (CalendarEvent event : calendarEventsList) {
+                            Circle indicator =
+                                    new Circle(4, Color.web(event.getEventType().getColorHex()));
                             eventIndicators.getChildren().add(indicator);
                         }
                     }
@@ -235,12 +217,12 @@ public class CalendarController
                     cell.getChildren().addAll(dateText, spacer, eventIndicators);
 
                     // Highlight the current date
-                    if (today.getYear() == dateFocus.getYear() &&
-                        today.getMonth() == dateFocus.getMonth() &&
-                        today.getDayOfMonth() == currentDate)
-                    {
-                        cell.setStyle("-fx-border-color: blue; -fx-border-width: "
-                                      + "2px; -fx-background-color: lightblue;");
+                    if (today.getYear() == dateFocus.getYear()
+                            && today.getMonth() == dateFocus.getMonth()
+                            && today.getDayOfMonth() == currentDate) {
+                        cell.setStyle(
+                                "-fx-border-color: blue; -fx-border-width: "
+                                        + "2px; -fx-background-color: lightblue;");
                     }
 
                     currentDate++;
@@ -256,20 +238,15 @@ public class CalendarController
      * @param calendarEvents The list of calendar events
      * @return A map of calendar events by date
      */
-    private Map<Integer, List<CalendarEvent>>
-    createCalendarMap(List<CalendarEvent> calendarEvents)
-    {
+    private Map<Integer, List<CalendarEvent>> createCalendarMap(
+            List<CalendarEvent> calendarEvents) {
         Map<Integer, List<CalendarEvent>> calendarEventMap = new HashMap<>();
 
-        for (CalendarEvent event : calendarEvents)
-        {
+        for (CalendarEvent event : calendarEvents) {
             Integer eventDate = event.getDate().getDayOfMonth();
-            if (!calendarEventMap.containsKey(eventDate))
-            {
+            if (!calendarEventMap.containsKey(eventDate)) {
                 calendarEventMap.put(eventDate, List.of(event));
-            }
-            else
-            {
+            } else {
                 List<CalendarEvent> oldListByDate = calendarEventMap.get(eventDate);
 
                 List<CalendarEvent> newList = new ArrayList<>(oldListByDate);
@@ -286,16 +263,12 @@ public class CalendarController
      * @param dateFocus The date to focus on
      * @return A map of calendar events by date
      */
-    private Map<Integer, List<CalendarEvent>>
-    getCalendarEventsMonth(LocalDate dateFocus)
-    {
+    private Map<Integer, List<CalendarEvent>> getCalendarEventsMonth(LocalDate dateFocus) {
         List<CalendarEvent> calendarEventsMonth = new ArrayList<>();
 
-        for (CalendarEvent event : calendarEvents)
-        {
-            if (event.getDate().getMonth() == dateFocus.getMonth() &&
-                event.getDate().getYear() == dateFocus.getYear())
-            {
+        for (CalendarEvent event : calendarEvents) {
+            if (event.getDate().getMonth() == dateFocus.getMonth()
+                    && event.getDate().getYear() == dateFocus.getYear()) {
                 calendarEventsMonth.add(event);
             }
         }

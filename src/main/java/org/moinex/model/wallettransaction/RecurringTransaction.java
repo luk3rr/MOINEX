@@ -36,8 +36,7 @@ import org.moinex.util.enums.TransactionType;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class RecurringTransaction extends BaseTransaction
-{
+public class RecurringTransaction extends BaseTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -59,32 +58,27 @@ public class RecurringTransaction extends BaseTransaction
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name             = "status",
-            nullable         = false,
-            columnDefinition = "varchar default 'ACTIVE'")
+    @Column(name = "status", nullable = false, columnDefinition = "varchar default 'ACTIVE'")
     private RecurringTransactionStatus status = RecurringTransactionStatus.ACTIVE;
 
     public abstract static class RecurringTransactionBuilder<
-        C extends RecurringTransaction, B extends RecurringTransactionBuilder<C, B>>
-        extends BaseTransactionBuilder<C, B>
-    {
-        public B startDate(LocalDateTime startDate)
-        {
+                    C extends RecurringTransaction, B extends RecurringTransactionBuilder<C, B>>
+            extends BaseTransactionBuilder<C, B> {
+        public B startDate(LocalDateTime startDate) {
             this.startDate = startDate.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
 
-        public B endDate(LocalDateTime endDate)
-        {
+        public B endDate(LocalDateTime endDate) {
             this.endDate = endDate.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
 
-        public B nextDueDate(LocalDateTime nextDueDate)
-        {
+        public B nextDueDate(LocalDateTime nextDueDate) {
             this.nextDueDate =
-                nextDueDate.with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME)
-                    .format(Constants.DB_DATE_FORMATTER);
+                    nextDueDate
+                            .with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME)
+                            .format(Constants.DB_DATE_FORMATTER);
             return self();
         }
     }
@@ -92,59 +86,55 @@ public class RecurringTransaction extends BaseTransaction
     /**
      * Constructor for testing purposes
      */
-    public RecurringTransaction(Long                          id,
-                                Wallet                        wallet,
-                                Category                      category,
-                                TransactionType               type,
-                                BigDecimal                    amount,
-                                LocalDateTime                 startDate,
-                                LocalDateTime                 endDate,
-                                LocalDateTime                 nextDueDate,
-                                RecurringTransactionFrequency frequency,
-                                String                        description)
-    {
+    public RecurringTransaction(
+            Long id,
+            Wallet wallet,
+            Category category,
+            TransactionType type,
+            BigDecimal amount,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            LocalDateTime nextDueDate,
+            RecurringTransactionFrequency frequency,
+            String description) {
         super(wallet, category, type, amount, description);
 
-        this.id        = id;
+        this.id = id;
         this.startDate = startDate.format(Constants.DB_DATE_FORMATTER);
-        this.endDate   = endDate.format(Constants.DB_DATE_FORMATTER);
+        this.endDate = endDate.format(Constants.DB_DATE_FORMATTER);
         this.nextDueDate =
-            nextDueDate.with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME)
-                .format(Constants.DB_DATE_FORMATTER);
+                nextDueDate
+                        .with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME)
+                        .format(Constants.DB_DATE_FORMATTER);
         this.frequency = frequency;
-        this.status    = RecurringTransactionStatus.ACTIVE;
+        this.status = RecurringTransactionStatus.ACTIVE;
     }
 
-    public LocalDateTime getStartDate()
-    {
+    public LocalDateTime getStartDate() {
         return LocalDateTime.parse(startDate, Constants.DB_DATE_FORMATTER);
     }
 
-    public LocalDateTime getEndDate()
-    {
+    public LocalDateTime getEndDate() {
         return LocalDateTime.parse(endDate, Constants.DB_DATE_FORMATTER);
     }
 
-    public LocalDateTime getNextDueDate()
-    {
+    public LocalDateTime getNextDueDate() {
         return LocalDateTime.parse(nextDueDate, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setStartDate(LocalDateTime startDate)
-    {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate.format(Constants.DB_DATE_FORMATTER);
     }
 
-    public void setEndDate(LocalDateTime endDate)
-    {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate.format(Constants.DB_DATE_FORMATTER);
     }
 
-    public void setNextDueDate(LocalDateTime nextDueDate)
-    {
+    public void setNextDueDate(LocalDateTime nextDueDate) {
         // Set the default time for the next due date
         this.nextDueDate =
-            nextDueDate.with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME)
-                .format(Constants.DB_DATE_FORMATTER);
+                nextDueDate
+                        .with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME)
+                        .format(Constants.DB_DATE_FORMATTER);
     }
 }

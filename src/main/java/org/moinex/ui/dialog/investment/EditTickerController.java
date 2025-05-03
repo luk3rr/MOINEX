@@ -24,10 +24,8 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class EditTickerController extends BaseTickerManagement
-{
-    @FXML
-    private CheckBox archivedCheckBox;
+public final class EditTickerController extends BaseTickerManagement {
+    @FXML private CheckBox archivedCheckBox;
 
     private Ticker ticker = null;
 
@@ -37,13 +35,11 @@ public final class EditTickerController extends BaseTickerManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditTickerController(TickerService tickerService)
-    {
+    public EditTickerController(TickerService tickerService) {
         super(tickerService);
     }
 
-    public void setTicker(Ticker tk)
-    {
+    public void setTicker(Ticker tk) {
         this.ticker = tk;
         nameField.setText(ticker.getName());
         symbolField.setText(ticker.getSymbol());
@@ -57,56 +53,52 @@ public final class EditTickerController extends BaseTickerManagement
 
     @FXML
     @Override
-    protected void handleSave()
-    {
+    protected void handleSave() {
         // Get name and symbol and remove leading and trailing whitespaces
-        String name   = nameField.getText().strip();
+        String name = nameField.getText().strip();
         String symbol = symbolField.getText().strip();
 
-        String     currentPriceStr = currentPriceField.getText();
-        TickerType type            = typeComboBox.getValue();
-        String     quantityStr     = quantityField.getText();
-        String     avgUnitPriceStr = avgUnitPriceField.getText();
+        String currentPriceStr = currentPriceField.getText();
+        TickerType type = typeComboBox.getValue();
+        String quantityStr = quantityField.getText();
+        String avgUnitPriceStr = avgUnitPriceField.getText();
 
-        if (currentPriceStr == null || type == null || name.isBlank() || symbol.isBlank() || currentPriceStr.isBlank())
-        {
+        if (currentPriceStr == null
+                || type == null
+                || name.isBlank()
+                || symbol.isBlank()
+                || currentPriceStr.isBlank()) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
         // If quantity is set, then avgUnitPrice must be set or vice versa
-        if ((quantityStr == null || quantityStr.isBlank()) &&
-                !(avgUnitPriceStr == null || avgUnitPriceStr.isBlank()) ||
-            (avgUnitPriceStr == null || avgUnitPriceStr.isBlank()) &&
-                !(quantityStr == null || quantityStr.isBlank()))
-        {
+        if ((quantityStr == null || quantityStr.isBlank())
+                        && !(avgUnitPriceStr == null || avgUnitPriceStr.isBlank())
+                || (avgUnitPriceStr == null || avgUnitPriceStr.isBlank())
+                        && !(quantityStr == null || quantityStr.isBlank())) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Quantity must be set if average unit price is set or vice-versa");
+                    "Empty fields",
+                    "Quantity must be set if average unit price is set or vice-versa");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal currentPrice = new BigDecimal(currentPriceStr);
 
             BigDecimal quantity;
             BigDecimal avgUnitPrice;
 
-            if ((quantityStr == null || quantityStr.isBlank()) &&
-                (avgUnitPriceStr == null || avgUnitPriceStr.isBlank()))
-            {
-                quantity     = BigDecimal.ZERO;
+            if ((quantityStr == null || quantityStr.isBlank())
+                    && (avgUnitPriceStr == null || avgUnitPriceStr.isBlank())) {
+                quantity = BigDecimal.ZERO;
                 avgUnitPrice = BigDecimal.ZERO;
-            }
-            else
-            {
+            } else {
                 assert quantityStr != null;
-                quantity     = new BigDecimal(quantityStr);
+                quantity = new BigDecimal(quantityStr);
                 assert avgUnitPriceStr != null;
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
@@ -114,19 +106,17 @@ public final class EditTickerController extends BaseTickerManagement
             boolean archived = archivedCheckBox.isSelected();
 
             // Check if it has any modification
-            if (ticker.getName().equals(name) && ticker.getSymbol().equals(symbol) &&
-                ticker.getCurrentUnitValue().compareTo(currentPrice) == 0 &&
-                ticker.getType().equals(type) &&
-                ticker.getCurrentQuantity().compareTo(quantity) == 0 &&
-                ticker.getAverageUnitValue().compareTo(avgUnitPrice) == 0 &&
-                ticker.isArchived() == archived)
-            {
-                WindowUtils.showInformationDialog("No changes",
-                                                  "No changes were to the ticker");
+            if (ticker.getName().equals(name)
+                    && ticker.getSymbol().equals(symbol)
+                    && ticker.getCurrentUnitValue().compareTo(currentPrice) == 0
+                    && ticker.getType().equals(type)
+                    && ticker.getCurrentQuantity().compareTo(quantity) == 0
+                    && ticker.getAverageUnitValue().compareTo(avgUnitPrice) == 0
+                    && ticker.isArchived() == archived) {
+                WindowUtils.showInformationDialog("No changes", "No changes were to the ticker");
 
                 return;
-            }
-            else // If there is any modification, update the ticker
+            } else // If there is any modification, update the ticker
             {
                 ticker.setName(name);
                 ticker.setSymbol(symbol);
@@ -138,19 +128,14 @@ public final class EditTickerController extends BaseTickerManagement
 
                 tickerService.updateTicker(ticker);
 
-                WindowUtils.showSuccessDialog("Ticker updated",
-                                              "The ticker updated successfully.");
+                WindowUtils.showSuccessDialog("Ticker updated", "The ticker updated successfully.");
             }
 
-            Stage stage = (Stage)nameField.getScene().getWindow();
+            Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error while adding ticker", e.getMessage());
         }
     }

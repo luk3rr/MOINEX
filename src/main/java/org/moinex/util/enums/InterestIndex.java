@@ -9,15 +9,14 @@ package org.moinex.util.enums;
 /**
  * ENUM that represents the index of interest of a bond
  */
-public enum InterestIndex
-{
+public enum InterestIndex {
     // Brazilian Indices
-    CDI,   // Certificado de Depósito Interbancário
+    CDI, // Certificado de Depósito Interbancário
     SELIC, // Sistema Especial de Liquidação e de Custódia
-    IPCA,  // Índice Nacional de Preços ao Consumidor Amplo
+    IPCA, // Índice Nacional de Preços ao Consumidor Amplo
 
     // International Indices
     LIBOR, // London Interbank Offered Rate
-    SOFR,  // Secured Overnight Financing Rate
-    OTHER  // Other indices aren't specified
+    SOFR, // Secured Overnight Financing Rate
+    OTHER // Other indices aren't specified
 }

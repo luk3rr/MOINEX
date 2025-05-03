@@ -27,16 +27,12 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class AddWalletController
-{
-    @FXML
-    private TextField walletNameField;
+public class AddWalletController {
+    @FXML private TextField walletNameField;
 
-    @FXML
-    private TextField walletBalanceField;
+    @FXML private TextField walletBalanceField;
 
-    @FXML
-    private ComboBox<WalletType> walletTypeComboBox;
+    @FXML private ComboBox<WalletType> walletTypeComboBox;
 
     private WalletService walletService;
 
@@ -48,72 +44,60 @@ public class AddWalletController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddWalletController(WalletService walletService)
-    {
+    public AddWalletController(WalletService walletService) {
         this.walletService = walletService;
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         configureComboBoxes();
 
         loadWalletTypes();
 
         populateWalletTypeComboBox();
 
-        walletBalanceField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-                {
-                    walletBalanceField.setText(oldValue);
-                }
-            });
+        walletBalanceField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                walletBalanceField.setText(oldValue);
+                            }
+                        });
     }
 
     @FXML
-    private void handleCancel()
-    {
-        Stage stage = (Stage)walletNameField.getScene().getWindow();
+    private void handleCancel() {
+        Stage stage = (Stage) walletNameField.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    private void handleSave()
-    {
+    private void handleSave() {
         String walletName = walletNameField.getText();
         walletName = walletName.strip(); // Remove leading and trailing whitespaces
 
-        String     walletBalanceStr = walletBalanceField.getText();
-        WalletType walletType       = walletTypeComboBox.getValue();
+        String walletBalanceStr = walletBalanceField.getText();
+        WalletType walletType = walletTypeComboBox.getValue();
 
-        if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletType == null)
-        {
+        if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletType == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal walletBalance = new BigDecimal(walletBalanceStr);
 
             walletService.addWallet(walletName, walletBalance, walletType);
 
-            WindowUtils.showSuccessDialog("Wallet created",
-                                          "The wallet was successfully created");
+            WindowUtils.showSuccessDialog("Wallet created", "The wallet was successfully created");
 
-            Stage stage = (Stage)walletNameField.getScene().getWindow();
+            Stage stage = (Stage) walletNameField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid balance",
-                                        "Please enter a valid balance.");
-        }
-        catch (IllegalArgumentException | EntityExistsException e)
-        {
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog("Invalid balance", "Please enter a valid balance.");
+        } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog("Error creating wallet", e.getMessage());
         }
     }
@@ -121,27 +105,23 @@ public class AddWalletController
     /**
      * Load the wallet types
      */
-    private void loadWalletTypes()
-    {
+    private void loadWalletTypes() {
         walletTypes = walletService.getAllWalletTypes();
     }
 
     /**
      * Populate the wallet type combo box
      */
-    private void populateWalletTypeComboBox()
-    {
+    private void populateWalletTypeComboBox() {
         String nameToMove = "Others";
 
         // Move the "Others" wallet type to the end of the list
-        if (walletTypes.stream().anyMatch(n -> n.getName().equals(nameToMove)))
-        {
+        if (walletTypes.stream().anyMatch(n -> n.getName().equals(nameToMove))) {
             WalletType walletType =
-                walletTypes.stream()
-                    .filter(wt -> wt.getName().equals(nameToMove))
-                    .findFirst()
-                    .orElseThrow(
-                        () -> new IllegalStateException("Invalid wallet type"));
+                    walletTypes.stream()
+                            .filter(wt -> wt.getName().equals(nameToMove))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalStateException("Invalid wallet type"));
 
             walletTypes.remove(walletType);
             walletTypes.add(walletType);
@@ -149,14 +129,12 @@ public class AddWalletController
 
         // Remove the Goals wallet type to prevent the user from creating a goal wallet.
         // Goal wallets are created through the Add Goal dialog.
-        walletTypes.removeIf(
-            wt -> wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME));
+        walletTypes.removeIf(wt -> wt.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME));
 
         walletTypeComboBox.getItems().setAll(walletTypes);
     }
 
-    private void configureComboBoxes()
-    {
+    private void configureComboBoxes() {
         UIUtils.configureComboBox(walletTypeComboBox, WalletType::getName);
     }
 }

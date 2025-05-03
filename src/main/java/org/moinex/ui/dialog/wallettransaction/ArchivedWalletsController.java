@@ -30,13 +30,10 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class ArchivedWalletsController
-{
-    @FXML
-    private TableView<Wallet> walletTableView;
+public class ArchivedWalletsController {
+    @FXML private TableView<Wallet> walletTableView;
 
-    @FXML
-    private TextField searchField;
+    @FXML private TextField searchField;
 
     private List<Wallet> archivedWallets;
 
@@ -50,16 +47,14 @@ public class ArchivedWalletsController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ArchivedWalletsController(WalletService            walletService,
-                                     WalletTransactionService walletTransactionService)
-    {
-        this.walletService            = walletService;
+    public ArchivedWalletsController(
+            WalletService walletService, WalletTransactionService walletTransactionService) {
+        this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
     }
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         loadArchivedWalletsFromDatabase();
 
         configureTableView();
@@ -67,132 +62,115 @@ public class ArchivedWalletsController
         updateWalletTableView();
 
         // Add listener to the search field
-        searchField.textProperty().addListener(
-            (observable, oldValue, newValue) -> updateWalletTableView());
+        searchField
+                .textProperty()
+                .addListener((observable, oldValue, newValue) -> updateWalletTableView());
     }
 
     @FXML
-    private void handleUnarchive()
-    {
+    private void handleUnarchive() {
         Wallet selectedWallet = walletTableView.getSelectionModel().getSelectedItem();
 
-        if (selectedWallet == null)
-        {
-            WindowUtils.showInformationDialog("No wallet selected",
-                                              "Please select a wallet to unarchive");
+        if (selectedWallet == null) {
+            WindowUtils.showInformationDialog(
+                    "No wallet selected", "Please select a wallet to unarchive");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 "Unarchive wallet " + selectedWallet.getName(),
-                "Are you sure you want to unarchive this wallet?"))
-        {
-            try
-            {
+                "Are you sure you want to unarchive this wallet?")) {
+            try {
                 walletService.unarchiveWallet(selectedWallet.getId());
 
-                WindowUtils.showSuccessDialog("Wallet unarchived",
-                                              "Wallet " + selectedWallet.getName() +
-                                                  " has been unarchived");
+                WindowUtils.showSuccessDialog(
+                        "Wallet unarchived",
+                        "Wallet " + selectedWallet.getName() + " has been unarchived");
 
                 // Remove this wallet from the list and update the table view
                 archivedWallets.remove(selectedWallet);
                 updateWalletTableView();
-            }
-            catch (EntityNotFoundException e)
-            {
+            } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog("Error unarchiving wallet", e.getMessage());
             }
         }
     }
 
     @FXML
-    private void handleDelete()
-    {
+    private void handleDelete() {
         Wallet selectedWallet = walletTableView.getSelectionModel().getSelectedItem();
 
-        if (selectedWallet == null)
-        {
-            WindowUtils.showInformationDialog("No wallet selected",
-                                              "Please select a wallet to delete");
+        if (selectedWallet == null) {
+            WindowUtils.showInformationDialog(
+                    "No wallet selected", "Please select a wallet to delete");
             return;
         }
 
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.getTransactionCountByWallet(
-                selectedWallet.getId()) > 0)
-        {
+        if (walletTransactionService.getTransactionCountByWallet(selectedWallet.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                "Wallet has transactions",
-                "Cannot delete a wallet with associated transactions. You can " +
-                "archive it instead.");
+                    "Wallet has transactions",
+                    "Cannot delete a wallet with associated transactions. You can "
+                            + "archive it instead.");
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 "Remove wallet " + selectedWallet.getName(),
-                "Are you sure you want to remove this wallet?"))
-        {
-            try
-            {
+                "Are you sure you want to remove this wallet?")) {
+            try {
                 walletService.deleteWallet(selectedWallet.getId());
 
-                WindowUtils.showSuccessDialog("Wallet deleted",
-                                              "Wallet " + selectedWallet.getName() +
-                                                  " has been deleted");
+                WindowUtils.showSuccessDialog(
+                        "Wallet deleted",
+                        "Wallet " + selectedWallet.getName() + " has been deleted");
 
                 // Remove this wallet from the list and update the table view
                 archivedWallets.remove(selectedWallet);
                 updateWalletTableView();
-            }
-            catch (EntityNotFoundException | IllegalStateException e)
-            {
+            } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog("Error removing wallet", e.getMessage());
             }
         }
     }
 
     @FXML
-    private void handleCancel()
-    {
-        Stage stage = (Stage)searchField.getScene().getWindow();
+    private void handleCancel() {
+        Stage stage = (Stage) searchField.getScene().getWindow();
         stage.close();
     }
 
     /**
      * Loads the categories from the database
      */
-    private void loadArchivedWalletsFromDatabase()
-    {
+    private void loadArchivedWalletsFromDatabase() {
         archivedWallets = walletService.getAllArchivedWallets();
     }
 
     /**
      * Updates the category table view
      */
-    private void updateWalletTableView()
-    {
+    private void updateWalletTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
         walletTableView.getItems().clear();
 
         // Populate the table view
-        if (similarTextOrId.isEmpty())
-        {
+        if (similarTextOrId.isEmpty()) {
             walletTableView.getItems().setAll(archivedWallets);
-        }
-        else
-        {
+        } else {
             archivedWallets.stream()
-                .filter(w -> {
-                    String type = w.getType().getName().toLowerCase();
-                    String name = w.getName().toLowerCase();
-                    String id   = w.getId().toString();
+                    .filter(
+                            w -> {
+                                String type = w.getType().getName().toLowerCase();
+                                String name = w.getName().toLowerCase();
+                                String id = w.getId().toString();
 
-                    return type.contains(similarTextOrId) ||
-                        name.contains(similarTextOrId) || id.contains(similarTextOrId);
-                })
-                .forEach(walletTableView.getItems()::add);
+                                return type.contains(similarTextOrId)
+                                        || name.contains(similarTextOrId)
+                                        || id.contains(similarTextOrId);
+                            })
+                    .forEach(walletTableView.getItems()::add);
         }
 
         walletTableView.refresh();
@@ -201,17 +179,16 @@ public class ArchivedWalletsController
     /**
      * Configures the table view columns
      */
-    private void configureTableView()
-    {
+    private void configureTableView() {
         TableColumn<Wallet, Long> idColumn = getWalletLongTableColumn();
 
         TableColumn<Wallet, String> walletColumn = new TableColumn<>("Wallet");
         walletColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getName()));
+                param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<Wallet, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(
-            param -> new SimpleStringProperty(param.getValue().getType().getName()));
+                param -> new SimpleStringProperty(param.getValue().getType().getName()));
 
         TableColumn<Wallet, Long> numOfTransactionsColumn = getLongTableColumn();
 
@@ -223,47 +200,50 @@ public class ArchivedWalletsController
 
     private TableColumn<Wallet, Long> getLongTableColumn() {
         TableColumn<Wallet, Long> numOfTransactionsColumn =
-            new TableColumn<>("Associated Transactions");
+                new TableColumn<>("Associated Transactions");
         numOfTransactionsColumn.setCellValueFactory(
-            param
-            -> new SimpleObjectProperty<>(
-                walletTransactionService.getTransactionCountByWallet(
-                    param.getValue().getId())));
+                param ->
+                        new SimpleObjectProperty<>(
+                                walletTransactionService.getTransactionCountByWallet(
+                                        param.getValue().getId())));
 
-        numOfTransactionsColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Long item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                } else {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        numOfTransactionsColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Long item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;");
+                                }
+                            }
+                        });
         return numOfTransactionsColumn;
     }
 
     private static TableColumn<Wallet, Long> getWalletLongTableColumn() {
         TableColumn<Wallet, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue().getId()));
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
-        idColumn.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(Long item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                } else {
-                    setText(item.toString());
-                    setAlignment(Pos.CENTER);
-                    setStyle("-fx-padding: 0;");
-                }
-            }
-        });
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Long item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;");
+                                }
+                            }
+                        });
         return idColumn;
     }
 }

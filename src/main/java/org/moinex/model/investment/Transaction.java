@@ -27,8 +27,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public abstract class Transaction
-{
+public abstract class Transaction {
     @Column(name = "quantity", nullable = false, precision = 20, scale = 8)
     private BigDecimal quantity;
 
@@ -36,8 +35,6 @@ public abstract class Transaction
     private BigDecimal unitPrice;
 
     @ManyToOne
-    @JoinColumn(name                 = "wallet_transaction_id",
-                referencedColumnName = "id",
-                nullable             = false)
+    @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id", nullable = false)
     private WalletTransaction walletTransaction;
 }

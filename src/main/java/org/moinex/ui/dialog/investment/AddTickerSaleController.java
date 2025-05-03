@@ -14,9 +14,9 @@ import java.time.LocalTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
-import org.moinex.error.MoinexException;
 import org.moinex.service.CategoryService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
@@ -32,8 +32,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddTickerSaleController extends BaseTickerTransactionManagement
-{
+public final class AddTickerSaleController extends BaseTickerTransactionManagement {
     /**
      * Constructor
      * @param walletService Wallet service
@@ -43,11 +42,11 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddTickerSaleController(WalletService            walletService,
-                                   WalletTransactionService walletTransactionService,
-                                   CategoryService          categoryService,
-                                   TickerService            tickerService)
-    {
+    public AddTickerSaleController(
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            CategoryService categoryService,
+            TickerService tickerService) {
         super(walletService, walletTransactionService, categoryService, tickerService);
 
         transactionType = TransactionType.INCOME;
@@ -55,58 +54,58 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
 
     @FXML
     @Override
-    protected void handleSave()
-    {
-        Wallet            wallet       = walletComboBox.getValue();
-        String            description  = descriptionField.getText();
-        TransactionStatus status       = statusComboBox.getValue();
-        Category          category     = categoryComboBox.getValue();
-        String            unitPriceStr = unitPriceField.getText();
-        String            quantityStr  = quantityField.getText();
-        LocalDate         buyDate      = transactionDatePicker.getValue();
+    protected void handleSave() {
+        Wallet wallet = walletComboBox.getValue();
+        String description = descriptionField.getText();
+        TransactionStatus status = statusComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        String unitPriceStr = unitPriceField.getText();
+        String quantityStr = quantityField.getText();
+        LocalDate buyDate = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.isBlank() ||
-            status == null || category == null || unitPriceStr == null ||
-            unitPriceStr.isBlank() || quantityStr == null ||
-            quantityStr.isBlank() || buyDate == null)
-        {
+        if (wallet == null
+                || description == null
+                || description.isBlank()
+                || status == null
+                || category == null
+                || unitPriceStr == null
+                || unitPriceStr.isBlank()
+                || quantityStr == null
+                || quantityStr.isBlank()
+                || buyDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
 
             BigDecimal quantity = new BigDecimal(quantityStr);
 
-            LocalTime     currentTime             = LocalTime.now();
+            LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
 
-            tickerService.addSale(ticker.getId(),
-                                  wallet.getId(),
-                                  quantity,
-                                  unitPrice,
-                                  category,
-                                  dateTimeWithCurrentHour,
-                                  description,
-                                  status);
+            tickerService.addSale(
+                    ticker.getId(),
+                    wallet.getId(),
+                    quantity,
+                    unitPrice,
+                    category,
+                    dateTimeWithCurrentHour,
+                    description,
+                    status);
 
             WindowUtils.showSuccessDialog("Sale added", "Sale added successfully");
 
-            Stage stage = (Stage)tickerNameLabel.getScene().getWindow();
+            Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException |
-               MoinexException.InsufficientResourcesException e)
-        {
+        } catch (EntityNotFoundException
+                | IllegalArgumentException
+                | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog("Error while selling ticker", e.getMessage());
         }
     }

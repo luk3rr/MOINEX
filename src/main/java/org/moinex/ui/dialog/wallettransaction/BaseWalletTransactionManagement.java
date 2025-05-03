@@ -6,6 +6,11 @@
 
 package org.moinex.ui.dialog.wallettransaction;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -30,40 +35,26 @@ import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 /**
  * Base class for the wallet transaction dialog controllers
  */
 @NoArgsConstructor
 public abstract class BaseWalletTransactionManagement {
-    @FXML
-    protected Label walletAfterBalanceValueLabel;
+    @FXML protected Label walletAfterBalanceValueLabel;
 
-    @FXML
-    protected Label walletCurrentBalanceValueLabel;
+    @FXML protected Label walletCurrentBalanceValueLabel;
 
-    @FXML
-    protected ComboBox<Wallet> walletComboBox;
+    @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML
-    protected ComboBox<TransactionStatus> statusComboBox;
+    @FXML protected ComboBox<TransactionStatus> statusComboBox;
 
-    @FXML
-    protected ComboBox<Category> categoryComboBox;
+    @FXML protected ComboBox<Category> categoryComboBox;
 
-    @FXML
-    protected TextField transactionValueField;
+    @FXML protected TextField transactionValueField;
 
-    @FXML
-    protected TextField descriptionField;
+    @FXML protected TextField descriptionField;
 
-    @FXML
-    protected DatePicker transactionDatePicker;
+    @FXML protected DatePicker transactionDatePicker;
 
     protected ConfigurableApplicationContext springContext;
 
@@ -141,11 +132,12 @@ public abstract class BaseWalletTransactionManagement {
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
 
-        walletComboBox.setOnAction(e -> {
-            UIUtils.updateWalletBalance(walletComboBox.getValue(),
-                    walletCurrentBalanceValueLabel);
-            walletAfterBalance();
-        });
+        walletComboBox.setOnAction(
+                e -> {
+                    UIUtils.updateWalletBalance(
+                            walletComboBox.getValue(), walletCurrentBalanceValueLabel);
+                    walletAfterBalance();
+                });
     }
 
     @FXML
@@ -160,20 +152,15 @@ public abstract class BaseWalletTransactionManagement {
                 Constants.CALCULATOR_FXML,
                 "Calculator",
                 springContext,
-                (CalculatorController controller)
-                        -> {
-                },
-                List.of(()
-                        -> calculatorService.updateComponentWithResult(
-                        transactionValueField)));
+                (CalculatorController controller) -> {},
+                List.of(() -> calculatorService.updateComponentWithResult(transactionValueField)));
     }
 
     protected void walletAfterBalance() {
         String transactionValueString = transactionValueField.getText();
         Wallet wt = walletComboBox.getValue();
 
-        if (transactionValueString == null ||
-                transactionValueString.isBlank() || wt == null) {
+        if (transactionValueString == null || transactionValueString.isBlank() || wt == null) {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
         }
@@ -191,16 +178,15 @@ public abstract class BaseWalletTransactionManagement {
             // Set the style according to the balance value after the transaction
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0) {
                 // Remove old style and add negative style
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
-                        Constants.NEGATIVE_BALANCE_STYLE);
+                UIUtils.setLabelStyle(
+                        walletAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
             } else {
                 // Remove old style and add neutral style
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel,
-                        Constants.NEUTRAL_BALANCE_STYLE);
+                UIUtils.setLabelStyle(
+                        walletAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
             }
 
-            walletAfterBalanceValueLabel.setText(
-                    UIUtils.formatCurrency(walletAfterBalanceValue));
+            walletAfterBalanceValueLabel.setText(UIUtils.formatCurrency(walletAfterBalanceValue));
         } catch (NumberFormatException e) {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
@@ -208,8 +194,7 @@ public abstract class BaseWalletTransactionManagement {
 
     private BigDecimal getBigDecimal(Wallet wallet, BigDecimal transactionValue) {
         if (transactionType == TransactionType.EXPENSE) {
-            return
-                    wallet.getBalance().subtract(transactionValue);
+            return wallet.getBalance().subtract(transactionValue);
         } else if (transactionType == TransactionType.INCOME) {
             return wallet.getBalance().add(transactionValue);
         }
@@ -233,8 +218,7 @@ public abstract class BaseWalletTransactionManagement {
         // to inform the user that a category is needed
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
-                    categoryComboBox,
-                    "You need to add a category before adding a transaction");
+                    categoryComboBox, "You need to add a category before adding a transaction");
         }
     }
 
@@ -245,40 +229,41 @@ public abstract class BaseWalletTransactionManagement {
     }
 
     protected void configureSuggestions() {
-        Function<WalletTransaction, String> filterFunction =
-                WalletTransaction::getDescription;
+        Function<WalletTransaction, String> filterFunction = WalletTransaction::getDescription;
 
         // Format:
         //    Description
         //    Amount | Wallet | Category
-        Function<WalletTransaction, String> displayFunction = wt
-                -> String.format("%s%n%s | %s | %s ",
-                wt.getDescription(),
-                UIUtils.formatCurrency(wt.getAmount()),
-                wt.getWallet().getName(),
-                wt.getCategory().getName());
+        Function<WalletTransaction, String> displayFunction =
+                wt ->
+                        String.format(
+                                "%s%n%s | %s | %s ",
+                                wt.getDescription(),
+                                UIUtils.formatCurrency(wt.getAmount()),
+                                wt.getWallet().getName(),
+                                wt.getCategory().getName());
 
-        Consumer<WalletTransaction> onSelectCallback =
-                this::fillFieldsWithTransaction;
+        Consumer<WalletTransaction> onSelectCallback = this::fillFieldsWithTransaction;
 
-        suggestionsHandler = new SuggestionsHandlerHelper<>(descriptionField,
-                filterFunction,
-                displayFunction,
-                onSelectCallback);
+        suggestionsHandler =
+                new SuggestionsHandlerHelper<>(
+                        descriptionField, filterFunction, displayFunction, onSelectCallback);
 
         suggestionsHandler.enable();
     }
 
     protected void configureListeners() {
         // Update wallet after balance when the value field changes
-        transactionValueField.textProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
-                        transactionValueField.setText(oldValue);
-                    } else {
-                        walletAfterBalance();
-                    }
-                });
+        transactionValueField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                transactionValueField.setText(oldValue);
+                            } else {
+                                walletAfterBalance();
+                            }
+                        });
     }
 
     protected void fillFieldsWithTransaction(WalletTransaction wt) {
@@ -295,8 +280,7 @@ public abstract class BaseWalletTransactionManagement {
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        UIUtils.updateWalletBalance(walletComboBox.getValue(),
-                walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 }

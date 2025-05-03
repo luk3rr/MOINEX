@@ -27,8 +27,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 @Setter
 @NoArgsConstructor
 @Builder
-public class Dividend
-{
+public class Dividend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -40,18 +39,15 @@ public class Dividend
     private Ticker ticker;
 
     @ManyToOne
-    @JoinColumn(name                 = "wallet_transaction_id",
-                referencedColumnName = "id",
-                nullable             = false)
+    @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id", nullable = false)
     private WalletTransaction walletTransaction;
 
     /**
      * Constructor for testing purposes
      */
-    public Dividend(Long id, Ticker ticker, WalletTransaction walletTransaction)
-    {
-        this.id                = id;
-        this.ticker            = ticker;
+    public Dividend(Long id, Ticker ticker, WalletTransaction walletTransaction) {
+        this.id = id;
+        this.ticker = ticker;
         this.walletTransaction = walletTransaction;
     }
 }

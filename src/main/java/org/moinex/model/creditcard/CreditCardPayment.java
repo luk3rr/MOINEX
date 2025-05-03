@@ -36,8 +36,7 @@ import org.moinex.util.Constants;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreditCardPayment
-{
+public class CreditCardPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -45,7 +44,7 @@ public class CreditCardPayment
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "wallet_id", referencedColumnName = "id" )
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id")
     private Wallet wallet;
 
     @ManyToOne
@@ -65,22 +64,18 @@ public class CreditCardPayment
     @Column(name = "installment", nullable = false)
     private Integer installment;
 
-    public static class CreditCardPaymentBuilder
-    {
-        public CreditCardPaymentBuilder date(LocalDateTime date)
-        {
+    public static class CreditCardPaymentBuilder {
+        public CreditCardPaymentBuilder date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
             return this;
         }
     }
 
-    public LocalDateTime getDate()
-    {
+    public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setDate(LocalDateTime date)
-    {
+    public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
     }
 }

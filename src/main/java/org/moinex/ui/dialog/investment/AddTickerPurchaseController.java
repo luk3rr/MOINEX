@@ -31,8 +31,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddTickerPurchaseController extends BaseTickerTransactionManagement
-{
+public final class AddTickerPurchaseController extends BaseTickerTransactionManagement {
     /**
      * Constructor
      * @param walletService Wallet service
@@ -43,11 +42,10 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
      */
     @Autowired
     public AddTickerPurchaseController(
-        WalletService            walletService,
-        WalletTransactionService walletTransactionService,
-        CategoryService          categoryService,
-        TickerService            tickerService)
-    {
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            CategoryService categoryService,
+            TickerService tickerService) {
         super(walletService, walletTransactionService, categoryService, tickerService);
 
         transactionType = TransactionType.EXPENSE;
@@ -55,58 +53,56 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
 
     @FXML
     @Override
-    protected void handleSave()
-    {
-        Wallet            wallet       = walletComboBox.getValue();
-        String            description  = descriptionField.getText();
-        TransactionStatus status       = statusComboBox.getValue();
-        Category          category     = categoryComboBox.getValue();
-        String            unitPriceStr = unitPriceField.getText();
-        String            quantityStr  = quantityField.getText();
-        LocalDate         buyDate      = transactionDatePicker.getValue();
+    protected void handleSave() {
+        Wallet wallet = walletComboBox.getValue();
+        String description = descriptionField.getText();
+        TransactionStatus status = statusComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        String unitPriceStr = unitPriceField.getText();
+        String quantityStr = quantityField.getText();
+        LocalDate buyDate = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.isBlank() ||
-            status == null || category == null || unitPriceStr == null ||
-            unitPriceStr.isBlank() || quantityStr == null ||
-            quantityStr.isBlank() || buyDate == null)
-        {
+        if (wallet == null
+                || description == null
+                || description.isBlank()
+                || status == null
+                || category == null
+                || unitPriceStr == null
+                || unitPriceStr.isBlank()
+                || quantityStr == null
+                || quantityStr.isBlank()
+                || buyDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
 
             BigDecimal quantity = new BigDecimal(quantityStr);
 
-            LocalTime     currentTime             = LocalTime.now();
+            LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
 
-            tickerService.addPurchase(ticker.getId(),
-                                      wallet.getId(),
-                                      quantity,
-                                      unitPrice,
-                                      category,
-                                      dateTimeWithCurrentHour,
-                                      description,
-                                      status);
+            tickerService.addPurchase(
+                    ticker.getId(),
+                    wallet.getId(),
+                    quantity,
+                    unitPrice,
+                    category,
+                    dateTimeWithCurrentHour,
+                    description,
+                    status);
 
-            WindowUtils.showSuccessDialog("Purchase added",
-                                          "Purchase added successfully");
+            WindowUtils.showSuccessDialog("Purchase added", "Purchase added successfully");
 
-            Stage stage = (Stage)tickerNameLabel.getScene().getWindow();
+            Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error while buying ticker", e.getMessage());
         }
     }

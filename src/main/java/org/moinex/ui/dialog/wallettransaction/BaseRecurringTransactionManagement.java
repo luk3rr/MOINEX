@@ -33,34 +33,24 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public abstract class BaseRecurringTransactionManagement
-{
-    @FXML
-    protected TextField descriptionField;
+public abstract class BaseRecurringTransactionManagement {
+    @FXML protected TextField descriptionField;
 
-    @FXML
-    protected TextField valueField;
+    @FXML protected TextField valueField;
 
-    @FXML
-    protected ComboBox<Wallet> walletComboBox;
+    @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML
-    protected ComboBox<TransactionType> typeComboBox;
+    @FXML protected ComboBox<TransactionType> typeComboBox;
 
-    @FXML
-    protected ComboBox<Category> categoryComboBox;
+    @FXML protected ComboBox<Category> categoryComboBox;
 
-    @FXML
-    protected ComboBox<RecurringTransactionFrequency> frequencyComboBox;
+    @FXML protected ComboBox<RecurringTransactionFrequency> frequencyComboBox;
 
-    @FXML
-    protected DatePicker startDatePicker;
+    @FXML protected DatePicker startDatePicker;
 
-    @FXML
-    protected DatePicker endDatePicker;
+    @FXML protected DatePicker endDatePicker;
 
-    @FXML
-    protected Label infoLabel;
+    @FXML protected Label infoLabel;
 
     protected WalletService walletService;
 
@@ -81,18 +71,16 @@ public abstract class BaseRecurringTransactionManagement
      */
     @Autowired
     protected BaseRecurringTransactionManagement(
-        WalletService               walletService,
-        RecurringTransactionService recurringTransactionService,
-        CategoryService             categoryService)
-    {
-        this.walletService               = walletService;
+            WalletService walletService,
+            RecurringTransactionService recurringTransactionService,
+            CategoryService categoryService) {
+        this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
-        this.categoryService             = categoryService;
+        this.categoryService = categoryService;
     }
 
     @FXML
-    protected void initialize()
-    {
+    protected void initialize() {
         configureComboBoxes();
 
         loadWalletsFromDatabase();
@@ -111,64 +99,63 @@ public abstract class BaseRecurringTransactionManagement
         frequencyComboBox.setOnAction(e -> updateInfoLabel());
 
         // Check if the value field is a valid monetary value
-        valueField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-            {
-                valueField.setText(oldValue);
-            }
-        });
+        valueField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                valueField.setText(oldValue);
+                            }
+                        });
 
         // Allow the user to set the value to null if the text is erased
-        endDatePicker.getEditor().textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (newValue == null || newValue.trim().isEmpty())
-                {
-                    endDatePicker.setValue(null);
-                }
-            });
+        endDatePicker
+                .getEditor()
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (newValue == null || newValue.trim().isEmpty()) {
+                                endDatePicker.setValue(null);
+                            }
+                        });
     }
 
     @FXML
-    protected void handleCancel()
-    {
-        Stage stage = (Stage)descriptionField.getScene().getWindow();
+    protected void handleCancel() {
+        Stage stage = (Stage) descriptionField.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     protected abstract void handleSave();
 
-    protected void updateInfoLabel()
-    {
-        LocalDate                     startDate = startDatePicker.getValue();
-        LocalDate                     endDate   = endDatePicker.getValue();
+    protected void updateInfoLabel() {
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
         RecurringTransactionFrequency frequency = frequencyComboBox.getValue();
 
         String msg = "";
 
-        if (startDate != null && frequency != null)
-        {
-            if (endDate != null)
-            {
-                msg = "Starts on " + startDate + ", ends on " + endDate +
-                      ", frequency " + frequency;
+        if (startDate != null && frequency != null) {
+            if (endDate != null) {
+                msg =
+                        "Starts on "
+                                + startDate
+                                + ", ends on "
+                                + endDate
+                                + ", frequency "
+                                + frequency;
 
-                try
-                {
+                try {
 
                     msg +=
-                        "\nLast transaction: " +
-                        recurringTransactionService.getLastTransactionDate(startDate,
-                                                                           endDate,
-                                                                           frequency);
-                }
-                catch (IllegalArgumentException | IllegalStateException e)
-                {
+                            "\nLast transaction: "
+                                    + recurringTransactionService.getLastTransactionDate(
+                                            startDate, endDate, frequency);
+                } catch (IllegalArgumentException | IllegalStateException e) {
                     // Do nothing
                 }
-            }
-            else
-            {
+            } else {
                 msg = "Starts on " + startDate + ", frequency " + frequency;
             }
         }
@@ -176,36 +163,30 @@ public abstract class BaseRecurringTransactionManagement
         infoLabel.setText(msg);
     }
 
-    protected void loadWalletsFromDatabase()
-    {
+    protected void loadWalletsFromDatabase() {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
-    protected void loadCategoriesFromDatabase()
-    {
+    protected void loadCategoriesFromDatabase() {
         categories = categoryService.getNonArchivedCategoriesOrderedByName();
     }
 
-    protected void populateComboBoxes()
-    {
+    protected void populateComboBoxes() {
         walletComboBox.getItems().setAll(wallets);
         typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
-        frequencyComboBox.getItems().setAll(
-            Arrays.asList(RecurringTransactionFrequency.values()));
+        frequencyComboBox.getItems().setAll(Arrays.asList(RecurringTransactionFrequency.values()));
         categoryComboBox.getItems().setAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox
         // to inform the user that a category is needed
-        if (categories.isEmpty())
-        {
+        if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
-                categoryComboBox,
-                "You need to add a category before adding an recurring transaction");
+                    categoryComboBox,
+                    "You need to add a category before adding an recurring transaction");
         }
     }
 
-    protected void configureComboBoxes()
-    {
+    protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(typeComboBox, TransactionType::name);
         UIUtils.configureComboBox(categoryComboBox, Category::getName);

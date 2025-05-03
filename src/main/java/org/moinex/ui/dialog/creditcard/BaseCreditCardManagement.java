@@ -24,28 +24,20 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Base class to implement the common behavior of the Add and Edit Credit Card
  */
 @NoArgsConstructor
-public abstract class BaseCreditCardManagement
-{
-    @FXML
-    protected TextField nameField;
+public abstract class BaseCreditCardManagement {
+    @FXML protected TextField nameField;
 
-    @FXML
-    protected TextField limitField;
+    @FXML protected TextField limitField;
 
-    @FXML
-    protected TextField lastFourDigitsField;
+    @FXML protected TextField lastFourDigitsField;
 
-    @FXML
-    protected ComboBox<String> closingDayComboBox;
+    @FXML protected ComboBox<String> closingDayComboBox;
 
-    @FXML
-    protected ComboBox<String> dueDayComboBox;
+    @FXML protected ComboBox<String> dueDayComboBox;
 
-    @FXML
-    protected ComboBox<CreditCardOperator> operatorComboBox;
+    @FXML protected ComboBox<CreditCardOperator> operatorComboBox;
 
-    @FXML
-    protected ComboBox<Wallet> defaultBillingWalletComboBox;
+    @FXML protected ComboBox<Wallet> defaultBillingWalletComboBox;
 
     protected CreditCardService creditCardService;
 
@@ -62,16 +54,14 @@ public abstract class BaseCreditCardManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseCreditCardManagement(CreditCardService creditCardService,
-                                   WalletService     walletService)
-    {
+    protected BaseCreditCardManagement(
+            CreditCardService creditCardService, WalletService walletService) {
         this.creditCardService = creditCardService;
-        this.walletService     = walletService;
+        this.walletService = walletService;
     }
 
     @FXML
-    protected void initialize()
-    {
+    protected void initialize() {
         configureComboBoxes();
 
         loadCreditCardOperatorsFromDatabase();
@@ -81,47 +71,45 @@ public abstract class BaseCreditCardManagement
 
         // Ensure that the limit field only accepts numbers and has a maximum of 4
         // digits
-        lastFourDigitsField.textProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!newValue.matches(Constants.DIGITS_ONLY_REGEX) ||
-                    newValue.length() > 4)
-                {
-                    lastFourDigitsField.setText(oldValue);
-                }
-            });
+        lastFourDigitsField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.DIGITS_ONLY_REGEX)
+                                    || newValue.length() > 4) {
+                                lastFourDigitsField.setText(oldValue);
+                            }
+                        });
 
-        limitField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX))
-            {
-                limitField.setText(oldValue);
-            }
-        });
+        limitField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                                limitField.setText(oldValue);
+                            }
+                        });
     }
 
     @FXML
     protected abstract void handleSave();
 
     @FXML
-    protected void handleCancel()
-    {
-        Stage stage = (Stage)nameField.getScene().getWindow();
+    protected void handleCancel() {
+        Stage stage = (Stage) nameField.getScene().getWindow();
         stage.close();
     }
 
-    protected void loadCreditCardOperatorsFromDatabase()
-    {
+    protected void loadCreditCardOperatorsFromDatabase() {
         operators = creditCardService.getAllCreditCardOperatorsOrderedByName();
     }
 
-    protected void loadWalletsFromDatabase()
-    {
+    protected void loadWalletsFromDatabase() {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
-    protected void populateComboBoxes()
-    {
-        for (int i = 1; i <= Constants.MAX_BILLING_DUE_DAY; i++)
-        {
+    protected void populateComboBoxes() {
+        for (int i = 1; i <= Constants.MAX_BILLING_DUE_DAY; i++) {
             closingDayComboBox.getItems().add(String.valueOf(i));
             dueDayComboBox.getItems().add(String.valueOf(i));
         }
@@ -133,8 +121,7 @@ public abstract class BaseCreditCardManagement
         defaultBillingWalletComboBox.getItems().addFirst(null);
     }
 
-    protected void configureComboBoxes()
-    {
+    protected void configureComboBoxes() {
         UIUtils.configureComboBox(operatorComboBox, CreditCardOperator::getName);
         UIUtils.configureComboBox(defaultBillingWalletComboBox, Wallet::getName);
     }

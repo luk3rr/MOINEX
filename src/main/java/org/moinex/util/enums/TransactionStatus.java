@@ -9,8 +9,7 @@ package org.moinex.util.enums;
 /**
  * ENUM that represents the status of a transaction
  */
-public enum TransactionStatus
-{
+public enum TransactionStatus {
     PENDING,
     CONFIRMED
 }

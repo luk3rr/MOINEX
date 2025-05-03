@@ -31,8 +31,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddDividendController extends BaseDividendManagement
-{
+public final class AddDividendController extends BaseDividendManagement {
     /**
      * Constructor
      * @param walletService WalletService
@@ -43,73 +42,68 @@ public final class AddDividendController extends BaseDividendManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddDividendController(WalletService            walletService,
-                                 WalletTransactionService walletTransactionService,
-                                 CategoryService          categoryService,
-                                 CalculatorService        calculatorService,
-                                 TickerService            tickerService)
-    {
-        super(walletService,
-              walletTransactionService,
-              categoryService,
-              calculatorService,
-              tickerService);
+    public AddDividendController(
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            CategoryService categoryService,
+            CalculatorService calculatorService,
+            TickerService tickerService) {
+        super(
+                walletService,
+                walletTransactionService,
+                categoryService,
+                calculatorService,
+                tickerService);
     }
 
     @FXML
     @Override
-    protected void handleSave()
-    {
-        Wallet            wallet              = walletComboBox.getValue();
-        String            description         = descriptionField.getText();
-        String            dividendValueString = dividendValueField.getText();
-        TransactionStatus status              = statusComboBox.getValue();
-        Category          category            = categoryComboBox.getValue();
-        LocalDate         dividendDate        = dividendDatePicker.getValue();
+    protected void handleSave() {
+        Wallet wallet = walletComboBox.getValue();
+        String description = descriptionField.getText();
+        String dividendValueString = dividendValueField.getText();
+        TransactionStatus status = statusComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        LocalDate dividendDate = dividendDatePicker.getValue();
 
-        if (wallet == null || description == null || description.isBlank() ||
-            dividendValueString == null || status == null ||
-            dividendValueString.isBlank() || category == null ||
-            dividendDate == null)
-        {
+        if (wallet == null
+                || description == null
+                || description.isBlank()
+                || dividendValueString == null
+                || status == null
+                || dividendValueString.isBlank()
+                || category == null
+                || dividendDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal dividendValue = new BigDecimal(dividendValueString);
 
-            LocalTime     currentTime             = LocalTime.now();
+            LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = dividendDate.atTime(currentTime);
 
-            tickerService.addDividend(ticker.getId(),
-                                      wallet.getId(),
-                                      category,
-                                      dividendValue,
-                                      dateTimeWithCurrentHour,
-                                      description,
-                                      status);
+            tickerService.addDividend(
+                    ticker.getId(),
+                    wallet.getId(),
+                    category,
+                    dividendValue,
+                    dateTimeWithCurrentHour,
+                    description,
+                    status);
 
-            WindowUtils.showSuccessDialog("Dividend created",
-                                          "The dividend was successfully created.");
+            WindowUtils.showSuccessDialog(
+                    "Dividend created", "The dividend was successfully created.");
 
-            Stage stage = (Stage)descriptionField.getScene().getWindow();
+            Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid dividend value",
-                                        "Dividend value must be a number.");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-
-                "Error while creating dividend",
-                e.getMessage());
+                    "Invalid dividend value", "Dividend value must be a number.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            WindowUtils.showErrorDialog("Error while creating dividend", e.getMessage());
         }
     }
 }

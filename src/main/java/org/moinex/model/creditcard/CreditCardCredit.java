@@ -33,8 +33,7 @@ import org.moinex.util.enums.CreditCardCreditType;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreditCardCredit extends CreditCardTransaction
-{
+public class CreditCardCredit extends CreditCardTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

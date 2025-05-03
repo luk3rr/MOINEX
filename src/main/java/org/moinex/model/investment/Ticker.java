@@ -34,8 +34,7 @@ import org.moinex.util.enums.TickerType;
 @Getter
 @Setter
 @SuperBuilder
-public class Ticker extends Asset
-{
+public class Ticker extends Asset {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -50,17 +49,12 @@ public class Ticker extends Asset
     private String lastUpdate;
 
     @Builder.Default
-    @Column(name             = "archived",
-            nullable         = false,
-            columnDefinition = "boolean default false")
+    @Column(name = "archived", nullable = false, columnDefinition = "boolean default false")
     private boolean isArchived = false; // Default value is false
 
-    public abstract static class TickerBuilder<C extends   Ticker, B
-                                                   extends TickerBuilder<C, B>>
-        extends AssetBuilder<C, B>
-    {
-        public B lastUpdate(LocalDateTime lastUpdate)
-        {
+    public abstract static class TickerBuilder<C extends Ticker, B extends TickerBuilder<C, B>>
+            extends AssetBuilder<C, B> {
+        public B lastUpdate(LocalDateTime lastUpdate) {
             this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
@@ -76,34 +70,27 @@ public class Ticker extends Asset
      * @param currentUnitValue The current unit value of the ticker
      * @param lastUpdate The last update of the ticker
      */
-    public Ticker(Long          id,
-                  String        name,
-                  String        symbol,
-                  TickerType    type,
-                  BigDecimal    currentQuantity,
-                  BigDecimal    currentUnitValue,
-                  BigDecimal    averageUnitValue,
-                  LocalDateTime lastUpdate)
-    {
-        super(name,
-              symbol,
-              currentQuantity,
-              currentUnitValue,
-              averageUnitValue,
-              BigDecimal.ONE);
+    public Ticker(
+            Long id,
+            String name,
+            String symbol,
+            TickerType type,
+            BigDecimal currentQuantity,
+            BigDecimal currentUnitValue,
+            BigDecimal averageUnitValue,
+            LocalDateTime lastUpdate) {
+        super(name, symbol, currentQuantity, currentUnitValue, averageUnitValue, BigDecimal.ONE);
 
-        this.id         = id;
-        this.type       = type;
+        this.id = id;
+        this.type = type;
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }
 
-    public LocalDateTime getLastUpdate()
-    {
+    public LocalDateTime getLastUpdate() {
         return LocalDateTime.parse(lastUpdate, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setLastUpdate(LocalDateTime lastUpdate)
-    {
+    public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
     }
 }

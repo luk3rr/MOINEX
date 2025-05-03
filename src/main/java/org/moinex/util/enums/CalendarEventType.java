@@ -12,8 +12,7 @@ import lombok.Getter;
  * Represents different types of events in the calendar
  */
 @Getter
-public enum CalendarEventType
-{
+public enum CalendarEventType {
     CREDIT_CARD_STATEMENT_CLOSING("Credit Card Statement Closing", "#FF9800"),
     CREDIT_CARD_DUE_DATE("Credit Card Due Date", "#F44336"),
     DEBT_PAYMENT_DUE_DATE("Debt Payment Due Date", "#3F51B5"),
@@ -22,10 +21,8 @@ public enum CalendarEventType
     private final String description;
     private final String colorHex;
 
-    CalendarEventType(String description, String colorHex)
-    {
+    CalendarEventType(String description, String colorHex) {
         this.description = description;
-        this.colorHex    = colorHex;
+        this.colorHex = colorHex;
     }
-
 }

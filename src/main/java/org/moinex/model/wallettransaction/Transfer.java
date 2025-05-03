@@ -33,8 +33,7 @@ import org.moinex.util.Constants;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class Transfer
-{
+public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -42,15 +41,11 @@ public class Transfer
     private Long id;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name                 = "sender_wallet_id",
-                referencedColumnName = "id",
-                nullable             = false)
+    @JoinColumn(name = "sender_wallet_id", referencedColumnName = "id", nullable = false)
     private Wallet senderWallet;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name                 = "receiver_wallet_id",
-                referencedColumnName = "id",
-                nullable             = false)
+    @JoinColumn(name = "receiver_wallet_id", referencedColumnName = "id", nullable = false)
     private Wallet receiverWallet;
 
     @Column(name = "date", nullable = false)
@@ -59,14 +54,12 @@ public class Transfer
     @Column(name = "amount", nullable = false, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "description" )
+    @Column(name = "description")
     private String description;
 
-    public abstract static class TransferBuilder<C extends   Transfer, B
-                                                     extends TransferBuilder<C, B>>
-    {
-        public B date(LocalDateTime date)
-        {
+    public abstract static class TransferBuilder<
+            C extends Transfer, B extends TransferBuilder<C, B>> {
+        public B date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
@@ -75,28 +68,26 @@ public class Transfer
     /**
      * Constructor for testing purposes
      */
-    public Transfer(Long          id,
-                    Wallet        senderWallet,
-                    Wallet        receiverWallet,
-                    LocalDateTime date,
-                    BigDecimal    amount,
-                    String        description)
-    {
-        this.id             = id;
-        this.senderWallet   = senderWallet;
+    public Transfer(
+            Long id,
+            Wallet senderWallet,
+            Wallet receiverWallet,
+            LocalDateTime date,
+            BigDecimal amount,
+            String description) {
+        this.id = id;
+        this.senderWallet = senderWallet;
         this.receiverWallet = receiverWallet;
-        this.date           = date.format(Constants.DB_DATE_FORMATTER);
-        this.amount         = amount;
-        this.description    = description;
+        this.date = date.format(Constants.DB_DATE_FORMATTER);
+        this.amount = amount;
+        this.description = description;
     }
 
-    public LocalDateTime getDate()
-    {
+    public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setDate(LocalDateTime date)
-    {
+    public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
     }
 }

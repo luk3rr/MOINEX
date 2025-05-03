@@ -12,13 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class FlywayConfig
-{
+public class FlywayConfig {
     @Bean
-    public Flyway flyway(DataSource dataSource)
-    {
-        Flyway flyway =
-            Flyway.configure().dataSource(dataSource).baselineOnMigrate(true).load();
+    public Flyway flyway(DataSource dataSource) {
+        Flyway flyway = Flyway.configure().dataSource(dataSource).baselineOnMigrate(true).load();
         flyway.migrate();
         return flyway;
     }

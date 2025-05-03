@@ -28,8 +28,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class TickerPurchase extends Transaction
-{
+public class TickerPurchase extends Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -37,21 +36,21 @@ public class TickerPurchase extends Transaction
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "ticker_id", referencedColumnName = "id" )
+    @JoinColumn(name = "ticker_id", referencedColumnName = "id")
     private Ticker ticker;
 
     /**
      * Constructor for testing purposes
      */
-    public TickerPurchase(Long              id,
-                          Ticker            ticker,
-                          BigDecimal        quantity,
-                          BigDecimal        unitPrice,
-                          WalletTransaction walletTransaction)
-    {
+    public TickerPurchase(
+            Long id,
+            Ticker ticker,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            WalletTransaction walletTransaction) {
         super(quantity, unitPrice, walletTransaction);
 
-        this.id     = id;
+        this.id = id;
         this.ticker = ticker;
     }
 }

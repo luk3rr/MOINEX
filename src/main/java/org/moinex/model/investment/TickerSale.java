@@ -28,8 +28,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class TickerSale extends Transaction
-{
+public class TickerSale extends Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -37,7 +36,7 @@ public class TickerSale extends Transaction
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "ticker_id", referencedColumnName = "id" )
+    @JoinColumn(name = "ticker_id", referencedColumnName = "id")
     private Ticker ticker;
 
     @Column(name = "average_cost", nullable = false)
@@ -46,17 +45,17 @@ public class TickerSale extends Transaction
     /**
      * Constructor for testing purposes
      */
-    public TickerSale(Long              id,
-                      Ticker            ticker,
-                      BigDecimal        quantity,
-                      BigDecimal        unitPrice,
-                      WalletTransaction walletTransaction,
-                      BigDecimal        averageCost)
-    {
+    public TickerSale(
+            Long id,
+            Ticker ticker,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            WalletTransaction walletTransaction,
+            BigDecimal averageCost) {
         super(quantity, unitPrice, walletTransaction);
 
-        this.id          = id;
-        this.ticker      = ticker;
+        this.id = id;
+        this.ticker = ticker;
         this.averageCost = averageCost;
     }
 }

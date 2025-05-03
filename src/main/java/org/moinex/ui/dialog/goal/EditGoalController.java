@@ -26,16 +26,12 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class EditGoalController extends BaseGoalManagement
-{
-    @FXML
-    private TextField currentBalanceField;
+public final class EditGoalController extends BaseGoalManagement {
+    @FXML private TextField currentBalanceField;
 
-    @FXML
-    private CheckBox archivedCheckBox;
+    @FXML private CheckBox archivedCheckBox;
 
-    @FXML
-    private CheckBox completedCheckBox;
+    @FXML private CheckBox completedCheckBox;
 
     private Goal goal = null;
 
@@ -45,13 +41,11 @@ public final class EditGoalController extends BaseGoalManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditGoalController(GoalService goalService)
-    {
+    public EditGoalController(GoalService goalService) {
         super(goalService);
     }
 
-    public void setGoal(Goal goal)
-    {
+    public void setGoal(Goal goal) {
         this.goal = goal;
 
         nameField.setText(goal.getName());
@@ -66,49 +60,46 @@ public final class EditGoalController extends BaseGoalManagement
 
     @Override
     @FXML
-    protected void handleSave()
-    {
+    protected void handleSave() {
         String goalName = nameField.getText();
-        goalName        = goalName.strip(); // Remove leading and trailing whitespaces
+        goalName = goalName.strip(); // Remove leading and trailing whitespaces
 
-        String    initialBalanceStr = initialBalanceField.getText();
-        String    currentBalanceStr = currentBalanceField.getText();
-        String    targetBalanceStr  = targetBalanceField.getText();
-        LocalDate targetDate        = targetDatePicker.getValue();
-        String    motivation        = motivationTextArea.getText();
-        boolean   archived          = archivedCheckBox.isSelected();
-        boolean   completed         = completedCheckBox.isSelected();
+        String initialBalanceStr = initialBalanceField.getText();
+        String currentBalanceStr = currentBalanceField.getText();
+        String targetBalanceStr = targetBalanceField.getText();
+        LocalDate targetDate = targetDatePicker.getValue();
+        String motivation = motivationTextArea.getText();
+        boolean archived = archivedCheckBox.isSelected();
+        boolean completed = completedCheckBox.isSelected();
 
-        if (goalName.isEmpty() || initialBalanceStr.isEmpty() ||
-            currentBalanceStr.isEmpty() || targetBalanceStr.isEmpty() ||
-            targetDate == null)
-        {
+        if (goalName.isEmpty()
+                || initialBalanceStr.isEmpty()
+                || currentBalanceStr.isEmpty()
+                || targetBalanceStr.isEmpty()
+                || targetDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal initialBalance = new BigDecimal(initialBalanceStr);
             BigDecimal currentBalance = new BigDecimal(currentBalanceStr);
-            BigDecimal targetBalance  = new BigDecimal(targetBalanceStr);
+            BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
             // Check if it has any modification
-            if (goal.getName().equals(goalName) &&
-                goal.getInitialBalance().equals(initialBalance) &&
-                goal.getBalance().equals(currentBalance) &&
-                goal.getTargetBalance().equals(targetBalance) &&
-                goal.getTargetDate().toLocalDate().equals(targetDate) &&
-                goal.getMotivation().equals(motivation) &&
-                goal.isArchived() == archived && goal.isCompleted() == completed)
-            {
-                WindowUtils.showInformationDialog("No changes",
-                                                  "No changes were made to the goal.");
-            }
-            else // If there is any modification, update the goal
+            if (goal.getName().equals(goalName)
+                    && goal.getInitialBalance().equals(initialBalance)
+                    && goal.getBalance().equals(currentBalance)
+                    && goal.getTargetBalance().equals(targetBalance)
+                    && goal.getTargetDate().toLocalDate().equals(targetDate)
+                    && goal.getMotivation().equals(motivation)
+                    && goal.isArchived() == archived
+                    && goal.isCompleted() == completed) {
+                WindowUtils.showInformationDialog(
+                        "No changes", "No changes were made to the goal.");
+            } else // If there is any modification, update the goal
             {
                 goal.setName(goalName);
                 goal.setInitialBalance(initialBalance);
@@ -122,32 +113,22 @@ public final class EditGoalController extends BaseGoalManagement
                 // checkbox, set the completion date to null, otherwise set the
                 // completion date to the current date, This is necessary for UpdateGoal
                 // identify if the completed field was changed
-                if (completed && !goal.isCompleted())
-                {
+                if (completed && !goal.isCompleted()) {
                     goal.setCompletionDate(LocalDate.now().atStartOfDay());
-                }
-                else
-                {
+                } else {
                     goal.setCompletionDate(null);
                 }
 
                 goalService.updateGoal(goal);
 
-                WindowUtils.showSuccessDialog("Goal updated",
-                                              "The goal was successfully updated.");
+                WindowUtils.showSuccessDialog("Goal updated", "The goal was successfully updated.");
             }
 
-            Stage stage = (Stage)nameField.getScene().getWindow();
+            Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid balance",
-                                        "Please enter a valid balance.");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException |
-               EntityExistsException e)
-        {
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog("Invalid balance", "Please enter a valid balance.");
+        } catch (EntityNotFoundException | IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
         }
     }

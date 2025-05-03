@@ -14,15 +14,13 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.text.TextAlignment;
 import org.moinex.util.UIUtils;
 
-public class CircularProgressBar extends Canvas
-{
-    private final Color  progressColor;
-    private final Color  backgroundColor;
-    private final Color  fontColor;
+public class CircularProgressBar extends Canvas {
+    private final Color progressColor;
+    private final Color backgroundColor;
+    private final Color fontColor;
     private final Double progressWidth;
 
-    public CircularProgressBar(Double radius, Double progressWidth)
-    {
+    public CircularProgressBar(Double radius, Double progressWidth) {
         super(radius, radius);
 
         this.progressWidth = progressWidth;
@@ -33,13 +31,12 @@ public class CircularProgressBar extends Canvas
         gc.setTextBaseline(VPos.CENTER);
 
         // Set default colors
-        progressColor   = Color.web("#3498db");
+        progressColor = Color.web("#3498db");
         backgroundColor = Color.web("#D3D3D3");
-        fontColor       = Color.web("#000000");
+        fontColor = Color.web("#000000");
     }
 
-    public void draw(Double percent)
-    {
+    public void draw(Double percent) {
         percent = Math.clamp(percent, 0, 100);
 
         final GraphicsContext gc = getGraphicsContext2D();
@@ -49,25 +46,26 @@ public class CircularProgressBar extends Canvas
         // Draw the background circle
         gc.setStroke(backgroundColor);
         gc.setLineWidth(progressWidth);
-        gc.strokeArc(progressWidth / 2,
-                     progressWidth / 2,
-                     getWidth() - progressWidth,
-                     getHeight() - progressWidth,
-                     0,
-                     360,
-                     ArcType.OPEN);
+        gc.strokeArc(
+                progressWidth / 2,
+                progressWidth / 2,
+                getWidth() - progressWidth,
+                getHeight() - progressWidth,
+                0,
+                360,
+                ArcType.OPEN);
 
         // Draw the progress circle
         gc.setStroke(progressColor);
         gc.setLineWidth(progressWidth);
         gc.strokeArc(
-            progressWidth / 2,
-            progressWidth / 2,
-            getWidth() - progressWidth,
-            getHeight() - progressWidth,
-            90,
-            -(percent / 100 * 360), // Negative angle to draw the circle clockwise
-            ArcType.OPEN);
+                progressWidth / 2,
+                progressWidth / 2,
+                getWidth() - progressWidth,
+                getHeight() - progressWidth,
+                90,
+                -(percent / 100 * 360), // Negative angle to draw the circle clockwise
+                ArcType.OPEN);
 
         gc.setFill(fontColor);
         gc.fillText(UIUtils.formatPercentage(percent), getWidth() / 2, getHeight() / 2);

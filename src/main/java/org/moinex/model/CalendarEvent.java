@@ -20,8 +20,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.moinex.util.enums.CalendarEventType;
 import org.moinex.util.Constants;
+import org.moinex.util.enums.CalendarEventType;
 
 /**
  * Represents an event in the calendar
@@ -32,8 +32,7 @@ import org.moinex.util.Constants;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class CalendarEvent
-{
+public class CalendarEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -46,7 +45,7 @@ public class CalendarEvent
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description" )
+    @Column(name = "description")
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -54,22 +53,18 @@ public class CalendarEvent
     private CalendarEventType eventType;
 
     public abstract static class CalendarEventBuilder<
-        C extends CalendarEvent, B extends CalendarEventBuilder<C, B>>
-    {
-        public B date(LocalDateTime date)
-        {
+            C extends CalendarEvent, B extends CalendarEventBuilder<C, B>> {
+        public B date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
     }
 
-    public LocalDateTime getDate()
-    {
+    public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setDate(LocalDateTime date)
-    {
+    public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
     }
 }

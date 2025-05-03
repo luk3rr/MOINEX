@@ -6,9 +6,14 @@
 
 package org.moinex.service;
 
-import jakarta.annotation.Resource;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.Comparator;
+import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
@@ -23,16 +28,8 @@ import org.moinex.util.enums.CreditCardInvoiceStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * This class is responsible for the business logic Credit Card entities
@@ -40,8 +37,7 @@ import java.util.List;
 @Service
 @NoArgsConstructor
 public class CreditCardService {
-    private static final Logger logger =
-            LoggerFactory.getLogger(CreditCardService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreditCardService.class);
     private CreditCardDebtRepository creditCardDebtRepository;
     private CreditCardCreditRepository creditCardCreditRepository;
     private CreditCardPaymentRepository creditCardPaymentRepository;
@@ -50,17 +46,15 @@ public class CreditCardService {
     private WalletRepository walletRepository;
     private CategoryRepository categoryRepository;
 
-    private CreditCardService selfReference;
-
     @Autowired
-    public CreditCardService(CreditCardDebtRepository creditCardDebtRepository,
-                             CreditCardCreditRepository creditCardCreditRepository,
-                             CreditCardPaymentRepository creditCardPaymentRepository,
-                             CreditCardRepository creditCardRepository,
-                             CreditCardOperatorRepository creditCardOperatorRepository,
-                             WalletRepository walletRepository,
-                             CategoryRepository categoryRepository,
-                            CreditCardService selfReference) {
+    public CreditCardService(
+            CreditCardDebtRepository creditCardDebtRepository,
+            CreditCardCreditRepository creditCardCreditRepository,
+            CreditCardPaymentRepository creditCardPaymentRepository,
+            CreditCardRepository creditCardRepository,
+            CreditCardOperatorRepository creditCardOperatorRepository,
+            WalletRepository walletRepository,
+            CategoryRepository categoryRepository) {
         this.creditCardDebtRepository = creditCardDebtRepository;
         this.creditCardCreditRepository = creditCardCreditRepository;
         this.creditCardPaymentRepository = creditCardPaymentRepository;
@@ -68,7 +62,6 @@ public class CreditCardService {
         this.creditCardOperatorRepository = creditCardOperatorRepository;
         this.walletRepository = walletRepository;
         this.categoryRepository = categoryRepository;
-        this.selfReference = selfReference;
     }
 
     /**
@@ -93,19 +86,14 @@ public class CreditCardService {
      *                                  different from 4
      */
     @Transactional
-    public Long addCreditCard(String name,
-                              Integer dueDate,
-                              Integer closingDay,
-                              BigDecimal maxDebt,
-                              String lastFourDigits,
-                              Long operatorId) {
-        return selfReference.addCreditCard(name,
-                dueDate,
-                closingDay,
-                maxDebt,
-                lastFourDigits,
-                operatorId,
-                null);
+    public Long addCreditCard(
+            String name,
+            Integer dueDate,
+            Integer closingDay,
+            BigDecimal maxDebt,
+            String lastFourDigits,
+            Long operatorId) {
+        return addCreditCard(name, dueDate, closingDay, maxDebt, lastFourDigits, operatorId, null);
     }
 
     /**
@@ -131,48 +119,57 @@ public class CreditCardService {
      *                                  different from 4
      */
     @Transactional
-    public Long addCreditCard(String name,
-                              Integer dueDate,
-                              Integer closingDay,
-                              BigDecimal maxDebt,
-                              String lastFourDigits,
-                              Long operatorId,
-                              Long defaultBillingWalletId) {
+    public Long addCreditCard(
+            String name,
+            Integer dueDate,
+            Integer closingDay,
+            BigDecimal maxDebt,
+            String lastFourDigits,
+            Long operatorId,
+            Long defaultBillingWalletId) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
         if (creditCardRepository.existsByName(name)) {
-            throw new EntityExistsException("Credit card with name " + name +
-                    " already exists");
+            throw new EntityExistsException("Credit card with name " + name + " already exists");
         }
 
         creditCardBasicChecks(name, dueDate, closingDay, maxDebt, lastFourDigits);
 
         CreditCardOperator operator =
-                creditCardOperatorRepository.findById(operatorId)
+                creditCardOperatorRepository
+                        .findById(operatorId)
                         .orElseThrow(
-                                ()
-                                        -> new EntityNotFoundException(String.format(
-                                        "Credit card operator with id %d does not exist", operatorId)));
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card operator with id %d does not"
+                                                                + " exist",
+                                                        operatorId)));
 
         Wallet defaultBillingWallet =
                 defaultBillingWalletId != null
-                        ? walletRepository.findById(defaultBillingWalletId)
-                        .orElseThrow(()
-                                -> new EntityNotFoundException(
-                                String.format("Wallet with id %d does not exist", defaultBillingWalletId)))
+                        ? walletRepository
+                                .findById(defaultBillingWalletId)
+                                .orElseThrow(
+                                        () ->
+                                                new EntityNotFoundException(
+                                                        String.format(
+                                                                "Wallet with id %d does not exist",
+                                                                defaultBillingWalletId)))
                         : null;
 
         CreditCard newCreditCard =
-                creditCardRepository.save(CreditCard.builder()
-                        .name(name)
-                        .billingDueDay(dueDate)
-                        .closingDay(closingDay)
-                        .maxDebt(maxDebt)
-                        .lastFourDigits(lastFourDigits)
-                        .operator(operator)
-                        .defaultBillingWallet(defaultBillingWallet)
-                        .build());
+                creditCardRepository.save(
+                        CreditCard.builder()
+                                .name(name)
+                                .billingDueDay(dueDate)
+                                .closingDay(closingDay)
+                                .maxDebt(maxDebt)
+                                .lastFourDigits(lastFourDigits)
+                                .operator(operator)
+                                .defaultBillingWallet(defaultBillingWallet)
+                                .build());
 
         logger.info("Credit card {} has created successfully", name);
 
@@ -188,13 +185,20 @@ public class CreditCardService {
      */
     @Transactional
     public void deleteCreditCard(Long id) {
-        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
-                ()
-                        -> new EntityNotFoundException(String.format("Credit card with id %d does not exist", id)));
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d does not exist",
+                                                        id)));
 
         if (getDebtCountByCreditCard(id) > 0) {
-            throw new IllegalStateException(String.format("Credit card with id %d" +
-                    " has debts and cannot be deleted", id));
+            throw new IllegalStateException(
+                    String.format(
+                            "Credit card with id %d" + " has debts and cannot be deleted", id));
         }
 
         creditCardRepository.delete(creditCard);
@@ -219,21 +223,32 @@ public class CreditCardService {
      */
     @Transactional
     public void updateCreditCard(CreditCard crc) {
-        CreditCard oldCrc = creditCardRepository.findById(crc.getId())
-                .orElseThrow(()
-                        -> new EntityNotFoundException(
-                        String.format("Credit card with id %d does not exist", crc.getId())));
+        CreditCard oldCrc =
+                creditCardRepository
+                        .findById(crc.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d does not exist",
+                                                        crc.getId())));
 
         CreditCardOperator operator =
-                creditCardOperatorRepository.findById(crc.getOperator().getId())
-                        .orElseThrow(() ->
-                                new EntityNotFoundException(String.format(
-                                        "Credit card operator with id %d does not exist", crc.getOperator().getId())));
+                creditCardOperatorRepository
+                        .findById(crc.getOperator().getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card operator with id %d does not"
+                                                                + " exist",
+                                                        crc.getOperator().getId())));
 
         // Remove leading and trailing whitespaces
         crc.setName(crc.getName().strip());
 
-        creditCardBasicChecks(crc.getName(),
+        creditCardBasicChecks(
+                crc.getName(),
                 crc.getBillingDueDay(),
                 crc.getClosingDay(),
                 crc.getMaxDebt(),
@@ -243,10 +258,10 @@ public class CreditCardService {
 
         // Check if the credit card name is already in use
         for (CreditCard creditCard : creditCards) {
-            if (creditCard.getName().equals(crc.getName()) &&
-                    !creditCard.getId().equals(crc.getId())) {
-                throw new IllegalStateException("Credit card with name " +
-                        crc.getName() + " already exists");
+            if (creditCard.getName().equals(crc.getName())
+                    && !creditCard.getId().equals(crc.getId())) {
+                throw new IllegalStateException(
+                        "Credit card with name " + crc.getName() + " already exists");
             }
         }
 
@@ -260,8 +275,7 @@ public class CreditCardService {
         // Update bill due day for each pending payment where the payment date is
         // greater than the current day. Overdue payments are not updated
         List<CreditCardPayment> payments =
-                getAllPendingCreditCardPayments(oldCrc.getId())
-                        .stream()
+                getAllPendingCreditCardPayments(oldCrc.getId()).stream()
                         .filter(p -> p.getDate().isAfter(LocalDateTime.now()))
                         .toList();
 
@@ -300,22 +314,33 @@ public class CreditCardService {
      * @throws MoinexException.InsufficientResourcesException If the credit card does not have enough
      */
     @Transactional
-    public void addDebt(Long crcId,
-                        Category category,
-                        LocalDateTime registerDate,
-                        YearMonth invoiceMonth,
-                        BigDecimal value,
-                        Integer installments,
-                        String description) {
-        CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
-                ()
-                        -> new EntityNotFoundException(
-                        String.format("Credit card with id %d does not exist", crcId)));
+    public void addDebt(
+            Long crcId,
+            Category category,
+            LocalDateTime registerDate,
+            YearMonth invoiceMonth,
+            BigDecimal value,
+            Integer installments,
+            String description) {
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(crcId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d does not exist",
+                                                        crcId)));
 
-        Category cat = categoryRepository.findById(category.getId())
-                .orElseThrow(() ->
-                        new EntityNotFoundException(
-                                String.format("Category with name %s does not exist", category)));
+        Category cat =
+                categoryRepository
+                        .findById(category.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Category with name %s does not exist",
+                                                        category)));
 
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null");
@@ -326,8 +351,8 @@ public class CreditCardService {
         }
 
         if (installments < 1 || installments > Constants.MAX_INSTALLMENTS) {
-            throw new IllegalArgumentException("Installment must be in the range [1, " +
-                    Constants.MAX_INSTALLMENTS + "]");
+            throw new IllegalArgumentException(
+                    "Installment must be in the range [1, " + Constants.MAX_INSTALLMENTS + "]");
         }
 
         if (registerDate == null) {
@@ -341,30 +366,36 @@ public class CreditCardService {
         BigDecimal availableCredit = getAvailableCredit(crcId);
 
         if (value.compareTo(availableCredit) > 0) {
-            throw new MoinexException.InsufficientResourcesException(String.format("Credit card with id %d" +
-                    " does not have enough credit", crcId));
+            throw new MoinexException.InsufficientResourcesException(
+                    String.format(
+                            "Credit card with id %d" + " does not have enough credit", crcId));
         }
 
-        CreditCardDebt debt = CreditCardDebt.builder()
-                .creditCard(creditCard)
-                .category(cat)
-                .date(registerDate)
-                .amount(value)
-                .installments(installments)
-                .description(description)
-                .build();
+        CreditCardDebt debt =
+                CreditCardDebt.builder()
+                        .creditCard(creditCard)
+                        .category(cat)
+                        .date(registerDate)
+                        .amount(value)
+                        .installments(installments)
+                        .description(description)
+                        .build();
 
         creditCardDebtRepository.save(debt);
 
-        logger.info("Debit registered on credit card with id {} with value {} and description {}", crcId, value, description);
+        logger.info(
+                "Debit registered on credit card with id {} with value {} and description {}",
+                crcId,
+                value,
+                description);
 
         // Divide the value exactly, with full precision
         BigDecimal exactInstallmentValue =
                 value.divide(new BigDecimal(installments), 2, RoundingMode.FLOOR);
 
         // Calculate the remainder
-        BigDecimal remainder = value.subtract(
-                exactInstallmentValue.multiply(new BigDecimal(installments)));
+        BigDecimal remainder =
+                value.subtract(exactInstallmentValue.multiply(new BigDecimal(installments)));
 
         // Iterate through the installments
         for (int i = 0; i < installments; i++) {
@@ -375,21 +406,26 @@ public class CreditCardService {
             }
 
             // Calculate the date and save the payment
-            LocalDateTime paymentDate = invoiceMonth.plusMonths(i)
-                    .atDay(creditCard.getBillingDueDay())
-                    .atTime(23, 59);
+            LocalDateTime paymentDate =
+                    invoiceMonth.plusMonths(i).atDay(creditCard.getBillingDueDay()).atTime(23, 59);
 
-            CreditCardPayment payment = CreditCardPayment.builder()
-                    .creditCardDebt(debt)
-                    .date(paymentDate)
-                    .amount(currentInstallmentValue)
-                    .installment(i + 1)
-                    .build();
+            CreditCardPayment payment =
+                    CreditCardPayment.builder()
+                            .creditCardDebt(debt)
+                            .date(paymentDate)
+                            .amount(currentInstallmentValue)
+                            .installment(i + 1)
+                            .build();
 
             creditCardPaymentRepository.save(payment);
 
-            logger.info("Payment of debt {} on credit card with id {} registered with value {} and due date {} ",
-                    description, crcId, currentInstallmentValue, paymentDate);
+            logger.info(
+                    "Payment of debt {} on credit card with id {} registered with value {} and due"
+                            + " date {} ",
+                    description,
+                    crcId,
+                    currentInstallmentValue,
+                    paymentDate);
         }
     }
 
@@ -401,8 +437,14 @@ public class CreditCardService {
      */
     @Transactional
     public void deleteDebt(Long debtId) {
-        CreditCardDebt debt = creditCardDebtRepository.findById(debtId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Debt with id %d not found", debtId)));
+        CreditCardDebt debt =
+                creditCardDebtRepository
+                        .findById(debtId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Debt with id %d not found", debtId)));
 
         // Delete all payments associated with the debt
         List<CreditCardPayment> payments = getPaymentsByDebtId(debtId);
@@ -428,26 +470,34 @@ public class CreditCardService {
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
-    public void addCredit(Long crcId,
-                          LocalDateTime date,
-                          BigDecimal amount,
-                          CreditCardCreditType type,
-                          String description) {
-        CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
-                () -> new EntityNotFoundException(
-                        String.format("Credit card with id %d does not exist", crcId)));
+    public void addCredit(
+            Long crcId,
+            LocalDateTime date,
+            BigDecimal amount,
+            CreditCardCreditType type,
+            String description) {
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(crcId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d does not exist",
+                                                        crcId)));
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
 
-        CreditCardCredit credit = CreditCardCredit.builder()
-                .creditCard(creditCard)
-                .amount(amount)
-                .date(date)
-                .description(description)
-                .type(type)
-                .build();
+        CreditCardCredit credit =
+                CreditCardCredit.builder()
+                        .creditCard(creditCard)
+                        .amount(amount)
+                        .date(date)
+                        .description(description)
+                        .type(type)
+                        .build();
 
         // Update credit card available rebate
         creditCard.setAvailableRebate(creditCard.getAvailableRebate().add(amount));
@@ -468,10 +518,12 @@ public class CreditCardService {
     @Transactional
     public void deleteCredit(Long creditId) {
         CreditCardCredit credit =
-                creditCardCreditRepository.findById(creditId).orElseThrow(
-                        ()
-                                -> new EntityNotFoundException("Credit with id " + creditId +
-                                " not found"));
+                creditCardCreditRepository
+                        .findById(creditId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Credit with id " + creditId + " not found"));
 
         creditCardCreditRepository.delete(credit);
 
@@ -487,15 +539,23 @@ public class CreditCardService {
      */
     @Transactional
     public void archiveCreditCard(Long id) {
-        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
-                ()
-                        -> new EntityNotFoundException(String.format("Credit card with id %d" +
-                        " not found and cannot be archived", id)));
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d not found and"
+                                                                + " cannot be archived",
+                                                        id)));
 
         if (getTotalPendingPayments(id).compareTo(BigDecimal.ZERO) > 0) {
             throw new IllegalStateException(
-                    String.format("Credit card with id %d" +
-                            " has pending payments and cannot be archived", id));
+                    String.format(
+                            "Credit card with id %d"
+                                    + " has pending payments and cannot be archived",
+                            id));
         }
 
         creditCard.setArchived(true);
@@ -512,11 +572,16 @@ public class CreditCardService {
      */
     @Transactional
     public void unarchiveCreditCard(Long id) {
-        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
-                ()
-                        -> new EntityNotFoundException(
-                        String.format("Credit card with id %d" +
-                                " not found and cannot be unarchived", id)));
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d not found and"
+                                                                + " cannot be unarchived",
+                                                        id)));
 
         creditCard.setArchived(false);
         creditCardRepository.save(creditCard);
@@ -537,19 +602,23 @@ public class CreditCardService {
     @Transactional
     public void updateCreditCardDebt(CreditCardDebt debt, YearMonth invoiceMonth) {
         CreditCardDebt oldDebt =
-                creditCardDebtRepository.findById(debt.getId())
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                String.format("Debt with id %d does not exist", debt.getId())));
-
+                creditCardDebtRepository
+                        .findById(debt.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Debt with id %d does not exist",
+                                                        debt.getId())));
 
         if (!creditCardRepository.existsById(debt.getCreditCard().getId())) {
             throw new EntityNotFoundException(
-                    String.format("Credit card with id %d does not exist", debt.getCreditCard().getId()));
+                    String.format(
+                            "Credit card with id %d does not exist", debt.getCreditCard().getId()));
         }
 
         if (debt.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException(
-                    "Total amount must be greater than zero");
+            throw new IllegalArgumentException("Total amount must be greater than zero");
         }
 
         // Complex update
@@ -576,9 +645,14 @@ public class CreditCardService {
     @Transactional
     public void updateCreditCardCredit(CreditCardCredit credit) {
         CreditCardCredit oldCredit =
-                creditCardCreditRepository.findById(credit.getId())
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                String.format("Credit with id %d does not exist", credit.getId())));
+                creditCardCreditRepository
+                        .findById(credit.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit with id %d does not exist",
+                                                        credit.getId())));
         credit.setCreditCard(oldCredit.getCreditCard());
         creditCardCreditRepository.save(credit);
 
@@ -599,18 +673,27 @@ public class CreditCardService {
      * @throws MoinexException.InsufficientResourcesException If the credit card does not have enough
      */
     @Transactional
-    public void payInvoice(Long crcId,
-                           Long walletId,
-                           Integer month,
-                           Integer year,
-                           BigDecimal rebate) {
-        Wallet wallet = walletRepository.findById(walletId).orElseThrow(
-                () -> new EntityNotFoundException(
-                        String.format("Wallet with id %d does not exist", walletId)));
+    public void payInvoice(
+            Long crcId, Long walletId, Integer month, Integer year, BigDecimal rebate) {
+        Wallet wallet =
+                walletRepository
+                        .findById(walletId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Wallet with id %d does not exist",
+                                                        walletId)));
 
-        CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
-                () -> new EntityNotFoundException(
-                        String.format("Credit card with id %d does not exist", crcId)));
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(crcId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Credit card with id %d does not exist",
+                                                        crcId)));
 
         if (rebate.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Rebate must be non-negative");
@@ -618,19 +701,19 @@ public class CreditCardService {
 
         if (creditCard.getAvailableRebate().compareTo(rebate) < 0) {
             throw new MoinexException.InsufficientResourcesException(
-                    "Credit card with id " + crcId +
-                            " does not have enough rebate to pay the invoice");
+                    "Credit card with id "
+                            + crcId
+                            + " does not have enough rebate to pay the invoice");
         }
 
-        List<CreditCardPayment> pendingPayments =
-                getPendingCreditCardPayments(crcId, month, year);
+        List<CreditCardPayment> pendingPayments = getPendingCreditCardPayments(crcId, month, year);
 
-        BigDecimal pendingPaymentsTotal = pendingPayments.stream()
-                .map(CreditCardPayment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal pendingPaymentsTotal =
+                pendingPayments.stream()
+                        .map(CreditCardPayment::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal pendingPaymentsTotalWithRebate =
-                pendingPaymentsTotal.subtract(rebate);
+        BigDecimal pendingPaymentsTotalWithRebate = pendingPaymentsTotal.subtract(rebate);
 
         // If the discount value is greater than the total of pending payments, then use
         // only the necessary to pay the pending payments
@@ -663,8 +746,10 @@ public class CreditCardService {
             totalRebateUsed = totalRebateUsed.add(rebateForThisPayment);
             remainingRebate = remainingRebate.subtract(rebateForThisPayment);
 
-            logger.info("Payment number {} of debt with id {} on credit card with id {} paid",
-                    payment.getInstallment(), payment.getCreditCardDebt().getId(),
+            logger.info(
+                    "Payment number {} of debt with id {} on credit card with id {} paid",
+                    payment.getInstallment(),
+                    payment.getCreditCardDebt().getId(),
                     payment.getCreditCardDebt().getCreditCard().getId());
         }
 
@@ -689,7 +774,7 @@ public class CreditCardService {
      */
     @Transactional
     public void payInvoice(Long crcId, Long walletId, Integer month, Integer year) {
-        selfReference.payInvoice(crcId, walletId, month, year, BigDecimal.ZERO);
+        payInvoice(crcId, walletId, month, year, BigDecimal.ZERO);
     }
 
     /**
@@ -736,14 +821,13 @@ public class CreditCardService {
      * count
      */
     public List<CreditCard> getAllNonArchivedCreditCardsOrderedByTransactionCountDesc() {
-        return creditCardRepository.findAllByIsArchivedFalse()
-                .stream()
-                .sorted(Comparator
-                        .comparingLong(
-                                (CreditCard c)
-                                        -> creditCardDebtRepository.getDebtCountByCreditCard(
-                                        c.getId()))
-                        .reversed())
+        return creditCardRepository.findAllByIsArchivedFalse().stream()
+                .sorted(
+                        Comparator.comparingLong(
+                                        (CreditCard c) ->
+                                                creditCardDebtRepository.getDebtCountByCreditCard(
+                                                        c.getId()))
+                                .reversed())
                 .toList();
     }
 
@@ -764,13 +848,15 @@ public class CreditCardService {
      * @throws EntityNotFoundException If the credit card does not exist
      */
     public BigDecimal getAvailableCredit(Long id) {
-        CreditCard creditCard = creditCardRepository.findById(id).orElseThrow(
-                ()
-                        -> new EntityNotFoundException("Credit card with id " + id +
-                        " does not exist"));
+        CreditCard creditCard =
+                creditCardRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Credit card with id " + id + " does not exist"));
 
-        BigDecimal totalPendingPayments =
-                creditCardPaymentRepository.getTotalPendingPayments(id);
+        BigDecimal totalPendingPayments = creditCardPaymentRepository.getTotalPendingPayments(id);
 
         return creditCard.getMaxDebt().subtract(totalPendingPayments);
     }
@@ -795,8 +881,7 @@ public class CreditCardService {
      * @return A list with all credit card payments in a month and year by credit card
      * id
      */
-    public List<CreditCardPayment>
-    getCreditCardPayments(Long crcId, Integer month, Integer year) {
+    public List<CreditCardPayment> getCreditCardPayments(Long crcId, Integer month, Integer year) {
         return creditCardPaymentRepository.getCreditCardPayments(crcId, month, year);
     }
 
@@ -809,11 +894,9 @@ public class CreditCardService {
      * @return A list with all credit card pending payments in a month and year by
      * credit card id
      */
-    public List<CreditCardPayment>
-    getPendingCreditCardPayments(Long crcId, Integer month, Integer year) {
-        return creditCardPaymentRepository.getPendingCreditCardPayments(crcId,
-                month,
-                year);
+    public List<CreditCardPayment> getPendingCreditCardPayments(
+            Long crcId, Integer month, Integer year) {
+        return creditCardPaymentRepository.getPendingCreditCardPayments(crcId, month, year);
     }
 
     /**
@@ -843,8 +926,7 @@ public class CreditCardService {
      * @param year  The year
      * @return A list with all paid payments of all credit cards in a month and year
      */
-    public List<CreditCardPayment> getAllPaidPaymentsByMonth(Integer month,
-                                                             Integer year) {
+    public List<CreditCardPayment> getAllPaidPaymentsByMonth(Integer month, Integer year) {
         return creditCardPaymentRepository.getAllPaidPaymentsByMonth(month, year);
     }
 
@@ -905,11 +987,8 @@ public class CreditCardService {
      * @return The total of all paid payments of all credit cards from the specified
      * month and year by a wallet
      */
-    public BigDecimal
-    getEffectivePaidPaymentsByMonth(Long walletId, Integer month, Integer year) {
-        return creditCardPaymentRepository.getEffectivePaidPaymentsByMonth(walletId,
-                month,
-                year);
+    public BigDecimal getEffectivePaidPaymentsByMonth(Long walletId, Integer month, Integer year) {
+        return creditCardPaymentRepository.getEffectivePaidPaymentsByMonth(walletId, month, year);
     }
 
     /**
@@ -1006,11 +1085,9 @@ public class CreditCardService {
      * @param month The month
      * @param year  The year
      */
-    public List<CreditCardCredit>
-    getCreditCardCreditsByMonth(Long crcId, Integer month, Integer year) {
-        return creditCardCreditRepository.findCreditCardCreditsByMonth(crcId,
-                month,
-                year);
+    public List<CreditCardCredit> getCreditCardCreditsByMonth(
+            Long crcId, Integer month, Integer year) {
+        return creditCardCreditRepository.findCreditCardCreditsByMonth(crcId, month, year);
     }
 
     /**
@@ -1021,11 +1098,8 @@ public class CreditCardService {
      * @param year  The year
      * @return The total of all credit card credits in a month and year
      */
-    public BigDecimal
-    getTotalCreditCardCreditsByMonth(Long crcId, Integer month, Integer year) {
-        return creditCardCreditRepository.getTotalCreditCardCreditsByMonth(crcId,
-                month,
-                year);
+    public BigDecimal getTotalCreditCardCreditsByMonth(Long crcId, Integer month, Integer year) {
+        return creditCardCreditRepository.getTotalCreditCardCreditsByMonth(crcId, month, year);
     }
 
     /**
@@ -1047,16 +1121,14 @@ public class CreditCardService {
      * @return The invoice status of the credit card in the specified month and year
      * @throws EntityNotFoundException If the credit card does not exist
      */
-    public CreditCardInvoiceStatus
-    getInvoiceStatus(Long crcId, Integer month, Integer year) {
+    public CreditCardInvoiceStatus getInvoiceStatus(Long crcId, Integer month, Integer year) {
         LocalDateTime nextInvoiceDate = getNextInvoiceDate(crcId);
         nextInvoiceDate = nextInvoiceDate.withHour(0).withMinute(0);
 
         LocalDateTime dateToCompare =
                 LocalDateTime.of(year, month, nextInvoiceDate.getDayOfMonth(), 23, 59);
 
-        if (dateToCompare.isAfter(nextInvoiceDate) ||
-                dateToCompare.isEqual(nextInvoiceDate)) {
+        if (dateToCompare.isAfter(nextInvoiceDate) || dateToCompare.isEqual(nextInvoiceDate)) {
             return CreditCardInvoiceStatus.OPEN;
         }
 
@@ -1080,10 +1152,15 @@ public class CreditCardService {
         if (nextInvoiceDate == null) {
             LocalDateTime now = LocalDateTime.now();
 
-            CreditCard creditCard = creditCardRepository.findById(crcId).orElseThrow(
-                    ()
-                            -> new EntityNotFoundException("Credit card with id " + crcId +
-                            " does not exist"));
+            CreditCard creditCard =
+                    creditCardRepository
+                            .findById(crcId)
+                            .orElseThrow(
+                                    () ->
+                                            new EntityNotFoundException(
+                                                    "Credit card with id "
+                                                            + crcId
+                                                            + " does not exist"));
 
             int currentDay = now.getDayOfMonth();
             Integer closingDay = creditCard.getClosingDay();
@@ -1172,24 +1249,26 @@ public class CreditCardService {
      * @throws IllegalArgumentException If the lastFourDigits is empty or has length
      *                                  different from 4
      */
-    private void creditCardBasicChecks(String name,
-                                       Integer dueDate,
-                                       Integer closingDay,
-                                       BigDecimal maxDebt,
-                                       String lastFourDigits) {
+    private void creditCardBasicChecks(
+            String name,
+            Integer dueDate,
+            Integer closingDay,
+            BigDecimal maxDebt,
+            String lastFourDigits) {
         if (name.isBlank()) {
             throw new IllegalArgumentException("Credit card name cannot be empty");
         }
 
         if (dueDate < 1 || dueDate > Constants.MAX_BILLING_DUE_DAY) {
             throw new IllegalArgumentException(
-                    "Billing due day must be in the range [1, " +
-                            Constants.MAX_BILLING_DUE_DAY + "]");
+                    "Billing due day must be in the range [1, "
+                            + Constants.MAX_BILLING_DUE_DAY
+                            + "]");
         }
 
         if (closingDay < 1 || closingDay > Constants.MAX_BILLING_DUE_DAY) {
-            throw new IllegalArgumentException("Closing day must be in the range [1, " +
-                    Constants.MAX_BILLING_DUE_DAY + "]");
+            throw new IllegalArgumentException(
+                    "Closing day must be in the range [1, " + Constants.MAX_BILLING_DUE_DAY + "]");
         }
 
         if (maxDebt.compareTo(BigDecimal.ZERO) <= 0) {
@@ -1211,18 +1290,21 @@ public class CreditCardService {
      */
     private void deletePayment(Long id) {
         CreditCardPayment payment =
-                creditCardPaymentRepository.findById(id).orElseThrow(
-                        ()
-                                -> new EntityNotFoundException("Payment with id " + id +
-                                " not found"));
+                creditCardPaymentRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Payment with id " + id + " not found"));
 
         // If payment was made with a wallet, add the amount back to the
         // wallet balance
         if (payment.getWallet() != null) {
-            payment.getWallet().setBalance(
-                    payment.getWallet().getBalance().add(payment.getAmount()));
+            payment.getWallet()
+                    .setBalance(payment.getWallet().getBalance().add(payment.getAmount()));
 
-            logger.info("Payment {} of debt {} on credit card {} deleted and added to wallet {}",
+            logger.info(
+                    "Payment {} of debt {} on credit card {} deleted and added to wallet {}",
                     payment.getInstallment(),
                     payment.getCreditCardDebt().getId(),
                     payment.getCreditCardDebt().getCreditCard().getId(),
@@ -1233,7 +1315,8 @@ public class CreditCardService {
 
         creditCardPaymentRepository.delete(payment);
 
-        logger.info("Payment number {} of debt {} on credit card {} deleted",
+        logger.info(
+                "Payment number {} of debt {} on credit card {} deleted",
                 payment.getInstallment(),
                 payment.getCreditCardDebt().getId(),
                 payment.getCreditCardDebt().getCreditCard().getId());
@@ -1252,9 +1335,9 @@ public class CreditCardService {
 
         // If the first payment is in the same month and year of the invoice, do not
         // update
-        if (firstPayment == null ||
-                (firstPayment.getDate().getMonth() == invoice.getMonth() &&
-                        firstPayment.getDate().getYear() == invoice.getYear())) {
+        if (firstPayment == null
+                || (firstPayment.getDate().getMonth() == invoice.getMonth()
+                        && firstPayment.getDate().getYear() == invoice.getYear())) {
             return;
         }
 
@@ -1270,7 +1353,8 @@ public class CreditCardService {
             payment.setDate(paymentDate);
             creditCardPaymentRepository.save(payment);
 
-            logger.info("Payment number {} of debt {} on credit card {} updated with due date {}",
+            logger.info(
+                    "Payment number {} of debt {} on credit card {} updated with due date {}",
                     payment.getInstallment(),
                     oldDebt.getId(),
                     oldDebt.getCreditCard().getId(),
@@ -1298,8 +1382,9 @@ public class CreditCardService {
         BigDecimal installmentValue =
                 value.divide(new BigDecimal(newInstallments), 2, RoundingMode.HALF_UP);
 
-        BigDecimal totalCalculated = installmentValue.multiply(
-                new BigDecimal(newInstallments)); // Total without remainder
+        BigDecimal totalCalculated =
+                installmentValue.multiply(
+                        new BigDecimal(newInstallments)); // Total without remainder
 
         BigDecimal remainder = value.subtract(totalCalculated);
 
@@ -1322,7 +1407,8 @@ public class CreditCardService {
                     payment.setAmount(i == 0 ? firstInstallment : installmentValue);
                     creditCardPaymentRepository.save(payment);
 
-                    logger.info("Payment number {} of debt {} on credit card {} updated with value {}",
+                    logger.info(
+                            "Payment number {} of debt {} on credit card {} updated with value {}",
                             payment.getInstallment(),
                             oldDebt.getId(),
                             oldDebt.getCreditCard().getId(),
@@ -1338,17 +1424,24 @@ public class CreditCardService {
                     // Calculate the payment date
                     LocalDateTime paymentDate = lastPayment.getDate().plusMonths(1);
 
-                    CreditCardPayment payment = CreditCardPayment.builder()
-                            .creditCardDebt(oldDebt)
-                            .date(paymentDate)
-                            .amount(installmentValue)
-                            .installment(i)
-                            .build();
+                    CreditCardPayment payment =
+                            CreditCardPayment.builder()
+                                    .creditCardDebt(oldDebt)
+                                    .date(paymentDate)
+                                    .amount(installmentValue)
+                                    .installment(i)
+                                    .build();
 
                     creditCardPaymentRepository.save(payment);
 
-                    logger.info("Payment number {} of debt {} on credit card {} registered with value {} and due date {}",
-                            i, oldDebt.getId(), oldDebt.getCreditCard().getId(), installmentValue, paymentDate);
+                    logger.info(
+                            "Payment number {} of debt {} on credit card {} registered with value"
+                                    + " {} and due date {}",
+                            i,
+                            oldDebt.getId(),
+                            oldDebt.getCreditCard().getId(),
+                            installmentValue,
+                            paymentDate);
 
                     // Add new payment to the list
                     payments.add(payment);
@@ -1358,8 +1451,13 @@ public class CreditCardService {
                     payment.setAmount(i == 0 ? firstInstallment : installmentValue);
                     creditCardPaymentRepository.save(payment);
 
-                    logger.info("Payment number {} of debt with id {} on credit card with id {} updated with value {}",
-                            payment.getInstallment(), oldDebt.getId(), oldDebt.getCreditCard().getId(), (i == 0 ? firstInstallment : installmentValue));
+                    logger.info(
+                            "Payment number {} of debt with id {} on credit card with id {} updated"
+                                    + " with value {}",
+                            payment.getInstallment(),
+                            oldDebt.getId(),
+                            oldDebt.getCreditCard().getId(),
+                            (i == 0 ? firstInstallment : installmentValue));
                 }
             }
         }
@@ -1389,8 +1487,8 @@ public class CreditCardService {
                 newAmount.divide(new BigDecimal(installments), 2, RoundingMode.FLOOR);
 
         // Calculate the remainder
-        BigDecimal remainder = newAmount.subtract(
-                exactInstallmentValue.multiply(new BigDecimal(installments)));
+        BigDecimal remainder =
+                newAmount.subtract(exactInstallmentValue.multiply(new BigDecimal(installments)));
 
         // Update payments
         for (int i = 0; i < oldDebt.getInstallments(); i++) {
@@ -1407,10 +1505,11 @@ public class CreditCardService {
             if (payment.getWallet() != null) {
                 BigDecimal diff = currentInstallmentValue.subtract(payment.getAmount());
 
-                payment.getWallet().setBalance(
-                        payment.getWallet().getBalance().add(diff));
+                payment.getWallet().setBalance(payment.getWallet().getBalance().add(diff));
 
-                logger.info("Payment number {} of debt {} on credit card {} updated and added to wallet {}",
+                logger.info(
+                        "Payment number {} of debt {} on credit card {} updated and added to wallet"
+                                + " {}",
                         payment.getInstallment(),
                         oldDebt.getId(),
                         oldDebt.getCreditCard().getId(),
@@ -1422,7 +1521,8 @@ public class CreditCardService {
             payment.setAmount(currentInstallmentValue);
             creditCardPaymentRepository.save(payment);
 
-            logger.info("Payment number {} of debt {} on credit card {} updated with value {}",
+            logger.info(
+                    "Payment number {} of debt {} on credit card {} updated with value {}",
                     payment.getInstallment(),
                     oldDebt.getId(),
                     oldDebt.getCreditCard().getId(),

@@ -32,8 +32,7 @@ import org.moinex.util.enums.TransactionStatus;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class WalletTransaction extends BaseTransaction
-{
+public class WalletTransaction extends BaseTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -48,24 +47,19 @@ public class WalletTransaction extends BaseTransaction
     private TransactionStatus status;
 
     public abstract static class WalletTransactionBuilder<
-        C extends   WalletTransaction, B
-            extends WalletTransactionBuilder<C, B>>
-        extends BaseTransactionBuilder<C, B>
-    {
-        public B date(LocalDateTime date)
-        {
+                    C extends WalletTransaction, B extends WalletTransactionBuilder<C, B>>
+            extends BaseTransactionBuilder<C, B> {
+        public B date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
     }
 
-    public LocalDateTime getDate()
-    {
+    public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }
 
-    public void setDate(LocalDateTime date)
-    {
+    public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
     }
 }

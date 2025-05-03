@@ -11,35 +11,31 @@ import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class MappingRow
-{
+public class MappingRow {
     private StringProperty csvColumn;
     private StringProperty selectedDbColumn;
-    private List<String>   dbColumnOptions;
+    private List<String> dbColumnOptions;
 
     /**
      * Constructor
      * @param csvColumn CSV column name
      * @param dbColumns List of DB column names
      */
-    public MappingRow(String csvColumn, List<String> dbColumns)
-    {
-        this.csvColumn        = new SimpleStringProperty(csvColumn);
+    public MappingRow(String csvColumn, List<String> dbColumns) {
+        this.csvColumn = new SimpleStringProperty(csvColumn);
         this.selectedDbColumn = new SimpleStringProperty("");
-        this.dbColumnOptions  = new ArrayList<>(dbColumns);
+        this.dbColumnOptions = new ArrayList<>(dbColumns);
     }
 
     /**
      * Get the CSV column name
      * @return CSV column name
      */
-    public String getCSVColumn()
-    {
+    public String getCSVColumn() {
         return csvColumn.get();
     }
 
-    public StringProperty csvColumnProperty()
-    {
+    public StringProperty csvColumnProperty() {
         return csvColumn;
     }
 
@@ -47,18 +43,15 @@ public class MappingRow
      * Get the selected DB column
      * @return selected DB column
      */
-    public String getSelectedDBColumn()
-    {
+    public String getSelectedDBColumn() {
         return selectedDbColumn.get();
     }
 
-    public void setSelectedDBColumn(String selectedDbColumn)
-    {
+    public void setSelectedDBColumn(String selectedDbColumn) {
         this.selectedDbColumn.set(selectedDbColumn);
     }
 
-    public StringProperty selectedDBColumnProperty()
-    {
+    public StringProperty selectedDBColumnProperty() {
         return selectedDbColumn;
     }
 
@@ -66,8 +59,7 @@ public class MappingRow
      * Get the DB column options for the ComboBox
      * @return List of DB column options
      */
-    public List<String> getDBColumnOptions()
-    {
+    public List<String> getDBColumnOptions() {
         return dbColumnOptions;
     }
 }

@@ -30,8 +30,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreditCardOperator
-{
+public class CreditCardOperator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -41,15 +40,14 @@ public class CreditCardOperator
     @Column(name = "name", nullable = false, length = 50, unique = true)
     private String name;
 
-    @Column(name = "icon",  length = 30)
+    @Column(name = "icon", length = 30)
     private String icon;
 
     /**
      * Constructor for testing purposes
      */
-    public CreditCardOperator(Long id, String name)
-    {
-        this.id   = id;
+    public CreditCardOperator(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }

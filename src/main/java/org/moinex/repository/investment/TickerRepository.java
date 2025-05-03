@@ -36,45 +36,35 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      * @param tickerId The id of the ticker
      * @return The count of purchases associated with the ticker
      */
-    @Query("SELECT count(p) "
-           + "FROM TickerPurchase p "
-           + "WHERE p.ticker.id = :tickerId")
-
-    Long
-    getPurchaseCountByTicker(@Param("tickerId") Long tickerId);
+    @Query("SELECT count(p) " + "FROM TickerPurchase p " + "WHERE p.ticker.id = :tickerId")
+    Long getPurchaseCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Get count of sales associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of sales associated with the ticker
      */
-    @Query("SELECT count(s) "
-           + "FROM TickerSale s "
-           + "WHERE s.ticker.id = :tickerId")
-    Long
-    getSaleCountByTicker(@Param("tickerId") Long tickerId);
+    @Query("SELECT count(s) " + "FROM TickerSale s " + "WHERE s.ticker.id = :tickerId")
+    Long getSaleCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Get count of dividends associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of dividends associated with the ticker
      */
-    @Query("SELECT count(d) "
-           + "FROM Dividend d "
-           + "WHERE d.ticker.id = :tickerId")
-    Long
-    getDividendCountByTicker(@Param("tickerId") Long tickerId);
+    @Query("SELECT count(d) " + "FROM Dividend d " + "WHERE d.ticker.id = :tickerId")
+    Long getDividendCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Get count of crypto exchanges associated with the ticker
      * @param tickerId The id of the ticker
      * @return The count of crypto exchanges associated with the ticker
      */
-    @Query("SELECT count(e) "
-           + "FROM CryptoExchange e "
-           + "WHERE e.soldCrypto.id = :tickerId OR e.receivedCrypto.id = :tickerId")
-    Long
-    getCryptoExchangeCountByTicker(@Param("tickerId") Long tickerId);
+    @Query(
+            "SELECT count(e) "
+                    + "FROM CryptoExchange e "
+                    + "WHERE e.soldCrypto.id = :tickerId OR e.receivedCrypto.id = :tickerId")
+    Long getCryptoExchangeCountByTicker(@Param("tickerId") Long tickerId);
 
     /**
      * Findall tickers and order them by symbol in ascending order
@@ -96,7 +86,6 @@ public interface TickerRepository extends JpaRepository<Ticker, Long> {
      *     order
      */
     List<Ticker> findAllByIsArchivedTrueOrderBySymbolAsc();
-
 
     /**
      * Get all non-archived tickers of a specific type

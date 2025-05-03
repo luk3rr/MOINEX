@@ -26,19 +26,14 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class AddCalendarEventController
-{
-    @FXML
-    private TextField titleField;
+public class AddCalendarEventController {
+    @FXML private TextField titleField;
 
-    @FXML
-    private ComboBox<CalendarEventType> typeComboBox;
+    @FXML private ComboBox<CalendarEventType> typeComboBox;
 
-    @FXML
-    private DatePicker datePicker;
+    @FXML private DatePicker datePicker;
 
-    @FXML
-    private TextArea descriptionTextArea;
+    @FXML private TextArea descriptionTextArea;
 
     private CalendarService calendarService;
 
@@ -48,71 +43,56 @@ public class AddCalendarEventController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddCalendarEventController(CalendarService calendarService)
-    {
+    public AddCalendarEventController(CalendarService calendarService) {
         this.calendarService = calendarService;
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         configureComboBoxes();
         UIUtils.setDatePickerFormat(datePicker);
         populateComboBoxes();
     }
 
     @FXML
-    private void handleCancel()
-    {
-        Stage stage = (Stage)titleField.getScene().getWindow();
+    private void handleCancel() {
+        Stage stage = (Stage) titleField.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    private void handleSave()
-    {
+    private void handleSave() {
         String eventTitle = titleField.getText();
         eventTitle = eventTitle.strip(); // Remove leading and trailing whitespaces
 
-        CalendarEventType eventType   = typeComboBox.getValue();
-        LocalDate         eventDate   = datePicker.getValue();
-        String            description = descriptionTextArea.getText();
+        CalendarEventType eventType = typeComboBox.getValue();
+        LocalDate eventDate = datePicker.getValue();
+        String description = descriptionTextArea.getText();
 
-        if (eventTitle.isEmpty() || eventDate == null || eventType == null)
-        {
+        if (eventTitle.isEmpty() || eventDate == null || eventType == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
-            calendarService.addEvent(eventTitle,
-                                     description,
-                                     eventDate.atStartOfDay(),
-                                     eventType);
+        try {
+            calendarService.addEvent(eventTitle, description, eventDate.atStartOfDay(), eventType);
 
-            WindowUtils.showSuccessDialog("Event created",
-                                          "The event was successfully created.");
+            WindowUtils.showSuccessDialog("Event created", "The event was successfully created.");
 
-            Stage stage = (Stage)titleField.getScene().getWindow();
+            Stage stage = (Stage) titleField.getScene().getWindow();
             stage.close();
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error creating event", e.getMessage());
         }
     }
 
-    private void populateComboBoxes()
-    {
+    private void populateComboBoxes() {
         typeComboBox.getItems().setAll(CalendarEventType.values());
     }
 
-    private void configureComboBoxes()
-    {
+    private void configureComboBoxes() {
         UIUtils.configureComboBox(typeComboBox, CalendarEventType::getDescription);
     }
 }

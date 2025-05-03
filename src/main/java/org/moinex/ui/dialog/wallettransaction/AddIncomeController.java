@@ -31,8 +31,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddIncomeController extends BaseWalletTransactionManagement
-{
+public final class AddIncomeController extends BaseWalletTransactionManagement {
     /**
      * Constructor
      * @param walletService WalletService
@@ -42,75 +41,66 @@ public final class AddIncomeController extends BaseWalletTransactionManagement
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddIncomeController(WalletService            walletService,
-                               WalletTransactionService walletTransactionService,
-                               CategoryService          categoryService,
-                               CalculatorService        calculatorService)
-    {
-        super(walletService,
-              walletTransactionService,
-              categoryService,
-              calculatorService);
+    public AddIncomeController(
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            CategoryService categoryService,
+            CalculatorService calculatorService) {
+        super(walletService, walletTransactionService, categoryService, calculatorService);
 
         transactionType = TransactionType.INCOME;
     }
 
     @FXML
     @Override
-    protected void handleSave()
-    {
-        Wallet            wallet            = walletComboBox.getValue();
-        String            description       = descriptionField.getText();
-        String            incomeValueString = transactionValueField.getText();
-        TransactionStatus status            = statusComboBox.getValue();
-        Category          category          = categoryComboBox.getValue();
-        LocalDate         incomeDate        = transactionDatePicker.getValue();
+    protected void handleSave() {
+        Wallet wallet = walletComboBox.getValue();
+        String description = descriptionField.getText();
+        String incomeValueString = transactionValueField.getText();
+        TransactionStatus status = statusComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        LocalDate incomeDate = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.isBlank() ||
-            incomeValueString == null || incomeValueString.isBlank() ||
-            status == null || category == null || incomeDate == null)
-        {
+        if (wallet == null
+                || description == null
+                || description.isBlank()
+                || incomeValueString == null
+                || incomeValueString.isBlank()
+                || status == null
+                || category == null
+                || incomeDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal incomeValue = new BigDecimal(incomeValueString);
 
-            LocalTime     currentTime             = LocalTime.now();
+            LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = incomeDate.atTime(currentTime);
 
-            walletTransactionService.addIncome(wallet.getId(),
-                                               category,
-                                               dateTimeWithCurrentHour,
-                                               incomeValue,
-                                               description,
-                                               status);
+            walletTransactionService.addIncome(
+                    wallet.getId(),
+                    category,
+                    dateTimeWithCurrentHour,
+                    incomeValue,
+                    description,
+                    status);
 
-            WindowUtils.showSuccessDialog("Income created",
-                                          "The income was successfully created.");
+            WindowUtils.showSuccessDialog("Income created", "The income was successfully created.");
 
-            Stage stage = (Stage)descriptionField.getScene().getWindow();
+            Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid income value",
-                                        "Income value must be a number.");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog("Invalid income value", "Income value must be a number.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error while creating income", e.getMessage());
         }
     }
 
     @Override
-    protected void loadSuggestionsFromDatabase()
-    {
-        suggestionsHandler.setSuggestions(
-            walletTransactionService.getIncomeSuggestions());
+    protected void loadSuggestionsFromDatabase() {
+        suggestionsHandler.setSuggestions(walletTransactionService.getIncomeSuggestions());
     }
 }

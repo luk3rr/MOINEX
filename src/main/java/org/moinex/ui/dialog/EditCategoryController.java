@@ -26,14 +26,11 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public class EditCategoryController {
-    @FXML
-    private Label selectedCategoryLabel;
+    @FXML private Label selectedCategoryLabel;
 
-    @FXML
-    private CheckBox archivedCheckBox;
+    @FXML private CheckBox archivedCheckBox;
 
-    @FXML
-    private TextField categoryNewNameField;
+    @FXML private TextField categoryNewNameField;
 
     private Category selectedCategory; // The category to be edited
 
@@ -65,16 +62,13 @@ public class EditCategoryController {
         boolean nameChanged = false;
         boolean archivedChanged = false;
 
-        if (newName == null ||
-                !newName.isBlank() && !newName.equals(selectedCategory.getName())) {
+        if (newName == null || !newName.isBlank() && !newName.equals(selectedCategory.getName())) {
             try {
                 categoryService.renameCategory(selectedCategory.getId(), newName);
 
                 nameChanged = true;
-            } catch (IllegalArgumentException | EntityExistsException |
-                     EntityNotFoundException e) {
-                WindowUtils.showErrorDialog("Error updating category name",
-                        e.getMessage());
+            } catch (IllegalArgumentException | EntityExistsException | EntityNotFoundException e) {
+                WindowUtils.showErrorDialog("Error updating category name", e.getMessage());
                 return;
             }
         }

@@ -23,66 +23,51 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class AddGoalController extends BaseGoalManagement
-{
+public final class AddGoalController extends BaseGoalManagement {
     /**
      * Constructor
      * @param goalService GoalService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddGoalController(GoalService goalService)
-    {
+    public AddGoalController(GoalService goalService) {
         super(goalService);
     }
 
     @Override
     @FXML
-    protected void handleSave()
-    {
+    protected void handleSave() {
         String goalName = nameField.getText();
-        goalName        = goalName.strip(); // Remove leading and trailing whitespaces
+        goalName = goalName.strip(); // Remove leading and trailing whitespaces
 
-        String    initialBalanceStr = initialBalanceField.getText();
-        String    targetBalanceStr  = targetBalanceField.getText();
-        LocalDate targetDate        = targetDatePicker.getValue();
-        String    motivation        = motivationTextArea.getText();
+        String initialBalanceStr = initialBalanceField.getText();
+        String targetBalanceStr = targetBalanceField.getText();
+        LocalDate targetDate = targetDatePicker.getValue();
+        String motivation = motivationTextArea.getText();
 
-        if (goalName.isEmpty() || initialBalanceStr.isEmpty() ||
-            targetBalanceStr.isEmpty() || targetDate == null)
-        {
+        if (goalName.isEmpty()
+                || initialBalanceStr.isEmpty()
+                || targetBalanceStr.isEmpty()
+                || targetDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal initialBalance = new BigDecimal(initialBalanceStr);
-            BigDecimal targetBalance  = new BigDecimal(targetBalanceStr);
+            BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
-            goalService.addGoal(goalName,
-                                initialBalance,
-                                targetBalance,
-                                targetDate,
-                                motivation);
+            goalService.addGoal(goalName, initialBalance, targetBalance, targetDate, motivation);
 
-            WindowUtils.showSuccessDialog("Goal created",
-                                          "The goal was successfully created.");
+            WindowUtils.showSuccessDialog("Goal created", "The goal was successfully created.");
 
-            Stage stage = (Stage)nameField.getScene().getWindow();
+            Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
-            WindowUtils.showErrorDialog("Invalid balance",
-                                        "Please enter a valid balance.");
-        }
-        catch (IllegalArgumentException | EntityExistsException |
-               EntityNotFoundException e)
-        {
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog("Invalid balance", "Please enter a valid balance.");
+        } catch (IllegalArgumentException | EntityExistsException | EntityNotFoundException e) {
             WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
         }
     }

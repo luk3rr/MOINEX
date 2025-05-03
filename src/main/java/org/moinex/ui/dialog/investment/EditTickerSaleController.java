@@ -33,8 +33,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public final class EditTickerSaleController extends BaseTickerTransactionManagement
-{
+public final class EditTickerSaleController extends BaseTickerTransactionManagement {
     private TickerSale sale = null;
 
     /**
@@ -46,21 +45,20 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditTickerSaleController(WalletService            walletService,
-                                    WalletTransactionService walletTransactionService,
-                                    CategoryService          categoryService,
-                                    TickerService            tickerService)
-    {
+    public EditTickerSaleController(
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            CategoryService categoryService,
+            TickerService tickerService) {
         super(walletService, walletTransactionService, categoryService, tickerService);
 
         transactionType = TransactionType.INCOME;
     }
 
-    public void setSale(TickerSale s)
-    {
+    public void setSale(TickerSale s) {
         this.sale = s;
-        tickerNameLabel.setText(sale.getTicker().getName() + " (" +
-                                sale.getTicker().getSymbol() + ")");
+        tickerNameLabel.setText(
+                sale.getTicker().getName() + " (" + sale.getTicker().getSymbol() + ")");
         unitPriceField.setText(sale.getTicker().getCurrentUnitValue().toString());
 
         setWalletComboBox(sale.getWalletTransaction().getWallet());
@@ -70,60 +68,55 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
         quantityField.setText(sale.getQuantity().toString());
         statusComboBox.setValue(sale.getWalletTransaction().getStatus());
         categoryComboBox.setValue(sale.getWalletTransaction().getCategory());
-        transactionDatePicker.setValue(
-            sale.getWalletTransaction().getDate().toLocalDate());
+        transactionDatePicker.setValue(sale.getWalletTransaction().getDate().toLocalDate());
 
-        totalPriceLabel.setText(
-            UIUtils.formatCurrency(sale.getWalletTransaction().getAmount()));
+        totalPriceLabel.setText(UIUtils.formatCurrency(sale.getWalletTransaction().getAmount()));
     }
 
     @FXML
     @Override
-    protected void handleSave()
-    {
-        Wallet            wallet       = walletComboBox.getValue();
-        String            description  = descriptionField.getText();
-        TransactionStatus status       = statusComboBox.getValue();
-        Category          category     = categoryComboBox.getValue();
-        String            unitPriceStr = unitPriceField.getText();
-        String            quantityStr  = quantityField.getText();
-        LocalDate         saleDate     = transactionDatePicker.getValue();
+    protected void handleSave() {
+        Wallet wallet = walletComboBox.getValue();
+        String description = descriptionField.getText();
+        TransactionStatus status = statusComboBox.getValue();
+        Category category = categoryComboBox.getValue();
+        String unitPriceStr = unitPriceField.getText();
+        String quantityStr = quantityField.getText();
+        LocalDate saleDate = transactionDatePicker.getValue();
 
-        if (wallet == null || description == null || description.isBlank() ||
-            status == null || category == null || unitPriceStr == null ||
-            unitPriceStr.isBlank() || quantityStr == null ||
-            quantityStr.isBlank() || saleDate == null)
-        {
+        if (wallet == null
+                || description == null
+                || description.isBlank()
+                || status == null
+                || category == null
+                || unitPriceStr == null
+                || unitPriceStr.isBlank()
+                || quantityStr == null
+                || quantityStr.isBlank()
+                || saleDate == null) {
             WindowUtils.showInformationDialog(
-                "Empty fields",
-                "Please fill all required fields before saving");
+                    "Empty fields", "Please fill all required fields before saving");
 
             return;
         }
 
-        try
-        {
+        try {
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
 
             BigDecimal quantity = new BigDecimal(quantityStr);
 
             // Check if it has any modification
-            if (sale.getWalletTransaction().getWallet().getId().equals(
-                    wallet.getId()) &&
-                sale.getWalletTransaction().getDescription().equals(description) &&
-                sale.getWalletTransaction().getStatus().equals(status) &&
-                sale.getWalletTransaction().getCategory().getId().equals(
-                    category.getId()) &&
-                sale.getUnitPrice().compareTo(unitPrice) == 0 &&
-                sale.getQuantity().compareTo(quantity) == 0 &&
-                sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate))
+            if (sale.getWalletTransaction().getWallet().getId().equals(wallet.getId())
+                    && sale.getWalletTransaction().getDescription().equals(description)
+                    && sale.getWalletTransaction().getStatus().equals(status)
+                    && sale.getWalletTransaction().getCategory().getId().equals(category.getId())
+                    && sale.getUnitPrice().compareTo(unitPrice) == 0
+                    && sale.getQuantity().compareTo(quantity) == 0
+                    && sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate)) {
+                WindowUtils.showInformationDialog("No changes", "No changes were made to the sale");
+            } else // If there is any modification, update the transaction
             {
-                WindowUtils.showInformationDialog("No changes",
-                                                  "No changes were made to the sale");
-            }
-            else // If there is any modification, update the transaction
-            {
-                LocalTime     currentTime             = LocalTime.now();
+                LocalTime currentTime = LocalTime.now();
                 LocalDateTime dateTimeWithCurrentHour = saleDate.atTime(currentTime);
 
                 sale.getWalletTransaction().setWallet(wallet);
@@ -136,19 +129,15 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
 
                 tickerService.updateSale(sale);
 
-                WindowUtils.showSuccessDialog("TickerSale updated",
-                                              "TickerSale updated successfully");
+                WindowUtils.showSuccessDialog(
+                        "TickerSale updated", "TickerSale updated successfully");
             }
 
-            Stage stage = (Stage)tickerNameLabel.getScene().getWindow();
+            Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
-        }
-        catch (EntityNotFoundException | IllegalArgumentException e)
-        {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog("Error while updating sale", e.getMessage());
         }
     }

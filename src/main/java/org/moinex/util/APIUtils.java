@@ -33,10 +33,8 @@ import org.slf4j.LoggerFactory;
  * Utility class for managing API-related operations, like fetching stock prices and
  * market indicators
  */
-public class APIUtils
-{
-    private static final ExecutorService executorService =
-        Executors.newCachedThreadPool();
+public class APIUtils {
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static final List<Process> runningProcesses = new ArrayList<>();
 
@@ -45,15 +43,13 @@ public class APIUtils
     private static final Logger logger = LoggerFactory.getLogger(APIUtils.class);
 
     // Prevent instantiation
-    private APIUtils() { }
+    private APIUtils() {}
 
     /**
      * Shutdown the executor service
      */
-    public static synchronized void shutdownExecutor()
-    {
-        if (shuttingDown)
-        {
+    public static synchronized void shutdownExecutor() {
+        if (shuttingDown) {
             return;
         }
 
@@ -65,16 +61,12 @@ public class APIUtils
 
         executorService.shutdown();
 
-        try
-        {
-            if (!executorService.awaitTermination(10, TimeUnit.SECONDS))
-            {
+        try {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
                 logger.warn("Forcing shutdown of executor service...");
                 executorService.shutdownNow();
             }
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             logger.warn("Shutdown interrupted. Forcing shutdown...");
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
@@ -84,35 +76,26 @@ public class APIUtils
     /**
      * Shutdown all running processes
      */
-    private static synchronized void shutdownProcesses()
-    {
+    private static synchronized void shutdownProcesses() {
         logger.info("Shutting down running processes");
 
-        for (Process process : runningProcesses)
-        {
-            try
-            {
+        for (Process process : runningProcesses) {
+            try {
                 // Primeiro, tentamos destruir o processo de forma normal
                 process.destroy();
-                if (!process.waitFor(5, TimeUnit.SECONDS))
-                {
+                if (!process.waitFor(5, TimeUnit.SECONDS)) {
                     // Se o processo não terminar dentro do limite de tempo, forçamos a
                     // destruição
-                    logger.warn(
-                        "Process did not terminate in time. Forcing shutdown...");
+                    logger.warn("Process did not terminate in time. Forcing shutdown...");
                     process.destroyForcibly();
                 }
                 logger.info("Process terminated: {}", process);
-            }
-            catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 // Se a espera pelo processo for interrompida, forçamos imediatamente
                 logger.warn("Process interrupted. Forcing shutdown...");
                 process.destroyForcibly();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 logger.warn("Error during process shutdown: {}", e.getMessage());
             }
         }
@@ -126,11 +109,10 @@ public class APIUtils
      * Register a process to be managed by the APIUtils class
      * @param process The process to register
      */
-    private static synchronized void registerProcess(Process process)
-    {
-        if (shuttingDown)
-        {
-            throw new MoinexException.ApplicationShuttingDownException("Application is shutting down");
+    private static synchronized void registerProcess(Process process) {
+        if (shuttingDown) {
+            throw new MoinexException.ApplicationShuttingDownException(
+                    "Application is shutting down");
         }
 
         runningProcesses.add(process);
@@ -140,11 +122,10 @@ public class APIUtils
      * Remove a process from the list of running processes
      * @param process The process to remove
      */
-    private static synchronized void removeProcess(Process process)
-    {
-        if (shuttingDown)
-        {
-            throw new MoinexException.ApplicationShuttingDownException("Application is shutting down");
+    private static synchronized void removeProcess(Process process) {
+        if (shuttingDown) {
+            throw new MoinexException.ApplicationShuttingDownException(
+                    "Application is shutting down");
         }
 
         runningProcesses.remove(process);
@@ -156,9 +137,9 @@ public class APIUtils
      * @param symbols Array of stock symbols
      * @return A CompletableFuture containing the JSON response
      */
-    public static CompletableFuture<JSONObject> fetchStockPricesAsync(String[] symbols)
-    {
-        return CompletableFuture.supplyAsync(() -> runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols), executorService);
+    public static CompletableFuture<JSONObject> fetchStockPricesAsync(String[] symbols) {
+        return CompletableFuture.supplyAsync(
+                () -> runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols), executorService);
     }
 
     /**
@@ -166,10 +147,12 @@ public class APIUtils
      *
      * @return A CompletableFuture containing the JSON response
      */
-    public static CompletableFuture<JSONObject> fetchBrazilianMarketIndicatorsAsync()
-    {
-        return CompletableFuture.supplyAsync(() -> runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT,
-                               new String[0]), executorService);
+    public static CompletableFuture<JSONObject> fetchBrazilianMarketIndicatorsAsync() {
+        return CompletableFuture.supplyAsync(
+                () ->
+                        runPythonScript(
+                                Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT, new String[0]),
+                executorService);
     }
 
     /**
@@ -177,34 +160,27 @@ public class APIUtils
      * @param script The script to run
      * @param args The arguments to pass to the script
      */
-    public static JSONObject runPythonScript(String script, String[] args)
-    {
+    public static JSONObject runPythonScript(String script, String[] args) {
         try (InputStream scriptInputStream =
-                 InitializationService.class.getResourceAsStream(Constants.SCRIPT_PATH +
-                                                                 script))
-        {
-            if (scriptInputStream == null)
-            {
-                throw new MoinexException.ScriptNotFoundException("Python " + script +
-                                                  " script not found");
+                InitializationService.class.getResourceAsStream(Constants.SCRIPT_PATH + script)) {
+            if (scriptInputStream == null) {
+                throw new MoinexException.ScriptNotFoundException(
+                        "Python " + script + " script not found");
             }
 
-            if (shuttingDown)
-            {
+            if (shuttingDown) {
                 throw new MoinexException.ApplicationShuttingDownException(
-                    "Application is shutting down");
+                        "Application is shutting down");
             }
 
             // Script name without extension
-            String scriptName    = script.substring(0, script.lastIndexOf('.'));
-            Path   tempDirectory = Paths.get(System.getProperty("java.io.tmpdir"));
-            Path   tempFile = Files.createTempFile(tempDirectory, scriptName, ".py");
+            String scriptName = script.substring(0, script.lastIndexOf('.'));
+            Path tempDirectory = Paths.get(System.getProperty("java.io.tmpdir"));
+            Path tempFile = Files.createTempFile(tempDirectory, scriptName, ".py");
 
             setSecurePermissions(tempFile);
 
-            Files.copy(scriptInputStream,
-                       tempFile,
-                       StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(scriptInputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
             List<String> commandList = new ArrayList<>();
             commandList.add(Constants.PYTHON_INTERPRETER);
@@ -216,19 +192,17 @@ public class APIUtils
             logger.info("Running Python script as: {}", String.join(" ", command));
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
-            Process        process        = processBuilder.start();
+            Process process = processBuilder.start();
             registerProcess(process);
 
-            try (BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(process.getInputStream())))
-            {
-                String output   = reader.lines().collect(Collectors.joining());
-                int    exitCode = process.waitFor();
+            try (BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String output = reader.lines().collect(Collectors.joining());
+                int exitCode = process.waitFor();
 
-                if (exitCode != 0)
-                {
+                if (exitCode != 0) {
                     throw new MoinexException.APIFetchException(
-                        "Error executing Python script. Exit code: " + exitCode);
+                            "Error executing Python script. Exit code: " + exitCode);
                 }
 
                 JSONObject jsonObject = new JSONObject(output);
@@ -237,27 +211,20 @@ public class APIUtils
                 logger.info("Output: {}", jsonObject);
 
                 return jsonObject;
-            }
-            finally
-            {
-                synchronized (runningProcesses)
-                {
+            } finally {
+                synchronized (runningProcesses) {
                     removeProcess(process);
                 }
             }
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             // Handle the case where the thread is interrupted
             Thread.currentThread().interrupt();
-            throw new MoinexException.APIFetchException("Python script execution was interrupted: " +
-                                        e);
-        }
-        catch (Exception e)
-        {
+            throw new MoinexException.APIFetchException(
+                    "Python script execution was interrupted: " + e);
+        } catch (Exception e) {
             // Handle general errors and exceptions
-            throw new MoinexException.APIFetchException("Error running Python script: " +
-                                        e.getMessage());
+            throw new MoinexException.APIFetchException(
+                    "Error running Python script: " + e.getMessage());
         }
     }
 
@@ -265,10 +232,8 @@ public class APIUtils
      * Set secure file permissions to restrict access to the owner only
      * @param file The file to set permissions for
      */
-    private static void setSecurePermissions(Path file) throws IOException
-    {
+    private static void setSecurePermissions(Path file) throws IOException {
         // Set file permissions to be readable and writable only by the owner
-        Files.setPosixFilePermissions(file,
-                                      PosixFilePermissions.fromString("rw-------"));
+        Files.setPosixFilePermissions(file, PosixFilePermissions.fromString("rw-------"));
     }
 }

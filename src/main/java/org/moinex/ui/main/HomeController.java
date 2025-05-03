@@ -62,48 +62,34 @@ import org.springframework.util.StringUtils;
  */
 @Controller
 @NoArgsConstructor
-public class HomeController
-{
+public class HomeController {
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-    @FXML
-    private JFXButton walletPrevButton;
+    @FXML private JFXButton walletPrevButton;
 
-    @FXML
-    private JFXButton walletNextButton;
+    @FXML private JFXButton walletNextButton;
 
-    @FXML
-    private AnchorPane walletView1;
+    @FXML private AnchorPane walletView1;
 
-    @FXML
-    private AnchorPane walletView2;
+    @FXML private AnchorPane walletView2;
 
-    @FXML
-    private AnchorPane creditCardView1;
+    @FXML private AnchorPane creditCardView1;
 
-    @FXML
-    private AnchorPane creditCardView2;
+    @FXML private AnchorPane creditCardView2;
 
-    @FXML
-    private AnchorPane monthResumeView;
+    @FXML private AnchorPane monthResumeView;
 
-    @FXML
-    private AnchorPane moneyFlowBarChartAnchorPane;
+    @FXML private AnchorPane moneyFlowBarChartAnchorPane;
 
-    @FXML
-    private JFXButton creditCardPrevButton;
+    @FXML private JFXButton creditCardPrevButton;
 
-    @FXML
-    private JFXButton creditCardNextButton;
+    @FXML private JFXButton creditCardNextButton;
 
-    @FXML
-    private BarChart<String, Number> moneyFlowBarChart;
+    @FXML private BarChart<String, Number> moneyFlowBarChart;
 
-    @FXML
-    private Label monthResumePaneTitle;
+    @FXML private Label monthResumePaneTitle;
 
-    @FXML
-    private TableView<WalletTransaction> transactionsTableView;
+    @FXML private TableView<WalletTransaction> transactionsTableView;
 
     private ConfigurableApplicationContext springContext;
 
@@ -134,21 +120,21 @@ public class HomeController
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public HomeController(WalletService               walletService,
-                          WalletTransactionService    walletTransactionService,
-                          RecurringTransactionService recurringTransactionService,
-                          CreditCardService           creditCardService, ConfigurableApplicationContext springContext)
-    {
-        this.walletService               = walletService;
-        this.walletTransactionService    = walletTransactionService;
+    public HomeController(
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            RecurringTransactionService recurringTransactionService,
+            CreditCardService creditCardService,
+            ConfigurableApplicationContext springContext) {
+        this.walletService = walletService;
+        this.walletTransactionService = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
-        this.creditCardService           = creditCardService;
+        this.creditCardService = creditCardService;
         this.springContext = springContext;
     }
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         loadWalletsFromDatabase();
         loadCreditCardsFromDatabase();
         loadLastTransactionsFromDatabase(Constants.HOME_LAST_TRANSACTIONS_SIZE);
@@ -170,56 +156,53 @@ public class HomeController
     /**
      * Set the actions for the buttons
      */
-    private void setButtonsActions()
-    {
-        walletPrevButton.setOnAction(event -> {
-            if (walletPaneCurrentPage > 0)
-            {
-                walletPaneCurrentPage--;
-                updateDisplayWallets();
-            }
-        });
+    private void setButtonsActions() {
+        walletPrevButton.setOnAction(
+                event -> {
+                    if (walletPaneCurrentPage > 0) {
+                        walletPaneCurrentPage--;
+                        updateDisplayWallets();
+                    }
+                });
 
-        walletNextButton.setOnAction(event -> {
-            if (walletPaneCurrentPage <
-                wallets.size() / Constants.HOME_PANES_ITEMS_PER_PAGE)
-            {
-                walletPaneCurrentPage++;
-                updateDisplayWallets();
-            }
-        });
+        walletNextButton.setOnAction(
+                event -> {
+                    if (walletPaneCurrentPage
+                            < wallets.size() / Constants.HOME_PANES_ITEMS_PER_PAGE) {
+                        walletPaneCurrentPage++;
+                        updateDisplayWallets();
+                    }
+                });
 
-        creditCardPrevButton.setOnAction(event -> {
-            if (creditCardPaneCurrentPage > 0)
-            {
-                creditCardPaneCurrentPage--;
-                updateDisplayCreditCards();
-            }
-        });
+        creditCardPrevButton.setOnAction(
+                event -> {
+                    if (creditCardPaneCurrentPage > 0) {
+                        creditCardPaneCurrentPage--;
+                        updateDisplayCreditCards();
+                    }
+                });
 
-        creditCardNextButton.setOnAction(event -> {
-            if (creditCardPaneCurrentPage <
-                creditCards.size() / Constants.HOME_PANES_ITEMS_PER_PAGE)
-            {
-                creditCardPaneCurrentPage++;
-                updateDisplayCreditCards();
-            }
-        });
+        creditCardNextButton.setOnAction(
+                event -> {
+                    if (creditCardPaneCurrentPage
+                            < creditCards.size() / Constants.HOME_PANES_ITEMS_PER_PAGE) {
+                        creditCardPaneCurrentPage++;
+                        updateDisplayCreditCards();
+                    }
+                });
     }
 
     /**
      * Load wallets from the database
      */
-    private void loadWalletsFromDatabase()
-    {
+    private void loadWalletsFromDatabase() {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
     /**
      * Load credit cards from the database
      */
-    private void loadCreditCardsFromDatabase()
-    {
+    private void loadCreditCardsFromDatabase() {
         creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByName();
     }
 
@@ -227,39 +210,32 @@ public class HomeController
      * Load the last transactions from the database
      * @param n The number of transactions to be loaded
      */
-    private void loadLastTransactionsFromDatabase(Integer n)
-    {
+    private void loadLastTransactionsFromDatabase(Integer n) {
         transactions = walletTransactionService.getNonArchivedLastTransactions(n);
     }
 
     /**
      * Update the display of wallets
      */
-    private void updateDisplayWallets()
-    {
+    private void updateDisplayWallets() {
         walletView1.getChildren().clear();
         walletView2.getChildren().clear();
 
         Integer start = walletPaneCurrentPage * Constants.HOME_PANES_ITEMS_PER_PAGE;
-        int end =
-            Math.min(start + Constants.HOME_PANES_ITEMS_PER_PAGE, wallets.size());
+        int end = Math.min(start + Constants.HOME_PANES_ITEMS_PER_PAGE, wallets.size());
 
-        for (int i = start; i < end; i++)
-        {
-            Wallet wallet     = wallets.get(i);
-            HBox   walletHBox = createWalletItemNode(wallet);
+        for (int i = start; i < end; i++) {
+            Wallet wallet = wallets.get(i);
+            HBox walletHBox = createWalletItemNode(wallet);
 
             AnchorPane.setTopAnchor(walletHBox, 0.0);
             AnchorPane.setBottomAnchor(walletHBox, 0.0);
 
-            if (i % 2 == 0)
-            {
+            if (i % 2 == 0) {
                 walletView1.getChildren().add(walletHBox);
                 AnchorPane.setLeftAnchor(walletHBox, 0.0);
                 AnchorPane.setRightAnchor(walletHBox, 10.0);
-            }
-            else
-            {
+            } else {
                 walletView2.getChildren().add(walletHBox);
                 AnchorPane.setLeftAnchor(walletHBox, 10.0);
                 AnchorPane.setRightAnchor(walletHBox, 0.0);
@@ -273,31 +249,25 @@ public class HomeController
     /**
      * Update the display of credit cards
      */
-    private void updateDisplayCreditCards()
-    {
+    private void updateDisplayCreditCards() {
         creditCardView1.getChildren().clear();
         creditCardView2.getChildren().clear();
 
         Integer start = creditCardPaneCurrentPage * Constants.HOME_PANES_ITEMS_PER_PAGE;
-        int end =
-            Math.min(start + Constants.HOME_PANES_ITEMS_PER_PAGE, creditCards.size());
+        int end = Math.min(start + Constants.HOME_PANES_ITEMS_PER_PAGE, creditCards.size());
 
-        for (int i = start; i < end; i++)
-        {
+        for (int i = start; i < end; i++) {
             CreditCard creditCard = creditCards.get(i);
-            HBox       crcHbox    = createCreditCardItemNode(creditCard);
+            HBox crcHbox = createCreditCardItemNode(creditCard);
 
             AnchorPane.setTopAnchor(crcHbox, 0.0);
             AnchorPane.setBottomAnchor(crcHbox, 0.0);
 
-            if (i % 2 == 0)
-            {
+            if (i % 2 == 0) {
                 creditCardView1.getChildren().add(crcHbox);
                 AnchorPane.setLeftAnchor(crcHbox, 0.0);
                 AnchorPane.setRightAnchor(crcHbox, 10.0);
-            }
-            else
-            {
+            } else {
                 creditCardView2.getChildren().add(crcHbox);
                 AnchorPane.setLeftAnchor(crcHbox, 10.0);
                 AnchorPane.setRightAnchor(crcHbox, 0.0);
@@ -311,95 +281,116 @@ public class HomeController
     /**
      * Update the display of the last transactions using VBox
      */
-    private void updateDisplayLastTransactions()
-    {
+    private void updateDisplayLastTransactions() {
         transactionsTableView.getColumns().clear();
 
         TableColumn<WalletTransaction, WalletTransaction> transactionColumn =
-            new TableColumn<>("Last " + Constants.HOME_LAST_TRANSACTIONS_SIZE +
-                              " Transactions");
+                new TableColumn<>(
+                        "Last " + Constants.HOME_LAST_TRANSACTIONS_SIZE + " Transactions");
 
         transactionColumn.setCellValueFactory(
-            param -> new SimpleObjectProperty<>(param.getValue()));
+                param -> new SimpleObjectProperty<>(param.getValue()));
 
         // Set the cell factory to display the transaction information
         transactionColumn.setCellFactory(
-            column -> new TableCell<>() {
-                @Override
-                protected void updateItem(WalletTransaction transaction, boolean empty) {
-                    super.updateItem(transaction, empty);
-                    if (empty || transaction == null) {
-                        setGraphic(null);
-                    } else {
-                        ImageView icon =
-                                transaction.getType() == TransactionType.INCOME
-                                        ? new ImageView(Constants.HOME_INCOME_ICON)
-                                        : new ImageView(Constants.HOME_EXPENSE_ICON);
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(
+                                    WalletTransaction transaction, boolean empty) {
+                                super.updateItem(transaction, empty);
+                                if (empty || transaction == null) {
+                                    setGraphic(null);
+                                } else {
+                                    ImageView icon =
+                                            transaction.getType() == TransactionType.INCOME
+                                                    ? new ImageView(Constants.HOME_INCOME_ICON)
+                                                    : new ImageView(Constants.HOME_EXPENSE_ICON);
 
-                        icon.setFitHeight(Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE);
-                        icon.setFitWidth(Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE);
+                                    icon.setFitHeight(Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE);
+                                    icon.setFitWidth(Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE);
 
-                        Label descriptionLabel =
-                                new Label(transaction.getDescription());
-                        descriptionLabel.setMinWidth(
-                                Constants.HOME_LAST_TRANSACTIONS_DESCRIPTION_LABEL_WIDTH);
+                                    Label descriptionLabel =
+                                            new Label(transaction.getDescription());
+                                    descriptionLabel.setMinWidth(
+                                            Constants
+                                                    .HOME_LAST_TRANSACTIONS_DESCRIPTION_LABEL_WIDTH);
 
-                        Label valueLabel =
-                                new Label(UIUtils.formatCurrency(transaction.getAmount()));
-                        valueLabel.setMinWidth(
-                                Constants.HOME_LAST_TRANSACTIONS_VALUE_LABEL_WIDTH);
+                                    Label valueLabel =
+                                            new Label(
+                                                    UIUtils.formatCurrency(
+                                                            transaction.getAmount()));
+                                    valueLabel.setMinWidth(
+                                            Constants.HOME_LAST_TRANSACTIONS_VALUE_LABEL_WIDTH);
 
-                        Label walletLabel =
-                                new Label(transaction.getWallet().getName());
-                        walletLabel.setMinWidth(
-                                Constants.HOME_LAST_TRANSACTIONS_WALLET_LABEL_WIDTH);
+                                    Label walletLabel =
+                                            new Label(transaction.getWallet().getName());
+                                    walletLabel.setMinWidth(
+                                            Constants.HOME_LAST_TRANSACTIONS_WALLET_LABEL_WIDTH);
 
-                        Label dateLabel = new Label(
-                                transaction.getDate().format(DateTimeFormatter.ofPattern(
-                                        Constants.DATE_FORMAT_NO_TIME)));
-                        dateLabel.setMinWidth(
-                                Constants.HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH);
+                                    Label dateLabel =
+                                            new Label(
+                                                    transaction
+                                                            .getDate()
+                                                            .format(
+                                                                    DateTimeFormatter.ofPattern(
+                                                                            Constants
+                                                                                    .DATE_FORMAT_NO_TIME)));
+                                    dateLabel.setMinWidth(
+                                            Constants.HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH);
 
-                        Label transactionStatusLabel = new Label(StringUtils.capitalize(
-                                transaction.getStatus().toString().toLowerCase()));
-                        transactionStatusLabel.setMinWidth(
-                                Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH);
+                                    Label transactionStatusLabel =
+                                            new Label(
+                                                    StringUtils.capitalize(
+                                                            transaction
+                                                                    .getStatus()
+                                                                    .toString()
+                                                                    .toLowerCase()));
+                                    transactionStatusLabel.setMinWidth(
+                                            Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH);
 
-                        Label transactionCategoryLabel =
-                                new Label(transaction.getCategory().getName());
-                        transactionCategoryLabel.setMinWidth(
-                                Constants.HOME_LAST_TRANSACTIONS_CATEGORY_LABEL_WIDTH);
+                                    Label transactionCategoryLabel =
+                                            new Label(transaction.getCategory().getName());
+                                    transactionCategoryLabel.setMinWidth(
+                                            Constants.HOME_LAST_TRANSACTIONS_CATEGORY_LABEL_WIDTH);
 
-                        HBox descriptionValueBox =
-                                new HBox(descriptionLabel, valueLabel);
-                        descriptionValueBox.setAlignment(Pos.CENTER_LEFT);
+                                    HBox descriptionValueBox =
+                                            new HBox(descriptionLabel, valueLabel);
+                                    descriptionValueBox.setAlignment(Pos.CENTER_LEFT);
 
-                        HBox walletCategoryStatusDateBox =
-                                new HBox(walletLabel,
-                                        transactionCategoryLabel,
-                                        transactionStatusLabel,
-                                        dateLabel);
-                        walletCategoryStatusDateBox.setAlignment(Pos.CENTER_LEFT);
+                                    HBox walletCategoryStatusDateBox =
+                                            new HBox(
+                                                    walletLabel,
+                                                    transactionCategoryLabel,
+                                                    transactionStatusLabel,
+                                                    dateLabel);
+                                    walletCategoryStatusDateBox.setAlignment(Pos.CENTER_LEFT);
 
-                        VBox vbox = new VBox(5,
-                                descriptionValueBox,
-                                walletCategoryStatusDateBox);
-                        HBox hbox = new HBox(10, icon, vbox);
-                        hbox.setAlignment(Pos.CENTER_LEFT);
+                                    VBox vbox =
+                                            new VBox(
+                                                    5,
+                                                    descriptionValueBox,
+                                                    walletCategoryStatusDateBox);
+                                    HBox hbox = new HBox(10, icon, vbox);
+                                    hbox.setAlignment(Pos.CENTER_LEFT);
 
-                        // Set style class based on the transaction type
-                        if (transaction.getType() == TransactionType.INCOME) {
-                            hbox.getStyleClass().add(
-                                    Constants.HOME_LAST_TRANSACTIONS_INCOME_ITEM_STYLE);
-                        } else {
-                            hbox.getStyleClass().add(
-                                    Constants.HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE);
-                        }
+                                    // Set style class based on the transaction type
+                                    if (transaction.getType() == TransactionType.INCOME) {
+                                        hbox.getStyleClass()
+                                                .add(
+                                                        Constants
+                                                                .HOME_LAST_TRANSACTIONS_INCOME_ITEM_STYLE);
+                                    } else {
+                                        hbox.getStyleClass()
+                                                .add(
+                                                        Constants
+                                                                .HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE);
+                                    }
 
-                        setGraphic(hbox);
-                    }
-                }
-            });
+                                    setGraphic(hbox);
+                                }
+                            }
+                        });
 
         transactionsTableView.getColumns().add(transactionColumn);
 
@@ -409,65 +400,66 @@ public class HomeController
     /**
      * Update the chart with incomes and expenses for the last months
      */
-    private void updateMoneyFlowBarChart()
-    {
+    private void updateMoneyFlowBarChart() {
         createMoneyFlowBarChart();
 
         // LinkedHashMap to keep the order of the months
         Map<String, Double> monthlyExpenses = new LinkedHashMap<>();
-        Map<String, Double> monthlyIncomes  = new LinkedHashMap<>();
+        Map<String, Double> monthlyIncomes = new LinkedHashMap<>();
 
         LocalDateTime maxMonth =
-            LocalDateTime.now().plusMonths(Constants.XYBAR_CHART_FUTURE_MONTHS);
+                LocalDateTime.now().plusMonths(Constants.XYBAR_CHART_FUTURE_MONTHS);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
-        int totalMonths =
-            Constants.XYBAR_CHART_MONTHS + Constants.XYBAR_CHART_FUTURE_MONTHS;
+        int totalMonths = Constants.XYBAR_CHART_MONTHS + Constants.XYBAR_CHART_FUTURE_MONTHS;
 
         // Collect data for the last months and the future months
-        for (int i = 0; i < totalMonths; i++)
-        {
+        for (int i = 0; i < totalMonths; i++) {
             // Get the data from the oldest month to the most recent, to keep the order
-            LocalDateTime date  = maxMonth.minusMonths(totalMonths - i - 1L);
-            Integer       month = date.getMonthValue();
-            Integer       year  = date.getYear();
+            LocalDateTime date = maxMonth.minusMonths(totalMonths - i - 1L);
+            Integer month = date.getMonthValue();
+            Integer year = date.getYear();
 
             // Get transactions
             List<WalletTransaction> nonArchivedTransactions =
-                walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
+                    walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
-                recurringTransactionService.getFutureTransactionsByMonth(
-                    YearMonth.of(year, month),
-                    YearMonth.of(year, month));
+                    recurringTransactionService.getFutureTransactionsByMonth(
+                            YearMonth.of(year, month), YearMonth.of(year, month));
 
             nonArchivedTransactions.addAll(futureTransactions);
 
-            logger.info("Found {} ({} future) transactions for {}/{}", nonArchivedTransactions.size(), futureTransactions.size(), month, year);
+            logger.info(
+                    "Found {} ({} future) transactions for {}/{}",
+                    nonArchivedTransactions.size(),
+                    futureTransactions.size(),
+                    month,
+                    year);
 
             BigDecimal crcPaidPayments =
-                creditCardService.getEffectivePaidPaymentsByMonth(month, year);
+                    creditCardService.getEffectivePaidPaymentsByMonth(month, year);
 
             BigDecimal crcPendingPayments =
-                creditCardService.getPendingPaymentsByMonth(month, year);
+                    creditCardService.getPendingPaymentsByMonth(month, year);
 
             // Calculate total expenses for the month
             BigDecimal totalExpenses =
-                nonArchivedTransactions.stream()
-                    .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                    .map(WalletTransaction::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    nonArchivedTransactions.stream()
+                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                            .map(WalletTransaction::getAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             // Consider credit card payments as expenses
             totalExpenses = totalExpenses.add(crcPaidPayments).add(crcPendingPayments);
 
             // Calculate total incomes for the month
             BigDecimal totalIncomes =
-                nonArchivedTransactions.stream()
-                    .filter(t -> t.getType().equals(TransactionType.INCOME))
-                    .map(WalletTransaction::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    nonArchivedTransactions.stream()
+                            .filter(t -> t.getType().equals(TransactionType.INCOME))
+                            .map(WalletTransaction::getAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             monthlyExpenses.put(date.format(formatter), totalExpenses.doubleValue());
             monthlyIncomes.put(date.format(formatter), totalIncomes.doubleValue());
@@ -483,37 +475,36 @@ public class HomeController
         double maxValue = 0.0;
 
         // Add data to each series
-        for (Map.Entry<String, Double> entry : monthlyExpenses.entrySet())
-        {
-            String month        = entry.getKey();
+        for (Map.Entry<String, Double> entry : monthlyExpenses.entrySet()) {
+            String month = entry.getKey();
             Double expenseValue = entry.getValue();
-            Double incomeValue  = monthlyIncomes.getOrDefault(month, 0.0);
+            Double incomeValue = monthlyIncomes.getOrDefault(month, 0.0);
 
-            expensesSeries.getData().add(
-                new XYChart.Data<>(month, 0.0)); // start at 0 for animation
-            incomesSeries.getData().add(
-                new XYChart.Data<>(month, 0.0)); // start at 0 for animation
+            expensesSeries
+                    .getData()
+                    .add(new XYChart.Data<>(month, 0.0)); // start at 0 for animation
+            incomesSeries.getData().add(new XYChart.Data<>(month, 0.0)); // start at 0 for animation
 
             maxValue = Math.max(maxValue, Math.max(expenseValue, incomeValue));
         }
 
         // Set Y-axis limits based on the maximum value found
         Axis<?> yAxis = moneyFlowBarChart.getYAxis();
-        if (yAxis instanceof NumberAxis numberAxis)
-        {
+        if (yAxis instanceof NumberAxis numberAxis) {
             Animation.setDynamicYAxisBounds(numberAxis, maxValue);
 
-            numberAxis.setTickLabelFormatter(new StringConverter<>() {
-                @Override
-                public String toString(Number value) {
-                    return UIUtils.formatCurrency(value);
-                }
+            numberAxis.setTickLabelFormatter(
+                    new StringConverter<>() {
+                        @Override
+                        public String toString(Number value) {
+                            return UIUtils.formatCurrency(value);
+                        }
 
-                @Override
-                public Number fromString(String string) {
-                    return 0;
-                }
-            });
+                        @Override
+                        public Number fromString(String string) {
+                            return 0;
+                        }
+                    });
         }
 
         moneyFlowBarChart.setVerticalGridLinesVisible(false);
@@ -524,22 +515,20 @@ public class HomeController
 
         // Add tooltips and animations to the bars
         // expensesSeries and incomesSeries have the same size
-        for (int i = 0; i < expensesSeries.getData().size(); i++)
-        {
+        for (int i = 0; i < expensesSeries.getData().size(); i++) {
             XYChart.Data<String, Number> expenseData = expensesSeries.getData().get(i);
-            XYChart.Data<String, Number> incomeData  = incomesSeries.getData().get(i);
+            XYChart.Data<String, Number> incomeData = incomesSeries.getData().get(i);
 
             Double targetExpenseValue = monthlyExpenses.get(expenseData.getXValue());
 
             // Add tooltip to the bars
-            UIUtils.addTooltipToXYChartNode(expenseData.getNode(),
-                                            UIUtils.formatCurrency(targetExpenseValue));
+            UIUtils.addTooltipToXYChartNode(
+                    expenseData.getNode(), UIUtils.formatCurrency(targetExpenseValue));
 
-            Double targetIncomeValue =
-                monthlyIncomes.getOrDefault(expenseData.getXValue(), 0.0);
+            Double targetIncomeValue = monthlyIncomes.getOrDefault(expenseData.getXValue(), 0.0);
 
-            UIUtils.addTooltipToXYChartNode(incomeData.getNode(),
-                                            UIUtils.formatCurrency(targetIncomeValue));
+            UIUtils.addTooltipToXYChartNode(
+                    incomeData.getNode(), UIUtils.formatCurrency(targetIncomeValue));
 
             // Animation for the bars
             Animation.xyChartAnimation(expenseData, targetExpenseValue);
@@ -550,18 +539,16 @@ public class HomeController
     /**
      * Update the display of the month resume
      */
-    private void updateMonthResume()
-    {
-        try
-        {
-            FXMLLoader loader =
-                new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
+    private void updateMonthResume() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
             // Add style class to the wallet pane
-            newContent.getStylesheets().add(
-                getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
+            newContent
+                    .getStylesheets()
+                    .add(getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
 
@@ -570,8 +557,8 @@ public class HomeController
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
             monthResumePaneTitle.setText(currentDate.format(formatter) + " Resume");
 
-            resumePaneController.updateResumePane(currentDate.getMonthValue(),
-                                                  currentDate.getYear());
+            resumePaneController.updateResumePane(
+                    currentDate.getMonthValue(), currentDate.getYear());
 
             AnchorPane.setTopAnchor(newContent, 0.0);
             AnchorPane.setBottomAnchor(newContent, 0.0);
@@ -580,9 +567,7 @@ public class HomeController
 
             monthResumeView.getChildren().clear();
             monthResumeView.getChildren().add(newContent);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error updating month resume: {}", e.getMessage());
         }
     }
@@ -592,8 +577,7 @@ public class HomeController
      * @param creditCard The credit card to be displayed
      * @return The HBox containing the credit card information
      */
-    private HBox createCreditCardItemNode(CreditCard creditCard)
-    {
+    private HBox createCreditCardItemNode(CreditCard creditCard) {
         HBox rootHbox = new HBox(10);
         rootHbox.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_STYLE);
 
@@ -607,31 +591,29 @@ public class HomeController
         UIUtils.addTooltipToNode(nameLabel, "Credit card name");
 
         Label crcOperatorLabel = new Label(creditCard.getOperator().getName());
-        crcOperatorLabel.getStyleClass().add(
-            Constants.HOME_CREDIT_CARD_ITEM_OPERATOR_STYLE);
+        crcOperatorLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_OPERATOR_STYLE);
         crcOperatorLabel.setAlignment(Pos.TOP_LEFT);
         UIUtils.addTooltipToNode(crcOperatorLabel, "Credit card operator");
 
-        Label availableCredit = new Label(UIUtils.formatCurrency(
-            creditCardService.getAvailableCredit(creditCard.getId())));
+        Label availableCredit =
+                new Label(
+                        UIUtils.formatCurrency(
+                                creditCardService.getAvailableCredit(creditCard.getId())));
 
-        availableCredit.getStyleClass().add(
-            Constants.HOME_CREDIT_CARD_ITEM_BALANCE_STYLE);
+        availableCredit.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_BALANCE_STYLE);
 
         UIUtils.addTooltipToNode(availableCredit, "Available credit");
 
         Label digitsLabel =
-            new Label(UIUtils.formatCreditCardNumber(creditCard.getLastFourDigits()));
+                new Label(UIUtils.formatCreditCardNumber(creditCard.getLastFourDigits()));
         digitsLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_DIGITS_STYLE);
         UIUtils.addTooltipToNode(digitsLabel, "Credit card number");
 
-        infoVbox.getChildren().addAll(nameLabel,
-                                      crcOperatorLabel,
-                                      availableCredit,
-                                      digitsLabel);
+        infoVbox.getChildren().addAll(nameLabel, crcOperatorLabel, availableCredit, digitsLabel);
 
-        ImageView icon = new ImageView(Constants.CRC_OPERATOR_ICONS_PATH +
-                                       creditCard.getOperator().getIcon());
+        ImageView icon =
+                new ImageView(
+                        Constants.CRC_OPERATOR_ICONS_PATH + creditCard.getOperator().getIcon());
 
         icon.setFitHeight(Constants.CRC_OPERATOR_ICONS_SIZE);
         icon.setFitWidth(Constants.CRC_OPERATOR_ICONS_SIZE);
@@ -653,8 +635,7 @@ public class HomeController
      * @param wallet The wallet to be displayed
      * @return The HBox containing the wallet information
      */
-    private HBox createWalletItemNode(Wallet wallet)
-    {
+    private HBox createWalletItemNode(Wallet wallet) {
         HBox rootHbox = new HBox(10);
         rootHbox.getStyleClass().add(Constants.HOME_WALLET_ITEM_STYLE);
 
@@ -678,8 +659,8 @@ public class HomeController
 
         infoVbox.getChildren().addAll(nameLabel, walletTypeLabel, balanceLabel);
 
-        ImageView icon = new ImageView(Constants.WALLET_TYPE_ICONS_PATH +
-                                       wallet.getType().getIcon());
+        ImageView icon =
+                new ImageView(Constants.WALLET_TYPE_ICONS_PATH + wallet.getType().getIcon());
 
         icon.setFitHeight(Constants.WALLET_TYPE_ICONS_SIZE);
         icon.setFitWidth(Constants.WALLET_TYPE_ICONS_SIZE);
@@ -699,10 +680,9 @@ public class HomeController
     /**
      * Create a new bar chart
      */
-    private void createMoneyFlowBarChart()
-    {
+    private void createMoneyFlowBarChart() {
         CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis   yAxis = new NumberAxis();
+        NumberAxis yAxis = new NumberAxis();
 
         moneyFlowBarChart = new BarChart<>(xAxis, yAxis);
 

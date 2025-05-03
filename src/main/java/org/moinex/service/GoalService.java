@@ -6,9 +6,12 @@
 
 package org.moinex.service;
 
-import jakarta.annotation.Resource;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
@@ -22,14 +25,8 @@ import org.moinex.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * This class is responsible for managing goals
@@ -44,21 +41,18 @@ public class GoalService {
     private WalletTransactionRepository walletTransactionRepository;
     private WalletTypeRepository walletTypeRepository;
 
-    private GoalService selfReference;
-
     @Autowired
-    public GoalService(GoalRepository goalRepository,
-                       WalletRepository walletRepository,
-                       TransferRepository transfersRepository,
-                       WalletTransactionRepository walletTransactionRepository,
-                       WalletTypeRepository walletTypeRepository,
-                       GoalService selfReference) {
+    public GoalService(
+            GoalRepository goalRepository,
+            WalletRepository walletRepository,
+            TransferRepository transfersRepository,
+            WalletTransactionRepository walletTransactionRepository,
+            WalletTypeRepository walletTypeRepository) {
         this.goalRepository = goalRepository;
         this.walletRepository = walletRepository;
         this.transfersRepository = transfersRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.walletTypeRepository = walletTypeRepository;
-        this.selfReference = selfReference;
     }
 
     /**
@@ -74,12 +68,10 @@ public class GoalService {
      *                                  target balance
      */
     @Transactional
-    public void validateDateAndBalances(BigDecimal initialBalance,
-                                        BigDecimal targetBalance,
-                                        LocalDateTime targetDateTime) {
+    public void validateDateAndBalances(
+            BigDecimal initialBalance, BigDecimal targetBalance, LocalDateTime targetDateTime) {
         if (targetDateTime.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException(
-                    "The target date of the goal cannot be in the past");
+            throw new IllegalArgumentException("The target date of the goal cannot be in the past");
         }
 
         if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
@@ -119,11 +111,12 @@ public class GoalService {
      * @throws EntityNotFoundException  If the goal wallet type is not found
      */
     @Transactional
-    public Long addGoal(String name,
-                        BigDecimal initialBalance,
-                        BigDecimal targetBalance,
-                        LocalDate targetDate,
-                        String motivation) {
+    public Long addGoal(
+            String name,
+            BigDecimal initialBalance,
+            BigDecimal targetBalance,
+            LocalDate targetDate,
+            String motivation) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
@@ -132,34 +125,34 @@ public class GoalService {
         }
 
         if (goalRepository.existsByName(name)) {
-            throw new EntityExistsException("A goal with name " + name +
-                    " already exists");
+            throw new EntityExistsException("A goal with name " + name + " already exists");
         }
 
         if (walletRepository.existsByName(name)) {
-            throw new EntityExistsException("A wallet with name " + name +
-                    " already exists");
+            throw new EntityExistsException("A wallet with name " + name + " already exists");
         }
 
         LocalDateTime targetDateTime = targetDate.atStartOfDay();
 
-        selfReference.validateDateAndBalances(initialBalance, targetBalance, targetDateTime);
+        validateDateAndBalances(initialBalance, targetBalance, targetDateTime);
 
         // All goals have the same wallet type
         WalletType walletType =
-                walletTypeRepository.findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME)
+                walletTypeRepository
+                        .findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME)
                         .orElseThrow(
                                 () -> new EntityNotFoundException("Goal wallet type not found"));
 
-        Goal goal = Goal.builder()
-                .name(name)
-                .initialBalance(initialBalance)
-                .balance(initialBalance)
-                .targetBalance(targetBalance)
-                .targetDate(targetDateTime)
-                .motivation(motivation)
-                .type(walletType)
-                .build();
+        Goal goal =
+                Goal.builder()
+                        .name(name)
+                        .initialBalance(initialBalance)
+                        .balance(initialBalance)
+                        .targetBalance(targetBalance)
+                        .targetDate(targetDateTime)
+                        .motivation(motivation)
+                        .type(walletType)
+                        .build();
 
         goalRepository.save(goal);
 
@@ -177,14 +170,21 @@ public class GoalService {
      */
     @Transactional
     public void deleteGoal(Long idGoal) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
-        if (walletTransactionRepository.getTransactionCountByWallet(idGoal) > 0 ||
-                transfersRepository.getTransferCountByWallet(idGoal) > 0) {
+        if (walletTransactionRepository.getTransactionCountByWallet(idGoal) > 0
+                || transfersRepository.getTransferCountByWallet(idGoal) > 0) {
             throw new IllegalStateException(
-                    "Goal wallet with id " + idGoal +
-                            " has transactions and cannot be deleted. Remove "
+                    "Goal wallet with id "
+                            + idGoal
+                            + " has transactions and cannot be deleted. Remove "
                             + "the transactions first or archive the goal");
         }
 
@@ -209,8 +209,15 @@ public class GoalService {
      */
     @Transactional
     public void updateGoal(Goal goal) {
-        Goal oldGoal = goalRepository.findById(goal.getId())
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", goal.getId())));
+        Goal oldGoal =
+                goalRepository
+                        .findById(goal.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found",
+                                                        goal.getId())));
 
         // Remove leading and trailing whitespaces
         goal.setName(goal.getName().strip());
@@ -221,17 +228,16 @@ public class GoalService {
 
         if (!goal.getName().equals(oldGoal.getName())) {
             if (goalRepository.existsByName(goal.getName())) {
-                throw new EntityExistsException("A goal with name " + goal.getName() +
-                        " already exists");
+                throw new EntityExistsException(
+                        "A goal with name " + goal.getName() + " already exists");
             } else if (walletRepository.existsByName(goal.getName())) {
-                throw new EntityExistsException("A wallet with name " + goal.getName() +
-                        " already exists");
+                throw new EntityExistsException(
+                        "A wallet with name " + goal.getName() + " already exists");
             }
         }
 
-        selfReference.validateDateAndBalances(goal.getInitialBalance(),
-                goal.getTargetBalance(),
-                goal.getTargetDate());
+        validateDateAndBalances(
+                goal.getInitialBalance(), goal.getTargetBalance(), goal.getTargetDate());
 
         oldGoal.setName(goal.getName());
         oldGoal.setInitialBalance(goal.getInitialBalance());
@@ -244,9 +250,9 @@ public class GoalService {
         // Check if the goal was completed or reopened, and update it
         if (goal.isCompleted() != oldGoal.isCompleted()) {
             if (goal.isCompleted()) {
-                selfReference.completeGoal(goal.getId());
+                completeGoal(goal.getId());
             } else {
-                selfReference.reopenGoal(goal.getId());
+                reopenGoal(goal.getId());
             }
         }
 
@@ -266,8 +272,16 @@ public class GoalService {
      */
     @Transactional
     public void archiveGoal(Long idGoal) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found and cannot be archived", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found and cannot be"
+                                                                + " archived",
+                                                        idGoal)));
         goal.setArchived(true);
 
         goalRepository.save(goal);
@@ -285,8 +299,16 @@ public class GoalService {
      */
     @Transactional
     public void unarchiveGoal(Long idGoal) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found and cannot be unarchived", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found and cannot be"
+                                                                + " unarchived",
+                                                        idGoal)));
         goal.setArchived(false);
 
         goalRepository.save(goal);
@@ -303,8 +325,14 @@ public class GoalService {
      */
     @Transactional
     public void completeGoal(Long idGoal) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         if (goal.getBalance().compareTo(goal.getTargetBalance()) < 0) {
             throw new MoinexException.IncompleteGoalException(
@@ -330,8 +358,14 @@ public class GoalService {
      */
     @Transactional
     public void reopenGoal(Long idGoal) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         goal.setCompletionDate(null);
         goalRepository.save(goal);
@@ -356,12 +390,17 @@ public class GoalService {
             throw new IllegalStateException("The name of the goal cannot be empty");
         }
 
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         if (goalRepository.existsByName(newName)) {
-            throw new EntityExistsException("A goal with name " + newName +
-                    " already exists");
+            throw new EntityExistsException("A goal with name " + newName + " already exists");
         }
 
         goal.setName(newName);
@@ -386,8 +425,14 @@ public class GoalService {
                     "The initial balance of the goal cannot be negative");
         }
 
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         goal.setInitialBalance(newInitialBalance);
         goalRepository.save(goal);
@@ -406,12 +451,17 @@ public class GoalService {
     @Transactional
     public void changeTargetBalance(Long idGoal, BigDecimal newTargetBalance) {
         if (newTargetBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException(
-                    "The target balance of the goal cannot be negative");
+            throw new IllegalArgumentException("The target balance of the goal cannot be negative");
         }
 
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         goal.setTargetBalance(newTargetBalance);
         goalRepository.save(goal);
@@ -429,12 +479,17 @@ public class GoalService {
      */
     @Transactional
     public void changeTargetDate(Long idGoal, LocalDateTime newTargetDate) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         if (newTargetDate.isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException(
-                    "The target date of the goal cannot be in the past");
+            throw new IllegalArgumentException("The target date of the goal cannot be in the past");
         }
 
         goal.setTargetDate(newTargetDate);
@@ -452,8 +507,14 @@ public class GoalService {
      */
     @Transactional
     public void changeMotivation(Long idGoal, String newMotivation) {
-        Goal goal = goalRepository.findById(idGoal)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Goal with id %d not found", idGoal)));
+        Goal goal =
+                goalRepository
+                        .findById(idGoal)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Goal with id %d not found", idGoal)));
 
         goal.setMotivation(newMotivation);
         goalRepository.save(goal);
@@ -476,7 +537,9 @@ public class GoalService {
      * @throws EntityNotFoundException If the goal does not exist
      */
     public Goal getGoalById(Long idGoal) {
-        return goalRepository.findById(idGoal).orElseThrow(
-                () -> new EntityNotFoundException("Goal with id " + idGoal + " not found"));
+        return goalRepository
+                .findById(idGoal)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Goal with id " + idGoal + " not found"));
     }
 }

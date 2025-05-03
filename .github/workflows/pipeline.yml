@@ -19,6 +19,9 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Check code for formatting
+      run: mvn spotless:check
+
     - name: Run tests with Maven
       run: mvn clean test jacoco:report
 

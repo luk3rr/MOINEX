@@ -9,8 +9,7 @@ package org.moinex.util.enums;
 /**
  * ENUM that represents the status of a recurring transaction
  */
-public enum RecurringTransactionStatus
-{
+public enum RecurringTransactionStatus {
     ACTIVE,
     INACTIVE
 }

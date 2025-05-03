@@ -9,22 +9,18 @@ package org.moinex.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserPreferencesService
-{
+public class UserPreferencesService {
     private boolean hideMonetaryValues = false;
 
-    public boolean hideMonetaryValues()
-    {
+    public boolean hideMonetaryValues() {
         return this.hideMonetaryValues;
     }
 
-    public boolean showMonetaryValues()
-    {
+    public boolean showMonetaryValues() {
         return !this.hideMonetaryValues;
     }
 
-    public void toggleHideMonetaryValues()
-    {
+    public void toggleHideMonetaryValues() {
         this.hideMonetaryValues = !this.hideMonetaryValues;
     }
 }

@@ -9,7 +9,6 @@ package org.moinex.model.investment;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,8 +24,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public abstract class Asset
-{
+public abstract class Asset {
     @Column(name = "name", nullable = false)
     private String name;
 
