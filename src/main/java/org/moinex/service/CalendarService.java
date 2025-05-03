@@ -70,7 +70,8 @@ public class CalendarService
 
         calendarEventRepository.save(event);
 
-        logger.info("Event '" + title + "' added to the calendar");
+        logger.info("Event '{}' added to the calendar", title);
+
     }
 
     /**
@@ -88,7 +89,7 @@ public class CalendarService
 
         calendarEventRepository.delete(event);
 
-        logger.info("Event '" + event.getTitle() + "' removed from the calendar");
+        logger.info("Event '{}' removed from the calendar", event.getTitle());
     }
 
     /**
@@ -100,7 +101,7 @@ public class CalendarService
     {
         calendarEventRepository.save(event);
 
-        logger.info("Event '" + event.getTitle() + "' updated");
+        logger.info("Event '{}' updated", event.getTitle());
     }
 
     /**

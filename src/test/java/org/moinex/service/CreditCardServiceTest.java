@@ -62,6 +62,9 @@ class CreditCardServiceTest
     @Mock
     private CategoryRepository m_categoryRepository;
 
+    @Mock
+    private CreditCardService m_selfRef;
+
     @InjectMocks
     private CreditCardService m_creditCardService;
 

@@ -25,8 +25,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @NoArgsConstructor
-public class EditCategoryController
-{
+public class EditCategoryController {
     @FXML
     private Label selectedCategoryLabel;
 
@@ -41,17 +40,16 @@ public class EditCategoryController
     private CategoryService categoryService;
 
     @Autowired
-    public EditCategoryController(CategoryService categoryService)
-    {
+    public EditCategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
     @FXML
-    public void initialize()
-    { }
+    public void initialize() {
+        // TODO: Implement this method
+    }
 
-    public void setCategory(Category ct)
-    {
+    public void setCategory(Category ct) {
         selectedCategoryLabel.setText(ct.getName());
         selectedCategory = ct;
 
@@ -59,80 +57,68 @@ public class EditCategoryController
     }
 
     @FXML
-    private void handleSave()
-    {
+    private void handleSave() {
         String newName = categoryNewNameField.getText();
 
         boolean archived = archivedCheckBox.isSelected();
 
-        boolean nameChanged     = false;
+        boolean nameChanged = false;
         boolean archivedChanged = false;
 
         if (newName == null ||
-            !newName.isBlank() && !newName.equals(selectedCategory.getName()))
-        {
-            try
-            {
+                !newName.isBlank() && !newName.equals(selectedCategory.getName())) {
+            try {
                 categoryService.renameCategory(selectedCategory.getId(), newName);
 
                 nameChanged = true;
-            }
-            catch (IllegalArgumentException | EntityExistsException |
-                   EntityNotFoundException e)
-            {
+            } catch (IllegalArgumentException | EntityExistsException |
+                     EntityNotFoundException e) {
                 WindowUtils.showErrorDialog("Error updating category name",
-                                            e.getMessage());
+                        e.getMessage());
                 return;
             }
         }
 
-        if (archived && !selectedCategory.isArchived())
-        {
-            try
-            {
+        if (archived && !selectedCategory.isArchived()) {
+            try {
                 categoryService.archiveCategory(selectedCategory.getId());
 
                 archivedChanged = true;
-            }
-            catch (EntityNotFoundException e)
-            {
+            } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog("Error updating category", e.getMessage());
                 return;
             }
-        }
-        else if (!archived && selectedCategory.isArchived())
-        {
-            try
-            {
+        } else if (!archived && selectedCategory.isArchived()) {
+            try {
                 categoryService.unarchiveCategory(selectedCategory.getId());
 
                 archivedChanged = true;
-            }
-            catch (EntityNotFoundException e)
-            {
+            } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog("Error updating category", e.getMessage());
                 return;
             }
         }
 
-        if (nameChanged || archivedChanged)
-        {
-            String msg = nameChanged && archivedChanged
-                             ? "Category name and archived status updated"
-                         : archivedChanged ? "Category archived status updated"
-                                           : "Category name updated";
+        if (nameChanged || archivedChanged) {
+            String msg;
+            if (nameChanged && archivedChanged) {
+                msg = "Category name and archived status updated";
+            } else if (archivedChanged) {
+                msg = "Category archived status updated";
+            } else {
+                msg = "Category name updated";
+            }
 
             WindowUtils.showSuccessDialog("Category updated", msg);
         }
 
-        Stage stage = (Stage)categoryNewNameField.getScene().getWindow();
+        Stage stage = (Stage) categoryNewNameField.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    private void handleCancel()
-    {
-        Stage stage = (Stage)categoryNewNameField.getScene().getWindow();
+    private void handleCancel() {
+        Stage stage = (Stage) categoryNewNameField.getScene().getWindow();
         stage.close();
     }
 }

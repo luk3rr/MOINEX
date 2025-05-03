@@ -209,7 +209,7 @@ public class AddCreditCardCreditController
         //    Description
         //    Amount | CreditCard | Rebate Type
         Function<CreditCardCredit, String> displayFunction = ccc
-            -> String.format("%s\n%s | %s | %s",
+            -> String.format("%s%n%s | %s | %s",
                              ccc.getDescription(),
                              UIUtils.formatCurrency(ccc.getAmount()),
                              ccc.getCreditCard().getName(),

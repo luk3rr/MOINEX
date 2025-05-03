@@ -93,6 +93,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         loadSuggestionsFromDatabase();
     }
 
+    @Override
     @FXML
     protected void initialize()
     {

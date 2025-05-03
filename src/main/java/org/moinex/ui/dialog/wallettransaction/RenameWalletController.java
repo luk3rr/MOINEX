@@ -73,10 +73,10 @@ public class RenameWalletController
     @FXML
     private void handleSave()
     {
-        Wallet wallet        = walletComboBox.getValue();
+        Wallet wt        = walletComboBox.getValue();
         String walletNewName = walletNewNameField.getText();
 
-        if (wallet == null || walletNewName.isBlank())
+        if (wt == null || walletNewName.isBlank())
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -86,7 +86,7 @@ public class RenameWalletController
 
         try
         {
-            walletService.renameWallet(wallet.getId(), walletNewName);
+            walletService.renameWallet(wt.getId(), walletNewName);
         }
         catch (IllegalArgumentException | EntityNotFoundException |
                EntityExistsException e)

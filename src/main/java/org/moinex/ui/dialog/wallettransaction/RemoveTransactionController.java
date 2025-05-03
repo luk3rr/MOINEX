@@ -64,7 +64,9 @@ public class RemoveTransactionController
 
     @FXML
     public void initialize()
-    { }
+    {
+        // TODO: Implement this method
+    }
 
     /**
      * Initializes the controller with the transaction type

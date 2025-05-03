@@ -277,9 +277,9 @@ public class CalculatorController
     private Double evaluateExpression(String expression)
     {
         Expression exp    = new ExpressionBuilder(expression).build();
-        Double     result = exp.evaluate();
+        Double result = exp.evaluate();
 
         // If the result is a number, return it. Otherwise, return 0
-        return result instanceof Number number ? result.doubleValue() : 0.0;
+        return result instanceof Number ? (double) result : 0.0;
     }
 }

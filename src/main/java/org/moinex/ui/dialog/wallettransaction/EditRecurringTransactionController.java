@@ -84,6 +84,7 @@ public final class EditRecurringTransactionController
         updateInfoLabel();
     }
 
+    @Override
     @FXML
     protected void initialize()
     {
@@ -185,6 +186,7 @@ public final class EditRecurringTransactionController
         }
     }
 
+    @Override
     protected void updateInfoLabel()
     {
         if (!activeCheckBox.isSelected())

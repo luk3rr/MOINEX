@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
     /**
-     * TODO: Implement tests
      * Get the transfers by wallet
      * @param walletId The id of the wallet
      * @return A list with the transfers in the wallet
@@ -30,7 +29,6 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     findTransfersByWallet(@Param("walletId") Long walletId);
 
     /**
-     * TODO: Implement tests
      * Get the transfers by month and year
      * @param month The month
      * @param year The year

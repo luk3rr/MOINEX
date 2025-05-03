@@ -16,13 +16,13 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class SplashScreenController
 {
-    private final ConfigurableApplicationContext springContext;
 
     public SplashScreenController(ConfigurableApplicationContext springContext) {
-        this.springContext = springContext;
     }
 
     @FXML
     public void initialize()
-    { }
+    {
+        // Splash screen
+    }
 }

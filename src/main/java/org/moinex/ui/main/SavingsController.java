@@ -150,7 +150,7 @@ public class SavingsController
     private final ScheduledExecutorService scheduler =
         Executors.newScheduledThreadPool(1);
 
-    private final Integer scheduleDelayInSeconds = 30;
+    private static final Integer SCHEDULE_DELAY_IN_SECONDS = 30;
 
     private Integer scheduledUpdatingMarketQuotesRetries = 0;
 
@@ -160,7 +160,7 @@ public class SavingsController
 
     private boolean scheduledUpdatingBrazilianIndicators = false;
 
-    private final Integer maxRetries = 3;
+    private static final Integer MAX_RETRIES = 3;
 
     private TickerService tickerService;
 
@@ -520,9 +520,9 @@ public class SavingsController
             // If the indicators are not found in the database, update them from the
             // API
             marketService.updateBrazilianMarketIndicatorsFromApiAsync()
-                .thenAccept(brazilianMarketIndicators -> {
+                .thenAccept(bmi -> {
                     Platform.runLater(() -> {
-                        this.brazilianMarketIndicators = brazilianMarketIndicators;
+                        this.brazilianMarketIndicators = bmi;
                         scheduledUpdatingBrazilianIndicatorsRetries = 0;
                     });
 
@@ -552,10 +552,10 @@ public class SavingsController
             // If the market quotes and commodities are not found in the database,
             // update them from the API
             marketService.updateMarketQuotesAndCommoditiesFromApiAsync()
-                .thenAccept(marketQuotesAndCommodities -> {
+                .thenAccept(mqc -> {
                     Platform.runLater(() -> {
-                        this.marketQuotesAndCommodities = marketQuotesAndCommodities;
-                        scheduledUpdatingMarketQuotesRetries = 0;
+                        this.marketQuotesAndCommodities = mqc;
+                        this.scheduledUpdatingMarketQuotesRetries = 0;
                     });
 
                     logger.info("Updated market quotes and commodities from the API");
@@ -772,8 +772,8 @@ public class SavingsController
         nameColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getName()));
 
-        TableColumn<Ticker, String> SymbolColumn = new TableColumn<>("Symbol");
-        SymbolColumn.setCellValueFactory(
+        TableColumn<Ticker, String> symbolColumn = new TableColumn<>("Symbol");
+        symbolColumn.setCellValueFactory(
             param -> new SimpleStringProperty(param.getValue().getSymbol()));
 
         TableColumn<Ticker, String> typeColumn = new TableColumn<>("Type");
@@ -808,7 +808,7 @@ public class SavingsController
         // Add the columns to the table view
         stocksFundsTabTickerTable.getColumns().add(idColumn);
         stocksFundsTabTickerTable.getColumns().add(nameColumn);
-        stocksFundsTabTickerTable.getColumns().add(SymbolColumn);
+        stocksFundsTabTickerTable.getColumns().add(symbolColumn);
         stocksFundsTabTickerTable.getColumns().add(typeColumn);
         stocksFundsTabTickerTable.getColumns().add(quantityColumn);
         stocksFundsTabTickerTable.getColumns().add(unitColumn);
@@ -916,7 +916,7 @@ public class SavingsController
      */
     private synchronized void schedulerEntryForUpdatingMarketQuotes()
     {
-        if (scheduledUpdatingMarketQuotesRetries >= maxRetries)
+        if (scheduledUpdatingMarketQuotesRetries >= MAX_RETRIES)
         {
             logger.warn("Max retries reached for updating market quotes");
             return;
@@ -936,7 +936,7 @@ public class SavingsController
         scheduler.schedule(() -> {
             loadMarketQuotesAndCommoditiesFromDatabase();
             scheduledUpdatingMarketQuotes = false;
-        }, scheduleDelayInSeconds, TimeUnit.SECONDS);
+        }, SCHEDULE_DELAY_IN_SECONDS, TimeUnit.SECONDS);
     }
 
     /**
@@ -944,7 +944,7 @@ public class SavingsController
      */
     private synchronized void schedulerEtryForUpdatingBrazilianIndicators()
     {
-        if (scheduledUpdatingBrazilianIndicatorsRetries >= maxRetries)
+        if (scheduledUpdatingBrazilianIndicatorsRetries >= MAX_RETRIES)
         {
             logger.warn("Max retries reached for updating Brazilian market indicators");
             return;
@@ -964,6 +964,6 @@ public class SavingsController
         scheduler.schedule(() -> {
             loadBrazilianMarketIndicatorsFromDatabase();
             scheduledUpdatingBrazilianIndicators = false;
-        }, scheduleDelayInSeconds, TimeUnit.SECONDS);
+        }, SCHEDULE_DELAY_IN_SECONDS, TimeUnit.SECONDS);
     }
 }

@@ -24,40 +24,35 @@ import javafx.stage.StageStyle;
 /**
  * JavaFX application entry point
  */
-public class JavaFXApp extends Application
-{
+public class JavaFXApp extends Application {
     private ConfigurableApplicationContext springContext;
 
     @Override
-    public void init() throws Exception
-    {
+    public void init() throws Exception {
         String[] args = getParameters().getRaw().toArray(new String[0]);
 
         springContext =
-            new SpringApplicationBuilder().sources(MainApplication.class).run(args);
+                new SpringApplicationBuilder().sources(MainApplication.class).run(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception
-    {
+    public void start(Stage primaryStage) throws Exception {
         FXMLLoader splashLoader =
-            new FXMLLoader(getClass().getResource(Constants.SPLASH_SCREEN_FXML));
-        Parent splashRoot  = splashLoader.load();
-        Stage  splashStage = new Stage();
+                new FXMLLoader(getClass().getResource(Constants.SPLASH_SCREEN_FXML));
+        Parent splashRoot = splashLoader.load();
+        Stage splashStage = new Stage();
         splashStage.initStyle(StageStyle.UNDECORATED); // Remove window border
         splashStage.setScene(new Scene(splashRoot));
         splashStage.show();
-
-        new Thread(() -> {
-            try
-            {
+        Thread.ofVirtual().start(() -> {
+            try {
                 springContext =
-                    new SpringApplicationBuilder()
-                        .sources(MainApplication.class)
-                        .run(getParameters().getRaw().toArray(new String[0]));
+                        new SpringApplicationBuilder()
+                                .sources(MainApplication.class)
+                                .run(getParameters().getRaw().toArray(new String[0]));
 
                 FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource(Constants.MAIN_FXML));
+                        new FXMLLoader(getClass().getResource(Constants.MAIN_FXML));
                 loader.setControllerFactory(springContext::getBean);
                 Parent mainRoot = loader.load();
 
@@ -70,18 +65,15 @@ public class JavaFXApp extends Application
                     primaryStage.show();
                     splashStage.close();
                 });
-            }
-            catch (InterruptedException | IOException e)
-            {
+            } catch (InterruptedException | IOException e) {
                 Thread.currentThread().interrupt();
                 javafx.application.Platform.exit();
             }
-        }).start();
+        });
     }
 
     @Override
-    public void stop() throws Exception
-    {
+    public void stop() throws Exception {
         APIUtils.shutdownExecutor();
 
         springContext.close();

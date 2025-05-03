@@ -54,8 +54,8 @@ import org.springframework.stereotype.Controller;
 public class GoalController
 {
     private static final Logger logger = LoggerFactory.getLogger(GoalController.class);
-    private final Integer       inProgressItemsPerPage   = 2;
-    private final Integer       accomplishedItemsPerPage = 2;
+    private static final Integer IN_PROGRESS_ITEMS_PER_PAGE = 2;
+    private static final Integer ACCOMPLISHED_ITEMS_PER_PAGE = 2;
     @FXML
     private AnchorPane inProgressPane1;
     @FXML
@@ -293,8 +293,8 @@ public class GoalController
         List<Goal> inProgressGoals =
             goals.stream().filter(g -> !g.isCompleted() && !g.isArchived()).toList();
 
-        Integer start = inProgressCurrentPage * inProgressItemsPerPage;
-        int     end = Math.min(start + inProgressItemsPerPage, inProgressGoals.size());
+        Integer start = inProgressCurrentPage * IN_PROGRESS_ITEMS_PER_PAGE;
+        int     end = Math.min(start + IN_PROGRESS_ITEMS_PER_PAGE, inProgressGoals.size());
 
         for (Integer i = start; i < end; i++)
         {
@@ -324,7 +324,7 @@ public class GoalController
                 AnchorPane.setLeftAnchor(newContent, 0.0);
                 AnchorPane.setRightAnchor(newContent, 0.0);
 
-                switch (i % inProgressItemsPerPage)
+                switch (i % IN_PROGRESS_ITEMS_PER_PAGE)
                 {
                     case 0:
                         inProgressPane1.getChildren().add(newContent);
@@ -332,6 +332,9 @@ public class GoalController
 
                     case 1:
                         inProgressPane2.getChildren().add(newContent);
+                        break;
+                    default:
+                        logger.error("Error while loading goal full pane");
                         break;
                 }
             }
@@ -356,8 +359,8 @@ public class GoalController
         List<Goal> accomplishedGoals =
             goals.stream().filter(Goal::isCompleted).toList();
 
-        Integer start = accomplishedCurrentPage * accomplishedItemsPerPage;
-        int end = Math.min(start + accomplishedItemsPerPage, accomplishedGoals.size());
+        Integer start = accomplishedCurrentPage * ACCOMPLISHED_ITEMS_PER_PAGE;
+        int end = Math.min(start + ACCOMPLISHED_ITEMS_PER_PAGE, accomplishedGoals.size());
 
         for (Integer i = start; i < end; i++)
         {
@@ -387,7 +390,7 @@ public class GoalController
                 AnchorPane.setLeftAnchor(newContent, 0.0);
                 AnchorPane.setRightAnchor(newContent, 0.0);
 
-                switch (i % accomplishedItemsPerPage)
+                switch (i % ACCOMPLISHED_ITEMS_PER_PAGE)
                 {
                     case 0:
                         accomplishedPane1.getChildren().add(newContent);
@@ -395,6 +398,9 @@ public class GoalController
 
                     case 1:
                         accomplishedPane2.getChildren().add(newContent);
+                        break;
+                    default:
+                        logger.error("Error while loading accomplished goal full pane");
                         break;
                 }
             }
@@ -500,7 +506,7 @@ private void setButtonsActions()
     });
 
     inProgressNextButton.setOnAction(event -> {
-        if (inProgressCurrentPage < inProgressGoalsSize / inProgressItemsPerPage)
+        if (inProgressCurrentPage < inProgressGoalsSize / IN_PROGRESS_ITEMS_PER_PAGE)
         {
             inProgressCurrentPage++;
             updateDisplayInProgressGoals();
@@ -519,7 +525,7 @@ private void setButtonsActions()
     });
 
     accomplishedNextButton.setOnAction(event -> {
-        if (accomplishedCurrentPage < accomplishedGoalsSize / accomplishedItemsPerPage)
+        if (accomplishedCurrentPage < accomplishedGoalsSize / ACCOMPLISHED_ITEMS_PER_PAGE)
         {
             accomplishedCurrentPage++;
             updateDisplayAccomplishedGoals();

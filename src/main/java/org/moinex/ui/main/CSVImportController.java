@@ -49,7 +49,6 @@ import org.springframework.stereotype.Controller;
 /**
  * Controller for the CSV Import screen
  * TODO: Implement the logic to input data from a CSV file into the database
- * TODO: Add option to default values
  */
 @Controller
 @NoArgsConstructor
@@ -478,6 +477,7 @@ public class CSVImportController
                                 getValueForColumn(csvHeaders, row, csvColumn)));
                         case "last_four_digits" -> crc.setLastFourDigits(
                                 getValueForColumn(csvHeaders, row, csvColumn));
+                        default -> logger.error("Unknown column: {}", dbColumn);
                     }
                 }
                 catch (IllegalArgumentException e)

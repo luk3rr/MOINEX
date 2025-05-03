@@ -428,12 +428,12 @@ public class HomeController
         for (int i = 0; i < totalMonths; i++)
         {
             // Get the data from the oldest month to the most recent, to keep the order
-            LocalDateTime date  = maxMonth.minusMonths(totalMonths - i - 1);
+            LocalDateTime date  = maxMonth.minusMonths(totalMonths - i - 1L);
             Integer       month = date.getMonthValue();
             Integer       year  = date.getYear();
 
             // Get transactions
-            List<WalletTransaction> transactions =
+            List<WalletTransaction> nonArchivedTransactions =
                 walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
 
             // Get future transactions and merge with the current transactions
@@ -442,9 +442,9 @@ public class HomeController
                     YearMonth.of(year, month),
                     YearMonth.of(year, month));
 
-            transactions.addAll(futureTransactions);
+            nonArchivedTransactions.addAll(futureTransactions);
 
-            logger.info("Found {} ({} future) transactions for {}/{}", transactions.size(), futureTransactions.size(), month, year);
+            logger.info("Found {} ({} future) transactions for {}/{}", nonArchivedTransactions.size(), futureTransactions.size(), month, year);
 
             BigDecimal crcPaidPayments =
                 creditCardService.getEffectivePaidPaymentsByMonth(month, year);
@@ -454,7 +454,7 @@ public class HomeController
 
             // Calculate total expenses for the month
             BigDecimal totalExpenses =
-                transactions.stream()
+                nonArchivedTransactions.stream()
                     .filter(t -> t.getType().equals(TransactionType.EXPENSE))
                     .map(WalletTransaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -464,7 +464,7 @@ public class HomeController
 
             // Calculate total incomes for the month
             BigDecimal totalIncomes =
-                transactions.stream()
+                nonArchivedTransactions.stream()
                     .filter(t -> t.getType().equals(TransactionType.INCOME))
                     .map(WalletTransaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);

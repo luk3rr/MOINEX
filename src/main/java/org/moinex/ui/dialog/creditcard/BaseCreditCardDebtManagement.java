@@ -71,7 +71,6 @@ public abstract class BaseCreditCardDebtManagement
     @FXML
     protected TextField installmentsField;
 
-    @Autowired
     protected ConfigurableApplicationContext springContext;
 
     protected SuggestionsHandlerHelper<CreditCardDebt> suggestionsHandler;
@@ -358,7 +357,7 @@ public abstract class BaseCreditCardDebtManagement
         //    Description
         //    Amount | CreditCard | Category | Installments
         Function<CreditCardDebt, String> displayFunction = ccd
-            -> String.format("%s\n%s | %s | %s | %sx",
+            -> String.format("%s%n%s | %s | %s | %sx",
                              ccd.getDescription(),
                              UIUtils.formatCurrency(ccd.getAmount()),
                              ccd.getCreditCard().getName(),

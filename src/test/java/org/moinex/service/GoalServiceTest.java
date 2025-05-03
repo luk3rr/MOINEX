@@ -49,6 +49,9 @@ class GoalServiceTest
     @Mock
     private GoalRepository m_goalRepository;
 
+    @Mock
+    private GoalService m_selfRef;
+
     @InjectMocks
     private GoalService m_goalService;
 

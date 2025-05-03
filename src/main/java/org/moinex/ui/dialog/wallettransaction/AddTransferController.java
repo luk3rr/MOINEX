@@ -170,13 +170,13 @@ public class AddTransferController
     @FXML
     private void handleSave()
     {
-        Wallet    senderWallet        = senderWalletComboBox.getValue();
-        Wallet    receiverWallet      = receiverWalletComboBox.getValue();
+        Wallet    senderWt        = senderWalletComboBox.getValue();
+        Wallet    receiverWt      = receiverWalletComboBox.getValue();
         String    transferValueString = transferValueField.getText();
         String    description         = descriptionField.getText();
         LocalDate transferDate        = transferDatePicker.getValue();
 
-        if (senderWallet == null || receiverWallet == null ||
+        if (senderWt == null || receiverWt == null ||
             transferValueString == null || transferValueString.isBlank() ||
             description == null || description.isBlank() ||
             transferDate == null)
@@ -194,8 +194,8 @@ public class AddTransferController
             LocalTime     currentTime             = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transferDate.atTime(currentTime);
 
-            walletTransactionService.transferMoney(senderWallet.getId(),
-                                                   receiverWallet.getId(),
+            walletTransactionService.transferMoney(senderWt.getId(),
+                                                   receiverWt.getId(),
                                                    dateTimeWithCurrentHour,
                                                    transferValue,
                                                    description);
@@ -234,14 +234,14 @@ public class AddTransferController
 
     private void updateSenderWalletBalance()
     {
-        Wallet senderWallet = senderWalletComboBox.getValue();
+        Wallet senderWt = senderWalletComboBox.getValue();
 
-        if (senderWallet == null)
+        if (senderWt == null)
         {
             return;
         }
 
-        if (senderWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (senderWt.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
             UIUtils.setLabelStyle(senderWalletCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
@@ -253,19 +253,19 @@ public class AddTransferController
         }
 
         senderWalletCurrentBalanceValueLabel.setText(
-            UIUtils.formatCurrency(senderWallet.getBalance()));
+            UIUtils.formatCurrency(senderWt.getBalance()));
     }
 
     private void updateReceiverWalletBalance()
     {
-        Wallet receiverWallet = receiverWalletComboBox.getValue();
+        Wallet receiverWt = receiverWalletComboBox.getValue();
 
-        if (receiverWallet == null)
+        if (receiverWt == null)
         {
             return;
         }
 
-        if (receiverWallet.getBalance().compareTo(BigDecimal.ZERO) < 0)
+        if (receiverWt.getBalance().compareTo(BigDecimal.ZERO) < 0)
         {
             UIUtils.setLabelStyle(receiverWalletCurrentBalanceValueLabel,
                                   Constants.NEGATIVE_BALANCE_STYLE);
@@ -277,16 +277,16 @@ public class AddTransferController
         }
 
         receiverWalletCurrentBalanceValueLabel.setText(
-            UIUtils.formatCurrency(receiverWallet.getBalance()));
+            UIUtils.formatCurrency(receiverWt.getBalance()));
     }
 
     private void updateSenderWalletAfterBalance()
     {
         String transferValueString = transferValueField.getText();
-        Wallet senderWallet        = senderWalletComboBox.getValue();
+        Wallet senderWt        = senderWalletComboBox.getValue();
 
         if (transferValueString == null || transferValueString.isBlank() ||
-            senderWallet == null)
+            senderWt == null)
         {
             UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
             return;
@@ -303,7 +303,7 @@ public class AddTransferController
             }
 
             BigDecimal senderWalletAfterBalance =
-                senderWallet.getBalance().subtract(transferValue);
+                senderWt.getBalance().subtract(transferValue);
 
             // Epsilon is used to avoid floating point arithmetic errors
             if (senderWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0)
@@ -331,10 +331,10 @@ public class AddTransferController
     private void updateReceiverWalletAfterBalance()
     {
         String transferValueString = transferValueField.getText();
-        Wallet receiverWallet      = receiverWalletComboBox.getValue();
+        Wallet receiverWt      = receiverWalletComboBox.getValue();
 
         if (transferValueString == null || transferValueString.isBlank() ||
-            receiverWallet == null)
+            receiverWt == null)
         {
             UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
             return;
@@ -351,7 +351,7 @@ public class AddTransferController
             }
 
             BigDecimal receiverWalletAfterBalance =
-                receiverWallet.getBalance().add(transferValue);
+                receiverWt.getBalance().add(transferValue);
 
             // Epsilon is used to avoid floating point arithmetic errors
             if (receiverWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0)
@@ -424,7 +424,7 @@ public class AddTransferController
         //    Description
         //    Amount | From: Wallet | To: Wallet
         Function<Transfer, String> displayFunction = tf
-            -> String.format("%s\n%s | From: %s | To: %s ",
+            -> String.format("%s%n%s | From: %s | To: %s ",
                              tf.getDescription(),
                              UIUtils.formatCurrency(tf.getAmount()),
                              tf.getSenderWallet().getName(),

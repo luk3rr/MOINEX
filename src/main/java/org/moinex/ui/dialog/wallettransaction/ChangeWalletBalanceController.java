@@ -84,10 +84,10 @@ public class ChangeWalletBalanceController
     @FXML
     private void handleSave()
     {
-        Wallet wallet        = walletComboBox.getValue();
+        Wallet wt        = walletComboBox.getValue();
         String newBalanceStr = balanceField.getText();
 
-        if (wallet == null || newBalanceStr.isBlank())
+        if (wt == null || newBalanceStr.isBlank())
         {
             WindowUtils.showInformationDialog(
                 "Invalid input",
@@ -100,7 +100,7 @@ public class ChangeWalletBalanceController
             BigDecimal newBalance = new BigDecimal(newBalanceStr);
 
             // Check if it has modification
-            if (wallet.getBalance().compareTo(newBalance) == 0)
+            if (wt.getBalance().compareTo(newBalance) == 0)
             {
                 WindowUtils.showInformationDialog("No changes",
                                                   "The balance was not changed.");
@@ -108,7 +108,7 @@ public class ChangeWalletBalanceController
             }
             else // Update balance
             {
-                walletService.updateWalletBalance(wallet.getId(), newBalance);
+                walletService.updateWalletBalance(wt.getId(), newBalance);
 
                 WindowUtils.showSuccessDialog("Wallet updated",
                                               "The balance was updated successfully.");

@@ -31,6 +31,8 @@ public final class WindowUtils
 {
     private static final Logger logger = LoggerFactory.getLogger(WindowUtils.class);
 
+    private WindowUtils() {}
+
     /**
      * Sets the attributes of an alert dialog
      * @param alert The alert dialog

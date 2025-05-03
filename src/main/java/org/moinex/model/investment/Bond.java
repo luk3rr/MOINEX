@@ -46,7 +46,6 @@ public class Bond extends Asset
     @Column(name = "type", nullable = false)
     private BondType type;
 
-    // TODO: Fix nullable. It should be false when the investment feature is implemented
     @Column(name = "interest_index" )
     private InterestIndex interestIndex;
 

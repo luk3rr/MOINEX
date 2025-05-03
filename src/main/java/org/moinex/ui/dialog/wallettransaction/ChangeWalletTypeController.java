@@ -82,18 +82,18 @@ public class ChangeWalletTypeController
 
         // Set the current type label
         walletComboBox.setOnAction(e -> {
-            Wallet wallet = walletComboBox.getValue();
-            updateCurrentTypeLabel(wallet);
+            Wallet wt = walletComboBox.getValue();
+            updateCurrentTypeLabel(wt);
         });
     }
 
     @FXML
     private void handleSave()
     {
-        Wallet     wallet        = walletComboBox.getValue();
+        Wallet     wt        = walletComboBox.getValue();
         WalletType walletNewType = newTypeComboBox.getValue();
 
-        if (wallet == null || walletNewType == null)
+        if (wt == null || walletNewType == null)
         {
             WindowUtils.showInformationDialog(
                 "Empty fields",
@@ -103,7 +103,7 @@ public class ChangeWalletTypeController
 
         try
         {
-            walletService.changeWalletType(wallet.getId(), walletNewType);
+            walletService.changeWalletType(wt.getId(), walletNewType);
 
             WindowUtils.showSuccessDialog("Wallet type changed",
                                           "The wallet type was successfully changed.");

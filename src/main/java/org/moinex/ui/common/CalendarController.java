@@ -214,11 +214,11 @@ public class CalendarController
                     HBox eventIndicators = new HBox(3);
                     eventIndicators.setAlignment(Pos.CENTER);
 
-                    List<CalendarEvent> calendarEvents =
+                    List<CalendarEvent> calendarEventsList =
                         calendarEventMap.get(currentDate);
-                    if (calendarEvents != null)
+                    if (calendarEventsList != null)
                     {
-                        for (CalendarEvent event : calendarEvents)
+                        for (CalendarEvent event : calendarEventsList)
                         {
                             Circle indicator = new Circle(
                                 4,
@@ -226,12 +226,6 @@ public class CalendarController
                             eventIndicators.getChildren().add(indicator);
                         }
                     }
-
-                    // Make the cell clickable to open the event details
-                    // TODO: Implement the event details view
-                    final Integer selectedDate = currentDate;
-                    cell.setOnMouseClicked(
-                        event -> System.out.println("Selected date: " + selectedDate));
 
                     // Align the event indicators to the bottom of the cell
                     Region spacer = new Region();

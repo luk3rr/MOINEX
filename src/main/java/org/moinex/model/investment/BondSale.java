@@ -35,6 +35,6 @@ public class BondSale extends Transaction
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "bond_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "bond_id", referencedColumnName = "id")
     private Bond bond;
 }

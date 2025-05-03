@@ -62,7 +62,6 @@ public abstract class BaseCryptoExchangeManagement
     @FXML
     protected DatePicker exchangeDatePicker;
 
-    @Autowired
     protected ConfigurableApplicationContext springContext;
 
     protected TickerService tickerService;

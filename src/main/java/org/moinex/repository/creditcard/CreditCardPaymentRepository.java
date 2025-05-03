@@ -118,7 +118,6 @@ public interface CreditCardPaymentRepository
     getTotalPaidAmount(@Param("creditCardId") Long creditCardId);
 
     /**
-     * TODO: Create tests
      * Get the total debt amount of all credit cards in a month and year
      * @param month The month
      * @param year The year
@@ -143,7 +142,6 @@ public interface CreditCardPaymentRepository
     getTotalDebtAmount(@Param("year") Integer year);
 
     /**
-     * TODO: Create tests
      * Get the total of all pending payments of all credit cards from a specified month
      * and year onward, including future months and the current month
      * @param month The starting month (inclusive)

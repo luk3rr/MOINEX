@@ -61,7 +61,6 @@ import org.springframework.stereotype.Controller;
 
 /**
  * Controller class for the transaction view
- * TODO: Load information from the database only when necessary
  */
 @Controller
 @NoArgsConstructor
@@ -458,7 +457,7 @@ public class TransactionController
         {
             // Get the date for the current month
             LocalDateTime date =
-                currentDate.minusMonths(Constants.XYBAR_CHART_MONTHS - i - 1);
+                currentDate.minusMonths(Constants.XYBAR_CHART_MONTHS - i - 1L);
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
 
             // Get confirmed transactions for the month

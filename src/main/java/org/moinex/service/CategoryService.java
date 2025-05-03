@@ -83,7 +83,7 @@ public class CategoryService
     public void deleteCategory(Long id)
     {
         Category category = categoryRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException("Category with ID " + id + " not found"));
+            () -> new EntityNotFoundException(String.format("Category with ID %d not found", id)));
 
         if (getCountTransactions(id) > 0)
         {
@@ -94,7 +94,7 @@ public class CategoryService
 
         categoryRepository.delete(category);
 
-        logger.info("Category " + category.getName() + " deleted successfully");
+        logger.info("Category '{}' deleted successfully", category.getName());
     }
 
     /**
@@ -123,13 +123,13 @@ public class CategoryService
         }
 
         Category category = categoryRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException("Category with ID " + id + " not found"));
+            () -> new EntityNotFoundException(String.format("Category with ID %d not found", id)));
 
         category.setName(newName);
 
         categoryRepository.save(category);
 
-        logger.info("Category " + newName + " renamed successfully");
+        logger.info("Category '{}' renamed successfully", newName);
     }
 
     /**
@@ -149,7 +149,7 @@ public class CategoryService
 
         categoryRepository.save(category);
 
-        logger.info("Category with id " + id + " was archived");
+        logger.info("Category with id {} was archived", id);
     }
 
     /**
@@ -169,7 +169,7 @@ public class CategoryService
 
         categoryRepository.save(category);
 
-        logger.info("Category with id " + id + " was unarchived");
+        logger.info("Category with id {} was unarchived", id);
     }
 
     /**

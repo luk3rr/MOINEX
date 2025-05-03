@@ -302,7 +302,7 @@ public class ResumePaneController
         }
 
         // Mensal Economies
-        double savingsPercentage = 0.0;
+        double savingsPercentage;
 
         if (totalConfirmedIncome.compareTo(BigDecimal.ZERO) <= 0)
         {

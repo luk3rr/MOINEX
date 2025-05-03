@@ -69,7 +69,6 @@ public abstract class BaseDividendManagement
     @FXML
     protected DatePicker dividendDatePicker;
 
-    @Autowired
     protected ConfigurableApplicationContext springContext;
 
     protected SuggestionsHandlerHelper<WalletTransaction> suggestionsHandler;
@@ -188,10 +187,10 @@ public abstract class BaseDividendManagement
     protected void walletAfterBalance()
     {
         String dividendValueString = dividendValueField.getText();
-        Wallet wallet              = walletComboBox.getValue();
+        Wallet wt              = walletComboBox.getValue();
 
         if (dividendValueString == null || dividendValueString.isBlank() ||
-            wallet == null)
+            wt == null)
         {
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
@@ -207,7 +206,7 @@ public abstract class BaseDividendManagement
                 return;
             }
 
-            BigDecimal walletAfterBalanceValue = wallet.getBalance().add(dividendValue);
+            BigDecimal walletAfterBalanceValue = wt.getBalance().add(dividendValue);
 
             // Epsilon is used to avoid floating point arithmetic errors
             if (walletAfterBalanceValue.compareTo(BigDecimal.ZERO) < 0)
@@ -273,7 +272,7 @@ public abstract class BaseDividendManagement
         //    Description
         //    Amount | Wallet | Category
         Function<WalletTransaction, String> displayFunction = wt
-            -> String.format("%s\n%s | %s | %s ",
+            -> String.format("%s%n%s | %s | %s ",
                              wt.getDescription(),
                              UIUtils.formatCurrency(wt.getAmount()),
                              wt.getWallet().getName(),

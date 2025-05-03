@@ -36,7 +36,9 @@ public class AddCategoryController
 
     @FXML
     private void initialize()
-    { }
+    {
+        // TODO: Implement this method
+    }
 
     @FXML
     public void handleSave()

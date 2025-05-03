@@ -128,8 +128,6 @@ public class ManageCategoryController
             WindowUtils.showInformationDialog(
                 "Category has transactions",
                 "Cannot remove a category with transactions");
-            // TODO: Implement a way to change the category of the transactions
-            // TODO: Implement a way to archive the category
             return;
         }
 

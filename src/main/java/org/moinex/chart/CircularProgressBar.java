@@ -40,7 +40,7 @@ public class CircularProgressBar extends Canvas
 
     public void draw(Double percent)
     {
-        percent = Math.max(Math.min(percent, 100), 0);
+        percent = Math.clamp(percent, 0, 100);
 
         final GraphicsContext gc = getGraphicsContext2D();
 
