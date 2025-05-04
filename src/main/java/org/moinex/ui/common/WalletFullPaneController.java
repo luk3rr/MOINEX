@@ -271,7 +271,9 @@ public class WalletFullPaneController {
     }
 
     @FXML
-    private void initialize() {}
+    private void initialize() {
+        // Still empty
+    }
 
     @FXML
     private void handleAddIncome() {

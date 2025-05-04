@@ -65,7 +65,7 @@ CREATE TABLE goal (completion_date varchar(255), initial_balance numeric(38,2) n
 
 -- HT_wallet definition
 
-CREATE TABLE HT_wallet(id bigint not null, hib_sess_id char(36) not null, primary key (id, hib_sess_id));
+CREATE TABLE HT_wallet(id bigint not null, hib_sess_id varchar(36) not null, primary key (id, hib_sess_id));
 
 -- market_quotes_and_commodities definition
 
@@ -79,7 +79,7 @@ CREATE TABLE purchase (id integer, quantity numeric(20,8) not null, unit_price n
 
 -- recurring_transaction definition
 
-CREATE TABLE recurring_transaction (id integer, amount numeric(38,2) not null, description varchar(255), type varchar(255) not null check (type in ('INCOME','EXPENSE')), end_date varchar(255) not null, frequency varchar(255) not null check (frequency in ('DAILY','WEEKLY','MONTHLY','YEARLY')), next_due_date varchar(255) not null, start_date varchar(255) not null, status varchar default 'ACTIVE' not null check (status in ('ACTIVE','INACTIVE')), category_id bigint not null, wallet_id bigint not null, primary key (id));
+CREATE TABLE recurring_transaction (id integer, amount numeric(38,2) not null, description varchar(255), type varchar(255) not null check (type in ('INCOME','EXPENSE')), end_date varchar(255) not null, frequency varchar(255) not null check (frequency in ('DAILY','WEEKLY','MONTHLY','YEARLY')), next_due_date varchar(255) not null, start_date varchar(255) not null, status varchar(255) default 'ACTIVE' not null check (status in ('ACTIVE','INACTIVE')), category_id bigint not null, wallet_id bigint not null, primary key (id));
 
 
 -- sale definition

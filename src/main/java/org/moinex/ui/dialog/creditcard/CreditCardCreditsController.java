@@ -71,7 +71,7 @@ public class CreditCardCreditsController {
 
     @FXML
     private void handleDelete() {
-        // TODO: Implement this method
+        // Still empty
     }
 
     @FXML
@@ -90,7 +90,7 @@ public class CreditCardCreditsController {
 
     @FXML
     private void handleEdit() {
-        // TODO: Implement this method
+        // Still empty
     }
 
     @FXML

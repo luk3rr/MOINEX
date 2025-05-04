@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
-import org.moinex.service.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +36,8 @@ public class APIUtils {
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private static final List<Process> runningProcesses = new ArrayList<>();
-
-    private static boolean shuttingDown = false;
-
     private static final Logger logger = LoggerFactory.getLogger(APIUtils.class);
+    private static boolean shuttingDown = false;
 
     // Prevent instantiation
     private APIUtils() {}
@@ -107,6 +104,7 @@ public class APIUtils {
 
     /**
      * Register a process to be managed by the APIUtils class
+     *
      * @param process The process to register
      */
     private static synchronized void registerProcess(Process process) {
@@ -120,6 +118,7 @@ public class APIUtils {
 
     /**
      * Remove a process from the list of running processes
+     *
      * @param process The process to remove
      */
     private static synchronized void removeProcess(Process process) {
@@ -157,12 +156,13 @@ public class APIUtils {
 
     /**
      * Execute a Python script with arguments
+     *
      * @param script The script to run
-     * @param args The arguments to pass to the script
+     * @param args   The arguments to pass to the script
      */
     public static JSONObject runPythonScript(String script, String[] args) {
         try (InputStream scriptInputStream =
-                InitializationService.class.getResourceAsStream(Constants.SCRIPT_PATH + script)) {
+                APIUtils.class.getResourceAsStream(Constants.SCRIPT_PATH + script)) {
             if (scriptInputStream == null) {
                 throw new MoinexException.ScriptNotFoundException(
                         "Python " + script + " script not found");
@@ -230,6 +230,7 @@ public class APIUtils {
 
     /**
      * Set secure file permissions to restrict access to the owner only
+     *
      * @param file The file to set permissions for
      */
     private static void setSecurePermissions(Path file) throws IOException {

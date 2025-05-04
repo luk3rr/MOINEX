@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -28,8 +27,7 @@ public class JavaFXApp extends Application {
     @Override
     public void init() throws Exception {
         String[] args = getParameters().getRaw().toArray(new String[0]);
-
-        springContext = new SpringApplicationBuilder().sources(MainApplication.class).run(args);
+        springContext = SpringApp.start(args);
     }
 
     @Override
@@ -38,30 +36,22 @@ public class JavaFXApp extends Application {
                 new FXMLLoader(getClass().getResource(Constants.SPLASH_SCREEN_FXML));
         Parent splashRoot = splashLoader.load();
         Stage splashStage = new Stage();
-        splashStage.initStyle(StageStyle.UNDECORATED); // Remove window border
+        splashStage.initStyle(StageStyle.UNDECORATED);
         splashStage.setScene(new Scene(splashRoot));
         splashStage.show();
+
         Thread.ofVirtual()
                 .start(
                         () -> {
                             try {
-                                springContext =
-                                        new SpringApplicationBuilder()
-                                                .sources(MainApplication.class)
-                                                .run(
-                                                        getParameters()
-                                                                .getRaw()
-                                                                .toArray(new String[0]));
-
                                 FXMLLoader loader =
                                         new FXMLLoader(getClass().getResource(Constants.MAIN_FXML));
                                 loader.setControllerFactory(springContext::getBean);
                                 Parent mainRoot = loader.load();
 
-                                // wait 1 second before showing the main window
                                 Thread.sleep(1000);
 
-                                javafx.application.Platform.runLater(
+                                Platform.runLater(
                                         () -> {
                                             primaryStage.setTitle(Constants.APP_NAME);
                                             primaryStage.setScene(new Scene(mainRoot));
@@ -70,7 +60,7 @@ public class JavaFXApp extends Application {
                                         });
                             } catch (InterruptedException | IOException e) {
                                 Thread.currentThread().interrupt();
-                                javafx.application.Platform.exit();
+                                Platform.exit();
                             }
                         });
     }

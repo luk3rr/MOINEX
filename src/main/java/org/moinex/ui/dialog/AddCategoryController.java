@@ -33,7 +33,7 @@ public class AddCategoryController {
 
     @FXML
     private void initialize() {
-        // TODO: Implement this method
+        // Still empty
     }
 
     @FXML

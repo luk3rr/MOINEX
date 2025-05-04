@@ -6,17 +6,14 @@
 
 package org.moinex.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -46,27 +43,24 @@ import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)
 class CreditCardServiceTest {
-    @Mock private CreditCardDebtRepository m_creditCardDebtRepository;
+    @Mock private CreditCardDebtRepository creditCardDebtRepository;
 
-    @Mock private CreditCardPaymentRepository m_creditCardPaymentRepository;
+    @Mock private CreditCardPaymentRepository creditCardPaymentRepository;
 
-    @Mock private CreditCardRepository m_creditCardRepository;
+    @Mock private CreditCardRepository creditCardRepository;
 
-    @Mock private CreditCardOperatorRepository m_creditCardOperatorRepository;
+    @Mock private CreditCardOperatorRepository creditCardOperatorRepository;
 
-    @Mock private CategoryRepository m_categoryRepository;
+    @Mock private CategoryRepository categoryRepository;
 
-    @Mock private CreditCardService m_selfRef;
+    @InjectMocks private CreditCardService creditCardService;
 
-    @InjectMocks private CreditCardService m_creditCardService;
-
-    private CreditCard m_creditCard;
-    private CreditCardOperator m_operator;
-    private Category m_category;
-    private LocalDateTime m_registerDate;
-    private YearMonth m_invoiceMonth;
-    private String m_description;
-    private String m_crcLastFourDigits;
+    private CreditCard creditCard;
+    private CreditCardOperator operator;
+    private Category category;
+    private LocalDateTime registerDate;
+    private YearMonth invoiceMonth;
+    private String description;
 
     @BeforeAll
     static void setUp() {
@@ -75,133 +69,155 @@ class CreditCardServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        m_crcLastFourDigits = "1234";
-        m_operator = new CreditCardOperator(1L, "Operator");
+        String crcLastFourDigits = "1234";
+        operator = new CreditCardOperator(1L, "Operator");
 
-        m_creditCard =
+        creditCard =
                 CreditCard.builder()
                         .name("Credit Card")
                         .billingDueDay(10)
                         .closingDay(4)
                         .maxDebt(new BigDecimal("1000.0"))
-                        .lastFourDigits(m_crcLastFourDigits)
-                        .operator(m_operator)
+                        .lastFourDigits(crcLastFourDigits)
+                        .operator(operator)
                         .build();
 
-        m_category = Category.builder().name("Category").build();
-        m_registerDate = LocalDateTime.now();
-        m_invoiceMonth = YearMonth.now();
-        m_description = "";
+        category = Category.builder().name("Category").build();
+        registerDate = LocalDateTime.now();
+        invoiceMonth = YearMonth.now();
+        description = "";
     }
 
     @Test
     @DisplayName("Test if the credit card is created successfully")
     void testCreateCreditCard() {
-        when(m_creditCardRepository.save(any(CreditCard.class))).thenReturn(m_creditCard);
+        when(creditCardRepository.save(any(CreditCard.class))).thenReturn(creditCard);
 
-        when(m_creditCardRepository.existsByName(m_creditCard.getName())).thenReturn(false);
+        when(creditCardRepository.existsByName(creditCard.getName())).thenReturn(false);
 
-        when(m_creditCardOperatorRepository.findById(m_operator.getId()))
-                .thenReturn(Optional.of(m_operator));
+        when(creditCardOperatorRepository.findById(operator.getId()))
+                .thenReturn(Optional.of(operator));
 
-        m_creditCardService.addCreditCard(
-                m_creditCard.getName(),
-                m_creditCard.getBillingDueDay(),
-                m_creditCard.getClosingDay(),
-                m_creditCard.getMaxDebt(),
-                m_creditCard.getLastFourDigits(),
-                m_creditCard.getOperator().getId());
+        creditCardService.addCreditCard(
+                creditCard.getName(),
+                creditCard.getBillingDueDay(),
+                creditCard.getClosingDay(),
+                creditCard.getMaxDebt(),
+                creditCard.getLastFourDigits(),
+                creditCard.getOperator().getId());
 
         // Capture the credit card that was saved and check if it is correct
         ArgumentCaptor<CreditCard> creditCardCaptor = ArgumentCaptor.forClass(CreditCard.class);
 
-        verify(m_creditCardRepository).save(creditCardCaptor.capture());
+        verify(creditCardRepository).save(creditCardCaptor.capture());
 
-        CreditCard creditCard = creditCardCaptor.getValue();
+        CreditCard ccd = creditCardCaptor.getValue();
 
-        assertEquals(m_creditCard.getName(), creditCard.getName());
-        assertEquals(m_creditCard.getBillingDueDay(), creditCard.getBillingDueDay());
-        assertEquals(m_creditCard.getMaxDebt(), creditCard.getMaxDebt());
+        assertEquals(this.creditCard.getName(), ccd.getName());
+        assertEquals(this.creditCard.getBillingDueDay(), ccd.getBillingDueDay());
+        assertEquals(this.creditCard.getMaxDebt(), ccd.getMaxDebt());
     }
 
     @Test
     @DisplayName("Test if the credit card is not created when the name is already in use")
     void testCreateCreditCardAlreadyExists() {
-        when(m_creditCardRepository.existsByName(m_creditCard.getName())).thenReturn(true);
+        when(creditCardRepository.existsByName(creditCard.getName())).thenReturn(true);
+
+        String creditCardName = creditCard.getName();
+        int billingDueDay = creditCard.getBillingDueDay();
+        int closingDay = creditCard.getClosingDay();
+        BigDecimal maxDebt = creditCard.getMaxDebt();
+        String lastFourDigits = creditCard.getLastFourDigits();
+        Long operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 EntityExistsException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                creditCardName,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                lastFourDigits,
+                                operatorId));
 
         // Verify that the credit card was not saved
-        verify(m_creditCardRepository, never()).save(any());
+        verify(creditCardRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Test if the credit card is not created when the billing due day is invalid")
     void testCreateCreditCardInvalidDueDate() {
-        when(m_creditCardRepository.existsByName(m_creditCard.getName())).thenReturn(false);
+        when(creditCardRepository.existsByName(creditCard.getName())).thenReturn(false);
 
         // Case when the billing due day is less than 1
-        m_creditCard.setBillingDueDay(0);
+        creditCard.setBillingDueDay(0);
+
+        String name = creditCard.getName();
+        int billingDueDay = creditCard.getBillingDueDay();
+        int closingDay = creditCard.getClosingDay();
+        BigDecimal maxDebt = creditCard.getMaxDebt();
+        String lastFourDigits = creditCard.getLastFourDigits();
+        Long operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                name,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                lastFourDigits,
+                                operatorId));
 
         // Case when the billing due day is greater than Constants.MAX_BILLING_DUE_DAY
-        m_creditCard.setBillingDueDay(Constants.MAX_BILLING_DUE_DAY + 1);
+        creditCard.setBillingDueDay(Constants.MAX_BILLING_DUE_DAY + 1);
+        int updatedBillingDueDay = creditCard.getBillingDueDay();
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                name,
+                                updatedBillingDueDay,
+                                closingDay,
+                                maxDebt,
+                                lastFourDigits,
+                                operatorId));
 
         // Verify that the credit card was not saved
-        verify(m_creditCardRepository, never()).save(any());
+        verify(creditCardRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Test if the credit card is not created when the max debt is negative")
     void testCreateCreditCardNegativeMaxDebt() {
-        when(m_creditCardRepository.existsByName(m_creditCard.getName())).thenReturn(false);
+        when(creditCardRepository.existsByName(creditCard.getName())).thenReturn(false);
 
         // Case when the max debt is negative
-        m_creditCard.setMaxDebt(new BigDecimal("-1.0"));
+        creditCard.setMaxDebt(new BigDecimal("-1.0"));
+
+        String creditCardName = creditCard.getName();
+        int billingDueDay = creditCard.getBillingDueDay();
+        int closingDay = creditCard.getClosingDay();
+        BigDecimal maxDebt = creditCard.getMaxDebt();
+        String lastFourDigits = creditCard.getLastFourDigits();
+        Long operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                creditCardName,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                lastFourDigits,
+                                operatorId));
 
         // Verify that the credit card was not saved
-        verify(m_creditCardRepository, never()).save(any());
+        verify(creditCardRepository, never()).save(any());
     }
 
     @Test
@@ -209,129 +225,142 @@ class CreditCardServiceTest {
             "Test if the credit card is not when last four digits is blank or not has 4 "
                     + "digits")
     void testCreateCreditCardInvalidLastFourDigits() {
-        when(m_creditCardRepository.existsByName(m_creditCard.getName())).thenReturn(false);
+        when(creditCardRepository.existsByName(creditCard.getName())).thenReturn(false);
 
         // Case when the last four digits is blank
-        m_creditCard.setLastFourDigits("");
+        creditCard.setLastFourDigits("");
+
+        String creditCardName = creditCard.getName();
+        int billingDueDay = creditCard.getBillingDueDay();
+        int closingDay = creditCard.getClosingDay();
+        BigDecimal maxDebt = creditCard.getMaxDebt();
+        String emptyLastFourDigits = creditCard.getLastFourDigits();
+        Long operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                creditCardName,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                emptyLastFourDigits,
+                                operatorId));
 
         // Case when the last four digits has less than 4 digits
-        m_creditCard.setLastFourDigits("123");
+        creditCard.setLastFourDigits("123");
+        String threeNumbersLastFourDigits = creditCard.getLastFourDigits();
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                creditCardName,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                threeNumbersLastFourDigits,
+                                operatorId));
 
         // Case when the last four digits has more than 4 digits
-        m_creditCard.setLastFourDigits("12345");
+        creditCard.setLastFourDigits("12345");
+        String fiveNumbersLastFourDigits = creditCard.getLastFourDigits();
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                creditCardName,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                fiveNumbersLastFourDigits,
+                                operatorId));
 
         // Verify that the credit card was not saved
-        verify(m_creditCardRepository, never()).save(any());
+        verify(creditCardRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Test if the credit card is not created when the operator does not exist")
     void testCreateCreditCardOperatorDoesNotExists() {
-        when(m_creditCardRepository.existsByName(m_creditCard.getName())).thenReturn(false);
+        when(creditCardRepository.existsByName(creditCard.getName())).thenReturn(false);
 
-        when(m_creditCardOperatorRepository.findById(m_operator.getId()))
-                .thenReturn(Optional.empty());
+        when(creditCardOperatorRepository.findById(operator.getId())).thenReturn(Optional.empty());
+
+        String creditCardName = creditCard.getName();
+        int billingDueDay = creditCard.getBillingDueDay();
+        int closingDay = creditCard.getClosingDay();
+        BigDecimal maxDebt = creditCard.getMaxDebt();
+        String lastFourDigits = creditCard.getLastFourDigits();
+        Long operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_creditCardService.addCreditCard(
-                                m_creditCard.getName(),
-                                m_creditCard.getBillingDueDay(),
-                                m_creditCard.getClosingDay(),
-                                m_creditCard.getMaxDebt(),
-                                m_creditCard.getLastFourDigits(),
-                                m_creditCard.getOperator().getId()));
+                        creditCardService.addCreditCard(
+                                creditCardName,
+                                billingDueDay,
+                                closingDay,
+                                maxDebt,
+                                lastFourDigits,
+                                operatorId));
 
         // Verify that the credit card was not saved
-        verify(m_creditCardRepository, never()).save(any());
+        verify(creditCardRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Test if the credit card is deleted successfully")
     void testDeleteCreditCard() {
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        m_creditCardService.deleteCreditCard(m_creditCard.getId());
+        creditCardService.deleteCreditCard(creditCard.getId());
 
         // Verify that the credit card was deleted
-        verify(m_creditCardRepository).delete(m_creditCard);
+        verify(creditCardRepository).delete(creditCard);
     }
 
     @Test
     @DisplayName("Test if the credit card is not deleted when it does not exist")
-    void testdeletecreditCardDoesNotExists() {
-        when(m_creditCardRepository.findById(m_creditCard.getId())).thenReturn(Optional.empty());
+    void testDeleteCreditCardDoesNotExists() {
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.empty());
+
+        Long creditCardId = creditCard.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> m_creditCardService.deleteCreditCard(m_creditCard.getId()));
+                () -> creditCardService.deleteCreditCard(creditCardId));
 
         // Verify that the credit card was not deleted
-        verify(m_creditCardRepository, never()).delete(any(CreditCard.class));
+        verify(creditCardRepository, never()).delete(any(CreditCard.class));
     }
 
     @Test
     @DisplayName("Test if the available credit is returned correctly when there is no debt")
     void testGetAvailableCredit() {
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
-        BigDecimal availableCredit = m_creditCardService.getAvailableCredit(m_creditCard.getId());
+        BigDecimal availableCredit = creditCardService.getAvailableCredit(creditCard.getId());
 
-        assertEquals(m_creditCard.getMaxDebt(), availableCredit);
+        assertEquals(creditCard.getMaxDebt(), availableCredit);
     }
 
     @Test
     @DisplayName("Test if the available credit is returned correctly when there is a debt")
     void testGetAvailableCreditWithDebt() {
-        BigDecimal maxDebt = m_creditCard.getMaxDebt();
-        BigDecimal totalPendingPayments = maxDebt.divide(new BigDecimal("2"));
+        BigDecimal maxDebt = creditCard.getMaxDebt();
+        BigDecimal totalPendingPayments = maxDebt.divide(new BigDecimal("2"), RoundingMode.HALF_UP);
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
-
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(totalPendingPayments);
 
-        BigDecimal availableCredit = m_creditCardService.getAvailableCredit(m_creditCard.getId());
+        BigDecimal availableCredit = creditCardService.getAvailableCredit(creditCard.getId());
 
         assertEquals(
                 maxDebt.subtract(totalPendingPayments).doubleValue(),
@@ -344,17 +373,16 @@ class CreditCardServiceTest {
             "Test if the available credit is returned correctly when there is a "
                     + "debt and payments")
     void testGetAvailableCreditWithDebtAndPayments() {
-        m_creditCard.setMaxDebt(new BigDecimal("1000.0"));
+        creditCard.setMaxDebt(new BigDecimal("1000.0"));
 
         BigDecimal totalPendingPayments = new BigDecimal("200.0");
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(totalPendingPayments);
 
-        BigDecimal availableCredit = m_creditCardService.getAvailableCredit(m_creditCard.getId());
+        BigDecimal availableCredit = creditCardService.getAvailableCredit(creditCard.getId());
 
         assertEquals(
                 new BigDecimal("1000.0").subtract(totalPendingPayments).doubleValue(),
@@ -365,142 +393,172 @@ class CreditCardServiceTest {
     @Test
     @DisplayName("Test if exception is thrown when the credit card does not exist")
     void testGetAvailableCreditDoesNotExists() {
-        when(m_creditCardRepository.findById(m_creditCard.getId())).thenReturn(Optional.empty());
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.empty());
+
+        Long creditCardId = creditCard.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> m_creditCardService.getAvailableCredit(m_creditCard.getId()));
+                () -> creditCardService.getAvailableCredit(creditCardId));
     }
 
     @Test
     @DisplayName("Test if the debt is registered successfully")
     void testRegisterDebt() {
-        m_creditCard.setMaxDebt(new BigDecimal("1000.0"));
+        creditCard.setMaxDebt(new BigDecimal("1000.0"));
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
-        m_creditCardService.addDebt(
-                m_creditCard.getId(),
-                m_category,
-                m_registerDate,
-                m_invoiceMonth,
+        creditCardService.addDebt(
+                creditCard.getId(),
+                category,
+                registerDate,
+                invoiceMonth,
                 new BigDecimal("100.0"),
                 1,
-                m_description);
+                description);
 
         // Verify that the debt was registered
-        verify(m_creditCardDebtRepository).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository).save(any(CreditCardDebt.class));
 
         // Verify that the payments were registered
-        verify(m_creditCardPaymentRepository).save(any(CreditCardPayment.class));
+        verify(creditCardPaymentRepository).save(any(CreditCardPayment.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the credit card does not exist")
     void testRegisterDebtCreditCardDoesNotExists() {
-        when(m_creditCardRepository.findById(m_creditCard.getId())).thenReturn(Optional.empty());
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.empty());
+
+        Long creditCardId = creditCard.getId();
+        Category debtCategory = category;
+        LocalDateTime debtRegisterDate = registerDate;
+        YearMonth debtInvoiceMonth = invoiceMonth;
+        BigDecimal debtValue = new BigDecimal("100.0");
+        int installments = 1;
+        String debtDescription = description;
 
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_creditCardService.addDebt(
-                                m_creditCard.getId(),
-                                m_category,
-                                m_registerDate,
-                                m_invoiceMonth,
-                                new BigDecimal("100.0"),
-                                1,
-                                m_description));
+                        creditCardService.addDebt(
+                                creditCardId,
+                                debtCategory,
+                                debtRegisterDate,
+                                debtInvoiceMonth,
+                                debtValue,
+                                installments,
+                                debtDescription));
 
         // Verify that the debt was not registered
-        verify(m_creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the category does not exist")
     void testRegisterDebtCategoryDoesNotExists() {
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.empty());
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.empty());
+
+        Long creditCardId = creditCard.getId();
+        Category debtCategory = category;
+        LocalDateTime debtRegisterDate = registerDate;
+        YearMonth debtInvoiceMonth = invoiceMonth;
+        BigDecimal debtValue = new BigDecimal("100.0");
+        int installments = 1;
+        String debtDescription = description;
 
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_creditCardService.addDebt(
-                                m_creditCard.getId(),
-                                m_category,
-                                m_registerDate,
-                                m_invoiceMonth,
-                                new BigDecimal("100.0"),
-                                1,
-                                m_description));
+                        creditCardService.addDebt(
+                                creditCardId,
+                                debtCategory,
+                                debtRegisterDate,
+                                debtInvoiceMonth,
+                                debtValue,
+                                installments,
+                                debtDescription));
 
         // Verify that the debt was not registered
-        verify(m_creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
 
         // Verify that the payments were not registered
-        verify(m_creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
+        verify(creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the value is negative")
     void testRegisterDebtNegativeValue() {
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
+
+        Long creditCardId = creditCard.getId();
+        Category debtCategory = category;
+        LocalDateTime debtRegisterDate = registerDate;
+        YearMonth debtInvoiceMonth = invoiceMonth;
+        BigDecimal debtValue = new BigDecimal("-1.0");
+        int installments = 1;
+        String debtDescription = description;
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addDebt(
-                                m_creditCard.getId(),
-                                m_category,
-                                m_registerDate,
-                                m_invoiceMonth,
-                                new BigDecimal("-1.0"),
-                                1,
-                                m_description));
+                        creditCardService.addDebt(
+                                creditCardId,
+                                debtCategory,
+                                debtRegisterDate,
+                                debtInvoiceMonth,
+                                debtValue,
+                                installments,
+                                debtDescription));
 
         // Verify that the debt was not registered
-        verify(m_creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
 
         // Verify that the payments were not registered
-        verify(m_creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
+        verify(creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the installment is less than 1")
     void testRegisterDebtInvalidInstallment() {
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
+
+        Long creditCardId = creditCard.getId();
+        Category debtCategory = category;
+        LocalDateTime debtRegisterDate = registerDate;
+        YearMonth debtInvoiceMonth = invoiceMonth;
+        BigDecimal debtValue = new BigDecimal("100.0");
+        int installments = 0;
+        String debtDescription = description;
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addDebt(
-                                m_creditCard.getId(),
-                                m_category,
-                                m_registerDate,
-                                m_invoiceMonth,
-                                new BigDecimal("100.0"),
-                                0,
-                                m_description));
+                        creditCardService.addDebt(
+                                creditCardId,
+                                debtCategory,
+                                debtRegisterDate,
+                                debtInvoiceMonth,
+                                debtValue,
+                                installments,
+                                debtDescription));
 
         // Verify that the debt was not registered
-        verify(m_creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
 
         // Verify that the payments were not registered
-        verify(m_creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
+        verify(creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
     }
 
     @Test
@@ -508,28 +566,35 @@ class CreditCardServiceTest {
             "Test if exception is thrown when the installment is greater than "
                     + "Constants.MAX_INSTALLMENTS")
     void testRegisterDebtInvalidInstallment2() {
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
+
+        Long creditCardId = creditCard.getId();
+        Category debtCategory = category;
+        LocalDateTime debtRegisterDate = registerDate;
+        YearMonth debtInvoiceMonth = invoiceMonth;
+        BigDecimal debtValue = new BigDecimal("100.0");
+        int installments = Constants.MAX_INSTALLMENTS + 1;
+        String debtDescription = description;
 
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_creditCardService.addDebt(
-                                m_creditCard.getId(),
-                                m_category,
-                                m_registerDate,
-                                m_invoiceMonth,
-                                new BigDecimal("100.0"),
-                                Constants.MAX_INSTALLMENTS + 1,
-                                m_description));
+                        creditCardService.addDebt(
+                                creditCardId,
+                                debtCategory,
+                                debtRegisterDate,
+                                debtInvoiceMonth,
+                                debtValue,
+                                installments,
+                                debtDescription));
 
         // Verify that the debt was not registered
-        verify(m_creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
 
         // Verify that the payments were not registered
-        verify(m_creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
+        verify(creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
     }
 
     @Test
@@ -537,45 +602,43 @@ class CreditCardServiceTest {
             "Test if exception is thrown when the credit card does not have enough "
                     + "credit to register the debt")
     void testRegisterDebtNotEnoughCredit() {
-        m_creditCard.setMaxDebt(new BigDecimal("100.0"));
+        creditCard.setMaxDebt(new BigDecimal("100.0"));
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         assertThrows(
                 MoinexException.InsufficientResourcesException.class,
                 () ->
-                        m_creditCardService.addDebt(
-                                m_creditCard.getId(),
-                                m_category,
-                                m_registerDate,
-                                m_invoiceMonth,
+                        creditCardService.addDebt(
+                                creditCard.getId(),
+                                category,
+                                registerDate,
+                                invoiceMonth,
                                 new BigDecimal("200.0"),
                                 1,
-                                m_description));
+                                description));
 
         // Verify that the debt was not registered
-        verify(m_creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
 
         // Verify that the payments were not registered
-        verify(m_creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
+        verify(creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
     }
 
     @Test
     @DisplayName("Test if the payment is registered successfully")
     void testRegisterPayment() {
         // Setup mocks
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
@@ -584,26 +647,27 @@ class CreditCardServiceTest {
 
         BigDecimal debtValue = new BigDecimal("100.0");
 
-        m_creditCardService.addDebt(
-                m_creditCard.getId(),
-                m_category,
-                m_registerDate,
-                m_invoiceMonth,
+        creditCardService.addDebt(
+                creditCard.getId(),
+                category,
+                registerDate,
+                invoiceMonth,
                 debtValue,
                 5,
-                m_description);
+                description);
 
         // Verify if the payment was saved
-        verify(m_creditCardPaymentRepository, times(5)).save(paymentCaptor.capture());
+        verify(creditCardPaymentRepository, times(5)).save(paymentCaptor.capture());
 
         // Get the captured payments and check if they are correct
         List<CreditCardPayment> capturedPayments = paymentCaptor.getAllValues();
 
         assertEquals(5, capturedPayments.size(), "The number of payments is incorrect");
 
-        BigDecimal expectedInstallmentValue = debtValue.divide(new BigDecimal("5"));
+        BigDecimal expectedInstallmentValue =
+                debtValue.divide(new BigDecimal("5"), RoundingMode.HALF_UP);
 
-        for (Integer installmentNumber = 0;
+        for (int installmentNumber = 0;
                 installmentNumber < capturedPayments.size();
                 installmentNumber++) {
             CreditCardPayment payment = capturedPayments.get(installmentNumber);
@@ -623,9 +687,9 @@ class CreditCardServiceTest {
 
             // Check if the payment date is correct
             LocalDateTime expectedPaymentDate =
-                    m_invoiceMonth
+                    invoiceMonth
                             .plusMonths(installmentNumber)
-                            .atDay(m_creditCard.getBillingDueDay())
+                            .atDay(creditCard.getBillingDueDay())
                             .atTime(23, 59);
 
             assertEquals(
@@ -634,8 +698,7 @@ class CreditCardServiceTest {
                     "The payment date of installment " + installmentNumber + " is incorrect");
 
             // Check if wallet is set correctly as null
-            assertEquals(
-                    null,
+            assertNull(
                     payment.getWallet(),
                     "The wallet of installment " + installmentNumber + " is incorrect");
         }
@@ -650,38 +713,38 @@ class CreditCardServiceTest {
         BigDecimal debtValue = new BigDecimal("120.0");
         Integer installments = 3;
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
         ArgumentCaptor<CreditCardPayment> paymentCaptor =
                 ArgumentCaptor.forClass(CreditCardPayment.class);
 
-        m_creditCardService.addDebt(
-                m_creditCard.getId(),
-                m_category,
-                m_registerDate,
-                m_invoiceMonth,
+        creditCardService.addDebt(
+                creditCard.getId(),
+                category,
+                registerDate,
+                invoiceMonth,
                 debtValue,
                 installments,
-                m_description);
+                description);
 
         // Verify if the payment was saved
-        verify(m_creditCardPaymentRepository, times(installments)).save(paymentCaptor.capture());
+        verify(creditCardPaymentRepository, times(installments)).save(paymentCaptor.capture());
 
         // Get the captured payments and check if they are correct
         List<CreditCardPayment> capturedPayments = paymentCaptor.getAllValues();
 
         assertEquals(installments, capturedPayments.size(), "The number of payments is incorrect");
 
-        BigDecimal expectedInstallmentValue = debtValue.divide(new BigDecimal(installments));
+        BigDecimal expectedInstallmentValue =
+                debtValue.divide(new BigDecimal(installments), RoundingMode.HALF_UP);
 
-        for (Integer installmentNumber = 0;
+        for (int installmentNumber = 0;
                 installmentNumber < capturedPayments.size();
                 installmentNumber++) {
             CreditCardPayment payment = capturedPayments.get(installmentNumber);
@@ -707,29 +770,28 @@ class CreditCardServiceTest {
         BigDecimal debtValue = new BigDecimal("100.0");
         Integer installments = 3;
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
         ArgumentCaptor<CreditCardPayment> paymentCaptor =
                 ArgumentCaptor.forClass(CreditCardPayment.class);
 
-        m_creditCardService.addDebt(
-                m_creditCard.getId(),
-                m_category,
-                m_registerDate,
-                m_invoiceMonth,
+        creditCardService.addDebt(
+                creditCard.getId(),
+                category,
+                registerDate,
+                invoiceMonth,
                 debtValue,
                 installments,
-                m_description);
+                description);
 
         // Verify if the payment was saved
-        verify(m_creditCardPaymentRepository, times(installments)).save(paymentCaptor.capture());
+        verify(creditCardPaymentRepository, times(installments)).save(paymentCaptor.capture());
 
         // Get the captured payments and check if they are correct
         List<CreditCardPayment> capturedPayments = paymentCaptor.getAllValues();
@@ -739,15 +801,15 @@ class CreditCardServiceTest {
         assertEquals(
                 BigDecimal.valueOf(33.34),
                 capturedPayments.get(0).getAmount(),
-                "Incorrent value of installment 1");
+                "Incorrect value of installment 1");
         assertEquals(
                 BigDecimal.valueOf(33.33),
                 capturedPayments.get(1).getAmount(),
-                "Incorrent value of installment 2");
+                "Incorrect value of installment 2");
         assertEquals(
                 BigDecimal.valueOf(33.33),
                 capturedPayments.get(2).getAmount(),
-                "Incorrent value of installment 3");
+                "Incorrect value of installment 3");
     }
 
     @Test
@@ -765,29 +827,28 @@ class CreditCardServiceTest {
         BigDecimal debtValue = new BigDecimal("100.0");
         Integer installments = 6;
 
-        when(m_creditCardRepository.findById(m_creditCard.getId()))
-                .thenReturn(Optional.of(m_creditCard));
+        when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(m_categoryRepository.findById(m_category.getId())).thenReturn(Optional.of(m_category));
+        when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(m_creditCardPaymentRepository.getTotalPendingPayments(m_creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
         ArgumentCaptor<CreditCardPayment> paymentCaptor =
                 ArgumentCaptor.forClass(CreditCardPayment.class);
 
-        m_creditCardService.addDebt(
-                m_creditCard.getId(),
-                m_category,
-                m_registerDate,
-                m_invoiceMonth,
+        creditCardService.addDebt(
+                creditCard.getId(),
+                category,
+                registerDate,
+                invoiceMonth,
                 debtValue,
                 installments,
-                m_description);
+                description);
 
         // Verify if the payment was saved
-        verify(m_creditCardPaymentRepository, times(installments)).save(paymentCaptor.capture());
+        verify(creditCardPaymentRepository, times(installments)).save(paymentCaptor.capture());
 
         // Get the captured payments and check if they are correct
         List<CreditCardPayment> capturedPayments = paymentCaptor.getAllValues();
@@ -797,26 +858,26 @@ class CreditCardServiceTest {
         assertEquals(
                 new BigDecimal("16.70"),
                 capturedPayments.get(0).getAmount(),
-                "Incorrent value of installment 1");
+                "Incorrect value of installment 1");
         assertEquals(
                 BigDecimal.valueOf(16.66),
                 capturedPayments.get(1).getAmount(),
-                "Incorrent value of installment 2");
+                "Incorrect value of installment 2");
         assertEquals(
                 BigDecimal.valueOf(16.66),
                 capturedPayments.get(2).getAmount(),
-                "Incorrent value of installment 3");
+                "Incorrect value of installment 3");
         assertEquals(
                 BigDecimal.valueOf(16.66),
                 capturedPayments.get(3).getAmount(),
-                "Incorrent value of installment 4");
+                "Incorrect value of installment 4");
         assertEquals(
                 BigDecimal.valueOf(16.66),
                 capturedPayments.get(4).getAmount(),
-                "Incorrent value of installment 5");
+                "Incorrect value of installment 5");
         assertEquals(
                 BigDecimal.valueOf(16.66),
                 capturedPayments.get(5).getAmount(),
-                "Incorrent value of installment 6");
+                "Incorrect value of installment 6");
     }
 }

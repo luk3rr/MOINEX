@@ -86,8 +86,6 @@ public class CreditCardController {
 
     private ConfigurableApplicationContext springContext;
 
-    private StackedBarChart<String, Number> debtsFlowStackedBarChart;
-
     private CreditCardService creditCardService;
 
     private CategoryService categoryService;
@@ -444,7 +442,8 @@ public class CreditCardController {
     private void updateMoneyFlow() {
         CategoryAxis categoryAxis = new CategoryAxis();
         NumberAxis numberAxis = new NumberAxis();
-        debtsFlowStackedBarChart = new StackedBarChart<>(categoryAxis, numberAxis);
+        StackedBarChart<String, Number> debtsFlowStackedBarChart =
+                new StackedBarChart<>(categoryAxis, numberAxis);
 
         debtsFlowStackedBarChart.setVerticalGridLinesVisible(false);
         debtsFlowPane.getChildren().clear();

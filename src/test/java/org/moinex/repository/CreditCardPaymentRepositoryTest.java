@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.moinex.app.MainApplication;
+import org.moinex.app.config.AppConfig;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardDebt;
@@ -37,25 +37,24 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MainApplication.class})
+@ContextConfiguration(classes = {AppConfig.class})
 @ActiveProfiles("test")
 class CreditCardPaymentRepositoryTest {
-    @Autowired private CreditCardPaymentRepository m_creditCardPaymentRepository;
+    @Autowired private CreditCardPaymentRepository creditCardPaymentRepository;
 
-    @Autowired private CreditCardRepository m_creditCardRepository;
+    @Autowired private CreditCardRepository creditCardRepository;
 
-    @Autowired private WalletRepository m_walletRepository;
+    @Autowired private WalletRepository walletRepository;
 
-    @Autowired private CreditCardDebtRepository m_creditCardDebtRepository;
+    @Autowired private CreditCardDebtRepository creditCardDebtRepository;
 
-    @Autowired private CreditCardOperatorRepository m_creditCardOperatorRepository;
+    @Autowired private CreditCardOperatorRepository creditCardOperatorRepository;
 
-    @Autowired private CategoryRepository m_categoryRepository;
+    @Autowired private CategoryRepository categoryRepository;
 
-    private CreditCard m_creditCard1;
-    private CreditCard m_creditCard2;
-    private CreditCardOperator m_crcOperator;
-    private Wallet m_wallet;
+    private CreditCard creditCard1;
+    private CreditCard creditCard2;
+    private Wallet wallet;
 
     private CreditCard createCreditCard(
             String name, CreditCardOperator operator, BigDecimal maxDebt) {
@@ -68,21 +67,20 @@ class CreditCardPaymentRepositoryTest {
                         .operator(operator)
                         .build();
 
-        m_creditCardRepository.save(creditCard);
+        creditCardRepository.save(creditCard);
         return creditCard;
     }
 
     private CreditCardOperator createCreditCardOperator(String name) {
-        CreditCardOperator creditCardOperator =
-                CreditCardOperator.builder().name(name).icon("").build();
-        m_creditCardOperatorRepository.save(creditCardOperator);
-        return creditCardOperator;
+        CreditCardOperator ccdOperator = CreditCardOperator.builder().name(name).icon("").build();
+        creditCardOperatorRepository.save(ccdOperator);
+        return ccdOperator;
     }
 
     private Wallet createWallet(String name, BigDecimal balance) {
-        Wallet m_wallet = Wallet.builder().name(name).balance(balance).build();
-        m_walletRepository.save(m_wallet);
-        return m_wallet;
+        Wallet wt = Wallet.builder().name(name).balance(balance).build();
+        walletRepository.save(wt);
+        return wt;
     }
 
     private CreditCardDebt createCreditCardDebt(CreditCard creditCard, BigDecimal totalAmount) {
@@ -95,13 +93,13 @@ class CreditCardPaymentRepositoryTest {
                         .category(createCategory("category"))
                         .build();
 
-        m_creditCardDebtRepository.save(creditCardDebt);
+        creditCardDebtRepository.save(creditCardDebt);
         return creditCardDebt;
     }
 
     private Category createCategory(String name) {
         Category category = Category.builder().name(name).build();
-        m_categoryRepository.save(category);
+        categoryRepository.save(category);
         return category;
     }
 
@@ -115,16 +113,16 @@ class CreditCardPaymentRepositoryTest {
                         .installment(1)
                         .build();
 
-        m_creditCardPaymentRepository.save(creditCardPayment);
+        creditCardPaymentRepository.save(creditCardPayment);
     }
 
     @BeforeEach
     void setUp() {
         // Initialize CreditCard and Wallet
-        m_crcOperator = createCreditCardOperator("Operator");
-        m_creditCard1 = createCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));
-        m_creditCard2 = createCreditCard("CreditCard2", m_crcOperator, new BigDecimal("1000.0"));
-        m_wallet = createWallet("Wallet", new BigDecimal("1000.0"));
+        CreditCardOperator creditCardOperator = createCreditCardOperator("Operator");
+        creditCard1 = createCreditCard("CreditCard1", creditCardOperator, new BigDecimal("1000.0"));
+        creditCard2 = createCreditCard("CreditCard2", creditCardOperator, new BigDecimal("1000.0"));
+        wallet = createWallet("Wallet", new BigDecimal("1000.0"));
     }
 
     @Test
@@ -132,9 +130,7 @@ class CreditCardPaymentRepositoryTest {
         // No payments yet
         assertEquals(
                 0.0,
-                m_creditCardPaymentRepository
-                        .getTotalPaidAmount(m_creditCard1.getId())
-                        .doubleValue(),
+                creditCardPaymentRepository.getTotalPaidAmount(creditCard1.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total paid amount must be 0.0");
     }
@@ -142,15 +138,13 @@ class CreditCardPaymentRepositoryTest {
     @Test
     void testSinglePayment() {
         // Create CreditCardDebt and Payment
-        CreditCardDebt debt = createCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
+        CreditCardDebt debt = createCreditCardDebt(creditCard1, new BigDecimal("500.0"));
 
-        createCreditCardPayment(debt, m_wallet, new BigDecimal("100.0"));
+        createCreditCardPayment(debt, wallet, new BigDecimal("100.0"));
 
         assertEquals(
                 100.0,
-                m_creditCardPaymentRepository
-                        .getTotalPaidAmount(m_creditCard1.getId())
-                        .doubleValue(),
+                creditCardPaymentRepository.getTotalPaidAmount(creditCard1.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total paid amount must be 100.0");
     }
@@ -158,16 +152,14 @@ class CreditCardPaymentRepositoryTest {
     @Test
     void testMultiplePayments() {
         // Create CreditCardDebt and Payments
-        CreditCardDebt debt = createCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
+        CreditCardDebt debt = createCreditCardDebt(creditCard1, new BigDecimal("500.0"));
 
-        createCreditCardPayment(debt, m_wallet, new BigDecimal("100.0"));
-        createCreditCardPayment(debt, m_wallet, new BigDecimal("200.0"));
+        createCreditCardPayment(debt, wallet, new BigDecimal("100.0"));
+        createCreditCardPayment(debt, wallet, new BigDecimal("200.0"));
 
         assertEquals(
                 300.0,
-                m_creditCardPaymentRepository
-                        .getTotalPaidAmount(m_creditCard1.getId())
-                        .doubleValue(),
+                creditCardPaymentRepository.getTotalPaidAmount(creditCard1.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total paid amount must be 300.0");
     }
@@ -175,26 +167,22 @@ class CreditCardPaymentRepositoryTest {
     @Test
     void testPaymentsForMultipleCreditCards() {
         // Create CreditCardDebt and Payments for both credit cards
-        CreditCardDebt debt1 = createCreditCardDebt(m_creditCard1, new BigDecimal("500.0"));
-        CreditCardDebt debt2 = createCreditCardDebt(m_creditCard2, new BigDecimal("500.0"));
+        CreditCardDebt debt1 = createCreditCardDebt(creditCard1, new BigDecimal("500.0"));
+        CreditCardDebt debt2 = createCreditCardDebt(creditCard2, new BigDecimal("500.0"));
 
-        createCreditCardPayment(debt1, m_wallet, new BigDecimal("100.0"));
-        createCreditCardPayment(debt1, m_wallet, new BigDecimal("200.0"));
-        createCreditCardPayment(debt2, m_wallet, new BigDecimal("255.0"));
+        createCreditCardPayment(debt1, wallet, new BigDecimal("100.0"));
+        createCreditCardPayment(debt1, wallet, new BigDecimal("200.0"));
+        createCreditCardPayment(debt2, wallet, new BigDecimal("255.0"));
 
         assertEquals(
                 300.0,
-                m_creditCardPaymentRepository
-                        .getTotalPaidAmount(m_creditCard1.getId())
-                        .doubleValue(),
+                creditCardPaymentRepository.getTotalPaidAmount(creditCard1.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total paid amount must be 300.0");
 
         assertEquals(
                 255.0,
-                m_creditCardPaymentRepository
-                        .getTotalPaidAmount(m_creditCard2.getId())
-                        .doubleValue(),
+                creditCardPaymentRepository.getTotalPaidAmount(creditCard2.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total paid amount must be 255.0");
     }

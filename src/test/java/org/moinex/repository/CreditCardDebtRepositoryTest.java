@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.moinex.app.MainApplication;
+import org.moinex.app.config.AppConfig;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardDebt;
@@ -33,23 +33,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MainApplication.class})
+@ContextConfiguration(classes = {AppConfig.class})
 @ActiveProfiles("test")
 class CreditCardDebtRepositoryTest {
-    @Autowired private CreditCardDebtRepository m_creditCardDebtRepository;
+    @Autowired private CreditCardDebtRepository creditCardDebtRepository;
 
-    @Autowired private CreditCardRepository m_creditCardRepository;
+    @Autowired private CreditCardRepository creditCardRepository;
 
-    @Autowired private CreditCardOperatorRepository m_creditCardOperatorRepository;
+    @Autowired private CreditCardOperatorRepository creditCardOperatorRepository;
 
-    @Autowired private CategoryRepository m_categoryRepository;
+    @Autowired private CategoryRepository categoryRepository;
 
-    private CreditCard m_creditCard;
-    private CreditCardOperator m_crcOperator;
+    private CreditCard creditCard;
+    private CreditCardOperator creditCardOperator;
 
     private CreditCard createCreditCard(
             String name, CreditCardOperator operator, BigDecimal maxDebt) {
-        CreditCard creditCard =
+        CreditCard ccd =
                 CreditCard.builder()
                         .name(name)
                         .maxDebt(maxDebt)
@@ -58,43 +58,42 @@ class CreditCardDebtRepositoryTest {
                         .operator(operator)
                         .build();
 
-        m_creditCardRepository.save(creditCard);
-        return creditCard;
+        creditCardRepository.save(ccd);
+        return ccd;
     }
 
     private CreditCardOperator createCreditCardOperator(String name) {
-        CreditCardOperator creditCardOperator =
-                CreditCardOperator.builder().name(name).icon("").build();
-        m_creditCardOperatorRepository.save(creditCardOperator);
-        return creditCardOperator;
+        CreditCardOperator ccdOperator = CreditCardOperator.builder().name(name).icon("").build();
+        creditCardOperatorRepository.save(ccdOperator);
+        return ccdOperator;
     }
 
     private Category createCategory(String name) {
         Category category = Category.builder().name(name).build();
-        m_categoryRepository.save(category);
+        categoryRepository.save(category);
         return category;
     }
 
     private CreditCardDebt createCreditCardDebt(
-            CreditCard m_creditCard, BigDecimal totalAmount, LocalDateTime date) {
+            CreditCard creditCard, BigDecimal totalAmount, LocalDateTime date) {
         CreditCardDebt creditCardDebt =
                 CreditCardDebt.builder()
-                        .creditCard(m_creditCard)
+                        .creditCard(creditCard)
                         .installments(1)
                         .amount(totalAmount)
                         .date(date)
                         .category(createCategory("category"))
                         .build();
 
-        m_creditCardDebtRepository.save(creditCardDebt);
+        creditCardDebtRepository.save(creditCardDebt);
         return creditCardDebt;
     }
 
     @BeforeEach
     void setUp() {
         // Initialize the credit card
-        m_crcOperator = createCreditCardOperator("Operator");
-        m_creditCard = createCreditCard("CreditCard", m_crcOperator, new BigDecimal("1000.0"));
+        creditCardOperator = createCreditCardOperator("Operator");
+        creditCard = createCreditCard("CreditCard", creditCardOperator, new BigDecimal("1000.0"));
     }
 
     @Test
@@ -102,7 +101,7 @@ class CreditCardDebtRepositoryTest {
         // No debt yet
         assertEquals(
                 0.0,
-                m_creditCardDebtRepository.getTotalDebt(m_creditCard.getId()).doubleValue(),
+                creditCardDebtRepository.getTotalDebt(creditCard.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total debt must be 0.0");
     }
@@ -110,11 +109,11 @@ class CreditCardDebtRepositoryTest {
     @Test
     void testSingleDebt() {
         createCreditCardDebt(
-                m_creditCard, new BigDecimal("1000.0"), LocalDateTime.now().plusDays(10));
+                creditCard, new BigDecimal("1000.0"), LocalDateTime.now().plusDays(10));
 
         assertEquals(
                 1000.0,
-                m_creditCardDebtRepository.getTotalDebt(m_creditCard.getId()).doubleValue(),
+                creditCardDebtRepository.getTotalDebt(creditCard.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total debt must be 1000.0");
     }
@@ -122,14 +121,13 @@ class CreditCardDebtRepositoryTest {
     @Test
     void testMultipleDebts() {
         createCreditCardDebt(
-                m_creditCard, new BigDecimal("1000.0"), LocalDateTime.now().plusDays(10));
+                creditCard, new BigDecimal("1000.0"), LocalDateTime.now().plusDays(10));
 
-        createCreditCardDebt(
-                m_creditCard, new BigDecimal("500.0"), LocalDateTime.now().plusDays(5));
+        createCreditCardDebt(creditCard, new BigDecimal("500.0"), LocalDateTime.now().plusDays(5));
 
         assertEquals(
                 1500.0,
-                m_creditCardDebtRepository.getTotalDebt(m_creditCard.getId()).doubleValue(),
+                creditCardDebtRepository.getTotalDebt(creditCard.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total debt must be 1500.0");
     }
@@ -137,10 +135,10 @@ class CreditCardDebtRepositoryTest {
     @Test
     void testDebtsForMultipleCreditCards() {
         CreditCard creditCard1 =
-                createCreditCard("CreditCard1", m_crcOperator, new BigDecimal("1000.0"));
+                createCreditCard("CreditCard1", creditCardOperator, new BigDecimal("1000.0"));
 
         CreditCard creditCard2 =
-                createCreditCard("CreditCard2", m_crcOperator, new BigDecimal("2000.0"));
+                createCreditCard("CreditCard2", creditCardOperator, new BigDecimal("2000.0"));
 
         createCreditCardDebt(
                 creditCard1, new BigDecimal("1000.0"), LocalDateTime.now().plusDays(10));
@@ -149,13 +147,13 @@ class CreditCardDebtRepositoryTest {
 
         assertEquals(
                 1000.0,
-                m_creditCardDebtRepository.getTotalDebt(creditCard1.getId()).doubleValue(),
+                creditCardDebtRepository.getTotalDebt(creditCard1.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total debt for CreditCard1 must be 1000.0");
 
         assertEquals(
                 500.0,
-                m_creditCardDebtRepository.getTotalDebt(creditCard2.getId()).doubleValue(),
+                creditCardDebtRepository.getTotalDebt(creditCard2.getId()).doubleValue(),
                 Constants.EPSILON,
                 "Total debt for CreditCard2 must be 500.0");
     }

@@ -61,7 +61,6 @@ import org.springframework.stereotype.Controller;
 public class WalletController {
     private static final Integer ITEMS_PER_PAGE = 3;
     private static final Logger logger = LoggerFactory.getLogger(WalletController.class);
-    @FXML private AnchorPane totalBalanceView;
     @FXML private AnchorPane walletPane1;
     @FXML private AnchorPane walletPane2;
     @FXML private AnchorPane walletPane3;
@@ -69,9 +68,6 @@ public class WalletController {
     @FXML private AnchorPane balanceByWalletTypePieChartAnchorPane;
     @FXML private VBox totalBalanceByWalletTypeVBox;
     @FXML private VBox totalBalancePaneInfoVBox;
-    @FXML private JFXButton totalBalancePaneTransferButton;
-    @FXML private JFXButton totalBalancePaneAddWalletButton;
-    @FXML private JFXButton totalBalancePaneViewArchivedWalletsButton;
     @FXML private JFXButton walletPrevButton;
     @FXML private JFXButton walletNextButton;
     @FXML private ComboBox<String> totalBalancePaneWalletTypeComboBox;

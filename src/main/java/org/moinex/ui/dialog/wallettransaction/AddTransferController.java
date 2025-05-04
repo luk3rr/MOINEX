@@ -72,10 +72,6 @@ public class AddTransferController {
 
     private List<Wallet> wallets;
 
-    private Wallet senderWallet = null;
-
-    private Wallet receiverWallet = null;
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -100,8 +96,7 @@ public class AddTransferController {
             return;
         }
 
-        this.senderWallet = wt;
-        senderWalletComboBox.setValue(senderWallet);
+        senderWalletComboBox.setValue(wt);
         updateSenderWalletBalance();
     }
 
@@ -110,8 +105,7 @@ public class AddTransferController {
             return;
         }
 
-        this.receiverWallet = wt;
-        receiverWalletComboBox.setValue(receiverWallet);
+        receiverWalletComboBox.setValue(wt);
         updateReceiverWalletBalance();
     }
 

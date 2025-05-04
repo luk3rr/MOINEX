@@ -35,8 +35,6 @@ public class RenameWalletController {
 
     private WalletService walletService;
 
-    private Wallet wallet = null;
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -52,8 +50,7 @@ public class RenameWalletController {
             return;
         }
 
-        this.wallet = wt;
-        walletComboBox.setValue(wallet);
+        walletComboBox.setValue(wt);
     }
 
     @FXML

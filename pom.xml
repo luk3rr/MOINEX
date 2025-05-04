@@ -249,7 +249,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <mainClass>org.moinex.app.MainApplication</mainClass>
+                    <mainClass>org.moinex.app.App</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -281,7 +281,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.moinex.app.MainApplication</mainClass>
+                            <mainClass>org.moinex.app.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -311,7 +311,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>org.moinex.app.MainApplication</mainClass>
+                    <mainClass>org.moinex.app.App</mainClass>
                 </configuration>
             </plugin>
             <plugin>

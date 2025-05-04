@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.moinex.app.MainApplication;
+import org.moinex.app.config.AppConfig;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -36,23 +36,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MainApplication.class})
+@ContextConfiguration(classes = {AppConfig.class})
 @ActiveProfiles("test")
 class WalletTransactionRepositoryTest {
-    @Autowired private WalletTransactionRepository m_walletTransactionRepository;
+    @Autowired private WalletTransactionRepository walletTransactionRepository;
 
-    @Autowired private WalletRepository m_walletRepository;
+    @Autowired private WalletRepository walletRepository;
 
-    @Autowired private CategoryRepository m_categoryRepository;
+    @Autowired private CategoryRepository categoryRepository;
 
-    private Wallet m_wallet1;
+    private Wallet wallet1;
 
-    private Wallet m_wallet2;
+    private Wallet wallet2;
 
     private Category createCategory(String name) {
         Category category = Category.builder().name(name).build();
-        m_categoryRepository.save(category);
-        m_categoryRepository.flush();
+        categoryRepository.save(category);
+        categoryRepository.flush();
         return category;
     }
 
@@ -68,22 +68,22 @@ class WalletTransactionRepositoryTest {
                         .category(createCategory("Category"))
                         .build();
 
-        m_walletTransactionRepository.save(walletTransaction);
-        m_walletTransactionRepository.flush();
+        walletTransactionRepository.save(walletTransaction);
+        walletTransactionRepository.flush();
         return walletTransaction;
     }
 
     private Wallet createWallet(String name, BigDecimal balance) {
         Wallet wallet = Wallet.builder().name(name).balance(balance).build();
-        m_walletRepository.save(wallet);
-        m_walletRepository.flush();
+        walletRepository.save(wallet);
+        walletRepository.flush();
         return wallet;
     }
 
     @BeforeEach
     void setUp() {
-        m_wallet1 = createWallet("Wallet1", new BigDecimal("1000.0"));
-        m_wallet2 = createWallet("Wallet2", new BigDecimal("2000.0"));
+        wallet1 = createWallet("Wallet1", new BigDecimal("1000.0"));
+        wallet2 = createWallet("Wallet2", new BigDecimal("2000.0"));
     }
 
     @Test
@@ -91,25 +91,23 @@ class WalletTransactionRepositoryTest {
     void testGetLastTransactions() {
         // Create the wallet transactions
         WalletTransaction walletTransaction1 =
-                createWalletTransaction(m_wallet1, new BigDecimal("140.0"), LocalDateTime.now());
+                createWalletTransaction(wallet1, new BigDecimal("140.0"), LocalDateTime.now());
         WalletTransaction walletTransaction2 =
                 createWalletTransaction(
-                        m_wallet1, new BigDecimal("210.0"), LocalDateTime.now().minusDays(1));
+                        wallet1, new BigDecimal("210.0"), LocalDateTime.now().minusDays(1));
 
         WalletTransaction walletTransaction3 =
                 createWalletTransaction(
-                        m_wallet1, new BigDecimal("300.0"), LocalDateTime.now().minusDays(2));
+                        wallet1, new BigDecimal("300.0"), LocalDateTime.now().minusDays(2));
 
-        createWalletTransaction(
-                m_wallet1, new BigDecimal("300.0"), LocalDateTime.now().minusDays(3));
+        createWalletTransaction(wallet1, new BigDecimal("300.0"), LocalDateTime.now().minusDays(3));
 
         // Request the last 3 transactions
         Pageable request = PageRequest.ofSize(3);
 
         // Get the last transactions in the wallet by date
         List<WalletTransaction> lastTransactions =
-                m_walletTransactionRepository.findLastTransactionsByWallet(
-                        m_wallet1.getId(), request);
+                walletTransactionRepository.findLastTransactionsByWallet(wallet1.getId(), request);
 
         // Check if the last transactions are correct
         assertEquals(3, lastTransactions.size());
@@ -130,8 +128,7 @@ class WalletTransactionRepositoryTest {
 
         // Get the last transactions in the wallet by date
         List<WalletTransaction> lastTransactions =
-                m_walletTransactionRepository.findLastTransactionsByWallet(
-                        m_wallet1.getId(), request);
+                walletTransactionRepository.findLastTransactionsByWallet(wallet1.getId(), request);
 
         // Check if the last transactions are correct
         assertEquals(0, lastTransactions.size());
@@ -142,24 +139,23 @@ class WalletTransactionRepositoryTest {
     void testGetLastTransactionsAllWallets() {
         // Create the wallet transactions
         WalletTransaction walletTransaction1 =
-                createWalletTransaction(m_wallet1, new BigDecimal("140.0"), LocalDateTime.now());
+                createWalletTransaction(wallet1, new BigDecimal("140.0"), LocalDateTime.now());
         WalletTransaction walletTransaction2 =
                 createWalletTransaction(
-                        m_wallet1, new BigDecimal("210.0"), LocalDateTime.now().minusDays(1));
+                        wallet1, new BigDecimal("210.0"), LocalDateTime.now().minusDays(1));
 
         WalletTransaction walletTransaction3 =
                 createWalletTransaction(
-                        m_wallet2, new BigDecimal("300.0"), LocalDateTime.now().minusDays(2));
+                        wallet2, new BigDecimal("300.0"), LocalDateTime.now().minusDays(2));
 
-        createWalletTransaction(
-                m_wallet2, new BigDecimal("300.0"), LocalDateTime.now().minusDays(3));
+        createWalletTransaction(wallet2, new BigDecimal("300.0"), LocalDateTime.now().minusDays(3));
 
         // Request the last 3 transactions
         Pageable request = PageRequest.ofSize(3);
 
         // Get the last transactions in the wallet by date
         List<WalletTransaction> lastTransactions =
-                m_walletTransactionRepository.findLastTransactions(request);
+                walletTransactionRepository.findLastTransactions(request);
 
         // Check if the last transactions are correct
         assertEquals(3, lastTransactions.size());

@@ -40,6 +40,7 @@ import org.moinex.ui.dialog.wallettransaction.AddTransferController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.GoalStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -381,14 +382,17 @@ public class GoalController {
     private Stream<Goal> filterGoalsByStatus(String selectedGoalStatus) {
         return goals.stream()
                 .filter(
-                        g ->
-                                switch (selectedGoalStatus) {
-                                    case "ALL" -> true;
-                                    case "COMPLETED" -> g.isCompleted() && !g.isArchived();
-                                    case "ACTIVE" -> !g.isCompleted() && !g.isArchived();
-                                    case "ARCHIVED" -> g.isArchived();
-                                    default -> false;
-                                });
+                        g -> {
+                            if ("ALL".equals(selectedGoalStatus)) {
+                                return true;
+                            }
+                            GoalStatus status = GoalStatus.valueOf(selectedGoalStatus);
+                            return switch (status) {
+                                case COMPLETED -> g.isCompleted() && !g.isArchived();
+                                case ACTIVE -> !g.isCompleted() && !g.isArchived();
+                                case ARCHIVED -> g.isArchived();
+                            };
+                        });
     }
 
     private void updateGoalTableView() {

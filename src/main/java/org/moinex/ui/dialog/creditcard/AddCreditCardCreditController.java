@@ -60,8 +60,6 @@ public class AddCreditCardCreditController {
 
     private CalculatorService calculatorService;
 
-    private CreditCard creditCard = null;
-
     @Autowired
     public AddCreditCardCreditController(
             CreditCardService creditCardService,
@@ -77,8 +75,7 @@ public class AddCreditCardCreditController {
             return;
         }
 
-        this.creditCard = crc;
-        crcComboBox.setValue(creditCard);
+        crcComboBox.setValue(crc);
     }
 
     @FXML

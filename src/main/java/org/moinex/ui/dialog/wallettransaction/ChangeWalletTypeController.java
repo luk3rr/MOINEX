@@ -41,8 +41,6 @@ public class ChangeWalletTypeController {
 
     private WalletService walletService;
 
-    private Wallet wallet = null;
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -58,9 +56,8 @@ public class ChangeWalletTypeController {
             return;
         }
 
-        this.wallet = wt;
-        walletComboBox.setValue(wallet);
-        updateCurrentTypeLabel(wallet);
+        walletComboBox.setValue(wt);
+        updateCurrentTypeLabel(wt);
     }
 
     @FXML

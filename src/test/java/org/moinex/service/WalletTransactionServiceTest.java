@@ -33,55 +33,42 @@ import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
-import org.moinex.repository.CategoryRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
-import org.moinex.repository.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.enums.TransactionStatus;
 import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class WalletTransactionServiceTest {
-    @Mock private WalletRepository m_walletRepository;
+    @Mock private WalletRepository walletRepository;
 
-    @Mock private WalletTypeRepository m_walletTypeRepository;
+    @Mock private TransferRepository transferRepository;
 
-    @Mock private TransferRepository m_transferRepository;
+    @Mock private WalletTransactionRepository walletTransactionRepository;
 
-    @Mock private CategoryRepository m_categoryRepository;
+    @InjectMocks private WalletTransactionService walletTransactionService;
 
-    @Mock private WalletTransactionRepository m_walletTransactionRepository;
-
-    @InjectMocks private WalletTransactionService m_walletTransactionService;
-
-    private Wallet m_wallet1;
-    private Wallet m_wallet2;
-    private Transfer m_transfer;
-    private WalletTransaction m_wallet1IncomeTransaction;
-    private WalletTransaction m_wallet1ExpenseTransaction;
-    private Category m_category;
-    private LocalDateTime m_date;
-    private BigDecimal m_incomeAmount;
-    private BigDecimal m_expenseAmount;
-    private BigDecimal m_transferAmount;
-    private String m_description = "";
+    private Wallet wallet1;
+    private Wallet wallet2;
+    private Transfer transfer;
+    private WalletTransaction wallet1IncomeTransaction;
+    private WalletTransaction wallet1ExpenseTransaction;
+    private Category category;
+    private LocalDateTime date;
+    private BigDecimal incomeAmount;
+    private BigDecimal expenseAmount;
+    private BigDecimal transferAmount;
+    private final String description = "";
 
     private Wallet createWallet(Long id, String name, BigDecimal balance) {
-        Wallet wallet = new Wallet(id, name, balance);
-        return wallet;
+        return new Wallet(id, name, balance);
     }
 
     private Transfer createTransfer(
-            Long id,
-            Wallet sender,
-            Wallet receiver,
-            LocalDateTime date,
-            BigDecimal amount,
-            String description) {
-        Transfer transfer = new Transfer(id, sender, receiver, date, amount, description);
-        return transfer;
+            Long id, Wallet sender, Wallet receiver, LocalDateTime date, BigDecimal amount) {
+        return new Transfer(id, sender, receiver, date, amount, "");
     }
 
     private WalletTransaction createWalletTransaction(
@@ -90,20 +77,16 @@ class WalletTransactionServiceTest {
             TransactionType type,
             TransactionStatus status,
             LocalDateTime date,
-            BigDecimal amount,
-            String description) {
-        WalletTransaction walletTransaction =
-                WalletTransaction.builder()
-                        .wallet(wallet)
-                        .category(category)
-                        .type(type)
-                        .status(status)
-                        .date(date)
-                        .amount(amount)
-                        .description(description)
-                        .build();
-
-        return walletTransaction;
+            BigDecimal amount) {
+        return WalletTransaction.builder()
+                .wallet(wallet)
+                .category(category)
+                .type(type)
+                .status(status)
+                .date(date)
+                .amount(amount)
+                .description("")
+                .build();
     }
 
     @BeforeAll
@@ -113,86 +96,83 @@ class WalletTransactionServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        m_incomeAmount = new BigDecimal("500");
-        m_expenseAmount = new BigDecimal("200");
-        m_transferAmount = new BigDecimal("125.5");
+        incomeAmount = new BigDecimal("500");
+        expenseAmount = new BigDecimal("200");
+        transferAmount = new BigDecimal("125.5");
 
-        m_date = LocalDateTime.now();
-        m_category = Category.builder().name("Category").build();
+        date = LocalDateTime.now();
+        category = Category.builder().name("Category").build();
 
-        m_wallet1 = createWallet(1L, "Wallet1", new BigDecimal("1000"));
-        m_wallet2 = createWallet(2L, "Wallet2", new BigDecimal("2000"));
+        wallet1 = createWallet(1L, "Wallet1", new BigDecimal("1000"));
+        wallet2 = createWallet(2L, "Wallet2", new BigDecimal("2000"));
 
-        m_transfer =
-                createTransfer(1L, m_wallet1, m_wallet2, m_date, m_transferAmount, m_description);
+        transfer = createTransfer(1L, wallet1, wallet2, date, transferAmount);
 
-        m_wallet1IncomeTransaction =
+        wallet1IncomeTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.INCOME,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        m_incomeAmount,
-                        m_description);
+                        date,
+                        incomeAmount);
 
-        m_wallet1ExpenseTransaction =
+        wallet1ExpenseTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.EXPENSE,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        m_expenseAmount,
-                        m_description);
+                        date,
+                        expenseAmount);
     }
 
     @Test
     @DisplayName("Test if the money transfer is successful")
     void testTransferMoneySuccess() {
-        BigDecimal m_senderPreviousBalance = m_wallet1.getBalance();
-        BigDecimal m_receiverPreviousBalance = m_wallet2.getBalance();
+        BigDecimal senderPreviousBalance = wallet1.getBalance();
+        BigDecimal receiverPreviousBalance = wallet2.getBalance();
 
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.of(m_wallet1));
-        when(m_walletRepository.findById(m_wallet2.getId())).thenReturn(Optional.of(m_wallet2));
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+        when(walletRepository.findById(wallet2.getId())).thenReturn(Optional.of(wallet2));
 
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
-        when(m_walletRepository.save(m_wallet2)).thenReturn(m_wallet2);
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
+        when(walletRepository.save(wallet2)).thenReturn(wallet2);
 
-        when(m_transferRepository.save(any(Transfer.class))).thenReturn(m_transfer);
+        when(transferRepository.save(any(Transfer.class))).thenReturn(transfer);
 
-        m_walletTransactionService.transferMoney(
-                m_wallet1.getId(),
-                m_wallet2.getId(),
-                m_transfer.getDate(),
-                m_transfer.getAmount(),
-                m_transfer.getDescription());
+        walletTransactionService.transferMoney(
+                wallet1.getId(),
+                wallet2.getId(),
+                transfer.getDate(),
+                transfer.getAmount(),
+                transfer.getDescription());
 
         // Check if the sender and receiver balances were updated
-        verify(m_walletRepository).findById(m_wallet1.getId());
-        verify(m_walletRepository).findById(m_wallet2.getId());
-        verify(m_walletRepository).save(m_wallet1);
-        verify(m_walletRepository).save(m_wallet2);
+        verify(walletRepository).findById(wallet1.getId());
+        verify(walletRepository).findById(wallet2.getId());
+        verify(walletRepository).save(wallet1);
+        verify(walletRepository).save(wallet2);
 
         assertEquals(
-                m_senderPreviousBalance.subtract(m_transferAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                senderPreviousBalance.subtract(transferAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         assertEquals(
-                m_receiverPreviousBalance.add(m_transferAmount).doubleValue(),
-                m_wallet2.getBalance().doubleValue(),
+                receiverPreviousBalance.add(transferAmount).doubleValue(),
+                wallet2.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         // Check if the transfer was saved
         ArgumentCaptor<Transfer> transferCaptor = ArgumentCaptor.forClass(Transfer.class);
 
-        verify(m_transferRepository).save(transferCaptor.capture());
+        verify(transferRepository).save(transferCaptor.capture());
 
-        assertEquals(m_wallet1, transferCaptor.getValue().getSenderWallet());
-        assertEquals(m_wallet2, transferCaptor.getValue().getReceiverWallet());
+        assertEquals(wallet1, transferCaptor.getValue().getSenderWallet());
+        assertEquals(wallet2, transferCaptor.getValue().getReceiverWallet());
         assertEquals(
-                m_transferAmount.doubleValue(),
+                transferAmount.doubleValue(),
                 transferCaptor.getValue().getAmount().doubleValue(),
                 Constants.EPSILON);
     }
@@ -200,42 +180,49 @@ class WalletTransactionServiceTest {
     @Test
     @DisplayName("Test if exception is thrown when the sender wallet does not exist")
     void testTransferMoneySenderDoesNotExist() {
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.empty());
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
+
+        Long senderWalletId = wallet1.getId();
+        Long receiverWalletId = wallet2.getId();
+        BigDecimal amountToTransfer = transferAmount;
 
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_walletTransactionService.transferMoney(
-                                m_wallet1.getId(),
-                                m_wallet2.getId(),
-                                m_date,
-                                m_transferAmount,
-                                m_description));
+                        walletTransactionService.transferMoney(
+                                senderWalletId,
+                                receiverWalletId,
+                                date,
+                                amountToTransfer,
+                                description));
 
         // Verify that the transfer was not saved
-        verify(m_transferRepository, never()).save(any(Transfer.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the receiver wallet does not exist")
     void testTransferMoneyReceiverDoesNotExist() {
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.of(m_wallet1));
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
 
-        when(m_walletRepository.findById(m_wallet2.getId())).thenReturn(Optional.empty());
+        when(walletRepository.findById(wallet2.getId())).thenReturn(Optional.empty());
+
+        Long senderWalletId = wallet1.getId();
+        Long receiverWalletId = wallet2.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_walletTransactionService.transferMoney(
-                                m_wallet1.getId(),
-                                m_wallet2.getId(),
-                                m_date,
-                                m_transferAmount,
-                                m_description),
+                        walletTransactionService.transferMoney(
+                                senderWalletId,
+                                receiverWalletId,
+                                date,
+                                transferAmount,
+                                description),
                 "Receiver wallet does not exist");
 
         // Verify that the transfer was not saved
-        verify(m_transferRepository, never()).save(any(Transfer.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
     }
 
     @Test
@@ -244,15 +231,15 @@ class WalletTransactionServiceTest {
         assertThrows(
                 MoinexException.SameSourceDestinationException.class,
                 () ->
-                        m_walletTransactionService.transferMoney(
-                                m_wallet1.getId(),
-                                m_wallet1.getId(),
-                                m_date,
-                                m_transferAmount,
-                                m_description));
+                        walletTransactionService.transferMoney(
+                                wallet1.getId(),
+                                wallet1.getId(),
+                                date,
+                                transferAmount,
+                                description));
 
         // Verify that the transfer was not saved
-        verify(m_transferRepository, never()).save(any(Transfer.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
     }
 
     @Test
@@ -260,88 +247,88 @@ class WalletTransactionServiceTest {
             "Test if exception is thrown when the amount to transfer is less "
                     + "than or equal to zero")
     void testTransferMoneyAmountZero() {
+        Long senderWalletId = wallet1.getId();
+        Long receiverWalletId = wallet2.getId();
+        BigDecimal zeroAmount = new BigDecimal("0.0");
+
         assertThrows(
                 IllegalArgumentException.class,
                 () ->
-                        m_walletTransactionService.transferMoney(
-                                m_wallet1.getId(),
-                                m_wallet2.getId(),
-                                m_date,
-                                new BigDecimal("0.0"),
-                                m_description));
+                        walletTransactionService.transferMoney(
+                                senderWalletId, receiverWalletId, date, zeroAmount, description));
 
         // Verify that the transfer was not saved
-        verify(m_transferRepository, never()).save(any(Transfer.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
     }
 
     @Test
     @DisplayName("Test if the confirmed income is added successfully")
     void testAddConfirmedIncome() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.of(m_wallet1));
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(
                         WalletTransaction.builder()
-                                .wallet(m_wallet1)
-                                .category(m_category)
+                                .wallet(wallet1)
+                                .category(category)
                                 .type(TransactionType.INCOME)
                                 .status(TransactionStatus.CONFIRMED)
-                                .date(m_date)
-                                .amount(m_incomeAmount)
-                                .description(m_description)
+                                .date(date)
+                                .amount(incomeAmount)
+                                .description(description)
                                 .build());
 
-        m_walletTransactionService.addIncome(
-                m_wallet1.getId(),
-                m_category,
-                m_date,
-                m_incomeAmount,
-                m_description,
+        walletTransactionService.addIncome(
+                wallet1.getId(),
+                category,
+                date,
+                incomeAmount,
+                description,
                 TransactionStatus.CONFIRMED);
 
         // Check if the wallet balance was updated
-        verify(m_walletRepository).save(m_wallet1);
+        verify(walletRepository).save(wallet1);
         assertEquals(
-                previousBalance.add(m_incomeAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                previousBalance.add(incomeAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the pending income is added successfully")
     void testAddPendingIncome() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.of(m_wallet1));
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(
                         WalletTransaction.builder()
-                                .wallet(m_wallet1)
-                                .category(m_category)
+                                .wallet(wallet1)
+                                .category(category)
                                 .type(TransactionType.INCOME)
                                 .status(TransactionStatus.PENDING)
-                                .date(m_date)
-                                .amount(m_incomeAmount)
-                                .description(m_description)
+                                .date(date)
+                                .amount(incomeAmount)
+                                .description(description)
                                 .build());
 
-        m_walletTransactionService.addIncome(
-                m_wallet1.getId(),
-                m_category,
-                m_date,
-                m_incomeAmount,
-                m_description,
+        walletTransactionService.addIncome(
+                wallet1.getId(),
+                category,
+                date,
+                incomeAmount,
+                description,
                 TransactionStatus.PENDING);
 
         // Check if the wallet balance is the same
-        verify(m_walletRepository, never()).save(any(Wallet.class));
+        verify(walletRepository, never()).save(any(Wallet.class));
         assertEquals(
                 previousBalance.doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
@@ -349,104 +336,106 @@ class WalletTransactionServiceTest {
     @DisplayName(
             "Test if exception is thrown when the wallet to receive the income " + "does not exist")
     void testAddIncomeWalletDoesNotExist() {
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.empty());
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
+
+        Long walletId = wallet1.getId();
 
         // Check for confirmed income
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_walletTransactionService.addIncome(
-                                m_wallet1.getId(),
-                                m_category,
-                                m_date,
-                                m_incomeAmount,
-                                m_description,
+                        walletTransactionService.addIncome(
+                                walletId,
+                                category,
+                                date,
+                                incomeAmount,
+                                description,
                                 TransactionStatus.CONFIRMED));
 
         // Check for pending income
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_walletTransactionService.addIncome(
-                                m_wallet1.getId(),
-                                m_category,
-                                m_date,
-                                m_incomeAmount,
-                                m_description,
+                        walletTransactionService.addIncome(
+                                walletId,
+                                category,
+                                date,
+                                incomeAmount,
+                                description,
                                 TransactionStatus.PENDING));
 
         // Verify that the income was not added
-        verify(m_walletTransactionRepository, never()).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
     }
 
     @Test
     @DisplayName("Test if the confirmed expense is added successfully")
     void testAddConfirmedExpense() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.of(m_wallet1));
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(
                         WalletTransaction.builder()
-                                .wallet(m_wallet1)
-                                .category(m_category)
+                                .wallet(wallet1)
+                                .category(category)
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.CONFIRMED)
-                                .date(m_date)
-                                .amount(m_expenseAmount)
-                                .description(m_description)
+                                .date(date)
+                                .amount(expenseAmount)
+                                .description(description)
                                 .build());
 
-        m_walletTransactionService.addExpense(
-                m_wallet1.getId(),
-                m_category,
-                m_date,
-                m_expenseAmount,
-                m_description,
+        walletTransactionService.addExpense(
+                wallet1.getId(),
+                category,
+                date,
+                expenseAmount,
+                description,
                 TransactionStatus.CONFIRMED);
 
         // Check if the wallet balance was updated
-        verify(m_walletRepository).save(m_wallet1);
+        verify(walletRepository).save(wallet1);
         assertEquals(
-                previousBalance.subtract(m_expenseAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                previousBalance.subtract(expenseAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the pending expense is added successfully")
     void testAddPendingExpense() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.of(m_wallet1));
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(
                         WalletTransaction.builder()
-                                .wallet(m_wallet1)
-                                .category(m_category)
+                                .wallet(wallet1)
+                                .category(category)
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.PENDING)
-                                .date(m_date)
-                                .amount(m_expenseAmount)
-                                .description(m_description)
+                                .date(date)
+                                .amount(expenseAmount)
+                                .description(description)
                                 .build());
 
-        m_walletTransactionService.addExpense(
-                m_wallet1.getId(),
-                m_category,
-                m_date,
-                m_expenseAmount,
-                m_description,
+        walletTransactionService.addExpense(
+                wallet1.getId(),
+                category,
+                date,
+                expenseAmount,
+                description,
                 TransactionStatus.PENDING);
 
         // Check if the wallet balance is the same
-        verify(m_walletRepository, never()).save(m_wallet1);
+        verify(walletRepository, never()).save(wallet1);
         assertEquals(
                 previousBalance.doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
@@ -455,34 +444,36 @@ class WalletTransactionServiceTest {
             "Test if exception is thrown when the wallet to receive the expense "
                     + "does not exist")
     void testAddExpenseWalletDoesNotExist() {
-        when(m_walletRepository.findById(m_wallet1.getId())).thenReturn(Optional.empty());
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
+
+        Long walletId = wallet1.getId();
 
         // Check for confirmed expense
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_walletTransactionService.addExpense(
-                                m_wallet1.getId(),
-                                m_category,
-                                m_date,
-                                m_expenseAmount,
-                                m_description,
+                        walletTransactionService.addExpense(
+                                walletId,
+                                category,
+                                date,
+                                expenseAmount,
+                                description,
                                 TransactionStatus.CONFIRMED));
 
         // Check for pending expense
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
-                        m_walletTransactionService.addExpense(
-                                m_wallet1.getId(),
-                                m_category,
-                                m_date,
-                                m_expenseAmount,
-                                m_description,
+                        walletTransactionService.addExpense(
+                                walletId,
+                                category,
+                                date,
+                                expenseAmount,
+                                description,
                                 TransactionStatus.PENDING));
 
         // Verify that the expense was not added
-        verify(m_walletTransactionRepository, never()).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
     }
 
     @Test
@@ -491,44 +482,43 @@ class WalletTransactionServiceTest {
                     + "wallet balance is updated correctly")
     void testChangeTransactionTypeFromExpenseToIncome() {
         // Setup previous state
-        BigDecimal oldBalance = m_wallet1.getBalance();
-        BigDecimal expenseAmount = m_wallet1ExpenseTransaction.getAmount();
+        BigDecimal oldBalance = wallet1.getBalance();
+        BigDecimal expenseTransactionAmount = wallet1ExpenseTransaction.getAmount();
         BigDecimal newIncomeAmount = new BigDecimal("300.0");
 
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.INCOME,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        newIncomeAmount,
-                        m_description);
+                        date,
+                        newIncomeAmount);
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(updatedTransaction);
 
-        m_walletTransactionService.updateTransaction(updatedTransaction);
+        walletTransactionService.updateTransaction(updatedTransaction);
 
         // Verify that the old expense was reverted and new income was applied
         assertEquals(
-                oldBalance.add(expenseAmount).add(newIncomeAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                oldBalance.add(expenseTransactionAmount).add(newIncomeAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1ExpenseTransaction.getId());
-        verify(m_walletRepository, times(2)).save(m_wallet1);
-        verify(m_walletTransactionRepository, times(3)).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1ExpenseTransaction.getId());
+        verify(walletRepository, times(2)).save(wallet1);
+        verify(walletTransactionRepository, times(3)).save(any(WalletTransaction.class));
     }
 
     @Test
@@ -536,93 +526,91 @@ class WalletTransactionServiceTest {
             "Test if transaction status is changed from CONFIRMED to PENDING "
                     + "and balance is reverted")
     void testChangeTransactionStatusFromConfirmedToPending() {
-        BigDecimal oldBalance = m_wallet1.getBalance();
+        BigDecimal oldBalance = wallet1.getBalance();
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.EXPENSE,
                         TransactionStatus.PENDING,
-                        m_date,
-                        m_expenseAmount,
-                        m_description);
+                        date,
+                        expenseAmount);
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(updatedTransaction);
 
-        m_walletTransactionService.updateTransaction(updatedTransaction);
+        walletTransactionService.updateTransaction(updatedTransaction);
 
         // Verify that the balance was reverted for the expense
         assertEquals(
-                oldBalance.add(m_expenseAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                oldBalance.add(expenseAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1ExpenseTransaction.getId());
-        verify(m_walletRepository).save(m_wallet1);
-        verify(m_walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1ExpenseTransaction.getId());
+        verify(walletRepository).save(wallet1);
+        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
     }
 
     @Test
     @DisplayName("Test if the wallet is changed and transaction is applied to the new wallet")
     void testChangeTransactionWallet() {
-        BigDecimal oldWallet1Balance = m_wallet1.getBalance();
-        BigDecimal oldWallet2Balance = m_wallet2.getBalance();
-        BigDecimal amount = m_wallet1IncomeTransaction.getAmount();
+        BigDecimal oldWallet1Balance = wallet1.getBalance();
+        BigDecimal oldWallet2Balance = wallet2.getBalance();
+        BigDecimal amount = wallet1IncomeTransaction.getAmount();
 
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet2,
-                        m_category,
+                        wallet2,
+                        category,
                         TransactionType.INCOME,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        amount,
-                        m_description);
+                        date,
+                        amount);
 
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1IncomeTransaction));
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
+                .thenReturn(Optional.of(wallet1IncomeTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletRepository.save(m_wallet2)).thenReturn(m_wallet2);
+        when(walletRepository.save(wallet2)).thenReturn(wallet2);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(updatedTransaction);
 
-        m_walletTransactionService.updateTransaction(updatedTransaction);
+        walletTransactionService.updateTransaction(updatedTransaction);
 
         // Verify that the amount was reverted from the old wallet and added to the new
         // wallet
         assertEquals(
                 oldWallet1Balance.subtract(amount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         assertEquals(
                 oldWallet2Balance.add(amount).doubleValue(),
-                m_wallet2.getBalance().doubleValue(),
+                wallet2.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1IncomeTransaction.getId());
-        verify(m_walletRepository).save(m_wallet1);
-        verify(m_walletRepository).save(m_wallet2);
-        verify(m_walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1IncomeTransaction.getId());
+        verify(walletRepository).save(wallet1);
+        verify(walletRepository).save(wallet2);
+        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
     }
 
     @Test
@@ -630,45 +618,44 @@ class WalletTransactionServiceTest {
             "Test if transaction amount is increased and wallet balance is " + "updated correctly")
     void testIncreaseTransactionAmount() {
         // Setup previous state
-        BigDecimal oldBalance = m_wallet1.getBalance();
-        BigDecimal oldAmount = m_wallet1ExpenseTransaction.getAmount();
+        BigDecimal oldBalance = wallet1.getBalance();
+        BigDecimal oldAmount = wallet1ExpenseTransaction.getAmount();
         BigDecimal newAmount = oldAmount.add(new BigDecimal("100.0"));
 
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.EXPENSE,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        newAmount,
-                        m_description);
+                        date,
+                        newAmount);
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(updatedTransaction);
 
-        m_walletTransactionService.updateTransaction(updatedTransaction);
+        walletTransactionService.updateTransaction(updatedTransaction);
 
         // Verify that the old amount was reverted and new amount was applied
         BigDecimal expectedBalance = oldBalance.add(oldAmount).subtract(newAmount);
         assertEquals(
                 expectedBalance.doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1ExpenseTransaction.getId());
-        verify(m_walletRepository, times(1)).save(m_wallet1);
-        verify(m_walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1ExpenseTransaction.getId());
+        verify(walletRepository, times(1)).save(wallet1);
+        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
     }
 
     @Test
@@ -676,84 +663,83 @@ class WalletTransactionServiceTest {
             "Test if transaction amount is decreased and wallet balance is " + "updated correctly")
     void testDecreaseTransactionAmount() {
         // Setup previous state
-        BigDecimal oldBalance = m_wallet1.getBalance();
-        BigDecimal oldAmount = m_wallet1ExpenseTransaction.getAmount();
+        BigDecimal oldBalance = wallet1.getBalance();
+        BigDecimal oldAmount = wallet1ExpenseTransaction.getAmount();
         BigDecimal newAmount = oldAmount.subtract(new BigDecimal("100.0"));
 
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.EXPENSE,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        newAmount,
-                        m_description);
+                        date,
+                        newAmount);
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
-        when(m_walletRepository.save(m_wallet1)).thenReturn(m_wallet1);
+        when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(updatedTransaction);
 
-        m_walletTransactionService.updateTransaction(updatedTransaction);
+        walletTransactionService.updateTransaction(updatedTransaction);
 
         // Verify that the old amount was reverted and new amount was applied
         BigDecimal expectedBalance = oldBalance.add(oldAmount).subtract(newAmount);
         assertEquals(
                 expectedBalance.doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1ExpenseTransaction.getId());
-        verify(m_walletRepository, times(1)).save(m_wallet1);
-        verify(m_walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1ExpenseTransaction.getId());
+        verify(walletRepository, times(1)).save(wallet1);
+        verify(walletTransactionRepository, times(2)).save(any(WalletTransaction.class));
     }
 
     @Test
     @DisplayName("Test if transaction amount remains the same and wallet balance is unaffected")
     void testChangeTransactionAmountWithNoChange() {
         // Setup previous state
-        BigDecimal oldBalance = m_wallet1.getBalance();
-        BigDecimal oldAmount = m_wallet1ExpenseTransaction.getAmount();
+        BigDecimal oldBalance = wallet1.getBalance();
+        BigDecimal oldAmount = wallet1ExpenseTransaction.getAmount();
 
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.EXPENSE,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        oldAmount, // Same amount as before
-                        m_description);
+                        date,
+                        oldAmount // Same amount as before
+                        );
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
-        when(m_walletTransactionRepository.save(any(WalletTransaction.class)))
+        when(walletTransactionRepository.save(any(WalletTransaction.class)))
                 .thenReturn(updatedTransaction);
 
-        m_walletTransactionService.updateTransaction(updatedTransaction);
+        walletTransactionService.updateTransaction(updatedTransaction);
 
         // Verify that the balance is unaffected
         assertEquals(
-                oldBalance.doubleValue(), m_wallet1.getBalance().doubleValue(), Constants.EPSILON);
+                oldBalance.doubleValue(), wallet1.getBalance().doubleValue(), Constants.EPSILON);
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1ExpenseTransaction.getId());
-        verify(m_walletRepository, never()).save(m_wallet1); // No save on wallet since no change
-        verify(m_walletTransactionRepository).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1ExpenseTransaction.getId());
+        verify(walletRepository, never()).save(wallet1); // No save on wallet since no change
+        verify(walletTransactionRepository).save(any(WalletTransaction.class));
     }
 
     @Test
@@ -763,29 +749,28 @@ class WalletTransactionServiceTest {
 
         WalletTransaction updatedTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.EXPENSE,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        invalidAmount,
-                        m_description);
+                        date,
+                        invalidAmount);
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        when(m_walletTransactionRepository.existsWalletByTransactionId(
-                        m_wallet1ExpenseTransaction.getId()))
+        when(walletTransactionRepository.existsWalletByTransactionId(
+                        wallet1ExpenseTransaction.getId()))
                 .thenReturn(true);
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> m_walletTransactionService.updateTransaction(updatedTransaction));
+                () -> walletTransactionService.updateTransaction(updatedTransaction));
 
         // Verify repository interactions
-        verify(m_walletTransactionRepository).findById(m_wallet1ExpenseTransaction.getId());
-        verify(m_walletRepository, never()).save(m_wallet1);
-        verify(m_walletTransactionRepository, never()).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository).findById(wallet1ExpenseTransaction.getId());
+        verify(walletRepository, never()).save(wallet1);
+        verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
     }
 
     @Test
@@ -793,203 +778,202 @@ class WalletTransactionServiceTest {
     void testUpdateNonExistentTransaction() {
         WalletTransaction nonExistentTransaction =
                 createWalletTransaction(
-                        m_wallet1,
-                        m_category,
+                        wallet1,
+                        category,
                         TransactionType.INCOME,
                         TransactionStatus.CONFIRMED,
-                        m_date,
-                        m_incomeAmount,
-                        m_description);
+                        date,
+                        incomeAmount);
 
-        when(m_walletTransactionRepository.findById(nonExistentTransaction.getId()))
+        when(walletTransactionRepository.findById(nonExistentTransaction.getId()))
                 .thenReturn(Optional.empty());
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> m_walletTransactionService.updateTransaction(nonExistentTransaction),
+                () -> walletTransactionService.updateTransaction(nonExistentTransaction),
                 "Transaction with id " + nonExistentTransaction.getId() + " not found");
 
-        verify(m_walletTransactionRepository, never()).save(any(WalletTransaction.class));
+        verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
     }
 
     @Test
     @DisplayName("Test if the confirmed expense is deleted successfully")
     void testDeleteConfirmedExpense() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        m_walletTransactionService.deleteTransaction(m_wallet1ExpenseTransaction.getId());
+        walletTransactionService.deleteTransaction(wallet1ExpenseTransaction.getId());
 
         // Check if the transaction was deleted
-        verify(m_walletTransactionRepository).delete(m_wallet1ExpenseTransaction);
+        verify(walletTransactionRepository).delete(wallet1ExpenseTransaction);
 
         // Check if the wallet balance was updated
-        verify(m_walletRepository).save(m_wallet1);
+        verify(walletRepository).save(wallet1);
 
         assertEquals(
-                previousBalance.add(m_expenseAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                previousBalance.add(expenseAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the pending expense is deleted successfully")
     void testDeletePendingExpense() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
-        m_wallet1ExpenseTransaction.setStatus(TransactionStatus.PENDING);
+        BigDecimal previousBalance = wallet1.getBalance();
+        wallet1ExpenseTransaction.setStatus(TransactionStatus.PENDING);
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        m_walletTransactionService.deleteTransaction(m_wallet1ExpenseTransaction.getId());
+        walletTransactionService.deleteTransaction(wallet1ExpenseTransaction.getId());
 
         // Check if the transaction was deleted
-        verify(m_walletTransactionRepository).delete(m_wallet1ExpenseTransaction);
+        verify(walletTransactionRepository).delete(wallet1ExpenseTransaction);
 
         // Check if the wallet balance was not updated
-        verify(m_walletRepository, never()).save(any(Wallet.class));
+        verify(walletRepository, never()).save(any(Wallet.class));
 
         assertEquals(
                 previousBalance.doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the confirmed income transaction is deleted successfully")
     void testDeleteConfirmedIncome() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1IncomeTransaction));
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
+                .thenReturn(Optional.of(wallet1IncomeTransaction));
 
-        m_walletTransactionService.deleteTransaction(m_wallet1IncomeTransaction.getId());
+        walletTransactionService.deleteTransaction(wallet1IncomeTransaction.getId());
 
         // Check if the transaction was deleted
-        verify(m_walletTransactionRepository).delete(m_wallet1IncomeTransaction);
+        verify(walletTransactionRepository).delete(wallet1IncomeTransaction);
 
         // Check if the wallet balance was updated
-        verify(m_walletRepository).save(m_wallet1);
+        verify(walletRepository).save(wallet1);
 
         assertEquals(
-                previousBalance.subtract(m_incomeAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                previousBalance.subtract(incomeAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the pending income transaction is deleted successfully")
     void testDeletePendingIncome() {
-        BigDecimal previousBalance = m_wallet1.getBalance();
-        m_wallet1IncomeTransaction.setStatus(TransactionStatus.PENDING);
+        BigDecimal previousBalance = wallet1.getBalance();
+        wallet1IncomeTransaction.setStatus(TransactionStatus.PENDING);
 
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1IncomeTransaction));
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
+                .thenReturn(Optional.of(wallet1IncomeTransaction));
 
-        m_walletTransactionService.deleteTransaction(m_wallet1IncomeTransaction.getId());
+        walletTransactionService.deleteTransaction(wallet1IncomeTransaction.getId());
 
         // Check if the transaction was deleted
-        verify(m_walletTransactionRepository).delete(m_wallet1IncomeTransaction);
+        verify(walletTransactionRepository).delete(wallet1IncomeTransaction);
 
         // Check if the wallet balance was not updated
-        verify(m_walletRepository, never()).save(any(Wallet.class));
+        verify(walletRepository, never()).save(any(Wallet.class));
 
         assertEquals(
                 previousBalance.doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the transaction to delete does not " + "exist")
     void testDeleteTransactionDoesNotExist() {
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
                 .thenReturn(Optional.empty());
+
+        Long transactionId = wallet1IncomeTransaction.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
-                () ->
-                        m_walletTransactionService.deleteTransaction(
-                                m_wallet1IncomeTransaction.getId()));
+                () -> walletTransactionService.deleteTransaction(transactionId));
     }
 
     @Test
     @DisplayName("Test if the income transaction is confirmed successfully")
     void testConfirmIncomeTransaction() {
-        m_wallet1IncomeTransaction.setStatus(TransactionStatus.PENDING);
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        wallet1IncomeTransaction.setStatus(TransactionStatus.PENDING);
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1IncomeTransaction));
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
+                .thenReturn(Optional.of(wallet1IncomeTransaction));
 
-        m_walletTransactionService.confirmTransaction(m_wallet1IncomeTransaction.getId());
+        walletTransactionService.confirmTransaction(wallet1IncomeTransaction.getId());
 
         // Check if the transaction was confirmed
-        verify(m_walletTransactionRepository).save(m_wallet1IncomeTransaction);
-        assertEquals(TransactionStatus.CONFIRMED, m_wallet1IncomeTransaction.getStatus());
+        verify(walletTransactionRepository).save(wallet1IncomeTransaction);
+        assertEquals(TransactionStatus.CONFIRMED, wallet1IncomeTransaction.getStatus());
 
         // Check if the wallet balance was updated
-        verify(m_walletRepository).save(m_wallet1);
+        verify(walletRepository).save(wallet1);
         assertEquals(
-                previousBalance.add(m_incomeAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                previousBalance.add(incomeAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if the expense transaction is confirmed successfully")
     void testConfirmExpenseTransaction() {
-        m_wallet1ExpenseTransaction.setStatus(TransactionStatus.PENDING);
-        BigDecimal previousBalance = m_wallet1.getBalance();
+        wallet1ExpenseTransaction.setStatus(TransactionStatus.PENDING);
+        BigDecimal previousBalance = wallet1.getBalance();
 
-        when(m_walletTransactionRepository.findById(m_wallet1ExpenseTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1ExpenseTransaction));
+        when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
+                .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
-        m_walletTransactionService.confirmTransaction(m_wallet1ExpenseTransaction.getId());
+        walletTransactionService.confirmTransaction(wallet1ExpenseTransaction.getId());
 
         // Check if the transaction was confirmed
-        verify(m_walletTransactionRepository).save(m_wallet1ExpenseTransaction);
-        assertEquals(TransactionStatus.CONFIRMED, m_wallet1ExpenseTransaction.getStatus());
+        verify(walletTransactionRepository).save(wallet1ExpenseTransaction);
+        assertEquals(TransactionStatus.CONFIRMED, wallet1ExpenseTransaction.getStatus());
 
         // Check if the wallet balance was updated
-        verify(m_walletRepository).save(m_wallet1);
+        verify(walletRepository).save(wallet1);
         assertEquals(
-                previousBalance.subtract(m_expenseAmount).doubleValue(),
-                m_wallet1.getBalance().doubleValue(),
+                previousBalance.subtract(expenseAmount).doubleValue(),
+                wallet1.getBalance().doubleValue(),
                 Constants.EPSILON);
     }
 
     @Test
     @DisplayName("Test if exception is thrown when the transaction to confirm does not " + "exist")
     void testConfirmTransactionDoesNotExist() {
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
                 .thenReturn(Optional.empty());
+
+        Long transactionId = wallet1IncomeTransaction.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
-                () ->
-                        m_walletTransactionService.confirmTransaction(
-                                m_wallet1IncomeTransaction.getId()));
+                () -> walletTransactionService.confirmTransaction(transactionId));
     }
 
     @Test
     @DisplayName("Test if the transaction already confirmed is not confirmed again")
     void testConfirmTransactionAlreadyConfirmed() {
-        when(m_walletTransactionRepository.findById(m_wallet1IncomeTransaction.getId()))
-                .thenReturn(Optional.of(m_wallet1IncomeTransaction));
+        when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
+                .thenReturn(Optional.of(wallet1IncomeTransaction));
 
         assertThrows(
                 MoinexException.AttributeAlreadySetException.class,
                 () ->
-                        m_walletTransactionService.confirmTransaction(
-                                m_wallet1IncomeTransaction.getId()));
+                        walletTransactionService.confirmTransaction(
+                                wallet1IncomeTransaction.getId()));
 
         // Check if the transaction was not confirmed
-        verify(m_walletTransactionRepository, never()).save(m_wallet1IncomeTransaction);
+        verify(walletTransactionRepository, never()).save(wallet1IncomeTransaction);
 
         // Check if the wallet balance was not updated
-        verify(m_walletRepository, never()).save(m_wallet1);
+        verify(walletRepository, never()).save(wallet1);
     }
 }

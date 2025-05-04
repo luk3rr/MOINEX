@@ -88,8 +88,6 @@ public class TransactionController {
 
     private ConfigurableApplicationContext springContext;
 
-    private StackedBarChart<String, Number> moneyFlowStackedBarChart;
-
     private WalletTransactionService walletTransactionService;
 
     private CreditCardService creditCardService;
@@ -344,7 +342,7 @@ public class TransactionController {
         // Get the search text
         String similarTextOrId = transactionsSearchField.getText().toLowerCase();
 
-        // Get selected values from the comboboxes
+        // Get selected values from the combo boxes
         TransactionType selectedTransactionType = transactionsTypeComboBox.getValue();
 
         LocalDateTime startDate = transactionsStartDatePicker.getValue().atStartOfDay();
@@ -406,7 +404,8 @@ public class TransactionController {
 
         CategoryAxis categoryAxis = new CategoryAxis();
         NumberAxis numberAxis = new NumberAxis();
-        moneyFlowStackedBarChart = new StackedBarChart<>(categoryAxis, numberAxis);
+        StackedBarChart<String, Number> moneyFlowStackedBarChart =
+                new StackedBarChart<>(categoryAxis, numberAxis);
 
         moneyFlowStackedBarChart.setVerticalGridLinesVisible(false);
         moneyFlowView.getChildren().clear();

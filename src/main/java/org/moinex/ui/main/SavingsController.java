@@ -36,8 +36,6 @@ import org.moinex.model.investment.BrazilianMarketIndicators;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.MarketQuotesAndCommodities;
 import org.moinex.model.investment.Ticker;
-import org.moinex.model.investment.TickerPurchase;
-import org.moinex.model.investment.TickerSale;
 import org.moinex.service.MarketService;
 import org.moinex.service.TickerService;
 import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
@@ -140,10 +138,6 @@ public class SavingsController {
 
     private List<Ticker> tickers;
 
-    private List<TickerPurchase> purchases;
-
-    private List<TickerSale> sales;
-
     private List<Dividend> dividends;
 
     private BrazilianMarketIndicators brazilianMarketIndicators;
@@ -152,8 +146,6 @@ public class SavingsController {
 
     private BigDecimal netCapitalInvested;
     private BigDecimal currentValue;
-    private BigDecimal profitLoss;
-    private BigDecimal dividendsReceived;
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
 
@@ -440,20 +432,6 @@ public class SavingsController {
     }
 
     /**
-     * Load the purchases from the database
-     */
-    private void loadPurchasesFromDatabase() {
-        purchases = tickerService.getAllPurchases();
-    }
-
-    /**
-     * Load the sales from the database
-     */
-    private void loadSalesFromDatabase() {
-        sales = tickerService.getAllSales();
-    }
-
-    /**
      * Load the dividends from the database
      */
     private void loadDividendsFromDatabase() {
@@ -485,7 +463,7 @@ public class SavingsController {
                     .exceptionally(
                             ex -> {
                                 Platform.runLater(
-                                        this::schedulerEtryForUpdatingBrazilianIndicators);
+                                        this::schedulerRetryForUpdatingBrazilianIndicators);
                                 logger.error(ex.getMessage());
                                 return null;
                             });
@@ -554,7 +532,7 @@ public class SavingsController {
      * Update the profit/loss field
      */
     private void updateProfitLossField() {
-        profitLoss = currentValue.subtract(netCapitalInvested);
+        BigDecimal profitLoss = currentValue.subtract(netCapitalInvested);
 
         stocksFundsTabProfitLossField.setText(UIUtils.formatCurrency(profitLoss));
     }
@@ -563,7 +541,7 @@ public class SavingsController {
      * Update the dividends received field
      */
     private void updateDividendsReceivedField() {
-        dividendsReceived =
+        BigDecimal dividendsReceived =
                 dividends.stream()
                         .map(d -> d.getWalletTransaction().getAmount())
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -576,8 +554,6 @@ public class SavingsController {
      */
     private void updatePortfolioIndicators() {
         loadTickersFromDatabase();
-        loadPurchasesFromDatabase();
-        loadSalesFromDatabase();
         loadDividendsFromDatabase();
 
         updateNetCapitalInvestedField();
@@ -593,7 +569,7 @@ public class SavingsController {
         // Get the search text
         String similarTextOrId = stocksFundsTabTickerSearchField.getText().toLowerCase();
 
-        // Get selected values from the comboboxes
+        // Get selected values from the combo boxes
         TickerType selectedTickerType = stocksFundsTabTickerTypeComboBox.getValue();
 
         // Clear the table view
@@ -692,26 +668,7 @@ public class SavingsController {
      * Configure the table view columns
      */
     private void configureTableView() {
-        TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(
-                column ->
-                        new TableCell<>() {
-                            @Override
-                            protected void updateItem(Long item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (item == null || empty) {
-                                    setText(null);
-                                } else {
-                                    setText(item.toString());
-                                    setAlignment(Pos.CENTER);
-                                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                    // ensure the text is centered
-                                }
-                            }
-                        });
+        TableColumn<Ticker, Long> idColumn = getTickerLongTableColumn();
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
@@ -762,6 +719,30 @@ public class SavingsController {
         stocksFundsTabTickerTable.getColumns().add(unitColumn);
         stocksFundsTabTickerTable.getColumns().add(totalColumn);
         stocksFundsTabTickerTable.getColumns().add(avgUnitColumn);
+    }
+
+    private static TableColumn<Ticker, Long> getTickerLongTableColumn() {
+        TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Long item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                    // ensure the text is centered
+                                }
+                            }
+                        });
+        return idColumn;
     }
 
     private void setOffUpdatePortfolioPricesButton() {
@@ -891,7 +872,7 @@ public class SavingsController {
     /**
      * Schedules a retry for updating Brazilian market indicators after a delay
      */
-    private synchronized void schedulerEtryForUpdatingBrazilianIndicators() {
+    private synchronized void schedulerRetryForUpdatingBrazilianIndicators() {
         if (scheduledUpdatingBrazilianIndicatorsRetries >= MAX_RETRIES) {
             logger.warn("Max retries reached for updating Brazilian market indicators");
             return;

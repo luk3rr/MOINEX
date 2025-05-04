@@ -18,6 +18,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,9 +55,6 @@ class RecurringTransactionServiceTest {
     private Wallet wallet2;
     private Category category;
     private Category category2;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private LocalDateTime nextDueDate;
 
     private RecurringTransaction dailyRT;
     private RecurringTransaction weeklyRecurringTransaction;
@@ -74,20 +72,17 @@ class RecurringTransactionServiceTest {
             LocalDateTime nextDueDate,
             RecurringTransactionFrequency frequency,
             String description) {
-        RecurringTransaction recurringTransaction =
-                new RecurringTransaction(
-                        id,
-                        wallet,
-                        category,
-                        type,
-                        amount,
-                        startDate,
-                        endDate,
-                        nextDueDate,
-                        frequency,
-                        description);
-
-        return recurringTransaction;
+        return new RecurringTransaction(
+                id,
+                wallet,
+                category,
+                type,
+                amount,
+                startDate,
+                endDate,
+                nextDueDate,
+                frequency,
+                description);
     }
 
     @BeforeEach
@@ -98,12 +93,13 @@ class RecurringTransactionServiceTest {
         category = Category.builder().name("c1").build();
         category2 = Category.builder().name("c2").build();
 
-        startDate = LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
-        endDate =
+        LocalDateTime startDate =
+                LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
+        LocalDateTime endDate =
                 LocalDateTime.now()
                         .plusMonths(1)
                         .with(Constants.RECURRING_TRANSACTION_DEFAULT_TIME);
-        nextDueDate =
+        LocalDateTime nextDueDate =
                 LocalDateTime.now().with(Constants.RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME);
 
         dailyRT =
@@ -198,18 +194,27 @@ class RecurringTransactionServiceTest {
     void testCreateRecurringTransactionWalletNotFound() {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.empty());
 
+        Long walletId = dailyRT.getWallet().getId();
+        Category ct = dailyRT.getCategory();
+        TransactionType type = dailyRT.getType();
+        BigDecimal amount = dailyRT.getAmount();
+        LocalDate startDt = dailyRT.getStartDate().toLocalDate();
+        LocalDate endDt = dailyRT.getEndDate().toLocalDate();
+        String description = dailyRT.getDescription();
+        RecurringTransactionFrequency frequency = dailyRT.getFrequency();
+
         assertThrows(
                 EntityNotFoundException.class,
                 () ->
                         recurringTransactionService.addRecurringTransaction(
-                                dailyRT.getWallet().getId(),
-                                dailyRT.getCategory(),
-                                dailyRT.getType(),
-                                dailyRT.getAmount(),
-                                dailyRT.getStartDate().toLocalDate(),
-                                dailyRT.getEndDate().toLocalDate(),
-                                dailyRT.getDescription(),
-                                dailyRT.getFrequency()));
+                                walletId,
+                                ct,
+                                type,
+                                amount,
+                                startDt,
+                                endDt,
+                                description,
+                                frequency));
 
         verify(recurringTransactionRepository, never()).save(any());
     }
@@ -233,8 +238,8 @@ class RecurringTransactionServiceTest {
 
         // Check if the status of the recurring transaction is INACTIVE
         assertEquals(
-                recurringTransactionCaptor.getValue().getStatus(),
-                RecurringTransactionStatus.INACTIVE);
+                RecurringTransactionStatus.INACTIVE,
+                recurringTransactionCaptor.getValue().getStatus());
     }
 
     @Test
@@ -244,9 +249,10 @@ class RecurringTransactionServiceTest {
     void testStopRecurringTransactionNotFound() {
         when(recurringTransactionRepository.findById(dailyRT.getId())).thenReturn(Optional.empty());
 
+        Long transactionId = dailyRT.getId();
         assertThrows(
                 EntityNotFoundException.class,
-                () -> recurringTransactionService.stopRecurringTransaction(dailyRT.getId()));
+                () -> recurringTransactionService.stopRecurringTransaction(transactionId));
 
         verify(recurringTransactionRepository, never()).save(any());
     }
@@ -287,9 +293,10 @@ class RecurringTransactionServiceTest {
     void testDeleteRecurringTransactionNotFound() {
         when(recurringTransactionRepository.findById(dailyRT.getId())).thenReturn(Optional.empty());
 
+        Long transactionId = dailyRT.getId();
         assertThrows(
                 EntityNotFoundException.class,
-                () -> recurringTransactionService.deleteRecurringTransaction(dailyRT.getId()));
+                () -> recurringTransactionService.deleteRecurringTransaction(transactionId));
 
         verify(recurringTransactionRepository, never()).delete(any());
     }
@@ -314,7 +321,8 @@ class RecurringTransactionServiceTest {
                 .thenReturn(Optional.of(dailyRT));
 
         // Update the recurring transaction
-        updatedRT.setWallet(dailyRT.getWallet().getId() == wallet.getId() ? wallet2 : wallet);
+        updatedRT.setWallet(
+                Objects.equals(dailyRT.getWallet().getId(), wallet.getId()) ? wallet2 : wallet);
 
         updatedRT.setCategory(
                 updatedRT.getCategory().getName().equals(category.getName())
@@ -388,7 +396,7 @@ class RecurringTransactionServiceTest {
         // Check if the captured dates correspond to the expected dates for each of the
         // 10 days
         for (int i = 0; i < 10; i++) {
-            LocalDate expectedDate = today.minusDays(10 - i).toLocalDate();
+            LocalDate expectedDate = today.minusDays(10L - i).toLocalDate();
 
             assertEquals(
                     expectedDate,
@@ -430,7 +438,7 @@ class RecurringTransactionServiceTest {
         // Check if the captured dates correspond to the expected dates for each of the
         // 2 weeks
         for (int i = 0; i < 5; i++) {
-            LocalDate expectedDate = today.minusWeeks(5 - i).toLocalDate();
+            LocalDate expectedDate = today.minusWeeks(5L - i).toLocalDate();
 
             assertEquals(
                     expectedDate,
@@ -472,7 +480,7 @@ class RecurringTransactionServiceTest {
         // Check if the captured dates correspond to the expected dates for each of the
         // 1 month
         for (int i = 0; i < 12; i++) {
-            LocalDate expectedDate = today.minusMonths(12 - i).toLocalDate();
+            LocalDate expectedDate = today.minusMonths(12L - i).toLocalDate();
 
             assertEquals(
                     expectedDate,
@@ -514,7 +522,7 @@ class RecurringTransactionServiceTest {
         // Check if the captured dates correspond to the expected dates for each of the
         // 1 year
         for (int i = 0; i < 5; i++) {
-            LocalDate expectedDate = today.minusYears(5 - i).toLocalDate();
+            LocalDate expectedDate = today.minusYears(5L - i).toLocalDate();
 
             assertEquals(
                     expectedDate,

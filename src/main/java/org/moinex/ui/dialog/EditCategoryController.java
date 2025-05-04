@@ -43,7 +43,7 @@ public class EditCategoryController {
 
     @FXML
     public void initialize() {
-        // TODO: Implement this method
+        // Still empty
     }
 
     public void setCategory(Category ct) {

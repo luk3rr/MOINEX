@@ -4,7 +4,7 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.app;
+package org.moinex.app.config;
 
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;

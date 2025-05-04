@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -548,7 +549,10 @@ public class HomeController {
             // Add style class to the wallet pane
             newContent
                     .getStylesheets()
-                    .add(getClass().getResource(Constants.COMMON_STYLE_SHEET).toExternalForm());
+                    .add(
+                            Objects.requireNonNull(
+                                            getClass().getResource(Constants.COMMON_STYLE_SHEET))
+                                    .toExternalForm());
 
             ResumePaneController resumePaneController = loader.getController();
 

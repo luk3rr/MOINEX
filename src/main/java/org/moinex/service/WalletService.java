@@ -243,7 +243,7 @@ public class WalletService {
      * @param newType The new type of the wallet
      * @throws EntityNotFoundException      If the wallet does not exist
      * @throws EntityNotFoundException      If the wallet type does not exist
-     * @throws AttributeAlreadySetException If the wallet already has the new type
+     * @throws MoinexException.AttributeAlreadySetException If the wallet already has the new type
      */
     @Transactional
     public void changeWalletType(Long id, WalletType newType) {

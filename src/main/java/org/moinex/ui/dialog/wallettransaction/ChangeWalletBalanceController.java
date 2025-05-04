@@ -36,8 +36,6 @@ public class ChangeWalletBalanceController {
 
     private WalletService walletService;
 
-    private Wallet wallet = null;
-
     /**
      * Constructor
      * @param walletService WalletService
@@ -53,9 +51,8 @@ public class ChangeWalletBalanceController {
             return;
         }
 
-        this.wallet = wt;
-        walletComboBox.setValue(wallet);
-        balanceField.setText(wallet.getBalance().toString());
+        walletComboBox.setValue(wt);
+        balanceField.setText(wt.getBalance().toString());
     }
 
     @FXML
