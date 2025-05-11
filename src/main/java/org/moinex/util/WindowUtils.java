@@ -154,8 +154,9 @@ public final class WindowUtils {
             Scene scene = new Scene(root);
             scene.getStylesheets()
                     .add(
-                            WindowUtils.class
-                                    .getResource(Constants.COMMON_STYLE_SHEET)
+                            Objects.requireNonNull(
+                                            WindowUtils.class.getResource(
+                                                    Constants.COMMON_STYLE_SHEET))
                                     .toExternalForm());
 
             T controller = loader.getController();

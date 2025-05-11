@@ -31,6 +31,7 @@ import org.moinex.util.enums.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -58,8 +59,14 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             WalletService walletService,
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
-            CalculatorService calculatorService) {
-        super(walletService, walletTransactionService, categoryService, calculatorService);
+            CalculatorService calculatorService,
+            ConfigurableApplicationContext springContext) {
+        super(
+                walletService,
+                walletTransactionService,
+                categoryService,
+                calculatorService,
+                springContext);
     }
 
     public void setTransaction(WalletTransaction wt) {

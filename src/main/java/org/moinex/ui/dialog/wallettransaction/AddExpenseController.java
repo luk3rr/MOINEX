@@ -24,6 +24,7 @@ import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
 import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -45,8 +46,14 @@ public final class AddExpenseController extends BaseWalletTransactionManagement 
             WalletService walletService,
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
-            CalculatorService calculatorService) {
-        super(walletService, walletTransactionService, categoryService, calculatorService);
+            CalculatorService calculatorService,
+            ConfigurableApplicationContext springContext) {
+        super(
+                walletService,
+                walletTransactionService,
+                categoryService,
+                calculatorService,
+                springContext);
 
         transactionType = TransactionType.EXPENSE;
     }

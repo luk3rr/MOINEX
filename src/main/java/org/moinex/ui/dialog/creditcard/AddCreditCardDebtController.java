@@ -21,6 +21,7 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -33,8 +34,9 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
     public AddCreditCardDebtController(
             CategoryService categoryService,
             CreditCardService creditCardService,
-            CalculatorService calculatorService) {
-        super(categoryService, creditCardService, calculatorService);
+            CalculatorService calculatorService,
+            ConfigurableApplicationContext springContext) {
+        super(categoryService, creditCardService, calculatorService, springContext);
     }
 
     @Override

@@ -83,10 +83,12 @@ public abstract class BaseCreditCardDebtManagement {
     protected BaseCreditCardDebtManagement(
             CategoryService categoryService,
             CreditCardService creditCardService,
-            CalculatorService calculatorService) {
+            CalculatorService calculatorService,
+            ConfigurableApplicationContext springContext) {
         this.categoryService = categoryService;
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
+        this.springContext = springContext;
     }
 
     public void setCreditCard(CreditCard crc) {

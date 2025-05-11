@@ -90,11 +90,13 @@ public abstract class BaseWalletTransactionManagement {
             WalletService walletService,
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
-            CalculatorService calculatorService) {
+            CalculatorService calculatorService,
+            ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.categoryService = categoryService;
         this.calculatorService = calculatorService;
+        this.springContext = springContext;
     }
 
     @FXML
