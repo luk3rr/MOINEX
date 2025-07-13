@@ -1,0 +1,29 @@
+variables:
+  PROJECT_NAME: "MOINEX"
+
+cache:
+  paths:
+    - ~/.m2/repository/
+
+stages:
+  - test
+
+unit_test:
+  stage: test
+  image: maven:3.9.6-eclipse-temurin-21
+  script:
+    - mvn clean install jacoco:prepare-agent install jacoco:report
+  artifacts:
+    paths:
+      - target/site/jacoco
+    when: always
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - ~/.m2/repository/
+    policy: pull-push
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_MERGE_REQUEST_ID'
+      when: always
+    - when: never
+      allow_failure: false
