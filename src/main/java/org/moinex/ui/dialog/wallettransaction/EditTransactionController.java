@@ -40,18 +40,17 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class EditTransactionController extends BaseWalletTransactionManagement {
-    @FXML private ComboBox<TransactionType> typeComboBox;
-
-    private WalletTransaction walletTransaction = null;
-
     private static final Logger logger = LoggerFactory.getLogger(EditTransactionController.class);
+    @FXML private ComboBox<TransactionType> typeComboBox;
+    private WalletTransaction walletTransaction = null;
 
     /**
      * Constructor
-     * @param walletService WalletService
+     *
+     * @param walletService            WalletService
      * @param walletTransactionService WalletTransactionService
-     * @param categoryService CategoryService
-     * @param calculatorService CalculatorService
+     * @param categoryService          CategoryService
+     * @param calculatorService        CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -71,23 +70,25 @@ public final class EditTransactionController extends BaseWalletTransactionManage
 
     public void setTransaction(WalletTransaction wt) {
         walletTransaction = wt;
-        walletComboBox.setValue(walletTransaction.getWallet());
-        statusComboBox.setValue(walletTransaction.getStatus());
-        categoryComboBox.setValue(walletTransaction.getCategory());
-        transactionValueField.setText(walletTransaction.getAmount().toString());
 
-        // Deactivate the listener to avoid the event of changing the text of
-        // the descriptionField from being triggered. After changing the text,
-        // the listener is activated again
+        disableTransactionValueListener();
         suggestionsHandler.disable();
-        descriptionField.setText(walletTransaction.getDescription());
-        suggestionsHandler.enable();
 
-        transactionDatePicker.setValue(walletTransaction.getDate().toLocalDate());
-        typeComboBox.setValue(walletTransaction.getType());
-        transactionType = walletTransaction.getType();
+        try {
+            typeComboBox.setValue(walletTransaction.getType());
+            transactionType = walletTransaction.getType();
+            walletComboBox.setValue(walletTransaction.getWallet());
+            statusComboBox.setValue(walletTransaction.getStatus());
+            categoryComboBox.setValue(walletTransaction.getCategory());
+            descriptionField.setText(walletTransaction.getDescription());
+            transactionDatePicker.setValue(walletTransaction.getDate().toLocalDate());
+            transactionValueField.setText(walletTransaction.getAmount().toString());
+        } finally {
+            enableTransactionValueListener();
+            suggestionsHandler.enable();
+        }
 
-        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletAfterBalanceValueLabel);
+        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
         loadSuggestionsFromDatabase();
     }
@@ -100,8 +101,8 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         typeComboBox.setOnAction(
                 e -> {
                     transactionType = typeComboBox.getValue();
-                    loadSuggestionsFromDatabase();
                     walletAfterBalance();
+                    loadSuggestionsFromDatabase();
                 });
 
         typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
@@ -183,6 +184,12 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 || transactionValueString.trim().isEmpty()
                 || wallet == null
                 || currentType == null) {
+            logger.warn(
+                    "Some fields are null: transactionValueString={}, "
+                            + "currentType={}, wallet={}",
+                    transactionValueString,
+                    currentType,
+                    wallet);
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
             return;
         }
@@ -191,6 +198,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             BigDecimal newAmount = new BigDecimal(transactionValueString);
 
             if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
+                logger.warn("After balance calculation with negative amount");
                 UIUtils.resetLabel(walletAfterBalanceValueLabel);
                 return;
             }
@@ -269,6 +277,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
 
             walletAfterBalanceValueLabel.setText(UIUtils.formatCurrency(walletAfterBalanceValue));
         } catch (NumberFormatException e) {
+            logger.error("Invalid transaction value: {}", transactionValueString, e);
             UIUtils.resetLabel(walletAfterBalanceValueLabel);
         }
     }

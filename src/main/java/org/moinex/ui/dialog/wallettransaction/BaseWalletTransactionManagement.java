@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -75,6 +76,8 @@ public abstract class BaseWalletTransactionManagement {
     protected Wallet wallet = null;
 
     protected TransactionType transactionType;
+
+    private ChangeListener<String> transactionValueListener;
 
     /**
      * Constructor
@@ -256,16 +259,16 @@ public abstract class BaseWalletTransactionManagement {
 
     protected void configureListeners() {
         // Update wallet after balance when the value field changes
-        transactionValueField
-                .textProperty()
-                .addListener(
-                        (observable, oldValue, newValue) -> {
-                            if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
-                                transactionValueField.setText(oldValue);
-                            } else {
-                                walletAfterBalance();
-                            }
-                        });
+        transactionValueListener =
+                (observable, oldValue, newValue) -> {
+                    if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
+                        transactionValueField.setText(oldValue);
+                    } else {
+                        walletAfterBalance();
+                    }
+                };
+
+        transactionValueField.textProperty().addListener(transactionValueListener);
     }
 
     protected void fillFieldsWithTransaction(WalletTransaction wt) {
@@ -284,5 +287,17 @@ public abstract class BaseWalletTransactionManagement {
 
         UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
+    }
+
+    public void disableTransactionValueListener() {
+        if (transactionValueListener != null) {
+            transactionValueField.textProperty().removeListener(transactionValueListener);
+        }
+    }
+
+    public void enableTransactionValueListener() {
+        if (transactionValueListener != null) {
+            transactionValueField.textProperty().addListener(transactionValueListener);
+        }
     }
 }
