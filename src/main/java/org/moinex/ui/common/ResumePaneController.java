@@ -85,9 +85,10 @@ public class ResumePaneController {
 
     /**
      * Constructor
-     * @param walletTransactionService WalletTransactionService
+     *
+     * @param walletTransactionService    WalletTransactionService
      * @param recurringTransactionService RecurringTransactionService
-     * @param creditCardService CreditCardService
+     * @param creditCardService           CreditCardService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -268,6 +269,8 @@ public class ResumePaneController {
         }
 
         // Set the economy label and sign label according to the economy value
+        UIUtils.removeTooltipFromNode(savingsCurrentValue);
+
         if (savingsPercentage > 0) {
             savingsLabel.setText("Savings");
             savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
@@ -280,8 +283,15 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().add(Constants.POSITIVE_BALANCE_STYLE);
         } else if (savingsPercentage < 0) {
             savingsLabel.setText("No savings");
-            savingsCurrentValue.setText(UIUtils.formatPercentage(-savingsPercentage));
-            savingsCurrentSign.setText("-");
+            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
+
+            if (savingsPercentage < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
+                savingsCurrentSign.setText(" ");
+                UIUtils.addTooltipToNode(
+                        savingsCurrentValue, "- " + UIUtils.formatPercentage(-savingsPercentage));
+            } else {
+                savingsCurrentSign.setText("-");
+            }
 
             savingsCurrentValue.getStyleClass().clear();
             savingsCurrentValue.getStyleClass().add(Constants.NEGATIVE_BALANCE_STYLE);

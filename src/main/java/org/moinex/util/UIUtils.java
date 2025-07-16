@@ -11,11 +11,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.function.Function;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.NonNull;
@@ -44,6 +40,7 @@ public final class UIUtils {
 
     /**
      * Add a tooltip to the XYChart node
+     *
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
@@ -56,6 +53,7 @@ public final class UIUtils {
 
     /**
      * Add a tooltip to a node
+     *
      * @param node The node to add the tooltip
      * @param text The text of the tooltip
      */
@@ -69,7 +67,16 @@ public final class UIUtils {
     }
 
     /**
+     * Remove any tooltip associated with a node.
+     * @param node The node to remove the tooltip from.
+     */
+    public static void removeTooltipFromNode(Node node) {
+        Tooltip.install(node, null);
+    }
+
+    /**
      * Format a number to a currency string
+     *
      * @param value The value to be formatted
      * @note Automatically formats to 2 fraction digits, rounding half up
      */
@@ -83,6 +90,7 @@ public final class UIUtils {
 
     /**
      * Format a number to a currency string with dynamic precision
+     *
      * @param value The value to be formatted
      */
     public static String formatCurrencyDynamic(Number value) {
@@ -109,6 +117,7 @@ public final class UIUtils {
 
     /**
      * Determines the number of fraction digits dynamically based on a BigDecimal value
+     *
      * @param value The BigDecimal value
      * @return Number of fraction digits
      */
@@ -128,14 +137,20 @@ public final class UIUtils {
 
     /**
      * Format a number to percentage string
+     *
      * @param value The value to be formatted
      */
     public static String formatPercentage(Number value) {
+        if (value.doubleValue() < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
+            return "Too much negative";
+        }
+
         return percentageFormat.format(value) + " %";
     }
 
     /**
      * Format the date picker to display the date in a specific format
+     *
      * @param datePicker The date picker to format
      */
     public static void setDatePickerFormat(DatePicker datePicker) {
@@ -156,6 +171,7 @@ public final class UIUtils {
 
     /**
      * Format the last four digits of a credit card number
+     *
      * @param lastFourDigits The last four digits of the credit card number
      * @return Formatted credit card number string
      */
@@ -169,6 +185,7 @@ public final class UIUtils {
 
     /**
      * Reset the text of a label to "-"
+     *
      * @param label The label to reset
      */
     public static void resetLabel(Label label) {
@@ -178,6 +195,7 @@ public final class UIUtils {
 
     /**
      * Set the style of a label
+     *
      * @param label The label to set the style
      * @param style The style to set
      */
@@ -193,6 +211,7 @@ public final class UIUtils {
 
     /**
      * Configure a ComboBox with a display function
+     *
      * @param comboBox        The ComboBox to configure
      * @param displayFunction The function to display the items
      * @param <T>             The type of the ComboBox items
