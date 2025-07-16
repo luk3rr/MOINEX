@@ -228,6 +228,8 @@ public final class Constants {
     public static final Double EPSILON = 1e-6;
     public static final Double ONE_SECOND_IN_NS = 1_000_000_000.0;
 
+    public static final Double NEGATIVE_PERCENTAGE_THRESHOLD = -1000.0;
+
     // Credit card
     public static final Integer MAX_BILLING_DUE_DAY = 28;
     public static final Integer INSTALLMENTS_FIELD_MAX_DIGITS = 3;
