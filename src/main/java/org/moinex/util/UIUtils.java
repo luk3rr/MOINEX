@@ -145,7 +145,7 @@ public final class UIUtils {
             return "Too much negative";
         }
 
-        return percentageFormat.format(value) + " %";
+        return percentageFormat.format(Math.abs(value.doubleValue())) + " %";
     }
 
     /**
