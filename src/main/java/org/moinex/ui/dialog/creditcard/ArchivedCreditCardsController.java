@@ -175,7 +175,7 @@ public class ArchivedCreditCardsController {
      * Configures the table view columns
      */
     private void configureTableView() {
-        TableColumn<CreditCard, Long> idColumn = getCreditCardLongTableColumn();
+        TableColumn<CreditCard, Integer> idColumn = getCreditCardLongTableColumn();
 
         TableColumn<CreditCard, String> crcColumn = new TableColumn<>("Credit Card");
         crcColumn.setCellValueFactory(
@@ -185,7 +185,7 @@ public class ArchivedCreditCardsController {
         operatorColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getOperator().getName()));
 
-        TableColumn<CreditCard, Long> numOfDebtsColumn = new TableColumn<>("Associated Debts");
+        TableColumn<CreditCard, Integer> numOfDebtsColumn = new TableColumn<>("Associated Debts");
         numOfDebtsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -196,7 +196,7 @@ public class ArchivedCreditCardsController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
@@ -214,15 +214,15 @@ public class ArchivedCreditCardsController {
         creditCardTableView.getColumns().add(numOfDebtsColumn);
     }
 
-    private static TableColumn<CreditCard, Long> getCreditCardLongTableColumn() {
-        TableColumn<CreditCard, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<CreditCard, Integer> getCreditCardLongTableColumn() {
+        TableColumn<CreditCard, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

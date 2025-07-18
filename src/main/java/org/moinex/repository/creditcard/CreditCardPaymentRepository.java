@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPayment, Long> {
+public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPayment, Integer> {
 
     /**
      * Get all credit card payments in a month and year
@@ -60,7 +60,9 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "AND strftime('%Y', ccp.date) = printf('%04d', :year)"
                     + "AND ccp.creditCardDebt.creditCard.id = :crcId")
     List<CreditCardPayment> getCreditCardPayments(
-            @Param("crcId") Long crcId, @Param("month") Integer month, @Param("year") Integer year);
+            @Param("crcId") Integer crcId,
+            @Param("month") Integer month,
+            @Param("year") Integer year);
 
     /**
      * Get credit card pending payments in a month and year by credit card
@@ -78,7 +80,9 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "AND ccp.creditCardDebt.creditCard.id = :crcId "
                     + "AND ccp.wallet IS NULL")
     List<CreditCardPayment> getPendingCreditCardPayments(
-            @Param("crcId") Long crcId, @Param("month") Integer month, @Param("year") Integer year);
+            @Param("crcId") Integer crcId,
+            @Param("month") Integer month,
+            @Param("year") Integer year);
 
     /**
      * Get all pending credit card payments
@@ -90,7 +94,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "WHERE ccp.creditCardDebt.creditCard.id = :crcId "
                     + "AND ccp.wallet IS NULL")
-    List<CreditCardPayment> getAllPendingCreditCardPayments(@Param("crcId") Long crcId);
+    List<CreditCardPayment> getAllPendingCreditCardPayments(@Param("crcId") Integer crcId);
 
     /**
      * Get payments by debt id
@@ -98,7 +102,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
      * @return A list with all credit card payments by debt id
      */
     @Query("SELECT ccp " + "FROM CreditCardPayment ccp " + "WHERE ccp.creditCardDebt.id = :debtId")
-    List<CreditCardPayment> getPaymentsByDebtId(@Param("debtId") Long debtId);
+    List<CreditCardPayment> getPaymentsByDebtId(@Param("debtId") Integer debtId);
 
     /**
      * Get the total paid amount of a credit card
@@ -110,7 +114,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "WHERE ccp.creditCardDebt.creditCard.id = :creditCardId "
                     + "AND ccp.wallet IS NOT NULL")
-    BigDecimal getTotalPaidAmount(@Param("creditCardId") Long creditCardId);
+    BigDecimal getTotalPaidAmount(@Param("creditCardId") Integer creditCardId);
 
     /**
      * Get the total debt amount of all credit cards in a month and year
@@ -184,7 +188,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
                     + "AND ccp.wallet.id = :walletId")
     BigDecimal getEffectivePaidPaymentsByMonth(
-            @Param("walletId") Long walletId,
+            @Param("walletId") Integer walletId,
             @Param("month") Integer month,
             @Param("year") Integer year);
 
@@ -217,7 +221,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "WHERE strftime('%Y', ccp.date) >= printf('%04d', :year) "
                     + "AND ccp.wallet IS NULL")
-    BigDecimal getTotalPendingPayments(@Param("year") Integer year);
+    BigDecimal getTotalPendingPaymentsByYear(@Param("year") Integer year);
 
     /**
      * Get the total of all paid payments of all credit cards from a specified year
@@ -256,7 +260,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "JOIN ccp.creditCardDebt ccd "
                     + "WHERE ccd.creditCard.id = :creditCardId "
                     + "AND ccp.wallet IS NULL")
-    BigDecimal getTotalPendingPayments(@Param("creditCardId") Long creditCardId);
+    BigDecimal getTotalPendingPaymentsByCreditCard(@Param("creditCardId") Integer creditCardId);
 
     /**
      * Get the total of all pending payments of all credit cards
@@ -278,7 +282,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "WHERE ccp.creditCardDebt.id = :debtId "
                     + "AND ccp.wallet IS NULL")
-    BigDecimal getRemainingDebt(@Param("debtId") Long debtId);
+    BigDecimal getRemainingDebt(@Param("debtId") Integer debtId);
 
     /**
      * Get the invoice amount of a credit card in a specified month and year
@@ -295,7 +299,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "AND strftime('%m', ccp.date) = printf('%02d', :month) "
                     + "AND strftime('%Y', ccp.date) = printf('%04d', :year)")
     BigDecimal getInvoiceAmount(
-            @Param("creditCardId") Long creditCardId,
+            @Param("creditCardId") Integer creditCardId,
             @Param("month") Integer month,
             @Param("year") Integer year);
 
@@ -310,5 +314,5 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "JOIN ccp.creditCardDebt ccd "
                     + "WHERE ccd.creditCard.id = :creditCardId "
                     + "AND ccp.wallet IS NULL")
-    String getNextInvoiceDate(@Param("creditCardId") Long creditCardId);
+    String getNextInvoiceDate(@Param("creditCardId") Integer creditCardId);
 }

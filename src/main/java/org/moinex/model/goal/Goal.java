@@ -70,7 +70,7 @@ public class Goal extends Wallet {
      * Constructor for testing purposes
      */
     public Goal(
-            Long id,
+            Integer id,
             String name,
             BigDecimal initialBalance,
             BigDecimal targetBalance,

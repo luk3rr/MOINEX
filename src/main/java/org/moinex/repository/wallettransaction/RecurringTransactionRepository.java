@@ -17,7 +17,8 @@ import org.springframework.stereotype.Repository;
  * This repository provides methods to query the database for RecurringTransaction
  */
 @Repository
-public interface RecurringTransactionRepository extends JpaRepository<RecurringTransaction, Long> {
+public interface RecurringTransactionRepository
+        extends JpaRepository<RecurringTransaction, Integer> {
 
     /**
      * Get the recurring transaction by its status

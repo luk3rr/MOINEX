@@ -111,7 +111,7 @@ public class GoalService {
      * @throws EntityNotFoundException  If the goal wallet type is not found
      */
     @Transactional
-    public Long addGoal(
+    public Integer addGoal(
             String name,
             BigDecimal initialBalance,
             BigDecimal targetBalance,
@@ -169,7 +169,7 @@ public class GoalService {
      * @throws IllegalStateException   If the goal has transactions
      */
     @Transactional
-    public void deleteGoal(Long idGoal) {
+    public void deleteGoal(Integer idGoal) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -271,7 +271,7 @@ public class GoalService {
      * application anymore
      */
     @Transactional
-    public void archiveGoal(Long idGoal) {
+    public void archiveGoal(Integer idGoal) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -298,7 +298,7 @@ public class GoalService {
      * will be used in the application again
      */
     @Transactional
-    public void unarchiveGoal(Long idGoal) {
+    public void unarchiveGoal(Integer idGoal) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -324,7 +324,7 @@ public class GoalService {
      * @throws MoinexException.IncompleteGoalException If the goal has not been completed yet
      */
     @Transactional
-    public void completeGoal(Long idGoal) {
+    public void completeGoal(Integer idGoal) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -357,7 +357,7 @@ public class GoalService {
      * @throws EntityNotFoundException If the goal does not exist
      */
     @Transactional
-    public void reopenGoal(Long idGoal) {
+    public void reopenGoal(Integer idGoal) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -383,7 +383,7 @@ public class GoalService {
      * @throws IllegalStateException   If the name of the goal is empty
      */
     @Transactional
-    public void renameGoal(Long idGoal, String newName) {
+    public void renameGoal(Integer idGoal, String newName) {
         newName = newName.strip();
 
         if (newName.isBlank()) {
@@ -419,7 +419,7 @@ public class GoalService {
      * @throws EntityNotFoundException  If the goal does not exist
      */
     @Transactional
-    public void changeInitialBalance(Long idGoal, BigDecimal newInitialBalance) {
+    public void changeInitialBalance(Integer idGoal, BigDecimal newInitialBalance) {
         if (newInitialBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
                     "The initial balance of the goal cannot be negative");
@@ -449,7 +449,7 @@ public class GoalService {
      * @throws EntityNotFoundException  If the goal does not exist
      */
     @Transactional
-    public void changeTargetBalance(Long idGoal, BigDecimal newTargetBalance) {
+    public void changeTargetBalance(Integer idGoal, BigDecimal newTargetBalance) {
         if (newTargetBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("The target balance of the goal cannot be negative");
         }
@@ -478,7 +478,7 @@ public class GoalService {
      * @throws IllegalArgumentException If the target date is in the past
      */
     @Transactional
-    public void changeTargetDate(Long idGoal, LocalDateTime newTargetDate) {
+    public void changeTargetDate(Integer idGoal, LocalDateTime newTargetDate) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -506,7 +506,7 @@ public class GoalService {
      * @throws EntityNotFoundException If the goal does not exist
      */
     @Transactional
-    public void changeMotivation(Long idGoal, String newMotivation) {
+    public void changeMotivation(Integer idGoal, String newMotivation) {
         Goal goal =
                 goalRepository
                         .findById(idGoal)
@@ -536,7 +536,7 @@ public class GoalService {
      * @return The goal with the given id
      * @throws EntityNotFoundException If the goal does not exist
      */
-    public Goal getGoalById(Long idGoal) {
+    public Goal getGoalById(Integer idGoal) {
         return goalRepository
                 .findById(idGoal)
                 .orElseThrow(

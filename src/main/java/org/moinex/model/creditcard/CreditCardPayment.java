@@ -41,7 +41,7 @@ public class CreditCardPayment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")

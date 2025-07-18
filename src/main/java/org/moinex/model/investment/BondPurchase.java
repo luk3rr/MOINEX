@@ -31,7 +31,7 @@ public class BondPurchase extends Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "bond_id", referencedColumnName = "id")

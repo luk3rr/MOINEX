@@ -40,7 +40,7 @@ public class CreditCard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.NO_ACTION)
@@ -73,6 +73,6 @@ public class CreditCard {
     private String lastFourDigits;
 
     @Builder.Default
-    @Column(name = "archived", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "archived", nullable = false)
     private boolean isArchived = false; // Default value is false
 }

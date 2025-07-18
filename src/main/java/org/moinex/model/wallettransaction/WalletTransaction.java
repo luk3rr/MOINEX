@@ -37,7 +37,7 @@ public class WalletTransaction extends BaseTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Column(name = "date", nullable = false)
     private String date;

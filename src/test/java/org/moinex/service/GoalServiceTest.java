@@ -53,7 +53,7 @@ class GoalServiceTest {
     }
 
     private Goal createGoal(
-            Long id,
+            Integer id,
             String name,
             BigDecimal initialBalance,
             BigDecimal targetBalance,
@@ -63,7 +63,7 @@ class GoalServiceTest {
                 id, name, initialBalance, targetBalance, targetDate, motivation, walletType);
     }
 
-    private WalletType createWalletType(Long id, String name) {
+    private WalletType createWalletType(Integer id, String name) {
         return new WalletType(id, name);
     }
 
@@ -71,14 +71,14 @@ class GoalServiceTest {
     void beforeEach() {
         goal =
                 createGoal(
-                        1L,
+                        1,
                         "Goal1",
                         BigDecimal.valueOf(100.0),
                         BigDecimal.valueOf(200.0),
                         LocalDateTime.now().plusDays(30),
                         "Motivation1");
 
-        walletType = createWalletType(1L, Constants.GOAL_DEFAULT_WALLET_TYPE_NAME);
+        walletType = createWalletType(1, Constants.GOAL_DEFAULT_WALLET_TYPE_NAME);
     }
 
     @Test
@@ -283,7 +283,7 @@ class GoalServiceTest {
     void testArchiveGoalDoesNotExist() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
 
         assertThrows(EntityNotFoundException.class, () -> goalService.archiveGoal(goalId));
 
@@ -295,7 +295,7 @@ class GoalServiceTest {
     void testUnarchiveGoalDoesNotExist() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
 
         assertThrows(EntityNotFoundException.class, () -> goalService.unarchiveGoal(goalId));
 
@@ -319,7 +319,7 @@ class GoalServiceTest {
     void testRenameGoalDoesNotExist() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
 
         assertThrows(
                 EntityNotFoundException.class, () -> goalService.renameGoal(goalId, "New Name"));
@@ -334,7 +334,7 @@ class GoalServiceTest {
 
         when(goalRepository.existsByName(goal.getName() + " Renamed")).thenReturn(true);
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         String goalName = goal.getName();
 
         assertThrows(
@@ -361,7 +361,7 @@ class GoalServiceTest {
     @Test
     @DisplayName("Test if the initial balance is not updated when the new balance is negative")
     void testUpdateInitialBalanceNegative() {
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         BigDecimal newInitialBalance = BigDecimal.valueOf(-1.0);
 
         assertThrows(
@@ -374,7 +374,7 @@ class GoalServiceTest {
     @Test
     @DisplayName("Test if the initial balance is not updated when the goal does not exist")
     void testUpdateInitialBalanceDoesNotExist() {
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         BigDecimal newInitialBalance = BigDecimal.valueOf(100.0);
 
         assertThrows(
@@ -399,7 +399,7 @@ class GoalServiceTest {
     @Test
     @DisplayName("Test if the target balance is not updated when the new balance is negative")
     void testUpdateTargetBalanceNegative() {
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         BigDecimal newTargetBalance = BigDecimal.valueOf(-1.0);
 
         assertThrows(
@@ -415,7 +415,7 @@ class GoalServiceTest {
     void testUpdateTargetBalanceDoesNotExist() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         BigDecimal newTargetBalance = BigDecimal.valueOf(100.0);
 
         assertThrows(
@@ -442,7 +442,7 @@ class GoalServiceTest {
     void testUpdateTargetDateDoesNotExist() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         assertThrows(
@@ -457,7 +457,7 @@ class GoalServiceTest {
     void testUpdateTargetDateInPast() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
         LocalDateTime pastDate = LocalDateTime.now().minusDays(1);
 
         assertThrows(
@@ -484,7 +484,7 @@ class GoalServiceTest {
     void testUpdateMotivationDoesNotExist() {
         when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
 
-        Long goalId = goal.getId();
+        Integer goalId = goal.getId();
 
         assertThrows(
                 EntityNotFoundException.class,

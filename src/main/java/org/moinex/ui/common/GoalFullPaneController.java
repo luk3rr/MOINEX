@@ -195,7 +195,7 @@ public class GoalFullPaneController {
             goalCurrentAmount.setText(UIUtils.formatCurrency(goal.getBalance()));
 
             // Calculate the number of months until the target date
-            Long monthsUntilTarget =
+            Integer monthsUntilTarget =
                     Constants.calculateMonthsUntilTarget(
                             LocalDate.now(), goal.getTargetDate().toLocalDate());
 
@@ -220,7 +220,7 @@ public class GoalFullPaneController {
             goalIdealAMountPerMonth.setText(UIUtils.formatCurrency(idealAmountPerMonth));
 
             // Calculate the missing days
-            Long missingDaysValue =
+            Integer missingDaysValue =
                     Constants.calculateDaysUntilTarget(
                             LocalDate.now(), goal.getTargetDate().toLocalDate());
 

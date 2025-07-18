@@ -145,14 +145,14 @@ public class CreditCardCreditsController {
      * Configures the table view columns
      */
     private void configureTableView() {
-        TableColumn<CreditCardCredit, Long> idColumn = new TableColumn<>("ID");
+        TableColumn<CreditCardCredit, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

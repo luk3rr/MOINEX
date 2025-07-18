@@ -55,21 +55,21 @@ class WalletServiceTest {
         MockitoAnnotations.openMocks(WalletServiceTest.class);
     }
 
-    private Wallet CreateWallet(Long id, String name, BigDecimal balance) {
+    private Wallet CreateWallet(Integer id, String name, BigDecimal balance) {
         return new Wallet(id, name, balance);
     }
 
-    private WalletType createWalletType(Long id, String name) {
+    private WalletType createWalletType(Integer id, String name) {
         return new WalletType(id, name);
     }
 
     @BeforeEach
     void beforeEach() {
-        wallet1 = CreateWallet(1L, "Wallet1", new BigDecimal("1000"));
-        wallet2 = CreateWallet(2L, "Wallet2", new BigDecimal("2000"));
+        wallet1 = CreateWallet(1, "Wallet1", new BigDecimal("1000"));
+        wallet2 = CreateWallet(2, "Wallet2", new BigDecimal("2000"));
 
-        walletType1 = createWalletType(1L, "Type1");
-        walletType2 = createWalletType(2L, "Type2");
+        walletType1 = createWalletType(1, "Type1");
+        walletType2 = createWalletType(2, "Type2");
     }
 
     @Test
@@ -111,8 +111,8 @@ class WalletServiceTest {
     void testDeleteWallet() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
         when(walletTransactionRepository.getTransactionCountByWallet(wallet1.getId()))
-                .thenReturn(0L);
-        when(transferRepository.getTransferCountByWallet(wallet1.getId())).thenReturn(0L);
+                .thenReturn(0);
+        when(transferRepository.getTransferCountByWallet(wallet1.getId())).thenReturn(0);
 
         walletService.deleteWallet(wallet1.getId());
 
@@ -125,7 +125,7 @@ class WalletServiceTest {
     void testDeleteWalletDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
 
         assertThrows(EntityNotFoundException.class, () -> walletService.deleteWallet(walletId));
 
@@ -152,7 +152,7 @@ class WalletServiceTest {
     void testArchiveWalletDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
 
         assertThrows(EntityNotFoundException.class, () -> walletService.archiveWallet(walletId));
 
@@ -181,7 +181,7 @@ class WalletServiceTest {
     void testRenameWalletDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
         String newName = "NewWalletName";
 
         assertThrows(
@@ -200,7 +200,7 @@ class WalletServiceTest {
 
         when(walletRepository.existsByName(wallet2.getName())).thenReturn(true);
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
         String walletName = wallet2.getName();
 
         assertThrows(
@@ -236,7 +236,7 @@ class WalletServiceTest {
     void testChangeWalletTypeWalletDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -255,7 +255,7 @@ class WalletServiceTest {
 
         when(walletTypeRepository.existsById(walletType2.getId())).thenReturn(false);
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -312,7 +312,7 @@ class WalletServiceTest {
     void testUpdateWalletBalanceDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
         BigDecimal newBalance = new BigDecimal("1000.0");
 
         assertThrows(

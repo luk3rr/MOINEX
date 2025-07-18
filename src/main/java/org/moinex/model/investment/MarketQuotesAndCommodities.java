@@ -33,7 +33,7 @@ public class MarketQuotesAndCommodities {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Column(name = "dollar")
     private BigDecimal dollar;

@@ -33,7 +33,7 @@ public class TickerPurchase extends Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "ticker_id", referencedColumnName = "id")
@@ -43,7 +43,7 @@ public class TickerPurchase extends Transaction {
      * Constructor for testing purposes
      */
     public TickerPurchase(
-            Long id,
+            Integer id,
             Ticker ticker,
             BigDecimal quantity,
             BigDecimal unitPrice,

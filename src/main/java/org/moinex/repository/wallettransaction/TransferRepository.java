@@ -14,7 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TransferRepository extends JpaRepository<Transfer, Long> {
+public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     /**
      * Get the transfers by wallet
      * @param walletId The id of the wallet
@@ -26,7 +26,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
                     + "WHERE t.senderWallet.id = :walletId "
                     + "OR t.receiverWallet.id = :walletId "
                     + "ORDER BY t.date DESC")
-    List<Transfer> findTransfersByWallet(@Param("walletId") Long walletId);
+    List<Transfer> findTransfersByWallet(@Param("walletId") Integer walletId);
 
     /**
      * Get the transfers by month and year
@@ -59,7 +59,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
                     + "AND strftime('%Y', t.date) = printf('%04d', :year) "
                     + "ORDER BY t.date DESC")
     List<Transfer> findTransfersByWalletAndMonth(
-            @Param("walletId") Long walletId,
+            @Param("walletId") Integer walletId,
             @Param("month") Integer month,
             @Param("year") Integer year);
 
@@ -73,7 +73,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
                     + "FROM Transfer t "
                     + "WHERE t.senderWallet.id = :walletId "
                     + "OR t.receiverWallet.id = :walletId")
-    Long getTransferCountByWallet(@Param("walletId") Long walletId);
+    Integer getTransferCountByWallet(@Param("walletId") Integer walletId);
 
     /**
      * Get suggestions. Suggestions are transfers with distinct descriptions

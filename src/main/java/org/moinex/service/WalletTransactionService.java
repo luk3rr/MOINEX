@@ -70,9 +70,9 @@ public class WalletTransactionService {
      * @throws MoinexException.InsufficientResourcesException If the sender wallet does not have enough
      */
     @Transactional
-    public Long transferMoney(
-            Long senderId,
-            Long receiverId,
+    public Integer transferMoney(
+            Integer senderId,
+            Integer receiverId,
             LocalDateTime date,
             BigDecimal amount,
             String description) {
@@ -150,8 +150,8 @@ public class WalletTransactionService {
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
-    public Long addIncome(
-            Long walletId,
+    public Integer addIncome(
+            Integer walletId,
             Category category,
             LocalDateTime date,
             BigDecimal amount,
@@ -211,8 +211,8 @@ public class WalletTransactionService {
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
-    public Long addExpense(
-            Long walletId,
+    public Integer addExpense(
+            Integer walletId,
             Category category,
             LocalDateTime date,
             BigDecimal amount,
@@ -551,7 +551,7 @@ public class WalletTransactionService {
      * @throws EntityNotFoundException If the transaction does not exist
      */
     @Transactional
-    public void deleteTransaction(Long transactionId) {
+    public void deleteTransaction(Integer transactionId) {
         WalletTransaction transaction =
                 walletTransactionRepository
                         .findById(transactionId)
@@ -589,7 +589,7 @@ public class WalletTransactionService {
      * @throws MoinexException.AttributeAlreadySetException If the transaction is already confirmed
      */
     @Transactional
-    public void confirmTransaction(Long transactionId) {
+    public void confirmTransaction(Integer transactionId) {
         WalletTransaction transaction =
                 walletTransactionRepository
                         .findById(transactionId)
@@ -626,7 +626,7 @@ public class WalletTransactionService {
      * @return The transaction with the provided id
      * @throws EntityNotFoundException If the transaction does not exist
      */
-    public WalletTransaction getTransactionById(Long id) {
+    public WalletTransaction getTransactionById(Integer id) {
         return walletTransactionRepository
                 .findById(id)
                 .orElseThrow(
@@ -691,7 +691,7 @@ public class WalletTransactionService {
      * @param year     The year of the transactions
      */
     public List<WalletTransaction> getNonArchivedTransactionsByWalletAndMonth(
-            Long walletId, Integer month, Integer year) {
+            Integer walletId, Integer month, Integer year) {
         return walletTransactionRepository.findNonArchivedTransactionsByWalletAndMonth(
                 walletId, month, year);
     }
@@ -758,7 +758,7 @@ public class WalletTransactionService {
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
-    public Long getTransactionCountByWallet(Long walletId) {
+    public Integer getTransactionCountByWallet(Integer walletId) {
         return walletTransactionRepository.getTransactionCountByWallet(walletId)
                 + transferRepository.getTransferCountByWallet(walletId);
     }
@@ -771,7 +771,8 @@ public class WalletTransactionService {
      * @param year     The year
      * @return A list with the transfers in the wallet by month
      */
-    public List<Transfer> getTransfersByWalletAndMonth(Long walletId, Integer month, Integer year) {
+    public List<Transfer> getTransfersByWalletAndMonth(
+            Integer walletId, Integer month, Integer year) {
         return transferRepository.findTransfersByWalletAndMonth(walletId, month, year);
     }
 

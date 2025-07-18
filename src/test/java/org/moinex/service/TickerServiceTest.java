@@ -70,7 +70,7 @@ class TickerServiceTest {
     void beforeEach() {
         ticker1 =
                 new Ticker(
-                        1L,
+                        1,
                         "Ticker1",
                         "T1",
                         TickerType.STOCK,
@@ -81,7 +81,7 @@ class TickerServiceTest {
 
         ticker2 =
                 new Ticker(
-                        2L,
+                        2,
                         "Ticker2",
                         "T2",
                         TickerType.STOCK,
@@ -92,7 +92,7 @@ class TickerServiceTest {
 
         crypto1 =
                 new Ticker(
-                        3L,
+                        3,
                         "crypto1",
                         "T3",
                         TickerType.CRYPTOCURRENCY,
@@ -103,7 +103,7 @@ class TickerServiceTest {
 
         crypto2 =
                 new Ticker(
-                        4L,
+                        4,
                         "crypto2",
                         "T4",
                         TickerType.CRYPTOCURRENCY,
@@ -114,7 +114,7 @@ class TickerServiceTest {
 
         crypto3 =
                 new Ticker(
-                        5L,
+                        5,
                         "crypto3",
                         "T5",
                         TickerType.CRYPTOCURRENCY,
@@ -123,7 +123,7 @@ class TickerServiceTest {
                         new BigDecimal("10"),
                         LocalDateTime.now());
 
-        wallet = new Wallet(1L, "Main Wallet", BigDecimal.ZERO);
+        wallet = new Wallet(1, "Main Wallet", BigDecimal.ZERO);
 
         category = Category.builder().name("Category").build();
 
@@ -140,15 +140,11 @@ class TickerServiceTest {
 
         tickerPurchase =
                 new TickerPurchase(
-                        1L,
-                        ticker1,
-                        new BigDecimal("1"),
-                        new BigDecimal("50"),
-                        purchaseTransaction);
+                        1, ticker1, new BigDecimal("1"), new BigDecimal("50"), purchaseTransaction);
 
         cryptoExchange =
                 new CryptoExchange(
-                        1L,
+                        1,
                         ticker1,
                         ticker1,
                         new BigDecimal("1"),
@@ -158,7 +154,7 @@ class TickerServiceTest {
 
         exchangeCrypto1ToCrypto2 =
                 new CryptoExchange(
-                        2L,
+                        2,
                         crypto1,
                         crypto2,
                         new BigDecimal("1"),
@@ -364,10 +360,10 @@ class TickerServiceTest {
     void testDeleteTicker() {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.of(ticker1));
 
-        when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(0L);
-        when(tickerRepository.getSaleCountByTicker(ticker1.getId())).thenReturn(0L);
-        when(tickerRepository.getDividendCountByTicker(ticker1.getId())).thenReturn(0L);
-        when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId())).thenReturn(0L);
+        when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(0);
+        when(tickerRepository.getSaleCountByTicker(ticker1.getId())).thenReturn(0);
+        when(tickerRepository.getDividendCountByTicker(ticker1.getId())).thenReturn(0);
+        when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId())).thenReturn(0);
 
         tickerService.deleteTicker(ticker1.getId());
 
@@ -379,7 +375,7 @@ class TickerServiceTest {
     void testDeleteTickerNotFound() {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.empty());
 
-        Long tickerId = ticker1.getId();
+        Integer tickerId = ticker1.getId();
         assertThrows(EntityNotFoundException.class, () -> tickerService.deleteTicker(tickerId));
 
         verify(tickerRepository, never()).delete(any(Ticker.class));
@@ -393,7 +389,7 @@ class TickerServiceTest {
         "0, 0, 1, 0" // Dividends
     })
     void testDeleteTickerWithTransactions(
-            long purchaseCount, long saleCount, long dividendCount, long cryptoExchangeCount) {
+            int purchaseCount, int saleCount, int dividendCount, int cryptoExchangeCount) {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.of(ticker1));
 
         when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(purchaseCount);
@@ -402,7 +398,7 @@ class TickerServiceTest {
         when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId()))
                 .thenReturn(cryptoExchangeCount);
 
-        Long tickerId = ticker1.getId();
+        Integer tickerId = ticker1.getId();
         assertThrows(IllegalStateException.class, () -> tickerService.deleteTicker(tickerId));
 
         verify(tickerRepository, never()).delete(any(Ticker.class));
@@ -413,12 +409,12 @@ class TickerServiceTest {
     void testDeleteTickerWithCryptoExchanges() {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.of(ticker1));
 
-        when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(0L);
-        when(tickerRepository.getSaleCountByTicker(ticker1.getId())).thenReturn(0L);
-        when(tickerRepository.getDividendCountByTicker(ticker1.getId())).thenReturn(0L);
-        when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId())).thenReturn(1L);
+        when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(0);
+        when(tickerRepository.getSaleCountByTicker(ticker1.getId())).thenReturn(0);
+        when(tickerRepository.getDividendCountByTicker(ticker1.getId())).thenReturn(0);
+        when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId())).thenReturn(1);
 
-        Long tickerId = ticker1.getId();
+        Integer tickerId = ticker1.getId();
         assertThrows(IllegalStateException.class, () -> tickerService.deleteTicker(tickerId));
 
         verify(tickerRepository, never()).delete(any(Ticker.class));
@@ -429,12 +425,12 @@ class TickerServiceTest {
     void testDeleteTickerWithTransactions() {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.of(ticker1));
 
-        when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(1L);
-        when(tickerRepository.getSaleCountByTicker(ticker1.getId())).thenReturn(2L);
-        when(tickerRepository.getDividendCountByTicker(ticker1.getId())).thenReturn(3L);
-        when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId())).thenReturn(4L);
+        when(tickerRepository.getPurchaseCountByTicker(ticker1.getId())).thenReturn(1);
+        when(tickerRepository.getSaleCountByTicker(ticker1.getId())).thenReturn(2);
+        when(tickerRepository.getDividendCountByTicker(ticker1.getId())).thenReturn(3);
+        when(tickerRepository.getCryptoExchangeCountByTicker(ticker1.getId())).thenReturn(4);
 
-        Long tickerId = ticker1.getId();
+        Integer tickerId = ticker1.getId();
         assertThrows(IllegalStateException.class, () -> tickerService.deleteTicker(tickerId));
 
         verify(tickerRepository, never()).delete(any(Ticker.class));
@@ -456,7 +452,7 @@ class TickerServiceTest {
     void testArchiveTickerNotFound() {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.empty());
 
-        Long tickerId = ticker1.getId();
+        Integer tickerId = ticker1.getId();
         assertThrows(EntityNotFoundException.class, () -> tickerService.archiveTicker(tickerId));
 
         verify(tickerRepository, never()).save(any(Ticker.class));
@@ -478,7 +474,7 @@ class TickerServiceTest {
     void testUnarchiveTickerNotFound() {
         when(tickerRepository.findById(ticker1.getId())).thenReturn(Optional.empty());
 
-        Long tickerId = ticker1.getId();
+        Integer tickerId = ticker1.getId();
         assertThrows(EntityNotFoundException.class, () -> tickerService.unarchiveTicker(tickerId));
 
         verify(tickerRepository, never()).save(any(Ticker.class));
@@ -487,12 +483,12 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if a purchase is added successfully to a ticker")
     void testAddPurchase() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        when(walletTransactionService.addExpense(anyLong(), any(), any(), any(), any(), any()))
-                .thenReturn(100L);
+        when(walletTransactionService.addExpense(anyInt(), any(), any(), any(), any(), any()))
+                .thenReturn(100);
 
-        when(walletTransactionService.getTransactionById(100L))
+        when(walletTransactionService.getTransactionById(100))
                 .thenReturn(
                         WalletTransaction.builder()
                                 .wallet(wallet)
@@ -505,8 +501,8 @@ class TickerServiceTest {
                                 .build());
 
         tickerService.addPurchase(
-                1L,
-                1L,
+                1,
+                1,
                 new BigDecimal("10"),
                 new BigDecimal("150"),
                 category,
@@ -527,10 +523,10 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if adding a purchase to a non-existent ticker throws an exception")
     void testAddPurchaseTickerNotFound() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tickerRepository.findById(1)).thenReturn(Optional.empty());
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal quantity = new BigDecimal("10");
         BigDecimal unitPrice = new BigDecimal("150");
         LocalDateTime date = LocalDateTime.now();
@@ -559,10 +555,10 @@ class TickerServiceTest {
             "Test if adding a purchase with quantity less than or equal to zero "
                     + "throws an exception")
     void testAddPurchaseInvalidQuantity() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal quantity = BigDecimal.ZERO;
         BigDecimal unitPrice = new BigDecimal("150");
         LocalDateTime date = LocalDateTime.now();
@@ -591,10 +587,10 @@ class TickerServiceTest {
             "Test if adding a purchase with unit price less than or equal to "
                     + "zero throws an exception")
     void testAddPurchaseInvalidUnitPrice() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal quantity = new BigDecimal("10");
         BigDecimal unitPrice = BigDecimal.ZERO;
         LocalDateTime date = LocalDateTime.now();
@@ -623,12 +619,12 @@ class TickerServiceTest {
     void testAddSale() {
         ticker1.setCurrentQuantity(new BigDecimal("20"));
 
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        when(walletTransactionService.addIncome(anyLong(), any(), any(), any(), any(), any()))
-                .thenReturn(100L);
+        when(walletTransactionService.addIncome(anyInt(), any(), any(), any(), any(), any()))
+                .thenReturn(100);
 
-        when(walletTransactionService.getTransactionById(100L))
+        when(walletTransactionService.getTransactionById(100))
                 .thenReturn(
                         WalletTransaction.builder()
                                 .wallet(wallet)
@@ -641,8 +637,8 @@ class TickerServiceTest {
                                 .build());
 
         tickerService.addSale(
-                1L,
-                1L,
+                1,
+                1,
                 new BigDecimal("10"),
                 new BigDecimal("200"),
                 category,
@@ -662,10 +658,10 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if adding a sale to a non-existent ticker throws an exception")
     void testAddSaleTickerNotFound() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tickerRepository.findById(1)).thenReturn(Optional.empty());
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal quantity = new BigDecimal("10");
         BigDecimal unitPrice = new BigDecimal("200");
         LocalDateTime date = LocalDateTime.now();
@@ -695,14 +691,14 @@ class TickerServiceTest {
                     + "throws an exception")
     void testAddSaleExceedsQuantity() {
         ticker1.setCurrentQuantity(new BigDecimal("5"));
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         assertThrows(
                 MoinexException.InsufficientResourcesException.class,
                 () ->
                         tickerService.addSale(
-                                1L,
-                                1L,
+                                1,
+                                1,
                                 new BigDecimal("10"),
                                 new BigDecimal("200"),
                                 category,
@@ -720,10 +716,10 @@ class TickerServiceTest {
                     + "throws an exception")
     void testAddSaleInvalidUnitPrice() {
         ticker1.setCurrentQuantity(new BigDecimal("10"));
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal quantity = new BigDecimal("5");
         BigDecimal unitPrice = BigDecimal.ZERO;
         LocalDateTime date = LocalDateTime.now();
@@ -750,12 +746,12 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if a dividend is added successfully to a ticker")
     void testAddDividend() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        when(walletTransactionService.addIncome(anyLong(), any(), any(), any(), any(), any()))
-                .thenReturn(100L);
+        when(walletTransactionService.addIncome(anyInt(), any(), any(), any(), any(), any()))
+                .thenReturn(100);
 
-        when(walletTransactionService.getTransactionById(100L))
+        when(walletTransactionService.getTransactionById(100))
                 .thenReturn(
                         WalletTransaction.builder()
                                 .wallet(wallet)
@@ -768,8 +764,8 @@ class TickerServiceTest {
                                 .build());
 
         tickerService.addDividend(
-                1L,
-                1L,
+                1,
+                1,
                 category,
                 new BigDecimal("50"),
                 LocalDateTime.now(),
@@ -782,10 +778,10 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if adding a dividend to a non-existent ticker throws an exception")
     void testAddDividendTickerNotFound() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tickerRepository.findById(1)).thenReturn(Optional.empty());
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal amount = new BigDecimal("50");
         LocalDateTime date = LocalDateTime.now();
         String description = "Dividend Payment";
@@ -802,7 +798,7 @@ class TickerServiceTest {
 
         // Verify that the wallet transaction was not created
         verify(walletTransactionService, never())
-                .addIncome(anyLong(), any(), any(), any(), any(), any());
+                .addIncome(anyInt(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -810,10 +806,10 @@ class TickerServiceTest {
             "Test if adding a dividend with amount less than or equal to zero "
                     + "throws an exception")
     void testAddDividendInvalidAmount() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-        Long tickerId = 1L;
-        Long walletId = 1L;
+        Integer tickerId = 1;
+        Integer walletId = 1;
         BigDecimal amount = BigDecimal.ZERO;
         LocalDateTime date = LocalDateTime.now();
         String description = "Dividend Payment";
@@ -830,7 +826,7 @@ class TickerServiceTest {
 
         // Verify that the wallet transaction was not created
         verify(walletTransactionService, never())
-                .addIncome(anyLong(), any(), any(), any(), any(), any());
+                .addIncome(anyInt(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -842,8 +838,8 @@ class TickerServiceTest {
         ticker1.setCurrentQuantity(new BigDecimal("10"));
         ticker2.setCurrentQuantity(new BigDecimal("0"));
 
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
-        when(tickerRepository.findById(2L)).thenReturn(Optional.of(ticker2));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(2)).thenReturn(Optional.of(ticker2));
 
         when(cryptoExchangeRepository.save(any(CryptoExchange.class))).thenReturn(cryptoExchange);
 
@@ -854,7 +850,7 @@ class TickerServiceTest {
         BigDecimal targetQuantity = new BigDecimal("1");
 
         tickerService.addCryptoExchange(
-                1L, 2L, sourceQuantity, targetQuantity, LocalDateTime.now(), "");
+                1, 2, sourceQuantity, targetQuantity, LocalDateTime.now(), "");
 
         // Capture the exchange object that was saved and check its values
         ArgumentCaptor<CryptoExchange> exchangeCaptor =
@@ -888,8 +884,8 @@ class TickerServiceTest {
                 MoinexException.SameSourceDestinationException.class,
                 () ->
                         tickerService.addCryptoExchange(
-                                1L,
-                                1L,
+                                1,
+                                1,
                                 new BigDecimal("1"),
                                 new BigDecimal("1"),
                                 LocalDateTime.now(),
@@ -904,10 +900,10 @@ class TickerServiceTest {
             "Test if adding a crypto exchange with source ticker not found "
                     + "throws an exception")
     void testAddCryptoExchangeSourceNotFound() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tickerRepository.findById(1)).thenReturn(Optional.empty());
 
-        Long sourceId = 1L;
-        Long targetId = 2L;
+        Integer sourceId = 1;
+        Integer targetId = 2;
         BigDecimal sourceQuantity = new BigDecimal("1");
         BigDecimal targetQuantity = new BigDecimal("1");
         LocalDateTime date = LocalDateTime.now();
@@ -933,11 +929,11 @@ class TickerServiceTest {
             "Test if adding a crypto exchange with target ticker not found "
                     + "throws an exception")
     void testAddCryptoExchangeTargetNotFound() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
-        when(tickerRepository.findById(2L)).thenReturn(Optional.empty());
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(2)).thenReturn(Optional.empty());
 
-        Long sourceId = 1L;
-        Long targetId = 2L;
+        Integer sourceId = 1;
+        Integer targetId = 2;
         BigDecimal sourceQuantity = new BigDecimal("1");
         BigDecimal targetQuantity = new BigDecimal("1");
         LocalDateTime date = LocalDateTime.now();
@@ -966,15 +962,15 @@ class TickerServiceTest {
         ticker1.setType(TickerType.STOCK);
         ticker2.setType(TickerType.STOCK);
 
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
-        when(tickerRepository.findById(2L)).thenReturn(Optional.of(ticker2));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(2)).thenReturn(Optional.of(ticker2));
 
         assertThrows(
                 MoinexException.InvalidTickerTypeException.class,
                 () ->
                         tickerService.addCryptoExchange(
-                                1L,
-                                2L,
+                                1,
+                                2,
                                 new BigDecimal("1"),
                                 new BigDecimal("1"),
                                 LocalDateTime.now(),
@@ -992,11 +988,11 @@ class TickerServiceTest {
         ticker1.setType(TickerType.CRYPTOCURRENCY);
         ticker2.setType(TickerType.CRYPTOCURRENCY);
 
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
-        when(tickerRepository.findById(2L)).thenReturn(Optional.of(ticker2));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(2)).thenReturn(Optional.of(ticker2));
 
-        Long sourceId = 1L;
-        Long targetId = 2L;
+        Integer sourceId = 1;
+        Integer targetId = 2;
         BigDecimal sourceQuantity = BigDecimal.ZERO;
         BigDecimal targetQuantity = new BigDecimal("1");
         LocalDateTime date = LocalDateTime.now();
@@ -1025,11 +1021,11 @@ class TickerServiceTest {
         ticker1.setType(TickerType.CRYPTOCURRENCY);
         ticker2.setType(TickerType.CRYPTOCURRENCY);
 
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
-        when(tickerRepository.findById(2L)).thenReturn(Optional.of(ticker2));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(2)).thenReturn(Optional.of(ticker2));
 
-        Long sourceId = 1L;
-        Long targetId = 2L;
+        Integer sourceId = 1;
+        Integer targetId = 2;
         BigDecimal sourceQuantity = new BigDecimal("1");
         BigDecimal targetQuantity = BigDecimal.ZERO;
         LocalDateTime date = LocalDateTime.now();
@@ -1061,15 +1057,15 @@ class TickerServiceTest {
         ticker1.setCurrentQuantity(new BigDecimal("5"));
         ticker2.setCurrentQuantity(new BigDecimal("0"));
 
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
-        when(tickerRepository.findById(2L)).thenReturn(Optional.of(ticker2));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(2)).thenReturn(Optional.of(ticker2));
 
         assertThrows(
                 MoinexException.InsufficientResourcesException.class,
                 () ->
                         tickerService.addCryptoExchange(
-                                1L,
-                                2L,
+                                1,
+                                2,
                                 new BigDecimal("10"),
                                 new BigDecimal("1"),
                                 LocalDateTime.now(),
@@ -1082,7 +1078,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker name is changed successfully")
     void testChangeTickerName() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         String oldName = ticker1.getName();
         String newName = oldName + " Changed";
@@ -1099,7 +1095,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if exception is thrown when updating a non-existent ticker")
     void testChangeTickerNameNotFound() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tickerRepository.findById(1)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> tickerService.updateTicker(ticker1));
 
@@ -1111,7 +1107,7 @@ class TickerServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {" "})
     void testChangeTickerInvalidName(String invalidName) {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setName(invalidName);
 
@@ -1123,7 +1119,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker symbol is changed successfully")
     void testChangeTickerSymbol() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         String oldSymbol = ticker1.getSymbol();
         String newSymbol = oldSymbol + " Changed";
@@ -1142,7 +1138,7 @@ class TickerServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {" "})
     void testChangeTickerInvalidSymbol(String invalidSymbol) {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setSymbol(invalidSymbol);
 
@@ -1154,7 +1150,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker type is changed successfully")
     void testChangeTickerType() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         TickerType oldType = ticker1.getType();
 
@@ -1179,7 +1175,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker price is changed successfully")
     void testChangeTickerPrice() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         BigDecimal oldPrice = ticker1.getCurrentUnitValue();
 
@@ -1205,7 +1201,7 @@ class TickerServiceTest {
     @DisplayName(
             "Test if exception is thrown when updating a ticker with price " + "less than zero")
     void testChangeTickerPriceLessThanZero() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setCurrentUnitValue(new BigDecimal("-0.05"));
 
@@ -1217,7 +1213,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if exception is thrown when updating a ticker with price " + "equal to zero")
     void testChangeTickerPriceEqualToZero() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setCurrentUnitValue(BigDecimal.ZERO);
 
@@ -1229,7 +1225,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker current quantity is changed successfully")
     void testChangeTickerCurrentQuantity() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         BigDecimal oldQuantity = ticker1.getCurrentQuantity();
 
@@ -1256,7 +1252,7 @@ class TickerServiceTest {
             "Test if exception is thrown when updating a ticker with current quantity "
                     + "less than zero")
     void testChangeTickerCurrentQuantityLessThanZero() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setCurrentQuantity(new BigDecimal("-0.05"));
 
@@ -1268,7 +1264,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker average price is changed successfully")
     void testChangeTickerAveragePrice() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         BigDecimal oldPrice = ticker1.getAverageUnitValue();
 
@@ -1299,7 +1295,7 @@ class TickerServiceTest {
             "Test if exception is thrown when updating a ticker with average price "
                     + "less than zero")
     void testChangeTickerAveragePriceLessThanZero() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setAverageUnitValue(new BigDecimal("-0.05"));
 
@@ -1311,7 +1307,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker is set to archived successfully")
     void testChangeTickerArchived() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setArchived(true);
 
@@ -1326,7 +1322,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if ticker is set to unarchived successfully")
     void testChangeTickerUnarchived() {
-        when(tickerRepository.findById(1L)).thenReturn(Optional.of(ticker1));
+        when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
         ticker1.setArchived(false);
 
@@ -1341,8 +1337,8 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if purchase quantity is updated successfully")
     void testUpdatePurchaseQuantity() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.of(tickerPurchase));
-        when(tickerRepository.existsById(1L)).thenReturn(true);
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.of(tickerPurchase));
+        when(tickerRepository.existsById(1)).thenReturn(true);
 
         BigDecimal oldQuantity = tickerPurchase.getQuantity();
 
@@ -1373,7 +1369,7 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if exception is thrown when updating a non-existent purchase")
     void testUpdatePurchaseNotFound() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.empty());
 
         assertThrows(
                 EntityNotFoundException.class, () -> tickerService.updatePurchase(tickerPurchase));
@@ -1386,8 +1382,8 @@ class TickerServiceTest {
             "Test if exception is thrown when updating a purchase with quantity "
                     + "less than zero")
     void testUpdatePurchaseQuantityLessThanZero() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.of(tickerPurchase));
-        when(tickerRepository.existsById(1L)).thenReturn(true);
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.of(tickerPurchase));
+        when(tickerRepository.existsById(1)).thenReturn(true);
 
         tickerPurchase.setQuantity(new BigDecimal("-0.05"));
 
@@ -1401,8 +1397,8 @@ class TickerServiceTest {
     @DisplayName(
             "Test if exception is thrown when updating a purchase with quantity " + "equal to zero")
     void testUpdatePurchaseQuantityEqualToZero() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.of(tickerPurchase));
-        when(tickerRepository.existsById(1L)).thenReturn(true);
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.of(tickerPurchase));
+        when(tickerRepository.existsById(1)).thenReturn(true);
 
         tickerPurchase.setQuantity(BigDecimal.ZERO);
 
@@ -1415,8 +1411,8 @@ class TickerServiceTest {
     @Test
     @DisplayName("Test if purchase unit price is updated successfully")
     void testUpdatePurchaseUnitPrice() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.of(tickerPurchase));
-        when(tickerRepository.existsById(1L)).thenReturn(true);
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.of(tickerPurchase));
+        when(tickerRepository.existsById(1)).thenReturn(true);
 
         BigDecimal oldUnitPrice = tickerPurchase.getUnitPrice();
 
@@ -1451,8 +1447,8 @@ class TickerServiceTest {
             "Test if exception is thrown when updating a purchase with unit price "
                     + "less than zero")
     void testUpdatePurchaseUnitPriceLessThanZero() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.of(tickerPurchase));
-        when(tickerRepository.existsById(1L)).thenReturn(true);
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.of(tickerPurchase));
+        when(tickerRepository.existsById(1)).thenReturn(true);
 
         tickerPurchase.setUnitPrice(new BigDecimal("-0.05"));
 
@@ -1467,8 +1463,8 @@ class TickerServiceTest {
             "Test if exception is thrown when updating a purchase with unit price "
                     + "equal to zero")
     void testUpdatePurchaseUnitPriceEqualToZero() {
-        when(tickerPurchaseRepository.findById(1L)).thenReturn(Optional.of(tickerPurchase));
-        when(tickerRepository.existsById(1L)).thenReturn(true);
+        when(tickerPurchaseRepository.findById(1)).thenReturn(Optional.of(tickerPurchase));
+        when(tickerRepository.existsById(1)).thenReturn(true);
 
         tickerPurchase.setUnitPrice(BigDecimal.ZERO);
 

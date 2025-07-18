@@ -41,7 +41,7 @@ public class RecurringTransaction extends BaseTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Column(name = "start_date", nullable = false)
     private String startDate;
@@ -87,7 +87,7 @@ public class RecurringTransaction extends BaseTransaction {
      * Constructor for testing purposes
      */
     public RecurringTransaction(
-            Long id,
+            Integer id,
             Wallet wallet,
             Category category,
             TransactionType type,

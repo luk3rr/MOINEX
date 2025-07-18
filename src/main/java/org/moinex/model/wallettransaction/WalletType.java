@@ -35,7 +35,7 @@ public class WalletType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)
     private String name;
@@ -46,7 +46,7 @@ public class WalletType {
     /**
      * Constructor for testing purposes
      */
-    public WalletType(Long id, String name) {
+    public WalletType(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

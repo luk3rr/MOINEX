@@ -242,7 +242,8 @@ public class CreditCardPaneController {
                 new Image(Constants.CRC_OPERATOR_ICONS_PATH + creditCard.getOperator().getIcon()));
 
         BigDecimal limit = creditCard.getMaxDebt();
-        BigDecimal pendingPayments = creditCardService.getTotalPendingPayments(creditCard.getId());
+        BigDecimal pendingPayments =
+                creditCardService.getTotalPendingPaymentsByCreditCard(creditCard.getId());
 
         BigDecimal limitAvailable = creditCardService.getAvailableCredit(creditCard.getId());
 

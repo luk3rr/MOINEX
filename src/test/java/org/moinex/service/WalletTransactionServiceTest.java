@@ -62,12 +62,12 @@ class WalletTransactionServiceTest {
     private BigDecimal transferAmount;
     private final String description = "";
 
-    private Wallet createWallet(Long id, String name, BigDecimal balance) {
+    private Wallet createWallet(Integer id, String name, BigDecimal balance) {
         return new Wallet(id, name, balance);
     }
 
     private Transfer createTransfer(
-            Long id, Wallet sender, Wallet receiver, LocalDateTime date, BigDecimal amount) {
+            Integer id, Wallet sender, Wallet receiver, LocalDateTime date, BigDecimal amount) {
         return new Transfer(id, sender, receiver, date, amount, "");
     }
 
@@ -103,10 +103,10 @@ class WalletTransactionServiceTest {
         date = LocalDateTime.now();
         category = Category.builder().name("Category").build();
 
-        wallet1 = createWallet(1L, "Wallet1", new BigDecimal("1000"));
-        wallet2 = createWallet(2L, "Wallet2", new BigDecimal("2000"));
+        wallet1 = createWallet(1, "Wallet1", new BigDecimal("1000"));
+        wallet2 = createWallet(2, "Wallet2", new BigDecimal("2000"));
 
-        transfer = createTransfer(1L, wallet1, wallet2, date, transferAmount);
+        transfer = createTransfer(1, wallet1, wallet2, date, transferAmount);
 
         wallet1IncomeTransaction =
                 createWalletTransaction(
@@ -182,8 +182,8 @@ class WalletTransactionServiceTest {
     void testTransferMoneySenderDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long senderWalletId = wallet1.getId();
-        Long receiverWalletId = wallet2.getId();
+        Integer senderWalletId = wallet1.getId();
+        Integer receiverWalletId = wallet2.getId();
         BigDecimal amountToTransfer = transferAmount;
 
         assertThrows(
@@ -207,8 +207,8 @@ class WalletTransactionServiceTest {
 
         when(walletRepository.findById(wallet2.getId())).thenReturn(Optional.empty());
 
-        Long senderWalletId = wallet1.getId();
-        Long receiverWalletId = wallet2.getId();
+        Integer senderWalletId = wallet1.getId();
+        Integer receiverWalletId = wallet2.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -247,8 +247,8 @@ class WalletTransactionServiceTest {
             "Test if exception is thrown when the amount to transfer is less "
                     + "than or equal to zero")
     void testTransferMoneyAmountZero() {
-        Long senderWalletId = wallet1.getId();
-        Long receiverWalletId = wallet2.getId();
+        Integer senderWalletId = wallet1.getId();
+        Integer receiverWalletId = wallet2.getId();
         BigDecimal zeroAmount = new BigDecimal("0.0");
 
         assertThrows(
@@ -338,7 +338,7 @@ class WalletTransactionServiceTest {
     void testAddIncomeWalletDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
 
         // Check for confirmed income
         assertThrows(
@@ -446,7 +446,7 @@ class WalletTransactionServiceTest {
     void testAddExpenseWalletDoesNotExist() {
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
 
-        Long walletId = wallet1.getId();
+        Integer walletId = wallet1.getId();
 
         // Check for confirmed expense
         assertThrows(
@@ -892,7 +892,7 @@ class WalletTransactionServiceTest {
         when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
                 .thenReturn(Optional.empty());
 
-        Long transactionId = wallet1IncomeTransaction.getId();
+        Integer transactionId = wallet1IncomeTransaction.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -951,7 +951,7 @@ class WalletTransactionServiceTest {
         when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
                 .thenReturn(Optional.empty());
 
-        Long transactionId = wallet1IncomeTransaction.getId();
+        Integer transactionId = wallet1IncomeTransaction.getId();
 
         assertThrows(
                 EntityNotFoundException.class,

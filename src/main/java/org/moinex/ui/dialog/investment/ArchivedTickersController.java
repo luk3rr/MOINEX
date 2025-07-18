@@ -204,7 +204,7 @@ public class ArchivedTickersController {
      * Configure the table view columns
      */
     private void configureTableView() {
-        TableColumn<Ticker, Long> idColumn = getTickerLongTableColumn();
+        TableColumn<Ticker, Integer> idColumn = getTickerLongTableColumn();
 
         TableColumn<Ticker, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
@@ -257,8 +257,8 @@ public class ArchivedTickersController {
         tickerTableView.getColumns().add(avgUnitColumn);
     }
 
-    private static TableColumn<Ticker, Long> getTickerLongTableColumn() {
-        TableColumn<Ticker, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<Ticker, Integer> getTickerLongTableColumn() {
+        TableColumn<Ticker, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -266,7 +266,7 @@ public class ArchivedTickersController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

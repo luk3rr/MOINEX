@@ -180,7 +180,7 @@ public class ArchivedWalletsController {
      * Configures the table view columns
      */
     private void configureTableView() {
-        TableColumn<Wallet, Long> idColumn = getWalletLongTableColumn();
+        TableColumn<Wallet, Integer> idColumn = getWalletLongTableColumn();
 
         TableColumn<Wallet, String> walletColumn = new TableColumn<>("Wallet");
         walletColumn.setCellValueFactory(
@@ -190,7 +190,7 @@ public class ArchivedWalletsController {
         typeColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getType().getName()));
 
-        TableColumn<Wallet, Long> numOfTransactionsColumn = getLongTableColumn();
+        TableColumn<Wallet, Integer> numOfTransactionsColumn = getLongTableColumn();
 
         walletTableView.getColumns().add(idColumn);
         walletTableView.getColumns().add(walletColumn);
@@ -198,8 +198,8 @@ public class ArchivedWalletsController {
         walletTableView.getColumns().add(numOfTransactionsColumn);
     }
 
-    private TableColumn<Wallet, Long> getLongTableColumn() {
-        TableColumn<Wallet, Long> numOfTransactionsColumn =
+    private TableColumn<Wallet, Integer> getLongTableColumn() {
+        TableColumn<Wallet, Integer> numOfTransactionsColumn =
                 new TableColumn<>("Associated Transactions");
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
@@ -211,7 +211,7 @@ public class ArchivedWalletsController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
@@ -225,15 +225,15 @@ public class ArchivedWalletsController {
         return numOfTransactionsColumn;
     }
 
-    private static TableColumn<Wallet, Long> getWalletLongTableColumn() {
-        TableColumn<Wallet, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<Wallet, Integer> getWalletLongTableColumn() {
+        TableColumn<Wallet, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
