@@ -33,7 +33,7 @@ public class BrazilianMarketIndicators {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Column(name = "selic_target")
     private BigDecimal selicTarget;

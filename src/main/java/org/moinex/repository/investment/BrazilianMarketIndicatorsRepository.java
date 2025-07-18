@@ -12,4 +12,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BrazilianMarketIndicatorsRepository
-        extends JpaRepository<BrazilianMarketIndicators, Long> {}
+        extends JpaRepository<BrazilianMarketIndicators, Integer> {}

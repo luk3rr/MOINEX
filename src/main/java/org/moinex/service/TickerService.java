@@ -79,7 +79,7 @@ public class TickerService {
      * @throws IllegalArgumentException If the average unit price is lower than zero
      */
     @Transactional
-    public Long addTicker(
+    public Integer addTicker(
             String name,
             String symbol,
             TickerType type,
@@ -142,7 +142,7 @@ public class TickerService {
      * @throws IllegalStateException   If the ticker has transactions associated with it
      */
     @Transactional
-    public void deleteTicker(Long id) {
+    public void deleteTicker(Integer id) {
         Ticker ticker =
                 tickerRepository
                         .findById(id)
@@ -178,7 +178,7 @@ public class TickerService {
      * anymore
      */
     @Transactional
-    public void archiveTicker(Long id) {
+    public void archiveTicker(Integer id) {
         Ticker ticker =
                 tickerRepository
                         .findById(id)
@@ -204,7 +204,7 @@ public class TickerService {
      * will be used in the application again
      */
     @Transactional
-    public void unarchiveTicker(Long id) {
+    public void unarchiveTicker(Integer id) {
         Ticker ticker =
                 tickerRepository
                         .findById(id)
@@ -351,8 +351,8 @@ public class TickerService {
      */
     @Transactional
     public void addPurchase(
-            Long tickerId,
-            Long walletId,
+            Integer tickerId,
+            Integer walletId,
             BigDecimal quantity,
             BigDecimal unitPrice,
             Category category,
@@ -381,7 +381,7 @@ public class TickerService {
         BigDecimal amount = unitPrice.multiply(quantity);
 
         // Create a wallet transaction for the dividend
-        Long id =
+        Integer id =
                 walletTransactionService.addExpense(
                         walletId, category, date, amount, description, status);
 
@@ -437,8 +437,8 @@ public class TickerService {
      */
     @Transactional
     public void addSale(
-            Long tickerId,
-            Long walletId,
+            Integer tickerId,
+            Integer walletId,
             BigDecimal quantity,
             BigDecimal unitPrice,
             Category category,
@@ -473,7 +473,7 @@ public class TickerService {
         BigDecimal amount = unitPrice.multiply(quantity);
 
         // Create a wallet transaction for the sale
-        Long id =
+        Integer id =
                 walletTransactionService.addIncome(
                         walletId, category, date, amount, description, status);
 
@@ -524,8 +524,8 @@ public class TickerService {
      */
     @Transactional
     public void addDividend(
-            Long tickerId,
-            Long walletId,
+            Integer tickerId,
+            Integer walletId,
             Category category,
             BigDecimal amount,
             LocalDateTime date,
@@ -547,7 +547,7 @@ public class TickerService {
         }
 
         // Create a wallet transaction for the dividend
-        Long id =
+        Integer id =
                 walletTransactionService.addIncome(
                         walletId, category, date, amount, description, status);
 
@@ -577,20 +577,20 @@ public class TickerService {
      * @param receivedQuantity The quantity of the target ticker
      * @param date             The date of the exchange
      * @param description      The description of the exchange
-     * @throws SameSourceDestinationException If the source and target tickers are the
-     *                                        same
-     * @throws EntityNotFoundException        If the source ticker does not exist
-     * @throws EntityNotFoundException        If the target ticker does not exist
-     * @throws InvalidTickerTypeException     If the tickers are not of type CRYPTO
-     * @throws IllegalArgumentException       If the quantity is less than or equal to zero
-     * @throws InsufficientResourcesException If the quantity is greater than the
-     *                                        current
-     *                                        quantity
+     * @throws MoinexException.SameSourceDestinationException If the source and target tickers are the
+     *                                                        same
+     * @throws EntityNotFoundException                        If the source ticker does not exist
+     * @throws EntityNotFoundException                        If the target ticker does not exist
+     * @throws MoinexException.InvalidTickerTypeException     If the tickers are not of type CRYPTO
+     * @throws IllegalArgumentException                       If the quantity is less than or equal to zero
+     * @throws MoinexException.InsufficientResourcesException If the quantity is greater than the
+     *                                                        current
+     *                                                        quantity
      */
     @Transactional
     public void addCryptoExchange(
-            Long sourceTickerId,
-            Long targetTickerId,
+            Integer sourceTickerId,
+            Integer targetTickerId,
             BigDecimal soldQuantity,
             BigDecimal receivedQuantity,
             LocalDateTime date,
@@ -678,7 +678,7 @@ public class TickerService {
      * @throws EntityNotFoundException If the purchase does not exist
      */
     @Transactional
-    public void deletePurchase(Long purchaseId) {
+    public void deletePurchase(Integer purchaseId) {
         TickerPurchase purchase =
                 tickerPurchaseRepository
                         .findById(purchaseId)
@@ -706,7 +706,7 @@ public class TickerService {
      * @throws EntityNotFoundException If the sale does not exist
      */
     @Transactional
-    public void deleteSale(Long saleId) {
+    public void deleteSale(Integer saleId) {
         TickerSale sale =
                 tickerSaleRepository
                         .findById(saleId)
@@ -734,7 +734,7 @@ public class TickerService {
      * @throws EntityNotFoundException If the dividend does not exist
      */
     @Transactional
-    public void deleteDividend(Long dividendId) {
+    public void deleteDividend(Integer dividendId) {
         Dividend dividend =
                 dividendRepository
                         .findById(dividendId)
@@ -762,7 +762,7 @@ public class TickerService {
      * @throws EntityNotFoundException If the crypto exchange does not exist
      */
     @Transactional
-    public void deleteCryptoExchange(Long exchangeId) {
+    public void deleteCryptoExchange(Integer exchangeId) {
         CryptoExchange exchange =
                 cryptoExchangeRepository
                         .findById(exchangeId)
@@ -934,7 +934,7 @@ public class TickerService {
      * @throws EntityNotFoundException        If the crypto exchange does not exist
      * @throws EntityNotFoundException        If the source ticker does not exist
      * @throws EntityNotFoundException        If the target ticker does not exist
-     * @throws SameSourceDestinationException If the source and target tickers are the
+     * @throws MoinexException.SameSourceDestinationException If the source and target tickers are the
      *                                        same
      * @throws IllegalArgumentException       If the quantity is less than or equal to zero
      */
@@ -1102,7 +1102,7 @@ public class TickerService {
      * @param tickerId The id of the ticker
      * @throws EntityNotFoundException If the ticker does not exist
      */
-    public void resetAveragePrice(Long tickerId) {
+    public void resetAveragePrice(Integer tickerId) {
         Ticker ticker =
                 tickerRepository
                         .findById(tickerId)
@@ -1164,7 +1164,7 @@ public class TickerService {
      * @param tickerId The id of the ticker
      * @return The count of transactions associated with the ticker
      */
-    public Long getTransactionCountByTicker(Long tickerId) {
+    public Integer getTransactionCountByTicker(Integer tickerId) {
         return getPurchaseCountByTicker(tickerId)
                 + getSaleCountByTicker(tickerId)
                 + getDividendCountByTicker(tickerId)
@@ -1177,7 +1177,7 @@ public class TickerService {
      * @param tickerId The id of the ticker
      * @return The count of purchases associated with the ticker
      */
-    public Long getPurchaseCountByTicker(Long tickerId) {
+    public Integer getPurchaseCountByTicker(Integer tickerId) {
         return tickerRepository.getPurchaseCountByTicker(tickerId);
     }
 
@@ -1187,7 +1187,7 @@ public class TickerService {
      * @param tickerId The id of the ticker
      * @return The count of sales associated with the ticker
      */
-    public Long getSaleCountByTicker(Long tickerId) {
+    public Integer getSaleCountByTicker(Integer tickerId) {
         return tickerRepository.getSaleCountByTicker(tickerId);
     }
 
@@ -1197,7 +1197,7 @@ public class TickerService {
      * @param tickerId The id of the ticker
      * @return The count of dividends associated with the ticker
      */
-    public Long getDividendCountByTicker(Long tickerId) {
+    public Integer getDividendCountByTicker(Integer tickerId) {
         return tickerRepository.getDividendCountByTicker(tickerId);
     }
 
@@ -1207,7 +1207,7 @@ public class TickerService {
      * @param tickerId The id of the ticker
      * @return The count of crypto exchanges associated with the ticker
      */
-    public Long getCryptoExchangeCountByTicker(Long tickerId) {
+    public Integer getCryptoExchangeCountByTicker(Integer tickerId) {
         return tickerRepository.getCryptoExchangeCountByTicker(tickerId);
     }
 

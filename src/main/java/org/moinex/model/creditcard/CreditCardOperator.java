@@ -35,7 +35,7 @@ public class CreditCardOperator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)
     private String name;
@@ -46,7 +46,7 @@ public class CreditCardOperator {
     /**
      * Constructor for testing purposes
      */
-    public CreditCardOperator(Long id, String name) {
+    public CreditCardOperator(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

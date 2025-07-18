@@ -69,7 +69,7 @@ public final class AddCreditCardController extends BaseCreditCardManagement {
             Integer crcClosingDay = Integer.parseInt(crcClosingDayStr);
             Integer crcDueDay = Integer.parseInt(crcDueDayStr);
 
-            Long crcDefaultBillingWalletId =
+            Integer crcDefaultBillingWalletId =
                     crcDefaultBillingWallet != null ? crcDefaultBillingWallet.getId() : null;
 
             creditCardService.addCreditCard(

@@ -70,7 +70,7 @@ class CreditCardServiceTest {
     @BeforeEach
     void beforeEach() {
         String crcLastFourDigits = "1234";
-        operator = new CreditCardOperator(1L, "Operator");
+        operator = new CreditCardOperator(1, "Operator");
 
         creditCard =
                 CreditCard.builder()
@@ -128,7 +128,7 @@ class CreditCardServiceTest {
         int closingDay = creditCard.getClosingDay();
         BigDecimal maxDebt = creditCard.getMaxDebt();
         String lastFourDigits = creditCard.getLastFourDigits();
-        Long operatorId = creditCard.getOperator().getId();
+        Integer operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 EntityExistsException.class,
@@ -158,7 +158,7 @@ class CreditCardServiceTest {
         int closingDay = creditCard.getClosingDay();
         BigDecimal maxDebt = creditCard.getMaxDebt();
         String lastFourDigits = creditCard.getLastFourDigits();
-        Long operatorId = creditCard.getOperator().getId();
+        Integer operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -203,7 +203,7 @@ class CreditCardServiceTest {
         int closingDay = creditCard.getClosingDay();
         BigDecimal maxDebt = creditCard.getMaxDebt();
         String lastFourDigits = creditCard.getLastFourDigits();
-        Long operatorId = creditCard.getOperator().getId();
+        Integer operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -235,7 +235,7 @@ class CreditCardServiceTest {
         int closingDay = creditCard.getClosingDay();
         BigDecimal maxDebt = creditCard.getMaxDebt();
         String emptyLastFourDigits = creditCard.getLastFourDigits();
-        Long operatorId = creditCard.getOperator().getId();
+        Integer operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -294,7 +294,7 @@ class CreditCardServiceTest {
         int closingDay = creditCard.getClosingDay();
         BigDecimal maxDebt = creditCard.getMaxDebt();
         String lastFourDigits = creditCard.getLastFourDigits();
-        Long operatorId = creditCard.getOperator().getId();
+        Integer operatorId = creditCard.getOperator().getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -327,7 +327,7 @@ class CreditCardServiceTest {
     void testDeleteCreditCardDoesNotExists() {
         when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.empty());
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -342,7 +342,7 @@ class CreditCardServiceTest {
     void testGetAvailableCredit() {
         when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         BigDecimal availableCredit = creditCardService.getAvailableCredit(creditCard.getId());
@@ -357,7 +357,7 @@ class CreditCardServiceTest {
         BigDecimal totalPendingPayments = maxDebt.divide(new BigDecimal("2"), RoundingMode.HALF_UP);
         when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(totalPendingPayments);
 
         BigDecimal availableCredit = creditCardService.getAvailableCredit(creditCard.getId());
@@ -379,7 +379,7 @@ class CreditCardServiceTest {
 
         when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.of(creditCard));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(totalPendingPayments);
 
         BigDecimal availableCredit = creditCardService.getAvailableCredit(creditCard.getId());
@@ -395,7 +395,7 @@ class CreditCardServiceTest {
     void testGetAvailableCreditDoesNotExists() {
         when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.empty());
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
 
         assertThrows(
                 EntityNotFoundException.class,
@@ -411,7 +411,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         creditCardService.addDebt(
@@ -435,7 +435,7 @@ class CreditCardServiceTest {
     void testRegisterDebtCreditCardDoesNotExists() {
         when(creditCardRepository.findById(creditCard.getId())).thenReturn(Optional.empty());
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
         Category debtCategory = category;
         LocalDateTime debtRegisterDate = registerDate;
         YearMonth debtInvoiceMonth = invoiceMonth;
@@ -466,7 +466,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.empty());
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
         Category debtCategory = category;
         LocalDateTime debtRegisterDate = registerDate;
         YearMonth debtInvoiceMonth = invoiceMonth;
@@ -500,7 +500,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
         Category debtCategory = category;
         LocalDateTime debtRegisterDate = registerDate;
         YearMonth debtInvoiceMonth = invoiceMonth;
@@ -534,7 +534,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
         Category debtCategory = category;
         LocalDateTime debtRegisterDate = registerDate;
         YearMonth debtInvoiceMonth = invoiceMonth;
@@ -570,7 +570,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        Long creditCardId = creditCard.getId();
+        Integer creditCardId = creditCard.getId();
         Category debtCategory = category;
         LocalDateTime debtRegisterDate = registerDate;
         YearMonth debtInvoiceMonth = invoiceMonth;
@@ -608,7 +608,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         assertThrows(
@@ -638,7 +638,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
@@ -717,7 +717,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
@@ -774,7 +774,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct
@@ -831,7 +831,7 @@ class CreditCardServiceTest {
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
 
-        when(creditCardPaymentRepository.getTotalPendingPayments(creditCard.getId()))
+        when(creditCardPaymentRepository.getTotalPendingPaymentsByYear(creditCard.getId()))
                 .thenReturn(new BigDecimal("0.0"));
 
         // Capture the payment that was saved and check if it is correct

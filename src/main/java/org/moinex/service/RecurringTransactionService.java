@@ -143,8 +143,8 @@ public class RecurringTransactionService {
      *                                  after the start date
      */
     @Transactional
-    public Long addRecurringTransaction(
-            Long walletId,
+    public Integer addRecurringTransaction(
+            Integer walletId,
             Category category,
             TransactionType type,
             BigDecimal amount,
@@ -185,8 +185,8 @@ public class RecurringTransactionService {
      *                                  after the start date
      **/
     @Transactional
-    public Long addRecurringTransaction(
-            Long walletId,
+    public Integer addRecurringTransaction(
+            Integer walletId,
             Category category,
             TransactionType type,
             BigDecimal amount,
@@ -250,7 +250,7 @@ public class RecurringTransactionService {
      *                                                     has already ended
      */
     @Transactional
-    public void stopRecurringTransaction(Long recurringTransactionId) {
+    public void stopRecurringTransaction(Integer recurringTransactionId) {
         RecurringTransaction recurringTransaction =
                 recurringTransactionRepository
                         .findById(recurringTransactionId)
@@ -278,7 +278,7 @@ public class RecurringTransactionService {
      * @throws EntityNotFoundException If the recurring transaction is not found
      */
     @Transactional
-    public void deleteRecurringTransaction(Long recurringTransactionId) {
+    public void deleteRecurringTransaction(Integer recurringTransactionId) {
         RecurringTransaction recurringTransaction =
                 recurringTransactionRepository
                         .findById(recurringTransactionId)
@@ -609,7 +609,7 @@ public class RecurringTransactionService {
      * @return The expected remaining amount
      * @throws EntityNotFoundException If the recurring transaction is not found
      */
-    public Double calculateExpectedRemainingAmount(Long rtId) {
+    public Double calculateExpectedRemainingAmount(Integer rtId) {
         RecurringTransaction rt =
                 recurringTransactionRepository
                         .findById(rtId)

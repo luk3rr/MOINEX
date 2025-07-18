@@ -203,7 +203,8 @@ public class CreditCardController {
                         .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Long installmentsPaid = payments.stream().filter(p -> p.getWallet() != null).count();
+        Integer installmentsPaid =
+                Math.toIntExact(payments.stream().filter(p -> p.getWallet() != null).count());
 
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
@@ -715,7 +716,7 @@ public class CreditCardController {
      * Configure the table view columns
      */
     private void configureTableView() {
-        TableColumn<CreditCardPayment, Long> idColumn = getCreditCardPaymentLongTableColumn();
+        TableColumn<CreditCardPayment, Integer> idColumn = getCreditCardPaymentLongTableColumn();
 
         TableColumn<CreditCardPayment, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(
@@ -797,8 +798,8 @@ public class CreditCardController {
         return installmentColumn;
     }
 
-    private static TableColumn<CreditCardPayment, Long> getCreditCardPaymentLongTableColumn() {
-        TableColumn<CreditCardPayment, Long> idColumn = new TableColumn<>("Debt ID");
+    private static TableColumn<CreditCardPayment, Integer> getCreditCardPaymentLongTableColumn() {
+        TableColumn<CreditCardPayment, Integer> idColumn = new TableColumn<>("Debt ID");
         idColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getCreditCardDebt().getId()));
 
@@ -807,7 +808,7 @@ public class CreditCardController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

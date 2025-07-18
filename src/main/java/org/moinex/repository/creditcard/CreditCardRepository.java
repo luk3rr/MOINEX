@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
+public interface CreditCardRepository extends JpaRepository<CreditCard, Integer> {
 
     /**
      * Check if a credit card with the given name exists

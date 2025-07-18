@@ -59,7 +59,7 @@ public class WalletService {
      * @throws EntityExistsException    If the wallet name is already in use
      */
     @Transactional
-    public Long addWallet(String name, BigDecimal balance) {
+    public Integer addWallet(String name, BigDecimal balance) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
@@ -91,7 +91,7 @@ public class WalletService {
      * @throws EntityExistsException    If the wallet name is already in use
      */
     @Transactional
-    public Long addWallet(String name, BigDecimal balance, WalletType walletType) {
+    public Integer addWallet(String name, BigDecimal balance, WalletType walletType) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
@@ -120,7 +120,7 @@ public class WalletService {
      * @throws IllegalStateException   If the wallet has transactions
      */
     @Transactional
-    public void deleteWallet(Long id) {
+    public void deleteWallet(Integer id) {
         Wallet wallet =
                 walletRepository
                         .findById(id)
@@ -156,7 +156,7 @@ public class WalletService {
      * application anymore
      */
     @Transactional
-    public void archiveWallet(Long id) {
+    public void archiveWallet(Integer id) {
         Wallet wallet =
                 walletRepository
                         .findById(id)
@@ -182,7 +182,7 @@ public class WalletService {
      * will be used in the application again
      */
     @Transactional
-    public void unarchiveWallet(Long id) {
+    public void unarchiveWallet(Integer id) {
         Wallet wallet =
                 walletRepository
                         .findById(id)
@@ -210,7 +210,7 @@ public class WalletService {
      * @throws EntityExistsException    If the wallet name is already in use
      */
     @Transactional
-    public void renameWallet(Long id, String newName) {
+    public void renameWallet(Integer id, String newName) {
         // Remove leading and trailing whitespaces
         newName = newName.strip();
 
@@ -246,7 +246,7 @@ public class WalletService {
      * @throws MoinexException.AttributeAlreadySetException If the wallet already has the new type
      */
     @Transactional
-    public void changeWalletType(Long id, WalletType newType) {
+    public void changeWalletType(Integer id, WalletType newType) {
         Wallet wallet =
                 walletRepository
                         .findById(id)
@@ -281,7 +281,7 @@ public class WalletService {
      * @throws EntityNotFoundException If the wallet does not exist
      */
     @Transactional
-    public void updateWalletBalance(Long id, BigDecimal newBalance) {
+    public void updateWalletBalance(Integer id, BigDecimal newBalance) {
         Wallet wallet =
                 walletRepository
                         .findById(id)
@@ -303,7 +303,7 @@ public class WalletService {
      * @return The wallet with the provided id
      * @throws EntityNotFoundException If the wallet does not exist
      */
-    public Wallet getWalletById(Long id) {
+    public Wallet getWalletById(Integer id) {
         return walletRepository
                 .findById(id)
                 .orElseThrow(

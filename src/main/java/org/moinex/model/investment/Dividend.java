@@ -32,7 +32,7 @@ public class Dividend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "ticker_id", referencedColumnName = "id", nullable = false)
@@ -45,7 +45,7 @@ public class Dividend {
     /**
      * Constructor for testing purposes
      */
-    public Dividend(Long id, Ticker ticker, WalletTransaction walletTransaction) {
+    public Dividend(Integer id, Ticker ticker, WalletTransaction walletTransaction) {
         this.id = id;
         this.ticker = ticker;
         this.walletTransaction = walletTransaction;

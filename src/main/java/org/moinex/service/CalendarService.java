@@ -74,7 +74,7 @@ public class CalendarService {
      * @throws EntityNotFoundException If the event is not found
      */
     @Transactional
-    public void deleteEvent(Long eventId) {
+    public void deleteEvent(Integer eventId) {
         CalendarEvent event =
                 calendarEventRepository
                         .findById(eventId)

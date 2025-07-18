@@ -385,7 +385,7 @@ public class InvestmentTransactionsController {
      * Configure the purchase table view columns
      */
     private void configurePurchaseTableView() {
-        TableColumn<TickerPurchase, Long> idColumn = getTickerPurchaseLongTableColumn();
+        TableColumn<TickerPurchase, Integer> idColumn = getTickerPurchaseLongTableColumn();
 
         TableColumn<TickerPurchase, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
@@ -450,8 +450,8 @@ public class InvestmentTransactionsController {
         purchaseTableView.getColumns().add(statusColumn);
     }
 
-    private static TableColumn<TickerPurchase, Long> getTickerPurchaseLongTableColumn() {
-        TableColumn<TickerPurchase, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<TickerPurchase, Integer> getTickerPurchaseLongTableColumn() {
+        TableColumn<TickerPurchase, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -459,7 +459,7 @@ public class InvestmentTransactionsController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
@@ -478,7 +478,7 @@ public class InvestmentTransactionsController {
      * Configure the sale table view columns
      */
     private void configureSaleTableView() {
-        TableColumn<TickerSale, Long> idColumn = getTickerSaleLongTableColumn();
+        TableColumn<TickerSale, Integer> idColumn = getTickerSaleLongTableColumn();
 
         TableColumn<TickerSale, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
@@ -543,8 +543,8 @@ public class InvestmentTransactionsController {
         saleTableView.getColumns().add(statusColumn);
     }
 
-    private static TableColumn<TickerSale, Long> getTickerSaleLongTableColumn() {
-        TableColumn<TickerSale, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<TickerSale, Integer> getTickerSaleLongTableColumn() {
+        TableColumn<TickerSale, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -552,7 +552,7 @@ public class InvestmentTransactionsController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
@@ -571,7 +571,7 @@ public class InvestmentTransactionsController {
      * Configure the table view columns
      */
     private void configureDividendTableView() {
-        TableColumn<Dividend, Long> idColumn = getDividendLongTableColumn();
+        TableColumn<Dividend, Integer> idColumn = getDividendLongTableColumn();
 
         TableColumn<Dividend, String> tickerNameColumn = new TableColumn<>("Ticker");
         tickerNameColumn.setCellValueFactory(
@@ -624,8 +624,8 @@ public class InvestmentTransactionsController {
         dividendTableView.getColumns().add(statusColumn);
     }
 
-    private static TableColumn<Dividend, Long> getDividendLongTableColumn() {
-        TableColumn<Dividend, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<Dividend, Integer> getDividendLongTableColumn() {
+        TableColumn<Dividend, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -633,7 +633,7 @@ public class InvestmentTransactionsController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
@@ -652,7 +652,7 @@ public class InvestmentTransactionsController {
      * Configure the table view columns
      */
     private void configureCryptoExchangeTableView() {
-        TableColumn<CryptoExchange, Long> idColumn = getCryptoExchangeLongTableColumn();
+        TableColumn<CryptoExchange, Integer> idColumn = getCryptoExchangeLongTableColumn();
 
         TableColumn<CryptoExchange, String> soldCryptoNameColumn = new TableColumn<>("Sold");
         soldCryptoNameColumn.setCellValueFactory(
@@ -705,8 +705,8 @@ public class InvestmentTransactionsController {
         cryptoExchangeTableView.getColumns().add(descriptionColumn);
     }
 
-    private static TableColumn<CryptoExchange, Long> getCryptoExchangeLongTableColumn() {
-        TableColumn<CryptoExchange, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<CryptoExchange, Integer> getCryptoExchangeLongTableColumn() {
+        TableColumn<CryptoExchange, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -714,7 +714,7 @@ public class InvestmentTransactionsController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

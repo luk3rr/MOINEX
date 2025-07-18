@@ -62,7 +62,7 @@ class RecurringTransactionServiceTest {
     private RecurringTransaction yearlyRecurringTransaction;
 
     private RecurringTransaction createRecurringTransaction(
-            Long id,
+            Integer id,
             Wallet wallet,
             Category category,
             TransactionType type,
@@ -87,8 +87,8 @@ class RecurringTransactionServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        wallet = new Wallet(1L, "Wallet", BigDecimal.valueOf(1000.0));
-        wallet2 = new Wallet(2L, "Wallet 2", BigDecimal.valueOf(500.0));
+        wallet = new Wallet(1, "Wallet", BigDecimal.valueOf(1000.0));
+        wallet2 = new Wallet(2, "Wallet 2", BigDecimal.valueOf(500.0));
 
         category = Category.builder().name("c1").build();
         category2 = Category.builder().name("c2").build();
@@ -104,7 +104,7 @@ class RecurringTransactionServiceTest {
 
         dailyRT =
                 createRecurringTransaction(
-                        1L,
+                        1,
                         wallet,
                         category,
                         TransactionType.EXPENSE,
@@ -117,7 +117,7 @@ class RecurringTransactionServiceTest {
 
         weeklyRecurringTransaction =
                 createRecurringTransaction(
-                        2L,
+                        2,
                         wallet,
                         category,
                         TransactionType.EXPENSE,
@@ -130,7 +130,7 @@ class RecurringTransactionServiceTest {
 
         monthlyRecurringTransaction =
                 createRecurringTransaction(
-                        3L,
+                        3,
                         wallet,
                         category,
                         TransactionType.EXPENSE,
@@ -143,7 +143,7 @@ class RecurringTransactionServiceTest {
 
         yearlyRecurringTransaction =
                 createRecurringTransaction(
-                        4L,
+                        4,
                         wallet,
                         category,
                         TransactionType.EXPENSE,
@@ -194,7 +194,7 @@ class RecurringTransactionServiceTest {
     void testCreateRecurringTransactionWalletNotFound() {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.empty());
 
-        Long walletId = dailyRT.getWallet().getId();
+        Integer walletId = dailyRT.getWallet().getId();
         Category ct = dailyRT.getCategory();
         TransactionType type = dailyRT.getType();
         BigDecimal amount = dailyRT.getAmount();
@@ -249,7 +249,7 @@ class RecurringTransactionServiceTest {
     void testStopRecurringTransactionNotFound() {
         when(recurringTransactionRepository.findById(dailyRT.getId())).thenReturn(Optional.empty());
 
-        Long transactionId = dailyRT.getId();
+        Integer transactionId = dailyRT.getId();
         assertThrows(
                 EntityNotFoundException.class,
                 () -> recurringTransactionService.stopRecurringTransaction(transactionId));
@@ -293,7 +293,7 @@ class RecurringTransactionServiceTest {
     void testDeleteRecurringTransactionNotFound() {
         when(recurringTransactionRepository.findById(dailyRT.getId())).thenReturn(Optional.empty());
 
-        Long transactionId = dailyRT.getId();
+        Integer transactionId = dailyRT.getId();
         assertThrows(
                 EntityNotFoundException.class,
                 () -> recurringTransactionService.deleteRecurringTransaction(transactionId));

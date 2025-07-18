@@ -39,7 +39,7 @@ public class Bond extends Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
@@ -58,6 +58,6 @@ public class Bond extends Asset {
     private String maturityDate;
 
     @Builder.Default
-    @Column(name = "archived", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "archived", nullable = false)
     private boolean archived = false; // Default value is false
 }

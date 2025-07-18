@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WalletTypeRepository extends JpaRepository<WalletType, Long> {
+public interface WalletTypeRepository extends JpaRepository<WalletType, Integer> {
 
     /**
      * Find all wallet types ordered by name ascending

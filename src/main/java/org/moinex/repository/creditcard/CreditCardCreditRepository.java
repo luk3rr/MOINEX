@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CreditCardCreditRepository extends JpaRepository<CreditCardCredit, Long> {
+public interface CreditCardCreditRepository extends JpaRepository<CreditCardCredit, Integer> {
 
     /**
      * Get credits card credits by credit card ID and month
@@ -30,7 +30,9 @@ public interface CreditCardCreditRepository extends JpaRepository<CreditCardCred
                     + "AND strftime('%m', ccc.date) = printf('%02d', :month) "
                     + "AND strftime('%Y', ccc.date) = printf('%04d', :year)")
     List<CreditCardCredit> findCreditCardCreditsByMonth(
-            @Param("crcId") Long crcId, @Param("month") Integer month, @Param("year") Integer year);
+            @Param("crcId") Integer crcId,
+            @Param("month") Integer month,
+            @Param("year") Integer year);
 
     /**
      * Get the total credits of a credit card by month
@@ -45,7 +47,9 @@ public interface CreditCardCreditRepository extends JpaRepository<CreditCardCred
                     + "AND strftime('%m', ccc.date) = printf('%02d', :month) "
                     + "AND strftime('%Y', ccc.date) = printf('%04d', :year)")
     BigDecimal getTotalCreditCardCreditsByMonth(
-            @Param("crcId") Long crcId, @Param("month") Integer month, @Param("year") Integer year);
+            @Param("crcId") Integer crcId,
+            @Param("month") Integer month,
+            @Param("year") Integer year);
 
     /**
      * Get suggestions. Suggestions are credits with distinct descriptions

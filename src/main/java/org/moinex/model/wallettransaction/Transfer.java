@@ -38,7 +38,7 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "sender_wallet_id", referencedColumnName = "id", nullable = false)
@@ -69,7 +69,7 @@ public class Transfer {
      * Constructor for testing purposes
      */
     public Transfer(
-            Long id,
+            Integer id,
             Wallet senderWallet,
             Wallet receiverWallet,
             LocalDateTime date,

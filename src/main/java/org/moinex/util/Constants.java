@@ -366,8 +366,8 @@ public final class Constants {
      * @param targetDate The target date
      * @return The number of months until the target date
      */
-    public static Long calculateMonthsUntilTarget(LocalDate beginDate, LocalDate targetDate) {
-        return ChronoUnit.MONTHS.between(beginDate, targetDate);
+    public static Integer calculateMonthsUntilTarget(LocalDate beginDate, LocalDate targetDate) {
+        return Math.toIntExact(ChronoUnit.MONTHS.between(beginDate, targetDate));
     }
 
     /**
@@ -376,8 +376,8 @@ public final class Constants {
      * @param targetDate The target date
      * @return The number of days until the target date
      */
-    public static Long calculateDaysUntilTarget(LocalDate beginDate, LocalDate targetDate) {
-        return ChronoUnit.DAYS.between(beginDate, targetDate);
+    public static Integer calculateDaysUntilTarget(LocalDate beginDate, LocalDate targetDate) {
+        return Math.toIntExact(ChronoUnit.DAYS.between(beginDate, targetDate));
     }
 
     /**

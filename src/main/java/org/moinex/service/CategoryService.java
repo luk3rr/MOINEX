@@ -47,7 +47,7 @@ public class CategoryService {
      * @throws IllegalArgumentException If the category name is empty
      */
     @Transactional
-    public Long addCategory(String name) {
+    public Integer addCategory(String name) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
@@ -75,7 +75,7 @@ public class CategoryService {
      * @throws IllegalStateException If the category has associated transactions
      */
     @Transactional
-    public void deleteCategory(Long id) {
+    public void deleteCategory(Integer id) {
         Category category =
                 categoryRepository
                         .findById(id)
@@ -106,7 +106,7 @@ public class CategoryService {
      * @throws IllegalArgumentException If the new name is empty
      */
     @Transactional
-    public void renameCategory(Long id, String newName) {
+    public void renameCategory(Integer id, String newName) {
         // Remove leading and trailing whitespaces
         newName = newName.strip();
 
@@ -140,7 +140,7 @@ public class CategoryService {
      * @throws EntityNotFoundException If the category not found
      */
     @Transactional
-    public void archiveCategory(Long id) {
+    public void archiveCategory(Integer id) {
         Category category =
                 categoryRepository
                         .findById(id)
@@ -164,7 +164,7 @@ public class CategoryService {
      * @throws EntityNotFoundException If the category not found
      */
     @Transactional
-    public void unarchiveCategory(Long id) {
+    public void unarchiveCategory(Integer id) {
         Category category =
                 categoryRepository
                         .findById(id)
@@ -203,7 +203,7 @@ public class CategoryService {
      * @param categoryId Category ID
      * @return Number of transactions
      */
-    public Long getCountTransactions(Long categoryId) {
+    public Integer getCountTransactions(Integer categoryId) {
         return categoryRepository.getCountTransactions(categoryId)
                 + creditCardDebtRepository.getCountTransactions(categoryId);
     }

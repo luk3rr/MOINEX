@@ -181,13 +181,13 @@ public class ManageCategoryController {
      * Configures the table view columns
      */
     private void configureTableView() {
-        TableColumn<Category, Long> idColumn = getCategoryLongTableColumn();
+        TableColumn<Category, Integer> idColumn = getCategoryLongTableColumn();
 
         TableColumn<Category, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
-        TableColumn<Category, Long> numOfTransactionsColumn = getLongTableColumn();
+        TableColumn<Category, Integer> numOfTransactionsColumn = getLongTableColumn();
 
         TableColumn<Category, String> archivedColumn = getCategoryStringTableColumn();
 
@@ -220,8 +220,8 @@ public class ManageCategoryController {
         return archivedColumn;
     }
 
-    private TableColumn<Category, Long> getLongTableColumn() {
-        TableColumn<Category, Long> numOfTransactionsColumn =
+    private TableColumn<Category, Integer> getLongTableColumn() {
+        TableColumn<Category, Integer> numOfTransactionsColumn =
                 new TableColumn<>("Associated Transactions");
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
@@ -232,7 +232,7 @@ public class ManageCategoryController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);
@@ -246,15 +246,15 @@ public class ManageCategoryController {
         return numOfTransactionsColumn;
     }
 
-    private static TableColumn<Category, Long> getCategoryLongTableColumn() {
-        TableColumn<Category, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<Category, Integer> getCategoryLongTableColumn() {
+        TableColumn<Category, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

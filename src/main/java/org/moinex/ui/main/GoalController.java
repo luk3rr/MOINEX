@@ -506,7 +506,7 @@ public class GoalController {
     }
 
     private void configureTableView() {
-        TableColumn<Goal, Long> idColumn = getGoalLongTableColumn();
+        TableColumn<Goal, Integer> idColumn = getGoalLongTableColumn();
 
         TableColumn<Goal, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(
@@ -616,7 +616,7 @@ public class GoalController {
                     if (param.getValue().isCompleted()) return new SimpleObjectProperty<>("-");
 
                     // Calculate the number of months until the target date
-                    Long monthsUntilTarget =
+                    Integer monthsUntilTarget =
                             Constants.calculateMonthsUntilTarget(
                                     LocalDate.now(),
                                     param.getValue().getTargetDate().toLocalDate());
@@ -667,8 +667,8 @@ public class GoalController {
         return progressColumn;
     }
 
-    private static TableColumn<Goal, Long> getGoalLongTableColumn() {
-        TableColumn<Goal, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<Goal, Integer> getGoalLongTableColumn() {
+        TableColumn<Goal, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -676,7 +676,7 @@ public class GoalController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

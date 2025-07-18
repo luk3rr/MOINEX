@@ -22,7 +22,7 @@ import org.springframework.stereotype.Repository;
  * that have a category that is not archived
  */
 @Repository
-public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Long> {
+public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, Integer> {
 
     /**
      * Get all transactions where both the category and wallet are not archived
@@ -159,7 +159,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
                     + "ORDER BY wt.date DESC")
     List<WalletTransaction> findTransactionsByWalletAndMonth(
-            @Param("walletId") Long walletId,
+            @Param("walletId") Integer walletId,
             @Param("month") Integer month,
             @Param("year") Integer year);
 
@@ -181,7 +181,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "AND wt.wallet.isArchived = false "
                     + "ORDER BY wt.date DESC")
     List<WalletTransaction> findNonArchivedTransactionsByWalletAndMonth(
-            @Param("walletId") Long walletId,
+            @Param("walletId") Integer walletId,
             @Param("month") Integer month,
             @Param("year") Integer year);
 
@@ -322,7 +322,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "WHERE wt.wallet.id = :walletId "
                     + "ORDER BY wt.date DESC")
     List<WalletTransaction> findLastTransactionsByWallet(
-            @Param("walletId") Long walletId, Pageable pageable);
+            @Param("walletId") Integer walletId, Pageable pageable);
 
     /**
      * Get the last n transactions in a wallet where both the category and wallet are
@@ -339,7 +339,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "AND wt.wallet.isArchived = false "
                     + "ORDER BY wt.date DESC")
     List<WalletTransaction> findNonArchivedLastTransactionsByWallet(
-            @Param("walletId") Long walletId, Pageable pageable);
+            @Param("walletId") Integer walletId, Pageable pageable);
 
     /**
      * Get the date of the oldest transaction
@@ -384,7 +384,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
      * @return The count of transactions in the wallet
      */
     @Query("SELECT count(wt) " + "FROM WalletTransaction wt " + "WHERE wt.wallet.id = :walletId")
-    Long getTransactionCountByWallet(@Param("walletId") Long walletId);
+    Integer getTransactionCountByWallet(@Param("walletId") Integer walletId);
 
     /**
      * Get count of transactions by wallet where both the category and wallet are not
@@ -398,7 +398,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "WHERE wt.wallet.id = :walletId "
                     + "AND wt.category.isArchived = false "
                     + "AND wt.wallet.isArchived = false")
-    Long getCountNonArchivedTransactionsByWallet(@Param("walletId") Long walletId);
+    Integer getCountNonArchivedTransactionsByWallet(@Param("walletId") Integer walletId);
 
     /**
      * Check if a wallet exists by transaction id
@@ -406,7 +406,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
      * @return True if the wallet exists, false otherwise
      */
     @Query("SELECT COUNT(wt) > 0 FROM WalletTransaction wt WHERE wt.id = :transactionId")
-    boolean existsWalletByTransactionId(@Param("transactionId") Long transactionId);
+    boolean existsWalletByTransactionId(@Param("transactionId") Integer transactionId);
 
     /**
      * Get suggestions. Suggestions are transactions with distinct descriptions

@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, Long> {
+public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, Integer> {
 
     /**
      * Get the total debt of a credit card
@@ -25,7 +25,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
     @Query(
             "SELECT coalesce(sum(ccd.amount), 0) FROM CreditCardDebt ccd "
                     + "WHERE ccd.creditCard.id = :creditCardId")
-    BigDecimal getTotalDebt(@Param("creditCardId") Long creditCardId);
+    BigDecimal getTotalDebt(@Param("creditCardId") Integer creditCardId);
 
     /**
      * Get the date of the earliest payment
@@ -47,7 +47,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
      * @return The count of debts by credit card
      */
     @Query("SELECT count(ccd) FROM CreditCardDebt ccd " + "WHERE ccd.creditCard.id = :creditCardId")
-    Long getDebtCountByCreditCard(@Param("creditCardId") Long creditCardId);
+    Integer getDebtCountByCreditCard(@Param("creditCardId") Integer creditCardId);
 
     /**
      * Get the number of associated transactions for a category
@@ -55,7 +55,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
      * @return Number of transactions
      */
     @Query("SELECT count(ccd) FROM CreditCardDebt ccd WHERE ccd.category.id = :categoryId")
-    Long getCountTransactions(@Param("categoryId") Long categoryId);
+    Integer getCountTransactions(@Param("categoryId") Integer categoryId);
 
     /**
      * Get suggestions. Suggestions are debts with distinct descriptions

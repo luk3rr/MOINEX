@@ -37,7 +37,7 @@ public class CryptoExchange {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "sold_crypto_id", referencedColumnName = "id", nullable = false)
@@ -71,7 +71,7 @@ public class CryptoExchange {
      * Constructor for testing purposes
      */
     public CryptoExchange(
-            Long id,
+            Integer id,
             Ticker soldCrypto,
             Ticker receivedCrypto,
             BigDecimal soldQuantity,

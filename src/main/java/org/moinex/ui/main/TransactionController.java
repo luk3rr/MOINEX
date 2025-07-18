@@ -782,7 +782,7 @@ public class TransactionController {
      * Configure the table view columns
      */
     private void configureTableView() {
-        TableColumn<WalletTransaction, Long> idColumn = getWalletTransactionLongTableColumn();
+        TableColumn<WalletTransaction, Integer> idColumn = getWalletTransactionLongTableColumn();
 
         TableColumn<WalletTransaction, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setCellValueFactory(
@@ -828,8 +828,8 @@ public class TransactionController {
         transactionsTableView.getColumns().add(statusColumn);
     }
 
-    private static TableColumn<WalletTransaction, Long> getWalletTransactionLongTableColumn() {
-        TableColumn<WalletTransaction, Long> idColumn = new TableColumn<>("ID");
+    private static TableColumn<WalletTransaction, Integer> getWalletTransactionLongTableColumn() {
+        TableColumn<WalletTransaction, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -837,7 +837,7 @@ public class TransactionController {
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

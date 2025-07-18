@@ -422,7 +422,7 @@ public class CSVImportController {
                     crc.getClosingDay(),
                     crc.getMaxDebt(),
                     crc.getLastFourDigits(),
-                    0L); // default operator id
+                    0); // default operator id
         }
     }
 

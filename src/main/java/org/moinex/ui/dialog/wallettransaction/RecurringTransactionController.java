@@ -204,7 +204,8 @@ public class RecurringTransactionController {
      * Configures the table view columns
      */
     private void configureTableView() {
-        TableColumn<RecurringTransaction, Long> idColumn = getRecurringTransactionLongTableColumn();
+        TableColumn<RecurringTransaction, Integer> idColumn =
+                getRecurringTransactionLongTableColumn();
 
         TableColumn<RecurringTransaction, String> descriptionColumn =
                 new TableColumn<>("Description");
@@ -357,16 +358,16 @@ public class RecurringTransactionController {
         return endDateColumn;
     }
 
-    private static TableColumn<RecurringTransaction, Long>
+    private static TableColumn<RecurringTransaction, Integer>
             getRecurringTransactionLongTableColumn() {
-        TableColumn<RecurringTransaction, Long> idColumn = new TableColumn<>("ID");
+        TableColumn<RecurringTransaction, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
                             @Override
-                            protected void updateItem(Long item, boolean empty) {
+                            protected void updateItem(Integer item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (item == null || empty) {
                                     setText(null);

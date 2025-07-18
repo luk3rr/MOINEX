@@ -27,7 +27,7 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "type_id", referencedColumnName = "id")
@@ -40,13 +40,13 @@ public class Wallet {
     private BigDecimal balance;
 
     @Builder.Default
-    @Column(name = "archived", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "archived", nullable = false)
     private boolean isArchived = false; // Default value is false
 
     /**
      * Constructor for testing purposes
      */
-    public Wallet(Long id, String name, BigDecimal balance) {
+    public Wallet(Integer id, String name, BigDecimal balance) {
         this.id = id;
         this.name = name;
         this.balance = balance;
