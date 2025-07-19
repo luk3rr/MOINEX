@@ -120,34 +120,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </JFXButton>
-                  <VBox alignment="BOTTOM_LEFT" spacing="20.0" VBox.vgrow="ALWAYS">
-                     <children>
-                        <JFXButton fx:id="importButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="Import" wrapText="true">
-                           <graphic>
-                              <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/sidebar/import.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </JFXButton>
-                        <JFXButton fx:id="settingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="Settings" wrapText="true">
-                           <graphic>
-                              <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../icon/sidebar/settings.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </JFXButton>
-                     </children>
-                  </VBox>
+                  <VBox alignment="BOTTOM_LEFT" spacing="20.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
             <VBox HBox.hgrow="ALWAYS">

@@ -62,10 +62,6 @@ public class MainController {
 
     @FXML private Button savingsButton;
 
-    @FXML private Button importButton;
-
-    @FXML private Button settingsButton;
-
     @FXML private AnchorPane contentArea;
 
     @FXML private ImageView toggleMonetaryValuesIcon;
@@ -98,7 +94,7 @@ public class MainController {
                 new Button[] {
                     menuButton, homeButton, walletButton,
                     creditCardButton, transactionButton, goalsButton,
-                    savingsButton, importButton, settingsButton
+                    savingsButton
                 };
 
         rootPane.getStylesheets()
@@ -148,18 +144,6 @@ public class MainController {
                 event -> {
                     loadContent(Constants.SAVINGS_FXML, Constants.SAVINGS_STYLE_SHEET);
                     updateSelectedButton(savingsButton);
-                });
-
-        importButton.setOnAction(
-                event -> {
-                    loadContent(Constants.CSV_IMPORT_FXML, Constants.CSV_IMPORT_STYLE_SHEET);
-                    updateSelectedButton(importButton);
-                });
-
-        settingsButton.setOnAction(
-                event -> {
-                    loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET);
-                    updateSelectedButton(settingsButton);
                 });
 
         // Load start page
