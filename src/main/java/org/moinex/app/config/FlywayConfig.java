@@ -15,7 +15,12 @@ import org.springframework.context.annotation.Configuration;
 public class FlywayConfig {
     @Bean
     public Flyway flyway(DataSource dataSource) {
-        Flyway flyway = Flyway.configure().dataSource(dataSource).baselineOnMigrate(true).load();
+        Flyway flyway =
+                Flyway.configure()
+                        .dataSource(dataSource)
+                        .baselineOnMigrate(true)
+                        .mixed(true)
+                        .load();
         flyway.migrate();
         return flyway;
     }
