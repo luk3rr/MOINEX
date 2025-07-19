@@ -2,17 +2,20 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefWidth="340.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.goal.AddGoalController">
+<VBox alignment="CENTER" prefWidth="400.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.goal.AddGoalController">
    <children>
       <HBox alignment="CENTER" spacing="5.0">
          <children>
@@ -125,6 +128,34 @@
             </VBox>
          </children>
       </HBox>
+      <HBox alignment="CENTER" spacing="10.0">
+         <children>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Master Wallet (optional)">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="masterWalletComboBox" minWidth="130.0" stylesheets="@../../../css/component/combo-box.css" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <TitledPane fx:id="goalFundingStrategyPane" alignment="CENTER" animated="false" collapsible="false" text="Goal Funding Strategy" textAlignment="CENTER">
+         <content>
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <RadioButton fx:id="newDepositRadioButton" mnemonicParsing="false" text="Adds to the master wallet" />
+                        <RadioButton fx:id="allocateFromMasterWalletRadioButton" mnemonicParsing="false" text="Allocates from the master wallet's existing balance " />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </content>
+      </TitledPane>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
             <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />

@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
+import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.repository.goal.GoalRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
@@ -22,6 +23,8 @@ import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.repository.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
+import org.moinex.util.enums.GoalFundingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,7 @@ public class GoalService {
     private TransferRepository transfersRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private WalletTypeRepository walletTypeRepository;
+    private WalletTransactionService walletTransactionService;
 
     @Autowired
     public GoalService(
@@ -47,12 +51,14 @@ public class GoalService {
             WalletRepository walletRepository,
             TransferRepository transfersRepository,
             WalletTransactionRepository walletTransactionRepository,
-            WalletTypeRepository walletTypeRepository) {
+            WalletTypeRepository walletTypeRepository,
+            WalletTransactionService walletTransactionService) {
         this.goalRepository = goalRepository;
         this.walletRepository = walletRepository;
         this.transfersRepository = transfersRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.walletTypeRepository = walletTypeRepository;
+        this.walletTransactionService = walletTransactionService;
     }
 
     /**
@@ -92,7 +98,7 @@ public class GoalService {
     }
 
     /**
-     * Creates a new goal
+     * Creates a new goal without a master wallet
      *
      * @param name           The name of the goal
      * @param initialBalance The initial balance of the goal
@@ -117,6 +123,38 @@ public class GoalService {
             BigDecimal targetBalance,
             LocalDate targetDate,
             String motivation) {
+        return addGoal(name, initialBalance, targetBalance, targetDate, motivation, null, null);
+    }
+
+    /**
+     * Creates a new goal
+     *
+     * @param name           The name of the goal
+     * @param initialBalance The initial balance of the goal
+     * @param targetBalance  The targetBalance balance of the goal
+     * @param targetDate     The targetBalance date of the goal
+     * @param motivation     The motivation for the goal
+     * @param masterWallet   The master wallet of the goal, can be null if the goal does not
+     * @return The id of the created goal
+     * @throws IllegalArgumentException If the name of the goal is empty
+     * @throws EntityExistsException    If a goal with the same name already exists
+     * @throws EntityExistsException    If a wallet with the same name already exists
+     * @throws IllegalArgumentException If the target date is in the past
+     * @throws IllegalArgumentException If the initial balance is negative
+     * @throws IllegalArgumentException If the target balance is negative or zero
+     * @throws IllegalArgumentException If the initial balance is greater than the
+     *                                  target balance
+     * @throws EntityNotFoundException  If the goal wallet type is not found
+     */
+    @Transactional
+    public Integer addGoal(
+            String name,
+            BigDecimal initialBalance,
+            BigDecimal targetBalance,
+            LocalDate targetDate,
+            String motivation,
+            Wallet masterWallet,
+            GoalFundingStrategy strategy) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
@@ -152,13 +190,72 @@ public class GoalService {
                         .targetDate(targetDateTime)
                         .motivation(motivation)
                         .type(walletType)
+                        .masterWallet(masterWallet)
                         .build();
+
+        handleFundingStrategy(goal, strategy);
 
         goalRepository.save(goal);
 
         logger.info("Goal {} created with initial balance {}", name, initialBalance);
 
         return goal.getId();
+    }
+
+    /**
+     * Handles the funding strategy for a goal when a master wallet and initial balance are provided.
+     *
+     * @param goal     The goal to be funded
+     * @param strategy The funding strategy to be applied
+     * @throws IllegalArgumentException                       If the funding strategy is null when a master wallet and initial balance are provided
+     * @throws MoinexException.InsufficientResourcesException If the master wallet does not have enough unallocated balance
+     */
+    private void handleFundingStrategy(Goal goal, GoalFundingStrategy strategy) {
+        if (goal.getMasterWallet() != null
+                && goal.getInitialBalance().compareTo(BigDecimal.ZERO) > 0) {
+            if (strategy == null) {
+                throw new IllegalArgumentException(
+                        "A funding strategy is required when a master wallet and initial balance"
+                                + " are provided.");
+            }
+
+            switch (strategy) {
+                case NEW_DEPOSIT:
+                    goal.getMasterWallet()
+                            .setBalance(
+                                    goal.getMasterWallet()
+                                            .getBalance()
+                                            .add(goal.getInitialBalance()));
+                    walletRepository.save(goal.getMasterWallet());
+                    logger.info(
+                            "Current master wallet '{}' balance updated to {} after funding goal"
+                                    + " '{}'",
+                            goal.getMasterWallet().getName(),
+                            goal.getMasterWallet().getBalance(),
+                            goal.getName());
+                    break;
+
+                case ALLOCATE_FROM_EXISTING:
+                    BigDecimal allocatedBalance =
+                            goalRepository.getSumOfBalancesByMasterWallet(
+                                    goal.getMasterWallet().getId());
+                    BigDecimal freeBalance =
+                            goal.getMasterWallet().getBalance().subtract(allocatedBalance);
+
+                    if (freeBalance.compareTo(goal.getInitialBalance()) < 0) {
+                        throw new MoinexException.InsufficientResourcesException(
+                                "Master wallet has insufficient unallocated balance. Free balance: "
+                                        + UIUtils.formatCurrency(freeBalance));
+                    }
+
+                    logger.info(
+                            "Allocating {} from master wallet '{}' to goal '{}'",
+                            goal.getInitialBalance(),
+                            goal.getMasterWallet().getName(),
+                            goal.getName());
+                    break;
+            }
+        }
     }
 
     /**
@@ -320,7 +417,7 @@ public class GoalService {
      * Complete a goal
      *
      * @param idGoal The id of the goal to be completed
-     * @throws EntityNotFoundException If the goal does not exist
+     * @throws EntityNotFoundException                 If the goal does not exist
      * @throws MoinexException.IncompleteGoalException If the goal has not been completed yet
      */
     @Transactional

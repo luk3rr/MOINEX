@@ -43,6 +43,10 @@ public class Wallet {
     @Column(name = "archived", nullable = false)
     private boolean isArchived = false; // Default value is false
 
+    @ManyToOne
+    @JoinColumn(name = "master_wallet_id", referencedColumnName = "id")
+    private Wallet masterWallet;
+
     /**
      * Constructor for testing purposes
      */

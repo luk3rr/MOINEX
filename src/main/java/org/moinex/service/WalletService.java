@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
+import org.moinex.repository.goal.GoalRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
@@ -36,17 +37,20 @@ public class WalletService {
     private TransferRepository transfersRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private WalletTypeRepository walletTypeRepository;
+    private GoalRepository goalRepository;
 
     @Autowired
     public WalletService(
             WalletRepository walletRepository,
             TransferRepository transfersRepository,
             WalletTransactionRepository walletTransactionRepository,
-            WalletTypeRepository walletTypeRepository) {
+            WalletTypeRepository walletTypeRepository,
+            GoalRepository goalRepository) {
         this.walletRepository = walletRepository;
         this.transfersRepository = transfersRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.walletTypeRepository = walletTypeRepository;
+        this.goalRepository = goalRepository;
     }
 
     /**
@@ -241,8 +245,8 @@ public class WalletService {
      *
      * @param id      The id of the wallet to change the type
      * @param newType The new type of the wallet
-     * @throws EntityNotFoundException      If the wallet does not exist
-     * @throws EntityNotFoundException      If the wallet type does not exist
+     * @throws EntityNotFoundException                      If the wallet does not exist
+     * @throws EntityNotFoundException                      If the wallet type does not exist
      * @throws MoinexException.AttributeAlreadySetException If the wallet already has the new type
      */
     @Transactional
@@ -356,5 +360,22 @@ public class WalletService {
                                                                         w.getId()))
                                 .reversed())
                 .toList();
+    }
+
+    /**
+     * Get the unallocated balance of a master wallet.
+     * This is the balance that is not allocated to any goals
+     *
+     * @param masterWallet The master wallet to check
+     * @return The unallocated balance of the master wallet
+     */
+    public BigDecimal getUnallocatedBalance(Wallet masterWallet) {
+        if (masterWallet == null) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal allocatedBalance =
+                goalRepository.getSumOfBalancesByMasterWallet(masterWallet.getId());
+        return masterWallet.getBalance().subtract(allocatedBalance);
     }
 }

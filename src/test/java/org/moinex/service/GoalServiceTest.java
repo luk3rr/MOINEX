@@ -16,22 +16,22 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
+import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.repository.goal.GoalRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
+import org.moinex.util.enums.GoalFundingStrategy;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
@@ -491,5 +491,108 @@ class GoalServiceTest {
                 () -> goalService.changeMotivation(goalId, "New Motivation"));
 
         verify(goalRepository, never()).save(any());
+    }
+
+    @Nested
+    @DisplayName("Add Goal With Master Wallet Tests")
+    class AddGoalWithMasterWalletTests {
+        private Wallet masterWallet;
+
+        @BeforeEach
+        void setup() {
+            masterWallet = new Wallet(10, "Master Wallet", new BigDecimal("1000.00"));
+            when(walletTypeRepository.findByName(anyString())).thenReturn(Optional.of(walletType));
+            when(goalRepository.existsByName(anyString())).thenReturn(false);
+            when(walletRepository.existsByName(anyString())).thenReturn(false);
+        }
+
+        @Test
+        @DisplayName(
+                "Should create goal with NEW_DEPOSIT strategy and update master wallet balance")
+        void testAddGoalWithMasterWallet_NewDepositStrategy_Success() {
+            BigDecimal initialBalance = new BigDecimal("200.00");
+
+            goalService.addGoal(
+                    "New Goal",
+                    initialBalance,
+                    new BigDecimal("500.00"),
+                    LocalDate.now().plusMonths(6),
+                    "Motivation",
+                    masterWallet,
+                    GoalFundingStrategy.NEW_DEPOSIT);
+
+            ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository).save(walletCaptor.capture());
+            assertEquals(new BigDecimal("1200.00"), walletCaptor.getValue().getBalance());
+
+            verify(goalRepository).save(any(Goal.class));
+        }
+
+        @Test
+        @DisplayName(
+                "Should create goal with ALLOCATE_FROM_EXISTING strategy without changing master"
+                        + " wallet balance")
+        void testAddGoalWithMasterWallet_AllocateStrategy_Success() {
+            BigDecimal initialBalance = new BigDecimal("300.00");
+            when(goalRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+                    .thenReturn(new BigDecimal("500.00"));
+
+            goalService.addGoal(
+                    "New Goal",
+                    initialBalance,
+                    new BigDecimal("500.00"),
+                    LocalDate.now().plusMonths(6),
+                    "Motivation",
+                    masterWallet,
+                    GoalFundingStrategy.ALLOCATE_FROM_EXISTING);
+
+            verify(walletRepository, never()).save(any(Wallet.class));
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertEquals(initialBalance, goalCaptor.getValue().getBalance());
+            assertEquals(masterWallet, goalCaptor.getValue().getMasterWallet());
+        }
+
+        @Test
+        @DisplayName(
+                "Should throw InsufficientResourcesException when allocating more than free"
+                        + " balance")
+        void testAddGoalWithMasterWallet_AllocateStrategy_InsufficientFunds() {
+            BigDecimal initialBalance = new BigDecimal("300.00");
+            when(goalRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+                    .thenReturn(new BigDecimal("800.00"));
+
+            assertThrows(
+                    MoinexException.InsufficientResourcesException.class,
+                    () ->
+                            goalService.addGoal(
+                                    "New Goal",
+                                    initialBalance,
+                                    new BigDecimal("500.00"),
+                                    LocalDate.now().plusMonths(6),
+                                    "Motivation",
+                                    masterWallet,
+                                    GoalFundingStrategy.ALLOCATE_FROM_EXISTING));
+
+            verify(goalRepository, never()).save(any());
+            verify(walletRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException if strategy is null when required")
+        void testAddGoalWithMasterWallet_MissingStrategy_ThrowsException() {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.addGoal(
+                                    "New Goal",
+                                    new BigDecimal("100.00"),
+                                    new BigDecimal("500.00"),
+                                    LocalDate.now().plusMonths(6),
+                                    "Motivation",
+                                    masterWallet,
+                                    null));
+        }
     }
 }
