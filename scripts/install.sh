@@ -41,7 +41,6 @@ while true; do
     printf "Digite o número da sua escolha (%d-%d): " "$EXIT_OPTION" "$COUNT"
     read -r CHOICE
 
-    # Valida se a entrada é um número
     case $CHOICE in
         ''|*[!0-9]*)
             print_error "Seleção inválida. Por favor, digite um número."
