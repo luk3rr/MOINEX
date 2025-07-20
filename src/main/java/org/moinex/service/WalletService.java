@@ -56,37 +56,6 @@ public class WalletService {
     /**
      * Creates a new wallet
      *
-     * @param name    The name of the wallet
-     * @param balance The initial balance of the wallet
-     * @return The id of the created wallet
-     * @throws IllegalArgumentException If the wallet name is empty
-     * @throws EntityExistsException    If the wallet name is already in use
-     */
-    @Transactional
-    public Integer addWallet(String name, BigDecimal balance) {
-        // Remove leading and trailing whitespaces
-        name = name.strip();
-
-        if (name.isBlank()) {
-            throw new IllegalArgumentException("Wallet name cannot be empty");
-        }
-
-        if (walletRepository.existsByName(name)) {
-            throw new EntityExistsException("Wallet with name " + name + " already exists");
-        }
-
-        logger.info("Wallet {} created with balance {}", name, balance);
-
-        Wallet wt = Wallet.builder().name(name).balance(balance).build();
-
-        walletRepository.save(wt);
-
-        return wt.getId();
-    }
-
-    /**
-     * Creates a new wallet
-     *
      * @param name       The name of the wallet
      * @param balance    The initial balance of the wallet
      * @param walletType The type of the wallet

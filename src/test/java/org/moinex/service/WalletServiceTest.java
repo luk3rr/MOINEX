@@ -77,9 +77,8 @@ class WalletServiceTest {
     void testCreateWallet() {
         when(walletRepository.existsByName(wallet1.getName())).thenReturn(false);
 
-        walletService.addWallet(wallet1.getName(), wallet1.getBalance());
+        walletService.addWallet(wallet1.getName(), wallet1.getBalance(), walletType1);
 
-        // Capture the wallet object that was saved and check if the values are correct
         ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
 
         verify(walletRepository).save(walletCaptor.capture());
@@ -93,6 +92,19 @@ class WalletServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when trying to create a wallet with empty name")
+    void testCreateWalletWithEmptyName() {
+        String name = "  ";
+        BigDecimal balance = wallet1.getBalance();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> walletService.addWallet(name, balance, walletType1));
+
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
     @DisplayName("Test if the wallet is not created when the name is already in use")
     void testCreateWalletAlreadyExists() {
         when(walletRepository.existsByName(wallet1.getName())).thenReturn(true);
@@ -100,9 +112,10 @@ class WalletServiceTest {
         String name = wallet1.getName();
         BigDecimal balance = wallet1.getBalance();
 
-        assertThrows(EntityExistsException.class, () -> walletService.addWallet(name, balance));
+        assertThrows(
+                EntityExistsException.class,
+                () -> walletService.addWallet(name, balance, walletType1));
 
-        // Verify that the wallet was not saved
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -116,7 +129,6 @@ class WalletServiceTest {
 
         walletService.deleteWallet(wallet1.getId());
 
-        // Verify that the wallet was deleted
         verify(walletRepository).delete(wallet1);
     }
 
@@ -129,7 +141,35 @@ class WalletServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> walletService.deleteWallet(walletId));
 
-        // Verify that the wallet was not deleted
+        verify(walletRepository, never()).delete(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Test if the wallet is not deleted when it has transactions")
+    void testDeleteWalletWithTransactions() {
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+        when(walletTransactionRepository.getTransactionCountByWallet(wallet1.getId()))
+                .thenReturn(1);
+
+        Integer walletId = wallet1.getId();
+
+        assertThrows(IllegalStateException.class, () -> walletService.deleteWallet(walletId));
+
+        verify(walletRepository, never()).delete(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Test if the wallet is not deleted when it has transfers")
+    void testDeleteWalletWithTransfers() {
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+        when(walletTransactionRepository.getTransactionCountByWallet(wallet1.getId()))
+                .thenReturn(0);
+        when(transferRepository.getTransferCountByWallet(wallet1.getId())).thenReturn(1);
+
+        Integer walletId = wallet1.getId();
+
+        assertThrows(IllegalStateException.class, () -> walletService.deleteWallet(walletId));
+
         verify(walletRepository, never()).delete(any(Wallet.class));
     }
 
@@ -142,7 +182,6 @@ class WalletServiceTest {
 
         walletService.archiveWallet(wallet1.getId());
 
-        // Check if the wallet was archived
         verify(walletRepository).save(wallet1);
         assertTrue(wallet1.isArchived());
     }
@@ -156,7 +195,33 @@ class WalletServiceTest {
 
         assertThrows(EntityNotFoundException.class, () -> walletService.archiveWallet(walletId));
 
-        // Verify that the wallet was not archived
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
+    @DisplayName("Test if the wallet is unarchived successfully")
+    void testArchiveWalletUnarchived() {
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+
+        wallet1.setArchived(true);
+
+        when(walletRepository.save(any(Wallet.class))).thenReturn(wallet1);
+
+        walletService.unarchiveWallet(wallet1.getId());
+
+        verify(walletRepository).save(wallet1);
+        assertFalse(wallet1.isArchived());
+    }
+
+    @Test
+    @DisplayName("Test if exception is thrown when trying to unarchive a non-existent wallet")
+    void testUnarchiveWalletDoesNotExist() {
+        when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.empty());
+
+        Integer walletId = wallet1.getId();
+
+        assertThrows(EntityNotFoundException.class, () -> walletService.unarchiveWallet(walletId));
+
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -171,9 +236,20 @@ class WalletServiceTest {
 
         walletService.renameWallet(wallet1.getId(), newName);
 
-        // Check if the wallet was renamed
         verify(walletRepository).save(wallet1);
         assertEquals(newName, wallet1.getName());
+    }
+
+    @Test
+    @DisplayName("Test if exception is thrown when trying to rename a wallet with an empty name")
+    void testRenameWalletWithEmptyName() {
+        String newName = "  ";
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> walletService.renameWallet(wallet1.getId(), newName));
+
+        verify(walletRepository, never()).save(any(Wallet.class));
     }
 
     @Test
@@ -187,7 +263,6 @@ class WalletServiceTest {
         assertThrows(
                 EntityNotFoundException.class, () -> walletService.renameWallet(walletId, newName));
 
-        // Verify that the wallet was not renamed
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -206,7 +281,6 @@ class WalletServiceTest {
         assertThrows(
                 EntityExistsException.class,
                 () -> walletService.renameWallet(walletId, walletName));
-        // Verify that the wallet was not renamed
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -219,12 +293,10 @@ class WalletServiceTest {
 
         when(walletRepository.save(any(Wallet.class))).thenReturn(wallet1);
 
-        // Define the wallet type of the wallet to be changed
         wallet1.setType(walletType1);
 
         walletService.changeWalletType(wallet1.getId(), walletType2);
 
-        // Check if the wallet type was updated
         verify(walletRepository).save(wallet1);
         assertEquals(walletType2.getId(), wallet1.getType().getId());
     }
@@ -242,7 +314,6 @@ class WalletServiceTest {
                 EntityNotFoundException.class,
                 () -> walletService.changeWalletType(walletId, walletType2));
 
-        // Verify that the wallet type was not updated
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -265,7 +336,6 @@ class WalletServiceTest {
                 EntityNotFoundException.class,
                 () -> walletService.changeWalletType(walletId, null));
 
-        // Verify that the wallet type was not updated
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -274,7 +344,6 @@ class WalletServiceTest {
             "Test if exception is thrown when trying to change the wallet type of "
                     + "a wallet to the same type")
     void testChangeWalletTypeSameType() {
-        // Define the wallet type of the wallet to be changed
         wallet1.setType(walletType1);
 
         when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
@@ -285,7 +354,6 @@ class WalletServiceTest {
                 MoinexException.AttributeAlreadySetException.class,
                 () -> walletService.changeWalletType(wallet1.getId(), wallet1.getType()));
 
-        // Verify that the wallet type was not updated
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 
@@ -299,7 +367,6 @@ class WalletServiceTest {
 
         walletService.updateWalletBalance(wallet1.getId(), newBalance);
 
-        // Check if the wallet balance was updated
         verify(walletRepository).save(wallet1);
         assertEquals(
                 newBalance.doubleValue(), wallet1.getBalance().doubleValue(), Constants.EPSILON);
@@ -319,7 +386,6 @@ class WalletServiceTest {
                 EntityNotFoundException.class,
                 () -> walletService.updateWalletBalance(walletId, newBalance));
 
-        // Verify that the wallet balance was not updated
         verify(walletRepository, never()).save(any(Wallet.class));
     }
 }

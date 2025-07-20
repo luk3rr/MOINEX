@@ -88,7 +88,7 @@ public class RecurringTransactionService {
 
         TemporalUnit unit = frequencyUnits.get(frequency);
         if (unit == null) {
-            throw new IllegalArgumentException("Invalid frequency type");
+            throw new IllegalArgumentException("Invalid frequency type: " + frequency);
         }
 
         LocalDate minimumEndDate = startDate.plus(1, unit);
@@ -245,9 +245,9 @@ public class RecurringTransactionService {
      * Stops a recurring transaction
      *
      * @param recurringTransactionId The id of the recurring transaction
-     * @throws EntityNotFoundException                     If the recurring transaction is not found
+     * @throws EntityNotFoundException                                     If the recurring transaction is not found
      * @throws MoinexException.RecurringTransactionAlreadyStoppedException If the recurring transaction
-     *                                                     has already ended
+     *                                                                     has already ended
      */
     @Transactional
     public void stopRecurringTransaction(Integer recurringTransactionId) {
@@ -415,9 +415,9 @@ public class RecurringTransactionService {
             }
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             m_logger.warn(
-                    String.format(
-                            "Failed to create transaction for recurring transaction %d: %s",
-                            recurring.getId(), e.getMessage()));
+                    "Failed to create transaction for recurring transaction {}: {}",
+                    recurring.getId(),
+                    e.getMessage());
         }
     }
 

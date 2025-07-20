@@ -582,44 +582,6 @@ public class WalletTransactionService {
     }
 
     /**
-     * Confirm a pending transaction
-     *
-     * @param transactionId The id of the transaction to be confirmed
-     * @throws EntityNotFoundException                      If the transaction does not exist
-     * @throws MoinexException.AttributeAlreadySetException If the transaction is already confirmed
-     */
-    @Transactional
-    public void confirmTransaction(Integer transactionId) {
-        WalletTransaction transaction =
-                walletTransactionRepository
-                        .findById(transactionId)
-                        .orElseThrow(
-                                () ->
-                                        new EntityNotFoundException(
-                                                "Transaction with id "
-                                                        + transactionId
-                                                        + " not found"));
-
-        if (transaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
-            throw new MoinexException.AttributeAlreadySetException(
-                    "Transaction with id " + transactionId + " is already confirmed");
-        }
-
-        Wallet wallet = transaction.getWallet();
-
-        if (transaction.getType().equals(TransactionType.EXPENSE)) {
-            wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
-        } else {
-            wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
-        }
-
-        transaction.setStatus(TransactionStatus.CONFIRMED);
-
-        walletRepository.save(wallet);
-        walletTransactionRepository.save(transaction);
-    }
-
-    /**
      * Get transaction by id
      *
      * @param id The id of the transaction
