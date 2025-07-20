@@ -8,6 +8,7 @@ package org.moinex.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -136,19 +137,24 @@ public class MarketService {
                                 String valorField = "valor";
 
                                 bmi.setSelicTarget(
-                                        jsonObject
-                                                .getJSONObject("selic_target")
-                                                .getBigDecimal(valorField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject("selic_target")
+                                                        .get(valorField)
+                                                        .toString()));
 
                                 bmi.setIpca12Months(
-                                        jsonObject
-                                                .getJSONObject("ipca_12_months")
-                                                .getBigDecimal(valorField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject("ipca_12_months")
+                                                        .get(valorField)
+                                                        .toString()));
 
                                 JSONObject ipcaLastMonth =
                                         jsonObject.getJSONObject("ipca_last_month");
 
-                                bmi.setIpcaLastMonth(ipcaLastMonth.getBigDecimal(valorField));
+                                bmi.setIpcaLastMonth(
+                                        new BigDecimal(ipcaLastMonth.get(valorField).toString()));
 
                                 // Extract the date in the format DD/MM/YYYY
                                 // and convert it to a YearMonth object
@@ -184,7 +190,7 @@ public class MarketService {
      *
      * @return A CompletableFuture with the market quotes and commodities
      * @throws MoinexException.ResourceAlreadyUpdatingException If the market quotes and commodities are
-     *                                          already being updated
+     *                                                          already being updated
      * @throws MoinexException.APIFetchException                If the API fetch fails
      */
     public CompletableFuture<MarketQuotesAndCommodities>
@@ -230,54 +236,75 @@ public class MarketService {
                                 String priceField = "price";
 
                                 mqac.setDollar(
-                                        jsonObject
-                                                .getJSONObject(Constants.DOLLAR_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.DOLLAR_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setEuro(
-                                        jsonObject
-                                                .getJSONObject(Constants.EURO_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.EURO_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setIbovespa(
-                                        jsonObject
-                                                .getJSONObject(Constants.IBOVESPA_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.IBOVESPA_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setBitcoin(
-                                        jsonObject
-                                                .getJSONObject(Constants.BITCOIN_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.BITCOIN_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setEthereum(
-                                        jsonObject
-                                                .getJSONObject(Constants.ETHEREUM_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.ETHEREUM_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setGold(
-                                        jsonObject
-                                                .getJSONObject(Constants.GOLD_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.GOLD_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setSoybean(
-                                        jsonObject
-                                                .getJSONObject(Constants.SOYBEAN_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.SOYBEAN_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setCoffee(
-                                        jsonObject
-                                                .getJSONObject(Constants.COFFEE_ARABICA_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(
+                                                                Constants.COFFEE_ARABICA_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setWheat(
-                                        jsonObject
-                                                .getJSONObject(Constants.WHEAT_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.WHEAT_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setOilBrent(
-                                        jsonObject
-                                                .getJSONObject(Constants.OIL_BRENT_TICKER)
-                                                .getBigDecimal(priceField));
+                                        new BigDecimal(
+                                                jsonObject
+                                                        .getJSONObject(Constants.OIL_BRENT_TICKER)
+                                                        .get(priceField)
+                                                        .toString()));
 
                                 mqac.setLastUpdate(LocalDateTime.now());
 

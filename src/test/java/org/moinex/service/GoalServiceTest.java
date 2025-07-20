@@ -1,495 +1,503 @@
-/*
- * Filename: GoalServiceTest.java
- * Created on: December  7, 2024
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- */
-
 package org.moinex.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.repository.goal.GoalRepository;
+import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
+import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.repository.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {
 
-    @Mock private WalletTypeRepository walletTypeRepository;
-
-    @Mock private WalletRepository walletRepository;
-
     @Mock private GoalRepository goalRepository;
+    @Mock private WalletRepository walletRepository;
+    @Mock private TransferRepository transfersRepository;
+    @Mock private WalletTransactionRepository walletTransactionRepository;
+    @Mock private WalletTypeRepository walletTypeRepository;
 
     @InjectMocks private GoalService goalService;
 
     private Goal goal;
     private WalletType walletType;
 
-    @BeforeAll
-    static void setUp() {
-        MockitoAnnotations.openMocks(WalletServiceTest.class);
-    }
-
-    private Goal createGoal(
-            Integer id,
-            String name,
-            BigDecimal initialBalance,
-            BigDecimal targetBalance,
-            LocalDateTime targetDate,
-            String motivation) {
-        return new Goal(
-                id, name, initialBalance, targetBalance, targetDate, motivation, walletType);
-    }
-
-    private WalletType createWalletType(Integer id, String name) {
-        return new WalletType(id, name);
-    }
-
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
+        walletType = new WalletType(1, Constants.GOAL_DEFAULT_WALLET_TYPE_NAME);
         goal =
-                createGoal(
-                        1,
-                        "Goal1",
-                        BigDecimal.valueOf(100.0),
-                        BigDecimal.valueOf(200.0),
-                        LocalDateTime.now().plusDays(30),
-                        "Motivation1");
-
-        walletType = createWalletType(1, Constants.GOAL_DEFAULT_WALLET_TYPE_NAME);
+                Goal.builder()
+                        .id(1)
+                        .name("Test Goal")
+                        .initialBalance(new BigDecimal("100.00"))
+                        .balance(new BigDecimal("150.00"))
+                        .targetBalance(new BigDecimal("1000.00"))
+                        .targetDate(LocalDateTime.now().plusMonths(6))
+                        .motivation("Test Motivation")
+                        .type(walletType)
+                        .build();
     }
 
     @Test
-    @DisplayName("Test if the goal is created successfully")
-    void testCreateGoal() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
+    @DisplayName("Should get all goals")
+    void getGoals_Success() {
+        when(goalRepository.findAll()).thenReturn(Collections.singletonList(goal));
 
-        when(walletTypeRepository.findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
-                .thenReturn(Optional.of(walletType));
+        List<Goal> goals = goalService.getGoals();
 
-        goalService.addGoal(
-                goal.getName(),
-                goal.getInitialBalance(),
-                goal.getTargetBalance(),
-                goal.getTargetDate().toLocalDate(),
-                goal.getMotivation());
-
-        // Capture the wallet object that was saved and check if the values are correct
-        ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
-
-        verify(goalRepository).save(goalCaptor.capture());
-
-        assertEquals(goal.getName(), goalCaptor.getValue().getName());
-
-        assertEquals(goal.getInitialBalance(), goalCaptor.getValue().getInitialBalance());
-
-        assertEquals(goal.getTargetBalance(), goalCaptor.getValue().getTargetBalance());
+        assertNotNull(goals);
+        assertEquals(1, goals.size());
+        verify(goalRepository).findAll();
     }
 
-    @Test
-    @DisplayName("Test if the goal is not created when the name already exists")
-    void testCreateGoalAlreadyExists() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(true);
+    @Nested
+    @DisplayName("Add Goal Tests")
+    class AddGoalTests {
+        @Test
+        @DisplayName("Should add goal successfully")
+        void addGoal_Success() {
+            when(goalRepository.existsByName(anyString())).thenReturn(false);
+            when(walletRepository.existsByName(anyString())).thenReturn(false);
+            when(walletTypeRepository.findByName(anyString())).thenReturn(Optional.of(walletType));
 
-        String goalName = goal.getName();
-        BigDecimal initialBalance = goal.getInitialBalance();
-        BigDecimal targetBalance = goal.getTargetBalance();
-        LocalDate targetDate = goal.getTargetDate().toLocalDate();
-        String motivation = goal.getMotivation();
+            goalService.addGoal(
+                    goal.getName(),
+                    goal.getInitialBalance(),
+                    goal.getTargetBalance(),
+                    goal.getTargetDate().toLocalDate(),
+                    goal.getMotivation());
 
-        assertThrows(
-                EntityExistsException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertEquals(goal.getName(), goalCaptor.getValue().getName());
+        }
 
-        verify(goalRepository, never()).save(any());
+        @Test
+        @DisplayName("Should throw IllegalArgumentException if goal name is empty")
+        void addGoal_EmptyName_ThrowsException() {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.addGoal(
+                                    "  ",
+                                    goal.getInitialBalance(),
+                                    goal.getTargetBalance(),
+                                    goal.getTargetDate().toLocalDate(),
+                                    goal.getMotivation()));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityExistsException if goal name already exists")
+        void addGoal_GoalNameExists_ThrowsException() {
+            when(goalRepository.existsByName(anyString())).thenReturn(true);
+
+            assertThrows(
+                    EntityExistsException.class,
+                    () ->
+                            goalService.addGoal(
+                                    goal.getName(),
+                                    goal.getInitialBalance(),
+                                    goal.getTargetBalance(),
+                                    goal.getTargetDate().toLocalDate(),
+                                    goal.getMotivation()));
+        }
+
+        @Test
+        @DisplayName(
+                "Should throw EntityExistsException if already exists a wallet with the same name")
+        void addGoal_WalletNameExists_ThrowsException() {
+            when(walletRepository.existsByName(anyString())).thenReturn(true);
+
+            assertThrows(
+                    EntityExistsException.class,
+                    () ->
+                            goalService.addGoal(
+                                    goal.getName(),
+                                    goal.getInitialBalance(),
+                                    goal.getTargetBalance(),
+                                    goal.getTargetDate().toLocalDate(),
+                                    goal.getMotivation()));
+        }
+
+        @Test
+        @DisplayName(
+                "Should throw EntityNotFoundException if default wallet type for goal not found")
+        void addGoal_WalletTypeNotFound_ThrowsException() {
+            when(walletTypeRepository.findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
+                    .thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () ->
+                            goalService.addGoal(
+                                    goal.getName(),
+                                    goal.getInitialBalance(),
+                                    goal.getTargetBalance(),
+                                    goal.getTargetDate().toLocalDate(),
+                                    goal.getMotivation()));
+        }
     }
 
-    @Test
-    @DisplayName("Test if the goal is not created when the initial balance is negative")
-    void testCreateGoalNegativeInitialBalance() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
-        when(walletRepository.existsByName(goal.getName())).thenReturn(false);
+    @Nested
+    @DisplayName("Delete Goal Tests")
+    class DeleteGoalTests {
+        @Test
+        @DisplayName("Should delete goal successfully if it has no transactions")
+        void deleteGoal_Success() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+            when(walletTransactionRepository.getTransactionCountByWallet(goal.getId()))
+                    .thenReturn(0);
+            when(transfersRepository.getTransferCountByWallet(goal.getId())).thenReturn(0);
 
-        String goalName = goal.getName();
-        BigDecimal initialBalance = BigDecimal.valueOf(-1.0);
-        BigDecimal targetBalance = goal.getTargetBalance();
-        LocalDate targetDate = goal.getTargetDate().toLocalDate();
-        String motivation = goal.getMotivation();
+            goalService.deleteGoal(goal.getId());
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
+            verify(goalRepository).delete(goal);
+        }
 
-        verify(goalRepository, never()).save(any());
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when deleting a non-existent goal")
+        void deleteGoal_NotFound_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> goalService.deleteGoal(goal.getId()));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalStateException when deleting a goal with transactions")
+        void deleteGoal_WithTransactions_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+            when(walletTransactionRepository.getTransactionCountByWallet(goal.getId()))
+                    .thenReturn(1);
+
+            assertThrows(IllegalStateException.class, () -> goalService.deleteGoal(goal.getId()));
+        }
     }
 
-    @Test
-    @DisplayName("Test if the goal is not created when the target balance is negative")
-    void testCreateGoalNegativeTargetBalance() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
+    @Nested
+    @DisplayName("Update Goal Tests")
+    class UpdateGoalTests {
+        @Test
+        @DisplayName("Should update goal successfully")
+        void updateGoal_Success() {
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Updated Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance())
+                            .targetBalance(new BigDecimal("1200.00"))
+                            .targetDate(goal.getTargetDate().plusMonths(1))
+                            .motivation("Updated Motivation")
+                            .build();
 
-        String goalName = goal.getName();
-        BigDecimal initialBalance = goal.getInitialBalance();
-        BigDecimal targetBalance = BigDecimal.valueOf(-1.0);
-        LocalDate targetDate = goal.getTargetDate().toLocalDate();
-        String motivation = goal.getMotivation();
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
+            goalService.updateGoal(updatedGoal);
 
-        verify(goalRepository, never()).save(any());
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertEquals("Updated Goal Name", goalCaptor.getValue().getName());
+            assertEquals(new BigDecimal("1200.00"), goalCaptor.getValue().getTargetBalance());
+        }
+
+        @Test
+        @DisplayName("Successfully complete goal when updating with completion date")
+        void toggleGoalStatus_Completed() {
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Updated Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance())
+                            .targetBalance(goal.getBalance())
+                            .targetDate(goal.getTargetDate().plusMonths(1))
+                            .motivation("Updated Motivation")
+                            .completionDate(LocalDateTime.now())
+                            .build();
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.updateGoal(updatedGoal);
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+            assertNotNull(goalCaptor.getValue().getCompletionDate());
+            assertTrue(goalCaptor.getValue().isCompleted());
+        }
+
+        @Test
+        @DisplayName("Successfully reopen goal when updating with null completion date")
+        void toggleGoalStatus_Reopened() {
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Updated Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance())
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate().plusMonths(1))
+                            .motivation("Updated Motivation")
+                            .build();
+
+            // Set old goal as completed
+            goal.setBalance(goal.getTargetBalance());
+            goal.setCompletionDate(LocalDateTime.now());
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.updateGoal(updatedGoal);
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+            assertNull(goalCaptor.getValue().getCompletionDate());
+            assertFalse(goalCaptor.getValue().isCompleted());
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException when updating with empty name")
+        void updateGoal_EmptyName_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("  ")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance())
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate())
+                            .motivation(goal.getMotivation())
+                            .build();
+
+            assertThrows(IllegalArgumentException.class, () -> goalService.updateGoal(updatedGoal));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityExistsException when updating to an existing goal name")
+        void updateGoal_ExistingName_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+            when(goalRepository.existsByName("Existing Goal Name")).thenReturn(true);
+
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Existing Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance())
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate())
+                            .motivation(goal.getMotivation())
+                            .build();
+
+            assertThrows(EntityExistsException.class, () -> goalService.updateGoal(updatedGoal));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityExistsException when updating to an existing wallet name")
+        void updateGoal_WalletNameExists_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+            when(goalRepository.existsByName(anyString())).thenReturn(false);
+            when(walletRepository.existsByName("Existing Wallet Name")).thenReturn(true);
+
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Existing Wallet Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance())
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate())
+                            .motivation(goal.getMotivation())
+                            .build();
+
+            assertThrows(EntityExistsException.class, () -> goalService.updateGoal(updatedGoal));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when updating a non-existent goal")
+        void updateGoal_NotFound_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> goalService.updateGoal(goal));
+        }
     }
 
-    @Test
-    @DisplayName("Test if the goal is not created when target balance zero")
-    void testCreateGoalZeroBalance() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
+    @Nested
+    @DisplayName("Complete and Reopen Goal Tests")
+    class CompleteAndReopenGoalTests {
+        @Test
+        @DisplayName("Should complete goal successfully when balance is sufficient")
+        void completeGoal_Success() {
+            goal.setBalance(goal.getTargetBalance());
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
-        String goalName = goal.getName();
-        BigDecimal initialBalance = BigDecimal.valueOf(0.0);
-        BigDecimal targetBalance = BigDecimal.valueOf(0.0);
-        LocalDate targetDate = goal.getTargetDate().toLocalDate();
-        String motivation = goal.getMotivation();
+            goalService.completeGoal(goal.getId());
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertNotNull(goalCaptor.getValue().getCompletionDate());
+        }
 
-        verify(goalRepository, never()).save(any());
+        @Test
+        @DisplayName("Should throw IncompleteGoalException when balance is insufficient")
+        void completeGoal_InsufficientBalance_ThrowsException() {
+            goal.setBalance(goal.getTargetBalance().subtract(BigDecimal.ONE));
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            assertThrows(
+                    MoinexException.IncompleteGoalException.class,
+                    () -> goalService.completeGoal(goal.getId()));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when completing a non-existent goal")
+        void completeGoal_NotFound_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class, () -> goalService.completeGoal(goal.getId()));
+        }
+
+        @Test
+        @DisplayName("Should reopen a completed goal")
+        void reopenGoal_Success() {
+            goal.setCompletionDate(LocalDateTime.now());
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.reopenGoal(goal.getId());
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertNull(goalCaptor.getValue().getCompletionDate());
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when reopening a non-existent goal")
+        void reopenGoal_NotFound_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> goalService.reopenGoal(goal.getId()));
+        }
     }
 
-    @Test
-    @DisplayName("Test if the goal is not created when the target date is in the past")
-    void testCreateGoalTargetDateInPast() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
+    @Nested
+    @DisplayName("Archive and Unarchive Goal Tests")
+    class ArchiveAndUnarchiveGoalTests {
+        @Test
+        @DisplayName("Should archive goal successfully")
+        void archiveGoal_Success() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
-        String goalName = goal.getName();
-        BigDecimal initialBalance = goal.getInitialBalance();
-        BigDecimal targetBalance = goal.getTargetBalance();
-        LocalDate targetDate = LocalDate.now().minusDays(1);
-        String motivation = goal.getMotivation();
+            goalService.archiveGoal(goal.getId());
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertTrue(goalCaptor.getValue().isArchived());
+        }
 
-        verify(goalRepository, never()).save(any());
+        @Test
+        @DisplayName("Should unarchive goal successfully")
+        void unarchiveGoal_Success() {
+            goal.setArchived(true);
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.unarchiveGoal(goal.getId());
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertFalse(goalCaptor.getValue().isArchived());
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when archiving a non-existent goal")
+        void archiveGoal_NotFound_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class, () -> goalService.archiveGoal(goal.getId()));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when unarchiving a non-existent goal")
+        void unarchiveGoal_NotFound_ThrowsException() {
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class, () -> goalService.unarchiveGoal(goal.getId()));
+        }
     }
 
-    @Test
-    @DisplayName(
-            "Test if the goal is not created when the target balance is less "
-                    + "than the initial balance")
-    void testCreateGoalTargetBalanceLessThanInitialBalance() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
-
-        String goalName = goal.getName();
-        BigDecimal initialBalance = goal.getInitialBalance();
-        BigDecimal targetBalance = initialBalance.subtract(BigDecimal.valueOf(1.0));
-        LocalDate targetDate = goal.getTargetDate().toLocalDate();
-        String motivation = goal.getMotivation();
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is not created when the wallet type does not exist")
-    void testCreateGoalWalletTypeDoesNotExist() {
-        when(goalRepository.existsByName(goal.getName())).thenReturn(false);
-
-        when(walletTypeRepository.findByName(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME))
-                .thenReturn(Optional.empty());
-
-        String goalName = goal.getName();
-        BigDecimal initialBalance = goal.getInitialBalance();
-        BigDecimal targetBalance = goal.getTargetBalance();
-        LocalDate targetDate = goal.getTargetDate().toLocalDate();
-        String motivation = goal.getMotivation();
-
-        assertThrows(
-                EntityNotFoundException.class,
-                () ->
-                        goalService.addGoal(
-                                goalName, initialBalance, targetBalance, targetDate, motivation));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is archived successfully")
-    void testArchiveGoal() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        goalService.archiveGoal(goal.getId());
-
-        verify(goalRepository).save(goal);
-        assertTrue(goal.isArchived());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is unarchived successfully")
-    void testUnarchiveGoal() {
-        goal.setArchived(true);
-
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        goalService.unarchiveGoal(goal.getId());
-
-        verify(goalRepository).save(goal);
-        assertFalse(goal.isArchived());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is not archived when it does not exist")
-    void testArchiveGoalDoesNotExist() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
-
-        Integer goalId = goal.getId();
-
-        assertThrows(EntityNotFoundException.class, () -> goalService.archiveGoal(goalId));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is not unarchived when it does not exist")
-    void testUnarchiveGoalDoesNotExist() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
-
-        Integer goalId = goal.getId();
-
-        assertThrows(EntityNotFoundException.class, () -> goalService.unarchiveGoal(goalId));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is renamed successfully")
-    void testRenameGoal() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        String newName = goal.getName() + " Renamed";
-        goalService.renameGoal(goal.getId(), newName);
-
-        verify(goalRepository).save(goal);
-        assertEquals(newName, goal.getName());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is not renamed when it does not exist")
-    void testRenameGoalDoesNotExist() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
-
-        Integer goalId = goal.getId();
-
-        assertThrows(
-                EntityNotFoundException.class, () -> goalService.renameGoal(goalId, "New Name"));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the goal is not renamed when the new name already exists")
-    void testRenameGoalAlreadyExists() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        when(goalRepository.existsByName(goal.getName() + " Renamed")).thenReturn(true);
-
-        Integer goalId = goal.getId();
-        String goalName = goal.getName();
-
-        assertThrows(
-                EntityExistsException.class,
-                () -> goalService.renameGoal(goalId, goalName + " Renamed"));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the initial balance is updated successfully")
-    void testUpdateInitialBalance() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        BigDecimal newInitialBalance = goal.getInitialBalance().add(BigDecimal.valueOf(100.0));
-
-        goalService.changeInitialBalance(goal.getId(), newInitialBalance);
-
-        verify(goalRepository).save(goal);
-
-        assertEquals(newInitialBalance, goal.getInitialBalance());
-    }
-
-    @Test
-    @DisplayName("Test if the initial balance is not updated when the new balance is negative")
-    void testUpdateInitialBalanceNegative() {
-        Integer goalId = goal.getId();
-        BigDecimal newInitialBalance = BigDecimal.valueOf(-1.0);
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> goalService.changeInitialBalance(goalId, newInitialBalance));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the initial balance is not updated when the goal does not exist")
-    void testUpdateInitialBalanceDoesNotExist() {
-        Integer goalId = goal.getId();
-        BigDecimal newInitialBalance = BigDecimal.valueOf(100.0);
-
-        assertThrows(
-                EntityNotFoundException.class,
-                () -> goalService.changeInitialBalance(goalId, newInitialBalance));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the target balance is updated successfully")
-    void testUpdateTargetBalance() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        BigDecimal newTargetBalance = goal.getTargetBalance().add(BigDecimal.valueOf(100.0));
-        goalService.changeTargetBalance(goal.getId(), newTargetBalance);
-
-        verify(goalRepository).save(goal);
-        assertEquals(newTargetBalance, goal.getTargetBalance());
-    }
-
-    @Test
-    @DisplayName("Test if the target balance is not updated when the new balance is negative")
-    void testUpdateTargetBalanceNegative() {
-        Integer goalId = goal.getId();
-        BigDecimal newTargetBalance = BigDecimal.valueOf(-1.0);
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> goalService.changeTargetBalance(goalId, newTargetBalance));
-
-        verify(goalRepository, never()).save(any());
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the target balance is not updated when the goal does not exist")
-    void testUpdateTargetBalanceDoesNotExist() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
-
-        Integer goalId = goal.getId();
-        BigDecimal newTargetBalance = BigDecimal.valueOf(100.0);
-
-        assertThrows(
-                EntityNotFoundException.class,
-                () -> goalService.changeTargetBalance(goalId, newTargetBalance));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the target date is updated successfully")
-    void testUpdateTargetDate() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        LocalDateTime newTargetDate = goal.getTargetDate().plusDays(30);
-        goalService.changeTargetDate(goal.getId(), newTargetDate);
-
-        verify(goalRepository).save(goal);
-        assertEquals(newTargetDate, goal.getTargetDate());
-    }
-
-    @Test
-    @DisplayName("Test if the target date is not updated when the goal does not exist")
-    void testUpdateTargetDateDoesNotExist() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
-
-        Integer goalId = goal.getId();
-        LocalDateTime currentDateTime = LocalDateTime.now();
-
-        assertThrows(
-                EntityNotFoundException.class,
-                () -> goalService.changeTargetDate(goalId, currentDateTime));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the target date is not updated when the new date is in the past")
-    void testUpdateTargetDateInPast() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        Integer goalId = goal.getId();
-        LocalDateTime pastDate = LocalDateTime.now().minusDays(1);
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> goalService.changeTargetDate(goalId, pastDate));
-
-        verify(goalRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Test if the motivation is updated successfully")
-    void testUpdateMotivation() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-
-        String newMotivation = goal.getMotivation() + " Updated";
-        goalService.changeMotivation(goal.getId(), newMotivation);
-
-        verify(goalRepository).save(goal);
-        assertEquals(newMotivation, goal.getMotivation());
-    }
-
-    @Test
-    @DisplayName("Test if the motivation is not updated when the goal does not exist")
-    void testUpdateMotivationDoesNotExist() {
-        when(goalRepository.findById(goal.getId())).thenReturn(Optional.empty());
-
-        Integer goalId = goal.getId();
-
-        assertThrows(
-                EntityNotFoundException.class,
-                () -> goalService.changeMotivation(goalId, "New Motivation"));
-
-        verify(goalRepository, never()).save(any());
+    @Nested
+    @DisplayName("Validation Tests")
+    class ValidationTests {
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for target date in the past")
+        void validateDateAndBalances_PastDate_ThrowsException() {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.validateDateAndBalances(
+                                    BigDecimal.TEN,
+                                    new BigDecimal("100"),
+                                    LocalDateTime.now().minusDays(1)));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for negative initial balance")
+        void validateDateAndBalances_NegativeInitialBalance_ThrowsException() {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.validateDateAndBalances(
+                                    new BigDecimal("-1"),
+                                    new BigDecimal("100"),
+                                    LocalDateTime.now().plusDays(1)));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for zero target balance")
+        void validateDateAndBalances_ZeroTargetBalance_ThrowsException() {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.validateDateAndBalances(
+                                    BigDecimal.ZERO,
+                                    BigDecimal.ZERO,
+                                    LocalDateTime.now().plusDays(1)));
+        }
+
+        @Test
+        @DisplayName(
+                "Should throw IllegalArgumentException for initial balance greater than target")
+        void validateDateAndBalances_InitialGreaterThanTarget_ThrowsException() {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.validateDateAndBalances(
+                                    new BigDecimal("101"),
+                                    new BigDecimal("100"),
+                                    LocalDateTime.now().plusDays(1)));
+        }
     }
 }

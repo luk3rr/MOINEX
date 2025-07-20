@@ -510,27 +510,6 @@ public class CreditCardService {
     }
 
     /**
-     * Delete a credit
-     *
-     * @param creditId The id of the credit
-     * @throws EntityNotFoundException If the credit does not exist
-     */
-    @Transactional
-    public void deleteCredit(Integer creditId) {
-        CreditCardCredit credit =
-                creditCardCreditRepository
-                        .findById(creditId)
-                        .orElseThrow(
-                                () ->
-                                        new EntityNotFoundException(
-                                                "Credit with id " + creditId + " not found"));
-
-        creditCardCreditRepository.delete(credit);
-
-        logger.info("Credit with id {} deleted", creditId);
-    }
-
-    /**
      * Archive a credit card
      *
      * @param id The id of the credit card
@@ -634,29 +613,6 @@ public class CreditCardService {
         creditCardDebtRepository.save(oldDebt);
 
         logger.info("Debt with id {} updated successfully", debt.getId());
-    }
-
-    /**
-     * Update the credit of a credit card
-     *
-     * @param credit The credit to be updated
-     * @throws EntityNotFoundException If the credit does not exist
-     */
-    @Transactional
-    public void updateCreditCardCredit(CreditCardCredit credit) {
-        CreditCardCredit oldCredit =
-                creditCardCreditRepository
-                        .findById(credit.getId())
-                        .orElseThrow(
-                                () ->
-                                        new EntityNotFoundException(
-                                                String.format(
-                                                        "Credit with id %d does not exist",
-                                                        credit.getId())));
-        credit.setCreditCard(oldCredit.getCreditCard());
-        creditCardCreditRepository.save(credit);
-
-        logger.info("Credit with id {} updated successfully", credit.getId());
     }
 
     /**
@@ -778,30 +734,12 @@ public class CreditCardService {
     }
 
     /**
-     * Get all credit cards
-     *
-     * @return A list with all credit cards
-     */
-    public List<CreditCard> getAllCreditCards() {
-        return creditCardRepository.findAll();
-    }
-
-    /**
      * Get all archived credit cards
      *
      * @return A list with all archived credit cards
      */
     public List<CreditCard> getAllArchivedCreditCards() {
         return creditCardRepository.findAllByIsArchivedTrue();
-    }
-
-    /**
-     * Get all credit cards ordered by name
-     *
-     * @return A list with all credit cards ordered by name
-     */
-    public List<CreditCard> getAllCreditCardsOrderedByName() {
-        return creditCardRepository.findAllByOrderByNameAsc();
     }
 
     /**
@@ -954,19 +892,6 @@ public class CreditCardService {
     }
 
     /**
-     * Get the total of all pending payments of all credit cards from a specified month
-     * and year onward, including future months and the current month
-     *
-     * @param month The starting month (inclusive)
-     * @param year  The starting year (inclusive)
-     * @return The total of all pending payments of all credit cards from the specified
-     * month and year onward
-     */
-    public BigDecimal getTotalPendingPayments(Integer month, Integer year) {
-        return creditCardPaymentRepository.getTotalPendingPayments(month, year);
-    }
-
-    /**
      * Get the effective amount paid for all credit card payments for a given month, and
      * year This value considers discounts (such as rebates used).
      *
@@ -1005,18 +930,6 @@ public class CreditCardService {
      */
     public BigDecimal getPendingPaymentsByMonth(Integer month, Integer year) {
         return creditCardPaymentRepository.getPendingPaymentsByMonth(month, year);
-    }
-
-    /**
-     * Get the total of all pending payments of all credit cards from a specified year
-     * onward, including future years and the current year
-     *
-     * @param year The starting year (inclusive)
-     * @return The total of all pending payments of all credit cards from the specified
-     * year onward
-     */
-    public BigDecimal getTotalPendingPaymentsByYear(Integer year) {
-        return creditCardPaymentRepository.getTotalPendingPaymentsByYear(year);
     }
 
     /**
@@ -1060,16 +973,6 @@ public class CreditCardService {
     }
 
     /**
-     * Get the remaining debt of a purchase
-     *
-     * @param debtId The id of the debt
-     * @return The remaining debt of the purchase
-     */
-    public BigDecimal getRemainingDebt(Integer debtId) {
-        return creditCardPaymentRepository.getRemainingDebt(debtId);
-    }
-
-    /**
      * Get the invoice amount of a credit card in a specified month and year
      *
      * @param crcId The credit card id
@@ -1091,18 +994,6 @@ public class CreditCardService {
     public List<CreditCardCredit> getCreditCardCreditsByMonth(
             Integer crcId, Integer month, Integer year) {
         return creditCardCreditRepository.findCreditCardCreditsByMonth(crcId, month, year);
-    }
-
-    /**
-     * Get the total of all credit card credits in a month and year
-     *
-     * @param crcId The id of the credit card
-     * @param month The month
-     * @param year  The year
-     * @return The total of all credit card credits in a month and year
-     */
-    public BigDecimal getTotalCreditCardCreditsByMonth(Integer crcId, Integer month, Integer year) {
-        return creditCardCreditRepository.getTotalCreditCardCreditsByMonth(crcId, month, year);
     }
 
     /**
@@ -1280,6 +1171,10 @@ public class CreditCardService {
 
         if (lastFourDigits.isBlank() || lastFourDigits.length() != 4) {
             throw new IllegalArgumentException("Last four digits must have length 4");
+        }
+
+        if (!lastFourDigits.matches("\\d{4}")) {
+            throw new IllegalArgumentException("Last four digits must be numeric");
         }
     }
 
