@@ -369,7 +369,7 @@ public class CSVImportController {
                 }
             }
 
-            walletService.addWallet(wt.getName(), wt.getBalance());
+            // walletService.addWallet(wt.getName(), wt.getBalance());
         }
     }
 

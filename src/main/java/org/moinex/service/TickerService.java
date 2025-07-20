@@ -318,7 +318,9 @@ public class TickerService {
                                         try {
                                             JSONObject tickerData =
                                                     jsonObject.getJSONObject(ticker.getSymbol());
-                                            BigDecimal price = tickerData.getBigDecimal("price");
+                                            BigDecimal price =
+                                                    new BigDecimal(
+                                                            tickerData.get("price").toString());
 
                                             price = Constants.roundPrice(price, ticker.getType());
 
