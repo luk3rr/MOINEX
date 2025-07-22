@@ -199,6 +199,7 @@ public final class Constants {
     public static final String HOME_WALLET_ITEM_NAME_STYLE = "wallet-item-name";
     public static final String HOME_WALLET_ITEM_BALANCE_STYLE = "wallet-item-balance";
     public static final String HOME_WALLET_TYPE_STYLE = "wallet-item-type";
+    public static final String HOME_VIRTUAL_WALLET_INFO_STYLE = "virtual-wallet-info";
 
     public static final String TOOLTIP_STYLE = "tooltip";
 

@@ -211,8 +211,8 @@ Considerando todos os pontos acima, a lista de tarefas para implementação é a
 #### 4.4.3 Interface
 - [X] Atualizar o formulário de criação de Metas para incluir o ComboBox de vinculação a Carteiras Mestras.
 - [ ] Atualizar o formulário de edição de Metas para incluir o ComboBox de vinculação a Carteiras Mestras.
-- [ ] Atualizar a Home Page para exibir Carteiras Virtuais com indicação de "fatia" de uma Carteira Mestra.
-- [ ] Atualizar a Wallet Page para exibir Carteiras Virtuais com indicação de "fatia" de uma Carteira Mestra.
+- [x] Atualizar a Home Page para exibir Carteiras Virtuais com indicação de "fatia" de uma Carteira Mestra.
+- [x] Atualizar a Wallet Page para exibir Carteiras Virtuais com indicação de "fatia" de uma Carteira Mestra.
 
 #### 4.4.4 Deleção de Carteiras
 - [ ] Implementar a lógica de deleção de Carteiras Mestras, garantindo que as Carteiras Virtuais vinculadas sejam

@@ -33,6 +33,12 @@
   -fx-text-fill: white;
 }
 
+.virtual-wallet-info {
+  -fx-font-size: 9px;
+  -fx-text-fill: white;
+  -fx-font-style: italic;
+}
+
 .credit-card-item {
   -fx-background-color: linear-gradient(to bottom right, #3498db, #9013fe);
   -fx-padding: 15px;

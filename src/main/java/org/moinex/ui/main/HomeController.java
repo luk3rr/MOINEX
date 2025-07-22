@@ -661,7 +661,19 @@ public class HomeController {
         balanceLabel.getStyleClass().add(Constants.HOME_WALLET_ITEM_BALANCE_STYLE);
         UIUtils.addTooltipToNode(balanceLabel, "Wallet balance");
 
-        infoVbox.getChildren().addAll(nameLabel, walletTypeLabel, balanceLabel);
+        if (wallet.isVirtual()) {
+            Label virtualWalletLabel = new Label("Virtual Wallet");
+
+            virtualWalletLabel.setAlignment(Pos.BOTTOM_LEFT);
+            virtualWalletLabel.getStyleClass().add(Constants.HOME_VIRTUAL_WALLET_INFO_STYLE);
+
+            UIUtils.addTooltipToNode(virtualWalletLabel, wallet.getVirtualWalletInfo());
+
+            infoVbox.getChildren()
+                    .addAll(nameLabel, walletTypeLabel, balanceLabel, virtualWalletLabel);
+        } else {
+            infoVbox.getChildren().addAll(nameLabel, walletTypeLabel, balanceLabel);
+        }
 
         ImageView icon =
                 new ImageView(Constants.WALLET_TYPE_ICONS_PATH + wallet.getType().getIcon());

@@ -59,6 +59,8 @@ public class WalletFullPaneController {
 
     @FXML private Label walletType;
 
+    @FXML private Label virtualWalletInfo;
+
     @FXML private Label openingBalanceSign;
 
     @FXML private Label openingBalanceValue;
@@ -191,6 +193,8 @@ public class WalletFullPaneController {
 
         wallet = wt;
         loadWalletInfo();
+
+        setupDynamicVisibility();
 
         walletName.setText(wallet.getName());
         walletType.setText(wallet.getType().getName());
@@ -407,5 +411,18 @@ public class WalletFullPaneController {
             UIUtils.setLabelStyle(signLabel, Constants.NEUTRAL_BALANCE_STYLE);
             UIUtils.setLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE);
         }
+    }
+
+    private void setupDynamicVisibility() {
+        if (wallet.isMaster()) {
+            virtualWalletInfo.setVisible(false);
+            virtualWalletInfo.setManaged(false);
+            return;
+        }
+
+        virtualWalletInfo.setVisible(true);
+        virtualWalletInfo.setManaged(true);
+
+        virtualWalletInfo.setText(wallet.getVirtualWalletInfo());
     }
 }

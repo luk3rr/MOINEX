@@ -68,4 +68,20 @@ public class Wallet {
     public int hashCode() {
         return id != null ? id.hashCode() : getClass().hashCode();
     }
+
+    public boolean isVirtual() {
+        return !isMaster();
+    }
+
+    public boolean isMaster() {
+        return masterWallet == null;
+    }
+
+    public String getVirtualWalletInfo() {
+        if (isMaster()) {
+            return "This is a master wallet, not a virtual wallet.";
+        }
+
+        return String.format("Virtual Wallet linked to '%s'", masterWallet.getName());
+    }
 }
