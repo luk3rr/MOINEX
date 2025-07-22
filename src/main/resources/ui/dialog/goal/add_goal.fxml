@@ -70,7 +70,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="initialBalanceField" promptText="\$ 0.00" VBox.vgrow="ALWAYS" />
+                        <TextField fx:id="balanceField" promptText="\$ 0.00" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER">

@@ -61,16 +61,6 @@
                         </ImageView>
                      </children>
                   </VBox>
-                  <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label text="Initial balance">
-                           <font>
-                              <Font size="10.0" />
-                           </font>
-                        </Label>
-                        <TextField fx:id="initialBalanceField" promptText="\$ 0.00" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
                   <VBox alignment="CENTER">
                      <children>
                         <Label text="Current balance">
@@ -78,7 +68,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="currentBalanceField" promptText="\$ 0.00" VBox.vgrow="ALWAYS" />
+                        <TextField fx:id="balanceField" promptText="\$ 0.00" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER">

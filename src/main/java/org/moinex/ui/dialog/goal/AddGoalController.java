@@ -88,7 +88,7 @@ public final class AddGoalController extends BaseGoalManagement {
         String goalName = nameField.getText();
         goalName = goalName.strip(); // Remove leading and trailing whitespaces
 
-        String initialBalanceStr = initialBalanceField.getText();
+        String initialBalanceStr = balanceField.getText();
         String targetBalanceStr = targetBalanceField.getText();
         LocalDate targetDate = targetDatePicker.getValue();
         String motivation = motivationTextArea.getText();
@@ -161,8 +161,7 @@ public final class AddGoalController extends BaseGoalManagement {
                 (observable, oldValue, newValue) -> {
                     boolean masterWalletSelected = masterWalletComboBox.getValue() != null;
                     boolean initialBalanceFilled =
-                            initialBalanceField.getText() != null
-                                    && !initialBalanceField.getText().isBlank();
+                            balanceField.getText() != null && !balanceField.getText().isBlank();
 
                     boolean showOptions = masterWalletSelected && initialBalanceFilled;
 
@@ -177,6 +176,6 @@ public final class AddGoalController extends BaseGoalManagement {
                 };
 
         masterWalletComboBox.valueProperty().addListener(listener);
-        initialBalanceField.textProperty().addListener(listener);
+        balanceField.textProperty().addListener(listener);
     }
 }

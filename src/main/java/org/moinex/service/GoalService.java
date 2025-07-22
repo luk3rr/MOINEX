@@ -73,7 +73,6 @@ public class GoalService {
      * @throws IllegalArgumentException If the initial balance is greater than the
      *                                  target balance
      */
-    @Transactional
     public void validateDateAndBalances(
             BigDecimal initialBalance, BigDecimal targetBalance, LocalDateTime targetDateTime) {
         if (targetDateTime.isBefore(LocalDateTime.now())) {
@@ -203,7 +202,7 @@ public class GoalService {
     }
 
     /**
-     * Handles the funding strategy for a goal when a master wallet and initial balance are provided.
+     * Handles the funding strategy for a goal when goal is an virtual wallet and a master wallet and initial balance are provided.
      *
      * @param goal     The goal to be funded
      * @param strategy The funding strategy to be applied
@@ -211,8 +210,7 @@ public class GoalService {
      * @throws MoinexException.InsufficientResourcesException If the master wallet does not have enough unallocated balance
      */
     private void handleFundingStrategy(Goal goal, GoalFundingStrategy strategy) {
-        if (goal.getMasterWallet() != null
-                && goal.getInitialBalance().compareTo(BigDecimal.ZERO) > 0) {
+        if (goal.isVirtual() && goal.getInitialBalance().compareTo(BigDecimal.ZERO) > 0) {
             if (strategy == null) {
                 throw new IllegalArgumentException(
                         "A funding strategy is required when a master wallet and initial balance"
@@ -337,8 +335,9 @@ public class GoalService {
                 goal.getInitialBalance(), goal.getTargetBalance(), goal.getTargetDate());
 
         oldGoal.setName(goal.getName());
-        oldGoal.setInitialBalance(goal.getInitialBalance());
-        oldGoal.setBalance(goal.getBalance());
+
+        updateBalance(oldGoal, goal.getBalance());
+
         oldGoal.setTargetBalance(goal.getTargetBalance());
         oldGoal.setTargetDate(goal.getTargetDate());
         oldGoal.setMotivation(goal.getMotivation());
@@ -353,9 +352,29 @@ public class GoalService {
             }
         }
 
-        goalRepository.save(goal);
+        goalRepository.save(oldGoal);
 
-        logger.info("Goal with id {} updated successfully", goal.getId());
+        logger.info("Goal with id {} updated successfully", oldGoal.getId());
+    }
+
+    private void updateBalance(Goal goal, BigDecimal newBalance) {
+        // increment or decrement the initial balance based on the new balance
+        BigDecimal balanceDifference = newBalance.subtract(goal.getBalance());
+
+        if (balanceDifference.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal updatedInitial = goal.getInitialBalance().add(balanceDifference);
+            goal.setInitialBalance(updatedInitial.max(BigDecimal.ZERO));
+
+            logger.info(
+                    "Goal with id {} initial balance updated to {}",
+                    goal.getId(),
+                    goal.getInitialBalance());
+        }
+
+        goal.setBalance(newBalance);
+
+        goalRepository.save(goal);
+        logger.info("Goal with id {} balance updated to {}", goal.getId(), newBalance);
     }
 
     /**

@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.goal.Goal;
@@ -27,8 +26,6 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class EditGoalController extends BaseGoalManagement {
-    @FXML private TextField currentBalanceField;
-
     @FXML private CheckBox archivedCheckBox;
 
     @FXML private CheckBox completedCheckBox;
@@ -49,8 +46,7 @@ public final class EditGoalController extends BaseGoalManagement {
         this.goal = goal;
 
         nameField.setText(goal.getName());
-        initialBalanceField.setText(goal.getInitialBalance().toString());
-        currentBalanceField.setText(goal.getBalance().toString());
+        balanceField.setText(goal.getBalance().toString());
         targetBalanceField.setText(goal.getTargetBalance().toString());
         targetDatePicker.setValue(goal.getTargetDate().toLocalDate());
         motivationTextArea.setText(goal.getMotivation());
@@ -64,8 +60,7 @@ public final class EditGoalController extends BaseGoalManagement {
         String goalName = nameField.getText();
         goalName = goalName.strip(); // Remove leading and trailing whitespaces
 
-        String initialBalanceStr = initialBalanceField.getText();
-        String currentBalanceStr = currentBalanceField.getText();
+        String balanceStr = balanceField.getText();
         String targetBalanceStr = targetBalanceField.getText();
         LocalDate targetDate = targetDatePicker.getValue();
         String motivation = motivationTextArea.getText();
@@ -73,8 +68,7 @@ public final class EditGoalController extends BaseGoalManagement {
         boolean completed = completedCheckBox.isSelected();
 
         if (goalName.isEmpty()
-                || initialBalanceStr.isEmpty()
-                || currentBalanceStr.isEmpty()
+                || balanceStr.isEmpty()
                 || targetBalanceStr.isEmpty()
                 || targetDate == null) {
             WindowUtils.showInformationDialog(
@@ -84,13 +78,11 @@ public final class EditGoalController extends BaseGoalManagement {
         }
 
         try {
-            BigDecimal initialBalance = new BigDecimal(initialBalanceStr);
-            BigDecimal currentBalance = new BigDecimal(currentBalanceStr);
+            BigDecimal currentBalance = new BigDecimal(balanceStr);
             BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
             // Check if it has any modification
             if (goal.getName().equals(goalName)
-                    && goal.getInitialBalance().equals(initialBalance)
                     && goal.getBalance().equals(currentBalance)
                     && goal.getTargetBalance().equals(targetBalance)
                     && goal.getTargetDate().toLocalDate().equals(targetDate)
@@ -102,7 +94,6 @@ public final class EditGoalController extends BaseGoalManagement {
             } else // If there is any modification, update the goal
             {
                 goal.setName(goalName);
-                goal.setInitialBalance(initialBalance);
                 goal.setBalance(currentBalance);
                 goal.setTargetBalance(targetBalance);
                 goal.setTargetDate(targetDate.atStartOfDay());

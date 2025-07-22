@@ -219,9 +219,90 @@ class GoalServiceTest {
             goalService.updateGoal(updatedGoal);
 
             ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
-            verify(goalRepository).save(goalCaptor.capture());
+            verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
             assertEquals("Updated Goal Name", goalCaptor.getValue().getName());
             assertEquals(new BigDecimal("1200.00"), goalCaptor.getValue().getTargetBalance());
+        }
+
+        @Test
+        @DisplayName(
+                "Should successfully update the initial balance when current balance is increased")
+        void updateGoal_InitialBalanceUpdated() {
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Updated Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance().add(new BigDecimal("50.00")))
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate().plusMonths(1))
+                            .motivation("Updated Motivation")
+                            .build();
+
+            BigDecimal expectedInitialBalance =
+                    goal.getInitialBalance().add(new BigDecimal("50.00"));
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.updateGoal(updatedGoal);
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+            assertEquals(expectedInitialBalance, goalCaptor.getValue().getInitialBalance());
+        }
+
+        @Test
+        @DisplayName(
+                "Should successfully update the initial balance when current balance is decreased")
+        void updateGoal_InitialBalanceDecreased() {
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Updated Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(goal.getBalance().subtract(new BigDecimal("50.00")))
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate().plusMonths(1))
+                            .motivation("Updated Motivation")
+                            .build();
+
+            BigDecimal expectedInitialBalance =
+                    goal.getInitialBalance().subtract(new BigDecimal("50.00"));
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.updateGoal(updatedGoal);
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+            assertEquals(expectedInitialBalance, goalCaptor.getValue().getInitialBalance());
+        }
+
+        @Test
+        @DisplayName(
+                "Should reset initial balance to zero if new balance implies a negative initial"
+                        + " value")
+        void updateGoal_InitialBalanceResetToZero() {
+            Goal updatedGoal =
+                    Goal.builder()
+                            .id(goal.getId())
+                            .name("Updated Goal Name")
+                            .initialBalance(goal.getInitialBalance())
+                            .balance(
+                                    goal.getBalance()
+                                            .subtract(goal.getInitialBalance().add(BigDecimal.ONE)))
+                            .targetBalance(goal.getTargetBalance())
+                            .targetDate(goal.getTargetDate().plusMonths(1))
+                            .motivation("Updated Motivation")
+                            .build();
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.updateGoal(updatedGoal);
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+            assertEquals(BigDecimal.ZERO, goalCaptor.getValue().getInitialBalance());
         }
 
         @Test

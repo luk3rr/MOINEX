@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class BaseGoalManagement {
     @FXML protected TextField nameField;
 
-    @FXML protected TextField initialBalanceField;
+    @FXML protected TextField balanceField;
 
     @FXML protected TextField targetBalanceField;
 
@@ -49,12 +49,12 @@ public abstract class BaseGoalManagement {
         UIUtils.setDatePickerFormat(targetDatePicker);
 
         // Ensure that the balance fields only accept monetary values
-        initialBalanceField
+        balanceField
                 .textProperty()
                 .addListener(
                         (observable, oldValue, newValue) -> {
                             if (!newValue.matches(Constants.MONETARY_VALUE_REGEX)) {
-                                initialBalanceField.setText(oldValue);
+                                balanceField.setText(oldValue);
                             }
                         });
 
