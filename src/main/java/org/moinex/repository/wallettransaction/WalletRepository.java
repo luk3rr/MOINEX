@@ -6,10 +6,13 @@
 
 package org.moinex.repository.wallettransaction;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.moinex.model.wallettransaction.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -51,4 +54,16 @@ public interface WalletRepository extends JpaRepository<Wallet, Integer> {
      * @return A list with all wallets that are not archived
      */
     List<Wallet> findAllByIsArchivedFalseOrderByNameAsc();
+
+    /**
+     * Find the sum of balances of all goals associated with a specific master wallet
+     *
+     * @param masterWalletId The ID of the master wallet
+     * @return The sum of balances of all goals associated with the master wallet
+     */
+    @Query(
+            "SELECT COALESCE(SUM(w.balance), 0) "
+                    + "FROM Wallet w "
+                    + "WHERE w.masterWallet.id = :masterWalletId")
+    BigDecimal getSumOfBalancesByMasterWallet(@Param("masterWalletId") Integer masterWalletId);
 }

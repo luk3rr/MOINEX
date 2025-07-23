@@ -235,7 +235,7 @@ public class GoalService {
 
                 case ALLOCATE_FROM_EXISTING:
                     BigDecimal allocatedBalance =
-                            goalRepository.getSumOfBalancesByMasterWallet(
+                            walletRepository.getSumOfBalancesByMasterWallet(
                                     goal.getMasterWallet().getId());
                     BigDecimal freeBalance =
                             goal.getMasterWallet().getBalance().subtract(allocatedBalance);

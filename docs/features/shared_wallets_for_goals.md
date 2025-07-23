@@ -198,12 +198,12 @@ Considerando todos os pontos acima, a lista de tarefas para implementação é a
 
 #### 4.4.2 Lógica de Negócio
 ##### 4.4.2.1 Gestão de Transações
-- [ ] Implementar a lógica de receita para Carteiras Virtuais
-- [ ] Implementar a lógica de receita para Carteiras Mestras com vinculação a Carteiras Virtuais
-- [ ] Implementar a lógica de despesa para Carteiras Virtuais
-- [ ] Implementar a lógica de despesa para Carteiras Mestras com vinculação a Carteiras Virtuais
-- [ ] Implementar a lógica de transferência para Carteiras Virtuais
-- [ ] Implementar a lógica de transferência para Carteiras Mestras com vinculação a Carteiras Virtuais
+- [X] Implementar a lógica de receita para Carteiras Virtuais
+- [X] Implementar a lógica de receita para Carteiras Mestras com vinculação a Carteiras Virtuais
+- [X] Implementar a lógica de despesa para Carteiras Virtuais
+- [X] Implementar a lógica de despesa para Carteiras Mestras com vinculação a Carteiras Virtuais
+- [X] Implementar a lógica de transferência para Carteiras Virtuais
+- [X] Implementar a lógica de transferência para Carteiras Mestras com vinculação a Carteiras Virtuais
 
 ##### 4.4.2.2 Cálculo de Saldo
 - [ ] Atualizar as funções de cálculo de balanço total para considerar apenas Carteiras Mestras nos resultados dos gráficos

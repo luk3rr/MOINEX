@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
@@ -40,6 +41,7 @@ class WalletTransactionServiceTest {
     @Mock private WalletRepository walletRepository;
     @Mock private TransferRepository transferRepository;
     @Mock private WalletTransactionRepository walletTransactionRepository;
+    @Mock private WalletService walletService;
     @InjectMocks private WalletTransactionService walletTransactionService;
     private Wallet wallet1;
     private Wallet wallet2;
@@ -124,14 +126,8 @@ class WalletTransactionServiceTest {
         @Test
         @DisplayName("Test if the money transfer is successful")
         void testTransferMoneySuccess() {
-            BigDecimal senderPreviousBalance = wallet1.getBalance();
-            BigDecimal receiverPreviousBalance = wallet2.getBalance();
-
             when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
             when(walletRepository.findById(wallet2.getId())).thenReturn(Optional.of(wallet2));
-
-            when(walletRepository.save(wallet1)).thenReturn(wallet1);
-            when(walletRepository.save(wallet2)).thenReturn(wallet2);
 
             when(transferRepository.save(any(Transfer.class))).thenReturn(transfer);
 
@@ -144,18 +140,13 @@ class WalletTransactionServiceTest {
 
             verify(walletRepository).findById(wallet1.getId());
             verify(walletRepository).findById(wallet2.getId());
-            verify(walletRepository).save(wallet1);
-            verify(walletRepository).save(wallet2);
 
-            assertEquals(
-                    senderPreviousBalance.subtract(transferAmount).doubleValue(),
-                    wallet1.getBalance().doubleValue(),
-                    Constants.EPSILON);
-
-            assertEquals(
-                    receiverPreviousBalance.add(transferAmount).doubleValue(),
-                    wallet2.getBalance().doubleValue(),
-                    Constants.EPSILON);
+            verify(walletService)
+                    .decrementWalletBalance(
+                            wallet1.getId(), transferAmount.setScale(2, RoundingMode.HALF_UP));
+            verify(walletService)
+                    .incrementWalletBalance(
+                            wallet2.getId(), transferAmount.setScale(2, RoundingMode.HALF_UP));
 
             ArgumentCaptor<Transfer> transferCaptor = ArgumentCaptor.forClass(Transfer.class);
 
@@ -286,10 +277,7 @@ class WalletTransactionServiceTest {
         @Test
         @DisplayName("Test if the confirmed income is added successfully")
         void testAddConfirmedIncome() {
-            BigDecimal previousBalance = wallet1.getBalance();
-
             when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
-            when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
             when(walletTransactionRepository.save(any(WalletTransaction.class)))
                     .thenReturn(
@@ -311,11 +299,9 @@ class WalletTransactionServiceTest {
                     description,
                     TransactionStatus.CONFIRMED);
 
-            verify(walletRepository).save(wallet1);
-            assertEquals(
-                    previousBalance.add(incomeAmount).doubleValue(),
-                    wallet1.getBalance().doubleValue(),
-                    Constants.EPSILON);
+            verify(walletService)
+                    .incrementWalletBalance(
+                            wallet1.getId(), incomeAmount.setScale(2, RoundingMode.HALF_UP));
         }
 
         @Test
@@ -416,10 +402,7 @@ class WalletTransactionServiceTest {
         @Test
         @DisplayName("Test if the confirmed expense is added successfully")
         void testAddConfirmedExpense() {
-            BigDecimal previousBalance = wallet1.getBalance();
-
             when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
-            when(walletRepository.save(wallet1)).thenReturn(wallet1);
 
             when(walletTransactionRepository.save(any(WalletTransaction.class)))
                     .thenReturn(
@@ -441,11 +424,9 @@ class WalletTransactionServiceTest {
                     description,
                     TransactionStatus.CONFIRMED);
 
-            verify(walletRepository).save(wallet1);
-            assertEquals(
-                    previousBalance.subtract(expenseAmount).doubleValue(),
-                    wallet1.getBalance().doubleValue(),
-                    Constants.EPSILON);
+            verify(walletService)
+                    .decrementWalletBalance(
+                            wallet1.getId(), expenseAmount.setScale(2, RoundingMode.HALF_UP));
         }
 
         @Test
@@ -558,6 +539,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("100.00"))
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
             }
 
@@ -612,14 +594,13 @@ class WalletTransactionServiceTest {
         @DisplayName("Update Transaction Type Tests")
         class UpdateTransactionTypeTests {
 
-            private Wallet testWallet;
             private WalletTransaction confirmedExpense;
             private WalletTransaction confirmedIncome;
             private WalletTransaction pendingExpense;
 
             @BeforeEach
             void setup() {
-                testWallet = new Wallet(10, "Test Wallet", new BigDecimal("1000.00"));
+                Wallet testWallet = new Wallet(10, "Test Wallet", new BigDecimal("1000.00"));
 
                 confirmedExpense =
                         WalletTransaction.builder()
@@ -628,6 +609,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("100.00"))
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
 
                 confirmedIncome =
@@ -637,6 +619,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("200.00"))
                                 .type(TransactionType.INCOME)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
 
                 pendingExpense =
@@ -646,6 +629,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("50.00"))
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.PENDING)
+                                .date(LocalDateTime.now())
                                 .build();
             }
 
@@ -653,114 +637,105 @@ class WalletTransactionServiceTest {
             @DisplayName("Should update balance correctly when changing from EXPENSE to INCOME")
             void updateTransaction_FromExpenseToIncome_UpdatesBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(confirmedExpense.getId())
-                                .wallet(testWallet)
-                                .date(LocalDateTime.now())
-                                .amount(confirmedExpense.getAmount())
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
+                        confirmedExpense.toBuilder().type(TransactionType.INCOME).build();
 
                 when(walletTransactionRepository.findById(confirmedExpense.getId()))
                         .thenReturn(Optional.of(confirmedExpense));
                 when(walletTransactionRepository.existsWalletByTransactionId(anyInt()))
                         .thenReturn(true);
 
-                BigDecimal initialBalance = testWallet.getBalance();
-                BigDecimal transactionAmount = confirmedExpense.getAmount();
-                // Saldo esperado: 1000 (inicial) + 100 (reverte despesa) + 100 (aplica receita) =
-                // 1200.00
-                BigDecimal expectedBalance =
-                        initialBalance.add(transactionAmount).add(transactionAmount);
-
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                // Increment twice because:
+                // 1. 100 (expense is reverted)
+                // 2. 100 (income is applied)
+                verify(walletService, times(2))
+                        .incrementWalletBalance(
+                                updatedData.getWallet().getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionType.INCOME, captor.getValue().getType());
             }
 
             @Test
             @DisplayName("Should update balance correctly when changing from INCOME to EXPENSE")
             void updateTransaction_FromIncomeToExpense_UpdatesBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(confirmedIncome.getId())
-                                .wallet(testWallet)
-                                .date(LocalDateTime.now())
-                                .amount(confirmedIncome.getAmount())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
+                        confirmedIncome.toBuilder().type(TransactionType.EXPENSE).build();
 
                 when(walletTransactionRepository.findById(confirmedIncome.getId()))
                         .thenReturn(Optional.of(confirmedIncome));
                 when(walletTransactionRepository.existsWalletByTransactionId(anyInt()))
                         .thenReturn(true);
 
-                BigDecimal initialBalance = testWallet.getBalance();
-                BigDecimal transactionAmount = confirmedIncome.getAmount();
-                // Saldo esperado: 1000 (inicial) - 200 (reverte receita) - 200 (aplica despesa) =
-                // 600.00
-                BigDecimal expectedBalance =
-                        initialBalance.subtract(transactionAmount).subtract(transactionAmount);
-
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                // Decrement twice because:
+                // 1. 200 (income is reverted)
+                // 2. 200 (expense is applied)
+                verify(walletService, times(2))
+                        .decrementWalletBalance(
+                                updatedData.getWallet().getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionType.EXPENSE, captor.getValue().getType());
             }
 
             @Test
             @DisplayName("Should not change balance when updating a PENDING transaction's type")
             void updateTransaction_ForPendingTransaction_DoesNotChangeBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(pendingExpense.getId())
-                                .wallet(testWallet)
-                                .date(LocalDateTime.now())
-                                .amount(pendingExpense.getAmount())
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.PENDING)
-                                .build();
+                        pendingExpense.toBuilder().type(TransactionType.INCOME).build();
 
                 when(walletTransactionRepository.findById(pendingExpense.getId()))
                         .thenReturn(Optional.of(pendingExpense));
                 when(walletTransactionRepository.existsWalletByTransactionId(anyInt()))
                         .thenReturn(true);
 
-                BigDecimal initialBalance = testWallet.getBalance();
-
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, initialBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository, never()).save(any(Wallet.class));
+                verify(walletService, never()).incrementWalletBalance(any(), any());
+                verify(walletService, never()).decrementWalletBalance(any(), any());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionType.INCOME, captor.getValue().getType());
             }
 
             @Test
             @DisplayName("Should not change balance if the new type is the same as the old type")
             void updateTransaction_SameType_DoesNothingToBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(confirmedExpense.getId())
-                                .wallet(testWallet)
-                                .date(LocalDateTime.now())
-                                .amount(confirmedExpense.getAmount())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
+                        confirmedExpense.toBuilder().type(TransactionType.EXPENSE).build();
 
                 when(walletTransactionRepository.findById(confirmedExpense.getId()))
                         .thenReturn(Optional.of(confirmedExpense));
                 when(walletTransactionRepository.existsWalletByTransactionId(anyInt()))
                         .thenReturn(true);
 
-                BigDecimal initialBalance = testWallet.getBalance();
-
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, initialBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository, never()).save(any(Wallet.class));
+                verify(walletService, never()).incrementWalletBalance(any(), any());
+                verify(walletService, never()).decrementWalletBalance(any(), any());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionType.EXPENSE, captor.getValue().getType());
+                assertEquals(confirmedExpense.getAmount(), captor.getValue().getAmount());
             }
         }
 
@@ -785,6 +760,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("100.00"))
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
 
                 confirmedIncomeOnWallet1 =
@@ -794,6 +770,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("200.00"))
                                 .type(TransactionType.INCOME)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
             }
 
@@ -803,36 +780,31 @@ class WalletTransactionServiceTest {
                             + " transaction")
             void updateTransaction_ChangeWalletForExpense_UpdatesBothBalances() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(confirmedExpenseOnWallet1.getId())
-                                .wallet(wallet2)
-                                .date(LocalDateTime.now())
-                                .amount(confirmedExpenseOnWallet1.getAmount())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
+                        confirmedExpenseOnWallet1.toBuilder().wallet(wallet2).build();
 
                 when(walletTransactionRepository.findById(confirmedExpenseOnWallet1.getId()))
                         .thenReturn(Optional.of(confirmedExpenseOnWallet1));
-                when(walletTransactionRepository.existsWalletByTransactionId(anyInt()))
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedExpenseOnWallet1.getId()))
                         .thenReturn(true);
-
-                BigDecimal wallet1InitialBalance = wallet1.getBalance();
-                BigDecimal wallet2InitialBalance = wallet2.getBalance();
-                BigDecimal transactionAmount = confirmedExpenseOnWallet1.getAmount();
-
-                // Saldo esperado wallet1: 1000 + 100 (reverte despesa) = 1100
-                BigDecimal expectedWallet1Balance = wallet1InitialBalance.add(transactionAmount);
-                // Saldo esperado wallet2: 500 - 100 (aplica despesa) = 400
-                BigDecimal expectedWallet2Balance =
-                        wallet2InitialBalance.subtract(transactionAmount);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedWallet1Balance.compareTo(wallet1.getBalance()));
-                assertEquals(0, expectedWallet2Balance.compareTo(wallet2.getBalance()));
-                verify(walletRepository).save(wallet1);
-                verify(walletRepository).save(wallet2);
+                // Revert expense from old wallet
+                verify(walletService, times(1))
+                        .incrementWalletBalance(
+                                wallet1.getId(), confirmedExpenseOnWallet1.getAmount());
+
+                // Apply expense to new wallet
+                verify(walletService, times(1))
+                        .decrementWalletBalance(wallet2.getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(wallet2.getId(), captor.getValue().getWallet().getId());
             }
 
             @Test
@@ -841,36 +813,30 @@ class WalletTransactionServiceTest {
                             + " transaction")
             void updateTransaction_ChangeWalletForIncome_UpdatesBothBalances() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(confirmedIncomeOnWallet1.getId())
-                                .wallet(wallet2)
-                                .date(LocalDateTime.now())
-                                .amount(confirmedIncomeOnWallet1.getAmount())
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
+                        confirmedIncomeOnWallet1.toBuilder().wallet(wallet2).build();
 
                 when(walletTransactionRepository.findById(confirmedIncomeOnWallet1.getId()))
                         .thenReturn(Optional.of(confirmedIncomeOnWallet1));
                 when(walletTransactionRepository.existsWalletByTransactionId(anyInt()))
                         .thenReturn(true);
 
-                BigDecimal wallet1InitialBalance = wallet1.getBalance();
-                BigDecimal wallet2InitialBalance = wallet2.getBalance();
-                BigDecimal transactionAmount = confirmedIncomeOnWallet1.getAmount();
-
-                // Saldo esperado wallet1: 1000 - 200 (reverte receita) = 800
-                BigDecimal expectedWallet1Balance =
-                        wallet1InitialBalance.subtract(transactionAmount);
-                // Saldo esperado wallet2: 500 + 200 (aplica receita) = 700
-                BigDecimal expectedWallet2Balance = wallet2InitialBalance.add(transactionAmount);
-
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedWallet1Balance.compareTo(wallet1.getBalance()));
-                assertEquals(0, expectedWallet2Balance.compareTo(wallet2.getBalance()));
-                verify(walletRepository).save(wallet1);
-                verify(walletRepository).save(wallet2);
+                // Revert income from old wallet
+                verify(walletService, times(1))
+                        .decrementWalletBalance(
+                                wallet1.getId(), confirmedIncomeOnWallet1.getAmount());
+
+                // Apply income to new wallet
+                verify(walletService, times(1))
+                        .incrementWalletBalance(wallet2.getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(wallet2.getId(), captor.getValue().getWallet().getId());
             }
         }
 
@@ -893,6 +859,7 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("100.00"))
                                 .type(TransactionType.EXPENSE)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
 
                 confirmedIncome =
@@ -902,107 +869,122 @@ class WalletTransactionServiceTest {
                                 .amount(new BigDecimal("200.00"))
                                 .type(TransactionType.INCOME)
                                 .status(TransactionStatus.CONFIRMED)
+                                .date(LocalDateTime.now())
                                 .build();
             }
 
             @Test
             @DisplayName("Should decrease wallet balance when increasing EXPENSE amount")
             void updateTransaction_IncreaseExpenseAmount_UpdatesBalance() {
-                BigDecimal newAmount = new BigDecimal("150.00");
-                WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(1)
-                                .wallet(testWallet)
-                                .amount(newAmount)
-                                .date(LocalDateTime.now())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
-                when(walletTransactionRepository.findById(1))
-                        .thenReturn(Optional.of(confirmedExpense));
-                when(walletTransactionRepository.existsWalletByTransactionId(1)).thenReturn(true);
+                BigDecimal increment = BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP);
+                BigDecimal newAmount = confirmedExpense.getAmount().add(increment);
 
-                BigDecimal expectedBalance = new BigDecimal("950.00");
+                WalletTransaction updatedData =
+                        confirmedExpense.toBuilder().amount(newAmount).build();
+
+                when(walletTransactionRepository.findById(confirmedExpense.getId()))
+                        .thenReturn(Optional.of(confirmedExpense));
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedExpense.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService, times(1))
+                        .decrementWalletBalance(confirmedExpense.getWallet().getId(), increment);
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(newAmount, captor.getValue().getAmount());
             }
 
             @Test
             @DisplayName("Should increase wallet balance when decreasing EXPENSE amount")
             void updateTransaction_DecreaseExpenseAmount_UpdatesBalance() {
-                BigDecimal newAmount = new BigDecimal("80.00");
-                WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(1)
-                                .wallet(testWallet)
-                                .amount(newAmount)
-                                .date(LocalDateTime.now())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
-                when(walletTransactionRepository.findById(1))
-                        .thenReturn(Optional.of(confirmedExpense));
-                when(walletTransactionRepository.existsWalletByTransactionId(1)).thenReturn(true);
+                BigDecimal decrement = BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP);
+                BigDecimal newAmount = confirmedExpense.getAmount().subtract(decrement);
 
-                BigDecimal expectedBalance = new BigDecimal("1020.00");
+                WalletTransaction updatedData =
+                        confirmedExpense.toBuilder().amount(newAmount).build();
+
+                when(walletTransactionRepository.findById(confirmedExpense.getId()))
+                        .thenReturn(Optional.of(confirmedExpense));
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedExpense.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService, times(1))
+                        .incrementWalletBalance(confirmedExpense.getWallet().getId(), decrement);
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(newAmount, captor.getValue().getAmount());
             }
 
             @Test
             @DisplayName("Should increase wallet balance when increasing INCOME amount")
             void updateTransaction_IncreaseIncomeAmount_UpdatesBalance() {
-                BigDecimal newAmount = new BigDecimal("250.00");
-                WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(2)
-                                .wallet(testWallet)
-                                .date(LocalDateTime.now())
-                                .amount(newAmount)
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
-                when(walletTransactionRepository.findById(2))
-                        .thenReturn(Optional.of(confirmedIncome));
-                when(walletTransactionRepository.existsWalletByTransactionId(2)).thenReturn(true);
+                BigDecimal increment = BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP);
 
-                BigDecimal expectedBalance = new BigDecimal("1050.00");
+                BigDecimal newAmount = confirmedIncome.getAmount().add(increment);
+
+                WalletTransaction updatedData =
+                        confirmedIncome.toBuilder().amount(newAmount).build();
+
+                when(walletTransactionRepository.findById(confirmedIncome.getId()))
+                        .thenReturn(Optional.of(confirmedIncome));
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedIncome.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService)
+                        .incrementWalletBalance(updatedData.getWallet().getId(), increment);
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(newAmount, captor.getValue().getAmount());
             }
 
             @Test
             @DisplayName("Should decrease wallet balance when decreasing INCOME amount")
             void updateTransaction_DecreaseIncomeAmount_UpdatesBalance() {
-                BigDecimal newAmount = new BigDecimal("150.00");
-                WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(2)
-                                .wallet(testWallet)
-                                .amount(newAmount)
-                                .date(LocalDateTime.now())
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.CONFIRMED)
-                                .build();
-                when(walletTransactionRepository.findById(2))
-                        .thenReturn(Optional.of(confirmedIncome));
-                when(walletTransactionRepository.existsWalletByTransactionId(2)).thenReturn(true);
+                BigDecimal decrement = BigDecimal.ONE.setScale(2, RoundingMode.HALF_UP);
 
-                BigDecimal expectedBalance = new BigDecimal("950.00");
+                BigDecimal newAmount = confirmedIncome.getAmount().subtract(decrement);
+
+                WalletTransaction updatedData =
+                        confirmedIncome.toBuilder().amount(newAmount).build();
+
+                when(walletTransactionRepository.findById(confirmedIncome.getId()))
+                        .thenReturn(Optional.of(confirmedIncome));
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedIncome.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService)
+                        .decrementWalletBalance(updatedData.getWallet().getId(), decrement);
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(newAmount, captor.getValue().getAmount());
             }
         }
 
@@ -1062,92 +1044,103 @@ class WalletTransactionServiceTest {
             @DisplayName("Should revert balance when changing EXPENSE from CONFIRMED to PENDING")
             void updateTransaction_ExpenseFromConfirmedToPending_RevertsBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(1)
-                                .wallet(testWallet)
-                                .amount(confirmedExpense.getAmount())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.PENDING)
-                                .date(LocalDateTime.now())
-                                .build();
-                when(walletTransactionRepository.findById(1))
+                        confirmedExpense.toBuilder().status(TransactionStatus.PENDING).build();
+
+                when(walletTransactionRepository.findById(confirmedExpense.getId()))
                         .thenReturn(Optional.of(confirmedExpense));
-                when(walletTransactionRepository.existsWalletByTransactionId(1)).thenReturn(true);
-                BigDecimal expectedBalance = new BigDecimal("1100.00");
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedExpense.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService)
+                        .incrementWalletBalance(
+                                confirmedExpense.getWallet().getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionStatus.PENDING, captor.getValue().getStatus());
             }
 
             @Test
             @DisplayName("Should apply balance when changing EXPENSE from PENDING to CONFIRMED")
             void updateTransaction_ExpenseFromPendingToConfirmed_AppliesBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(2)
-                                .wallet(testWallet)
-                                .amount(pendingExpense.getAmount())
-                                .type(TransactionType.EXPENSE)
-                                .status(TransactionStatus.CONFIRMED)
-                                .date(LocalDateTime.now())
-                                .build();
-                when(walletTransactionRepository.findById(2))
+                        pendingExpense.toBuilder().status(TransactionStatus.CONFIRMED).build();
+
+                when(walletTransactionRepository.findById(pendingExpense.getId()))
                         .thenReturn(Optional.of(pendingExpense));
-                when(walletTransactionRepository.existsWalletByTransactionId(2)).thenReturn(true);
-                BigDecimal expectedBalance = new BigDecimal("950.00");
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                pendingExpense.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService)
+                        .decrementWalletBalance(
+                                updatedData.getWallet().getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionStatus.CONFIRMED, captor.getValue().getStatus());
             }
 
             @Test
             @DisplayName("Should revert balance when changing INCOME from CONFIRMED to PENDING")
             void updateTransaction_IncomeFromConfirmedToPending_RevertsBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(3)
-                                .wallet(testWallet)
-                                .amount(confirmedIncome.getAmount())
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.PENDING)
-                                .date(LocalDateTime.now())
-                                .build();
-                when(walletTransactionRepository.findById(3))
+                        confirmedIncome.toBuilder().status(TransactionStatus.PENDING).build();
+
+                when(walletTransactionRepository.findById(confirmedIncome.getId()))
                         .thenReturn(Optional.of(confirmedIncome));
-                when(walletTransactionRepository.existsWalletByTransactionId(3)).thenReturn(true);
-                BigDecimal expectedBalance = new BigDecimal("800.00");
+                when(walletTransactionRepository.existsWalletByTransactionId(
+                                confirmedIncome.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService)
+                        .decrementWalletBalance(
+                                confirmedIncome.getWallet().getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionStatus.PENDING, captor.getValue().getStatus());
             }
 
             @Test
             @DisplayName("Should apply balance when changing INCOME from PENDING to CONFIRMED")
             void updateTransaction_IncomeFromPendingToConfirmed_AppliesBalance() {
                 WalletTransaction updatedData =
-                        WalletTransaction.builder()
-                                .id(4)
-                                .wallet(testWallet)
-                                .amount(pendingIncome.getAmount())
-                                .type(TransactionType.INCOME)
-                                .status(TransactionStatus.CONFIRMED)
-                                .date(LocalDateTime.now())
-                                .build();
-                when(walletTransactionRepository.findById(4))
+                        pendingIncome.toBuilder().status(TransactionStatus.CONFIRMED).build();
+
+                when(walletTransactionRepository.findById(pendingIncome.getId()))
                         .thenReturn(Optional.of(pendingIncome));
-                when(walletTransactionRepository.existsWalletByTransactionId(4)).thenReturn(true);
-                BigDecimal expectedBalance = new BigDecimal("1150.00");
+                when(walletTransactionRepository.existsWalletByTransactionId(pendingIncome.getId()))
+                        .thenReturn(true);
 
                 walletTransactionService.updateTransaction(updatedData);
 
-                assertEquals(0, expectedBalance.compareTo(testWallet.getBalance()));
-                verify(walletRepository).save(testWallet);
+                verify(walletService)
+                        .incrementWalletBalance(
+                                pendingIncome.getWallet().getId(), updatedData.getAmount());
+
+                ArgumentCaptor<WalletTransaction> captor =
+                        ArgumentCaptor.forClass(WalletTransaction.class);
+
+                verify(walletTransactionRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(TransactionStatus.CONFIRMED, captor.getValue().getStatus());
             }
         }
     }
@@ -1159,21 +1152,13 @@ class WalletTransactionServiceTest {
         @Test
         @DisplayName("Test if the confirmed expense is deleted successfully")
         void testDeleteConfirmedExpense() {
-            BigDecimal previousBalance = wallet1.getBalance();
-
             when(walletTransactionRepository.findById(wallet1ExpenseTransaction.getId()))
                     .thenReturn(Optional.of(wallet1ExpenseTransaction));
 
             walletTransactionService.deleteTransaction(wallet1ExpenseTransaction.getId());
 
             verify(walletTransactionRepository).delete(wallet1ExpenseTransaction);
-
-            verify(walletRepository).save(wallet1);
-
-            assertEquals(
-                    previousBalance.add(expenseAmount).doubleValue(),
-                    wallet1.getBalance().doubleValue(),
-                    Constants.EPSILON);
+            verify(walletService).incrementWalletBalance(wallet1.getId(), expenseAmount);
         }
 
         @Test
@@ -1200,21 +1185,13 @@ class WalletTransactionServiceTest {
         @Test
         @DisplayName("Test if the confirmed income transaction is deleted successfully")
         void testDeleteConfirmedIncome() {
-            BigDecimal previousBalance = wallet1.getBalance();
-
             when(walletTransactionRepository.findById(wallet1IncomeTransaction.getId()))
                     .thenReturn(Optional.of(wallet1IncomeTransaction));
 
             walletTransactionService.deleteTransaction(wallet1IncomeTransaction.getId());
 
             verify(walletTransactionRepository).delete(wallet1IncomeTransaction);
-
-            verify(walletRepository).save(wallet1);
-
-            assertEquals(
-                    previousBalance.subtract(incomeAmount).doubleValue(),
-                    wallet1.getBalance().doubleValue(),
-                    Constants.EPSILON);
+            verify(walletService).decrementWalletBalance(wallet1.getId(), incomeAmount);
         }
 
         @Test

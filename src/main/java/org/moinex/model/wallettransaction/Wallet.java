@@ -56,6 +56,16 @@ public class Wallet {
         this.balance = balance;
     }
 
+    /**
+     * Constructor for testing purposes
+     */
+    public Wallet(Integer id, String name, BigDecimal balance, WalletType type) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

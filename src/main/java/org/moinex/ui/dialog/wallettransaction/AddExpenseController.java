@@ -101,7 +101,7 @@ public final class AddExpenseController extends BaseWalletTransactionManagement 
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid expense value", "Expense value must be a number");
-        } catch (EntityNotFoundException | IllegalArgumentException e) {
+        } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
             WindowUtils.showErrorDialog("Error creating expense", e.getMessage());
         }
     }

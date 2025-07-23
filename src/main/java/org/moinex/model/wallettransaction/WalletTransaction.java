@@ -55,6 +55,22 @@ public class WalletTransaction extends BaseTransaction {
         }
     }
 
+    public WalletTransactionBuilder<?, ?> toBuilder() {
+        return this.toBuilderImpl();
+    }
+
+    protected WalletTransactionBuilder<?, ?> toBuilderImpl() {
+        return WalletTransaction.builder()
+                .id(this.getId())
+                .date(this.getDate())
+                .status(this.getStatus())
+                .amount(this.getAmount())
+                .type(this.getType())
+                .wallet(this.getWallet())
+                .category(this.getCategory())
+                .description(this.getDescription());
+    }
+
     public LocalDateTime getDate() {
         return LocalDateTime.parse(date, Constants.DB_DATE_FORMATTER);
     }

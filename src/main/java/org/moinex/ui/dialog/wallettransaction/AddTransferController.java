@@ -192,6 +192,7 @@ public class AddTransferController {
         } catch (MoinexException.SameSourceDestinationException
                 | IllegalArgumentException
                 | EntityNotFoundException
+                | IllegalStateException
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog("Error while creating transfer", e.getMessage());
         }

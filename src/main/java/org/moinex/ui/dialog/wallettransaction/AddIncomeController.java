@@ -101,7 +101,7 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid income value", "Income value must be a number.");
-        } catch (EntityNotFoundException | IllegalArgumentException e) {
+        } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
             WindowUtils.showErrorDialog("Error while creating income", e.getMessage());
         }
     }

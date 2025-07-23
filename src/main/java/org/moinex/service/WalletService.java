@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
@@ -20,6 +21,7 @@ import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.repository.wallettransaction.WalletTypeRepository;
+import org.moinex.util.UIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -263,10 +265,77 @@ public class WalletService {
                                         new EntityNotFoundException(
                                                 String.format("Wallet with id %d not found", id)));
 
-        wallet.setBalance(newBalance);
+        BigDecimal diff = newBalance.subtract(wallet.getBalance());
+
+        if (diff.compareTo(BigDecimal.ZERO) > 0) {
+            updateWalletBalance(id, diff, true);
+        } else if (diff.compareTo(BigDecimal.ZERO) < 0) {
+            updateWalletBalance(id, diff.negate(), false);
+        } else {
+            logger.info("Wallet with id {} balance remains unchanged", id);
+        }
+    }
+
+    @Transactional
+    public void incrementWalletBalance(Integer id, BigDecimal amount) {
+        updateWalletBalance(id, amount, true);
+    }
+
+    @Transactional
+    public void decrementWalletBalance(Integer id, BigDecimal amount) {
+        updateWalletBalance(id, amount, false);
+    }
+
+    private void updateWalletBalance(
+            @NonNull Integer id, @NonNull BigDecimal amount, boolean increment) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
+        Wallet wallet =
+                walletRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format("Wallet with id %d not found", id)));
+
+        BigDecimal adjustedAmount = increment ? amount : amount.negate();
+
+        if (wallet.isVirtual()) {
+            if (wallet.getBalance().add(adjustedAmount).compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalStateException("Virtual wallets cannot have negative balances");
+            }
+
+            Wallet master = wallet.getMasterWallet();
+            master.setBalance(master.getBalance().add(adjustedAmount));
+            walletRepository.save(master);
+
+            logger.info(
+                    "Master wallet with id {} balance {} by {}",
+                    master.getId(),
+                    increment ? "incremented" : "decremented",
+                    amount);
+
+        } else if (wallet.isMaster() && !increment) {
+            BigDecimal unallocatedBalance = getUnallocatedBalance(wallet);
+
+            if (unallocatedBalance.compareTo(amount) < 0) {
+                throw new IllegalStateException(
+                        "Master wallet cannot be decremented below the unallocated balance. "
+                                + "\nUnallocated balance is "
+                                + UIUtils.formatCurrency(unallocatedBalance));
+            }
+        }
+
+        wallet.setBalance(wallet.getBalance().add(adjustedAmount));
         walletRepository.save(wallet);
 
-        logger.info("Wallet with id {} balance updated to {}", id, newBalance);
+        logger.info(
+                "Wallet with id {} balance {} by {}",
+                wallet.getId(),
+                increment ? "incremented" : "decremented",
+                amount);
     }
 
     /**
@@ -338,13 +407,10 @@ public class WalletService {
      * @param masterWallet The master wallet to check
      * @return The unallocated balance of the master wallet
      */
-    public BigDecimal getUnallocatedBalance(Wallet masterWallet) {
-        if (masterWallet == null) {
-            return BigDecimal.ZERO;
-        }
-
+    public BigDecimal getUnallocatedBalance(@NonNull Wallet masterWallet) {
         BigDecimal allocatedBalance =
-                goalRepository.getSumOfBalancesByMasterWallet(masterWallet.getId());
+                walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId());
+
         return masterWallet.getBalance().subtract(allocatedBalance);
     }
 }

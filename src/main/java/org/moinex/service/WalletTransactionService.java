@@ -43,15 +43,18 @@ public class WalletTransactionService {
     private WalletRepository walletRepository;
     private TransferRepository transferRepository;
     private WalletTransactionRepository walletTransactionRepository;
+    private WalletService walletService;
 
     @Autowired
     public WalletTransactionService(
             WalletRepository walletRepository,
             TransferRepository transferRepository,
-            WalletTransactionRepository walletTransactionRepository) {
+            WalletTransactionRepository walletTransactionRepository,
+            WalletService walletService) {
         this.walletRepository = walletRepository;
         this.transferRepository = transferRepository;
         this.walletTransactionRepository = walletTransactionRepository;
+        this.walletService = walletService;
     }
 
     /**
@@ -121,11 +124,8 @@ public class WalletTransactionService {
                                 .description(description)
                                 .build());
 
-        senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
-        receiverWallet.setBalance(receiverWallet.getBalance().add(amount));
-
-        walletRepository.save(senderWallet);
-        walletRepository.save(receiverWallet);
+        walletService.decrementWalletBalance(senderWallet.getId(), amount);
+        walletService.incrementWalletBalance(receiverWallet.getId(), amount);
 
         logger.info(
                 "Transfer from wallet with id {} to wallet with id {} of {} was successful",
@@ -187,8 +187,7 @@ public class WalletTransactionService {
         walletTransactionRepository.save(wt);
 
         if (status == TransactionStatus.CONFIRMED) {
-            wallet.setBalance(wallet.getBalance().add(amount));
-            walletRepository.save(wallet);
+            walletService.incrementWalletBalance(walletId, amount);
         }
 
         logger.info(
@@ -248,8 +247,7 @@ public class WalletTransactionService {
         walletTransactionRepository.save(wt);
 
         if (status.equals(TransactionStatus.CONFIRMED)) {
-            wallet.setBalance(wallet.getBalance().subtract(amount));
-            walletRepository.save(wallet);
+            walletService.decrementWalletBalance(walletId, amount);
         }
 
         logger.info(
@@ -338,9 +336,11 @@ public class WalletTransactionService {
         if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
             // Revert the old transaction
             if (oldType.equals(TransactionType.EXPENSE)) {
-                wallet.setBalance(wallet.getBalance().add(oldTransaction.getAmount()));
+                walletService.incrementWalletBalance(wallet.getId(), oldTransaction.getAmount());
+
             } else if (oldType.equals(TransactionType.INCOME)) {
-                wallet.setBalance(wallet.getBalance().subtract(oldTransaction.getAmount()));
+                walletService.decrementWalletBalance(wallet.getId(), oldTransaction.getAmount());
+
             } else {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
@@ -349,16 +349,16 @@ public class WalletTransactionService {
 
             // Apply the new transaction
             if (newType.equals(TransactionType.EXPENSE)) {
-                wallet.setBalance(wallet.getBalance().subtract(oldTransaction.getAmount()));
+                walletService.decrementWalletBalance(wallet.getId(), oldTransaction.getAmount());
+
             } else if (newType.equals(TransactionType.INCOME)) {
-                wallet.setBalance(wallet.getBalance().add(oldTransaction.getAmount()));
+                walletService.incrementWalletBalance(wallet.getId(), oldTransaction.getAmount());
+
             } else {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
                 throw new IllegalStateException("Transaction type not recognized");
             }
-
-            walletRepository.save(wallet);
         }
 
         oldTransaction.setType(newType);
@@ -388,24 +388,22 @@ public class WalletTransactionService {
         if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
             if (oldTransaction.getType().equals(TransactionType.EXPENSE)) {
                 // Revert expense from old wallet
-                oldWallet.setBalance(oldWallet.getBalance().add(oldTransaction.getAmount()));
+                walletService.incrementWalletBalance(oldWallet.getId(), oldTransaction.getAmount());
 
                 // Apply expense to new wallet
-                newWallet.setBalance(newWallet.getBalance().subtract(oldTransaction.getAmount()));
+                walletService.decrementWalletBalance(newWallet.getId(), oldTransaction.getAmount());
+
             } else if (oldTransaction.getType().equals(TransactionType.INCOME)) {
                 // Revert income from old wallet
-                oldWallet.setBalance(oldWallet.getBalance().subtract(oldTransaction.getAmount()));
+                walletService.decrementWalletBalance(oldWallet.getId(), oldTransaction.getAmount());
 
                 // Apply income to new wallet
-                newWallet.setBalance(newWallet.getBalance().add(oldTransaction.getAmount()));
+                walletService.incrementWalletBalance(newWallet.getId(), oldTransaction.getAmount());
             } else {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
                 throw new IllegalStateException("Transaction type not recognized");
             }
-
-            walletRepository.save(oldWallet);
-            walletRepository.save(newWallet);
         }
 
         oldTransaction.setWallet(newWallet);
@@ -444,29 +442,25 @@ public class WalletTransactionService {
         // Apply the difference to the wallet balance
         if (oldTransaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
             if (oldTransaction.getType().equals(TransactionType.EXPENSE)) {
-                BigDecimal balance = wallet.getBalance();
 
                 if (oldAmount.compareTo(newAmount) > 0) {
-                    wallet.setBalance(balance.add(diff));
+                    walletService.incrementWalletBalance(wallet.getId(), diff);
+
                 } else {
-                    wallet.setBalance(balance.subtract(diff));
+                    walletService.decrementWalletBalance(wallet.getId(), diff);
                 }
             } else if (oldTransaction.getType().equals(TransactionType.INCOME)) {
                 if (oldAmount.compareTo(newAmount) > 0) {
-                    wallet.setBalance(wallet.getBalance().subtract(diff));
+                    walletService.decrementWalletBalance(wallet.getId(), diff);
+
                 } else {
-                    wallet.setBalance(wallet.getBalance().add(diff));
+                    walletService.incrementWalletBalance(wallet.getId(), diff);
                 }
             } else {
                 // WARNING for the case of new types being added to the enum
                 // and not being handled here
                 throw new IllegalStateException("Transaction type not recognized");
             }
-
-            logger.info(
-                    "Wallet with id {} balance changed to {}", wallet.getId(), wallet.getBalance());
-
-            walletRepository.save(wallet);
         }
 
         oldTransaction.setAmount(newAmount);
@@ -502,12 +496,12 @@ public class WalletTransactionService {
             if (oldStatus.equals(TransactionStatus.CONFIRMED)) {
                 if (newStatus.equals(TransactionStatus.PENDING)) {
                     // Revert the expense
-                    wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
+                    walletService.incrementWalletBalance(wallet.getId(), transaction.getAmount());
                 }
             } else if (oldStatus.equals(TransactionStatus.PENDING)) {
                 if (newStatus.equals(TransactionStatus.CONFIRMED)) {
                     // Apply the expense
-                    wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
+                    walletService.decrementWalletBalance(wallet.getId(), transaction.getAmount());
                 }
             } else {
                 // WARNING for the case of new status being added to the enum
@@ -517,11 +511,13 @@ public class WalletTransactionService {
         } else if (transaction.getType().equals(TransactionType.INCOME)) {
             if (oldStatus.equals(TransactionStatus.CONFIRMED)) {
                 if (newStatus.equals(TransactionStatus.PENDING)) {
-                    wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
+                    // Revert the income
+                    walletService.decrementWalletBalance(wallet.getId(), transaction.getAmount());
                 }
             } else if (oldStatus.equals(TransactionStatus.PENDING)) {
                 if (newStatus.equals(TransactionStatus.CONFIRMED)) {
-                    wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
+                    // Apply the income
+                    walletService.incrementWalletBalance(wallet.getId(), transaction.getAmount());
                 }
             } else {
                 // WARNING for the case of new status being added to the enum
@@ -535,9 +531,6 @@ public class WalletTransactionService {
         }
 
         transaction.setStatus(newStatus);
-        walletRepository.save(wallet);
-
-        logger.info("Wallet with id {} balance changed to {}", wallet.getId(), wallet.getBalance());
 
         walletTransactionRepository.save(transaction);
 
@@ -568,12 +561,10 @@ public class WalletTransactionService {
         if (transaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
             BigDecimal amount = transaction.getAmount();
             if (transaction.getType().equals(TransactionType.INCOME)) {
-                wallet.setBalance(wallet.getBalance().subtract(amount));
+                walletService.decrementWalletBalance(wallet.getId(), amount);
             } else {
-                wallet.setBalance(wallet.getBalance().add(amount));
+                walletService.incrementWalletBalance(wallet.getId(), amount);
             }
-
-            walletRepository.save(wallet);
         }
 
         walletTransactionRepository.delete(transaction);

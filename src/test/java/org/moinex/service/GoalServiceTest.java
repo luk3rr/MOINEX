@@ -626,7 +626,7 @@ class GoalServiceTest {
                         + " wallet balance")
         void testAddGoalWithMasterWallet_AllocateStrategy_Success() {
             BigDecimal initialBalance = new BigDecimal("300.00");
-            when(goalRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+            when(walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
                     .thenReturn(new BigDecimal("500.00"));
 
             goalService.addGoal(
@@ -652,7 +652,7 @@ class GoalServiceTest {
                         + " balance")
         void testAddGoalWithMasterWallet_AllocateStrategy_InsufficientFunds() {
             BigDecimal initialBalance = new BigDecimal("300.00");
-            when(goalRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+            when(walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
                     .thenReturn(new BigDecimal("800.00"));
 
             assertThrows(

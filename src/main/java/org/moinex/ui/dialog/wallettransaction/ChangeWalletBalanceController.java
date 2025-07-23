@@ -104,8 +104,8 @@ public class ChangeWalletBalanceController {
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid input", "Balance must be a number");
             return;
-        } catch (EntityNotFoundException e) {
-            WindowUtils.showErrorDialog("Error renaming wallet", e.getMessage());
+        } catch (EntityNotFoundException | IllegalStateException e) {
+            WindowUtils.showErrorDialog("Error updating waller", e.getMessage());
             return;
         }
 
