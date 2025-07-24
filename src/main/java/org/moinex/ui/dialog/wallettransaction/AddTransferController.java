@@ -7,13 +7,6 @@
 package org.moinex.ui.dialog.wallettransaction;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -36,29 +29,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 /**
  * Controller for the Add Transfer dialog
  */
 @Controller
 @NoArgsConstructor
 public class AddTransferController {
-    @FXML private Label senderWalletAfterBalanceValueLabel;
+    @FXML
+    private Label senderWalletAfterBalanceValueLabel;
 
-    @FXML private Label receiverWalletAfterBalanceValueLabel;
+    @FXML
+    private Label receiverWalletAfterBalanceValueLabel;
 
-    @FXML private Label senderWalletCurrentBalanceValueLabel;
+    @FXML
+    private Label senderWalletCurrentBalanceValueLabel;
 
-    @FXML private Label receiverWalletCurrentBalanceValueLabel;
+    @FXML
+    private Label receiverWalletCurrentBalanceValueLabel;
 
-    @FXML private ComboBox<Wallet> senderWalletComboBox;
+    @FXML
+    private ComboBox<Wallet> senderWalletComboBox;
 
-    @FXML private ComboBox<Wallet> receiverWalletComboBox;
+    @FXML
+    private ComboBox<Wallet> receiverWalletComboBox;
 
-    @FXML private TextField transferValueField;
+    @FXML
+    private TextField transferValueField;
 
-    @FXML private TextField descriptionField;
+    @FXML
+    private TextField descriptionField;
 
-    @FXML private DatePicker transferDatePicker;
+    @FXML
+    private DatePicker transferDatePicker;
 
     private ConfigurableApplicationContext springContext;
 
@@ -74,9 +84,10 @@ public class AddTransferController {
 
     /**
      * Constructor
-     * @param walletService WalletService
+     *
+     * @param walletService            WalletService
      * @param walletTransactionService WalletTransactionService
-     * @param calculatorService CalculatorService
+     * @param calculatorService        CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -190,10 +201,11 @@ public class AddTransferController {
             WindowUtils.showErrorDialog(
                     "Invalid transfer value", "Transfer value must be a number.");
         } catch (MoinexException.SameSourceDestinationException
-                | IllegalArgumentException
-                | EntityNotFoundException
-                | IllegalStateException
-                | MoinexException.InsufficientResourcesException e) {
+                 | IllegalArgumentException
+                 | EntityNotFoundException
+                 | IllegalStateException
+                 | MoinexException.InsufficientResourcesException
+                 | MoinexException.TransferFromMasterToVirtualWalletException e) {
             WindowUtils.showErrorDialog("Error while creating transfer", e.getMessage());
         }
     }
@@ -204,7 +216,8 @@ public class AddTransferController {
                 Constants.CALCULATOR_FXML,
                 "Calculator",
                 springContext,
-                (CalculatorController controller) -> {},
+                (CalculatorController controller) -> {
+                },
                 List.of(() -> calculatorService.updateComponentWithResult(transferValueField)));
     }
 
@@ -245,12 +258,21 @@ public class AddTransferController {
                 UIUtils.formatCurrency(receiverWt.getBalance()));
     }
 
-    private void updateSenderWalletAfterBalance() {
+    /**
+     * Updates the projected balance of a wallet (sender or receiver) after a transfer,
+     * considering the rules for virtual and master wallets.
+     *
+     * @param currentWallet The wallet whose balance is being calculated (sender or receiver)
+     * @param otherWallet   The other wallet involved in the transaction
+     * @param label         The UI Label to be updated
+     * @param isSender      True if the currentWallet is the sender, false if it is the receiver
+     */
+    private void updateAfterBalance(
+            Wallet currentWallet, Wallet otherWallet, Label label, boolean isSender) {
         String transferValueString = transferValueField.getText();
-        Wallet senderWt = senderWalletComboBox.getValue();
 
-        if (transferValueString == null || transferValueString.isBlank() || senderWt == null) {
-            UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
+        if (transferValueString == null || transferValueString.isBlank() || currentWallet == null || currentWallet.equals(otherWallet)) {
+            UIUtils.resetLabel(label);
             return;
         }
 
@@ -258,65 +280,75 @@ public class AddTransferController {
             BigDecimal transferValue = new BigDecimal(transferValueString);
 
             if (transferValue.compareTo(BigDecimal.ZERO) < 0) {
-                UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
+                UIUtils.resetLabel(label);
                 return;
             }
 
-            BigDecimal senderWalletAfterBalance = senderWt.getBalance().subtract(transferValue);
+            BigDecimal afterBalance;
 
-            // Epsilon is used to avoid floating point arithmetic errors
-            if (senderWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0) {
-                // Remove old style and add negative style
-                UIUtils.setLabelStyle(
-                        senderWalletAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
+            if (isSender) {
+                if (currentWallet.isMaster() && otherWallet.isVirtual() && otherWallet.getMasterWallet().equals(currentWallet)) {
+                    // If the current wallet is the SENDER and is a master wallet of the receiver,
+                    // then an error is thrown... BUT be a buddy and show a message to the user :)
+                    WindowUtils.showInformationDialog(
+                            "Invalid Transfer",
+                            "You cannot transfer money from a master wallet to its virtual wallet."
+                    );
+                    return;
+                }
+
+                afterBalance = currentWallet.getBalance().subtract(transferValue);
             } else {
-                // Remove old style and add neutral style
-                UIUtils.setLabelStyle(
-                        senderWalletAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
+                // If the current wallet is the RECEIVER, the logic depends on its relationship with
+                // the sender
+                // Scenario: Virtual -> Linked Master Wallet
+                // If the sender is a virtual wallet and the receiver is its master wallet,
+                // the money is already in the total fund. It's just an internal reorganization
+                if (otherWallet != null
+                        && otherWallet.isVirtual()
+                        && otherWallet.getMasterWallet().equals(currentWallet)) {
+                    // The total balance of the master wallet does not change.
+                    afterBalance = currentWallet.getBalance();
+                } else {
+                    // For all other cases (Master -> Master, Master -> Virtual, etc.),
+                    // the receiver's balance simply increases.
+                    afterBalance = currentWallet.getBalance().add(transferValue);
+                }
             }
 
-            senderWalletAfterBalanceValueLabel.setText(
-                    UIUtils.formatCurrency(senderWalletAfterBalance));
+            if (afterBalance.compareTo(BigDecimal.ZERO) < 0) {
+                UIUtils.setLabelStyle(label, Constants.NEGATIVE_BALANCE_STYLE);
+            } else {
+                UIUtils.setLabelStyle(label, Constants.NEUTRAL_BALANCE_STYLE);
+            }
+
+            label.setText(UIUtils.formatCurrency(afterBalance));
+
         } catch (NumberFormatException e) {
-            UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
+            UIUtils.resetLabel(label);
         }
     }
 
+    /**
+     * Wrapper to update the projected balance of the sender wallet
+     */
+    private void updateSenderWalletAfterBalance() {
+        updateAfterBalance(
+                senderWalletComboBox.getValue(),
+                receiverWalletComboBox.getValue(),
+                senderWalletAfterBalanceValueLabel,
+                true);
+    }
+
+    /**
+     * Wrapper to update the projected balance of the receiver wallet
+     */
     private void updateReceiverWalletAfterBalance() {
-        String transferValueString = transferValueField.getText();
-        Wallet receiverWt = receiverWalletComboBox.getValue();
-
-        if (transferValueString == null || transferValueString.isBlank() || receiverWt == null) {
-            UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
-            return;
-        }
-
-        try {
-            BigDecimal transferValue = new BigDecimal(transferValueString);
-
-            if (transferValue.compareTo(BigDecimal.ZERO) < 0) {
-                UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
-                return;
-            }
-
-            BigDecimal receiverWalletAfterBalance = receiverWt.getBalance().add(transferValue);
-
-            // Epsilon is used to avoid floating point arithmetic errors
-            if (receiverWalletAfterBalance.compareTo(BigDecimal.ZERO) < 0) {
-                // Remove old style and add negative style
-                UIUtils.setLabelStyle(
-                        receiverWalletAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE);
-            } else {
-                // Remove old style and add neutral style
-                UIUtils.setLabelStyle(
-                        receiverWalletAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE);
-            }
-
-            receiverWalletAfterBalanceValueLabel.setText(
-                    UIUtils.formatCurrency(receiverWalletAfterBalance));
-        } catch (NumberFormatException e) {
-            UIUtils.resetLabel(receiverWalletAfterBalanceValueLabel);
-        }
+        updateAfterBalance(
+                receiverWalletComboBox.getValue(),
+                senderWalletComboBox.getValue(),
+                receiverWalletAfterBalanceValueLabel,
+                false);
     }
 
     private void configureListeners() {
