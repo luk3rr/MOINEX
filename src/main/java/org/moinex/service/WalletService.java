@@ -287,7 +287,7 @@ public class WalletService {
     }
 
     private void updateWalletBalance(
-            @NonNull Integer id, @NonNull BigDecimal amount, boolean increment) {
+            @NonNull Integer id, @NonNull BigDecimal amount, boolean isIncrement) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
@@ -300,7 +300,7 @@ public class WalletService {
                                         new EntityNotFoundException(
                                                 String.format("Wallet with id %d not found", id)));
 
-        BigDecimal adjustedAmount = increment ? amount : amount.negate();
+        BigDecimal adjustedAmount = isIncrement ? amount : amount.negate();
 
         if (wallet.isVirtual()) {
             if (wallet.getBalance().add(adjustedAmount).compareTo(BigDecimal.ZERO) < 0) {
@@ -314,10 +314,10 @@ public class WalletService {
             logger.info(
                     "Master wallet with id {} balance {} by {}",
                     master.getId(),
-                    increment ? "incremented" : "decremented",
+                    isIncrement ? "incremented" : "decremented",
                     amount);
 
-        } else if (wallet.isMaster() && !increment) {
+        } else if (wallet.isMaster() && !isIncrement) {
             BigDecimal unallocatedBalance = getUnallocatedBalance(wallet);
 
             if (unallocatedBalance.compareTo(amount) < 0) {
@@ -334,7 +334,7 @@ public class WalletService {
         logger.info(
                 "Wallet with id {} balance {} by {}",
                 wallet.getId(),
-                increment ? "incremented" : "decremented",
+                isIncrement ? "incremented" : "decremented",
                 amount);
     }
 

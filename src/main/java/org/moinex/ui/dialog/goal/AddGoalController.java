@@ -94,10 +94,7 @@ public final class AddGoalController extends BaseGoalManagement {
         String motivation = motivationTextArea.getText();
         Wallet masterWallet = masterWalletComboBox.getValue();
 
-        if (goalName.isEmpty()
-                || initialBalanceStr.isEmpty()
-                || targetBalanceStr.isEmpty()
-                || targetDate == null) {
+        if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
                     "Empty fields", "Please fill all required fields before saving");
 
@@ -117,7 +114,8 @@ public final class AddGoalController extends BaseGoalManagement {
         }
 
         try {
-            BigDecimal initialBalance = new BigDecimal(initialBalanceStr);
+            BigDecimal initialBalance =
+                    new BigDecimal(initialBalanceStr.isEmpty() ? "0" : initialBalanceStr);
             BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
             goalService.addGoal(

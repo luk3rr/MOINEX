@@ -80,14 +80,15 @@ public class AddWalletController {
         String walletBalanceStr = walletBalanceField.getText();
         WalletType walletType = walletTypeComboBox.getValue();
 
-        if (walletName.isEmpty() || walletBalanceStr.isEmpty() || walletType == null) {
+        if (walletName.isEmpty() || walletType == null) {
             WindowUtils.showInformationDialog(
                     "Empty fields", "Please fill all required fields before saving");
             return;
         }
 
         try {
-            BigDecimal walletBalance = new BigDecimal(walletBalanceStr);
+            BigDecimal walletBalance =
+                    new BigDecimal(walletBalanceStr.isEmpty() ? "0" : walletBalanceStr);
 
             walletService.addWallet(walletName, walletBalance, walletType);
 
