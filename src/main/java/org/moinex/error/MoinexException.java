@@ -97,4 +97,13 @@ public sealed class MoinexException extends RuntimeException {
             super(message);
         }
     }
+
+    /**
+     * Exception thrown when user tries to transfer money from a master wallet to its virtual wallet
+     */
+    public static final class TransferFromMasterToVirtualWalletException extends MoinexException {
+        public TransferFromMasterToVirtualWalletException(String message) {
+            super(message);
+        }
+    }
 }

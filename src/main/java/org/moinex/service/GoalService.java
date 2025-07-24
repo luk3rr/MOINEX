@@ -173,6 +173,11 @@ public class GoalService {
 
         validateDateAndBalances(initialBalance, targetBalance, targetDateTime);
 
+        if (masterWallet != null && !masterWallet.isMaster()) {
+            throw new IllegalArgumentException(
+                    "The master wallet must be a master wallet, not a virtual wallet");
+        }
+
         // All goals have the same wallet type
         WalletType walletType =
                 walletTypeRepository

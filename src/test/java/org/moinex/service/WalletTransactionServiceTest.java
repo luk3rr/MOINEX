@@ -224,6 +224,32 @@ class WalletTransactionServiceTest {
         }
 
         @Test
+        @DisplayName("Should throw exception when user tries to transfer money from a master wallet to its virtual wallet")
+        void testTransferMoneyMasterToVirtualWallet() {
+            Wallet masterWallet = createWallet(1, "Master Wallet", new BigDecimal("1000"));
+            Wallet virtualWallet = createWallet(2, "Virtual Wallet", new BigDecimal("500"));
+            masterWallet.setMasterWallet(null);
+            virtualWallet.setMasterWallet(masterWallet);
+
+            when(walletRepository.findById(masterWallet.getId()))
+                    .thenReturn(Optional.of(masterWallet));
+            when(walletRepository.findById(virtualWallet.getId()))
+                    .thenReturn(Optional.of(virtualWallet));
+
+            assertThrows(
+                    MoinexException.TransferFromMasterToVirtualWalletException.class,
+                    () ->
+                            walletTransactionService.transferMoney(
+                                    masterWallet.getId(),
+                                    virtualWallet.getId(),
+                                    date,
+                                    transferAmount,
+                                    description));
+
+            verify(transferRepository, never()).save(any(Transfer.class));
+        }
+
+        @Test
         @DisplayName(
                 "Test if exception is thrown when the amount to transfer is less "
                         + "than or equal to zero")

@@ -109,6 +109,11 @@ public class WalletTransactionService {
                                                 "Receiver wallet not found and cannot transfer"
                                                         + " money"));
 
+        if (senderWallet.isMaster() && receiverWallet.isVirtual() && receiverWallet.getMasterWallet().equals(senderWallet)) {
+            throw new MoinexException.TransferFromMasterToVirtualWalletException(
+                    "You cannot transfer money from a master wallet to its virtual wallet.");
+        }
+
         if (senderWallet.getBalance().compareTo(amount) < 0) {
             throw new MoinexException.InsufficientResourcesException(
                     "Sender wallet does not have enough balance to transfer");

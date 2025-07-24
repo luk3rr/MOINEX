@@ -160,6 +160,27 @@ class GoalServiceTest {
                                     goal.getTargetDate().toLocalDate(),
                                     goal.getMotivation()));
         }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException if master wallet is actually a virtual wallet")
+        void addGoal_MasterWalletIsVirtual_ThrowsException() {
+            Wallet masterWallet = new Wallet(1, "Virtual Wallet", BigDecimal.ZERO);
+            masterWallet.setMasterWallet(new Wallet(2, "Master Wallet", BigDecimal.ZERO));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            goalService.addGoal(
+                                    goal.getName(),
+                                    goal.getInitialBalance(),
+                                    goal.getTargetBalance(),
+                                    goal.getTargetDate().toLocalDate(),
+                                    goal.getMotivation(),
+                                    masterWallet,
+                                    any()));
+
+            verify(goalRepository, never()).save(any(Goal.class));
+        }
     }
 
     @Nested

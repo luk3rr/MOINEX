@@ -75,7 +75,7 @@ public final class AddGoalController extends BaseGoalManagement {
     }
 
     private void populateComboBoxes() {
-        masterWalletComboBox.getItems().setAll(wallets);
+        masterWalletComboBox.getItems().setAll(wallets.stream().filter(Wallet::isMaster).toList());
     }
 
     private void configureComboBoxes() {
