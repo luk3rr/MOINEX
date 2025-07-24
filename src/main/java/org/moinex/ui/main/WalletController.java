@@ -281,7 +281,7 @@ public class WalletController {
         BigDecimal pendingExpenses = BigDecimal.ZERO;
         BigDecimal pendingIncomes = BigDecimal.ZERO;
         BigDecimal walletsCurrentBalance = BigDecimal.ZERO;
-        long totalWallets = 0L;
+        long totalAmountInWallets = 0L;
 
         // Filter wallet types, according to the selected item,
         // If "All Wallets" is selected, show all transactions
@@ -295,6 +295,7 @@ public class WalletController {
 
             walletsCurrentBalance =
                     wallets.stream()
+                            .filter(Wallet::isMaster)
                             .map(Wallet::getBalance)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -312,7 +313,8 @@ public class WalletController {
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            totalWallets = wallets.stream().map(Wallet::getId).distinct().count();
+            totalAmountInWallets =
+                    wallets.stream().filter(Wallet::isMaster).map(Wallet::getId).distinct().count();
         } else if (selectedIndex > 0 && selectedIndex - 1 < walletTypes.size()) {
             WalletType selectedWalletType = walletTypes.get(selectedIndex - 1);
 
@@ -320,6 +322,7 @@ public class WalletController {
 
             walletsCurrentBalance =
                     wallets.stream()
+                            .filter(Wallet::isMaster)
                             .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
                             .map(Wallet::getBalance)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -350,8 +353,9 @@ public class WalletController {
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            totalWallets =
+            totalAmountInWallets =
                     wallets.stream()
+                            .filter(Wallet::isMaster)
                             .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
                             .map(Wallet::getId)
                             .distinct()
@@ -372,7 +376,8 @@ public class WalletController {
 
         balanceForeseenLabel.getStyleClass().add(Constants.TOTAL_BALANCE_FORESEEN_LABEL_STYLE);
 
-        Label totalWalletsLabel = new Label("Balance corresponds to " + totalWallets + " wallets");
+        Label totalWalletsLabel =
+                new Label("Balance corresponds to " + totalAmountInWallets + " master wallets");
         totalWalletsLabel.getStyleClass().add(Constants.WALLET_TOTAL_BALANCE_WALLETS_LABEL_STYLE);
 
         totalBalancePaneInfoVBox.getChildren().clear();
@@ -465,6 +470,7 @@ public class WalletController {
                 if (wt != null) {
                     BigDecimal totalBalance =
                             wallets.stream()
+                                    .filter(Wallet::isMaster)
                                     .filter(w -> w.getType().getId().equals(wt.getId()))
                                     .map(Wallet::getBalance)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);

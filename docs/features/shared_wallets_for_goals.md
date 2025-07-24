@@ -206,7 +206,7 @@ Considerando todos os pontos acima, a lista de tarefas para implementação é a
 - [X] Implementar a lógica de transferência para Carteiras Mestras com vinculação a Carteiras Virtuais
 
 ##### 4.4.2.2 Cálculo de Saldo
-- [ ] Atualizar as funções de cálculo de balanço total para considerar apenas Carteiras Mestras nos resultados dos gráficos
+- [X] Atualizar as funções de cálculo de balanço total para considerar apenas Carteiras Mestras nos resultados dos gráficos
 
 #### 4.4.3 Interface
 - [X] Atualizar o formulário de criação de Metas para incluir o ComboBox de vinculação a Carteiras Mestras.
