@@ -25,12 +25,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
-import org.moinex.ui.dialog.wallettransaction.AddExpenseController;
-import org.moinex.ui.dialog.wallettransaction.AddIncomeController;
-import org.moinex.ui.dialog.wallettransaction.AddTransferController;
-import org.moinex.ui.dialog.wallettransaction.ChangeWalletBalanceController;
-import org.moinex.ui.dialog.wallettransaction.ChangeWalletTypeController;
-import org.moinex.ui.dialog.wallettransaction.RenameWalletController;
+import org.moinex.ui.dialog.wallettransaction.*;
 import org.moinex.ui.main.WalletController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -115,8 +110,9 @@ public class WalletFullPaneController {
 
     /**
      * Constructor
-     * @param walletService WalletService
-     * @param creditCardService CreditCardService
+     *
+     * @param walletService            WalletService
+     * @param creditCardService        CreditCardService
      * @param walletTransactionService WalletTransactionService
      * @note This constructor is used for dependency injection
      */
@@ -181,6 +177,7 @@ public class WalletFullPaneController {
 
     /**
      * Load wallet information
+     *
      * @param wt Wallet name to find in the database
      * @return The updated VBox
      */
@@ -362,9 +359,22 @@ public class WalletFullPaneController {
             return;
         }
 
+        Integer totalOfAssociatedVirtualWallets =
+                walletService.getCountOfVirtualWalletsByMasterWalletId(wallet.getId());
+
+        String virtualWalletsMessage =
+                totalOfAssociatedVirtualWallets.equals(0)
+                        ? ""
+                        : "This wallet has "
+                                + totalOfAssociatedVirtualWallets
+                                + " virtual wallet(s) associated with it. Deleting this wallet all"
+                                + " virtual wallets will be unlinked from it.";
+
         if (WindowUtils.showConfirmationDialog(
                 "Delete wallet " + wallet.getName(),
-                "Are you sure you want to remove this wallet?")) {
+                "Are you sure you want to remove this wallet?\n"
+                        + "This action cannot be undone.\n"
+                        + virtualWalletsMessage)) {
             try {
                 walletService.deleteWallet(wallet.getId());
 
@@ -395,9 +405,10 @@ public class WalletFullPaneController {
 
     /**
      * Set the value of a label
-     * @param signLabel Label to set the sign
+     *
+     * @param signLabel  Label to set the sign
      * @param valueLabel Label to set the value
-     * @param value Value to set
+     * @param value      Value to set
      */
     private void setLabelValue(Label signLabel, Label valueLabel, BigDecimal value) {
         if (value.compareTo(BigDecimal.ZERO) < 0) {

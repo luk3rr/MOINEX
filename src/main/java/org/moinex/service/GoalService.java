@@ -288,6 +288,23 @@ public class GoalService {
                             + "the transactions first or archive the goal");
         }
 
+        if (goal.isMaster()) {
+            List<Wallet> virtualWallets =
+                    walletRepository.findVirtualWalletsByMasterWallet(goal.getId());
+
+            if (!virtualWallets.isEmpty())
+                logger.info("Goal with id {} has virtual wallets and will be unlinked", idGoal);
+
+            virtualWallets.forEach(
+                    virtualWallet -> {
+                        virtualWallet.setMasterWallet(null);
+                        walletRepository.save(virtualWallet);
+                        logger.info(
+                                "Virtual wallet with id {} unlinked from master wallet",
+                                virtualWallet.getId());
+                    });
+        }
+
         goalRepository.delete(goal);
 
         logger.info("Goal {} was permanently deleted", goal.getName());

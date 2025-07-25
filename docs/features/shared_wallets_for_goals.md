@@ -215,9 +215,9 @@ Considerando todos os pontos acima, a lista de tarefas para implementação é a
 - [x] Atualizar a Wallet Page para exibir Carteiras Virtuais com indicação de "fatia" de uma Carteira Mestra.
 
 #### 4.4.4 Deleção de Carteiras
-- [ ] Implementar a lógica de deleção de Carteiras Mestras, garantindo que as Carteiras Virtuais vinculadas sejam
+- [X] Implementar a lógica de deleção de Carteiras Mestras, garantindo que as Carteiras Virtuais vinculadas sejam
   desvinculadas corretamente.
-- [ ] Implementar a lógica de deleção de Carteiras Virtuais, garantindo que o saldo seja mantido na Carteira Mestra
+- [X] Implementar a lógica de deleção de Carteiras Virtuais, garantindo que o saldo seja mantido na Carteira Mestra
   vinculada.
 
 #### 4.4.5 Arquivamento de Carteiras

@@ -24,6 +24,7 @@ import org.moinex.chart.CircularProgressBar;
 import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.GoalService;
+import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.dialog.goal.EditGoalController;
 import org.moinex.ui.dialog.wallettransaction.AddExpenseController;
@@ -87,13 +88,16 @@ public class GoalFullPaneController {
 
     private GoalService goalService;
 
+    private WalletService walletService;
+
     private WalletTransactionService walletTransactionService;
 
     private Goal goal;
 
     /**
      * Constructor
-     * @param goalService Goal service
+     *
+     * @param goalService              Goal service
      * @param walletTransactionService Wallet transaction service
      * @note This constructor is used for dependency injection
      */
@@ -102,11 +106,13 @@ public class GoalFullPaneController {
             GoalService goalService,
             WalletTransactionService walletTransactionService,
             ConfigurableApplicationContext springContext,
-            GoalController goalController) {
+            GoalController goalController,
+            WalletService walletService) {
         this.goalService = goalService;
         this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
         this.goalController = goalController;
+        this.walletService = walletService;
     }
 
     /**
@@ -123,6 +129,7 @@ public class GoalFullPaneController {
 
     /**
      * Update the goal pane with the given goal
+     *
      * @param gl Goal to update the pane with
      * @return The updated VBox
      */
@@ -389,6 +396,19 @@ public class GoalFullPaneController {
                 .append(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
                 .append("\n");
 
+        Integer totalOfAssociatedVirtualWallets =
+                walletService.getCountOfVirtualWalletsByMasterWalletId(goal.getId());
+
+        if (!totalOfAssociatedVirtualWallets.equals(0)) {
+            String virtualWalletsMessage =
+                    "\nThis goal has "
+                            + totalOfAssociatedVirtualWallets
+                            + " virtual wallet(s) associated with it. Deleting this goal all"
+                            + " virtual wallets will be unlinked from it.";
+
+            message.append(virtualWalletsMessage).append("\n");
+        }
+
         try {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
@@ -417,8 +437,9 @@ public class GoalFullPaneController {
 
     /**
      * Set the value of a label
+     *
      * @param valueLabel Label to set the value
-     * @param value Value to set
+     * @param value      Value to set
      */
     private void setLabelValue(Label valueLabel, BigDecimal value) {
         valueLabel.setText(UIUtils.formatCurrency(value));

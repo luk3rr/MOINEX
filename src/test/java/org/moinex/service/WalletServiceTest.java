@@ -125,6 +125,36 @@ class WalletServiceTest {
             assertThrows(
                     IllegalStateException.class, () -> walletService.deleteWallet(wallet1.getId()));
         }
+
+        @Test
+        @DisplayName("Should unlink virtual wallets before deleting master wallet")
+        void deleteMasterWallet_UnlinkVirtualWallets() {
+            Wallet masterWallet = new Wallet(1, "Master Wallet", new BigDecimal("100.00"));
+            Wallet virtualWallet1 = new Wallet(2, "Virtual Wallet1", new BigDecimal("50.00"));
+            Wallet virtualWallet2 = new Wallet(3, "Virtual Wallet2", new BigDecimal("30.00"));
+            virtualWallet1.setMasterWallet(masterWallet);
+            virtualWallet2.setMasterWallet(masterWallet);
+
+            when(walletRepository.findById(masterWallet.getId()))
+                    .thenReturn(Optional.of(masterWallet));
+            when(walletRepository.findVirtualWalletsByMasterWallet(masterWallet.getId()))
+                    .thenReturn(List.of(virtualWallet1, virtualWallet2));
+            when(walletTransactionRepository.getTransactionCountByWallet(masterWallet.getId()))
+                    .thenReturn(0);
+            when(transferRepository.getTransferCountByWallet(masterWallet.getId())).thenReturn(0);
+
+            walletService.deleteWallet(masterWallet.getId());
+
+            ArgumentCaptor<Wallet> captor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository, times(2)).save(captor.capture());
+            List<Wallet> savedWallets = captor.getAllValues();
+            assertTrue(savedWallets.stream().allMatch(w -> w.getMasterWallet() == null));
+            assertTrue(
+                    savedWallets.stream().anyMatch(w -> w.getId().equals(virtualWallet1.getId())));
+            assertTrue(
+                    savedWallets.stream().anyMatch(w -> w.getId().equals(virtualWallet2.getId())));
+            verify(walletRepository).delete(masterWallet);
+        }
     }
 
     @Nested

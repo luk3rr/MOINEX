@@ -224,7 +224,9 @@ class WalletTransactionServiceTest {
         }
 
         @Test
-        @DisplayName("Should throw exception when user tries to transfer money from a master wallet to its virtual wallet")
+        @DisplayName(
+                "Should throw exception when user tries to transfer money from a master wallet to"
+                        + " its virtual wallet")
         void testTransferMoneyMasterToVirtualWallet() {
             Wallet masterWallet = createWallet(1, "Master Wallet", new BigDecimal("1000"));
             Wallet virtualWallet = createWallet(2, "Virtual Wallet", new BigDecimal("500"));

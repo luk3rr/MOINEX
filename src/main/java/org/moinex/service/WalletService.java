@@ -116,6 +116,23 @@ public class WalletService {
                             id));
         }
 
+        if (wallet.isMaster()) {
+            List<Wallet> virtualWallets =
+                    walletRepository.findVirtualWalletsByMasterWallet(wallet.getId());
+
+            if (!virtualWallets.isEmpty())
+                logger.info("Wallet with id {} has virtual wallets and will be unlinked", id);
+
+            virtualWallets.forEach(
+                    virtualWallet -> {
+                        virtualWallet.setMasterWallet(null);
+                        walletRepository.save(virtualWallet);
+                        logger.info(
+                                "Virtual wallet with id {} unlinked from master wallet",
+                                virtualWallet.getId());
+                    });
+        }
+
         walletRepository.delete(wallet);
 
         logger.info("Wallet with id {} was permanently deleted", id);
@@ -412,5 +429,9 @@ public class WalletService {
                 walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId());
 
         return masterWallet.getBalance().subtract(allocatedBalance);
+    }
+
+    public Integer getCountOfVirtualWalletsByMasterWalletId(Integer masterWalletId) {
+        return walletRepository.getCountOfVirtualWalletsByMasterWalletId(masterWalletId);
     }
 }

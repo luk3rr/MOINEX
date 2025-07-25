@@ -7,6 +7,13 @@
 package org.moinex.ui.dialog.wallettransaction;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -29,46 +36,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 /**
  * Controller for the Add Transfer dialog
  */
 @Controller
 @NoArgsConstructor
 public class AddTransferController {
-    @FXML
-    private Label senderWalletAfterBalanceValueLabel;
+    @FXML private Label senderWalletAfterBalanceValueLabel;
 
-    @FXML
-    private Label receiverWalletAfterBalanceValueLabel;
+    @FXML private Label receiverWalletAfterBalanceValueLabel;
 
-    @FXML
-    private Label senderWalletCurrentBalanceValueLabel;
+    @FXML private Label senderWalletCurrentBalanceValueLabel;
 
-    @FXML
-    private Label receiverWalletCurrentBalanceValueLabel;
+    @FXML private Label receiverWalletCurrentBalanceValueLabel;
 
-    @FXML
-    private ComboBox<Wallet> senderWalletComboBox;
+    @FXML private ComboBox<Wallet> senderWalletComboBox;
 
-    @FXML
-    private ComboBox<Wallet> receiverWalletComboBox;
+    @FXML private ComboBox<Wallet> receiverWalletComboBox;
 
-    @FXML
-    private TextField transferValueField;
+    @FXML private TextField transferValueField;
 
-    @FXML
-    private TextField descriptionField;
+    @FXML private TextField descriptionField;
 
-    @FXML
-    private DatePicker transferDatePicker;
+    @FXML private DatePicker transferDatePicker;
 
     private ConfigurableApplicationContext springContext;
 
@@ -201,11 +191,11 @@ public class AddTransferController {
             WindowUtils.showErrorDialog(
                     "Invalid transfer value", "Transfer value must be a number.");
         } catch (MoinexException.SameSourceDestinationException
-                 | IllegalArgumentException
-                 | EntityNotFoundException
-                 | IllegalStateException
-                 | MoinexException.InsufficientResourcesException
-                 | MoinexException.TransferFromMasterToVirtualWalletException e) {
+                | IllegalArgumentException
+                | EntityNotFoundException
+                | IllegalStateException
+                | MoinexException.InsufficientResourcesException
+                | MoinexException.TransferFromMasterToVirtualWalletException e) {
             WindowUtils.showErrorDialog("Error while creating transfer", e.getMessage());
         }
     }
@@ -216,8 +206,7 @@ public class AddTransferController {
                 Constants.CALCULATOR_FXML,
                 "Calculator",
                 springContext,
-                (CalculatorController controller) -> {
-                },
+                (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transferValueField)));
     }
 
@@ -271,7 +260,10 @@ public class AddTransferController {
             Wallet currentWallet, Wallet otherWallet, Label label, boolean isSender) {
         String transferValueString = transferValueField.getText();
 
-        if (transferValueString == null || transferValueString.isBlank() || currentWallet == null || currentWallet.equals(otherWallet)) {
+        if (transferValueString == null
+                || transferValueString.isBlank()
+                || currentWallet == null
+                || currentWallet.equals(otherWallet)) {
             UIUtils.resetLabel(label);
             return;
         }
@@ -287,13 +279,15 @@ public class AddTransferController {
             BigDecimal afterBalance;
 
             if (isSender) {
-                if (currentWallet.isMaster() && otherWallet.isVirtual() && otherWallet.getMasterWallet().equals(currentWallet)) {
+                if (currentWallet.isMaster()
+                        && otherWallet.isVirtual()
+                        && otherWallet.getMasterWallet().equals(currentWallet)) {
                     // If the current wallet is the SENDER and is a master wallet of the receiver,
                     // then an error is thrown... BUT be a buddy and show a message to the user :)
                     WindowUtils.showInformationDialog(
                             "Invalid Transfer",
-                            "You cannot transfer money from a master wallet to its virtual wallet."
-                    );
+                            "You cannot transfer money from a master wallet to its virtual"
+                                    + " wallet.");
                     return;
                 }
 

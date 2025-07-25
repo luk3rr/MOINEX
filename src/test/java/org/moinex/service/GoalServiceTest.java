@@ -162,7 +162,9 @@ class GoalServiceTest {
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException if master wallet is actually a virtual wallet")
+        @DisplayName(
+                "Should throw IllegalArgumentException if master wallet is actually a virtual"
+                        + " wallet")
         void addGoal_MasterWalletIsVirtual_ThrowsException() {
             Wallet masterWallet = new Wallet(1, "Virtual Wallet", BigDecimal.ZERO);
             masterWallet.setMasterWallet(new Wallet(2, "Master Wallet", BigDecimal.ZERO));
@@ -215,6 +217,49 @@ class GoalServiceTest {
                     .thenReturn(1);
 
             assertThrows(IllegalStateException.class, () -> goalService.deleteGoal(goal.getId()));
+        }
+
+        @Test
+        @DisplayName("Should unlink virtual wallets before deleting master wallet")
+        void deleteMasterWallet_UnlinkVirtualWallets() {
+            Wallet virtualWallet1 = new Wallet(2, "Virtual Wallet1", new BigDecimal("50.00"));
+            Wallet virtualWallet2 = new Wallet(3, "Virtual Wallet2", new BigDecimal("30.00"));
+
+            Goal virtualGoal =
+                    Goal.builder()
+                            .id(4)
+                            .name("Test Goal")
+                            .initialBalance(new BigDecimal("100.00"))
+                            .balance(new BigDecimal("150.00"))
+                            .targetBalance(new BigDecimal("1000.00"))
+                            .targetDate(LocalDateTime.now().plusMonths(6))
+                            .motivation("Test Motivation")
+                            .type(walletType)
+                            .build();
+
+            virtualWallet1.setMasterWallet(goal);
+            virtualWallet2.setMasterWallet(goal);
+            virtualGoal.setMasterWallet(goal);
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+            when(walletRepository.findVirtualWalletsByMasterWallet(goal.getId()))
+                    .thenReturn(List.of(virtualWallet1, virtualWallet2, virtualGoal));
+            when(walletTransactionRepository.getTransactionCountByWallet(goal.getId()))
+                    .thenReturn(0);
+            when(transfersRepository.getTransferCountByWallet(goal.getId())).thenReturn(0);
+
+            goalService.deleteGoal(goal.getId());
+
+            ArgumentCaptor<Wallet> captor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository, times(3)).save(captor.capture());
+            List<Wallet> savedWallets = captor.getAllValues();
+            assertTrue(savedWallets.stream().allMatch(w -> w.getMasterWallet() == null));
+            assertTrue(
+                    savedWallets.stream().anyMatch(w -> w.getId().equals(virtualWallet1.getId())));
+            assertTrue(
+                    savedWallets.stream().anyMatch(w -> w.getId().equals(virtualWallet2.getId())));
+            assertTrue(savedWallets.stream().anyMatch(w -> w.getId().equals(virtualGoal.getId())));
+            verify(goalRepository).delete(goal);
         }
     }
 
