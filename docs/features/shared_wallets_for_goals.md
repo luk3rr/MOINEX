@@ -221,9 +221,9 @@ Considerando todos os pontos acima, a lista de tarefas para implementação é a
   vinculada.
 
 #### 4.4.5 Arquivamento de Carteiras
-- [ ] Implementar a lógica de arquivamento de Carteiras Mestras, garantindo que as Carteiras Virtuais vinculadas sejam
+- [X] Implementar a lógica de arquivamento de Carteiras Mestras, garantindo que as Carteiras Virtuais vinculadas sejam
   desvinculadas corretamente.
-- [ ] Implementar a lógica de arquivamento de Carteiras Virtuais, garantindo que o saldo seja mantido na Carteira Mestra
+- [X] Implementar a lógica de arquivamento de Carteiras Virtuais, garantindo que o saldo seja mantido na Carteira Mestra
   vinculada.
 
 ## 5. Riscos e Considerações

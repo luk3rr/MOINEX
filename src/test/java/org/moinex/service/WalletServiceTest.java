@@ -390,12 +390,67 @@ class WalletServiceTest {
         @DisplayName("Should archive wallet successfully")
         void archiveWallet_Success() {
             when(walletRepository.findById(wallet1.getId())).thenReturn(Optional.of(wallet1));
+            when(walletRepository.getAllocatedBalanceByMasterWallet(wallet1.getId()))
+                    .thenReturn(BigDecimal.ZERO);
 
             walletService.archiveWallet(wallet1.getId());
 
             ArgumentCaptor<Wallet> captor = ArgumentCaptor.forClass(Wallet.class);
             verify(walletRepository).save(captor.capture());
             assertTrue(captor.getValue().isArchived());
+        }
+
+        @Test
+        @DisplayName("Should unlink virtual wallets when archiving a master wallet")
+        void archiveMasterWallet_UnlinkVirtualWallets() {
+            BigDecimal masterWalletBalance = new BigDecimal("100.00");
+            BigDecimal allocatedBalance = BigDecimal.TEN;
+            BigDecimal expectedBalanceAfterArchive = masterWalletBalance.subtract(allocatedBalance);
+
+            Wallet masterWallet = new Wallet(1, "Master Wallet", masterWalletBalance);
+            Wallet virtualWallet1 = new Wallet(2, "Virtual Wallet1", new BigDecimal("5.00"));
+            Wallet virtualWallet2 = new Wallet(3, "Virtual Wallet2", new BigDecimal("5.00"));
+            virtualWallet1.setMasterWallet(masterWallet);
+            virtualWallet2.setMasterWallet(masterWallet);
+
+            when(walletRepository.findById(masterWallet.getId()))
+                    .thenReturn(Optional.of(masterWallet));
+            when(walletRepository.findVirtualWalletsByMasterWallet(masterWallet.getId()))
+                    .thenReturn(List.of(virtualWallet1, virtualWallet2));
+            when(walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId()))
+                    .thenReturn(BigDecimal.TEN);
+
+            walletService.archiveWallet(masterWallet.getId());
+
+            verify(walletRepository, never()).delete(virtualWallet1);
+            verify(walletRepository, never()).delete(virtualWallet2);
+
+            ArgumentCaptor<Wallet> captor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository, atLeastOnce()).save(captor.capture());
+
+            assertEquals(captor.getValue().getBalance(), expectedBalanceAfterArchive);
+        }
+
+        @Test
+        @DisplayName("Should not updated master wallet when archiving a virtual wallet")
+        void archiveVirtualWallet_NoMasterUpdate() {
+            BigDecimal virtualWalletBalance = new BigDecimal("50.00");
+            Wallet masterWallet = new Wallet(1, "Master Wallet", new BigDecimal("100.00"));
+            Wallet virtualWallet = new Wallet(2, "Virtual Wallet", virtualWalletBalance);
+            virtualWallet.setMasterWallet(masterWallet);
+
+            when(walletRepository.findById(virtualWallet.getId()))
+                    .thenReturn(Optional.of(virtualWallet));
+
+            walletService.archiveWallet(virtualWallet.getId());
+
+            verify(walletRepository, never()).save(masterWallet);
+
+            ArgumentCaptor<Wallet> captor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository, atLeastOnce()).save(captor.capture());
+
+            assertTrue(captor.getValue().isArchived());
+            assertTrue(captor.getValue().isMaster());
         }
 
         @Test

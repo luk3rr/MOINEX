@@ -167,6 +167,14 @@ public class WalletService {
                                                                 + " archived",
                                                         id)));
         wallet.setArchived(true);
+
+        if (wallet.isMaster()) {
+            updateWalletBalance(wallet.getId(), getUnallocatedBalance(wallet));
+            removeAllVirtualWalletsFromMasterWallet(wallet.getId());
+        } else if (wallet.isVirtual()) {
+            wallet.setMasterWallet(null);
+        }
+
         walletRepository.save(wallet);
 
         logger.info("Wallet with id {} was archived", id);
