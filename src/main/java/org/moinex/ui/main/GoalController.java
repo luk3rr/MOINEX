@@ -21,13 +21,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import lombok.NoArgsConstructor;
 import org.moinex.model.goal.Goal;
@@ -89,6 +83,135 @@ public class GoalController {
         this.goalService = goalService;
         this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
+    }
+
+    private static TableColumn<Goal, String> getColumn() {
+        TableColumn<Goal, String> recommendedMonthlyDepositColumn =
+                new TableColumn<>("Recommended Monthly Deposit");
+        recommendedMonthlyDepositColumn.setCellValueFactory(
+                param -> {
+                    // If the goal is archived, return an empty string
+                    if (param.getValue().isCompleted()) return new SimpleObjectProperty<>("-");
+
+                    // Calculate the number of months until the target date
+                    long monthsUntilTarget =
+                            Constants.calculateMonthsUntilTarget(
+                                    LocalDate.now(),
+                                    param.getValue().getTargetDate().toLocalDate());
+
+                    // Calculate the recommended monthly deposit
+                    double recommendedMonthlyDeposit =
+                            getRecommendedMonthlyDeposit(param, monthsUntilTarget);
+
+                    return new SimpleObjectProperty<>(
+                            UIUtils.formatCurrency(recommendedMonthlyDeposit));
+                });
+        return recommendedMonthlyDepositColumn;
+    }
+
+    private static TableColumn<Goal, String> getTableColumn() {
+        TableColumn<Goal, String> monthsUntilTargetColumn =
+                new TableColumn<>("Months Until Target");
+        monthsUntilTargetColumn.setCellValueFactory(
+                param -> {
+                    // If the goal is archived, return an empty string
+                    if (param.getValue().isCompleted()) return new SimpleObjectProperty<>("-");
+
+                    // Calculate the number of months until the target date
+                    Integer monthsUntilTarget =
+                            Constants.calculateMonthsUntilTarget(
+                                    LocalDate.now(),
+                                    param.getValue().getTargetDate().toLocalDate());
+
+                    return new SimpleObjectProperty<>(monthsUntilTarget.toString());
+                });
+        return monthsUntilTargetColumn;
+    }
+
+    private static TableColumn<Goal, String> getStringTableColumn() {
+        TableColumn<Goal, String> completionDateColumn = new TableColumn<>("Completion Date");
+        completionDateColumn.setCellValueFactory(
+                param -> {
+                    // If the goal is archived and has a completion date, return it
+                    // formatted, otherwise return an empty string
+                    if (param.getValue().isCompleted()
+                            && param.getValue().getCompletionDate() != null) {
+                        return new SimpleStringProperty(
+                                param.getValue()
+                                        .getCompletionDate()
+                                        .format(Constants.DATE_FORMATTER_NO_TIME));
+                    }
+
+                    return new SimpleObjectProperty<>("-");
+                });
+        return completionDateColumn;
+    }
+
+    private static TableColumn<Goal, String> getGoalStringTableColumn() {
+        TableColumn<Goal, String> progressColumn = new TableColumn<>("Progress");
+        progressColumn.setCellValueFactory(
+                param -> {
+                    // If the goal is archived, return 100 %
+                    if (param.getValue().isCompleted())
+                        return new SimpleObjectProperty<>(UIUtils.formatPercentage(100));
+
+                    return new SimpleObjectProperty<>(
+                            UIUtils.formatPercentage(
+                                    // Calculate the progress, avoiding division by zero
+                                    param.getValue().getBalance().compareTo(BigDecimal.ZERO) == 0
+                                            ? BigDecimal.ZERO
+                                            : param.getValue().getBalance().doubleValue()
+                                                    / param.getValue()
+                                                            .getTargetBalance()
+                                                            .doubleValue()
+                                                    * 100));
+                });
+        return progressColumn;
+    }
+
+    private static TableColumn<Goal, Integer> getGoalLongTableColumn() {
+        TableColumn<Goal, Integer> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
+
+        // Align the ID column to the center
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Integer item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;"); // set padding to zero to
+                                    // ensure the text is centered
+                                }
+                            }
+                        });
+        return idColumn;
+    }
+
+    private static double getRecommendedMonthlyDeposit(
+            TableColumn.CellDataFeatures<Goal, String> param, long monthsUntilTarget) {
+        double recommendedMonthlyDeposit;
+
+        if (monthsUntilTarget <= 0) {
+            recommendedMonthlyDeposit =
+                    param.getValue()
+                            .getTargetBalance()
+                            .subtract(param.getValue().getBalance())
+                            .doubleValue();
+        } else {
+            recommendedMonthlyDeposit =
+                    param.getValue()
+                                    .getTargetBalance()
+                                    .subtract(param.getValue().getBalance())
+                                    .doubleValue()
+                            / BigDecimal.valueOf(monthsUntilTarget).doubleValue();
+        }
+        return recommendedMonthlyDeposit;
     }
 
     @FXML
@@ -544,9 +667,14 @@ public class GoalController {
 
         TableColumn<Goal, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setCellValueFactory(
-                param ->
-                        new SimpleObjectProperty<>(
-                                param.getValue().isCompleted() ? "COMPLETED" : "ACTIVE"));
+                param -> {
+                    Goal goal = param.getValue();
+                    String status =
+                            goal.isArchived()
+                                    ? "ARCHIVED"
+                                    : goal.isCompleted() ? "COMPLETED" : "ACTIVE";
+                    return new SimpleObjectProperty<>(status);
+                });
 
         TableColumn<Goal, String> monthsUntilTargetColumn = getTableColumn();
 
@@ -581,135 +709,6 @@ public class GoalController {
                                     });
                     return row;
                 });
-    }
-
-    private static TableColumn<Goal, String> getColumn() {
-        TableColumn<Goal, String> recommendedMonthlyDepositColumn =
-                new TableColumn<>("Recommended Monthly Deposit");
-        recommendedMonthlyDepositColumn.setCellValueFactory(
-                param -> {
-                    // If the goal is archived, return an empty string
-                    if (param.getValue().isCompleted()) return new SimpleObjectProperty<>("-");
-
-                    // Calculate the number of months until the target date
-                    long monthsUntilTarget =
-                            Constants.calculateMonthsUntilTarget(
-                                    LocalDate.now(),
-                                    param.getValue().getTargetDate().toLocalDate());
-
-                    // Calculate the recommended monthly deposit
-                    double recommendedMonthlyDeposit =
-                            getRecommendedMonthlyDeposit(param, monthsUntilTarget);
-
-                    return new SimpleObjectProperty<>(
-                            UIUtils.formatCurrency(recommendedMonthlyDeposit));
-                });
-        return recommendedMonthlyDepositColumn;
-    }
-
-    private static TableColumn<Goal, String> getTableColumn() {
-        TableColumn<Goal, String> monthsUntilTargetColumn =
-                new TableColumn<>("Months Until Target");
-        monthsUntilTargetColumn.setCellValueFactory(
-                param -> {
-                    // If the goal is archived, return an empty string
-                    if (param.getValue().isCompleted()) return new SimpleObjectProperty<>("-");
-
-                    // Calculate the number of months until the target date
-                    Integer monthsUntilTarget =
-                            Constants.calculateMonthsUntilTarget(
-                                    LocalDate.now(),
-                                    param.getValue().getTargetDate().toLocalDate());
-
-                    return new SimpleObjectProperty<>(monthsUntilTarget.toString());
-                });
-        return monthsUntilTargetColumn;
-    }
-
-    private static TableColumn<Goal, String> getStringTableColumn() {
-        TableColumn<Goal, String> completionDateColumn = new TableColumn<>("Completion Date");
-        completionDateColumn.setCellValueFactory(
-                param -> {
-                    // If the goal is archived and has a completion date, return it
-                    // formatted, otherwise return an empty string
-                    if (param.getValue().isCompleted()
-                            && param.getValue().getCompletionDate() != null) {
-                        return new SimpleStringProperty(
-                                param.getValue()
-                                        .getCompletionDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME));
-                    }
-
-                    return new SimpleObjectProperty<>("-");
-                });
-        return completionDateColumn;
-    }
-
-    private static TableColumn<Goal, String> getGoalStringTableColumn() {
-        TableColumn<Goal, String> progressColumn = new TableColumn<>("Progress");
-        progressColumn.setCellValueFactory(
-                param -> {
-                    // If the goal is archived, return 100 %
-                    if (param.getValue().isCompleted())
-                        return new SimpleObjectProperty<>(UIUtils.formatPercentage(100));
-
-                    return new SimpleObjectProperty<>(
-                            UIUtils.formatPercentage(
-                                    // Calculate the progress, avoiding division by zero
-                                    param.getValue().getBalance().compareTo(BigDecimal.ZERO) == 0
-                                            ? BigDecimal.ZERO
-                                            : param.getValue().getBalance().doubleValue()
-                                                    / param.getValue()
-                                                            .getTargetBalance()
-                                                            .doubleValue()
-                                                    * 100));
-                });
-        return progressColumn;
-    }
-
-    private static TableColumn<Goal, Integer> getGoalLongTableColumn() {
-        TableColumn<Goal, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(
-                column ->
-                        new TableCell<>() {
-                            @Override
-                            protected void updateItem(Integer item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (item == null || empty) {
-                                    setText(null);
-                                } else {
-                                    setText(item.toString());
-                                    setAlignment(Pos.CENTER);
-                                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                    // ensure the text is centered
-                                }
-                            }
-                        });
-        return idColumn;
-    }
-
-    private static double getRecommendedMonthlyDeposit(
-            TableColumn.CellDataFeatures<Goal, String> param, long monthsUntilTarget) {
-        double recommendedMonthlyDeposit;
-
-        if (monthsUntilTarget <= 0) {
-            recommendedMonthlyDeposit =
-                    param.getValue()
-                            .getTargetBalance()
-                            .subtract(param.getValue().getBalance())
-                            .doubleValue();
-        } else {
-            recommendedMonthlyDeposit =
-                    param.getValue()
-                                    .getTargetBalance()
-                                    .subtract(param.getValue().getBalance())
-                                    .doubleValue()
-                            / BigDecimal.valueOf(monthsUntilTarget).doubleValue();
-        }
-        return recommendedMonthlyDeposit;
     }
 
     private void populateStatusComboBox() {

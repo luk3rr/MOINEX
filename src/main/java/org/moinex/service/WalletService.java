@@ -117,12 +117,23 @@ public class WalletService {
         }
 
         if (wallet.isMaster()) {
-            List<Wallet> virtualWallets =
-                    walletRepository.findVirtualWalletsByMasterWallet(wallet.getId());
+            removeAllVirtualWalletsFromMasterWallet(wallet.getId());
+        }
 
-            if (!virtualWallets.isEmpty())
-                logger.info("Wallet with id {} has virtual wallets and will be unlinked", id);
+        walletRepository.delete(wallet);
 
+        logger.info("Wallet with id {} was permanently deleted", id);
+    }
+
+    public void removeAllVirtualWalletsFromMasterWallet(Integer masterWalletId) {
+        List<Wallet> virtualWallets =
+                walletRepository.findVirtualWalletsByMasterWallet(masterWalletId);
+
+        if (!virtualWallets.isEmpty()) {
+            logger.info(
+                    "Removing {} virtual wallets from master wallet with id {}",
+                    virtualWallets.size(),
+                    masterWalletId);
             virtualWallets.forEach(
                     virtualWallet -> {
                         virtualWallet.setMasterWallet(null);
@@ -132,10 +143,6 @@ public class WalletService {
                                 virtualWallet.getId());
                     });
         }
-
-        walletRepository.delete(wallet);
-
-        logger.info("Wallet with id {} was permanently deleted", id);
     }
 
     /**
@@ -426,7 +433,7 @@ public class WalletService {
      */
     public BigDecimal getUnallocatedBalance(@NonNull Wallet masterWallet) {
         BigDecimal allocatedBalance =
-                walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId());
+                walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId());
 
         return masterWallet.getBalance().subtract(allocatedBalance);
     }

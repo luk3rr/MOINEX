@@ -14,8 +14,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
+import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
+import org.moinex.service.WalletService;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,12 +37,11 @@ public final class EditGoalController extends BaseGoalManagement {
 
     /**
      * Constructor
-     * @param goalService GoalService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditGoalController(GoalService goalService) {
-        super(goalService);
+    public EditGoalController(GoalService goalService, WalletService walletService) {
+        super(goalService, walletService);
     }
 
     public void setGoal(Goal goal) {
@@ -52,6 +54,14 @@ public final class EditGoalController extends BaseGoalManagement {
         motivationTextArea.setText(goal.getMotivation());
         archivedCheckBox.setSelected(goal.isArchived());
         completedCheckBox.setSelected(goal.isCompleted());
+        masterWalletComboBox.setValue(goal.getMasterWallet());
+    }
+
+    @Override
+    @FXML
+    protected void initialize() {
+        super.initialize();
+        setupDisableMasterWalletComboBox();
     }
 
     @Override
@@ -66,6 +76,8 @@ public final class EditGoalController extends BaseGoalManagement {
         String motivation = motivationTextArea.getText();
         boolean archived = archivedCheckBox.isSelected();
         boolean completed = completedCheckBox.isSelected();
+
+        Wallet masterWallet = masterWalletComboBox.getValue();
 
         if (goalName.isEmpty()
                 || balanceStr.isEmpty()
@@ -84,6 +96,7 @@ public final class EditGoalController extends BaseGoalManagement {
             // Check if it has any modification
             if (goal.getName().equals(goalName)
                     && goal.getBalance().equals(currentBalance)
+                    && (goal.isVirtual() && goal.getMasterWallet().equals(masterWallet))
                     && goal.getTargetBalance().equals(targetBalance)
                     && goal.getTargetDate().toLocalDate().equals(targetDate)
                     && goal.getMotivation().equals(motivation)
@@ -99,6 +112,7 @@ public final class EditGoalController extends BaseGoalManagement {
                 goal.setTargetDate(targetDate.atStartOfDay());
                 goal.setMotivation(motivation);
                 goal.setArchived(archived);
+                goal.setMasterWallet(masterWallet);
 
                 // If the goal was completed and the user unchecked the completed
                 // checkbox, set the completion date to null, otherwise set the
@@ -119,8 +133,31 @@ public final class EditGoalController extends BaseGoalManagement {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog("Invalid balance", "Please enter a valid balance.");
-        } catch (EntityNotFoundException | IllegalArgumentException | EntityExistsException e) {
+        } catch (EntityNotFoundException
+                | IllegalArgumentException
+                | EntityExistsException
+                | MoinexException.IncompleteGoalException e) {
             WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
         }
+    }
+
+    private void setupDisableMasterWalletComboBox() {
+        archivedCheckBox
+                .selectedProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            masterWalletComboBox.setValue(null);
+                            masterWalletComboBox.setDisable(
+                                    newValue || completedCheckBox.isSelected());
+                        });
+
+        completedCheckBox
+                .selectedProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            masterWalletComboBox.setValue(null);
+                            masterWalletComboBox.setDisable(
+                                    newValue || archivedCheckBox.isSelected());
+                        });
     }
 }

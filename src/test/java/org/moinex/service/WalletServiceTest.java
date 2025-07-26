@@ -172,6 +172,67 @@ class WalletServiceTest {
         }
 
         @Test
+        @DisplayName(
+                "Should update balance of a normal (master) wallet, and decides if should be"
+                        + " incremented or decremented")
+        void updateWalletBalance_NormalWallet_Success_Increment() {
+            BigDecimal newBalance = masterWallet.getBalance().add(BigDecimal.ONE);
+            when(walletRepository.findById(masterWallet.getId()))
+                    .thenReturn(Optional.of(masterWallet));
+
+            walletService.updateWalletBalance(masterWallet.getId(), newBalance);
+
+            ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository).save(walletCaptor.capture());
+            assertEquals(newBalance, walletCaptor.getValue().getBalance());
+        }
+
+        @Test
+        @DisplayName(
+                "Should update balance of a normal (master) wallet, and decides if should be"
+                        + " incremented or decremented")
+        void updateWalletBalance_NormalWallet_Success_Decrement() {
+            BigDecimal newBalance = masterWallet.getBalance().subtract(BigDecimal.ONE);
+            when(walletRepository.findById(masterWallet.getId()))
+                    .thenReturn(Optional.of(masterWallet));
+
+            when(walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId()))
+                    .thenReturn(BigDecimal.ZERO);
+
+            walletService.updateWalletBalance(masterWallet.getId(), newBalance);
+
+            ArgumentCaptor<Wallet> walletCaptor = ArgumentCaptor.forClass(Wallet.class);
+            verify(walletRepository).save(walletCaptor.capture());
+            assertEquals(newBalance, walletCaptor.getValue().getBalance());
+        }
+
+        @Test
+        @DisplayName(
+                "Should throw EntityNotFoundException for a non-existent wallet when updating"
+                        + " balance")
+        void updateWalletBalance_NormalWalletNotFound_ThrowsException() {
+            when(walletRepository.findById(999)).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () -> walletService.updateWalletBalance(999, BigDecimal.TEN));
+        }
+
+        @Test
+        @DisplayName(
+                "Should not update balance of a normal (master) wallet if the new balance is the"
+                        + " same")
+        void updateWalletBalance_NormalWallet_SameBalance_NoUpdate() {
+            BigDecimal currentBalance = masterWallet.getBalance();
+            when(walletRepository.findById(masterWallet.getId()))
+                    .thenReturn(Optional.of(masterWallet));
+
+            walletService.updateWalletBalance(masterWallet.getId(), currentBalance);
+
+            verify(walletRepository, never()).save(any());
+        }
+
+        @Test
         @DisplayName("Should increment balance of a normal (master) wallet")
         void incrementWalletBalance_NormalWallet_Success() {
             BigDecimal amount = new BigDecimal("150.00");
@@ -191,7 +252,7 @@ class WalletServiceTest {
             BigDecimal amount = new BigDecimal("150.00");
             when(walletRepository.findById(masterWallet.getId()))
                     .thenReturn(Optional.of(masterWallet));
-            when(walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+            when(walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId()))
                     .thenReturn(BigDecimal.ZERO);
 
             walletService.decrementWalletBalance(masterWallet.getId(), amount);
@@ -291,7 +352,7 @@ class WalletServiceTest {
             BigDecimal amount = masterWallet.getBalance();
             when(walletRepository.findById(masterWallet.getId()))
                     .thenReturn(Optional.of(masterWallet));
-            when(walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+            when(walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId()))
                     .thenReturn(BigDecimal.ONE);
 
             assertThrows(

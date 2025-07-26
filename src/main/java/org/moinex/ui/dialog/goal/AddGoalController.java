@@ -10,7 +10,6 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -20,7 +19,6 @@ import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
 import org.moinex.service.WalletService;
-import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.GoalFundingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,6 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddGoalController extends BaseGoalManagement {
-    @FXML private ComboBox<Wallet> masterWalletComboBox;
 
     @FXML private TitledPane goalFundingStrategyPane;
 
@@ -42,10 +39,6 @@ public final class AddGoalController extends BaseGoalManagement {
 
     private ToggleGroup strategyToggleGroup;
 
-    private List<Wallet> wallets;
-
-    private WalletService walletService;
-
     /**
      * Constructor
      *
@@ -53,33 +46,14 @@ public final class AddGoalController extends BaseGoalManagement {
      */
     @Autowired
     public AddGoalController(GoalService goalService, WalletService walletService) {
-        super(goalService);
-        this.walletService = walletService;
+        super(goalService, walletService);
     }
 
     @Override
     @FXML
     protected void initialize() {
-        super.initialize(); // Chama o initialize da classe base
+        super.initialize();
         setupDynamicVisibilityListeners();
-
-        loadWalletsFromDatabase();
-
-        configureComboBoxes();
-
-        populateComboBoxes();
-    }
-
-    private void loadWalletsFromDatabase() {
-        wallets = walletService.getAllNonArchivedWalletsOrderedByName();
-    }
-
-    private void populateComboBoxes() {
-        masterWalletComboBox.getItems().setAll(wallets.stream().filter(Wallet::isMaster).toList());
-    }
-
-    private void configureComboBoxes() {
-        UIUtils.configureComboBox(masterWalletComboBox, Wallet::getName);
     }
 
     @Override

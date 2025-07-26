@@ -43,7 +43,7 @@ public class GoalService {
     private TransferRepository transfersRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private WalletTypeRepository walletTypeRepository;
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
 
     @Autowired
     public GoalService(
@@ -52,13 +52,13 @@ public class GoalService {
             TransferRepository transfersRepository,
             WalletTransactionRepository walletTransactionRepository,
             WalletTypeRepository walletTypeRepository,
-            WalletTransactionService walletTransactionService) {
+            WalletService walletService) {
         this.goalRepository = goalRepository;
         this.walletRepository = walletRepository;
         this.transfersRepository = transfersRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.walletTypeRepository = walletTypeRepository;
-        this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
     }
 
     /**
@@ -197,7 +197,7 @@ public class GoalService {
                         .masterWallet(masterWallet)
                         .build();
 
-        handleFundingStrategy(goal, strategy);
+        handleFundingStrategy(goal, strategy, goal.getBalance());
 
         goalRepository.save(goal);
 
@@ -207,57 +207,52 @@ public class GoalService {
     }
 
     /**
-     * Handles the funding strategy for a goal when goal is an virtual wallet and a master wallet and initial balance are provided.
+     * Handles the funding strategy for a goal when goal is an virtual wallet and a master wallet is provided.
      *
      * @param goal     The goal to be funded
      * @param strategy The funding strategy to be applied
-     * @throws IllegalArgumentException                       If the funding strategy is null when a master wallet and initial balance are provided
+     * @throws IllegalArgumentException                       If the funding strategy is null when a master wallet is provided
      * @throws MoinexException.InsufficientResourcesException If the master wallet does not have enough unallocated balance
      */
-    private void handleFundingStrategy(Goal goal, GoalFundingStrategy strategy) {
-        if (goal.isVirtual() && goal.getInitialBalance().compareTo(BigDecimal.ZERO) > 0) {
-            if (strategy == null) {
-                throw new IllegalArgumentException(
-                        "A funding strategy is required when a master wallet and initial balance"
-                                + " are provided.");
-            }
+    private void handleFundingStrategy(Goal goal, GoalFundingStrategy strategy, BigDecimal value) {
+        if (!goal.isVirtual()) return;
 
-            switch (strategy) {
-                case NEW_DEPOSIT:
-                    goal.getMasterWallet()
-                            .setBalance(
-                                    goal.getMasterWallet()
-                                            .getBalance()
-                                            .add(goal.getInitialBalance()));
-                    walletRepository.save(goal.getMasterWallet());
-                    logger.info(
-                            "Current master wallet '{}' balance updated to {} after funding goal"
-                                    + " '{}'",
-                            goal.getMasterWallet().getName(),
-                            goal.getMasterWallet().getBalance(),
-                            goal.getName());
-                    break;
+        if (strategy == null) {
+            throw new IllegalArgumentException(
+                    "A funding strategy is required when a master wallet" + " are provided.");
+        }
 
-                case ALLOCATE_FROM_EXISTING:
-                    BigDecimal allocatedBalance =
-                            walletRepository.getSumOfBalancesByMasterWallet(
-                                    goal.getMasterWallet().getId());
-                    BigDecimal freeBalance =
-                            goal.getMasterWallet().getBalance().subtract(allocatedBalance);
+        switch (strategy) {
+            case NEW_DEPOSIT:
+                goal.getMasterWallet().setBalance(goal.getMasterWallet().getBalance().add(value));
+                walletRepository.save(goal.getMasterWallet());
+                logger.info(
+                        "Current master wallet '{}' balance updated to {} after funding goal"
+                                + " '{}'",
+                        goal.getMasterWallet().getName(),
+                        goal.getMasterWallet().getBalance(),
+                        goal.getName());
+                break;
 
-                    if (freeBalance.compareTo(goal.getInitialBalance()) < 0) {
-                        throw new MoinexException.InsufficientResourcesException(
-                                "Master wallet has insufficient unallocated balance. Free balance: "
-                                        + UIUtils.formatCurrency(freeBalance));
-                    }
+            case ALLOCATE_FROM_EXISTING:
+                BigDecimal allocatedBalance =
+                        walletRepository.getAllocatedBalanceByMasterWallet(
+                                goal.getMasterWallet().getId());
+                BigDecimal freeBalance =
+                        goal.getMasterWallet().getBalance().subtract(allocatedBalance);
 
-                    logger.info(
-                            "Allocating {} from master wallet '{}' to goal '{}'",
-                            goal.getInitialBalance(),
-                            goal.getMasterWallet().getName(),
-                            goal.getName());
-                    break;
-            }
+                if (freeBalance.compareTo(value) < 0) {
+                    throw new MoinexException.InsufficientResourcesException(
+                            "Master wallet has insufficient unallocated balance. Free balance: "
+                                    + UIUtils.formatCurrency(freeBalance));
+                }
+
+                logger.info(
+                        "Allocating {} from master wallet '{}' to goal '{}'",
+                        goal.getInitialBalance(),
+                        goal.getMasterWallet().getName(),
+                        goal.getName());
+                break;
         }
     }
 
@@ -289,20 +284,7 @@ public class GoalService {
         }
 
         if (goal.isMaster()) {
-            List<Wallet> virtualWallets =
-                    walletRepository.findVirtualWalletsByMasterWallet(goal.getId());
-
-            if (!virtualWallets.isEmpty())
-                logger.info("Goal with id {} has virtual wallets and will be unlinked", idGoal);
-
-            virtualWallets.forEach(
-                    virtualWallet -> {
-                        virtualWallet.setMasterWallet(null);
-                        walletRepository.save(virtualWallet);
-                        logger.info(
-                                "Virtual wallet with id {} unlinked from master wallet",
-                                virtualWallet.getId());
-                    });
+            walletService.removeAllVirtualWalletsFromMasterWallet(goal.getId());
         }
 
         goalRepository.delete(goal);
@@ -313,7 +295,7 @@ public class GoalService {
     /**
      * Updates a goal
      *
-     * @param goal The goal to be updated
+     * @param goalUpdated The goal to be updated
      * @throws EntityNotFoundException  If the goal does not exist
      * @throws IllegalArgumentException If the name of the goal is empty
      * @throws EntityExistsException    If a goal with the same name already exists
@@ -325,58 +307,108 @@ public class GoalService {
      *                                  target balance
      */
     @Transactional
-    public void updateGoal(Goal goal) {
+    public void updateGoal(Goal goalUpdated) {
         Goal oldGoal =
                 goalRepository
-                        .findById(goal.getId())
+                        .findById(goalUpdated.getId())
                         .orElseThrow(
                                 () ->
                                         new EntityNotFoundException(
                                                 String.format(
                                                         "Goal with id %d not found",
-                                                        goal.getId())));
+                                                        goalUpdated.getId())));
 
         // Remove leading and trailing whitespaces
-        goal.setName(goal.getName().strip());
+        goalUpdated.setName(goalUpdated.getName().strip());
 
-        if (goal.getName().isBlank()) {
+        if (goalUpdated.getName().isBlank()) {
             throw new IllegalArgumentException("The name of the goal cannot be empty");
         }
 
-        if (!goal.getName().equals(oldGoal.getName())) {
-            if (goalRepository.existsByName(goal.getName())) {
+        if (!goalUpdated.getName().equals(oldGoal.getName())) {
+            if (goalRepository.existsByName(goalUpdated.getName())) {
                 throw new EntityExistsException(
-                        "A goal with name " + goal.getName() + " already exists");
-            } else if (walletRepository.existsByName(goal.getName())) {
+                        "A goal with name " + goalUpdated.getName() + " already exists");
+            } else if (walletRepository.existsByName(goalUpdated.getName())) {
                 throw new EntityExistsException(
-                        "A wallet with name " + goal.getName() + " already exists");
+                        "A wallet with name " + goalUpdated.getName() + " already exists");
             }
         }
 
         validateDateAndBalances(
-                goal.getInitialBalance(), goal.getTargetBalance(), goal.getTargetDate());
+                goalUpdated.getInitialBalance(),
+                goalUpdated.getTargetBalance(),
+                goalUpdated.getTargetDate());
 
-        oldGoal.setName(goal.getName());
+        oldGoal.setName(goalUpdated.getName());
 
-        updateBalance(oldGoal, goal.getBalance());
+        if (oldGoal.isArchived() != goalUpdated.isArchived()) {
+            if (goalUpdated.isArchived()) {
+                archiveGoal(oldGoal.getId());
+            } else {
+                unarchiveGoal(oldGoal.getId());
+            }
+        }
 
-        oldGoal.setTargetBalance(goal.getTargetBalance());
-        oldGoal.setTargetDate(goal.getTargetDate());
-        oldGoal.setMotivation(goal.getMotivation());
-        oldGoal.setArchived(goal.isArchived());
+        updateMasterWallet(oldGoal, goalUpdated);
+
+        updateBalance(oldGoal, goalUpdated.getBalance());
+
+        oldGoal.setTargetBalance(goalUpdated.getTargetBalance());
+        oldGoal.setTargetDate(goalUpdated.getTargetDate());
+        oldGoal.setMotivation(goalUpdated.getMotivation());
 
         // Check if the goal was completed or reopened, and update it
-        if (goal.isCompleted() != oldGoal.isCompleted()) {
-            if (goal.isCompleted()) {
-                completeGoal(goal.getId());
+        if (goalUpdated.isCompleted() != oldGoal.isCompleted()) {
+            if (goalUpdated.isCompleted()) {
+                completeGoal(goalUpdated.getId());
             } else {
-                reopenGoal(goal.getId());
+                reopenGoal(goalUpdated.getId());
             }
         }
 
         goalRepository.save(oldGoal);
 
         logger.info("Goal with id {} updated successfully", oldGoal.getId());
+    }
+
+    private void updateMasterWallet(Goal oldGoal, Goal newGoal) {
+        Wallet newMasterWallet = newGoal.getMasterWallet();
+
+        if (newMasterWallet != null && !newMasterWallet.isMaster()) {
+            throw new IllegalArgumentException(
+                    "The master wallet must be a master wallet, not a virtual wallet");
+        }
+
+        Wallet currentMasterWallet = oldGoal.getMasterWallet();
+
+        if (currentMasterWallet != null && currentMasterWallet.equals(newMasterWallet)) {
+            logger.info("Goal with id {} already has the same master wallet", oldGoal.getId());
+            return;
+        }
+
+        if (currentMasterWallet != null) {
+            currentMasterWallet.setBalance(
+                    currentMasterWallet.getBalance().subtract(oldGoal.getBalance()));
+            walletRepository.save(currentMasterWallet);
+            logger.info(
+                    "Balance of {} for goal '{}' was removed from old master wallet '{}'",
+                    oldGoal.getBalance(),
+                    oldGoal.getName(),
+                    currentMasterWallet.getName());
+        }
+
+        oldGoal.setMasterWallet(newMasterWallet);
+
+        if (newMasterWallet != null) {
+            handleFundingStrategy(oldGoal, GoalFundingStrategy.NEW_DEPOSIT, newGoal.getBalance());
+            logger.info(
+                    "Goal with id {} master wallet updated to {}",
+                    oldGoal.getId(),
+                    newMasterWallet.getName());
+        } else {
+            logger.info("Goal with id {} master wallet removed", oldGoal.getId());
+        }
     }
 
     private void updateBalance(Goal goal, BigDecimal newBalance) {
@@ -421,6 +453,13 @@ public class GoalService {
                                                                 + " archived",
                                                         idGoal)));
         goal.setArchived(true);
+
+        if (goal.isMaster()) {
+            walletService.removeAllVirtualWalletsFromMasterWallet(goal.getId());
+        } else if (goal.isVirtual()) {
+            // If the goal is a virtual wallet, leave its balance in the master wallet
+            goal.setMasterWallet(null);
+        }
 
         goalRepository.save(goal);
 
@@ -482,6 +521,10 @@ public class GoalService {
 
         goal.setCompletionDate(LocalDateTime.now());
         goal.setTargetBalance(goal.getBalance());
+
+        // If the goal is a virtual wallet, unlink it from its master
+        // This frees up the allocated balance in the master wallet for other transactions
+        goal.setMasterWallet(null);
 
         goalRepository.save(goal);
 

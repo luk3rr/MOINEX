@@ -93,5 +93,5 @@ public interface WalletRepository extends JpaRepository<Wallet, Integer> {
             "SELECT COALESCE(SUM(w.balance), 0) "
                     + "FROM Wallet w "
                     + "WHERE w.masterWallet.id = :masterWalletId")
-    BigDecimal getSumOfBalancesByMasterWallet(@Param("masterWalletId") Integer masterWalletId);
+    BigDecimal getAllocatedBalanceByMasterWallet(@Param("masterWalletId") Integer masterWalletId);
 }

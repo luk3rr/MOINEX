@@ -6,13 +6,14 @@
 
 package org.moinex.ui.dialog.goal;
 
+import java.util.List;
 import javafx.fxml.FXML;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
+import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @NoArgsConstructor
 public abstract class BaseGoalManagement {
+    @FXML protected ComboBox<Wallet> masterWalletComboBox;
+
     @FXML protected TextField nameField;
 
     @FXML protected TextField balanceField;
@@ -32,21 +35,33 @@ public abstract class BaseGoalManagement {
 
     @FXML protected TextArea motivationTextArea;
 
+    protected List<Wallet> masterWallets;
+
+    protected WalletService walletService;
+
     protected GoalService goalService;
 
     /**
      * Constructor
+     *
      * @param goalService GoalService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseGoalManagement(GoalService goalService) {
+    protected BaseGoalManagement(GoalService goalService, WalletService walletService) {
         this.goalService = goalService;
+        this.walletService = walletService;
     }
 
     @FXML
     protected void initialize() {
         UIUtils.setDatePickerFormat(targetDatePicker);
+
+        loadWalletsFromDatabase();
+
+        configureComboBoxes();
+
+        populateComboBoxes();
 
         // Ensure that the balance fields only accept monetary values
         balanceField
@@ -75,5 +90,48 @@ public abstract class BaseGoalManagement {
     protected void handleCancel() {
         Stage stage = (Stage) nameField.getScene().getWindow();
         stage.close();
+    }
+
+    private void populateComboBoxes() {
+        masterWalletComboBox.getItems().add(null);
+        masterWalletComboBox.getItems().addAll(masterWallets);
+
+        masterWalletComboBox.setCellFactory(
+                lv ->
+                        new ListCell<>() {
+                            @Override
+                            protected void updateItem(Wallet item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty || item == null) {
+                                    setText(""); // Display empty text when no wallet is selected
+                                } else {
+                                    setText(item.getName());
+                                }
+                            }
+                        });
+
+        masterWalletComboBox.setButtonCell(
+                new ListCell<>() {
+                    @Override
+                    protected void updateItem(Wallet item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(""); // Display empty text when no wallet is selected
+                        } else {
+                            setText(item.getName());
+                        }
+                    }
+                });
+    }
+
+    private void configureComboBoxes() {
+        UIUtils.configureComboBox(masterWalletComboBox, Wallet::getName);
+    }
+
+    private void loadWalletsFromDatabase() {
+        masterWallets =
+                walletService.getAllNonArchivedWalletsOrderedByName().stream()
+                        .filter(Wallet::isMaster)
+                        .toList();
     }
 }

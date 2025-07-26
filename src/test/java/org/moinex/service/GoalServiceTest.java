@@ -40,6 +40,7 @@ class GoalServiceTest {
     @Mock private TransferRepository transfersRepository;
     @Mock private WalletTransactionRepository walletTransactionRepository;
     @Mock private WalletTypeRepository walletTypeRepository;
+    @Mock private WalletService walletService;
 
     @InjectMocks private GoalService goalService;
 
@@ -222,9 +223,6 @@ class GoalServiceTest {
         @Test
         @DisplayName("Should unlink virtual wallets before deleting master wallet")
         void deleteMasterWallet_UnlinkVirtualWallets() {
-            Wallet virtualWallet1 = new Wallet(2, "Virtual Wallet1", new BigDecimal("50.00"));
-            Wallet virtualWallet2 = new Wallet(3, "Virtual Wallet2", new BigDecimal("30.00"));
-
             Goal virtualGoal =
                     Goal.builder()
                             .id(4)
@@ -237,28 +235,16 @@ class GoalServiceTest {
                             .type(walletType)
                             .build();
 
-            virtualWallet1.setMasterWallet(goal);
-            virtualWallet2.setMasterWallet(goal);
             virtualGoal.setMasterWallet(goal);
 
             when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
-            when(walletRepository.findVirtualWalletsByMasterWallet(goal.getId()))
-                    .thenReturn(List.of(virtualWallet1, virtualWallet2, virtualGoal));
             when(walletTransactionRepository.getTransactionCountByWallet(goal.getId()))
                     .thenReturn(0);
             when(transfersRepository.getTransferCountByWallet(goal.getId())).thenReturn(0);
 
             goalService.deleteGoal(goal.getId());
 
-            ArgumentCaptor<Wallet> captor = ArgumentCaptor.forClass(Wallet.class);
-            verify(walletRepository, times(3)).save(captor.capture());
-            List<Wallet> savedWallets = captor.getAllValues();
-            assertTrue(savedWallets.stream().allMatch(w -> w.getMasterWallet() == null));
-            assertTrue(
-                    savedWallets.stream().anyMatch(w -> w.getId().equals(virtualWallet1.getId())));
-            assertTrue(
-                    savedWallets.stream().anyMatch(w -> w.getId().equals(virtualWallet2.getId())));
-            assertTrue(savedWallets.stream().anyMatch(w -> w.getId().equals(virtualGoal.getId())));
+            verify(walletService).removeAllVirtualWalletsFromMasterWallet(goal.getId());
             verify(goalRepository).delete(goal);
         }
     }
@@ -269,6 +255,8 @@ class GoalServiceTest {
         @Test
         @DisplayName("Should update goal successfully")
         void updateGoal_Success() {
+            goal.setArchived(true);
+
             Goal updatedGoal =
                     Goal.builder()
                             .id(goal.getId())
@@ -278,6 +266,7 @@ class GoalServiceTest {
                             .targetBalance(new BigDecimal("1200.00"))
                             .targetDate(goal.getTargetDate().plusMonths(1))
                             .motivation("Updated Motivation")
+                            .isArchived(false)
                             .build();
 
             when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
@@ -288,6 +277,7 @@ class GoalServiceTest {
             verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
             assertEquals("Updated Goal Name", goalCaptor.getValue().getName());
             assertEquals(new BigDecimal("1200.00"), goalCaptor.getValue().getTargetBalance());
+            assertFalse(goalCaptor.getValue().isArchived());
         }
 
         @Test
@@ -302,6 +292,7 @@ class GoalServiceTest {
                             .balance(goal.getBalance().add(new BigDecimal("50.00")))
                             .targetBalance(goal.getTargetBalance())
                             .targetDate(goal.getTargetDate().plusMonths(1))
+                            .isArchived(true)
                             .motivation("Updated Motivation")
                             .build();
 
@@ -315,6 +306,7 @@ class GoalServiceTest {
             ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
             verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
             assertEquals(expectedInitialBalance, goalCaptor.getValue().getInitialBalance());
+            assertTrue(goalCaptor.getValue().isArchived());
         }
 
         @Test
@@ -491,6 +483,162 @@ class GoalServiceTest {
 
             assertThrows(EntityNotFoundException.class, () -> goalService.updateGoal(goal));
         }
+
+        @Nested
+        @DisplayName("Update Goal Master Wallet Tests")
+        class UpdateGoalMasterWalletTests {
+            private Wallet masterWalletA;
+            private Wallet masterWalletB;
+
+            @BeforeEach
+            void setup() {
+                masterWalletA = new Wallet(10, "Master A", new BigDecimal("5000.00"));
+                masterWalletB = new Wallet(11, "Master B", new BigDecimal("3000.00"));
+            }
+
+            @Test
+            @DisplayName("Should associate a master wallet with a standalone goal")
+            void updateGoal_SetMasterWalletForStandaloneGoal() {
+                goal.setMasterWallet(null);
+                Goal updatedGoalData =
+                        Goal.builder()
+                                .id(goal.getId())
+                                .name(goal.getName())
+                                .masterWallet(masterWalletA)
+                                .balance(goal.getBalance())
+                                .initialBalance(goal.getInitialBalance())
+                                .targetBalance(goal.getTargetBalance())
+                                .targetDate(goal.getTargetDate())
+                                .build();
+
+                when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+                goalService.updateGoal(updatedGoalData);
+
+                ArgumentCaptor<Goal> captor = ArgumentCaptor.forClass(Goal.class);
+                verify(goalRepository, atLeastOnce()).save(captor.capture());
+
+                assertNotNull(captor.getValue().getMasterWallet());
+                assertEquals(masterWalletA.getId(), captor.getValue().getMasterWallet().getId());
+
+                assertEquals(new BigDecimal("5150.00"), masterWalletA.getBalance());
+            }
+
+            @Test
+            @DisplayName("Should remove master wallet from a virtual goal")
+            void updateGoal_RemoveMasterWalletFromVirtualGoal() {
+                goal.setMasterWallet(masterWalletA);
+                goal.setBalance(new BigDecimal("200.00"));
+                masterWalletA.setBalance(new BigDecimal("5200.00"));
+
+                Goal updatedGoalData =
+                        Goal.builder()
+                                .id(goal.getId())
+                                .name(goal.getName())
+                                .masterWallet(null)
+                                .balance(goal.getBalance())
+                                .initialBalance(goal.getInitialBalance())
+                                .targetBalance(goal.getTargetBalance())
+                                .targetDate(goal.getTargetDate())
+                                .build();
+
+                when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+                goalService.updateGoal(updatedGoalData);
+
+                ArgumentCaptor<Goal> captor = ArgumentCaptor.forClass(Goal.class);
+                verify(goalRepository, atLeastOnce()).save(captor.capture());
+
+                assertNull(captor.getValue().getMasterWallet());
+
+                assertEquals(new BigDecimal("5000.00"), masterWalletA.getBalance());
+            }
+
+            @Test
+            @DisplayName("Should update master wallet from A to B correctly")
+            void updateGoal_SetMasterWalletFromBToA() {
+                goal.setMasterWallet(masterWalletA);
+                goal.setBalance(new BigDecimal("100.00"));
+                masterWalletA.setBalance(new BigDecimal("5100.00"));
+
+                Goal updatedGoalData =
+                        Goal.builder()
+                                .id(goal.getId())
+                                .name(goal.getName())
+                                .masterWallet(masterWalletB)
+                                .balance(goal.getBalance())
+                                .initialBalance(goal.getInitialBalance())
+                                .targetBalance(goal.getTargetBalance())
+                                .targetDate(goal.getTargetDate())
+                                .build();
+
+                when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+                goalService.updateGoal(updatedGoalData);
+
+                ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+                verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+
+                assertEquals(masterWalletB, goalCaptor.getValue().getMasterWallet());
+
+                // Check if the balance of the old master wallet (A) was decreased
+                assertEquals(new BigDecimal("5000.00"), masterWalletA.getBalance());
+                verify(walletRepository).save(masterWalletA);
+
+                // Check if the balance of the new master wallet (B) was changed
+                assertEquals(new BigDecimal("3100.00"), masterWalletB.getBalance());
+                verify(walletRepository).save(masterWalletB);
+            }
+
+            @Test
+            @DisplayName("Should throw exception when trying to set a virtual wallet as master")
+            void updateGoal_SetVirtualWalletAsMaster_ThrowsException() {
+                Wallet newMasterWhoIsVirtual = new Wallet(12, "I am virtual", BigDecimal.TEN);
+                newMasterWhoIsVirtual.setMasterWallet(masterWalletA);
+
+                Goal updatedGoalData =
+                        Goal.builder()
+                                .id(goal.getId())
+                                .name(goal.getName())
+                                .masterWallet(newMasterWhoIsVirtual)
+                                .balance(goal.getBalance())
+                                .initialBalance(goal.getInitialBalance())
+                                .targetBalance(goal.getTargetBalance())
+                                .targetDate(goal.getTargetDate())
+                                .build();
+
+                when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> goalService.updateGoal(updatedGoalData));
+            }
+
+            @Test
+            @DisplayName("Should not change master wallet if it is the same")
+            void updateGoal_SameMasterWallet_NoChange() {
+                goal.setMasterWallet(masterWalletA);
+                Goal updatedGoalData =
+                        Goal.builder()
+                                .id(goal.getId())
+                                .name(goal.getName())
+                                .masterWallet(masterWalletA)
+                                .balance(goal.getBalance())
+                                .initialBalance(goal.getInitialBalance())
+                                .targetBalance(goal.getTargetBalance())
+                                .targetDate(goal.getTargetDate())
+                                .build();
+
+                when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+                goalService.updateGoal(updatedGoalData);
+
+                ArgumentCaptor<Goal> captor = ArgumentCaptor.forClass(Goal.class);
+                verify(goalRepository, atLeastOnce()).save(captor.capture());
+
+                assertEquals(masterWalletA, captor.getValue().getMasterWallet());
+            }
+        }
     }
 
     @Nested
@@ -555,8 +703,8 @@ class GoalServiceTest {
     @DisplayName("Archive and Unarchive Goal Tests")
     class ArchiveAndUnarchiveGoalTests {
         @Test
-        @DisplayName("Should archive goal successfully")
-        void archiveGoal_Success() {
+        @DisplayName("Should archive goal successfully when its a master wallet")
+        void archiveMasterGoal_Success() {
             when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
 
             goalService.archiveGoal(goal.getId());
@@ -564,6 +712,27 @@ class GoalServiceTest {
             ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
             verify(goalRepository).save(goalCaptor.capture());
             assertTrue(goalCaptor.getValue().isArchived());
+        }
+
+        @Test
+        @DisplayName("Should archive goal successfully when its a virtual wallet")
+        void archiveVirtualGoal_Success() {
+            goal.setMasterWallet(new Wallet(1, "Master Wallet", BigDecimal.ZERO));
+
+            when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+            goalService.archiveGoal(goal.getId());
+
+            ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+            verify(goalRepository).save(goalCaptor.capture());
+            assertTrue(goalCaptor.getValue().isArchived());
+
+            // Ensure the goal is now a master wallet, meaning it is no longer linked to one
+            assertTrue(goalCaptor.getValue().isMaster());
+
+            // Ensure the master wallet is not updated
+            // The balance of the goal should still stay in the master wallet
+            verify(walletRepository, never()).save(any(Wallet.class));
         }
 
         @Test
@@ -692,7 +861,7 @@ class GoalServiceTest {
                         + " wallet balance")
         void testAddGoalWithMasterWallet_AllocateStrategy_Success() {
             BigDecimal initialBalance = new BigDecimal("300.00");
-            when(walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+            when(walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId()))
                     .thenReturn(new BigDecimal("500.00"));
 
             goalService.addGoal(
@@ -718,7 +887,7 @@ class GoalServiceTest {
                         + " balance")
         void testAddGoalWithMasterWallet_AllocateStrategy_InsufficientFunds() {
             BigDecimal initialBalance = new BigDecimal("300.00");
-            when(walletRepository.getSumOfBalancesByMasterWallet(masterWallet.getId()))
+            when(walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId()))
                     .thenReturn(new BigDecimal("800.00"));
 
             assertThrows(
