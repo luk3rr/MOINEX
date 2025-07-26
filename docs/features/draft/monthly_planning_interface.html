@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planning - Moinex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!--
+        Chosen Palette: Moinex Teal & Neutrals
+        Application Structure Plan: A dashboard-style single-page application. The top section provides a high-level summary: total monthly income and a doughnut chart showing the planned allocation. The main body consists of a responsive grid of cards, each representing a budget group (e.g., Essentials, Variables, Investments). This structure allows for quick assessment of the overall plan (top section) and detailed monitoring of each specific budget category (main section). The user flow is simple: view the current month's plan, see real-time spending against targets, and use the period selector to view past or future months. This design was chosen for its clarity, information density, and alignment with modern financial dashboards, making it highly usable for tracking budget adherence.
+        Visualization & Content Choices:
+        - Renda Base Mensal: Goal=Inform -> Presentation=Large Text Card -> Interaction=None -> Justification=Provides the primary context number for the entire page. Library=HTML/Tailwind.
+        - Distribuição do Plano: Goal=Organize/Proportions -> Presentation=Doughnut Chart -> Interaction=Hover for details -> Justification=Instantly shows the user's intended financial strategy (e.g., 50/30/20 rule). Library=Chart.js (Canvas).
+        - Grupos de Orçamento: Goal=Compare/Track Progress -> Presentation=Grid of Cards with Progress Bars -> Interaction=Period Selector updates all cards -> Justification=Allows direct comparison of planned vs. actual spending for each category, which is the core task. The progress bar provides an immediate visual cue of budget status. Library=HTML/Tailwind/JS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        .progress-bar-bg {
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+<div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Monthly Planning</h1>
+        <div class="flex items-center space-x-4">
+            <label for="period-select" class="text-sm font-medium text-gray-600">Period:</label>
+            <select id="period-select" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                <option value="2025-07">July/2025</option>
+                <option value="2025-06">June/2025</option>
+                <option value="2025-05">May/2025</option>
+            </select>
+        </div>
+    </header>
+
+    <main>
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="lg:col-span-1 card p-6 flex flex-col justify-center">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Base Monthly Income</h2>
+                <p id="base-income" class="text-5xl font-bold text-gray-900 mb-4">$0.00</p>
+                <div class="flex space-x-2">
+                    <button class="bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-700 transition">Edit Plan</button>
+                    <button class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">New Plan</button>
+                </div>
+            </div>
+            <div class="lg:col-span-2 card p-6">
+                <h2 class="text-lg font-semibold text-gray-500 mb-4">Plan Distribution</h2>
+                <div class="chart-container relative h-64 md:h-72">
+                    <canvas id="allocation-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="budget-groups-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        </section>
+    </main>
+</div>
+
+<script>
+    const financialPlanData = {
+        baseIncome: 2750.00,
+        groups: [
+            {
+                name: "Essential Expenses",
+                icon: '🏠',
+                targetPercentage: 50,
+                categories: ["Rent", "Bills", "Groceries"],
+                color: '#0d9488' // Teal
+            },
+            {
+                name: "Variable Spending",
+                icon: '🛒',
+                targetPercentage: 30,
+                categories: ["Leisure", "Shopping", "Hobbies"],
+                color: '#6366f1' // Indigo
+            },
+            {
+                name: "Investments",
+                icon: '💹',
+                targetPercentage: 20,
+                categories: ["Fixed Income Inv.", "Variable Income Inv."],
+                color: '#f59e0b' // Amber
+            }
+        ]
+    };
+
+    const transactionsData = {
+        "2025-07": [
+            { category: "Rent", amount: 900.00 },
+            { category: "Bills", amount: 185.50 },
+            { category: "Groceries", amount: 450.25 },
+            { category: "Leisure", amount: 250.00 },
+            { category: "Shopping", amount: 120.75 },
+            { category: "Fixed Income Inv.", amount: 550.00 },
+        ],
+        "2025-06": [
+            { category: "Rent", amount: 900.00 },
+            { category: "Bills", amount: 192.00 },
+            { category: "Groceries", amount: 510.80 },
+            { category: "Leisure", amount: 480.00 },
+            { category: "Hobbies", amount: 75.00 },
+            { category: "Variable Income Inv.", amount: 400.00 },
+        ],
+        "2025-05": [
+            { category: "Rent", amount: 900.00 },
+            { category: "Bills", amount: 178.30 },
+            { category: "Groceries", amount: 420.00 },
+            { category: "Leisure", amount: 150.00 },
+            { category: "Fixed Income Inv.", amount: 300.00 },
+            { category: "Variable Income Inv.", amount: 300.00 },
+        ]
+    };
+
+    let allocationChartInstance = null;
+
+    function formatCurrency(value) {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    }
+
+    function calculatePlanStatus(period) {
+        const currentTransactions = transactionsData[period] || [];
+        const baseIncome = financialPlanData.baseIncome;
+
+        return financialPlanData.groups.map(group => {
+            const targetAmount = baseIncome * (group.targetPercentage / 100);
+            const spentAmount = currentTransactions
+                .filter(t => group.categories.includes(t.category))
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const progress = targetAmount > 0 ? (spentAmount / targetAmount) * 100 : 0;
+            const remaining = targetAmount - spentAmount;
+
+            return { ...group, targetAmount, spentAmount, progress, remaining };
+        });
+    }
+
+    function renderSummary(planStatus) {
+        document.getElementById('base-income').textContent = formatCurrency(financialPlanData.baseIncome);
+
+        const chartCtx = document.getElementById('allocation-chart').getContext('2d');
+        const chartData = {
+            labels: planStatus.map(g => g.name),
+            datasets: [{
+                data: planStatus.map(g => g.targetPercentage),
+                backgroundColor: planStatus.map(g => g.color),
+                borderColor: '#f3f4f6',
+                borderWidth: 4,
+                hoverOffset: 8
+            }]
+        };
+
+        if (allocationChartInstance) {
+            allocationChartInstance.destroy();
+        }
+
+        allocationChartInstance = new Chart(chartCtx, {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 10,
+                            padding: 20,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderBudgetGroups(planStatus) {
+        const grid = document.getElementById('budget-groups-grid');
+        grid.innerHTML = '';
+
+        planStatus.forEach(group => {
+            const progressClamped = Math.min(group.progress, 100);
+            let progressBarColor = 'bg-teal-500';
+            let remainingTextColor = 'text-green-600';
+            let remainingTextPrefix = 'Available:';
+
+            if (group.progress > 100) {
+                progressBarColor = 'bg-red-500';
+                remainingTextColor = 'text-red-600';
+                remainingTextPrefix = 'Overspent:';
+            } else if (group.progress > 75) {
+                progressBarColor = 'bg-yellow-500';
+                remainingTextColor = 'text-yellow-600';
+            }
+
+            const cardHTML = `
+                    <div class="card p-6 flex flex-col">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">${group.icon}</span>
+                                <h3 class="text-xl font-semibold">${group.name}</h3>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Target: ${group.targetPercentage}%</p>
+                                <p class="font-semibold">${formatCurrency(group.targetAmount)}</p>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="text-4xl font-bold mb-3">${formatCurrency(group.spentAmount)}</p>
+                            <div class="progress-bar-bg w-full h-3 mb-2">
+                                <div class="progress-bar-fill ${progressBarColor}" style="width: ${progressClamped}%"></div>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <p class="${remainingTextColor} font-semibold">
+                                    ${remainingTextPrefix} ${formatCurrency(Math.abs(group.remaining))}
+                                </p>
+                                <p class="text-gray-500">${group.progress.toFixed(1)}%</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            grid.innerHTML += cardHTML;
+        });
+    }
+
+    function updateDashboard() {
+        const selectedPeriod = document.getElementById('period-select').value;
+        const planStatus = calculatePlanStatus(selectedPeriod);
+        renderSummary(planStatus);
+        renderBudgetGroups(planStatus);
+    }
+
+    document.getElementById('period-select').addEventListener('change', updateDashboard);
+
+    document.addEventListener('DOMContentLoaded', updateDashboard);
+</script>
+
+</body>
+</html>
