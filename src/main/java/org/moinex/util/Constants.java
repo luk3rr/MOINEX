@@ -58,6 +58,8 @@ public final class Constants {
     public static final String CREDIT_CARD_FXML = UI_MAIN_PATH + "credit_card.fxml";
     public static final String TRANSACTION_FXML = UI_MAIN_PATH + "transaction.fxml";
     public static final String GOALS_FXML = UI_MAIN_PATH + "goals.fxml";
+    public static final String PLANS_FXML = UI_MAIN_PATH + "plans.fxml";
+    public static final String GOALS_AND_PLANS_FXML = UI_MAIN_PATH + "goals_and_plans.fxml";
     public static final String SAVINGS_FXML = UI_MAIN_PATH + "savings.fxml";
     public static final String CSV_IMPORT_FXML = UI_MAIN_PATH + "csv_import.fxml";
     public static final String SETTINGS_FXML = UI_MAIN_PATH + "settings.fxml";
@@ -173,6 +175,8 @@ public final class Constants {
     public static final String CREDIT_CARD_STYLE_SHEET = CSS_SCENE_PATH + "credit-card.css";
     public static final String TRANSACTION_STYLE_SHEET = CSS_SCENE_PATH + "transaction.css";
     public static final String GOALS_STYLE_SHEET = CSS_SCENE_PATH + "goals.css";
+    public static final String PLANS_STYLE_SHEET = CSS_SCENE_PATH + "plans.css";
+    public static final String GOALS_AND_PLANS_STYLE_SHEET = CSS_SCENE_PATH + "goals_and_plans.css";
     public static final String SAVINGS_STYLE_SHEET = CSS_SCENE_PATH + "savings.css";
     public static final String CSV_IMPORT_STYLE_SHEET = CSS_SCENE_PATH + "csv_import.css";
     public static final String SETTINGS_STYLE_SHEET = CSS_SCENE_PATH + "settings.css";

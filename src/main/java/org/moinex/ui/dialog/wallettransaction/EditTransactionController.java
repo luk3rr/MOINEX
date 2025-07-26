@@ -88,7 +88,8 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             suggestionsHandler.enable();
         }
 
-        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalanceLabelStyle(
+                walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
         loadSuggestionsFromDatabase();
     }

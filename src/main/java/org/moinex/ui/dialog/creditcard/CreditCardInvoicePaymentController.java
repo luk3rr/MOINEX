@@ -124,7 +124,8 @@ public class CreditCardInvoicePaymentController {
 
         if (creditCard.getDefaultBillingWallet() != null) {
             walletComboBox.setValue(creditCard.getDefaultBillingWallet());
-            UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceLabel);
+            UIUtils.updateWalletBalanceLabelStyle(
+                    walletComboBox.getValue(), walletCurrentBalanceLabel);
             walletAfterBalance();
         }
     }
@@ -146,7 +147,7 @@ public class CreditCardInvoicePaymentController {
 
         walletComboBox.setOnAction(
                 e -> {
-                    UIUtils.updateWalletBalance(
+                    UIUtils.updateWalletBalanceLabelStyle(
                             walletComboBox.getValue(), walletCurrentBalanceLabel);
                     walletAfterBalance();
                 });
