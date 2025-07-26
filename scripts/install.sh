@@ -21,24 +21,30 @@ print_info "A obter a lista de versões disponíveis..."
 TAG_LIST=$(git tag -l --sort=-creatordate --format='%(refname:short) -- %(subject)')
 
 if [ -z "$TAG_LIST" ]; then
-    print_error "Nenhuma versão (tag) encontrada neste repositório."
-    exit 1
+    print_info "Nenhuma versão estável (tag) encontrada. Apenas a versão de desenvolvimento está disponível."
 fi
 
 print_info "Por favor, selecione a versão que deseja instalar:"
 
-COUNT=2
+TMP_TAGS_FILE=$(mktemp)
+echo "$TAG_LIST" > "$TMP_TAGS_FILE"
+
 EXIT_OPTION=0
 MAIN_BRANCH_OPTION=1
+
 echo "  $EXIT_OPTION) Sair"
 echo "  $MAIN_BRANCH_OPTION) Instalar a versão de desenvolvimento (branch main, pode ser instável)"
-echo "$TAG_LIST" | while read -r TAG; do
+
+COUNT=2
+while IFS= read -r TAG; do
     echo "  $COUNT) $TAG"
     COUNT=$((COUNT + 1))
-done
+done < "$TMP_TAGS_FILE"
+
+TOTAL_OPTIONS=$((COUNT - 1))
 
 while true; do
-    printf "Digite o número da sua escolha (%d-%d): " "$EXIT_OPTION" "$COUNT"
+    printf "Digite o número da sua escolha (%d-%d): " "$EXIT_OPTION" "$TOTAL_OPTIONS"
     read -r CHOICE
 
     case $CHOICE in
@@ -48,24 +54,26 @@ while true; do
             ;;
     esac
 
-    if [ "$CHOICE" -ge $EXIT_OPTION ] && [ "$CHOICE" -le "$COUNT" ]; then
+    if [ "$CHOICE" -ge "$EXIT_OPTION" ] && [ "$CHOICE" -le "$TOTAL_OPTIONS" ]; then
         if [ "$CHOICE" -eq "$EXIT_OPTION" ]; then
             print_error "Instalação cancelada."
+            rm -f "$TMP_TAGS_FILE"
             exit 0
         elif [ "$CHOICE" -eq "$MAIN_BRANCH_OPTION" ]; then
             VERSION="main"
             break
         else
-            TAG_CHOICE_INDEX=$((CHOICE - 1))
-            CHOSEN_LINE=$(echo "$TAG_LIST" | sed -n "${TAG_CHOICE_INDEX}p")
+            TAG_INDEX=$((CHOICE - 1))
+            CHOSEN_LINE=$(sed -n "${TAG_INDEX}p" "$TMP_TAGS_FILE")
             VERSION=$(echo "$CHOSEN_LINE" | cut -d ' ' -f 1)
             break
         fi
     else
-        print_error "Seleção inválida. Por favor, digite um número entre $EXIT_OPTION e $COUNT."
+        print_error "Seleção inválida. Por favor, digite um número entre $EXIT_OPTION e $TOTAL_OPTIONS."
     fi
 done
 
+rm -f "$TMP_TAGS_FILE"
 
 if [ "$VERSION" = "main" ]; then
     print_success ">> A fazer checkout para a branch 'main' e a obter as últimas alterações..."
@@ -160,4 +168,6 @@ else
     exit 1
 fi
 
+git checkout main > /dev/null 2>&1
 print_success ">> Instalação da versão $VERSION concluída com sucesso. Aproveite o Moinex!"
+
