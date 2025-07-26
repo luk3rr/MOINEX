@@ -215,31 +215,31 @@ public class GoalService {
      * @throws MoinexException.InsufficientResourcesException If the master wallet does not have enough unallocated balance
      */
     private void handleFundingStrategy(Goal goal, GoalFundingStrategy strategy, BigDecimal value) {
-        if (!goal.isVirtual()) return;
+        if (!goal.isVirtual() || value.compareTo(BigDecimal.ZERO) <= 0) return;
 
         if (strategy == null) {
             throw new IllegalArgumentException(
                     "A funding strategy is required when a master wallet" + " are provided.");
         }
 
+        Wallet masterWallet = goal.getMasterWallet();
+
         switch (strategy) {
             case NEW_DEPOSIT:
-                goal.getMasterWallet().setBalance(goal.getMasterWallet().getBalance().add(value));
-                walletRepository.save(goal.getMasterWallet());
+                masterWallet.setBalance(masterWallet.getBalance().add(value));
+                walletRepository.save(masterWallet);
                 logger.info(
                         "Current master wallet '{}' balance updated to {} after funding goal"
                                 + " '{}'",
-                        goal.getMasterWallet().getName(),
-                        goal.getMasterWallet().getBalance(),
+                        masterWallet.getName(),
+                        masterWallet.getBalance(),
                         goal.getName());
                 break;
 
             case ALLOCATE_FROM_EXISTING:
                 BigDecimal allocatedBalance =
-                        walletRepository.getAllocatedBalanceByMasterWallet(
-                                goal.getMasterWallet().getId());
-                BigDecimal freeBalance =
-                        goal.getMasterWallet().getBalance().subtract(allocatedBalance);
+                        walletRepository.getAllocatedBalanceByMasterWallet(masterWallet.getId());
+                BigDecimal freeBalance = masterWallet.getBalance().subtract(allocatedBalance);
 
                 if (freeBalance.compareTo(value) < 0) {
                     throw new MoinexException.InsufficientResourcesException(
@@ -249,8 +249,8 @@ public class GoalService {
 
                 logger.info(
                         "Allocating {} from master wallet '{}' to goal '{}'",
-                        goal.getInitialBalance(),
-                        goal.getMasterWallet().getName(),
+                        value,
+                        masterWallet.getName(),
                         goal.getName());
                 break;
         }
@@ -382,8 +382,26 @@ public class GoalService {
 
         Wallet currentMasterWallet = oldGoal.getMasterWallet();
 
+        if (newMasterWallet == null && currentMasterWallet == null) {
+            logger.info("Goal with id {} has no master wallet to update", oldGoal.getId());
+            return;
+        }
+
         if (currentMasterWallet != null && currentMasterWallet.equals(newMasterWallet)) {
-            logger.info("Goal with id {} already has the same master wallet", oldGoal.getId());
+            BigDecimal balanceDifference = newGoal.getBalance().subtract(oldGoal.getBalance());
+
+            if (balanceDifference.compareTo(BigDecimal.ZERO) != 0) {
+                currentMasterWallet.setBalance(
+                        currentMasterWallet.getBalance().add(balanceDifference));
+                walletRepository.save(currentMasterWallet);
+                logger.info(
+                        "Balance of master wallet '{}' {} by {} due to goal update",
+                        currentMasterWallet.getName(),
+                        (balanceDifference.compareTo(BigDecimal.ZERO) > 0)
+                                ? "increased"
+                                : "decreased",
+                        balanceDifference.abs());
+            }
             return;
         }
 
@@ -401,7 +419,13 @@ public class GoalService {
         oldGoal.setMasterWallet(newMasterWallet);
 
         if (newMasterWallet != null) {
-            handleFundingStrategy(oldGoal, GoalFundingStrategy.NEW_DEPOSIT, newGoal.getBalance());
+            BigDecimal depositValue =
+                    newMasterWallet.equals(currentMasterWallet)
+                            ? newGoal.getBalance().subtract(oldGoal.getBalance())
+                            : newGoal.getBalance();
+
+            handleFundingStrategy(oldGoal, GoalFundingStrategy.NEW_DEPOSIT, depositValue);
+
             logger.info(
                     "Goal with id {} master wallet updated to {}",
                     oldGoal.getId(),

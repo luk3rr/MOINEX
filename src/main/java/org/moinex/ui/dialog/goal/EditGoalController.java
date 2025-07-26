@@ -37,6 +37,7 @@ public final class EditGoalController extends BaseGoalManagement {
 
     /**
      * Constructor
+     *
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -79,10 +80,7 @@ public final class EditGoalController extends BaseGoalManagement {
 
         Wallet masterWallet = masterWalletComboBox.getValue();
 
-        if (goalName.isEmpty()
-                || balanceStr.isEmpty()
-                || targetBalanceStr.isEmpty()
-                || targetDate == null) {
+        if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
                     "Empty fields", "Please fill all required fields before saving");
 
@@ -90,7 +88,7 @@ public final class EditGoalController extends BaseGoalManagement {
         }
 
         try {
-            BigDecimal currentBalance = new BigDecimal(balanceStr);
+            BigDecimal currentBalance = new BigDecimal(balanceStr.isEmpty() ? "0" : balanceStr);
             BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
             // Check if it has any modification

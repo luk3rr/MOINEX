@@ -591,6 +591,39 @@ class GoalServiceTest {
             }
 
             @Test
+            @DisplayName(
+                    "Should update master wallet correctly when goal current balance is bigger than"
+                            + " current balance of the master wallet")
+            void updateGoal_SetMasterWalletFromAtoBWithHigherBalance() {
+                goal.setMasterWallet(masterWalletA);
+                goal.setBalance(new BigDecimal("100.00"));
+                masterWalletA.setBalance(new BigDecimal("5000.00"));
+
+                Goal updatedGoalData =
+                        Goal.builder()
+                                .id(goal.getId())
+                                .name(goal.getName())
+                                .masterWallet(masterWalletA)
+                                .balance(new BigDecimal("5500.00"))
+                                .initialBalance(goal.getInitialBalance())
+                                .targetBalance(goal.getTargetBalance())
+                                .targetDate(goal.getTargetDate())
+                                .build();
+
+                when(goalRepository.findById(goal.getId())).thenReturn(Optional.of(goal));
+
+                goalService.updateGoal(updatedGoalData);
+
+                ArgumentCaptor<Goal> goalCaptor = ArgumentCaptor.forClass(Goal.class);
+                verify(goalRepository, atLeastOnce()).save(goalCaptor.capture());
+
+                assertEquals(masterWalletA, goalCaptor.getValue().getMasterWallet());
+
+                assertEquals(new BigDecimal("10400.00"), masterWalletA.getBalance());
+                verify(walletRepository).save(masterWalletA);
+            }
+
+            @Test
             @DisplayName("Should throw exception when trying to set a virtual wallet as master")
             void updateGoal_SetVirtualWalletAsMaster_ThrowsException() {
                 Wallet newMasterWhoIsVirtual = new Wallet(12, "I am virtual", BigDecimal.TEN);
