@@ -95,15 +95,14 @@ Migração da Base de Dados (Flyway):
 - [X] Definir a tabela de junção budget_group_categories com as colunas budget_group_id e category_id.
 
 Entidades JPA:
-- [ ] Criar a classe de entidade FinancialPlan.java.
-- [ ] Criar a classe de entidade BudgetGroup.java.
-- [ ] Implementar a relação @OneToMany em FinancialPlan para BudgetGroup.
-- [ ] Implementar a relação @ManyToMany em BudgetGroup para a entidade Category existente, usando a tabela de junção.
+- [X] Criar a classe de entidade FinancialPlan.java.
+- [X] Criar a classe de entidade BudgetGroup.java.
+- [X] Implementar a relação @ManyToMany em BudgetGroup para a entidade Category existente, usando a tabela de junção.
 
 Repositórios (Spring Data JPA):
-- [ ] Criar a interface FinancialPlanRepository.
-- [ ] Criar a interface BudgetGroupRepository.
-- [ ] Adicionar uma consulta ao WalletTransactionRepository para somar os montantes por uma lista de IDs de categoria e um intervalo de datas (mês/ano).
+- [X] Criar a interface FinancialPlanRepository.
+- [X] Criar a interface BudgetGroupRepository.
+- [X] Adicionar uma consulta ao WalletTransactionRepository para somar os montantes por uma lista de IDs de categoria e um intervalo de datas (mês/ano).
 
 Camada de Serviço (FinancialPlanningService):
 - [ ] Criar a nova classe de serviço FinancialPlanningService.java.

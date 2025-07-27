@@ -6,7 +6,6 @@
 
 package org.moinex.repository.wallettransaction;
 
-import java.util.List;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.util.enums.TransactionType;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +13,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Repository for the WalletTransaction entity
@@ -26,6 +28,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get all transactions where both the category and wallet are not archived
+     *
      * @return A list with all transactions
      */
     @Query(
@@ -38,6 +41,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get all income transactions
+     *
      * @return A list with all income transactions
      */
     @Query(
@@ -49,6 +53,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get all income transactions where both the category and wallet are not archived
+     *
      * @return A list with all income transactions
      */
     @Query(
@@ -62,6 +67,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get all expense transactions
+     *
      * @return A list with all expense transactions
      */
     @Query(
@@ -73,6 +79,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get all expense transactions where both the category and wallet are not archived
+     *
      * @return A list with all expense transactions
      */
     @Query(
@@ -86,8 +93,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the all transactions by month and year
+     *
      * @param month The month
-     * @param year The year
+     * @param year  The year
      * @return A list with the transactions by month and year
      */
     @Query(
@@ -102,8 +110,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the all transactions by month and year when both the category and wallet are
      * not archived
+     *
      * @param month The month
-     * @param year The year
+     * @param year  The year
      * @return A list with the transactions by month and year
      */
     @Query(
@@ -119,6 +128,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the all transactions by year
+     *
      * @param year The year
      * @return A list with the transactions by year
      */
@@ -132,6 +142,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the all transactions by year when both the category and wallet are not
      * archived
+     *
      * @param year The year
      * @return A list with the transactions by year
      */
@@ -146,9 +157,10 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the transactions by wallet and month
+     *
      * @param walletId The id of the wallet
-     * @param month The month
-     * @param year The year
+     * @param month    The month
+     * @param year     The year
      * @return A list with the transactions in the wallet by month
      */
     @Query(
@@ -166,9 +178,10 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the transactions by wallet and month when both the category and wallet are
      * not
+     *
      * @param walletId The id of the wallet
-     * @param month The month
-     * @param year The year
+     * @param month    The month
+     * @param year     The year
      * @return A list with the transactions in the wallet by month
      */
     @Query(
@@ -187,8 +200,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get all transactions between two dates
+     *
      * @param startDate The start date
-     * @param endDate The end date
+     * @param endDate   The end date
      * @return A list with the transactions between the two dates
      */
     @Query(
@@ -203,8 +217,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get all transactions between two dates where both the category and wallet are not
      * archived
+     *
      * @param startDate The start date
-     * @param endDate The end date
+     * @param endDate   The end date
      * @return A list with the transactions between the two dates
      */
     @Query(
@@ -220,8 +235,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the confirmed transactions by month and year
+     *
      * @param month The month
-     * @param year The year
+     * @param year  The year
      * @return A list with the transactions in the wallet by month and year
      */
     @Query(
@@ -237,8 +253,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the confirmed transactions by month and year when both the category and
      * wallet are not archived
+     *
      * @param month The month
-     * @param year The year
+     * @param year  The year
      * @return A list with the transactions in the wallet by month and year
      */
     @Query(
@@ -255,8 +272,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the pending transactions by month and year
+     *
      * @param month The month
-     * @param year The year
+     * @param year  The year
      * @return A list with the transactions in the wallet by month and year
      */
     @Query(
@@ -272,8 +290,9 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the pending transactions by month and year when both the category and wallet
      * are not archived
+     *
      * @param month The month
-     * @param year The year
+     * @param year  The year
      * @return A list with the transactions in the wallet by month and year
      */
     @Query(
@@ -290,6 +309,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the last n transactions of all wallets
+     *
      * @param pageable The pageable object
      * @return A list with the last n transactions of all wallets
      */
@@ -299,6 +319,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the last n transactions of all wallets where both the category and wallet are
      * not archived
+     *
      * @param pageable The pageable object
      * @return A list with the last n transactions of all wallets
      */
@@ -312,6 +333,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the last n transactions in a wallet
+     *
      * @param walletId The id of the wallet
      * @param pageable The pageable object
      * @return A list with the last n transactions in the wallet
@@ -327,6 +349,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the last n transactions in a wallet where both the category and wallet are
      * not archived
+     *
      * @param walletId The id of the wallet
      * @param pageable The pageable object
      * @return A list with the last n transactions in the wallet
@@ -343,6 +366,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the date of the oldest transaction
+     *
      * @return The date of the oldest transaction
      */
     @Query("SELECT min(wt.date) " + "FROM WalletTransaction wt")
@@ -351,6 +375,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get the date of the oldest transaction where both the category and wallet are not
      * archived
+     *
      * @return The date of the oldest transaction
      */
     @Query(
@@ -362,6 +387,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the date of the newest transaction
+     *
      * @return The date of the newest transaction
      */
     @Query("SELECT max(wt.date) " + "FROM WalletTransaction wt")
@@ -369,6 +395,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get the date of the newest transaction and the category is not archived
+     *
      * @return The date of the newest transaction
      */
     @Query(
@@ -380,6 +407,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Get count of transactions by wallet
+     *
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
@@ -389,6 +417,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get count of transactions by wallet where both the category and wallet are not
      * archived
+     *
      * @param walletId The id of the wallet
      * @return The count of transactions in the wallet
      */
@@ -402,6 +431,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     /**
      * Check if a wallet exists by transaction id
+     *
      * @param transactionId The id of the transaction
      * @return True if the wallet exists, false otherwise
      */
@@ -411,6 +441,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
     /**
      * Get suggestions. Suggestions are transactions with distinct descriptions
      * and most recent date
+     *
      * @param transactionType The type of the transaction
      * @return A list with the suggestions
      */
@@ -428,4 +459,21 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "ORDER BY wt.date DESC")
     List<WalletTransaction> findSuggestions(
             @Param("transactionType") TransactionType transactionType);
+
+    /**
+     * Sums the amount of all transactions for a given list of category IDs and a specific date range
+     *
+     * @param categoryIds The list of category IDs to filter by.
+     * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @return The total sum of the transaction amounts. Returns 0 if no transactions are found.
+     */
+    @Query("SELECT COALESCE(SUM(wt.amount), 0) " +
+            "FROM WalletTransaction wt " +
+            "WHERE wt.category.id IN :categoryIds " +
+            "AND wt.date BETWEEN :startDate AND :endDate")
+    BigDecimal getSumAmountByCategoriesAndDateBetween(
+            @Param("categoryIds") List<Integer> categoryIds,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
 }
