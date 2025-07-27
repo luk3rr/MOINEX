@@ -89,10 +89,10 @@ Modelagem de dados:
 - [X] Atualizar o modelo de dados para incluir as novas tabelas financial_plan, budget_group e budget_group_categories.
 
 Migração da Base de Dados (Flyway):
-- [ ] Criar um novo script de migração SQL (V00X__create_financial_plan_tables.sql).
-- [ ] Definir a tabela financial_plan com as colunas id, name, base_income.
-- [ ] Definir a tabela budget_group com as colunas id, name, target_percentage e plan_id (chave estrangeira para financial_plan).
-- [ ] Definir a tabela de junção budget_group_categories com as colunas budget_group_id e category_id.
+- [X] Criar um novo script de migração SQL (V00X__create_financial_plan_tables.sql).
+- [X] Definir a tabela financial_plan com as colunas id, name, base_income.
+- [X] Definir a tabela budget_group com as colunas id, name, target_percentage e plan_id (chave estrangeira para financial_plan).
+- [X] Definir a tabela de junção budget_group_categories com as colunas budget_group_id e category_id.
 
 Entidades JPA:
 - [ ] Criar a classe de entidade FinancialPlan.java.
