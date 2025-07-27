@@ -82,3 +82,82 @@ Esta funcionalidade tem um enorme potencial de crescimento. Como possível evolu
 - Planeamento para Despesas Não-Mensais: Criar um tipo de grupo especial, como "Fundo de Provisionamento", onde o utilizador pode alocar uma percentagem mensal para despesas anuais (ex: IUC, seguros), e o saldo acumula de mês para mês.
 - Sugestões Inteligentes: Após alguns meses de utilização, a aplicação poderia analisar os dados e sugerir: "Notamos que a sua categoria 'Restaurantes' está consistentemente a exceder o orçamento. Gostaria de lhe atribuir uma meta própria?"
 - Gráficos Históricos: Mostrar a evolução dos gastos por grupo ao longo do tempo.
+
+## Checklist de Implementação
+### Fase 1: Backend (Estrutura de Dados e Lógica de Negócio)
+Modelagem de dados:
+- [X] Atualizar o modelo de dados para incluir as novas tabelas financial_plan, budget_group e budget_group_categories.
+
+Migração da Base de Dados (Flyway):
+- [ ] Criar um novo script de migração SQL (V00X__create_financial_plan_tables.sql).
+- [ ] Definir a tabela financial_plan com as colunas id, name, base_income.
+- [ ] Definir a tabela budget_group com as colunas id, name, target_percentage e plan_id (chave estrangeira para financial_plan).
+- [ ] Definir a tabela de junção budget_group_categories com as colunas budget_group_id e category_id.
+
+Entidades JPA:
+- [ ] Criar a classe de entidade FinancialPlan.java.
+- [ ] Criar a classe de entidade BudgetGroup.java.
+- [ ] Implementar a relação @OneToMany em FinancialPlan para BudgetGroup.
+- [ ] Implementar a relação @ManyToMany em BudgetGroup para a entidade Category existente, usando a tabela de junção.
+
+Repositórios (Spring Data JPA):
+- [ ] Criar a interface FinancialPlanRepository.
+- [ ] Criar a interface BudgetGroupRepository.
+- [ ] Adicionar uma consulta ao WalletTransactionRepository para somar os montantes por uma lista de IDs de categoria e um intervalo de datas (mês/ano).
+
+Camada de Serviço (FinancialPlanningService):
+- [ ] Criar a nova classe de serviço FinancialPlanningService.java.
+- [ ] Implementar o método createPlan(name, income, groups) para criar um novo plano e os seus grupos.
+- [ ] Implementar o método updatePlan(...) para editar um plano existente.
+- [ ] Implementar o método assignCategoriesToGroup(groupId, categoryIds) para gerir as associações.
+- [ ] Implementar o método principal getPlanStatus(planId, YearMonth period) que calcula os gastos atuais para cada grupo e retorna os dados para a UI.
+
+Testes Unitários (Backend):
+- [ ] Criar a classe FinancialPlanningServiceTest.java.
+- [ ] Escrever testes para validar a criação e edição de planos.
+- [ ] Escrever testes para a lógica de cálculo do método getPlanStatus, simulando diferentes cenários de transações.
+- [ ] Testar os casos de erro (ex: percentagens que não somam 100%, dados inválidos).
+
+### Fase 2: Frontend (Interface do Utilizador em JavaFX)
+Navegação Principal:
+- [ ] Adicionar um novo ícone para "Planeamento" na barra lateral principal.
+- [ ] Modificar o MainController para que o novo botão carregue a tela principal de planeamento (planning.fxml).
+
+Tela Principal de Planeamento:
+- [ ] Criar o ficheiro planning.fxml seguindo o esboço visual.
+- [ ] Criar o controller PlanningController.java.
+- [ ] Implementar o ComboBox para a seleção do período (mês/ano).
+- [ ] Implementar o card de "Renda Base Mensal".
+- [ ] Implementar o gráfico de anel (Doughnut Chart) para a "Distribuição do Plano".
+- [ ] Criar um contentor (ex: GridPane ou FlowPane) para os cards dos grupos de orçamento.
+
+Componente Reutilizável (Card de Grupo de Orçamento):
+- [ ] (Opcional, mas recomendado) Criar um FXML separado (budget_group_card.fxml) para um único card.
+- [ ] Criar o seu respetivo controller (BudgetGroupCardController.java).
+- [ ] Implementar a lógica para preencher os dados do card (título, metas, valor gasto, barra de progresso, etc.).
+- [ ] Implementar a lógica de cores dinâmicas para a barra de progresso e o texto de estado.
+
+Lógica do Controller Principal (PlanningController):
+- [ ] Injetar o FinancialPlanningService.
+- [ ] No método initialize, carregar os dados do plano para o mês atual.
+- [ ] Criar um método updateView(YearMonth period) que:
+  - Chama o financialPlanningService.getPlanStatus(). 
+  - Atualiza o gráfico de anel. 
+  - Limpa e recria dinamicamente os cards dos grupos de orçamento no contentor.
+- [ ] Adicionar um listener ao ComboBox de período para chamar updateView.
+
+Assistente de Criação/Edição de Planos (Diálogos):
+- [ ] Criar o FXML e o controller para o diálogo de "Novo/Editar Plano".
+- [ ] Implementar a interface para definir o nome do plano e a renda base.
+- [ ] Implementar a interface para adicionar/editar/remover grupos e as suas percentagens, incluindo os modelos (50/30/20, etc.).
+- [ ] Implementar a interface para associar categorias a cada grupo (ex: CheckListView ou duas ListViews com botões de transferência).
+
+### Fase 3: Integração e Finalização
+Constantes e Estilos:
+- [ ] Adicionar os caminhos para os novos ficheiros FXML no ficheiro Constants.java.
+- [ ] Criar um novo ficheiro CSS (planning.css) para estilizar os novos componentes, garantindo a consistência com o tema da aplicação.
+
+Testes End-to-End:
+- [ ] Testar o fluxo completo: criar um plano, associar categorias, adicionar transações nessas categorias e verificar se o dashboard de planeamento reflete os dados corretamente.
+- [ ] Testar a edição de um plano e verificar se os cálculos são atualizados.
+- [ ] Testar a navegação entre diferentes meses.

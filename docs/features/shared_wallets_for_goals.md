@@ -140,19 +140,19 @@ Nesse caso, as operações permanecem inalteradas.
 
 #### 4.2.2 Cálculo do saldo total das carteiras
 O saldo total das carteiras devem considerar somente as carteiras mestras, uma vez que as carteiras virtuais são
-representações de fatias do saldo da carteira mestra. 
+representações de fatias do saldo da carteira mestra.
 
 Nesse sentido, as funções de cálculo de saldo devem ser adaptadas para ignorar as carteiras virtuais e não distorcer o
 total consolidado que é exibido nos gráficos e relatórios.
 
 #### 4.2.3 Alteração de carteira mestra
 Se uma carteira virtual for alterada para vincular a uma nova carteira mestra, o saldo da carteira virtual
-deverá ser transferido para a nova carteira mestra. 
+deverá ser transferido para a nova carteira mestra.
 
 A fatia da carteira virtual na carteira mestra antiga será transferida para a nova carteira mestra,
 e o saldo da carteira virtual não será alterado.
 
-#### 4.2.4 Deleção de Carteiras 
+#### 4.2.4 Deleção de Carteiras
 #### 4.2.4.1 Deleção de Carteira Mestra
 Se uma carteira mestra for deletada, todas as carteiras virtuais vinculadas a ela deverão ser desvinculadas.
 Nesse caso, o campo masterWallet das carteiras virtuais será definido como null, tornando-as carteiras mestras independentes.
@@ -194,7 +194,7 @@ Considerando todos os pontos acima, a lista de tarefas para implementação é a
 - [X] Adicionar o campo masterWallet na entidade Wallet.
 - [X] Atualizar o esquema do banco de dados para incluir a coluna master_wallet_id na tabela wallet. As
   migrações devem garantir que as Wallets existentes serão master por default, isto é, terão masterWallet = null.
-- [ ] Atualizar o modelo de dados para refletir a relação entre Wallet e Master Wallet.
+- [X] Atualizar o modelo de dados para refletir a relação entre Wallet e Master Wallet.
 
 #### 4.4.2 Lógica de Negócio
 ##### 4.4.2.1 Gestão de Transações
