@@ -1,15 +1,17 @@
 package org.moinex.model.financialplanning;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "financial_plan")
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FinancialPlan {
@@ -22,4 +24,13 @@ public class FinancialPlan {
 
     @Column(name = "base_income", nullable = false)
     private BigDecimal baseIncome;
+
+    @OneToMany(
+            mappedBy = "plan",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @Builder.Default
+    private List<BudgetGroup> budgetGroups = new ArrayList<>();
 }

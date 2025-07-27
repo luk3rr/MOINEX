@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FinancialPlanRepository extends JpaRepository<FinancialPlan, Integer> {
+    boolean existsByName(String name);
 }

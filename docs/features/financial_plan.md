@@ -105,17 +105,18 @@ Repositórios (Spring Data JPA):
 - [X] Adicionar uma consulta ao WalletTransactionRepository para somar os montantes por uma lista de IDs de categoria e um intervalo de datas (mês/ano).
 
 Camada de Serviço (FinancialPlanningService):
-- [ ] Criar a nova classe de serviço FinancialPlanningService.java.
+- [X] Criar a nova classe de serviço FinancialPlanningService.java.
 - [ ] Implementar o método createPlan(name, income, groups) para criar um novo plano e os seus grupos.
 - [ ] Implementar o método updatePlan(...) para editar um plano existente.
 - [ ] Implementar o método assignCategoriesToGroup(groupId, categoryIds) para gerir as associações.
-- [ ] Implementar o método principal getPlanStatus(planId, YearMonth period) que calcula os gastos atuais para cada grupo e retorna os dados para a UI.
+- [X] Implementar o método principal getPlanStatus(planId, YearMonth period) que calcula os gastos atuais para cada grupo e retorna os dados para a UI.
 
 Testes Unitários (Backend):
-- [ ] Criar a classe FinancialPlanningServiceTest.java.
-- [ ] Escrever testes para validar a criação e edição de planos.
-- [ ] Escrever testes para a lógica de cálculo do método getPlanStatus, simulando diferentes cenários de transações.
-- [ ] Testar os casos de erro (ex: percentagens que não somam 100%, dados inválidos).
+- [X] Criar a classe FinancialPlanningServiceTest.java.
+- [X] Escrever testes para validar a criação de planos.
+- [ ] Escrever testes para validar a edição de planos.
+- [X] Escrever testes para a lógica de cálculo do método getPlanStatus, simulando diferentes cenários de transações.
+- [X] Testar os casos de erro (ex: percentagens que não somam 100%, dados inválidos).
 
 ### Fase 2: Frontend (Interface do Utilizador em JavaFX)
 Navegação Principal:

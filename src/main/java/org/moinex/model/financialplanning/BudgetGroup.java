@@ -1,9 +1,7 @@
 package org.moinex.model.financialplanning;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.moinex.model.Category;
 
 import java.math.BigDecimal;
@@ -13,6 +11,8 @@ import java.util.Set;
 @Entity
 @Table(name = "budget_group")
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class BudgetGroup {
@@ -27,7 +27,7 @@ public class BudgetGroup {
     @Column(name = "target_percentage", nullable = false)
     private BigDecimal targetPercentage;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", nullable = false)
     private FinancialPlan plan;
 
