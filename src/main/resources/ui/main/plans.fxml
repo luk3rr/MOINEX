@@ -55,20 +55,20 @@
                                  <children>
                                     <HBox alignment="CENTER" layoutX="-21.0" layoutY="25.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <JFXButton onAction="#handleEditPlan" stylesheets="@../../css/component/buttons.css" text="Edit Plan">
-                                             <graphic>
-                                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../icon/common/pencil.png" />
-                                                   </image>
-                                                </ImageView>
-                                             </graphic>
-                                          </JFXButton>
                                           <JFXButton onAction="#handleNewPlan" stylesheets="@../../css/component/buttons.css" text="New Plan">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
                                                       <Image url="@../../icon/common/add.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleEditPlan" stylesheets="@../../css/component/buttons.css" text="Edit Plan">
+                                             <graphic>
+                                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/pencil.png" />
                                                    </image>
                                                 </ImageView>
                                              </graphic>

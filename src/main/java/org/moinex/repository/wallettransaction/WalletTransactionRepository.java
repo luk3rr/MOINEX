@@ -6,6 +6,8 @@
 
 package org.moinex.repository.wallettransaction;
 
+import java.math.BigDecimal;
+import java.util.List;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.util.enums.TransactionType;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +15,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * Repository for the WalletTransaction entity
@@ -468,10 +467,11 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
      * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
      * @return The total sum of the transaction amounts. Returns 0 if no transactions are found.
      */
-    @Query("SELECT COALESCE(SUM(wt.amount), 0) " +
-            "FROM WalletTransaction wt " +
-            "WHERE wt.category.id IN :categoryIds " +
-            "AND wt.date BETWEEN :startDate AND :endDate")
+    @Query(
+            "SELECT COALESCE(SUM(wt.amount), 0) "
+                    + "FROM WalletTransaction wt "
+                    + "WHERE wt.category.id IN :categoryIds "
+                    + "AND wt.date BETWEEN :startDate AND :endDate")
     BigDecimal getSumAmountByCategoriesAndDateBetween(
             @Param("categoryIds") List<Integer> categoryIds,
             @Param("startDate") String startDate,

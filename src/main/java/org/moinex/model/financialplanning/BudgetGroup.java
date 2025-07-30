@@ -1,12 +1,11 @@
 package org.moinex.model.financialplanning;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.moinex.model.Category;
-
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.*;
+import org.moinex.model.Category;
 
 @Entity
 @Table(name = "budget_group")
@@ -35,8 +34,7 @@ public class BudgetGroup {
     @JoinTable(
             name = "budget_group_categories",
             joinColumns = @JoinColumn(name = "budget_group_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
     @Builder.Default
     private Set<Category> categories = new HashSet<>();
 }

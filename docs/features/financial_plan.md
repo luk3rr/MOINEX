@@ -120,19 +120,19 @@ Testes Unitários (Backend):
 
 ### Fase 2: Frontend (Interface do Utilizador em JavaFX)
 Navegação Principal:
-- [ ] Adicionar um novo ícone para "Planeamento" na barra lateral principal.
-- [ ] Modificar o MainController para que o novo botão carregue a tela principal de planeamento (planning.fxml).
+- [X] Modificar ícone da barra lateral de Goal para Goals & Plans
+- [X] Separar Goals e Plans em duas tabs diferentes.
 
 Tela Principal de Planeamento:
-- [ ] Criar o ficheiro planning.fxml seguindo o esboço visual.
-- [ ] Criar o controller PlanningController.java.
+- [X] Criar o ficheiro planning.fxml seguindo o esboço visual.
+- [X] Criar o controller PlanningController.java.
 - [ ] Implementar o ComboBox para a seleção do período (mês/ano).
 - [ ] Implementar o card de "Renda Base Mensal".
 - [ ] Implementar o gráfico de anel (Doughnut Chart) para a "Distribuição do Plano".
 - [ ] Criar um contentor (ex: GridPane ou FlowPane) para os cards dos grupos de orçamento.
 
 Componente Reutilizável (Card de Grupo de Orçamento):
-- [ ] (Opcional, mas recomendado) Criar um FXML separado (budget_group_card.fxml) para um único card.
+- [ ] Criar um FXML separado (budget_group_card.fxml) para um único card.
 - [ ] Criar o seu respetivo controller (BudgetGroupCardController.java).
 - [ ] Implementar a lógica para preencher os dados do card (título, metas, valor gasto, barra de progresso, etc.).
 - [ ] Implementar a lógica de cores dinâmicas para a barra de progresso e o texto de estado.
@@ -147,10 +147,10 @@ Lógica do Controller Principal (PlanningController):
 - [ ] Adicionar um listener ao ComboBox de período para chamar updateView.
 
 Assistente de Criação/Edição de Planos (Diálogos):
-- [ ] Criar o FXML e o controller para o diálogo de "Novo/Editar Plano".
-- [ ] Implementar a interface para definir o nome do plano e a renda base.
-- [ ] Implementar a interface para adicionar/editar/remover grupos e as suas percentagens, incluindo os modelos (50/30/20, etc.).
-- [ ] Implementar a interface para associar categorias a cada grupo (ex: CheckListView ou duas ListViews com botões de transferência).
+- [/] Criar o FXML e o controller para o diálogo de "Novo/Editar Plano".
+- [X] Implementar a interface para definir o nome do plano e a renda base.
+- [/] Implementar a interface para adicionar/editar/remover grupos e as suas percentagens, incluindo os modelos (50/30/20, etc.).
+- [X] Implementar a interface para associar categorias a cada grupo (ex: CheckListView ou duas ListViews com botões de transferência).
 
 ### Fase 3: Integração e Finalização
 Constantes e Estilos:

@@ -42,4 +42,16 @@ public class Category {
     @Builder.Default
     @Column(name = "archived", nullable = false)
     private boolean isArchived = false; // Default value is false
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Category category)) return false;
+        return id != null && id.equals(category.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : getClass().hashCode();
+    }
 }

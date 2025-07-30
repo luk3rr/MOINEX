@@ -1,11 +1,10 @@
 package org.moinex.model.financialplanning;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
 
 @Entity
 @Table(name = "financial_plan")
@@ -29,8 +28,7 @@ public class FinancialPlan {
             mappedBy = "plan",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
+            fetch = FetchType.EAGER)
     @Builder.Default
     private List<BudgetGroup> budgetGroups = new ArrayList<>();
 }

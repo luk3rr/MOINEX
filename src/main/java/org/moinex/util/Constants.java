@@ -45,6 +45,8 @@ public final class Constants {
     public static final String UI_DIALOG_INVESTMENT_PATH = UI_DIALOG_PATH + "investment/";
     public static final String UI_DIALOG_WALLETTRANSACTION_PATH =
             UI_DIALOG_PATH + "wallettransaction/";
+    public static final String UI_DIALOG_FINANCIALPLANNING_PATH =
+            UI_DIALOG_PATH + "financialplanning/";
 
     public static final String UI_COMMON_PATH = "/ui/common/";
 
@@ -137,6 +139,11 @@ public final class Constants {
     public static final String INVESTMENT_TRANSACTIONS_FXML =
             UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
 
+    // UI financial planning package
+    public static final String ADD_BUDGET_GROUP_FXML =
+            UI_DIALOG_FINANCIALPLANNING_PATH + "add_budget_group.fxml";
+    public static final String ADD_PLAN_FXML = UI_DIALOG_FINANCIALPLANNING_PATH + "add_plan.fxml";
+
     // UI dialog package
     public static final String ADD_CATEGORY_FXML = UI_DIALOG_PATH + ("add_category." + "fxml");
     public static final String REMOVE_CATEGORY_FXML = UI_DIALOG_PATH + "remove_category.fxml";
@@ -147,6 +154,8 @@ public final class Constants {
     // UI common package
     public static final String WALLET_FULL_PANE_FXML = UI_COMMON_PATH + "wallet_full_pane.fxml";
     public static final String GOAL_FULL_PANE_FXML = UI_COMMON_PATH + "goal_full_pane.fxml";
+    public static final String BUDGET_GROUP_PREVIEW_PANE_FXML =
+            UI_COMMON_PATH + "budget_group_preview_pane.fxml";
 
     public static final String RESUME_PANE_FXML = UI_COMMON_PATH + "resume_pane.fxml";
     public static final String CRC_PANE_FXML = UI_COMMON_PATH + ("credit_card_pane." + "fxml");
@@ -332,6 +341,7 @@ public final class Constants {
     // Regex
     public static final String DIGITS_ONLY_REGEX = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
+    public static final String BUDGET_GROUP_PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
 
     public static final Integer INVESTMENT_CALCULATION_PRECISION = 8;
     public static final String INVESTMENT_VALUE_REGEX =
