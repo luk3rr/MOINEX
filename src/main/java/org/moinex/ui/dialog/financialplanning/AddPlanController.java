@@ -1,8 +1,10 @@
 package org.moinex.ui.dialog.financialplanning;
 
 import com.jfoenix.controls.JFXButton;
+import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +20,7 @@ import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.FinancialPlanningService;
 import org.moinex.ui.common.BudgetGroupPreviewController;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,55 +44,55 @@ public class AddPlanController {
     private final Map<String, Pair<String, String>> budgetGroupOptionsSettings =
             Map.of(
                     OPTION_1,
-                            new Pair<>(
-                                    "50/30/20",
-                                    "A balanced approach, ideal for most people.\n"
-                                        + "Allocates 50% to needs, 30% to wants, and 20% to savings"
-                                        + " and investments."),
+                    new Pair<>(
+                            "50/30/20",
+                            "A balanced approach, ideal for most people.\n"
+                                    + "Allocates 50% to needs, 30% to wants, and 20% to savings"
+                                    + " and investments."),
                     OPTION_2,
-                            new Pair<>(
-                                    "30/30/40",
-                                    "An investment-focused plan for those who can allocate more"
-                                        + " towards their financial goals.\n"
-                                        + "Allocates 30% for essentials, 30% for wants, and 40% for"
-                                        + " investments."),
+                    new Pair<>(
+                            "30/30/40",
+                            "An investment-focused plan for those who can allocate more"
+                                    + " towards their financial goals.\n"
+                                    + "Allocates 30% for essentials, 30% for wants, and 40% for"
+                                    + " investments."),
                     OPTION_3,
-                            new Pair<>(
-                                    "Custom",
-                                    "Build your own plan from scratch.\n"
-                                            + "Create your own budget groups and define their"
-                                            + " percentage allocations."));
+                    new Pair<>(
+                            "Custom",
+                            "Build your own plan from scratch.\n"
+                                    + "Create your own budget groups and define their"
+                                    + " percentage allocations."));
     // <fx:id> -> <List of BudgetGroup>
     private final Map<String, List<BudgetGroup>> budgetGroupTemplates =
             Map.of(
                     OPTION_1,
-                            List.of(
-                                    BudgetGroup.builder()
-                                            .name("Essentials")
-                                            .targetPercentage(BigDecimal.valueOf(50))
-                                            .build(),
-                                    BudgetGroup.builder()
-                                            .name("Wants")
-                                            .targetPercentage(BigDecimal.valueOf(30))
-                                            .build(),
-                                    BudgetGroup.builder()
-                                            .name("Investments")
-                                            .targetPercentage(BigDecimal.valueOf(20))
-                                            .build()),
+                    List.of(
+                            BudgetGroup.builder()
+                                    .name("Essentials")
+                                    .targetPercentage(BigDecimal.valueOf(50))
+                                    .build(),
+                            BudgetGroup.builder()
+                                    .name("Wants")
+                                    .targetPercentage(BigDecimal.valueOf(30))
+                                    .build(),
+                            BudgetGroup.builder()
+                                    .name("Investments")
+                                    .targetPercentage(BigDecimal.valueOf(20))
+                                    .build()),
                     OPTION_2,
-                            List.of(
-                                    BudgetGroup.builder()
-                                            .name("Essentials")
-                                            .targetPercentage(BigDecimal.valueOf(30))
-                                            .build(),
-                                    BudgetGroup.builder()
-                                            .name("Wants")
-                                            .targetPercentage(BigDecimal.valueOf(30))
-                                            .build(),
-                                    BudgetGroup.builder()
-                                            .name("Investments")
-                                            .targetPercentage(BigDecimal.valueOf(40))
-                                            .build()));
+                    List.of(
+                            BudgetGroup.builder()
+                                    .name("Essentials")
+                                    .targetPercentage(BigDecimal.valueOf(30))
+                                    .build(),
+                            BudgetGroup.builder()
+                                    .name("Wants")
+                                    .targetPercentage(BigDecimal.valueOf(30))
+                                    .build(),
+                            BudgetGroup.builder()
+                                    .name("Investments")
+                                    .targetPercentage(BigDecimal.valueOf(40))
+                                    .build()));
     @FXML private ToggleGroup templateToggleGroup;
     @FXML private RadioButton option1;
     @FXML private RadioButton option2;
@@ -97,6 +100,7 @@ public class AddPlanController {
     @FXML private Label option1Description;
     @FXML private Label option2Description;
     @FXML private Label option3Description;
+    @FXML private Label budgetGroupInfo;
     @FXML private TextField planNameField;
     @FXML private TextField baseIncomeField;
     @FXML private AnchorPane pane1;
@@ -124,6 +128,7 @@ public class AddPlanController {
         configureRadioButtons();
         configureListeners();
         configureButtonsActions();
+        budgetGroupInfo.setVisible(false);
     }
 
     /**
@@ -146,6 +151,69 @@ public class AddPlanController {
                             });
                 },
                 List.of());
+    }
+
+    /**
+     * Handles the cancel action, closing the dialog window.
+     */
+    @FXML
+    private void handleCancel() {
+        planNameField.getScene().getWindow().hide();
+    }
+
+    /**
+     * Handles the save action, creating or updating the financial plan.
+     */
+    @FXML
+    private void handleSave() {
+        String planName = planNameField.getText().trim();
+        String baseIncomeText = baseIncomeField.getText().trim();
+
+        if (planName.isEmpty() || baseIncomeText.isEmpty()) {
+            WindowUtils.showInformationDialog(
+                    "Empty Fields", "Please fill in all required fields.");
+            return;
+        }
+
+        if (budgetGroups.isEmpty() || budgetGroups.size() < 2) {
+            WindowUtils.showInformationDialog(
+                    "Insufficient Budget Groups",
+                    "You must have at least two budget groups to create a financial plan.");
+            return;
+        }
+
+        if (calculateTotalPercentage().compareTo(new BigDecimal("100")) != 0) {
+            WindowUtils.showInformationDialog(
+                    "Invalid Budget Group Percentages",
+                    "Total percentage must equal 100%. Please adjust the budget group"
+                            + " percentages.");
+            return;
+        }
+
+        if (hasEmptyGroups()) {
+            WindowUtils.showInformationDialog(
+                    "Empty Budget Groups",
+                    "One or more budget groups have no categories assigned. Please edit them.");
+            return;
+        }
+
+        try {
+            BigDecimal baseIncome;
+            baseIncome = new BigDecimal(baseIncomeText);
+
+            financialPlanningService.createPlan(planName, baseIncome, budgetGroups);
+
+            WindowUtils.showSuccessDialog(
+                    "Financial Plan Created", "Your financial plan has been successfully created.");
+
+            planNameField.getScene().getWindow().hide();
+        } catch (NumberFormatException e) {
+            WindowUtils.showErrorDialog(
+                    "Invalid Base Income",
+                    "Base income must be a valid monetary value. Please check your input.");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            WindowUtils.showErrorDialog("Error while creating financial plan", e.getMessage());
+        }
     }
 
     /**
@@ -233,6 +301,7 @@ public class AddPlanController {
 
         prevButton.setDisable(paneCurrentPage == 0);
         nextButton.setDisable(end >= budgetGroups.size());
+        validateAndDisplayBudgetInfo();
     }
 
     /**
@@ -267,7 +336,26 @@ public class AddPlanController {
      *
      * @param groupToEdit The BudgetGroup to be edited
      */
-    private void handleEditBudgetGroup(BudgetGroup groupToEdit) {}
+    private void handleEditBudgetGroup(BudgetGroup groupToEdit) {
+        WindowUtils.openModalWindow(
+                Constants.EDIT_BUDGET_GROUP_FXML,
+                "Edit Budget Group",
+                springContext,
+                (EditBudgetGroupController controller) -> {
+                    controller.setAssignedCategories(getAssignedCategories());
+                    controller.setGroup(groupToEdit);
+
+                    controller.setOnSave(
+                            newBudgetGroup -> {
+                                int index = budgetGroups.indexOf(groupToEdit);
+                                if (index != -1) {
+                                    budgetGroups.set(index, newBudgetGroup);
+                                    updateBudgetGroupsContainer();
+                                }
+                            });
+                },
+                List.of());
+    }
 
     /**
      * Handles the action of deleting a budget group from the container
@@ -278,20 +366,6 @@ public class AddPlanController {
         budgetGroups.remove(groupToRemove);
         updateBudgetGroupsContainer();
     }
-
-    /**
-     * Handles the cancel action, closing the dialog window.
-     */
-    @FXML
-    private void handleCancel() {
-        planNameField.getScene().getWindow().hide();
-    }
-
-    /**
-     * Handles the save action, creating or updating the financial plan.
-     */
-    @FXML
-    private void handleSave() {}
 
     private void configureRadioButtons() {
         option1.setText(budgetGroupOptionsSettings.get(OPTION_1).getKey());
@@ -382,5 +456,64 @@ public class AddPlanController {
     private void createCustomTemplate() {
         this.budgetGroups = new ArrayList<>();
         updateBudgetGroupsContainer();
+    }
+
+    private boolean hasEmptyGroups() {
+        return budgetGroups.stream()
+                .anyMatch(
+                        group -> group.getCategories() == null || group.getCategories().isEmpty());
+    }
+
+    private BigDecimal calculateTotalPercentage() {
+        return budgetGroups.stream()
+                .map(BudgetGroup::getTargetPercentage)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private void validateAndDisplayBudgetInfo() {
+        budgetGroupInfo
+                .getStyleClass()
+                .removeAll(
+                        Constants.INFO_LABEL_RED_STYLE,
+                        Constants.INFO_LABEL_YELLOW_STYLE,
+                        Constants.INFO_LABEL_GREEN_STYLE);
+
+        if (budgetGroups == null || budgetGroups.isEmpty()) {
+            budgetGroupInfo.setVisible(false);
+            return;
+        }
+
+        BigDecimal totalPercentage = calculateTotalPercentage();
+
+        if (totalPercentage.compareTo(new BigDecimal("100")) > 0) {
+            budgetGroupInfo.setText(
+                    MessageFormat.format(
+                            "Total percentage is {0}, which exceeds 100%%. Please adjust the group"
+                                    + " percentages.",
+                            UIUtils.formatPercentage(totalPercentage)));
+            budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
+
+        } else if (hasEmptyGroups()) {
+            budgetGroupInfo.setText(
+                    "One or more budget groups have no categories assigned. Right-click a group to"
+                            + " edit it.");
+            budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
+
+        } else if (totalPercentage.compareTo(new BigDecimal("100")) < 0) {
+            BigDecimal remaining = new BigDecimal("100").subtract(totalPercentage);
+            budgetGroupInfo.setText(
+                    MessageFormat.format(
+                            "Total percentage is {0}. You can adjust percentages or add a new group"
+                                    + " to allocate the remaining {1}",
+                            UIUtils.formatPercentage(totalPercentage),
+                            UIUtils.formatPercentage(remaining)));
+            budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
+
+        } else {
+            budgetGroupInfo.setText("Your budget plan is correctly configured!");
+            budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+        }
+
+        budgetGroupInfo.setVisible(true);
     }
 }

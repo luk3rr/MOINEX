@@ -149,7 +149,7 @@ Lógica do Controller Principal (PlanningController):
 Assistente de Criação/Edição de Planos (Diálogos):
 - [/] Criar o FXML e o controller para o diálogo de "Novo/Editar Plano".
 - [X] Implementar a interface para definir o nome do plano e a renda base.
-- [/] Implementar a interface para adicionar/editar/remover grupos e as suas percentagens, incluindo os modelos (50/30/20, etc.).
+- [X] Implementar a interface para adicionar/editar/remover grupos e as suas percentagens, incluindo os modelos (50/30/20, etc.).
 - [X] Implementar a interface para associar categorias a cada grupo (ex: CheckListView ou duas ListViews com botões de transferência).
 
 ### Fase 3: Integração e Finalização

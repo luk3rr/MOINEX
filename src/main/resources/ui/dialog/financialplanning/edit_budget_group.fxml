@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefWidth="500.0" spacing="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.financialplanning.EditBudgetGroupController">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+    <children>
+        <!-- Group Details Section -->
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <VBox HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Group Name">
+                            <font><Font size="10.0" /></font>
+                        </Label>
+                        <TextField fx:id="groupNameField" promptText="Ex: Essential Expenses" />
+                    </children>
+                </VBox>
+                <VBox>
+                    <children>
+                        <Label text="Target Percentage (%)">
+                            <font><Font size="10.0" /></font>
+                        </Label>
+                        <TextField fx:id="targetPercentageField" prefWidth="120.0" promptText="Ex: 50" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <!-- Category Association Section -->
+        <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Associated Categories" textAlignment="CENTER" VBox.vgrow="ALWAYS">
+            <content>
+                <HBox alignment="CENTER" spacing="10.0" style="-fx-padding: 10;">
+                    <children>
+                        <!-- Available Categories List -->
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Available Categories" />
+                                <ListView fx:id="availableCategoriesListView" />
+                            </children>
+                        </VBox>
+
+                        <!-- Transfer Buttons -->
+                        <VBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <JFXButton fx:id="addCategoryButton" contentDisplay="GRAPHIC_ONLY">
+                                    <graphic>
+                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                            <image><Image url="@../../../icon/common/arrow_right.png" /></image>
+                                        </ImageView>
+                                    </graphic>
+                                </JFXButton>
+                                <JFXButton fx:id="removeCategoryButton" contentDisplay="GRAPHIC_ONLY">
+                                    <graphic>
+                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                            <image><Image url="@../../../icon/common/arrow_left.png" /></image>
+                                        </ImageView>
+                                    </graphic>
+                                </JFXButton>
+                            </children>
+                        </VBox>
+
+                        <!-- Selected Categories List -->
+                        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Categories in Group" />
+                                <ListView fx:id="selectedCategoriesListView" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </content>
+        </TitledPane>
+
+        <!-- Action Buttons -->
+        <HBox alignment="CENTER" spacing="10.0">
+            <children>
+                <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
+                <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+            </children>
+            <padding>
+                <Insets top="10.0" />
+            </padding>
+        </HBox>
+    </children>
+</VBox>

@@ -1,203 +1,26 @@
 package org.moinex.ui.dialog.financialplanning;
 
-import com.jfoenix.controls.JFXButton;
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Consumer;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import lombok.NoArgsConstructor;
-import org.moinex.model.Category;
-import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.CategoryService;
-import org.moinex.util.Constants;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Add/Edit Budget Group dialog.
+ * Controller for the Add Budget Group dialog
  */
 @Controller
 @NoArgsConstructor
-public class AddBudgetGroupController {
-
-    // FXML Components
-    @FXML private TextField groupNameField;
-
-    @FXML private TextField targetPercentageField;
-
-    @FXML private ListView<Category> availableCategoriesListView;
-
-    @FXML private ListView<Category> selectedCategoriesListView;
-
-    @FXML private JFXButton addCategoryButton;
-
-    @FXML private JFXButton removeCategoryButton;
-
-    private Consumer<BudgetGroup> onSaveCallback;
-    private CategoryService categoryService;
-    private Set<Category> assignedCategories;
+public class AddBudgetGroupController extends BaseBudgetGroupController {
 
     @Autowired
     public AddBudgetGroupController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
-    /**
-     * Method to be called by the parent controller to pass initial data.
-     *
-     * @param alreadyAssignedCategories A set of categories already used in the current plan.
-     */
-    public void setAssignedCategories(Set<Category> alreadyAssignedCategories) {
-        this.assignedCategories = alreadyAssignedCategories;
-
-        populateAvailableCategories();
-    }
-
-    public void setOnSave(Consumer<BudgetGroup> callback) {
-        this.onSaveCallback = callback;
-    }
-
-    private void populateAvailableCategories() {
-        List<Category> allCategories = categoryService.getNonArchivedCategoriesOrderedByName();
-
-        List<Category> availableCategories =
-                allCategories.stream()
-                        .filter(category -> !assignedCategories.contains(category))
-                        .toList();
-
-        availableCategoriesListView.setCellFactory(param -> createCategoryCell());
-        selectedCategoriesListView.setCellFactory(param -> createCategoryCell());
-
-        availableCategoriesListView.getItems().setAll(availableCategories);
-    }
-
-    private ListCell<Category> createCategoryCell() {
-        return new ListCell<>() {
-            @Override
-            protected void updateItem(Category item, boolean empty) {
-                super.updateItem(item, empty);
-                setText((empty || item == null) ? null : item.getName());
-            }
-        };
+        super(categoryService);
     }
 
     @FXML
     public void initialize() {
-        setupButtonActions();
-        configureListeners();
-    }
-
-    /**
-     * Sets up the event handlers for the add and remove category buttons.
-     */
-    private void setupButtonActions() {
-        addCategoryButton.setOnAction(
-                event -> moveCategory(availableCategoriesListView, selectedCategoriesListView));
-        removeCategoryButton.setOnAction(
-                event -> moveCategory(selectedCategoriesListView, availableCategoriesListView));
-
-        availableCategoriesListView
-                .getSelectionModel()
-                .selectedItemProperty()
-                .addListener(
-                        (observable, oldValue, newValue) ->
-                                addCategoryButton.setDisable(newValue == null));
-
-        selectedCategoriesListView
-                .getSelectionModel()
-                .selectedItemProperty()
-                .addListener(
-                        (observable, oldValue, newValue) ->
-                                removeCategoryButton.setDisable(newValue == null));
-
-        addCategoryButton.setDisable(availableCategoriesListView.getItems().isEmpty());
-        removeCategoryButton.setDisable(selectedCategoriesListView.getItems().isEmpty());
-    }
-
-    private void configureListeners() {
-        ChangeListener<String> targetPercentageListener =
-                (observable, oldValue, newValue) -> {
-                    if (!newValue.matches(Constants.BUDGET_GROUP_PERCENTAGE_REGEX)) {
-                        targetPercentageField.setText(oldValue);
-                    }
-                };
-
-        targetPercentageField.textProperty().addListener(targetPercentageListener);
-    }
-
-    /**
-     * Moves the selected category from a source list to a destination list
-     *
-     * @param source      The source ListView
-     * @param destination The destination ListView
-     */
-    private void moveCategory(ListView<Category> source, ListView<Category> destination) {
-        List<Category> selectedItems =
-                new ArrayList<>(source.getSelectionModel().getSelectedItems());
-
-        if (selectedItems.isEmpty()) {
-            return;
-        }
-
-        for (Category category : selectedItems) {
-            source.getItems().remove(category);
-            destination.getItems().add(category);
-        }
-
-        destination
-                .getItems()
-                .sort(Comparator.comparing(Category::getName, String.CASE_INSENSITIVE_ORDER));
-    }
-
-    /**
-     * Handles the cancel action, closing the dialog window.
-     */
-    @FXML
-    private void handleCancel() {
-        groupNameField.getScene().getWindow().hide();
-    }
-
-    /**
-     * Handles the save action, returning the configured budget group data.
-     */
-    @FXML
-    private void handleSave() {
-        String groupName = groupNameField.getText().trim();
-        String targetPercentageText = targetPercentageField.getText().trim();
-
-        if (groupName.isEmpty() || targetPercentageText.isEmpty()) {
-            WindowUtils.showInformationDialog(
-                    "Required Fields", "Please fill in all required fields");
-            return;
-        }
-
-        double targetPercentage;
-        try {
-            targetPercentage = Double.parseDouble(targetPercentageText);
-        } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog(
-                    "Invalid Input", "Target percentage must be a valid number");
-            return;
-        }
-
-        List<Category> selectedCategories = selectedCategoriesListView.getItems();
-
-        BudgetGroup budgetGroup =
-                BudgetGroup.builder()
-                        .name(groupName)
-                        .targetPercentage(BigDecimal.valueOf(targetPercentage))
-                        .categories(new HashSet<>(selectedCategories))
-                        .build();
-
-        if (onSaveCallback != null) {
-            onSaveCallback.accept(budgetGroup);
-        }
-
-        handleCancel();
+        super.initialize();
     }
 }

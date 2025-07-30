@@ -142,6 +142,8 @@ public final class Constants {
     // UI financial planning package
     public static final String ADD_BUDGET_GROUP_FXML =
             UI_DIALOG_FINANCIALPLANNING_PATH + "add_budget_group.fxml";
+    public static final String EDIT_BUDGET_GROUP_FXML =
+            UI_DIALOG_FINANCIALPLANNING_PATH + "edit_budget_group.fxml";
     public static final String ADD_PLAN_FXML = UI_DIALOG_FINANCIALPLANNING_PATH + "add_plan.fxml";
 
     // UI dialog package
@@ -191,6 +193,11 @@ public final class Constants {
     public static final String SETTINGS_STYLE_SHEET = CSS_SCENE_PATH + "settings.css";
 
     public static final String COMMON_STYLE_SHEET = CSS_COMMON_PATH + "common-styles.css";
+
+    // Info styles from common-styles.css
+    public static final String INFO_LABEL_RED_STYLE = "info-label-red";
+    public static final String INFO_LABEL_GREEN_STYLE = "info-label-green";
+    public static final String INFO_LABEL_YELLOW_STYLE = "info-label-yellow";
 
     // Main pane styles
     public static final String SIDEBAR_SELECTED_BUTTON_STYLE = "sidebar-button-selected";
