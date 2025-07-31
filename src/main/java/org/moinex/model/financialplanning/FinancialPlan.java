@@ -31,4 +31,7 @@ public class FinancialPlan {
             fetch = FetchType.EAGER)
     @Builder.Default
     private List<BudgetGroup> budgetGroups = new ArrayList<>();
+
+    @Column(name = "archived", nullable = false)
+    private boolean archived = false;
 }

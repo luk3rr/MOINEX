@@ -24,6 +24,43 @@
   -fx-padding: 0em;
 }
 
+.progress-bar.progress-bar-green > .bar {
+  -fx-background-color: linear-gradient(
+          to bottom,
+          derive(#28a745, -7%),
+          derive(#28a745, 0%),
+          derive(#28a745, -3%),
+          derive(#28a745, -9%)
+  );
+}
+
+.progress-bar.progress-bar-yellow > .bar {
+  -fx-background-color: linear-gradient(
+          to bottom,
+          derive(#ffc107, -7%),
+          derive(#ffc107, 0%),
+          derive(#ffc107, -3%),
+          derive(#ffc107, -9%)
+  );
+}
+
+.progress-bar.progress-bar-red > .bar {
+  -fx-background-color: linear-gradient(
+          to bottom,
+          derive(#dc3545, -7%),
+          derive(#dc3545, 0%),
+          derive(#dc3545, -3%),
+          derive(#dc3545, -9%)
+  );
+}
+
+.progress-bar {
+  -fx-indeterminate-bar-length: 60;
+  -fx-indeterminate-bar-escape: true;
+  -fx-indeterminate-bar-flip: true;
+  -fx-indeterminate-bar-animation-time: 2;
+}
+
 .progress-bar:indeterminate > .bar {
   -fx-background-color: linear-gradient(to left, transparent, orange);
 }

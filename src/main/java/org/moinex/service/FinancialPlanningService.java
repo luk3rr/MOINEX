@@ -171,5 +171,14 @@ public class FinancialPlanningService {
                 .collect(Collectors.toList());
     }
 
-    public static record PlanStatusDTO(BudgetGroup group, BigDecimal spentAmount) {}
+    public FinancialPlan getActivePlan() {
+        return financialPlanRepository
+                .findByArchivedFalse()
+                .orElseThrow(
+                        () ->
+                                new EntityNotFoundException(
+                                        "No active financial plan found. Please create one."));
+    }
+
+    public record PlanStatusDTO(BudgetGroup group, BigDecimal spentAmount) {}
 }

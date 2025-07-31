@@ -9,36 +9,35 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="root" stylesheets="@../../css/scene/pane.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.BudgetGroupPaneController">
    <children>
       <VBox minWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox alignment="CENTER_LEFT">
                <children>
-                  <Label text="Group name" />
+                  <Label fx:id="groupNameLabel" text="Group name" />
                   <Region HBox.hgrow="ALWAYS" />
                   <VBox alignment="CENTER_RIGHT">
                      <children>
                         <HBox spacing="5.0">
                            <children>
                               <Label text="Target:" />
-                              <Label text="0.00 %" />
+                              <Label fx:id="targetPercentageLabel" text="0.00 %" />
                            </children>
                         </HBox>
-                        <Label text="\$ 0.00" />
+                        <Label fx:id="targetAmountLabel" text="\$ 0.00" />
                      </children>
                   </VBox>
                </children>
             </HBox>
-            <Label text="\$ 0.00">
+            <Label fx:id="spentAmountLabel" text="\$ 0.00">
                <font>
                   <Font name="System Bold" size="48.0" />
                </font>
             </Label>
             <AnchorPane>
                <children>
-                  <ProgressBar prefHeight="15.0" progress="0.53" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ProgressBar fx:id="progressBar" prefHeight="15.0" progress="0.53" stylesheets="@../../css/component/progress-bar.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
                <VBox.margin>
                   <Insets />
@@ -49,10 +48,10 @@
             </AnchorPane>
             <HBox>
                <children>
-                  <Label text="Overspent: " />
-                  <Label text="\$ 0.00" />
+                  <Label fx:id="statusPrefixLabel" text="Overspent: " />
+                  <Label fx:id="statusAmountLabel" text="\$ 0.00" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label text="111.7 %" />
+                  <Label fx:id="progressPercentageLabel" text="111.7 %" />
                </children>
             </HBox>
          </children>

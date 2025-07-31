@@ -10,7 +10,8 @@ CREATE TABLE financial_plan
 (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        VARCHAR(50)    NOT NULL,
-    base_income NUMERIC(38, 2) NOT NULL
+    base_income NUMERIC(38, 2) NOT NULL,
+    archived    BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE budget_group
