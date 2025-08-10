@@ -85,11 +85,6 @@ public class PlanController {
     }
 
     @FXML
-    private void handleEditPlan() {
-        // TODO: Lógica para abrir o diálogo de edição do plano financeiro atual.
-    }
-
-    @FXML
     private void handleNewPlan() {
         WindowUtils.openModalWindow(
                 Constants.ADD_PLAN_FXML,
@@ -97,6 +92,16 @@ public class PlanController {
                 springContext,
                 (AddPlanController controller) -> {},
                 List.of(this::updateView));
+    }
+
+    @FXML
+    private void handleEditPlan() {
+        // TODO: Lógica para abrir o diálogo de edição do plano financeiro atual.
+    }
+
+    @FXML
+    private void handlePlanArchive() {
+        // TODO: Lógica para abrir o diálogo de edição do plano financeiro atual.
     }
 
     /**

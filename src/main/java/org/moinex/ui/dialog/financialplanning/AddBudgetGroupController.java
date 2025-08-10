@@ -1,6 +1,5 @@
 package org.moinex.ui.dialog.financialplanning;
 
-import java.util.*;
 import javafx.fxml.FXML;
 import lombok.NoArgsConstructor;
 import org.moinex.service.CategoryService;

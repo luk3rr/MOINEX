@@ -106,7 +106,7 @@ Repositórios (Spring Data JPA):
 
 Camada de Serviço (FinancialPlanningService):
 - [X] Criar a nova classe de serviço FinancialPlanningService.java.
-- [ ] Implementar o método createPlan(name, income, groups) para criar um novo plano e os seus grupos.
+- [X] Implementar o método createPlan(name, income, groups) para criar um novo plano e os seus grupos.
 - [ ] Implementar o método updatePlan(...) para editar um plano existente.
 - [ ] Implementar o método assignCategoriesToGroup(groupId, categoryIds) para gerir as associações.
 - [X] Implementar o método principal getPlanStatus(planId, YearMonth period) que calcula os gastos atuais para cada grupo e retorna os dados para a UI.
