@@ -121,6 +121,7 @@ public final class Constants {
     public static final String EDIT_BUDGET_GROUP_FXML =
             UI_DIALOG_FINANCIALPLANNING_PATH + "edit_budget_group.fxml";
     public static final String ADD_PLAN_FXML = UI_DIALOG_FINANCIALPLANNING_PATH + "add_plan.fxml";
+    public static final String EDIT_PLAN_FXML = UI_DIALOG_FINANCIALPLANNING_PATH + "edit_plan.fxml";
     public static final String UI_COMMON_PATH = "/ui/common/";
     public static final String CSS_SCENE_PATH = "/css/scene/";
     public static final String CSS_COMMON_PATH = "/css/common/";

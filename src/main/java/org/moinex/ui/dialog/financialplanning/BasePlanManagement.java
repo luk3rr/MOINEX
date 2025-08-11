@@ -4,16 +4,15 @@ import com.jfoenix.controls.JFXButton;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import lombok.NoArgsConstructor;
@@ -106,6 +105,14 @@ public abstract class BasePlanManagement {
         pane2.getChildren().clear();
         pane3.getChildren().clear();
 
+        budgetGroups.sort(
+                (a, b) -> {
+                    if (b.getTargetPercentage() == null || a.getTargetPercentage() == null) {
+                        return 0; // Handle null values gracefully
+                    }
+                    return b.getTargetPercentage().compareTo(a.getTargetPercentage());
+                });
+
         Integer start = paneCurrentPage * ITEMS_PER_PAGE;
         int end = Math.min(start + ITEMS_PER_PAGE, budgetGroups.size());
 
@@ -181,6 +188,33 @@ public abstract class BasePlanManagement {
         return budgetGroups.stream()
                 .map(BudgetGroup::getTargetPercentage)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    protected boolean isPlanValid() {
+        if (budgetGroups.isEmpty() || budgetGroups.size() < 2) {
+            WindowUtils.showInformationDialog(
+                    "Insufficient Budget Groups",
+                    "You must have at least two budget groups to create a financial plan.");
+
+            return false;
+        }
+
+        if (calculateTotalPercentage().compareTo(new BigDecimal("100")) != 0) {
+            WindowUtils.showInformationDialog(
+                    "Invalid Budget Group Percentages",
+                    "Total percentage must equal 100%. Please adjust the budget group"
+                            + " percentages.");
+            return false;
+        }
+
+        if (hasEmptyGroups()) {
+            WindowUtils.showInformationDialog(
+                    "Empty Budget Groups",
+                    "One or more budget groups have no categories assigned. Please edit them.");
+            return false;
+        }
+
+        return true;
     }
 
     /**

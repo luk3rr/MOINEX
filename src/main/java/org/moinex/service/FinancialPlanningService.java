@@ -15,6 +15,9 @@ import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,8 @@ public class FinancialPlanningService {
     private BudgetGroupRepository budgetGroupRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private CategoryRepository categoryRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(FinancialPlanningService.class);
 
     @Autowired
     public FinancialPlanningService(
@@ -75,7 +80,57 @@ public class FinancialPlanningService {
         groups.forEach(group -> group.setPlan(plan));
         plan.setBudgetGroups(groups);
 
+        logger.info(
+                "Financial plan '{}' created with base income {}",
+                name,
+                UIUtils.formatCurrency(income));
+
         return financialPlanRepository.save(plan).getId();
+    }
+
+    /**
+     * Edits an existing financial plan and its budget groups
+     *
+     * @param plan The financial plan with updated details
+     */
+    @Transactional
+    public void updatePlan(@NonNull FinancialPlan plan) {
+        FinancialPlan originalPlan =
+                financialPlanRepository
+                        .findById(plan.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Financial plan with ID "
+                                                        + plan.getId()
+                                                        + " not found"));
+
+        if (plan.getName() == null || plan.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("The name of the financial plan cannot be empty.");
+        }
+
+        if (plan.getBaseIncome() == null || plan.getBaseIncome().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("The base income must be greater than zero.");
+        }
+
+        // Check if the name is being changed to one that already exists
+        if (!originalPlan.getName().equals(plan.getName())
+                && financialPlanRepository.existsByName(plan.getName())) {
+            throw new IllegalStateException("A financial plan with this name already exists.");
+        }
+
+        validateBudgetGroups(plan.getBudgetGroups());
+
+        originalPlan.setName(plan.getName());
+        originalPlan.setBaseIncome(plan.getBaseIncome());
+
+        originalPlan.getBudgetGroups().clear();
+        plan.getBudgetGroups().forEach(group -> group.setPlan(originalPlan));
+        originalPlan.getBudgetGroups().addAll(plan.getBudgetGroups());
+
+        financialPlanRepository.save(originalPlan);
+
+        logger.info("Financial plan '{}' updated", plan.getName());
     }
 
     private void validateBudgetGroups(List<BudgetGroup> groups) {

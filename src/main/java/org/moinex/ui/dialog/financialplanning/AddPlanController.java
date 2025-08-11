@@ -92,6 +92,7 @@ public class AddPlanController extends BasePlanManagement {
         super(financialPlanningService, springContext);
     }
 
+    @Override
     @FXML
     public void initialize() {
         super.initialize();
@@ -111,27 +112,7 @@ public class AddPlanController extends BasePlanManagement {
             return;
         }
 
-        if (budgetGroups.isEmpty() || budgetGroups.size() < 2) {
-            WindowUtils.showInformationDialog(
-                    "Insufficient Budget Groups",
-                    "You must have at least two budget groups to create a financial plan.");
-            return;
-        }
-
-        if (calculateTotalPercentage().compareTo(new BigDecimal("100")) != 0) {
-            WindowUtils.showInformationDialog(
-                    "Invalid Budget Group Percentages",
-                    "Total percentage must equal 100%. Please adjust the budget group"
-                            + " percentages.");
-            return;
-        }
-
-        if (hasEmptyGroups()) {
-            WindowUtils.showInformationDialog(
-                    "Empty Budget Groups",
-                    "One or more budget groups have no categories assigned. Please edit them.");
-            return;
-        }
+        if (!isPlanValid()) return;
 
         try {
             BigDecimal baseIncome;

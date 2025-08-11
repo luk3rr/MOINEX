@@ -9,10 +9,7 @@ import static org.mockito.Mockito.*;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -298,6 +295,151 @@ class FinancialPlanningServiceTest {
                                     financialPlan.getName(),
                                     financialPlan.getBaseIncome(),
                                     groups));
+        }
+    }
+
+    @Nested
+    @DisplayName("Update Plan Tests")
+    class UpdatePlanTests {
+        FinancialPlan existingPlan;
+
+        @BeforeEach
+        void setup() {
+            BudgetGroup existingGroupA =
+                    BudgetGroup.builder()
+                            .name("Essentials")
+                            .targetPercentage(new BigDecimal("50.00"))
+                            .categories(Set.of(category1))
+                            .build();
+
+            BudgetGroup existingGroupB =
+                    BudgetGroup.builder()
+                            .name("Savings")
+                            .targetPercentage(new BigDecimal("50.00"))
+                            .categories(Set.of(category2))
+                            .build();
+
+            existingPlan =
+                    FinancialPlan.builder()
+                            .id(1)
+                            .name("Original Plan")
+                            .baseIncome(new BigDecimal("3000.00"))
+                            .budgetGroups(new ArrayList<>(List.of(existingGroupA, existingGroupB)))
+                            .build();
+
+            existingGroupA.setPlan(existingPlan);
+            existingGroupB.setPlan(existingPlan);
+        }
+
+        @Test
+        @DisplayName("Should update a financial plan successfully")
+        void updatePlan_Success() {
+            BudgetGroup budgetGroupC =
+                    BudgetGroup.builder()
+                            .name("Entertainment")
+                            .targetPercentage(BigDecimal.valueOf(80))
+                            .categories(Set.of(category1))
+                            .build();
+
+            BudgetGroup budgetGroupD =
+                    BudgetGroup.builder()
+                            .name("Health")
+                            .targetPercentage(BigDecimal.valueOf(20))
+                            .categories(Set.of(category2))
+                            .build();
+
+            FinancialPlan updatedPlan =
+                    FinancialPlan.builder()
+                            .id(existingPlan.getId())
+                            .name(existingPlan.getName() + " Updated")
+                            .baseIncome(existingPlan.getBaseIncome().add(BigDecimal.ONE))
+                            .budgetGroups(List.of(budgetGroupC, budgetGroupD))
+                            .build();
+
+            when(financialPlanRepository.findById(anyInt())).thenReturn(Optional.of(existingPlan));
+
+            when(categoryRepository.existsById(anyInt())).thenReturn(true);
+            when(financialPlanRepository.existsByName(anyString())).thenReturn(false);
+            when(financialPlanRepository.save(any(FinancialPlan.class))).thenReturn(updatedPlan);
+
+            financialPlanningService.updatePlan(updatedPlan);
+
+            ArgumentCaptor<FinancialPlan> planCaptor = ArgumentCaptor.forClass(FinancialPlan.class);
+            verify(financialPlanRepository).save(planCaptor.capture());
+            FinancialPlan savedPlan = planCaptor.getValue();
+            assertEquals(updatedPlan.getName(), savedPlan.getName());
+            assertEquals(updatedPlan.getBudgetGroups().size(), savedPlan.getBudgetGroups().size());
+            assertEquals(updatedPlan.getBudgetGroups().size(), savedPlan.getBudgetGroups().size());
+            assertEquals(
+                    updatedPlan.getName(),
+                    savedPlan.getBudgetGroups().getFirst().getPlan().getName());
+            assertEquals(
+                    updatedPlan.getBudgetGroups().getFirst().getName(),
+                    savedPlan.getBudgetGroups().getFirst().getName());
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when updating a non-existent plan")
+        void updatePlan_NotFound_ThrowsException() {
+            when(financialPlanRepository.findById(999)).thenReturn(Optional.empty());
+            FinancialPlan nonExistentPlan = FinancialPlan.builder().id(999).build();
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () -> financialPlanningService.updatePlan(nonExistentPlan));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for a blank name")
+        void updatePlan_BlankName_ThrowsException() {
+            FinancialPlan updatedPlan =
+                    FinancialPlan.builder()
+                            .id(existingPlan.getId())
+                            .name("    ")
+                            .baseIncome(existingPlan.getBaseIncome())
+                            .budgetGroups(existingPlan.getBudgetGroups())
+                            .build();
+
+            when(financialPlanRepository.findById(existingPlan.getId()))
+                    .thenReturn(Optional.of(financialPlan));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> financialPlanningService.updatePlan(updatedPlan));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for a zero base income")
+        void updatePlan_ZeroIncome_ThrowsException() {
+            existingPlan.setBaseIncome(BigDecimal.ZERO);
+            when(financialPlanRepository.findById(existingPlan.getId()))
+                    .thenReturn(Optional.of(new FinancialPlan()));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> financialPlanningService.updatePlan(existingPlan));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalStateException when renaming to an existing plan name")
+        void updatePlan_DuplicateName_ThrowsException() {
+            String existingName = "Another Plan";
+
+            FinancialPlan updatedPlan =
+                    FinancialPlan.builder()
+                            .id(existingPlan.getId())
+                            .name(existingName)
+                            .baseIncome(existingPlan.getBaseIncome())
+                            .budgetGroups(existingPlan.getBudgetGroups())
+                            .build();
+
+            when(financialPlanRepository.findById(existingPlan.getId()))
+                    .thenReturn(Optional.of(existingPlan));
+            when(financialPlanRepository.existsByName(existingName)).thenReturn(true);
+
+            assertThrows(
+                    IllegalStateException.class,
+                    () -> financialPlanningService.updatePlan(updatedPlan));
         }
     }
 

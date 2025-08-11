@@ -37,4 +37,11 @@ public class BudgetGroup {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     @Builder.Default
     private Set<Category> categories = new HashSet<>();
+
+    public boolean isSame(BudgetGroup other) {
+        if (other == null) return false;
+        return this.name.equals(other.name)
+                && this.targetPercentage.compareTo(other.targetPercentage) == 0
+                && this.categories.equals(other.categories);
+    }
 }

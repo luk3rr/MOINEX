@@ -26,6 +26,7 @@ import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
 import org.moinex.ui.common.BudgetGroupPaneController;
 import org.moinex.ui.dialog.financialplanning.AddPlanController;
+import org.moinex.ui.dialog.financialplanning.EditPlanController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -96,7 +97,18 @@ public class PlanController {
 
     @FXML
     private void handleEditPlan() {
-        // TODO: Lógica para abrir o diálogo de edição do plano financeiro atual.
+        if (currentPlan == null) {
+            WindowUtils.showInformationDialog(
+                    "No Active Plan", "Please create a financial plan before editing.");
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.EDIT_PLAN_FXML,
+                "Edit Financial Plan",
+                springContext,
+                (EditPlanController controller) -> controller.setPlan(currentPlan),
+                List.of(this::updateView));
     }
 
     @FXML
@@ -232,6 +244,10 @@ public class PlanController {
     private void updateBudgetGroupPanes() {
         List<AnchorPane> panes = List.of(budgetGroupPane1, budgetGroupPane2, budgetGroupPane3);
         panes.forEach(p -> p.getChildren().clear());
+
+        currentPlanStatus.sort(
+                (a, b) ->
+                        b.group().getTargetPercentage().compareTo(a.group().getTargetPercentage()));
 
         int startIndex = currentPage * ITEMS_PER_PAGE;
         for (int i = 0; i < ITEMS_PER_PAGE; i++) {
