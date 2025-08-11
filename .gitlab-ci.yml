@@ -1,3 +1,8 @@
+include:
+  - project: 'personal/infrastructure_lives'
+    file: '/pipeline/backend.yml'
+    ref: main
+
 variables:
   PROJECT_NAME: "MOINEX"
 
@@ -7,15 +12,21 @@ cache:
 
 stages:
   - test
+  - quality
+  - build
+  - deploy
 
 unit_test:
   stage: test
   image: maven:3.9.6-eclipse-temurin-21
   script:
     - mvn clean install jacoco:prepare-agent install jacoco:report
+    - mvn dependency:copy-dependencies
   artifacts:
     paths:
-      - target/site/jacoco
+      - target/classes
+      - target/dependency
+      - target/site/jacoco/jacoco.xml
     when: always
   cache:
     key: "$CI_COMMIT_REF_SLUG"
@@ -27,3 +38,24 @@ unit_test:
       when: always
     - when: never
       allow_failure: false
+
+build_migration:
+  rules:
+    - when: never
+
+deploy_migration:
+  rules:
+    - when: never
+
+deploy_migration_rollback:
+  rules:
+    - when: never
+
+build_app:
+  rules:
+    - when: never
+
+deploy_app:
+  rules:
+    - when: never
+
