@@ -29,12 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class FinancialPlanningService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FinancialPlanningService.class);
     private FinancialPlanRepository financialPlanRepository;
     private BudgetGroupRepository budgetGroupRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private CategoryRepository categoryRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(FinancialPlanningService.class);
 
     @Autowired
     public FinancialPlanningService(
@@ -79,6 +78,15 @@ public class FinancialPlanningService {
 
         groups.forEach(group -> group.setPlan(plan));
         plan.setBudgetGroups(groups);
+
+        try {
+            FinancialPlan oldPlan = getActivePlan();
+            oldPlan.setArchived(true);
+            financialPlanRepository.save(oldPlan);
+            logger.info("Archived previous financial plan: {}", oldPlan.getName());
+        } catch (EntityNotFoundException e) {
+            logger.info("No active financial plan found, creating a new one.");
+        }
 
         logger.info(
                 "Financial plan '{}' created with base income {}",

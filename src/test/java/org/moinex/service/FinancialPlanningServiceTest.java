@@ -296,6 +296,39 @@ class FinancialPlanningServiceTest {
                                     financialPlan.getBaseIncome(),
                                     groups));
         }
+
+        @Test
+        @DisplayName("Should archive old plan when creating a new one")
+        void createPlan_ArchivesOldPlan() {
+            FinancialPlan oldPlan =
+                    FinancialPlan.builder()
+                            .id(1)
+                            .name("Old Plan")
+                            .baseIncome(new BigDecimal("2000.00"))
+                            .budgetGroups(List.of(budgetGroup1))
+                            .archived(false)
+                            .build();
+
+            when(financialPlanRepository.findByArchivedFalse()).thenReturn(Optional.of(oldPlan));
+            when(financialPlanRepository.existsByName(anyString())).thenReturn(false);
+            when(categoryRepository.existsById(anyInt())).thenReturn(true);
+            when(financialPlanRepository.save(any(FinancialPlan.class))).thenReturn(financialPlan);
+
+            financialPlanningService.createPlan(
+                    financialPlan.getName(),
+                    financialPlan.getBaseIncome(),
+                    financialPlan.getBudgetGroups());
+
+            verify(financialPlanRepository).save(argThat(plan -> plan.isArchived()));
+            verify(financialPlanRepository)
+                    .save(argThat(plan -> plan.getName().equals(financialPlan.getName())));
+            verify(financialPlanRepository, times(1)).findByArchivedFalse();
+            verify(financialPlanRepository, times(1)).existsByName(financialPlan.getName());
+            verify(categoryRepository, atLeastOnce()).existsById(anyInt());
+            verify(financialPlanRepository, times(2)).save(any(FinancialPlan.class));
+            assertTrue(oldPlan.isArchived(), "Old plan should be archived");
+            assertFalse(financialPlan.isArchived(), "New plan should not be archived");
+        }
     }
 
     @Nested

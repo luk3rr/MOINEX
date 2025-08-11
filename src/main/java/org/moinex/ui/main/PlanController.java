@@ -79,6 +79,7 @@ public class PlanController {
 
         try {
             this.currentPlan = financialPlanningService.getActivePlan();
+
             updateView();
         } catch (EntityNotFoundException e) {
             logger.warn("No active financial plan found. Please create a new plan.");
@@ -109,11 +110,6 @@ public class PlanController {
                 springContext,
                 (EditPlanController controller) -> controller.setPlan(currentPlan),
                 List.of(this::updateView));
-    }
-
-    @FXML
-    private void handlePlanArchive() {
-        // TODO: Lógica para abrir o diálogo de edição do plano financeiro atual.
     }
 
     /**

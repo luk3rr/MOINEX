@@ -107,14 +107,14 @@ Repositórios (Spring Data JPA):
 Camada de Serviço (FinancialPlanningService):
 - [X] Criar a nova classe de serviço FinancialPlanningService.java.
 - [X] Implementar o método createPlan(name, income, groups) para criar um novo plano e os seus grupos.
-- [ ] Implementar o método updatePlan(...) para editar um plano existente.
-- [ ] Implementar o método assignCategoriesToGroup(groupId, categoryIds) para gerir as associações.
+- [X] Implementar o método updatePlan(...) para editar um plano existente.
+- [X] Implementar o método assignCategoriesToGroup(groupId, categoryIds) para gerir as associações.
 - [X] Implementar o método principal getPlanStatus(planId, YearMonth period) que calcula os gastos atuais para cada grupo e retorna os dados para a UI.
 
 Testes Unitários (Backend):
 - [X] Criar a classe FinancialPlanningServiceTest.java.
 - [X] Escrever testes para validar a criação de planos.
-- [ ] Escrever testes para validar a edição de planos.
+- [X] Escrever testes para validar a edição de planos.
 - [X] Escrever testes para a lógica de cálculo do método getPlanStatus, simulando diferentes cenários de transações.
 - [X] Testar os casos de erro (ex: percentagens que não somam 100%, dados inválidos).
 
@@ -126,38 +126,38 @@ Navegação Principal:
 Tela Principal de Planeamento:
 - [X] Criar o ficheiro planning.fxml seguindo o esboço visual.
 - [X] Criar o controller PlanningController.java.
-- [ ] Implementar o ComboBox para a seleção do período (mês/ano).
-- [ ] Implementar o card de "Renda Base Mensal".
-- [ ] Implementar o gráfico de anel (Doughnut Chart) para a "Distribuição do Plano".
-- [ ] Criar um contentor (ex: GridPane ou FlowPane) para os cards dos grupos de orçamento.
+- [X] Implementar o ComboBox para a seleção do período (mês/ano).
+- [X] Implementar o card de "Renda Base Mensal".
+- [X] Implementar o gráfico de anel (Doughnut Chart) para a "Distribuição do Plano".
+- [X] Criar um contentor (ex: GridPane ou FlowPane) para os cards dos grupos de orçamento.
 
 Componente Reutilizável (Card de Grupo de Orçamento):
-- [ ] Criar um FXML separado (budget_group_card.fxml) para um único card.
-- [ ] Criar o seu respetivo controller (BudgetGroupCardController.java).
-- [ ] Implementar a lógica para preencher os dados do card (título, metas, valor gasto, barra de progresso, etc.).
-- [ ] Implementar a lógica de cores dinâmicas para a barra de progresso e o texto de estado.
+- [X] Criar um FXML separado (budget_group_card.fxml) para um único card.
+- [X] Criar o seu respetivo controller (BudgetGroupCardController.java).
+- [X] Implementar a lógica para preencher os dados do card (título, metas, valor gasto, barra de progresso, etc.).
+- [X] Implementar a lógica de cores dinâmicas para a barra de progresso e o texto de estado.
 
 Lógica do Controller Principal (PlanningController):
-- [ ] Injetar o FinancialPlanningService.
-- [ ] No método initialize, carregar os dados do plano para o mês atual.
-- [ ] Criar um método updateView(YearMonth period) que:
+- [X] Injetar o FinancialPlanningService.
+- [X] No método initialize, carregar os dados do plano para o mês atual.
+- [X] Criar um método updateView(YearMonth period) que:
   - Chama o financialPlanningService.getPlanStatus(). 
   - Atualiza o gráfico de anel. 
   - Limpa e recria dinamicamente os cards dos grupos de orçamento no contentor.
-- [ ] Adicionar um listener ao ComboBox de período para chamar updateView.
+- [X] Adicionar um listener ao ComboBox de período para chamar updateView.
 
 Assistente de Criação/Edição de Planos (Diálogos):
-- [/] Criar o FXML e o controller para o diálogo de "Novo/Editar Plano".
+- [X] Criar o FXML e o controller para o diálogo de "Novo/Editar Plano".
 - [X] Implementar a interface para definir o nome do plano e a renda base.
 - [X] Implementar a interface para adicionar/editar/remover grupos e as suas percentagens, incluindo os modelos (50/30/20, etc.).
 - [X] Implementar a interface para associar categorias a cada grupo (ex: CheckListView ou duas ListViews com botões de transferência).
 
 ### Fase 3: Integração e Finalização
 Constantes e Estilos:
-- [ ] Adicionar os caminhos para os novos ficheiros FXML no ficheiro Constants.java.
-- [ ] Criar um novo ficheiro CSS (planning.css) para estilizar os novos componentes, garantindo a consistência com o tema da aplicação.
+- [X] Adicionar os caminhos para os novos ficheiros FXML no ficheiro Constants.java.
+- [X] Criar um novo ficheiro CSS (planning.css) para estilizar os novos componentes, garantindo a consistência com o tema da aplicação.
 
 Testes End-to-End:
-- [ ] Testar o fluxo completo: criar um plano, associar categorias, adicionar transações nessas categorias e verificar se o dashboard de planeamento reflete os dados corretamente.
-- [ ] Testar a edição de um plano e verificar se os cálculos são atualizados.
-- [ ] Testar a navegação entre diferentes meses.
+- [X] Testar o fluxo completo: criar um plano, associar categorias, adicionar transações nessas categorias e verificar se o dashboard de planeamento reflete os dados corretamente.
+- [X] Testar a edição de um plano e verificar se os cálculos são atualizados.
+- [X] Testar a navegação entre diferentes meses.
