@@ -98,13 +98,14 @@ CREATE TABLE market_quotes_and_commodities
 
 CREATE TABLE wallet
 (
-    id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    archived BOOLEAN        NOT NULL DEFAULT FALSE,
-    balance  NUMERIC(38, 2) NOT NULL,
-    name     VARCHAR(50)    NOT NULL UNIQUE,
-    type_id  INTEGER,
-    CONSTRAINT fk_wallet_to_wallet_type
-        FOREIGN KEY (type_id) REFERENCES wallet_type (id)
+    id               INTEGER               NOT NULL PRIMARY KEY AUTOINCREMENT,
+    archived         BOOLEAN DEFAULT FALSE NOT NULL,
+    balance          NUMERIC(38, 2)        NOT NULL,
+    name             VARCHAR(50)           NOT NULL UNIQUE,
+    type_id          INTEGER,
+    master_wallet_id INTEGER,
+    CONSTRAINT fk_wallet_type FOREIGN KEY (type_id) REFERENCES wallet_type (id),
+    CONSTRAINT fk_master_wallet FOREIGN KEY (master_wallet_id) REFERENCES wallet (id)
 );
 
 CREATE TABLE wallet_transaction
