@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefWidth="400.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wallettransaction.AddTransferController">
+<VBox alignment="CENTER" prefWidth="460.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wallettransaction.AddTransferController">
    <children>
       <VBox alignment="CENTER" spacing="10.0">
          <children>
@@ -112,16 +112,30 @@
             </JFXButton>
          </children>
       </HBox>
-      <VBox alignment="CENTER">
+      <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <Label text="Date">
-               <font>
-                  <Font size="10.0" />
-               </font>
-            </Label>
-            <DatePicker fx:id="transferDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../../css/component/data-picker.css" />
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Date">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="transferDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../../css/component/data-picker.css" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Category (optional)">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="categoryComboBox" minWidth="130.0" stylesheets="@../../../css/component/combo-box.css" />
+               </children>
+            </VBox>
          </children>
-      </VBox>
+      </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
             <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />

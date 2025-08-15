@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.moinex.model.Category;
 import org.moinex.util.Constants;
 
 /**
@@ -57,6 +58,10 @@ public class Transfer {
     @Column(name = "description")
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private Category category;
+
     public abstract static class TransferBuilder<
             C extends Transfer, B extends TransferBuilder<C, B>> {
         public B date(LocalDateTime date) {
@@ -74,13 +79,15 @@ public class Transfer {
             Wallet receiverWallet,
             LocalDateTime date,
             BigDecimal amount,
-            String description) {
+            String description,
+            Category category) {
         this.id = id;
         this.senderWallet = senderWallet;
         this.receiverWallet = receiverWallet;
         this.date = date.format(Constants.DB_DATE_FORMATTER);
         this.amount = amount;
         this.description = description;
+        this.category = category;
     }
 
     public LocalDateTime getDate() {
