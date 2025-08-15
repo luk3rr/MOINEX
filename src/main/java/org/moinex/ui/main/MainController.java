@@ -58,7 +58,7 @@ public class MainController {
 
     @FXML private Button transactionButton;
 
-    @FXML private Button goalsButton;
+    @FXML private Button goalsAndPlanButton;
 
     @FXML private Button savingsButton;
 
@@ -93,7 +93,7 @@ public class MainController {
         sidebarButtons =
                 new Button[] {
                     menuButton, homeButton, walletButton,
-                    creditCardButton, transactionButton, goalsButton,
+                    creditCardButton, transactionButton, goalsAndPlanButton,
                     savingsButton
                 };
 
@@ -134,10 +134,11 @@ public class MainController {
                     updateSelectedButton(transactionButton);
                 });
 
-        goalsButton.setOnAction(
+        goalsAndPlanButton.setOnAction(
                 event -> {
-                    loadContent(Constants.GOALS_FXML, Constants.GOALS_STYLE_SHEET);
-                    updateSelectedButton(goalsButton);
+                    loadContent(
+                            Constants.GOALS_AND_PLANS_FXML, Constants.GOALS_AND_PLANS_STYLE_SHEET);
+                    updateSelectedButton(goalsAndPlanButton);
                 });
 
         savingsButton.setOnAction(

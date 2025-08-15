@@ -31,3 +31,21 @@
   -fx-text-fill: grey;
   -fx-padding: 5px;
 }
+
+.info-label-red {
+  -fx-text-fill: #dc3545;
+  -fx-font-weight: bold;
+  -fx-font-size: 13px;
+}
+
+.info-label-yellow {
+  -fx-text-fill: #F5B427;
+  -fx-font-weight: bold;
+  -fx-font-size: 13px;
+}
+
+.info-label-green {
+  -fx-text-fill: #28a745;
+  -fx-font-weight: bold;
+  -fx-font-size: 13px;
+}

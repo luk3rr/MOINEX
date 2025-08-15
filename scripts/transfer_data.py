@@ -49,7 +49,7 @@ def migrate_data(old_db_path, new_db_path):
         new_cursor = new_conn.cursor()
 
         # 1. Get the list of all tables from the old database
-        old_cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'flyway_%';")
+        old_cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'flyway_%' AND name NOT LIKE 'HT%';")
         tables = [row[0] for row in old_cursor.fetchall()]
 
         print(f"Tables found for migration: {tables}\n")

@@ -76,6 +76,7 @@ public class WalletTransactionService {
     public Integer transferMoney(
             Integer senderId,
             Integer receiverId,
+            Category category,
             LocalDateTime date,
             BigDecimal amount,
             String description) {
@@ -126,6 +127,7 @@ public class WalletTransactionService {
                         Transfer.builder()
                                 .senderWallet(senderWallet)
                                 .receiverWallet(receiverWallet)
+                                .category(category)
                                 .date(date)
                                 .amount(amount)
                                 .description(description)

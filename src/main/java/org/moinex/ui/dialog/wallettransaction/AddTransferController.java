@@ -22,9 +22,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
+import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
+import org.moinex.service.CategoryService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.CalculatorController;
@@ -60,6 +62,8 @@ public class AddTransferController {
 
     @FXML private DatePicker transferDatePicker;
 
+    @FXML protected ComboBox<Category> categoryComboBox;
+
     private ConfigurableApplicationContext springContext;
 
     private SuggestionsHandlerHelper<Transfer> suggestionsHandler;
@@ -70,7 +74,11 @@ public class AddTransferController {
 
     private CalculatorService calculatorService;
 
+    private CategoryService categoryService;
+
     private List<Wallet> wallets;
+
+    private List<Category> categories;
 
     /**
      * Constructor
@@ -85,10 +93,12 @@ public class AddTransferController {
             WalletService walletService,
             WalletTransactionService walletTransactionService,
             CalculatorService calculatorService,
+            CategoryService categoryService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.calculatorService = calculatorService;
+        this.categoryService = categoryService;
         this.springContext = springContext;
     }
 
@@ -117,6 +127,7 @@ public class AddTransferController {
         configureComboBoxes();
 
         loadWalletsFromDatabase();
+        loadCategoriesFromDatabase();
         loadSuggestionsFromDatabase();
 
         populateComboBoxes();
@@ -157,6 +168,8 @@ public class AddTransferController {
         String description = descriptionField.getText();
         LocalDate transferDate = transferDatePicker.getValue();
 
+        Category category = categoryComboBox.getValue();
+
         if (senderWt == null
                 || receiverWt == null
                 || transferValueString == null
@@ -178,6 +191,7 @@ public class AddTransferController {
             walletTransactionService.transferMoney(
                     senderWt.getId(),
                     receiverWt.getId(),
+                    category,
                     dateTimeWithCurrentHour,
                     transferValue,
                     description);
@@ -364,6 +378,10 @@ public class AddTransferController {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
+    protected void loadCategoriesFromDatabase() {
+        categories = categoryService.getNonArchivedCategoriesOrderedByName();
+    }
+
     private void loadSuggestionsFromDatabase() {
         suggestionsHandler.setSuggestions(walletTransactionService.getTransferSuggestions());
     }
@@ -371,11 +389,17 @@ public class AddTransferController {
     private void populateComboBoxes() {
         senderWalletComboBox.getItems().setAll(wallets);
         receiverWalletComboBox.getItems().setAll(wallets);
+
+        // set the first as empty to discelect any category
+        categories.addFirst(null);
+
+        categoryComboBox.getItems().setAll(categories);
     }
 
     private void configureComboBoxes() {
         UIUtils.configureComboBox(senderWalletComboBox, Wallet::getName);
         UIUtils.configureComboBox(receiverWalletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 
     private void configureSuggestions() {
@@ -383,15 +407,18 @@ public class AddTransferController {
 
         // Format:
         //    Description
-        //    Amount | From: Wallet | To: Wallet
+        //    Amount | From: Wallet | To: Wallet | Category
         Function<Transfer, String> displayFunction =
                 tf ->
                         String.format(
-                                "%s%n%s | From: %s | To: %s ",
+                                "%s%n%s | From: %s | To: %s | %s ",
                                 tf.getDescription(),
                                 UIUtils.formatCurrency(tf.getAmount()),
                                 tf.getSenderWallet().getName(),
-                                tf.getReceiverWallet().getName());
+                                tf.getReceiverWallet().getName(),
+                                tf.getCategory() != null
+                                        ? tf.getCategory().getName()
+                                        : "No Category");
 
         Consumer<Transfer> onSelectCallback = this::fillFieldsWithTransaction;
 
@@ -414,6 +441,8 @@ public class AddTransferController {
         suggestionsHandler.enable();
 
         transferValueField.setText(t.getAmount().toString());
+
+        categoryComboBox.setValue(t.getCategory());
 
         updateSenderWalletBalance();
         updateSenderWalletAfterBalance();

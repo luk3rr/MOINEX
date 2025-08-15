@@ -25,6 +25,7 @@ public class DoughnutChart extends PieChart {
     private final Label centerLabel;
     private final StackPane stackPane;
     private final double seriesTotal;
+    private boolean showCenterLabel = true;
 
     public DoughnutChart(ObservableList<Data> pieData) {
         super(pieData);
@@ -102,13 +103,13 @@ public class DoughnutChart extends PieChart {
                     parent.getChildren().add(innerCircle);
                 }
 
-                if (!parent.getChildren().contains(stackPane)) {
+                if (showCenterLabel && !parent.getChildren().contains(stackPane)) {
                     parent.getChildren().add(stackPane);
                 }
             }
         }
 
-        if (!stackPane.getChildren().contains(centerLabel)) {
+        if (showCenterLabel && !stackPane.getChildren().contains(centerLabel)) {
             stackPane.getChildren().add(centerLabel);
         }
     }
@@ -148,6 +149,12 @@ public class DoughnutChart extends PieChart {
 
         // background transparent
         stackPane.setStyle("-fx-background-color: transparent;");
+    }
+
+    public void setShowCenterLabel(boolean show) {
+        this.showCenterLabel = show;
+        stackPane.setVisible(show);
+        stackPane.setManaged(show);
     }
 
     public void setCenterLabelTextStyle(String text, String style) {

@@ -110,7 +110,7 @@ public abstract class BaseTickerTransactionManagement {
 
         this.wallet = wt;
         walletComboBox.setValue(wallet);
-        UIUtils.updateWalletBalance(wt, walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalanceLabelStyle(wt, walletCurrentBalanceValueLabel);
     }
 
     public void setTicker(Ticker ticker) {
@@ -141,7 +141,7 @@ public abstract class BaseTickerTransactionManagement {
 
         walletComboBox.setOnAction(
                 e -> {
-                    UIUtils.updateWalletBalance(
+                    UIUtils.updateWalletBalanceLabelStyle(
                             walletComboBox.getValue(), walletCurrentBalanceValueLabel);
                     walletAfterBalance();
                 });
@@ -349,7 +349,8 @@ public abstract class BaseTickerTransactionManagement {
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalanceLabelStyle(
+                walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 }

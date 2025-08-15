@@ -115,7 +115,7 @@ public abstract class BaseWalletTransactionManagement {
         wallet = wt;
 
         walletComboBox.setValue(wallet);
-        UIUtils.updateWalletBalance(wallet, walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalanceLabelStyle(wallet, walletCurrentBalanceValueLabel);
     }
 
     @FXML
@@ -139,7 +139,7 @@ public abstract class BaseWalletTransactionManagement {
 
         walletComboBox.setOnAction(
                 e -> {
-                    UIUtils.updateWalletBalance(
+                    UIUtils.updateWalletBalanceLabelStyle(
                             walletComboBox.getValue(), walletCurrentBalanceValueLabel);
                     walletAfterBalance();
                 });
@@ -285,7 +285,8 @@ public abstract class BaseWalletTransactionManagement {
         statusComboBox.setValue(wt.getStatus());
         categoryComboBox.setValue(wt.getCategory());
 
-        UIUtils.updateWalletBalance(walletComboBox.getValue(), walletCurrentBalanceValueLabel);
+        UIUtils.updateWalletBalanceLabelStyle(
+                walletComboBox.getValue(), walletCurrentBalanceValueLabel);
         walletAfterBalance();
     }
 

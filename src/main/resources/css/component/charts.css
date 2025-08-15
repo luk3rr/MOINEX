@@ -1,0 +1,23 @@
+.chart-color-0  { -fx-pie-color: #22c55e; }  .legend-rect.chart-color-0  { -fx-fill: #22c55e; }   /* verde lucro */
+.chart-color-1  { -fx-pie-color: #3b82f6; }  .legend-rect.chart-color-1  { -fx-fill: #3b82f6; }   /* azul principal */
+.chart-color-2  { -fx-pie-color: #f59e0b; }  .legend-rect.chart-color-2  { -fx-fill: #f59e0b; }   /* laranja alerta */
+.chart-color-3  { -fx-pie-color: #ef4444; }  .legend-rect.chart-color-3  { -fx-fill: #ef4444; }   /* vermelho perda */
+.chart-color-4  { -fx-pie-color: #818cf8; }  .legend-rect.chart-color-4  { -fx-fill: #818cf8; }   /* azul secundário */
+
+.chart-color-5  { -fx-pie-color: #eab308; }  .legend-rect.chart-color-5  { -fx-fill: #eab308; }   /* amarelo destaque */
+.chart-color-6  { -fx-pie-color: #10b981; }  .legend-rect.chart-color-6  { -fx-fill: #10b981; }   /* verde esmeralda */
+.chart-color-7  { -fx-pie-color: #6366f1; }  .legend-rect.chart-color-7  { -fx-fill: #6366f1; }   /* roxo */
+.chart-color-8  { -fx-pie-color: #f472b6; }  .legend-rect.chart-color-8  { -fx-fill: #f472b6; }   /* rosa claro */
+.chart-color-9  { -fx-pie-color: #60a5fa; }  .legend-rect.chart-color-9  { -fx-fill: #60a5fa; }   /* azul claro */
+
+.chart-color-10 { -fx-pie-color: #14b8a6; }  .legend-rect.chart-color-10 { -fx-fill: #14b8a6; }   /* verde água */
+.chart-color-11 { -fx-pie-color: #c084fc; }  .legend-rect.chart-color-11 { -fx-fill: #c084fc; }   /* lilás */
+.chart-color-12 { -fx-pie-color: #facc15; }  .legend-rect.chart-color-12 { -fx-fill: #facc15; }   /* amarelo vivo */
+.chart-color-13 { -fx-pie-color: #fb923c; }  .legend-rect.chart-color-13 { -fx-fill: #fb923c; }   /* laranja queimado */
+.chart-color-14 { -fx-pie-color: #a3e635; }  .legend-rect.chart-color-14 { -fx-fill: #a3e635; }   /* verde limão */
+
+.chart-color-15 { -fx-pie-color: #0ea5e9; }  .legend-rect.chart-color-15 { -fx-fill: #0ea5e9; }   /* azul médio */
+.chart-color-16 { -fx-pie-color: #64748b; }  .legend-rect.chart-color-16 { -fx-fill: #64748b; }   /* cinza azulado */
+.chart-color-17 { -fx-pie-color: #94a3b8; }  .legend-rect.chart-color-17 { -fx-fill: #94a3b8; }   /* cinza claro */
+.chart-color-18 { -fx-pie-color: #e11d48; }  .legend-rect.chart-color-18 { -fx-fill: #e11d48; }   /* vermelho escuro */
+.chart-color-19 { -fx-pie-color: #2dd4bf; }  .legend-rect.chart-color-19 { -fx-fill: #2dd4bf; }   /* turquesa */

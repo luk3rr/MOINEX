@@ -65,7 +65,7 @@ class WalletTransactionServiceTest {
 
     private Transfer createTransfer(
             Integer id, Wallet sender, Wallet receiver, LocalDateTime date, BigDecimal amount) {
-        return new Transfer(id, sender, receiver, date, amount, "");
+        return new Transfer(id, sender, receiver, date, amount, "", null);
     }
 
     private WalletTransaction createWalletTransaction(
@@ -134,6 +134,7 @@ class WalletTransactionServiceTest {
             walletTransactionService.transferMoney(
                     wallet1.getId(),
                     wallet2.getId(),
+                    category,
                     transfer.getDate(),
                     transfer.getAmount(),
                     transfer.getDescription());
@@ -175,6 +176,7 @@ class WalletTransactionServiceTest {
                             walletTransactionService.transferMoney(
                                     senderWalletId,
                                     receiverWalletId,
+                                    category,
                                     date,
                                     amountToTransfer,
                                     description));
@@ -198,6 +200,7 @@ class WalletTransactionServiceTest {
                             walletTransactionService.transferMoney(
                                     senderWalletId,
                                     receiverWalletId,
+                                    category,
                                     date,
                                     transferAmount,
                                     description),
@@ -216,6 +219,7 @@ class WalletTransactionServiceTest {
                             walletTransactionService.transferMoney(
                                     wallet1.getId(),
                                     wallet1.getId(),
+                                    category,
                                     date,
                                     transferAmount,
                                     description));
@@ -244,6 +248,7 @@ class WalletTransactionServiceTest {
                             walletTransactionService.transferMoney(
                                     masterWallet.getId(),
                                     virtualWallet.getId(),
+                                    category,
                                     date,
                                     transferAmount,
                                     description));
@@ -266,6 +271,7 @@ class WalletTransactionServiceTest {
                             walletTransactionService.transferMoney(
                                     senderWalletId,
                                     receiverWalletId,
+                                    category,
                                     date,
                                     zeroAmount,
                                     description));
@@ -290,6 +296,7 @@ class WalletTransactionServiceTest {
                             walletTransactionService.transferMoney(
                                     senderWalletId,
                                     receiverWalletId,
+                                    category,
                                     date,
                                     amountToTransfer,
                                     description));

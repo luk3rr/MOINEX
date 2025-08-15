@@ -6,11 +6,15 @@
 
 package org.moinex.util;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.function.Function;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -18,6 +22,7 @@ import lombok.NonNull;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.UserPreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -68,6 +73,7 @@ public final class UIUtils {
 
     /**
      * Remove any tooltip associated with a node.
+     *
      * @param node The node to remove the tooltip from.
      */
     public static void removeTooltipFromNode(Node node) {
@@ -254,7 +260,8 @@ public final class UIUtils {
                 });
     }
 
-    public static void updateWalletBalance(@NonNull Wallet wt, @NonNull Label balanceLabel) {
+    public static void updateWalletBalanceLabelStyle(
+            @NonNull Wallet wt, @NonNull Label balanceLabel) {
         BigDecimal balance = wt.getBalance();
         balanceLabel.setText(formatCurrencyDynamic(balance));
 
@@ -263,5 +270,23 @@ public final class UIUtils {
         } else {
             setLabelStyle(balanceLabel, Constants.NEUTRAL_BALANCE_STYLE);
         }
+    }
+
+    public static void loadContentIntoTab(
+            Tab tab,
+            String fxmlPath,
+            String cssPath,
+            ConfigurableApplicationContext springContext,
+            Class<?> resourceClass)
+            throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(resourceClass.getResource(fxmlPath));
+        loader.setControllerFactory(springContext::getBean);
+        Parent content = loader.load();
+
+        content.getStylesheets()
+                .add(Objects.requireNonNull(resourceClass.getResource(cssPath)).toExternalForm());
+
+        tab.setContent(content);
     }
 }

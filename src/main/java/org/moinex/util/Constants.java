@@ -41,28 +41,51 @@ public final class Constants {
     public static final String UI_MAIN_PATH = "/ui/main/";
     public static final String UI_DIALOG_PATH = "/ui/dialog/";
     public static final String UI_DIALOG_CREDITCARD_PATH = UI_DIALOG_PATH + "creditcard/";
+    // UI creditcard package
+    public static final String ADD_CREDIT_CARD_DEBT_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "add_credit_card_debt.fxml";
+    public static final String ADD_CREDIT_CARD_CREDIT_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "add_credit_card_credit.fxml";
+    public static final String CREDIT_CARD_CREDITS_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "credit_card_credits.fxml";
+    public static final String ADD_CREDIT_CARD_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "add_credit_card.fxml";
+    public static final String ARCHIVED_CREDIT_CARDS_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "archived_credit_cards.fxml";
+    public static final String EDIT_CREDIT_CARD_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "edit_credit_card.fxml";
+    public static final String EDIT_CREDIT_CARD_DEBT_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "edit_credit_card_debt.fxml";
+    public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
+            UI_DIALOG_CREDITCARD_PATH + "credit_card_invoice_payment.fxml";
     public static final String UI_DIALOG_GOAL_PATH = UI_DIALOG_PATH + "goal/";
+    // UI goal package
+    public static final String EDIT_GOAL_FXML = UI_DIALOG_GOAL_PATH + ("edit_goal." + "fxml");
+    public static final String ADD_GOAL_FXML = UI_DIALOG_GOAL_PATH + "add_goal.fxml";
     public static final String UI_DIALOG_INVESTMENT_PATH = UI_DIALOG_PATH + "investment/";
+    // UI investment package
+    public static final String BUY_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "buy_ticker.fxml";
+    public static final String SALE_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "sale_ticker.fxml";
+    public static final String ADD_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "add_ticker.fxml";
+    public static final String ADD_DIVIDEND_FXML =
+            UI_DIALOG_INVESTMENT_PATH + ("add_dividend." + "fxml");
+    public static final String ADD_CRYPTO_EXCHANGE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "add_crypto_exchange.fxml";
+    public static final String ARCHIVED_TICKERS_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "archived_tickers.fxml";
+    public static final String EDIT_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "edit_ticker.fxml";
+    public static final String EDIT_TICKER_PURCHASE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_ticker_purchase.fxml";
+    public static final String EDIT_TICKER_SALE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_ticker_sale.fxml";
+    public static final String EDIT_DIVIDEND_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_dividend.fxml";
+    public static final String EDIT_CRYPTO_EXCHANGE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_crypto_exchange.fxml";
+    public static final String INVESTMENT_TRANSACTIONS_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
     public static final String UI_DIALOG_WALLETTRANSACTION_PATH =
             UI_DIALOG_PATH + "wallettransaction/";
-
-    public static final String UI_COMMON_PATH = "/ui/common/";
-
-    public static final String CSS_SCENE_PATH = "/css/scene/";
-    public static final String CSS_COMMON_PATH = "/css/common/";
-
-    // UI main package
-    public static final String MAIN_FXML = UI_MAIN_PATH + "main.fxml";
-    public static final String HOME_FXML = UI_MAIN_PATH + "home.fxml";
-    public static final String WALLET_FXML = UI_MAIN_PATH + "wallet.fxml";
-    public static final String CREDIT_CARD_FXML = UI_MAIN_PATH + "credit_card.fxml";
-    public static final String TRANSACTION_FXML = UI_MAIN_PATH + "transaction.fxml";
-    public static final String GOALS_FXML = UI_MAIN_PATH + "goals.fxml";
-    public static final String SAVINGS_FXML = UI_MAIN_PATH + "savings.fxml";
-    public static final String CSV_IMPORT_FXML = UI_MAIN_PATH + "csv_import.fxml";
-    public static final String SETTINGS_FXML = UI_MAIN_PATH + "settings.fxml";
-    public static final String SPLASH_SCREEN_FXML = UI_MAIN_PATH + ("splash_screen." + "fxml");
-
     // UI wallettransaction package
     public static final String ADD_WALLET_FXML =
             UI_DIALOG_WALLETTRANSACTION_PATH + "add_wallet.fxml";
@@ -90,51 +113,32 @@ public final class Constants {
             UI_DIALOG_WALLETTRANSACTION_PATH + "add_recurring_transaction.fxml";
     public static final String EDIT_RECURRING_TRANSACTION_FXML =
             UI_DIALOG_WALLETTRANSACTION_PATH + "edit_recurring_transaction.fxml";
-
-    // UI creditcard package
-    public static final String ADD_CREDIT_CARD_DEBT_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "add_credit_card_debt.fxml";
-    public static final String ADD_CREDIT_CARD_CREDIT_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "add_credit_card_credit.fxml";
-    public static final String CREDIT_CARD_CREDITS_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "credit_card_credits.fxml";
-    public static final String ADD_CREDIT_CARD_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "add_credit_card.fxml";
-    public static final String ARCHIVED_CREDIT_CARDS_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "archived_credit_cards.fxml";
-    public static final String EDIT_CREDIT_CARD_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "edit_credit_card.fxml";
-    public static final String EDIT_CREDIT_CARD_DEBT_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "edit_credit_card_debt.fxml";
-    public static final String CREDIT_CARD_INVOICE_PAYMENT_FXML =
-            UI_DIALOG_CREDITCARD_PATH + "credit_card_invoice_payment.fxml";
-
-    // UI goal package
-    public static final String EDIT_GOAL_FXML = UI_DIALOG_GOAL_PATH + ("edit_goal." + "fxml");
-    public static final String ADD_GOAL_FXML = UI_DIALOG_GOAL_PATH + "add_goal.fxml";
-
-    // UI investment package
-    public static final String BUY_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "buy_ticker.fxml";
-    public static final String SALE_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "sale_ticker.fxml";
-    public static final String ADD_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "add_ticker.fxml";
-    public static final String ADD_DIVIDEND_FXML =
-            UI_DIALOG_INVESTMENT_PATH + ("add_dividend." + "fxml");
-    public static final String ADD_CRYPTO_EXCHANGE_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "add_crypto_exchange.fxml";
-    public static final String ARCHIVED_TICKERS_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "archived_tickers.fxml";
-    public static final String EDIT_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "edit_ticker.fxml";
-    public static final String EDIT_TICKER_PURCHASE_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "edit_ticker_purchase.fxml";
-    public static final String EDIT_TICKER_SALE_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "edit_ticker_sale.fxml";
-    public static final String EDIT_DIVIDEND_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "edit_dividend.fxml";
-    public static final String EDIT_CRYPTO_EXCHANGE_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "edit_crypto_exchange.fxml";
-    public static final String INVESTMENT_TRANSACTIONS_FXML =
-            UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
-
+    public static final String UI_DIALOG_FINANCIALPLANNING_PATH =
+            UI_DIALOG_PATH + "financialplanning/";
+    // UI financial planning package
+    public static final String ADD_BUDGET_GROUP_FXML =
+            UI_DIALOG_FINANCIALPLANNING_PATH + "add_budget_group.fxml";
+    public static final String EDIT_BUDGET_GROUP_FXML =
+            UI_DIALOG_FINANCIALPLANNING_PATH + "edit_budget_group.fxml";
+    public static final String ADD_PLAN_FXML = UI_DIALOG_FINANCIALPLANNING_PATH + "add_plan.fxml";
+    public static final String EDIT_PLAN_FXML = UI_DIALOG_FINANCIALPLANNING_PATH + "edit_plan.fxml";
+    public static final String UI_COMMON_PATH = "/ui/common/";
+    public static final String CSS_SCENE_PATH = "/css/scene/";
+    public static final String CSS_COMMON_PATH = "/css/common/";
+    public static final String CSS_COMPONENT_PATH = "/css/component/";
+    // UI main package
+    public static final String MAIN_FXML = UI_MAIN_PATH + "main.fxml";
+    public static final String HOME_FXML = UI_MAIN_PATH + "home.fxml";
+    public static final String WALLET_FXML = UI_MAIN_PATH + "wallet.fxml";
+    public static final String CREDIT_CARD_FXML = UI_MAIN_PATH + "credit_card.fxml";
+    public static final String TRANSACTION_FXML = UI_MAIN_PATH + "transaction.fxml";
+    public static final String GOALS_FXML = UI_MAIN_PATH + "goals.fxml";
+    public static final String PLANS_FXML = UI_MAIN_PATH + "plans.fxml";
+    public static final String GOALS_AND_PLANS_FXML = UI_MAIN_PATH + "goals_and_plans.fxml";
+    public static final String SAVINGS_FXML = UI_MAIN_PATH + "savings.fxml";
+    public static final String CSV_IMPORT_FXML = UI_MAIN_PATH + "csv_import.fxml";
+    public static final String SETTINGS_FXML = UI_MAIN_PATH + "settings.fxml";
+    public static final String SPLASH_SCREEN_FXML = UI_MAIN_PATH + ("splash_screen." + "fxml");
     // UI dialog package
     public static final String ADD_CATEGORY_FXML = UI_DIALOG_PATH + ("add_category." + "fxml");
     public static final String REMOVE_CATEGORY_FXML = UI_DIALOG_PATH + "remove_category.fxml";
@@ -145,6 +149,9 @@ public final class Constants {
     // UI common package
     public static final String WALLET_FULL_PANE_FXML = UI_COMMON_PATH + "wallet_full_pane.fxml";
     public static final String GOAL_FULL_PANE_FXML = UI_COMMON_PATH + "goal_full_pane.fxml";
+    public static final String BUDGET_GROUP_PANE_FXML = UI_COMMON_PATH + "budget_group_pane.fxml";
+    public static final String BUDGET_GROUP_PREVIEW_PANE_FXML =
+            UI_COMMON_PATH + "budget_group_preview_pane.fxml";
 
     public static final String RESUME_PANE_FXML = UI_COMMON_PATH + "resume_pane.fxml";
     public static final String CRC_PANE_FXML = UI_COMMON_PATH + ("credit_card_pane." + "fxml");
@@ -173,11 +180,28 @@ public final class Constants {
     public static final String CREDIT_CARD_STYLE_SHEET = CSS_SCENE_PATH + "credit-card.css";
     public static final String TRANSACTION_STYLE_SHEET = CSS_SCENE_PATH + "transaction.css";
     public static final String GOALS_STYLE_SHEET = CSS_SCENE_PATH + "goals.css";
+    public static final String PLANS_STYLE_SHEET = CSS_SCENE_PATH + "plans.css";
+    public static final String GOALS_AND_PLANS_STYLE_SHEET = CSS_SCENE_PATH + "goals_and_plans.css";
     public static final String SAVINGS_STYLE_SHEET = CSS_SCENE_PATH + "savings.css";
     public static final String CSV_IMPORT_STYLE_SHEET = CSS_SCENE_PATH + "csv_import.css";
     public static final String SETTINGS_STYLE_SHEET = CSS_SCENE_PATH + "settings.css";
+    public static final String CHARTS_COLORS_STYLE_SHEET = CSS_COMPONENT_PATH + "charts.css";
+
+    // Component styles
+    public static final Integer CHARTS_COLORS_COUNT = 20;
+    public static final String CHARTS_COLORS_PREFIX = "chart-color-";
+    public static final String CHARTS_LEGEND_RECT_STYLE = "legend-rect";
+
+    public static final String PROGRESS_BAR_RED_COLOR_STYLE = "progress-bar-red";
+    public static final String PROGRESS_BAR_YELLOW_COLOR_STYLE = "progress-bar-yellow";
+    public static final String PROGRESS_BAR_GREEN_COLOR_STYLE = "progress-bar-green";
 
     public static final String COMMON_STYLE_SHEET = CSS_COMMON_PATH + "common-styles.css";
+
+    // Info styles from common-styles.css
+    public static final String INFO_LABEL_RED_STYLE = "info-label-red";
+    public static final String INFO_LABEL_GREEN_STYLE = "info-label-green";
+    public static final String INFO_LABEL_YELLOW_STYLE = "info-label-yellow";
 
     // Main pane styles
     public static final String SIDEBAR_SELECTED_BUTTON_STYLE = "sidebar-button-selected";
@@ -328,6 +352,7 @@ public final class Constants {
     // Regex
     public static final String DIGITS_ONLY_REGEX = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
+    public static final String BUDGET_GROUP_PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
 
     public static final Integer INVESTMENT_CALCULATION_PRECISION = 8;
     public static final String INVESTMENT_VALUE_REGEX =
@@ -347,8 +372,12 @@ public final class Constants {
     public static final String BITCOIN_TICKER = "BTC-USD";
     public static final String ETHEREUM_TICKER = "ETH-USD";
 
+    // Prevent instantiation
+    private Constants() {}
+
     /**
      * Get a regex that matches digits up to n
+     *
      * @param n The maximum number of digits
      * @return The regex
      * @throws IllegalArgumentException If n is negative
@@ -363,7 +392,8 @@ public final class Constants {
 
     /**
      * Calculate the number of months until the target date
-     * @param beginDate The start date
+     *
+     * @param beginDate  The start date
      * @param targetDate The target date
      * @return The number of months until the target date
      */
@@ -373,7 +403,8 @@ public final class Constants {
 
     /**
      * Calculate the number of days until the target date
-     * @param beginDate The begin date
+     *
+     * @param beginDate  The begin date
      * @param targetDate The target date
      * @return The number of days until the target date
      */
@@ -383,7 +414,8 @@ public final class Constants {
 
     /**
      * Round price according to the ticker type
-     * @param price The price to be rounded
+     *
+     * @param price      The price to be rounded
      * @param tickerType The ticker type
      */
     public static BigDecimal roundPrice(BigDecimal price, TickerType tickerType) {
@@ -395,7 +427,4 @@ public final class Constants {
             return price.setScale(INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP);
         }
     }
-
-    // Prevent instantiation
-    private Constants() {}
 }

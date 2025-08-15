@@ -1,15 +1,15 @@
 {
   "id": "0",
-  "name": "sqlite-db",
-  "createdAt": "2025-07-18T21:20:25.497Z",
-  "updatedAt": "2025-07-18T22:56:35.973Z",
+  "name": "moinex",
+  "createdAt": "2025-08-11T00:05:33.544Z",
+  "updatedAt": "2025-08-15T19:36:08.987Z",
   "databaseType": "sqlite",
   "tables": [
     {
       "id": "1",
-      "name": "bond",
-      "x": 1760.5129681243975,
-      "y": 847.007981262921,
+      "name": "credit_card_credit",
+      "x": -1964.3132864683266,
+      "y": -252.13670526232698,
       "fields": [
         {
           "id": "2",
@@ -21,11 +21,11 @@
           "primaryKey": true,
           "unique": false,
           "nullable": true,
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221
         },
         {
           "id": "3",
-          "name": "average_unit_value",
+          "name": "amount",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -33,81 +33,26 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
           "id": "4",
-          "name": "average_unit_value_count",
+          "name": "date",
           "type": {
-            "id": "numeric",
-            "name": "numeric"
+            "id": "varchar",
+            "name": "varchar"
           },
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
         },
         {
           "id": "5",
-          "name": "current_quantity",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "6",
-          "name": "current_unit_value",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "7",
-          "name": "name",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "8",
-          "name": "symbol",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": true,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "9",
-          "name": "maturity_date",
+          "name": "description",
           "type": {
             "id": "varchar",
             "name": "varchar"
@@ -115,62 +60,11 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
         },
         {
-          "id": "10",
-          "name": "archived",
-          "type": {
-            "id": "boolean",
-            "name": "boolean"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "default": "FALSE",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "11",
-          "name": "interest_index",
-          "type": {
-            "id": "tinyint",
-            "name": "tinyint"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "12",
-          "name": "interest_rate",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "13",
-          "name": "interest_type",
-          "type": {
-            "id": "tinyint",
-            "name": "tinyint"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "14",
+          "id": "6",
           "name": "type",
           "type": {
             "id": "varchar",
@@ -179,36 +73,38 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        }
-      ],
-      "indexes": [
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
         {
-          "id": "15",
-          "name": "sqlite_autoindex_bond_1",
-          "unique": true,
-          "fieldIds": [
-            "8"
-          ],
-          "createdAt": 1752873625220
+          "id": "7",
+          "name": "crc_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
         }
       ],
-      "color": "#8a61f5",
+      "indexes": [],
+      "color": "#ff6363",
       "isView": false,
       "isMaterializedView": false,
-      "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
-      "id": "16",
-      "name": "dividend",
-      "x": 457.1694401057015,
-      "y": -44.41092896336545,
+      "id": "8",
+      "name": "recurring_transaction",
+      "x": -1143.8680978014181,
+      "y": -285.5836893885083,
       "fields": [
         {
-          "id": "17",
+          "id": "9",
           "name": "id",
           "type": {
             "id": "integer",
@@ -220,8 +116,114 @@
           "createdAt": 1752873625221
         },
         {
+          "id": "10",
+          "name": "amount",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "11",
+          "name": "description",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "12",
+          "name": "type",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "13",
+          "name": "end_date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "14",
+          "name": "frequency",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "15",
+          "name": "next_due_date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "16",
+          "name": "start_date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "17",
+          "name": "status",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255",
+          "default": "'ACTIVE'"
+        },
+        {
           "id": "18",
-          "name": "ticker_id",
+          "name": "category_id",
           "type": {
             "id": "integer",
             "name": "integer"
@@ -233,111 +235,6 @@
         },
         {
           "id": "19",
-          "name": "wallet_transaction_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        }
-      ],
-      "indexes": [],
-      "color": "#ff9f74",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
-    },
-    {
-      "id": "20",
-      "name": "credit_card_payment",
-      "x": -663.6521433754339,
-      "y": 334.3651104961677,
-      "fields": [
-        {
-          "id": "21",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "22",
-          "name": "amount",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "23",
-          "name": "date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "24",
-          "name": "installment",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "25",
-          "name": "rebate_used",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "default": "0.00",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "26",
-          "name": "debt_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "27",
           "name": "wallet_id",
           "type": {
             "id": "integer",
@@ -345,23 +242,125 @@
           },
           "primaryKey": false,
           "unique": false,
-          "nullable": true,
+          "nullable": false,
           "createdAt": 1752873625221
+        }
+      ],
+      "indexes": [],
+      "color": "#c05dcf",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "20",
+      "name": "budget_group_categories",
+      "x": -1782.3125527136551,
+      "y": 1036.2262983263327,
+      "fields": [
+        {
+          "id": "21",
+          "name": "budget_group_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1753626738578
+        },
+        {
+          "id": "22",
+          "name": "category_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1753626764538
         }
       ],
       "indexes": [],
       "color": "#42e0c0",
       "isView": false,
+      "createdAt": 1753626738578,
+      "order": 27,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "23",
+      "name": "credit_card_operator",
+      "x": -2018.2265684144436,
+      "y": 195.59041814713626,
+      "fields": [
+        {
+          "id": "24",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625219
+        },
+        {
+          "id": "25",
+          "name": "icon",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625219,
+          "characterMaximumLength": "30"
+        },
+        {
+          "id": "26",
+          "name": "name",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1752873625219,
+          "characterMaximumLength": "50"
+        }
+      ],
+      "indexes": [
+        {
+          "id": "27",
+          "name": "sqlite_autoindex_credit_card_operator_1",
+          "unique": true,
+          "fieldIds": [
+            "26"
+          ],
+          "createdAt": 1752873625219
+        }
+      ],
+      "color": "#ff9f74",
+      "isView": false,
       "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "createdAt": 1752873625219,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
       "id": "28",
       "name": "calendar_event",
-      "x": -440.92749390153404,
-      "y": 2442.876318659633,
+      "x": 101.37686034908901,
+      "y": 835.3313851903588,
       "fields": [
         {
           "id": "29",
@@ -385,8 +384,8 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
         },
         {
           "id": "31",
@@ -398,8 +397,8 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
         },
         {
           "id": "32",
@@ -411,8 +410,8 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
         },
         {
           "id": "33",
@@ -424,8 +423,8 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
         }
       ],
       "indexes": [],
@@ -433,14 +432,14 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": null
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
       "id": "34",
-      "name": "credit_card_credit",
-      "x": -1962.141782570537,
-      "y": -252.13670526232698,
+      "name": "dividend",
+      "x": 457.1694401057015,
+      "y": -44.41092896336545,
       "fields": [
         {
           "id": "35",
@@ -456,60 +455,19 @@
         },
         {
           "id": "36",
-          "name": "amount",
+          "name": "ticker_id",
           "type": {
-            "id": "numeric",
-            "name": "numeric"
+            "id": "integer",
+            "name": "integer"
           },
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "precision": 38,
-          "scale": 2,
           "createdAt": 1752873625221
         },
         {
           "id": "37",
-          "name": "date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "38",
-          "name": "description",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "39",
-          "name": "type",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "40",
-          "name": "crc_id",
+          "name": "wallet_transaction_id",
           "type": {
             "id": "integer",
             "name": "integer"
@@ -521,21 +479,84 @@
         }
       ],
       "indexes": [],
-      "color": "#ff6363",
+      "color": "#ff9f74",
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
-      "id": "41",
-      "name": "credit_card_debt",
-      "x": -1216.6263837115332,
-      "y": 753.1888303688715,
+      "id": "38",
+      "name": "budget_group",
+      "x": -2107.7315828486685,
+      "y": 1036.5204286187097,
       "fields": [
         {
+          "id": "39",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1753626581376
+        },
+        {
+          "id": "40",
+          "name": "name",
+          "type": {
+            "id": "text",
+            "name": "text"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1753626596286
+        },
+        {
+          "id": "41",
+          "name": "target_percentage",
+          "type": {
+            "id": "decimal",
+            "name": "decimal"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1753626603764
+        },
+        {
           "id": "42",
+          "name": "plan_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1753626643608
+        }
+      ],
+      "indexes": [],
+      "color": "#8eb7ff",
+      "isView": false,
+      "createdAt": 1753626581376,
+      "order": 26,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "43",
+      "name": "bond_sale",
+      "x": 1317.9747638486406,
+      "y": 897.8590521977104,
+      "fields": [
+        {
+          "id": "44",
           "name": "id",
           "type": {
             "id": "integer",
@@ -544,49 +565,11 @@
           "primaryKey": true,
           "unique": false,
           "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "43",
-          "name": "date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "44",
-          "name": "description",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221
         },
         {
           "id": "45",
-          "name": "installments",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "46",
-          "name": "amount",
+          "name": "quantity",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -594,13 +577,27 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 20,
+          "scale": 8
+        },
+        {
+          "id": "46",
+          "name": "unit_price",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
           "id": "47",
-          "name": "category_id",
+          "name": "wallet_transaction_id",
           "type": {
             "id": "integer",
             "name": "integer"
@@ -608,34 +605,34 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221
         },
         {
           "id": "48",
-          "name": "crc_id",
+          "name": "bond_id",
           "type": {
             "id": "integer",
             "name": "integer"
           },
           "primaryKey": false,
           "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
+          "nullable": true,
+          "createdAt": 1752873625221
         }
       ],
       "indexes": [],
-      "color": "#9ef07a",
+      "color": "#8a61f5",
       "isView": false,
       "isMaterializedView": false,
-      "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
       "id": "49",
       "name": "wallet",
-      "x": -215.5864353244126,
-      "y": 28.94657589651856,
+      "x": -217.07586530476246,
+      "y": 15.987171465164685,
       "fields": [
         {
           "id": "50",
@@ -659,8 +656,8 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "default": "FALSE",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "default": "FALSE"
         },
         {
           "id": "52",
@@ -672,9 +669,9 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
           "id": "53",
@@ -686,8 +683,8 @@
           "primaryKey": false,
           "unique": true,
           "nullable": false,
-          "characterMaximumLength": "50",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "50"
         },
         {
           "id": "54",
@@ -700,11 +697,23 @@
           "unique": false,
           "nullable": true,
           "createdAt": 1752873625220
+        },
+        {
+          "id": "55",
+          "name": "master_wallet_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1753626938481
         }
       ],
       "indexes": [
         {
-          "id": "55",
+          "id": "56",
           "name": "sqlite_autoindex_wallet_1",
           "unique": true,
           "fieldIds": [
@@ -717,43 +726,30 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
-      "id": "56",
-      "name": "goal",
-      "x": -522.702625161193,
-      "y": -249.28599161268676,
+      "id": "57",
+      "name": "bond_purchase",
+      "x": 1313.6608736917078,
+      "y": 655.1631256072366,
       "fields": [
         {
-          "id": "57",
-          "name": "wallet_id",
+          "id": "58",
+          "name": "id",
           "type": {
             "id": "integer",
             "name": "integer"
           },
           "primaryKey": true,
           "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "58",
-          "name": "completion_date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
           "nullable": true,
-          "characterMaximumLength": "255",
           "createdAt": 1752873625221
         },
         {
           "id": "59",
-          "name": "initial_balance",
+          "name": "quantity",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -761,26 +757,13 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "createdAt": 1752873625221,
+          "precision": 20,
+          "scale": 8
         },
         {
           "id": "60",
-          "name": "motivation",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "500",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "61",
-          "name": "target_balance",
+          "name": "unit_price",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -788,31 +771,42 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
+          "scale": 2
+        },
+        {
+          "id": "61",
+          "name": "wallet_transaction_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
           "createdAt": 1752873625221
         },
         {
           "id": "62",
-          "name": "target_date",
+          "name": "bond_id",
           "type": {
-            "id": "varchar",
-            "name": "varchar"
+            "id": "integer",
+            "name": "integer"
           },
           "primaryKey": false,
           "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
+          "nullable": true,
           "createdAt": 1752873625221
         }
       ],
       "indexes": [],
-      "color": "#8a61f5",
+      "color": "#9ef07a",
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
       "id": "63",
@@ -842,9 +836,9 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 20,
-          "scale": 8,
-          "createdAt": 1752873625221
+          "scale": 8
         },
         {
           "id": "66",
@@ -856,9 +850,9 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
           "id": "67",
@@ -890,187 +884,43 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
       "id": "69",
-      "name": "recurring_transaction",
-      "x": -1141.6965939036286,
-      "y": -285.5836893885083,
+      "name": "goal",
+      "x": -524.8741290589826,
+      "y": -249.28599161268676,
       "fields": [
         {
           "id": "70",
-          "name": "id",
+          "name": "wallet_id",
           "type": {
             "id": "integer",
             "name": "integer"
           },
           "primaryKey": true,
           "unique": false,
-          "nullable": true,
+          "nullable": false,
           "createdAt": 1752873625221
         },
         {
           "id": "71",
-          "name": "amount",
+          "name": "completion_date",
           "type": {
-            "id": "numeric",
-            "name": "numeric"
+            "id": "varchar",
+            "name": "varchar"
           },
           "primaryKey": false,
           "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "nullable": true,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
         },
         {
           "id": "72",
-          "name": "description",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "73",
-          "name": "type",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "74",
-          "name": "end_date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "75",
-          "name": "frequency",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "76",
-          "name": "next_due_date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "77",
-          "name": "start_date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "78",
-          "name": "status",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "default": "'ACTIVE'",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "79",
-          "name": "category_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "80",
-          "name": "wallet_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        }
-      ],
-      "indexes": [],
-      "color": "#c05dcf",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
-    },
-    {
-      "id": "81",
-      "name": "wallet_transaction",
-      "x": 102.42608165680835,
-      "y": 448.0043848827823,
-      "fields": [
-        {
-          "id": "82",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "83",
-          "name": "amount",
+          "name": "initial_balance",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -1078,13 +928,13 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "84",
-          "name": "description",
+          "id": "73",
+          "name": "motivation",
           "type": {
             "id": "varchar",
             "name": "varchar"
@@ -1092,12 +942,26 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "500"
         },
         {
-          "id": "85",
-          "name": "type",
+          "id": "74",
+          "name": "target_balance",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "75",
+          "name": "target_date",
           "type": {
             "id": "varchar",
             "name": "varchar"
@@ -1105,155 +969,26 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "86",
-          "name": "date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "87",
-          "name": "status",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "88",
-          "name": "category_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "89",
-          "name": "wallet_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
         }
       ],
       "indexes": [],
       "color": "#8a61f5",
       "isView": false,
       "isMaterializedView": false,
-      "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
-    },
-    {
-      "id": "90",
-      "name": "purchase",
-      "x": 870.3333131300519,
-      "y": -474.1114747361759,
-      "fields": [
-        {
-          "id": "91",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "92",
-          "name": "quantity",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 20,
-          "scale": 8,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "93",
-          "name": "unit_price",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "94",
-          "name": "ticker_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "95",
-          "name": "wallet_transaction_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        }
-      ],
-      "indexes": [],
-      "color": "#42e0c0",
-      "isView": false,
-      "isMaterializedView": false,
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
-      "id": "96",
+      "id": "76",
       "name": "crypto_exchange",
       "x": 1649.5950159931522,
       "y": -330.41921451210163,
       "fields": [
         {
-          "id": "97",
+          "id": "77",
           "name": "id",
           "type": {
             "id": "integer",
@@ -1265,7 +1000,7 @@
           "createdAt": 1752873625221
         },
         {
-          "id": "98",
+          "id": "78",
           "name": "date",
           "type": {
             "id": "varchar",
@@ -1274,11 +1009,11 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
         },
         {
-          "id": "99",
+          "id": "79",
           "name": "description",
           "type": {
             "id": "varchar",
@@ -1287,11 +1022,11 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
         },
         {
-          "id": "100",
+          "id": "80",
           "name": "received_quantity",
           "type": {
             "id": "numeric",
@@ -1300,12 +1035,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
-          "id": "101",
+          "id": "81",
           "name": "sold_quantity",
           "type": {
             "id": "numeric",
@@ -1314,12 +1049,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
-          "id": "102",
+          "id": "82",
           "name": "received_crypto_id",
           "type": {
             "id": "integer",
@@ -1331,7 +1066,7 @@
           "createdAt": 1752873625221
         },
         {
-          "id": "103",
+          "id": "83",
           "name": "sold_crypto_id",
           "type": {
             "id": "integer",
@@ -1348,14 +1083,270 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
+    },
+    {
+      "id": "84",
+      "name": "transfer",
+      "x": -174.03478921914228,
+      "y": -299.0479040329172,
+      "fields": [
+        {
+          "id": "85",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "86",
+          "name": "amount",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "87",
+          "name": "date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "88",
+          "name": "description",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "89",
+          "name": "receiver_wallet_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "90",
+          "name": "sender_wallet_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "91",
+          "name": "category_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "unique": false,
+          "nullable": true,
+          "primaryKey": false,
+          "createdAt": 1755286480516
+        }
+      ],
+      "indexes": [],
+      "color": "#4dee8a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "92",
+      "name": "credit_card",
+      "x": -1595.6554708204408,
+      "y": -92.70526888776892,
+      "fields": [
+        {
+          "id": "93",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "94",
+          "name": "archived",
+          "type": {
+            "id": "boolean",
+            "name": "boolean"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "default": "FALSE"
+        },
+        {
+          "id": "95",
+          "name": "billing_due_day",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "96",
+          "name": "closing_day",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "97",
+          "name": "last_four_digits",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "4"
+        },
+        {
+          "id": "98",
+          "name": "max_debt",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "99",
+          "name": "name",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "50"
+        },
+        {
+          "id": "100",
+          "name": "available_rebate",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2,
+          "default": "0.00"
+        },
+        {
+          "id": "101",
+          "name": "default_billing_wallet_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "102",
+          "name": "operator_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        }
+      ],
+      "indexes": [
+        {
+          "id": "103",
+          "name": "sqlite_autoindex_credit_card_1",
+          "unique": true,
+          "fieldIds": [
+            "99"
+          ],
+          "createdAt": 1752873625220
+        }
+      ],
+      "color": "#4dee8a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625220,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
       "id": "104",
-      "name": "credit_card",
-      "x": -1593.4839669226512,
-      "y": -92.70526888776892,
+      "name": "market_quotes_and_commodities",
+      "x": 443.64100455088607,
+      "y": 773.9605602076025,
       "fields": [
         {
           "id": "105",
@@ -1371,159 +1362,6 @@
         },
         {
           "id": "106",
-          "name": "archived",
-          "type": {
-            "id": "boolean",
-            "name": "boolean"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "default": "FALSE",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "107",
-          "name": "billing_due_day",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "108",
-          "name": "closing_day",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "109",
-          "name": "last_four_digits",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "4",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "110",
-          "name": "max_debt",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "111",
-          "name": "name",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": true,
-          "nullable": false,
-          "characterMaximumLength": "50",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "112",
-          "name": "available_rebate",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "default": "0.00",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "113",
-          "name": "default_billing_wallet_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "114",
-          "name": "operator_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        }
-      ],
-      "indexes": [
-        {
-          "id": "115",
-          "name": "sqlite_autoindex_credit_card_1",
-          "unique": true,
-          "fieldIds": [
-            "111"
-          ],
-          "createdAt": 1752873625220
-        }
-      ],
-      "color": "#4dee8a",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
-    },
-    {
-      "id": "116",
-      "name": "market_quotes_and_commodities",
-      "x": 149.12512876402207,
-      "y": 2454.052888152858,
-      "fields": [
-        {
-          "id": "117",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "118",
           "name": "bitcoin",
           "type": {
             "id": "numeric",
@@ -1532,12 +1370,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "119",
+          "id": "107",
           "name": "coffee",
           "type": {
             "id": "numeric",
@@ -1546,12 +1384,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "120",
+          "id": "108",
           "name": "dollar",
           "type": {
             "id": "numeric",
@@ -1560,12 +1398,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "121",
+          "id": "109",
           "name": "ethereum",
           "type": {
             "id": "numeric",
@@ -1574,12 +1412,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "122",
+          "id": "110",
           "name": "euro",
           "type": {
             "id": "numeric",
@@ -1588,12 +1426,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "123",
+          "id": "111",
           "name": "gold",
           "type": {
             "id": "numeric",
@@ -1602,12 +1440,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "124",
+          "id": "112",
           "name": "ibovespa",
           "type": {
             "id": "numeric",
@@ -1616,12 +1454,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "125",
+          "id": "113",
           "name": "last_update",
           "type": {
             "id": "timestamp",
@@ -1633,7 +1471,7 @@
           "createdAt": 1752873625220
         },
         {
-          "id": "126",
+          "id": "114",
           "name": "oil_brent",
           "type": {
             "id": "numeric",
@@ -1642,12 +1480,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "127",
+          "id": "115",
           "name": "soybean",
           "type": {
             "id": "numeric",
@@ -1656,12 +1494,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         },
         {
-          "id": "128",
+          "id": "116",
           "name": "wheat",
           "type": {
             "id": "numeric",
@@ -1670,9 +1508,9 @@
           "primaryKey": false,
           "unique": false,
           "nullable": true,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
+          "scale": 2
         }
       ],
       "indexes": [],
@@ -1680,17 +1518,19 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": null
+      "width": 329,
+      "expanded": true,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
-      "id": "129",
-      "name": "ticker_sale",
-      "x": 1999.6369955131088,
-      "y": 350.9719024221896,
+      "id": "117",
+      "name": "purchase",
+      "x": 870.3333131300519,
+      "y": -474.1114747361759,
       "fields": [
         {
-          "id": "130",
+          "id": "118",
           "name": "id",
           "type": {
             "id": "integer",
@@ -1702,7 +1542,7 @@
           "createdAt": 1752873625221
         },
         {
-          "id": "131",
+          "id": "119",
           "name": "quantity",
           "type": {
             "id": "numeric",
@@ -1711,12 +1551,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 20,
-          "scale": 8,
-          "createdAt": 1752873625221
+          "scale": 8
         },
         {
-          "id": "132",
+          "id": "120",
           "name": "unit_price",
           "type": {
             "id": "numeric",
@@ -1725,12 +1565,91 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
+          "scale": 2
+        },
+        {
+          "id": "121",
+          "name": "ticker_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
           "createdAt": 1752873625221
         },
         {
-          "id": "133",
+          "id": "122",
+          "name": "wallet_transaction_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
+        }
+      ],
+      "indexes": [],
+      "color": "#42e0c0",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
+    },
+    {
+      "id": "123",
+      "name": "ticker_sale",
+      "x": 1999.6369955131088,
+      "y": 350.9719024221896,
+      "fields": [
+        {
+          "id": "124",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "125",
+          "name": "quantity",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 20,
+          "scale": 8
+        },
+        {
+          "id": "126",
+          "name": "unit_price",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "127",
           "name": "average_cost",
           "type": {
             "id": "numeric",
@@ -1739,12 +1658,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
-          "id": "134",
+          "id": "128",
           "name": "wallet_transaction_id",
           "type": {
             "id": "integer",
@@ -1756,7 +1675,7 @@
           "createdAt": 1752873625221
         },
         {
-          "id": "135",
+          "id": "129",
           "name": "ticker_id",
           "type": {
             "id": "integer",
@@ -1773,17 +1692,183 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
-      "id": "136",
+      "id": "130",
+      "name": "wallet_type",
+      "x": -216.57319273240435,
+      "y": 266.31654277943915,
+      "fields": [
+        {
+          "id": "131",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "132",
+          "name": "icon",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "30"
+        },
+        {
+          "id": "133",
+          "name": "name",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "50"
+        }
+      ],
+      "indexes": [
+        {
+          "id": "134",
+          "name": "sqlite_autoindex_wallet_type_1",
+          "unique": true,
+          "fieldIds": [
+            "133"
+          ],
+          "createdAt": 1752873625220
+        }
+      ],
+      "color": "#c05dcf",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625220,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "135",
+      "name": "credit_card_debt",
+      "x": -1218.7978876093227,
+      "y": 753.1888303688715,
+      "fields": [
+        {
+          "id": "136",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "137",
+          "name": "date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "138",
+          "name": "description",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "139",
+          "name": "installments",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "140",
+          "name": "amount",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "141",
+          "name": "category_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "142",
+          "name": "crc_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        }
+      ],
+      "indexes": [],
+      "color": "#9ef07a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625220,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "143",
       "name": "category",
-      "x": -1635.5201608952934,
+      "x": -1637.691664793083,
       "y": 641.0120581281326,
       "fields": [
         {
-          "id": "137",
+          "id": "144",
           "name": "id",
           "type": {
             "id": "integer",
@@ -1795,7 +1880,7 @@
           "createdAt": 1752873625219
         },
         {
-          "id": "138",
+          "id": "145",
           "name": "archived",
           "type": {
             "id": "boolean",
@@ -1807,7 +1892,7 @@
           "createdAt": 1752873625219
         },
         {
-          "id": "139",
+          "id": "146",
           "name": "name",
           "type": {
             "id": "varchar",
@@ -1816,8 +1901,8 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "characterMaximumLength": "50",
-          "createdAt": 1752873625219
+          "createdAt": 1752873625219,
+          "characterMaximumLength": "50"
         }
       ],
       "indexes": [],
@@ -1825,109 +1910,14 @@
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625219,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
-    },
-    {
-      "id": "140",
-      "name": "brazilian_market_indicators",
-      "x": -132.63938557970783,
-      "y": 2452.560053350421,
-      "fields": [
-        {
-          "id": "141",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "142",
-          "name": "ipca_12_months",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "143",
-          "name": "ipca_last_month_rate",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "144",
-          "name": "ipca_last_month_reference",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "145",
-          "name": "last_update",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "146",
-          "name": "selic_target",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        }
-      ],
-      "indexes": [],
-      "color": "#ff6b8a",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": null
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
       "id": "147",
-      "name": "sale",
-      "x": 1289.1246549716432,
-      "y": -474.0065725687246,
+      "name": "bond",
+      "x": 1760.5129681243975,
+      "y": 847.007981262921,
       "fields": [
         {
           "id": "148",
@@ -1939,10 +1929,311 @@
           "primaryKey": true,
           "unique": false,
           "nullable": true,
-          "createdAt": 1752873625221
+          "createdAt": 1752873625220
         },
         {
           "id": "149",
+          "name": "average_unit_value",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "150",
+          "name": "average_unit_value_count",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "151",
+          "name": "current_quantity",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "152",
+          "name": "current_unit_value",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "153",
+          "name": "name",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "154",
+          "name": "symbol",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "155",
+          "name": "maturity_date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "156",
+          "name": "archived",
+          "type": {
+            "id": "boolean",
+            "name": "boolean"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "default": "FALSE"
+        },
+        {
+          "id": "157",
+          "name": "interest_index",
+          "type": {
+            "id": "tinyint",
+            "name": "tinyint"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "158",
+          "name": "interest_rate",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "159",
+          "name": "interest_type",
+          "type": {
+            "id": "tinyint",
+            "name": "tinyint"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "160",
+          "name": "type",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        }
+      ],
+      "indexes": [
+        {
+          "id": "161",
+          "name": "sqlite_autoindex_bond_1",
+          "unique": true,
+          "fieldIds": [
+            "154"
+          ],
+          "createdAt": 1752873625220
+        }
+      ],
+      "color": "#8a61f5",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625220,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
+    },
+    {
+      "id": "162",
+      "name": "credit_card_payment",
+      "x": -665.8236472732234,
+      "y": 334.3651104961677,
+      "fields": [
+        {
+          "id": "163",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "164",
+          "name": "amount",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "165",
+          "name": "date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "166",
+          "name": "installment",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "167",
+          "name": "rebate_used",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221,
+          "precision": 38,
+          "scale": 2,
+          "default": "0.00"
+        },
+        {
+          "id": "168",
+          "name": "debt_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "169",
+          "name": "wallet_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625221
+        }
+      ],
+      "indexes": [],
+      "color": "#42e0c0",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
+    },
+    {
+      "id": "170",
+      "name": "sale",
+      "x": 1289.1246549716432,
+      "y": -474.0065725687246,
+      "fields": [
+        {
+          "id": "171",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625221
+        },
+        {
+          "id": "172",
           "name": "quantity",
           "type": {
             "id": "numeric",
@@ -1951,12 +2242,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 20,
-          "scale": 8,
-          "createdAt": 1752873625221
+          "scale": 8
         },
         {
-          "id": "150",
+          "id": "173",
           "name": "unit_price",
           "type": {
             "id": "numeric",
@@ -1965,12 +2256,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
-          "id": "151",
+          "id": "174",
           "name": "average_cost",
           "type": {
             "id": "numeric",
@@ -1979,12 +2270,12 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625221,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
-          "id": "152",
+          "id": "175",
           "name": "ticker_id",
           "type": {
             "id": "integer",
@@ -1996,311 +2287,87 @@
           "createdAt": 1752873625221
         },
         {
-          "id": "153",
-          "name": "wallet_transaction_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        }
-      ],
-      "indexes": [],
-      "color": "#4dee8a",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
-    },
-    {
-      "id": "154",
-      "name": "transfer",
-      "x": -171.86328532135275,
-      "y": -299.0479040329172,
-      "fields": [
-        {
-          "id": "155",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "156",
-          "name": "amount",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "157",
-          "name": "date",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "158",
-          "name": "description",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "159",
-          "name": "receiver_wallet_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "160",
-          "name": "sender_wallet_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        }
-      ],
-      "indexes": [],
-      "color": "#4dee8a",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
-    },
-    {
-      "id": "161",
-      "name": "bond_sale",
-      "x": 1317.9747638486406,
-      "y": 897.8590521977104,
-      "fields": [
-        {
-          "id": "162",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "163",
-          "name": "quantity",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 20,
-          "scale": 8,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "164",
-          "name": "unit_price",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "165",
-          "name": "wallet_transaction_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "createdAt": 1752873625221
-        },
-        {
-          "id": "166",
-          "name": "bond_id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625221
-        }
-      ],
-      "indexes": [],
-      "color": "#8a61f5",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
-    },
-    {
-      "id": "167",
-      "name": "ticker",
-      "x": 1022.5777558778107,
-      "y": -13.217773662911858,
-      "fields": [
-        {
-          "id": "168",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "169",
-          "name": "average_unit_value",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "170",
-          "name": "average_unit_value_count",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "171",
-          "name": "current_quantity",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "172",
-          "name": "current_unit_value",
-          "type": {
-            "id": "numeric",
-            "name": "numeric"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "173",
-          "name": "name",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "174",
-          "name": "symbol",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": true,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "175",
-          "name": "archived",
-          "type": {
-            "id": "boolean",
-            "name": "boolean"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "default": "FALSE",
-          "createdAt": 1752873625220
-        },
-        {
           "id": "176",
+          "name": "wallet_transaction_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625221
+        }
+      ],
+      "indexes": [],
+      "color": "#4dee8a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
+    },
+    {
+      "id": "177",
+      "name": "brazilian_market_indicators",
+      "x": 868.8817571730235,
+      "y": 552.7906677596828,
+      "fields": [
+        {
+          "id": "178",
+          "name": "id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "179",
+          "name": "ipca_12_months",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "180",
+          "name": "ipca_last_month_rate",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "181",
+          "name": "ipca_last_month_reference",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "182",
           "name": "last_update",
           "type": {
             "id": "varchar",
@@ -2308,110 +2375,38 @@
           },
           "primaryKey": false,
           "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "177",
-          "name": "type",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": false,
-          "characterMaximumLength": "255",
-          "createdAt": 1752873625220
-        }
-      ],
-      "indexes": [
-        {
-          "id": "178",
-          "name": "sqlite_autoindex_ticker_1",
-          "unique": true,
-          "fieldIds": [
-            "174"
-          ],
-          "createdAt": 1752873625220
-        }
-      ],
-      "color": "#9ef07a",
-      "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
-    },
-    {
-      "id": "179",
-      "name": "wallet_type",
-      "x": -214.40168883461482,
-      "y": 266.31654277943915,
-      "fields": [
-        {
-          "id": "180",
-          "name": "id",
-          "type": {
-            "id": "integer",
-            "name": "integer"
-          },
-          "primaryKey": true,
-          "unique": false,
           "nullable": true,
-          "createdAt": 1752873625220
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
         },
-        {
-          "id": "181",
-          "name": "icon",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "30",
-          "createdAt": 1752873625220
-        },
-        {
-          "id": "182",
-          "name": "name",
-          "type": {
-            "id": "varchar",
-            "name": "varchar"
-          },
-          "primaryKey": false,
-          "unique": true,
-          "nullable": false,
-          "characterMaximumLength": "50",
-          "createdAt": 1752873625220
-        }
-      ],
-      "indexes": [
         {
           "id": "183",
-          "name": "sqlite_autoindex_wallet_type_1",
-          "unique": true,
-          "fieldIds": [
-            "182"
-          ],
-          "createdAt": 1752873625220
+          "name": "selic_target",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
         }
       ],
-      "color": "#c05dcf",
+      "indexes": [],
+      "color": "#ff6b8a",
       "isView": false,
       "isMaterializedView": false,
       "createdAt": 1752873625220,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
     },
     {
       "id": "184",
-      "name": "credit_card_operator",
-      "x": -2016.055064516654,
-      "y": 195.59041814713626,
+      "name": "financial_plan",
+      "x": -2106.018170579108,
+      "y": 835.5126104981956,
       "fields": [
         {
           "id": "185",
@@ -2421,60 +2416,60 @@
             "name": "integer"
           },
           "primaryKey": true,
-          "unique": false,
-          "nullable": true,
-          "createdAt": 1752873625219
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1753626519800
         },
         {
           "id": "186",
-          "name": "icon",
+          "name": "name",
           "type": {
-            "id": "varchar",
-            "name": "varchar"
+            "id": "text",
+            "name": "text"
           },
           "primaryKey": false,
           "unique": false,
-          "nullable": true,
-          "characterMaximumLength": "30",
-          "createdAt": 1752873625219
+          "nullable": false,
+          "createdAt": 1753626538169
         },
         {
           "id": "187",
-          "name": "name",
+          "name": "base_income",
           "type": {
-            "id": "varchar",
-            "name": "varchar"
+            "id": "decimal",
+            "name": "decimal"
           },
           "primaryKey": false,
-          "unique": true,
+          "unique": false,
           "nullable": false,
-          "characterMaximumLength": "50",
-          "createdAt": 1752873625219
-        }
-      ],
-      "indexes": [
+          "createdAt": 1753626547521
+        },
         {
           "id": "188",
-          "name": "sqlite_autoindex_credit_card_operator_1",
-          "unique": true,
-          "fieldIds": [
-            "187"
-          ],
-          "createdAt": 1752873625219
+          "name": "archived",
+          "type": {
+            "id": "bool",
+            "name": "bool"
+          },
+          "unique": false,
+          "nullable": false,
+          "primaryKey": false,
+          "createdAt": 1754952514386
         }
       ],
-      "color": "#ff9f74",
+      "indexes": [],
+      "color": "#ff6b8a",
       "isView": false,
-      "isMaterializedView": false,
-      "createdAt": 1752873625219,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "rnveq6gvsv7ryjuzqjcw0o5gf"
+      "createdAt": 1753626519801,
+      "order": 25,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     },
     {
       "id": "189",
-      "name": "bond_purchase",
-      "x": 1313.6608736917078,
-      "y": 655.1631256072366,
+      "name": "ticker",
+      "x": 1022.5777558778107,
+      "y": -13.217773662911858,
       "fields": [
         {
           "id": "190",
@@ -2486,11 +2481,11 @@
           "primaryKey": true,
           "unique": false,
           "nullable": true,
-          "createdAt": 1752873625221
+          "createdAt": 1752873625220
         },
         {
           "id": "191",
-          "name": "quantity",
+          "name": "average_unit_value",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -2498,13 +2493,13 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "precision": 20,
-          "scale": 8,
-          "createdAt": 1752873625221
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
         },
         {
           "id": "192",
-          "name": "unit_price",
+          "name": "average_unit_value_count",
           "type": {
             "id": "numeric",
             "name": "numeric"
@@ -2512,437 +2507,682 @@
           "primaryKey": false,
           "unique": false,
           "nullable": false,
+          "createdAt": 1752873625220,
           "precision": 38,
-          "scale": 2,
-          "createdAt": 1752873625221
+          "scale": 2
         },
         {
           "id": "193",
-          "name": "wallet_transaction_id",
+          "name": "current_quantity",
           "type": {
-            "id": "integer",
-            "name": "integer"
+            "id": "numeric",
+            "name": "numeric"
           },
           "primaryKey": false,
           "unique": false,
           "nullable": false,
-          "createdAt": 1752873625221
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
         },
         {
           "id": "194",
-          "name": "bond_id",
+          "name": "current_unit_value",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "195",
+          "name": "name",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "196",
+          "name": "symbol",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": true,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "197",
+          "name": "archived",
+          "type": {
+            "id": "boolean",
+            "name": "boolean"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "default": "FALSE"
+        },
+        {
+          "id": "198",
+          "name": "last_update",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "199",
+          "name": "type",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        }
+      ],
+      "indexes": [
+        {
+          "id": "200",
+          "name": "sqlite_autoindex_ticker_1",
+          "unique": true,
+          "fieldIds": [
+            "196"
+          ],
+          "createdAt": 1752873625220
+        }
+      ],
+      "color": "#9ef07a",
+      "isView": false,
+      "isMaterializedView": false,
+      "createdAt": 1752873625220,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "ss0r4f6o3ivmphtzs9fyw4w8b"
+    },
+    {
+      "id": "201",
+      "name": "wallet_transaction",
+      "x": 100.25457775901882,
+      "y": 448.0043848827823,
+      "fields": [
+        {
+          "id": "202",
+          "name": "id",
           "type": {
             "id": "integer",
             "name": "integer"
+          },
+          "primaryKey": true,
+          "unique": false,
+          "nullable": true,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "203",
+          "name": "amount",
+          "type": {
+            "id": "numeric",
+            "name": "numeric"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "precision": 38,
+          "scale": 2
+        },
+        {
+          "id": "204",
+          "name": "description",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
           },
           "primaryKey": false,
           "unique": false,
           "nullable": true,
-          "createdAt": 1752873625221
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "205",
+          "name": "type",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "206",
+          "name": "date",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "207",
+          "name": "status",
+          "type": {
+            "id": "varchar",
+            "name": "varchar"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220,
+          "characterMaximumLength": "255"
+        },
+        {
+          "id": "208",
+          "name": "category_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
+        },
+        {
+          "id": "209",
+          "name": "wallet_id",
+          "type": {
+            "id": "integer",
+            "name": "integer"
+          },
+          "primaryKey": false,
+          "unique": false,
+          "nullable": false,
+          "createdAt": 1752873625220
         }
       ],
       "indexes": [],
-      "color": "#9ef07a",
+      "color": "#8a61f5",
       "isView": false,
       "isMaterializedView": false,
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk",
-      "parentAreaId": "554izuubm6t65kn648jto80ks"
+      "createdAt": 1752873625220,
+      "diagramId": "0sqwyqxgz2fq",
+      "parentAreaId": "etcvg3t5lmp23pmzmprl8egsj"
     }
   ],
   "relationships": [
     {
-      "id": "195",
-      "name": "fk_bond_purchase_bond_id_bond_id",
-      "sourceTableId": "189",
-      "targetTableId": "1",
-      "sourceFieldId": "194",
-      "targetFieldId": "2",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "196",
-      "name": "fk_bond_purchase_wallet_transaction_id_wallet_transaction_id",
-      "sourceTableId": "189",
-      "targetTableId": "81",
-      "sourceFieldId": "193",
-      "targetFieldId": "82",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "197",
-      "name": "fk_bond_sale_bond_id_bond_id",
-      "sourceTableId": "161",
-      "targetTableId": "1",
-      "sourceFieldId": "166",
-      "targetFieldId": "2",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "198",
-      "name": "fk_bond_sale_wallet_transaction_id_wallet_transaction_id",
-      "sourceTableId": "161",
-      "targetTableId": "81",
-      "sourceFieldId": "165",
-      "targetFieldId": "82",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "199",
-      "name": "fk_credit_card_credit_crc_id_credit_card_id",
-      "sourceTableId": "34",
-      "targetTableId": "104",
-      "sourceFieldId": "40",
-      "targetFieldId": "105",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "200",
-      "name": "fk_credit_card_debt_category_id_category_id",
-      "sourceTableId": "41",
-      "targetTableId": "136",
-      "sourceFieldId": "47",
-      "targetFieldId": "137",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "201",
-      "name": "fk_credit_card_debt_crc_id_credit_card_id",
-      "sourceTableId": "41",
-      "targetTableId": "104",
-      "sourceFieldId": "48",
-      "targetFieldId": "105",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "202",
-      "name": "fk_credit_card_default_billing_wallet_id_wallet_id",
-      "sourceTableId": "104",
-      "targetTableId": "49",
-      "sourceFieldId": "113",
-      "targetFieldId": "50",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "203",
-      "name": "fk_credit_card_operator_id_credit_card_operator_id",
-      "sourceTableId": "104",
+      "id": "210",
+      "name": "budget_goup_plan_id_fk",
+      "sourceTableId": "38",
       "targetTableId": "184",
-      "sourceFieldId": "114",
+      "sourceFieldId": "42",
       "targetFieldId": "185",
       "sourceCardinality": "many",
       "targetCardinality": "one",
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk"
+      "createdAt": 1753626668285,
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "204",
-      "name": "fk_credit_card_payment_debt_id_credit_card_debt_id",
+      "id": "211",
+      "name": "budget_group_categories_budget_group_id_fk",
       "sourceTableId": "20",
-      "targetTableId": "41",
-      "sourceFieldId": "26",
-      "targetFieldId": "42",
+      "targetTableId": "38",
+      "sourceFieldId": "21",
+      "targetFieldId": "39",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1753626799365,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "212",
+      "name": "budget_group_categories_category_id_fk",
+      "sourceTableId": "20",
+      "targetTableId": "143",
+      "sourceFieldId": "22",
+      "targetFieldId": "144",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1753626803826,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "213",
+      "name": "fk_bond_purchase_bond_id_bond_id",
+      "sourceTableId": "57",
+      "targetTableId": "147",
+      "sourceFieldId": "62",
+      "targetFieldId": "148",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "205",
-      "name": "fk_credit_card_payment_wallet_id_wallet_id",
-      "sourceTableId": "20",
+      "id": "214",
+      "name": "fk_bond_purchase_wallet_transaction_id_wallet_transaction_id",
+      "sourceTableId": "57",
+      "targetTableId": "201",
+      "sourceFieldId": "61",
+      "targetFieldId": "202",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "215",
+      "name": "fk_bond_sale_bond_id_bond_id",
+      "sourceTableId": "43",
+      "targetTableId": "147",
+      "sourceFieldId": "48",
+      "targetFieldId": "148",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "216",
+      "name": "fk_bond_sale_wallet_transaction_id_wallet_transaction_id",
+      "sourceTableId": "43",
+      "targetTableId": "201",
+      "sourceFieldId": "47",
+      "targetFieldId": "202",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "217",
+      "name": "fk_credit_card_credit_crc_id_credit_card_id",
+      "sourceTableId": "1",
+      "targetTableId": "92",
+      "sourceFieldId": "7",
+      "targetFieldId": "93",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "218",
+      "name": "fk_credit_card_debt_category_id_category_id",
+      "sourceTableId": "135",
+      "targetTableId": "143",
+      "sourceFieldId": "141",
+      "targetFieldId": "144",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "219",
+      "name": "fk_credit_card_debt_crc_id_credit_card_id",
+      "sourceTableId": "135",
+      "targetTableId": "92",
+      "sourceFieldId": "142",
+      "targetFieldId": "93",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "220",
+      "name": "fk_credit_card_default_billing_wallet_id_wallet_id",
+      "sourceTableId": "92",
       "targetTableId": "49",
-      "sourceFieldId": "27",
+      "sourceFieldId": "101",
+      "targetFieldId": "50",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "221",
+      "name": "fk_credit_card_operator_id_credit_card_operator_id",
+      "sourceTableId": "92",
+      "targetTableId": "23",
+      "sourceFieldId": "102",
+      "targetFieldId": "24",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "222",
+      "name": "fk_credit_card_payment_debt_id_credit_card_debt_id",
+      "sourceTableId": "162",
+      "targetTableId": "135",
+      "sourceFieldId": "168",
+      "targetFieldId": "136",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "223",
+      "name": "fk_credit_card_payment_wallet_id_wallet_id",
+      "sourceTableId": "162",
+      "targetTableId": "49",
+      "sourceFieldId": "169",
       "targetFieldId": "50",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "206",
+      "id": "224",
       "name": "fk_crypto_exchange_received_crypto_id_ticker_id",
-      "sourceTableId": "96",
-      "targetTableId": "167",
-      "sourceFieldId": "102",
-      "targetFieldId": "168",
+      "sourceTableId": "76",
+      "targetTableId": "189",
+      "sourceFieldId": "82",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "207",
+      "id": "225",
       "name": "fk_crypto_exchange_sold_crypto_id_ticker_id",
-      "sourceTableId": "96",
-      "targetTableId": "167",
-      "sourceFieldId": "103",
-      "targetFieldId": "168",
+      "sourceTableId": "76",
+      "targetTableId": "189",
+      "sourceFieldId": "83",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "208",
+      "id": "226",
       "name": "fk_dividend_ticker_id_ticker_id",
-      "sourceTableId": "16",
-      "targetTableId": "167",
-      "sourceFieldId": "18",
-      "targetFieldId": "168",
+      "sourceTableId": "34",
+      "targetTableId": "189",
+      "sourceFieldId": "36",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "209",
+      "id": "227",
       "name": "fk_dividend_wallet_transaction_id_wallet_transaction_id",
-      "sourceTableId": "16",
-      "targetTableId": "81",
-      "sourceFieldId": "19",
-      "targetFieldId": "82",
+      "sourceTableId": "34",
+      "targetTableId": "201",
+      "sourceFieldId": "37",
+      "targetFieldId": "202",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "210",
+      "id": "228",
       "name": "fk_goal_wallet_id_wallet_id",
-      "sourceTableId": "56",
+      "sourceTableId": "69",
       "targetTableId": "49",
-      "sourceFieldId": "57",
+      "sourceFieldId": "70",
       "targetFieldId": "50",
       "sourceCardinality": "one",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "211",
+      "id": "229",
       "name": "fk_purchase_ticker_id_ticker_id",
-      "sourceTableId": "90",
-      "targetTableId": "167",
-      "sourceFieldId": "94",
-      "targetFieldId": "168",
+      "sourceTableId": "117",
+      "targetTableId": "189",
+      "sourceFieldId": "121",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "212",
+      "id": "230",
       "name": "fk_purchase_wallet_transaction_id_wallet_transaction_id",
-      "sourceTableId": "90",
-      "targetTableId": "81",
-      "sourceFieldId": "95",
-      "targetFieldId": "82",
+      "sourceTableId": "117",
+      "targetTableId": "201",
+      "sourceFieldId": "122",
+      "targetFieldId": "202",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "213",
+      "id": "231",
       "name": "fk_recurring_transaction_category_id_category_id",
-      "sourceTableId": "69",
-      "targetTableId": "136",
-      "sourceFieldId": "79",
-      "targetFieldId": "137",
+      "sourceTableId": "8",
+      "targetTableId": "143",
+      "sourceFieldId": "18",
+      "targetFieldId": "144",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "214",
+      "id": "232",
       "name": "fk_recurring_transaction_wallet_id_wallet_id",
-      "sourceTableId": "69",
+      "sourceTableId": "8",
       "targetTableId": "49",
-      "sourceFieldId": "80",
+      "sourceFieldId": "19",
       "targetFieldId": "50",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "215",
+      "id": "233",
       "name": "fk_sale_ticker_id_ticker_id",
-      "sourceTableId": "147",
-      "targetTableId": "167",
-      "sourceFieldId": "152",
-      "targetFieldId": "168",
+      "sourceTableId": "170",
+      "targetTableId": "189",
+      "sourceFieldId": "175",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "216",
+      "id": "234",
       "name": "fk_sale_wallet_transaction_id_wallet_transaction_id",
-      "sourceTableId": "147",
-      "targetTableId": "81",
-      "sourceFieldId": "153",
-      "targetFieldId": "82",
+      "sourceTableId": "170",
+      "targetTableId": "201",
+      "sourceFieldId": "176",
+      "targetFieldId": "202",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "217",
+      "id": "235",
       "name": "fk_ticker_purchase_ticker_id_ticker_id",
       "sourceTableId": "63",
-      "targetTableId": "167",
+      "targetTableId": "189",
       "sourceFieldId": "68",
-      "targetFieldId": "168",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "218",
+      "id": "236",
       "name": "fk_ticker_purchase_wallet_transaction_id_wallet_transaction_id",
       "sourceTableId": "63",
-      "targetTableId": "81",
+      "targetTableId": "201",
       "sourceFieldId": "67",
-      "targetFieldId": "82",
+      "targetFieldId": "202",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "219",
+      "id": "237",
       "name": "fk_ticker_sale_ticker_id_ticker_id",
-      "sourceTableId": "129",
-      "targetTableId": "167",
-      "sourceFieldId": "135",
-      "targetFieldId": "168",
+      "sourceTableId": "123",
+      "targetTableId": "189",
+      "sourceFieldId": "129",
+      "targetFieldId": "190",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "220",
+      "id": "238",
       "name": "fk_ticker_sale_wallet_transaction_id_wallet_transaction_id",
-      "sourceTableId": "129",
-      "targetTableId": "81",
-      "sourceFieldId": "134",
-      "targetFieldId": "82",
+      "sourceTableId": "123",
+      "targetTableId": "201",
+      "sourceFieldId": "128",
+      "targetFieldId": "202",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "221",
+      "id": "239",
       "name": "fk_transfer_receiver_wallet_id_wallet_id",
-      "sourceTableId": "154",
-      "targetTableId": "49",
-      "sourceFieldId": "159",
-      "targetFieldId": "50",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "222",
-      "name": "fk_transfer_sender_wallet_id_wallet_id",
-      "sourceTableId": "154",
-      "targetTableId": "49",
-      "sourceFieldId": "160",
-      "targetFieldId": "50",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625222,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "223",
-      "name": "fk_wallet_transaction_category_id_category_id",
-      "sourceTableId": "81",
-      "targetTableId": "136",
-      "sourceFieldId": "88",
-      "targetFieldId": "137",
-      "sourceCardinality": "many",
-      "targetCardinality": "one",
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk"
-    },
-    {
-      "id": "224",
-      "name": "fk_wallet_transaction_wallet_id_wallet_id",
-      "sourceTableId": "81",
+      "sourceTableId": "84",
       "targetTableId": "49",
       "sourceFieldId": "89",
       "targetFieldId": "50",
       "sourceCardinality": "many",
       "targetCardinality": "one",
-      "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk"
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "225",
-      "name": "fk_wallet_type_id_wallet_type_id",
-      "sourceTableId": "49",
-      "targetTableId": "179",
-      "sourceFieldId": "54",
-      "targetFieldId": "180",
+      "id": "240",
+      "name": "fk_transfer_sender_wallet_id_wallet_id",
+      "sourceTableId": "84",
+      "targetTableId": "49",
+      "sourceFieldId": "90",
+      "targetFieldId": "50",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625222,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "241",
+      "name": "fk_wallet_transaction_category_id_category_id",
+      "sourceTableId": "201",
+      "targetTableId": "143",
+      "sourceFieldId": "208",
+      "targetFieldId": "144",
       "sourceCardinality": "many",
       "targetCardinality": "one",
       "createdAt": 1752873625221,
-      "diagramId": "o22v7xc5fvuk"
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "242",
+      "name": "fk_wallet_transaction_wallet_id_wallet_id",
+      "sourceTableId": "201",
+      "targetTableId": "49",
+      "sourceFieldId": "209",
+      "targetFieldId": "50",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "243",
+      "name": "fk_wallet_type_id_wallet_type_id",
+      "sourceTableId": "49",
+      "targetTableId": "130",
+      "sourceFieldId": "54",
+      "targetFieldId": "131",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1752873625221,
+      "diagramId": "0sqwyqxgz2fq"
+    },
+    {
+      "id": "244",
+      "name": "transfer_category_id_fk",
+      "sourceTableId": "84",
+      "targetTableId": "143",
+      "sourceFieldId": "91",
+      "targetFieldId": "144",
+      "sourceCardinality": "many",
+      "targetCardinality": "one",
+      "createdAt": 1755286507008
     }
   ],
   "dependencies": [],
   "areas": [
     {
-      "id": "226",
+      "id": "245",
       "name": "Basic Transactions Model",
-      "x": -2157.188436287012,
+      "x": -2159.3599401848014,
       "y": -502.30648480109,
       "width": 2571,
       "height": 1771,
-      "color": "#ff9f74"
+      "color": "#ff9f74",
+      "diagramId": "0sqwyqxgz2fq"
     },
     {
-      "id": "227",
+      "id": "246",
       "name": "Investment Model",
       "x": 412.8183610133465,
       "y": -504.50119598580426,
       "width": 1954,
       "height": 1769,
-      "color": "#4dee8a"
+      "color": "#4dee8a",
+      "diagramId": "0sqwyqxgz2fq"
     }
   ],
   "customTypes": []
