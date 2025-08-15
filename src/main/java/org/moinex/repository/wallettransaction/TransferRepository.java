@@ -6,6 +6,7 @@
 
 package org.moinex.repository.wallettransaction;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.moinex.model.wallettransaction.Transfer;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -92,4 +93,22 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
                     + "                       t2.description = t.description) "
                     + "ORDER BY t.date DESC")
     List<Transfer> findSuggestions();
+
+    /**
+     * Sums the amount of all trasnfer for a given list of category IDs and a specific date range
+     *
+     * @param categoryIds The list of category IDs to filter by.
+     * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @return The total sum of the transfer amounts. Returns 0 if no transfers are found.
+     */
+    @Query(
+            "SELECT COALESCE(SUM(tf.amount), 0) "
+                    + "FROM Transfer tf "
+                    + "WHERE tf.category.id IN :categoryIds "
+                    + "AND tf.date BETWEEN :startDate AND :endDate")
+    BigDecimal getSumAmountByCategoriesAndDateBetween(
+            @Param("categoryIds") List<Integer> categoryIds,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
 }

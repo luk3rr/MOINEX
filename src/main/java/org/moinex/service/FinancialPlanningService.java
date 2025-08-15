@@ -13,9 +13,11 @@ import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
 import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
+import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
+import org.moinex.util.enums.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,17 +36,20 @@ public class FinancialPlanningService {
     private BudgetGroupRepository budgetGroupRepository;
     private WalletTransactionRepository walletTransactionRepository;
     private CategoryRepository categoryRepository;
+    private TransferRepository transferRepository;
 
     @Autowired
     public FinancialPlanningService(
             FinancialPlanRepository financialPlanRepository,
             BudgetGroupRepository budgetGroupRepository,
             WalletTransactionRepository walletTransactionRepository,
-            CategoryRepository categoryRepository) {
+            CategoryRepository categoryRepository,
+            TransferRepository transferRepository) {
         this.financialPlanRepository = financialPlanRepository;
         this.budgetGroupRepository = budgetGroupRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.categoryRepository = categoryRepository;
+        this.transferRepository = transferRepository;
     }
 
     /**
@@ -227,9 +232,16 @@ public class FinancialPlanningService {
                             BigDecimal spentAmount =
                                     walletTransactionRepository
                                             .getSumAmountByCategoriesAndDateBetween(
-                                                    categoryIds, startDate, endDate);
+                                                    categoryIds,
+                                                    TransactionType.EXPENSE,
+                                                    startDate,
+                                                    endDate);
 
-                            return new PlanStatusDTO(group, spentAmount);
+                            BigDecimal transferAmount =
+                                    transferRepository.getSumAmountByCategoriesAndDateBetween(
+                                            categoryIds, startDate, endDate);
+
+                            return new PlanStatusDTO(group, spentAmount.add(transferAmount));
                         })
                 .collect(Collectors.toList());
     }

@@ -25,7 +25,9 @@ import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
 import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
+import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
+import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class FinancialPlanningServiceTest {
@@ -33,6 +35,7 @@ class FinancialPlanningServiceTest {
     @Mock private FinancialPlanRepository financialPlanRepository;
     @Mock private BudgetGroupRepository budgetGroupRepository;
     @Mock private WalletTransactionRepository walletTransactionRepository;
+    @Mock private TransferRepository transferRepository;
     @Mock private CategoryRepository categoryRepository;
 
     @InjectMocks private FinancialPlanningService financialPlanningService;
@@ -488,8 +491,11 @@ class FinancialPlanningServiceTest {
             when(financialPlanRepository.findById(financialPlan.getId()))
                     .thenReturn(Optional.of(financialPlan));
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(expectedSpentAmount);
+            when(transferRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.PlanStatusDTO> statusList =
                     financialPlanningService.getPlanStatus(financialPlan.getId(), period);
@@ -519,7 +525,7 @@ class FinancialPlanningServiceTest {
             assertEquals(1, statusList.size());
             assertEquals(0, BigDecimal.ZERO.compareTo(statusList.getFirst().spentAmount()));
             verify(walletTransactionRepository, never())
-                    .getSumAmountByCategoriesAndDateBetween(any(), any(), any());
+                    .getSumAmountByCategoriesAndDateBetween(any(), any(), any(), any());
         }
 
         @Test

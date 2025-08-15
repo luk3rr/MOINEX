@@ -463,6 +463,7 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
      * Sums the amount of all transactions for a given list of category IDs and a specific date range
      *
      * @param categoryIds The list of category IDs to filter by.
+     * @param transactionType The type of the transaction (INCOME or EXPENSE).
      * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
      * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
      * @return The total sum of the transaction amounts. Returns 0 if no transactions are found.
@@ -471,9 +472,11 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
             "SELECT COALESCE(SUM(wt.amount), 0) "
                     + "FROM WalletTransaction wt "
                     + "WHERE wt.category.id IN :categoryIds "
+                    + "AND wt.type = :transactionType "
                     + "AND wt.date BETWEEN :startDate AND :endDate")
     BigDecimal getSumAmountByCategoriesAndDateBetween(
             @Param("categoryIds") List<Integer> categoryIds,
+            @Param("transactionType") TransactionType transactionType,
             @Param("startDate") String startDate,
             @Param("endDate") String endDate);
 }
