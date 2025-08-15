@@ -88,12 +88,16 @@ def migrate_data(old_db_path, new_db_path):
 
             # 4. Strict Schema Validation: Abort if columns do not match
             if set(old_columns) != set(new_columns):
-                print(f"\n--- ERROR: Schema mismatch for table '{table_name}' ---")
+                print(f"\n--- WARNING: Schema mismatch for table '{table_name}' ---")
                 print(f"  [OLD DB] Columns: {sorted(old_columns)}")
                 print(f"  [NEW DB] Columns: {sorted(new_columns)}")
-                print("Aborting migration. Please ensure schemas are identical before running.")
-                new_conn.rollback()
-                sys.exit(1)
+                confirm = input("Schemas are different. Proceed anyway? (Type 'yes' to continue): ")
+                if confirm.lower() != 'yes':
+                    print("Migration aborted by user.")
+                    new_conn.rollback()
+                    sys.exit(0)
+                else:
+                    print("Proceeding despite schema mismatch.")
 
             # 5. Standard handling for all tables
             new_cursor.execute(f"DELETE FROM {table_name}")
