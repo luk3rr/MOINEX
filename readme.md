@@ -1,6 +1,6 @@
 <h1 align="center">
 <br>
-<img src="./img/icons/moinex-icon-2560.jpg" alt="Logótipo do Moinex" width="300">
+<img src="./docs/img/icons/moinex-icon-2560.jpg" alt="Logótipo do Moinex" width="300">
 <br>
 </h1>
 
@@ -14,7 +14,7 @@ MOINEX é uma aplicação de gestão financeira pessoal que permite aos utilizad
 suas transações financeiras. A aplicação possibilita a categorização de receitas e despesas, o cálculo de balanços
 mensais e a exibição de gráficos, proporcionando uma visão clara da saúde financeira de forma intuitiva.
 
-![Main Screen](./img/screenshots/home.png)
+![Main Screen](./docs/img/screenshots/home.png)
 
 ## Funcionalidades Principais
 
