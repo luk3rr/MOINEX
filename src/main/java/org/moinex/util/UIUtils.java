@@ -10,9 +10,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -288,5 +290,27 @@ public final class UIUtils {
                 .add(Objects.requireNonNull(resourceClass.getResource(cssPath)).toExternalForm());
 
         tab.setContent(content);
+    }
+
+    public static <S, T> void alignTableColumn(TableColumn<S, T> column, Pos alignment) {
+        column.setCellFactory(
+                col ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(T item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                    setStyle("");
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(alignment);
+                                }
+                            }
+                        });
+    }
+
+    public static void alignTableColumn(List<? extends TableColumn<?, ?>> columns, Pos alignment) {
+        columns.forEach(column -> alignTableColumn(column, alignment));
     }
 }

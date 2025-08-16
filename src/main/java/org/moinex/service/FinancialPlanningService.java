@@ -12,7 +12,6 @@ import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
 import org.moinex.repository.creditcard.CreditCardPaymentRepository;
-import org.moinex.repository.creditcard.CreditCardRepository;
 import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
@@ -252,7 +251,9 @@ public class FinancialPlanningService {
                                             categoryIds, startDate, endDate);
 
                             BigDecimal spentAmount =
-                                    walletTransactionsAmount.add(creditCardTransactionsAmount).add(transferAmount);
+                                    walletTransactionsAmount
+                                            .add(creditCardTransactionsAmount)
+                                            .add(transferAmount);
 
                             return new PlanStatusDTO(group, spentAmount);
                         })

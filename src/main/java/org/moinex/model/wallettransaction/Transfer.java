@@ -6,7 +6,6 @@
 
 package org.moinex.model.wallettransaction;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,11 +40,11 @@ public class Transfer {
     @Setter(AccessLevel.NONE)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne()
     @JoinColumn(name = "sender_wallet_id", referencedColumnName = "id", nullable = false)
     private Wallet senderWallet;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne()
     @JoinColumn(name = "receiver_wallet_id", referencedColumnName = "id", nullable = false)
     private Wallet receiverWallet;
 

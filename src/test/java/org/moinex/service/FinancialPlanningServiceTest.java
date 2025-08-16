@@ -499,7 +499,7 @@ class FinancialPlanningServiceTest {
                             anyList(), anyString(), anyString()))
                     .thenReturn(BigDecimal.ZERO);
             when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                    anyList(), anyString(), anyString()))
+                            anyList(), anyString(), anyString()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.PlanStatusDTO> statusList =

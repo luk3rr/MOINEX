@@ -6,6 +6,7 @@
 
 package org.moinex.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -29,7 +30,7 @@ public class SuggestionsHandlerHelper<T> {
     private final Consumer<T> onSelectCallback;
     private final TextField componentField;
     private ChangeListener<String> componentFieldListener;
-    @Setter private List<T> suggestions;
+    @Setter private List<T> suggestions = new ArrayList<>();
 
     public SuggestionsHandlerHelper(
             TextField componentField,

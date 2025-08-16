@@ -31,11 +31,11 @@
                                  <children>
                                     <HBox layoutX="-21.0" layoutY="25.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <JFXButton fx:id="totalBalancePaneTransferButton" onAction="#handleAddTransfer" stylesheets="@../../css/component/buttons.css" text="Transfer">
+                                          <JFXButton fx:id="totalBalancePaneTransferButton" onAction="#handleAddTransfer" stylesheets="@../../css/component/buttons.css" text="Add Transfer">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
-                                                      <Image url="@../../icon/common/transfer.png" />
+                                                      <Image url="@../../icon/common/add.png" />
                                                    </image>
                                                 </ImageView>
                                              </graphic>
@@ -54,6 +54,15 @@
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
                                                       <Image url="@../../icon/common/archive.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleViewTransfers" stylesheets="@../../css/component/buttons.css" text="Transfers">
+                                             <graphic>
+                                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/transfer.png" />
                                                    </image>
                                                 </ImageView>
                                              </graphic>
