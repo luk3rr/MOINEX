@@ -322,6 +322,157 @@ public class WalletTransactionService {
     }
 
     /**
+     * Updates an existing transfer, adjusting the balances of all affected wallets.
+     *
+     * @param updatedTransfer The Transfer object with the updated information.
+     * @throws EntityNotFoundException if the transfer or any involved wallet is not found.
+     * @throws MoinexException.SameSourceDestinationException if the new sender and receiver are the same.
+     * @throws IllegalArgumentException if the new amount is zero or negative.
+     * @throws MoinexException.InsufficientResourcesException if the new sender wallet has insufficient funds.
+     */
+    @Transactional
+    public void updateTransfer(Transfer updatedTransfer) {
+        Transfer oldTransfer =
+                transferRepository
+                        .findById(updatedTransfer.getId())
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Transfer with id "
+                                                        + updatedTransfer.getId()
+                                                        + " not found."));
+
+        Wallet newSender = updatedTransfer.getSenderWallet();
+        Wallet newReceiver = updatedTransfer.getReceiverWallet();
+
+        BigDecimal newAmount = updatedTransfer.getAmount().setScale(2, RoundingMode.HALF_UP);
+
+        if (newSender.getId().equals(newReceiver.getId())) {
+            throw new MoinexException.SameSourceDestinationException(
+                    "Sender and receiver wallets must be different");
+        }
+        if (newAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount to transfer must be greater than zero");
+        }
+
+        revertTransferWalletBalances(oldTransfer, updatedTransfer);
+
+        oldTransfer.setSenderWallet(newSender);
+        oldTransfer.setReceiverWallet(newReceiver);
+        oldTransfer.setAmount(newAmount);
+        oldTransfer.setDate(updatedTransfer.getDate());
+        oldTransfer.setDescription(updatedTransfer.getDescription());
+        oldTransfer.setCategory(updatedTransfer.getCategory());
+
+        transferRepository.save(oldTransfer);
+        logger.info("Transfer with id {} updated successfully.", oldTransfer.getId());
+    }
+
+    /**
+     * Deletes a transfer and reverts the balance changes in the respective wallets.
+     *
+     * @param transferId The ID of the transfer to be deleted.
+     * @throws EntityNotFoundException if the transfer is not found.
+     */
+    @Transactional
+    public void deleteTransfer(Integer transferId) {
+        Transfer transfer =
+                transferRepository
+                        .findById(transferId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Transfer with id " + transferId + " not found."));
+
+        Wallet senderWallet = transfer.getSenderWallet();
+        Wallet receiverWallet = transfer.getReceiverWallet();
+        BigDecimal amount = transfer.getAmount();
+
+        logger.info(
+                "Reverting transfer {}: returning {} to sender {} and debiting from receiver {}",
+                transferId,
+                amount,
+                senderWallet.getId(),
+                receiverWallet.getId());
+        walletService.incrementWalletBalance(senderWallet.getId(), amount);
+        walletService.decrementWalletBalance(receiverWallet.getId(), amount);
+
+        transferRepository.delete(transfer);
+
+        logger.info("Transfer with id {} deleted successfully.", transferId);
+    }
+
+    /**
+     * Reverts the wallet balances based on the old and new transfer details.
+     *
+     * @param oldTransfer The original transfer before the update.
+     * @param newTransfer The updated transfer with new details.
+     */
+    private void revertTransferWalletBalances(Transfer oldTransfer, Transfer newTransfer) {
+        Wallet oldSender = oldTransfer.getSenderWallet();
+        Wallet oldReceiver = oldTransfer.getReceiverWallet();
+        BigDecimal oldAmount = oldTransfer.getAmount();
+
+        Wallet newSender = newTransfer.getSenderWallet();
+        Wallet newReceiver = newTransfer.getReceiverWallet();
+        BigDecimal newAmount = newTransfer.getAmount().setScale(2, RoundingMode.HALF_UP);
+
+        boolean senderChanged = !oldSender.getId().equals(newSender.getId());
+        boolean receiverChanged = !oldReceiver.getId().equals(newReceiver.getId());
+
+        if (!senderChanged && !receiverChanged) {
+            // Case 1: Only the amount possibly changed
+            BigDecimal difference = newAmount.subtract(oldAmount);
+            if (difference.compareTo(BigDecimal.ZERO) > 0) {
+                // Amount increased -> debit difference from sender and credit to receiver
+                walletService.decrementWalletBalance(newSender.getId(), difference);
+                walletService.incrementWalletBalance(newReceiver.getId(), difference);
+            } else if (difference.compareTo(BigDecimal.ZERO) < 0) {
+                // Amount decreased -> credit difference to sender and debit from receiver
+                BigDecimal absDiff = difference.abs();
+                walletService.incrementWalletBalance(newSender.getId(), absDiff);
+                walletService.decrementWalletBalance(newReceiver.getId(), absDiff);
+            }
+        } else if (senderChanged && !receiverChanged) {
+            // Case 2a: Sender changed
+
+            walletService.incrementWalletBalance(oldSender.getId(), oldAmount);
+            walletService.decrementWalletBalance(newSender.getId(), newAmount);
+
+            if (!oldAmount.equals(newAmount)) {
+                BigDecimal difference = newAmount.subtract(oldAmount);
+
+                if (difference.compareTo(BigDecimal.ZERO) > 0) {
+                    walletService.incrementWalletBalance(newReceiver.getId(), difference);
+                } else if (difference.compareTo(BigDecimal.ZERO) < 0) {
+                    walletService.decrementWalletBalance(newReceiver.getId(), difference.abs());
+                }
+            }
+        } else if (!senderChanged && receiverChanged) {
+            // Case 2b: Receiver changed
+
+            walletService.decrementWalletBalance(oldReceiver.getId(), oldAmount);
+            walletService.incrementWalletBalance(newReceiver.getId(), newAmount);
+
+            if (!oldAmount.equals(newAmount)) {
+                BigDecimal difference = newAmount.subtract(oldAmount);
+                if (difference.compareTo(BigDecimal.ZERO) > 0) {
+                    walletService.decrementWalletBalance(newSender.getId(), difference);
+                } else if (difference.compareTo(BigDecimal.ZERO) < 0) {
+                    walletService.incrementWalletBalance(newSender.getId(), difference.abs());
+                }
+            }
+        } else {
+            // Case 3: Both sender and receiver changed
+            walletService.incrementWalletBalance(oldSender.getId(), oldAmount);
+            walletService.decrementWalletBalance(oldReceiver.getId(), oldAmount);
+
+            walletService.decrementWalletBalance(newSender.getId(), newAmount);
+            walletService.incrementWalletBalance(newReceiver.getId(), newAmount);
+        }
+    }
+
+    /**
      * Change the type of transaction
      *
      * @param oldTransaction The transaction to be updated
@@ -766,5 +917,9 @@ public class WalletTransactionService {
      */
     public List<Transfer> getTransferSuggestions() {
         return transferRepository.findSuggestions();
+    }
+
+    public List<Transfer> getAllTransfers() {
+        return transferRepository.findAll();
     }
 }

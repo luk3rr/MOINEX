@@ -9,7 +9,6 @@ package org.moinex.repository.creditcard;
 import java.math.BigDecimal;
 import java.util.List;
 import org.moinex.model.creditcard.CreditCardPayment;
-import org.moinex.util.enums.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

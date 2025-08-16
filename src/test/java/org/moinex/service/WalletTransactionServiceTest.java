@@ -18,10 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
@@ -1262,6 +1259,390 @@ class WalletTransactionServiceTest {
             assertThrows(
                     EntityNotFoundException.class,
                     () -> walletTransactionService.deleteTransaction(transactionId));
+        }
+    }
+
+    @Nested
+    @DisplayName("Update and Delete Transfer Tests")
+    class UpdateAndDeleteTransferTests {
+        private Wallet senderWallet;
+        private Wallet receiverWallet;
+        private Wallet anotherSenderWallet;
+        private Wallet anotherReceiverWallet;
+        private Transfer transfer;
+
+        @BeforeEach
+        void setup() {
+            senderWallet = new Wallet(1, "Sender Wallet", new BigDecimal("350.00"));
+            receiverWallet = new Wallet(2, "Receiver Wallet", new BigDecimal("500.00"));
+            anotherSenderWallet = new Wallet(3, "Another Wallet", new BigDecimal("300.00"));
+            anotherReceiverWallet = new Wallet(4, "Another Wallet", new BigDecimal("400"));
+
+            transfer =
+                    Transfer.builder()
+                            .id(1)
+                            .senderWallet(senderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(new BigDecimal("150.00"))
+                            .date(LocalDateTime.now())
+                            .description("Initial Transfer")
+                            .build();
+        }
+
+        @Test
+        @DisplayName("Should update transfer successfully, reverting old and applying new balances")
+        void updateTransfer_Success() {
+            BigDecimal originalAmount = transfer.getAmount();
+
+            Transfer updatedData =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(anotherSenderWallet)
+                            .receiverWallet(anotherReceiverWallet)
+                            .amount(new BigDecimal("50.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Updated Transfer")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updatedData);
+
+            ArgumentCaptor<Transfer> captor = ArgumentCaptor.forClass(Transfer.class);
+            verify(transferRepository).save(captor.capture());
+
+            Transfer saved = captor.getValue();
+            assertEquals("Updated Transfer", saved.getDescription());
+            assertEquals(anotherSenderWallet, saved.getSenderWallet());
+            assertEquals(anotherReceiverWallet, saved.getReceiverWallet());
+            assertEquals(updatedData.getAmount(), saved.getAmount());
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), originalAmount);
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), originalAmount);
+
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(anotherSenderWallet.getId(), updatedData.getAmount());
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(anotherReceiverWallet.getId(), updatedData.getAmount());
+        }
+
+        @Test
+        @DisplayName("Should update transfer when only amount increases with same wallets")
+        void updateTransfer_SameWallets_AmountIncreases() {
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(new BigDecimal("200.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Increased amount")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(senderWallet.getId(), new BigDecimal("50.00"));
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(receiverWallet.getId(), new BigDecimal("50.00"));
+        }
+
+        @Test
+        @DisplayName("Should update transfer when only amount decreases with same wallets")
+        void updateTransfer_SameWallets_AmountDecreases() {
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(new BigDecimal("100.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Decreased amount")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), new BigDecimal("50.00"));
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), new BigDecimal("50.00"));
+        }
+
+        @Test
+        @DisplayName("Should update transfer when only sender changes, amount unchanged")
+        void updateTransfer_SenderChanged_SameAmount() {
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(anotherSenderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(transfer.getAmount())
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Sender changed")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), new BigDecimal("150.00"));
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(anotherSenderWallet.getId(), new BigDecimal("150.00"));
+        }
+
+        @Test
+        @DisplayName("Should update transfer when only sender changes, amount changed")
+        void updateTransfer_SenderChanged_AmountChanged() {
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(anotherSenderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(new BigDecimal("200.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Sender changed with new amount")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), new BigDecimal("150.00"));
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(anotherSenderWallet.getId(), new BigDecimal("200.00"));
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(receiverWallet.getId(), new BigDecimal("50.00"));
+        }
+
+        @Test
+        @DisplayName("Should update transfer when only receiver changes, amount unchanged")
+        void updateTransfer_ReceiverChanged_SameAmount() {
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(anotherReceiverWallet)
+                            .amount(transfer.getAmount())
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Receiver changed")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), new BigDecimal("150.00"));
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(
+                            anotherReceiverWallet.getId(), new BigDecimal("150.00"));
+        }
+
+        @Test
+        @DisplayName("Should update transfer when only receiver changes, amount changed")
+        void updateTransfer_ReceiverChanged_AmountChanged() {
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(anotherReceiverWallet)
+                            .amount(new BigDecimal("100.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Receiver changed with new amount")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), new BigDecimal("150.00"));
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(
+                            anotherReceiverWallet.getId(), new BigDecimal("100.00"));
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), new BigDecimal("50.00"));
+        }
+
+        @Test
+        @DisplayName(
+                "Should update transfer when only sender changes and amount decreases (difference <"
+                        + " 0)")
+        void updateTransfer_SenderChanged_AmountDecreased() {
+            // old: sender=1, receiver=2, amount=150.00
+            // new: sender=3, receiver=2, amount=100.00 -> diff = -50.00
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(anotherSenderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(new BigDecimal("100.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Sender changed, amount decreased")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), new BigDecimal("150.00"));
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(anotherSenderWallet.getId(), new BigDecimal("100.00"));
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), new BigDecimal("50.00"));
+        }
+
+        @Test
+        @DisplayName(
+                "Should update transfer when only receiver changes and amount increases (difference"
+                        + " > 0)")
+        void updateTransfer_ReceiverChanged_AmountIncreased() {
+            // old: sender=1, receiver=2, amount=150.00
+            // new: sender=1, receiver=4, amount=200.00 -> diff = +50.00
+            Transfer updated =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(anotherReceiverWallet)
+                            .amount(new BigDecimal("200.00"))
+                            .date(LocalDateTime.now().plusDays(1))
+                            .description("Receiver changed, amount increased")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.updateTransfer(updated);
+
+            InOrder inOrder = inOrder(walletService);
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), new BigDecimal("150.00"));
+            inOrder.verify(walletService)
+                    .incrementWalletBalance(
+                            anotherReceiverWallet.getId(), new BigDecimal("200.00"));
+            inOrder.verify(walletService)
+                    .decrementWalletBalance(senderWallet.getId(), new BigDecimal("50.00"));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when updating a non-existent transfer")
+        void updateTransfer_NotFound_ThrowsException() {
+            when(transferRepository.findById(999)).thenReturn(Optional.empty());
+            Transfer nonExistentTransfer = Transfer.builder().id(999).build();
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () -> walletTransactionService.updateTransfer(nonExistentTransfer));
+        }
+
+        @Test
+        @DisplayName(
+                "Should throw SameSourceAndDestinationException when trying to update transfer with"
+                        + " same sender and receiver")
+        void updateTransfer_SameSourceAndDestination_ThrowsException() {
+            Transfer invalidTransfer =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(senderWallet)
+                            .amount(new BigDecimal("100.00"))
+                            .date(LocalDateTime.now())
+                            .description("Invalid Transfer")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            assertThrows(
+                    MoinexException.SameSourceDestinationException.class,
+                    () -> walletTransactionService.updateTransfer(invalidTransfer));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for negative amount")
+        void updateTransfer_NegativeAmount_ThrowsException() {
+            Transfer negativeTransfer =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(new BigDecimal("-1.00"))
+                            .date(LocalDateTime.now())
+                            .description("Invalid Transfer")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> walletTransactionService.updateTransfer(negativeTransfer));
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException for zero amount")
+        void updateTransfer_ZeroAmount_ThrowsException() {
+            Transfer zeroTransfer =
+                    Transfer.builder()
+                            .id(transfer.getId())
+                            .senderWallet(senderWallet)
+                            .receiverWallet(receiverWallet)
+                            .amount(BigDecimal.ZERO)
+                            .date(LocalDateTime.now())
+                            .description("Invalid Transfer")
+                            .build();
+
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> walletTransactionService.updateTransfer(zeroTransfer));
+        }
+
+        @Test
+        @DisplayName("Should delete transfer successfully and revert balances")
+        void deleteTransfer_Success() {
+            when(transferRepository.findById(transfer.getId())).thenReturn(Optional.of(transfer));
+
+            walletTransactionService.deleteTransfer(transfer.getId());
+
+            verify(walletService)
+                    .incrementWalletBalance(senderWallet.getId(), transfer.getAmount());
+            verify(walletService)
+                    .decrementWalletBalance(receiverWallet.getId(), transfer.getAmount());
+
+            verify(transferRepository).delete(transfer);
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when deleting a non-existent transfer")
+        void deleteTransfer_NotFound_ThrowsException() {
+            when(transferRepository.findById(999)).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () -> walletTransactionService.deleteTransfer(999));
         }
     }
 }

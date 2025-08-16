@@ -93,10 +93,13 @@ public final class Constants {
             UI_DIALOG_WALLETTRANSACTION_PATH + "add_income.fxml";
     public static final String ADD_TRANSFER_FXML =
             UI_DIALOG_WALLETTRANSACTION_PATH + ("add_transfer." + "fxml");
+    public static final String EDIT_TRANSFER_FXML =
+            UI_DIALOG_WALLETTRANSACTION_PATH + ("edit_transfer." + "fxml");
     public static final String ADD_EXPENSE_FXML =
             UI_DIALOG_WALLETTRANSACTION_PATH + "add_expense.fxml";
     public static final String ARCHIVED_WALLETS_FXML =
             UI_DIALOG_WALLETTRANSACTION_PATH + "archived_wallets.fxml";
+    public static final String TRANSFERS_FXML = UI_DIALOG_WALLETTRANSACTION_PATH + "transfers.fxml";
     public static final String EDIT_TRANSACTION_FXML =
             UI_DIALOG_WALLETTRANSACTION_PATH + "edit_transaction.fxml";
     public static final String REMOVE_TRANSACTION_FXML =

@@ -41,6 +41,7 @@ import org.moinex.ui.common.WalletFullPaneController;
 import org.moinex.ui.dialog.wallettransaction.AddTransferController;
 import org.moinex.ui.dialog.wallettransaction.AddWalletController;
 import org.moinex.ui.dialog.wallettransaction.ArchivedWalletsController;
+import org.moinex.ui.dialog.wallettransaction.TransferController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -188,6 +189,22 @@ public class WalletController {
                             updateDisplayWallets();
                             updateTotalBalanceView();
                             updateMoneyFlowBarChart();
+                            updateDoughnutChart();
+                        }));
+    }
+
+    @FXML
+    private void handleViewTransfers() {
+        WindowUtils.openModalWindow(
+                Constants.TRANSFERS_FXML,
+                "View Transfers",
+                springContext,
+                (TransferController controller) -> {},
+                List.of(
+                        () -> {
+                            loadWalletsFromDatabase();
+                            updateDisplayWallets();
+                            updateTotalBalanceView();
                             updateDoughnutChart();
                         }));
     }

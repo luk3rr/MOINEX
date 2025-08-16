@@ -95,7 +95,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     List<Transfer> findSuggestions();
 
     /**
-     * Sums the amount of all trasnfer for a given list of category IDs and a specific date range
+     * Sums the amount of all transfer for a given list of category IDs and a specific date range
      *
      * @param categoryIds The list of category IDs to filter by.
      * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
