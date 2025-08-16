@@ -9,6 +9,7 @@ package org.moinex.repository.creditcard;
 import java.math.BigDecimal;
 import java.util.List;
 import org.moinex.model.creditcard.CreditCardPayment;
+import org.moinex.util.enums.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -315,4 +316,23 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "WHERE ccd.creditCard.id = :creditCardId "
                     + "AND ccp.wallet IS NULL")
     String getNextInvoiceDate(@Param("creditCardId") Integer creditCardId);
+
+    /**
+     * Sums the amount of all transactions for a given list of category IDs and a specific date range
+     *
+     * @param categoryIds The list of category IDs to filter by.
+     * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @return The total sum of the transaction amounts. Returns 0 if no transactions are found.
+     */
+    @Query(
+            "SELECT COALESCE(SUM(ccp.amount), 0) "
+                    + "FROM CreditCardPayment ccp "
+                    + "JOIN ccp.creditCardDebt ccd "
+                    + "WHERE ccd.category.id IN :categoryIds "
+                    + "AND ccp.date BETWEEN :startDate AND :endDate")
+    BigDecimal getSumAmountByCategoriesAndDateBetween(
+            @Param("categoryIds") List<Integer> categoryIds,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
 }

@@ -11,6 +11,8 @@ import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
+import org.moinex.repository.creditcard.CreditCardPaymentRepository;
+import org.moinex.repository.creditcard.CreditCardRepository;
 import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
@@ -35,6 +37,7 @@ public class FinancialPlanningService {
     private FinancialPlanRepository financialPlanRepository;
     private BudgetGroupRepository budgetGroupRepository;
     private WalletTransactionRepository walletTransactionRepository;
+    private CreditCardPaymentRepository creditCardPaymentRepository;
     private CategoryRepository categoryRepository;
     private TransferRepository transferRepository;
 
@@ -43,11 +46,13 @@ public class FinancialPlanningService {
             FinancialPlanRepository financialPlanRepository,
             BudgetGroupRepository budgetGroupRepository,
             WalletTransactionRepository walletTransactionRepository,
+            CreditCardPaymentRepository creditCardPaymentRepository,
             CategoryRepository categoryRepository,
             TransferRepository transferRepository) {
         this.financialPlanRepository = financialPlanRepository;
         this.budgetGroupRepository = budgetGroupRepository;
         this.walletTransactionRepository = walletTransactionRepository;
+        this.creditCardPaymentRepository = creditCardPaymentRepository;
         this.categoryRepository = categoryRepository;
         this.transferRepository = transferRepository;
     }
@@ -229,7 +234,7 @@ public class FinancialPlanningService {
                                             .map(Category::getId)
                                             .collect(Collectors.toList());
 
-                            BigDecimal spentAmount =
+                            BigDecimal walletTransactionsAmount =
                                     walletTransactionRepository
                                             .getSumAmountByCategoriesAndDateBetween(
                                                     categoryIds,
@@ -237,11 +242,19 @@ public class FinancialPlanningService {
                                                     startDate,
                                                     endDate);
 
+                            BigDecimal creditCardTransactionsAmount =
+                                    creditCardPaymentRepository
+                                            .getSumAmountByCategoriesAndDateBetween(
+                                                    categoryIds, startDate, endDate);
+
                             BigDecimal transferAmount =
                                     transferRepository.getSumAmountByCategoriesAndDateBetween(
                                             categoryIds, startDate, endDate);
 
-                            return new PlanStatusDTO(group, spentAmount.add(transferAmount));
+                            BigDecimal spentAmount =
+                                    walletTransactionsAmount.add(creditCardTransactionsAmount).add(transferAmount);
+
+                            return new PlanStatusDTO(group, spentAmount);
                         })
                 .collect(Collectors.toList());
     }

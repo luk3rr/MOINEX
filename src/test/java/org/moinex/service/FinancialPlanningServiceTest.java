@@ -23,6 +23,7 @@ import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
+import org.moinex.repository.creditcard.CreditCardPaymentRepository;
 import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
@@ -35,6 +36,7 @@ class FinancialPlanningServiceTest {
     @Mock private FinancialPlanRepository financialPlanRepository;
     @Mock private BudgetGroupRepository budgetGroupRepository;
     @Mock private WalletTransactionRepository walletTransactionRepository;
+    @Mock private CreditCardPaymentRepository creditCardPaymentRepository;
     @Mock private TransferRepository transferRepository;
     @Mock private CategoryRepository categoryRepository;
 
@@ -495,6 +497,9 @@ class FinancialPlanningServiceTest {
                     .thenReturn(expectedSpentAmount);
             when(transferRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), anyString(), anyString()))
+                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                    anyList(), anyString(), anyString()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.PlanStatusDTO> statusList =
