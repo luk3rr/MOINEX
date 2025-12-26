@@ -15,17 +15,23 @@
          <children>
             <HBox alignment="CENTER_LEFT">
                <children>
-                  <Label fx:id="groupNameLabel" text="Group name" />
+                  <Label fx:id="groupNameLabel" text="Group name">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font></Label>
                   <Region HBox.hgrow="ALWAYS" />
                   <VBox alignment="CENTER_RIGHT">
                      <children>
                         <HBox spacing="5.0">
                            <children>
-                              <Label text="Target:" />
-                              <Label fx:id="targetPercentageLabel" text="0.00 %" />
+                              <Label text="Target:" textFill="DIMGRAY" />
+                              <Label fx:id="targetPercentageLabel" text="0.00 %" textFill="DIMGRAY" />
                            </children>
                         </HBox>
-                        <Label fx:id="targetAmountLabel" text="\$ 0.00" />
+                        <Label fx:id="targetAmountLabel" text="\$ 0.00">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font></Label>
                      </children>
                   </VBox>
                </children>
@@ -51,7 +57,7 @@
                   <Label fx:id="statusPrefixLabel" text="Overspent: " />
                   <Label fx:id="statusAmountLabel" text="\$ 0.00" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="progressPercentageLabel" text="111.7 %" />
+                  <Label fx:id="progressPercentageLabel" text="111.7 %" textFill="DIMGRAY" />
                </children>
             </HBox>
          </children>
