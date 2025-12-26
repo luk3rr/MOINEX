@@ -94,6 +94,8 @@ public class TransactionController {
 
     private CategoryService categoryService;
 
+    private static final Integer DAYS_BEFORE_OFFSET = 30;
+
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     /**
@@ -139,14 +141,12 @@ public class TransactionController {
 
         transactionsTypeComboBox.setValue(null); // All transactions
 
-        // Set the start and end date pickers to the first and last day of the current
-        // month
-        LocalDateTime firstDayOfMonth = currentDate.withDayOfMonth(1);
+        LocalDateTime startDate = currentDate.minusDays(DAYS_BEFORE_OFFSET);
         LocalDateTime lastDayOfMonth =
                 currentDate.withDayOfMonth(
                         currentDate.getMonth().length(currentDate.toLocalDate().isLeapYear()));
 
-        transactionsStartDatePicker.setValue(firstDayOfMonth.toLocalDate());
+        transactionsStartDatePicker.setValue(startDate.toLocalDate());
         transactionsEndDatePicker.setValue(lastDayOfMonth.toLocalDate());
 
         // Update the resumes
