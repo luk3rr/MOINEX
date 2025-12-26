@@ -70,8 +70,8 @@ public class RecurringTransactionController {
 
         populateRecurringTransactionStatusComboBox();
 
-        // Set the default value for the status combo box (null = All)
-        statusComboBox.setValue(null);
+        // Set the default value for the status combo box
+        statusComboBox.setValue(RecurringTransactionStatus.ACTIVE);
 
         updateRecurringTransactionTableView();
 
