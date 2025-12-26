@@ -7,11 +7,9 @@
 package org.moinex.ui.main;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -64,11 +62,13 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public class TransactionController {
-    @FXML private AnchorPane monthResumeView;
+    @FXML private AnchorPane monthYearResumeView;
 
     @FXML private AnchorPane yearResumeView;
 
-    @FXML private ComboBox<YearMonth> monthResumeComboBox;
+    @FXML private ComboBox<Year> monthYearResumeYearComboBox;
+
+    @FXML private ComboBox<Month> monthYearResumeMonthComboBox;
 
     @FXML private ComboBox<Year> yearResumeComboBox;
 
@@ -121,7 +121,7 @@ public class TransactionController {
     private void initialize() {
         configureTableView();
 
-        populateMonthResumeComboBox();
+        populateMonthYearResumeComboBoxes();
         populateYearComboBox();
         populateTransactionTypeComboBox();
 
@@ -132,8 +132,8 @@ public class TransactionController {
         LocalDateTime currentDate = LocalDateTime.now();
 
         // Select the default values
-        monthResumeComboBox.setValue(
-                YearMonth.of(currentDate.getYear(), currentDate.getMonthValue()));
+        monthYearResumeYearComboBox.setValue(Year.of(currentDate.getYear()));
+        monthYearResumeMonthComboBox.setValue(currentDate.getMonth());
 
         yearResumeComboBox.setValue(Year.of(currentDate.getYear()));
 
@@ -150,13 +150,14 @@ public class TransactionController {
         transactionsEndDatePicker.setValue(lastDayOfMonth.toLocalDate());
 
         // Update the resumes
-        updateMonthResume();
+        updateMonthYearResume();
         updateYearResume();
         updateMoneyFlow();
         updateTransactionTableView();
 
         // Add a listener to handle user selection
-        monthResumeComboBox.setOnAction(event -> updateMonthResume());
+        monthYearResumeYearComboBox.setOnAction(event -> updateMonthYearResume());
+        monthYearResumeMonthComboBox.setOnAction(event -> updateMonthYearResume());
 
         yearResumeComboBox.setOnAction(event -> updateYearResume());
 
@@ -183,7 +184,7 @@ public class TransactionController {
                 (AddIncomeController controller) -> {},
                 List.of(
                         () -> {
-                            updateMonthResume();
+                            updateMonthYearResume();
                             updateYearResume();
                             updateTransactionTableView();
                             updateMoneyFlow();
@@ -199,7 +200,7 @@ public class TransactionController {
                 (AddExpenseController controller) -> {},
                 List.of(
                         () -> {
-                            updateMonthResume();
+                            updateMonthYearResume();
                             updateYearResume();
                             updateTransactionTableView();
                             updateMoneyFlow();
@@ -226,7 +227,7 @@ public class TransactionController {
                         controller.setTransaction(selectedTransaction),
                 List.of(
                         () -> {
-                            updateMonthResume();
+                            updateMonthYearResume();
                             updateYearResume();
                             updateTransactionTableView();
                             updateMoneyFlow();
@@ -298,7 +299,7 @@ public class TransactionController {
                 message.toString())) {
             walletTransactionService.deleteTransaction(selectedTransaction.getId());
 
-            updateMonthResume();
+            updateMonthYearResume();
             updateYearResume();
             updateTransactionTableView();
             updateMoneyFlow();
@@ -314,7 +315,7 @@ public class TransactionController {
                 (RecurringTransactionController controller) -> {},
                 List.of(
                         () -> {
-                            updateMonthResume();
+                            updateMonthYearResume();
                             updateYearResume();
                             updateTransactionTableView();
                             updateMoneyFlow();
@@ -600,8 +601,11 @@ public class TransactionController {
     /**
      * Update the month resume view
      */
-    private void updateMonthResume() {
-        YearMonth selectedYearMonth = monthResumeComboBox.getValue();
+    private void updateMonthYearResume() {
+        YearMonth selectedYearMonth =
+                YearMonth.of(
+                        monthYearResumeYearComboBox.getValue().getValue(),
+                        monthYearResumeMonthComboBox.getValue().getValue());
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
@@ -624,8 +628,8 @@ public class TransactionController {
             AnchorPane.setLeftAnchor(newContent, 10.0);
             AnchorPane.setRightAnchor(newContent, 10.0);
 
-            monthResumeView.getChildren().clear();
-            monthResumeView.getChildren().add(newContent);
+            monthYearResumeView.getChildren().clear();
+            monthYearResumeView.getChildren().add(newContent);
         } catch (Exception e) {
             logger.error("Error updating month resume: {}", e.getMessage());
         }
@@ -735,7 +739,7 @@ public class TransactionController {
      * Populate the month resume combo box with the months between the oldest
      * transaction date and the current date
      */
-    private void populateMonthResumeComboBox() {
+    private void populateMonthYearResumeComboBoxes() {
         LocalDateTime oldestWalletTransaction = walletTransactionService.getOldestTransactionDate();
 
         LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
@@ -760,22 +764,42 @@ public class TransactionController {
         }
 
         ObservableList<YearMonth> monthYearList = FXCollections.observableArrayList(months);
-        monthResumeComboBox.setItems(monthYearList);
 
-        // Custom string converter to format the YearMonth as "Month/Year"
-        monthResumeComboBox.setConverter(
+        ObservableList<Year> years =
+                FXCollections.observableArrayList(
+                        monthYearList.stream()
+                                .map(YearMonth::getYear)
+                                .distinct()
+                                .sorted(Comparator.reverseOrder())
+                                .map(Year::of)
+                                .toList());
+
+        monthYearResumeYearComboBox.setItems(years);
+        monthYearResumeYearComboBox.setValue(years.getFirst());
+
+        ObservableList<Month> uniqueMonths =
+                FXCollections.observableArrayList(
+                        monthYearList.stream()
+                                .map(YearMonth::getMonth)
+                                .distinct()
+                                .sorted(Comparator.comparingInt(Month::getValue))
+                                .toList());
+
+        monthYearResumeMonthComboBox.setItems(uniqueMonths);
+        monthYearResumeMonthComboBox.setValue(uniqueMonths.getFirst());
+
+        monthYearResumeMonthComboBox.setConverter(
                 new StringConverter<>() {
-                    private final DateTimeFormatter formatter =
-                            DateTimeFormatter.ofPattern("yyyy MMM");
-
                     @Override
-                    public String toString(YearMonth yearMonth) {
-                        return yearMonth != null ? yearMonth.format(formatter) : "";
+                    public String toString(Month month) {
+                        return month != null
+                                ? month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                : "";
                     }
 
                     @Override
-                    public YearMonth fromString(String string) {
-                        return YearMonth.parse(string, formatter);
+                    public Month fromString(String string) {
+                        return Month.valueOf(string.toUpperCase());
                     }
                 });
     }

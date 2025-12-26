@@ -9,11 +9,9 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -68,7 +66,9 @@ public class CreditCardController {
 
     @FXML private ComboBox<Year> totalDebtsYearFilterComboBox;
 
-    @FXML private ComboBox<YearMonth> debtsListMonthFilterComboBox;
+    @FXML private ComboBox<Month> debtsListMonthFilterComboBox;
+
+    @FXML private ComboBox<Year> debtsListYearFilterComboBox;
 
     @FXML private TableView<CreditCardPayment> debtsTableView;
 
@@ -125,10 +125,9 @@ public class CreditCardController {
 
         totalDebtsYearFilterComboBox.setValue(Year.from(now));
 
-        YearMonth currentYearMonth = YearMonth.of(now.getYear(), now.getMonthValue());
-
         // Select the default values
-        debtsListMonthFilterComboBox.setValue(currentYearMonth);
+        debtsListMonthFilterComboBox.setValue(now.getMonth());
+        debtsListYearFilterComboBox.setValue(Year.of(now.getYear()));
 
         debtsListMonthFilterComboBox.setOnAction(event -> updateDebtsTableView());
 
@@ -258,21 +257,24 @@ public class CreditCardController {
 
     @FXML
     private void handleTablePrevMonth() {
-        YearMonth nowMonth = debtsListMonthFilterComboBox.getValue().minusMonths(1);
-
-        // Set the previous month as current month
-        debtsListMonthFilterComboBox.setValue(nowMonth);
-
-        updateDebtsTableView();
+        updateTableCurrentMonthYear(-1);
     }
 
     @FXML
     private void handleTableNextMonth() {
-        YearMonth newMonth = debtsListMonthFilterComboBox.getValue().plusMonths(1);
+        updateTableCurrentMonthYear(1);
+    }
 
-        // Set next month as current month
-        debtsListMonthFilterComboBox.setValue(newMonth);
+    private YearMonth getTableCurrentMonthYear() {
+        return YearMonth.of(
+                debtsListYearFilterComboBox.getValue().getValue(),
+                debtsListMonthFilterComboBox.getValue().getValue());
+    }
 
+    private void updateTableCurrentMonthYear(Integer offset) {
+        YearMonth nextYearMonth = getTableCurrentMonthYear().plusMonths(offset);
+        debtsListMonthFilterComboBox.setValue(nextYearMonth.getMonth());
+        debtsListYearFilterComboBox.setValue(Year.of(nextYearMonth.getYear()));
         updateDebtsTableView();
     }
 
@@ -317,7 +319,7 @@ public class CreditCardController {
      * Update the debt table view
      */
     private void updateDebtsTableView() {
-        YearMonth selectedMonth = debtsListMonthFilterComboBox.getValue();
+        YearMonth selectedMonth = getTableCurrentMonthYear();
 
         // Get the search text
         String similarTextOrId = debtSearchField.getText().toLowerCase();
@@ -605,22 +607,41 @@ public class CreditCardController {
 
         ObservableList<YearMonth> yearMonthList = FXCollections.observableArrayList(yearMonths);
 
-        debtsListMonthFilterComboBox.setItems(yearMonthList);
+        ObservableList<Year> years =
+                FXCollections.observableArrayList(
+                        yearMonthList.stream()
+                                .map(YearMonth::getYear)
+                                .distinct()
+                                .sorted(Comparator.reverseOrder())
+                                .map(Year::of)
+                                .toList());
 
-        // Custom string converter to format the YearMonth as "MMM/yy"
+        debtsListYearFilterComboBox.setItems(years);
+        debtsListYearFilterComboBox.setValue(years.getFirst());
+
+        ObservableList<Month> uniqueMonths =
+                FXCollections.observableArrayList(
+                        yearMonthList.stream()
+                                .map(YearMonth::getMonth)
+                                .distinct()
+                                .sorted(Comparator.comparingInt(Month::getValue))
+                                .toList());
+
+        debtsListMonthFilterComboBox.setItems(uniqueMonths);
+        debtsListMonthFilterComboBox.setValue(uniqueMonths.getFirst());
+
         debtsListMonthFilterComboBox.setConverter(
                 new StringConverter<>() {
-                    private final DateTimeFormatter formatter =
-                            DateTimeFormatter.ofPattern("MMM/yy");
-
                     @Override
-                    public String toString(YearMonth yearMonth) {
-                        return yearMonth != null ? yearMonth.format(formatter) : "";
+                    public String toString(Month month) {
+                        return month != null
+                                ? month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                : "";
                     }
 
                     @Override
-                    public YearMonth fromString(String string) {
-                        return YearMonth.parse(string, formatter);
+                    public Month fromString(String string) {
+                        return Month.valueOf(string.toUpperCase());
                     }
                 });
     }
@@ -702,8 +723,24 @@ public class CreditCardController {
                             final DateTimeFormatter formatter =
                                     DateTimeFormatter.ofPattern("MMM/yy");
 
-                            if (newMonth != null) {
-                                invoiceMonth.setText(newMonth.format(formatter));
+                            if (newMonth != null
+                                    && debtsListYearFilterComboBox.getValue() != null) {
+                                invoiceMonth.setText(getTableCurrentMonthYear().format(formatter));
+                            }
+
+                            updateDebtsTableView();
+                        });
+
+        debtsListYearFilterComboBox
+                .valueProperty()
+                .addListener(
+                        (observable, oldValue, newYear) -> {
+                            final DateTimeFormatter formatter =
+                                    DateTimeFormatter.ofPattern("MMM/yy");
+
+                            if (newYear != null
+                                    && debtsListMonthFilterComboBox.getValue() != null) {
+                                invoiceMonth.setText(getTableCurrentMonthYear().format(formatter));
                             }
 
                             updateDebtsTableView();

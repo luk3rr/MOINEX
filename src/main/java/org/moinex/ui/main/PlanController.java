@@ -188,7 +188,9 @@ public class PlanController {
 
             this.currentPlanStatus.sort(
                     (a, b) ->
-                            b.group().getTargetPercentage().compareTo(a.group().getTargetPercentage()));
+                            b.group()
+                                    .getTargetPercentage()
+                                    .compareTo(a.group().getTargetPercentage()));
 
             baseMonthlyIncome.setText(UIUtils.formatCurrency(currentPlan.getBaseIncome()));
             updateDoughnutChart();
@@ -290,18 +292,14 @@ public class PlanController {
             legendItem.setAlignment(Pos.CENTER_LEFT);
 
             Rectangle colorRect = new Rectangle(10, 10);
-            colorRect.getStyleClass().addAll(
-                    Constants.CHARTS_LEGEND_RECT_STYLE,
-                    "data" + index
-            );
+            colorRect.getStyleClass().addAll(Constants.CHARTS_LEGEND_RECT_STYLE, "data" + index);
 
-            Label legendLabel = new Label(
-                    String.format(
-                            "%s (%.0f%%)",
-                            status.group().getName(),
-                            status.group().getTargetPercentage()
-                    )
-            );
+            Label legendLabel =
+                    new Label(
+                            String.format(
+                                    "%s (%.0f%%)",
+                                    status.group().getName(),
+                                    status.group().getTargetPercentage()));
 
             legendItem.getChildren().addAll(colorRect, legendLabel);
             budgetGroupVBox.getChildren().add(legendItem);

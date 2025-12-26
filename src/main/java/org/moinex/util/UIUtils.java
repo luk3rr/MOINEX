@@ -316,8 +316,10 @@ public final class UIUtils {
     }
 
     public static void applyDefaultChartStyle(Chart chart) {
-        chart.getStylesheets().add(
-                UIUtils.class.getResource(Constants.CHARTS_COLORS_STYLE_SHEET).toExternalForm()
-        );
+        chart.getStylesheets()
+                .add(
+                        UIUtils.class
+                                .getResource(Constants.CHARTS_COLORS_STYLE_SHEET)
+                                .toExternalForm());
     }
 }

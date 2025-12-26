@@ -26,21 +26,26 @@
                            <children>
                               <HBox spacing="10.0" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <AnchorPane fx:id="monthResumePane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                                    <AnchorPane fx:id="monthYearResumePane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                        <children>
                                           <VBox alignment="TOP_CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <HBox alignment="TOP_CENTER">
+                                                <HBox alignment="CENTER">
                                                    <children>
-                                                      <Label fx:id="monthResumeTitle" styleClass="title" text="Resume" HBox.hgrow="ALWAYS" />
+                                                      <Label fx:id="monthYearResumeTitle" styleClass="title" text="Resume" HBox.hgrow="ALWAYS" />
                                                       <AnchorPane HBox.hgrow="ALWAYS">
                                                          <children>
-                                                            <ComboBox fx:id="monthResumeComboBox" minWidth="90.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="0.0" />
+                                                            <HBox alignment="CENTER_RIGHT" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <children>
+                                                                  <ComboBox fx:id="monthYearResumeMonthComboBox" minWidth="90.0" stylesheets="@../../css/component/combo-box.css" />
+                                                                  <ComboBox fx:id="monthYearResumeYearComboBox" minWidth="90.0" stylesheets="@../../css/component/combo-box.css" />
+                                                               </children>
+                                                            </HBox>
                                                          </children>
                                                       </AnchorPane>
                                                    </children>
                                                 </HBox>
-                                                <AnchorPane fx:id="monthResumeView" minWidth="250.0" VBox.vgrow="ALWAYS" />
+                                                <AnchorPane fx:id="monthYearResumeView" minWidth="250.0" VBox.vgrow="ALWAYS" />
                                              </children>
                                           </VBox>
                                        </children>
@@ -49,7 +54,7 @@
                                        <children>
                                           <VBox alignment="TOP_CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <HBox alignment="TOP_CENTER">
+                                                <HBox alignment="CENTER">
                                                    <children>
                                                       <Label styleClass="title" text="Resume" HBox.hgrow="ALWAYS" />
                                                       <AnchorPane HBox.hgrow="ALWAYS">
@@ -116,7 +121,7 @@
                            <children>
                               <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <HBox alignment="TOP_CENTER">
+                                    <HBox alignment="CENTER">
                                        <children>
                                           <Label fx:id="moneyFlowTitle" styleClass="title" text="Money flow by category" HBox.hgrow="ALWAYS" />
                                           <AnchorPane HBox.hgrow="ALWAYS">
