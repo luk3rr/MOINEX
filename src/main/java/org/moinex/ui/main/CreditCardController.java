@@ -460,7 +460,7 @@ public class CreditCardController {
         LocalDateTime currentDate = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
 
-        List<Category> categories = categoryService.getCategories();
+        List<Category> categories = categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
 
         // Loop through the months
@@ -542,6 +542,8 @@ public class CreditCardController {
                         return 0;
                     }
                 });
+
+        UIUtils.applyDefaultChartStyle(debtsFlowStackedBarChart);
 
         for (XYChart.Series<String, Number> series : debtsFlowStackedBarChart.getData()) {
             for (XYChart.Data<String, Number> data : series.getData()) {

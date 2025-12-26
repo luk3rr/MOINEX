@@ -500,6 +500,8 @@ public class WalletController {
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
         doughnutChart.setLabelsVisible(false);
 
+        UIUtils.applyDefaultChartStyle(doughnutChart);
+
         // Remove the previous chart and add the new one
         balanceByWalletTypePieChartAnchorPane.getChildren().removeIf(this::isDoughnutChart);
 

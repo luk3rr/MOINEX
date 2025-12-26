@@ -528,6 +528,8 @@ public class TransactionController {
                     }
                 });
 
+        UIUtils.applyDefaultChartStyle(moneyFlowStackedBarChart);
+
         for (XYChart.Series<String, Number> series : moneyFlowStackedBarChart.getData()) {
             for (XYChart.Data<String, Number> data : series.getData()) {
                 // Calculate the total for the month to find the percentage

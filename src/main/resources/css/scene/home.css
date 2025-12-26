@@ -120,11 +120,11 @@
 }
 
 .default-color0.chart-bar {
-  -fx-bar-fill: #dc3545;
+  -fx-bar-fill: #ef4444;
 }
 
 .default-color1.chart-bar {
-  -fx-bar-fill: #28a745;
+  -fx-bar-fill: #22c55e;
 }
 
 .chart-plot-background {

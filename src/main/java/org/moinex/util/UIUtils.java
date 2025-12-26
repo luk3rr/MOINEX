@@ -17,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.chart.Chart;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -312,5 +313,11 @@ public final class UIUtils {
 
     public static void alignTableColumn(List<? extends TableColumn<?, ?>> columns, Pos alignment) {
         columns.forEach(column -> alignTableColumn(column, alignment));
+    }
+
+    public static void applyDefaultChartStyle(Chart chart) {
+        chart.getStylesheets().add(
+                UIUtils.class.getResource(Constants.CHARTS_COLORS_STYLE_SHEET).toExternalForm()
+        );
     }
 }

@@ -186,6 +186,10 @@ public class PlanController {
                     financialPlanningService.getPlanStatus(
                             this.currentPlan.getId(), selectedPeriod);
 
+            this.currentPlanStatus.sort(
+                    (a, b) ->
+                            b.group().getTargetPercentage().compareTo(a.group().getTargetPercentage()));
+
             baseMonthlyIncome.setText(UIUtils.formatCurrency(currentPlan.getBaseIncome()));
             updateDoughnutChart();
             currentPage = 0;
@@ -214,22 +218,14 @@ public class PlanController {
         doughnutChart.setLegendVisible(false);
         doughnutChart.setLabelsVisible(false);
 
+        UIUtils.applyDefaultChartStyle(doughnutChart);
+
         pieChartAnchorPane.getChildren().clear();
         pieChartAnchorPane.getChildren().add(doughnutChart);
         AnchorPane.setTopAnchor(doughnutChart, 0.0);
         AnchorPane.setBottomAnchor(doughnutChart, 0.0);
         AnchorPane.setLeftAnchor(doughnutChart, 0.0);
         AnchorPane.setRightAnchor(doughnutChart, 0.0);
-
-        int colorIndex = 0;
-        for (PieChart.Data data : doughnutChart.getData()) {
-            data.getNode()
-                    .getStyleClass()
-                    .add(
-                            Constants.CHARTS_COLORS_PREFIX
-                                    + (colorIndex % Constants.CHARTS_COLORS_COUNT));
-            colorIndex++;
-        }
 
         updateChartLegend();
     }
@@ -240,10 +236,6 @@ public class PlanController {
     private void updateBudgetGroupPanes() {
         List<AnchorPane> panes = List.of(budgetGroupPane1, budgetGroupPane2, budgetGroupPane3);
         panes.forEach(p -> p.getChildren().clear());
-
-        currentPlanStatus.sort(
-                (a, b) ->
-                        b.group().getTargetPercentage().compareTo(a.group().getTargetPercentage()));
 
         int startIndex = currentPage * ITEMS_PER_PAGE;
         for (int i = 0; i < ITEMS_PER_PAGE; i++) {
@@ -291,30 +283,30 @@ public class PlanController {
     private void updateChartLegend() {
         budgetGroupVBox.getChildren().clear();
 
-        int colorIndex = 0;
+        int index = 0;
 
         for (FinancialPlanningService.PlanStatusDTO status : currentPlanStatus) {
             HBox legendItem = new HBox(5);
             legendItem.setAlignment(Pos.CENTER_LEFT);
 
             Rectangle colorRect = new Rectangle(10, 10);
-            colorRect
-                    .getStyleClass()
-                    .addAll(
-                            Constants.CHARTS_LEGEND_RECT_STYLE,
-                            Constants.CHARTS_COLORS_PREFIX
-                                    + (colorIndex % Constants.CHARTS_COLORS_COUNT));
+            colorRect.getStyleClass().addAll(
+                    Constants.CHARTS_LEGEND_RECT_STYLE,
+                    "data" + index
+            );
 
-            String labelText =
+            Label legendLabel = new Label(
                     String.format(
                             "%s (%.0f%%)",
-                            status.group().getName(), status.group().getTargetPercentage());
-            Label legendLabel = new Label(labelText);
+                            status.group().getName(),
+                            status.group().getTargetPercentage()
+                    )
+            );
 
             legendItem.getChildren().addAll(colorRect, legendLabel);
             budgetGroupVBox.getChildren().add(legendItem);
 
-            colorIndex++;
+            index++;
         }
     }
 }

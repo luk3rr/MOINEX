@@ -1,23 +1,89 @@
-.chart-color-0  { -fx-pie-color: #22c55e; }  .legend-rect.chart-color-0  { -fx-fill: #22c55e; }   /* verde lucro */
-.chart-color-1  { -fx-pie-color: #3b82f6; }  .legend-rect.chart-color-1  { -fx-fill: #3b82f6; }   /* azul principal */
-.chart-color-2  { -fx-pie-color: #f59e0b; }  .legend-rect.chart-color-2  { -fx-fill: #f59e0b; }   /* laranja alerta */
-.chart-color-3  { -fx-pie-color: #ef4444; }  .legend-rect.chart-color-3  { -fx-fill: #ef4444; }   /* vermelho perda */
-.chart-color-4  { -fx-pie-color: #818cf8; }  .legend-rect.chart-color-4  { -fx-fill: #818cf8; }   /* azul secundário */
+/* ============================================================
+   BARS (BarChart / StackedBarChart)
+   ============================================================ */
 
-.chart-color-5  { -fx-pie-color: #eab308; }  .legend-rect.chart-color-5  { -fx-fill: #eab308; }   /* amarelo destaque */
-.chart-color-6  { -fx-pie-color: #10b981; }  .legend-rect.chart-color-6  { -fx-fill: #10b981; }   /* verde esmeralda */
-.chart-color-7  { -fx-pie-color: #6366f1; }  .legend-rect.chart-color-7  { -fx-fill: #6366f1; }   /* roxo */
-.chart-color-8  { -fx-pie-color: #f472b6; }  .legend-rect.chart-color-8  { -fx-fill: #f472b6; }   /* rosa claro */
-.chart-color-9  { -fx-pie-color: #60a5fa; }  .legend-rect.chart-color-9  { -fx-fill: #60a5fa; }   /* azul claro */
+/* GRUPO 1 – Azul → Verde (frio, base) */
+.chart-bar.series0  { -fx-bar-fill: #2563eb; }
+.chart-bar.series1  { -fx-bar-fill: #3b82f6; }
+.chart-bar.series2  { -fx-bar-fill: #22c55e; }
+.chart-bar.series3  { -fx-bar-fill: #16a34a; }
+.chart-bar.series4  { -fx-bar-fill: #14532d; }
 
-.chart-color-10 { -fx-pie-color: #14b8a6; }  .legend-rect.chart-color-10 { -fx-fill: #14b8a6; }   /* verde água */
-.chart-color-11 { -fx-pie-color: #c084fc; }  .legend-rect.chart-color-11 { -fx-fill: #c084fc; }   /* lilás */
-.chart-color-12 { -fx-pie-color: #facc15; }  .legend-rect.chart-color-12 { -fx-fill: #facc15; }   /* amarelo vivo */
-.chart-color-13 { -fx-pie-color: #fb923c; }  .legend-rect.chart-color-13 { -fx-fill: #fb923c; }   /* laranja queimado */
-.chart-color-14 { -fx-pie-color: #a3e635; }  .legend-rect.chart-color-14 { -fx-fill: #a3e635; }   /* verde limão */
+/* GRUPO 2 – Verde → Amarelo */
+.chart-bar.series5  { -fx-bar-fill: #4ade80; }
+.chart-bar.series6  { -fx-bar-fill: #84cc16; }
+.chart-bar.series7  { -fx-bar-fill: #eab308; }
+.chart-bar.series8  { -fx-bar-fill: #ca8a04; }
+.chart-bar.series9  { -fx-bar-fill: #713f12; }
 
-.chart-color-15 { -fx-pie-color: #0ea5e9; }  .legend-rect.chart-color-15 { -fx-fill: #0ea5e9; }   /* azul médio */
-.chart-color-16 { -fx-pie-color: #64748b; }  .legend-rect.chart-color-16 { -fx-fill: #64748b; }   /* cinza azulado */
-.chart-color-17 { -fx-pie-color: #94a3b8; }  .legend-rect.chart-color-17 { -fx-fill: #94a3b8; }   /* cinza claro */
-.chart-color-18 { -fx-pie-color: #e11d48; }  .legend-rect.chart-color-18 { -fx-fill: #e11d48; }   /* vermelho escuro */
-.chart-color-19 { -fx-pie-color: #2dd4bf; }  .legend-rect.chart-color-19 { -fx-fill: #2dd4bf; }   /* turquesa */
+/* GRUPO 3 – Amarelo → Laranja */
+.chart-bar.series10 { -fx-bar-fill: #fde047; }
+.chart-bar.series11 { -fx-bar-fill: #facc15; }
+.chart-bar.series12 { -fx-bar-fill: #fb923c; }
+.chart-bar.series13 { -fx-bar-fill: #ea580c; }
+.chart-bar.series14 { -fx-bar-fill: #7c2d12; }
+
+/* GRUPO 4 – Vermelho */
+.chart-bar.series15 { -fx-bar-fill: #fecaca; }
+.chart-bar.series16 { -fx-bar-fill: #f87171; }
+.chart-bar.series17 { -fx-bar-fill: #ef4444; }
+.chart-bar.series18 { -fx-bar-fill: #b91c1c; }
+.chart-bar.series19 { -fx-bar-fill: #7f1d1d; }
+
+/* GRUPO 5 – Rosa → Roxo */
+.chart-bar.series20 { -fx-bar-fill: #f9a8d4; }
+.chart-bar.series21 { -fx-bar-fill: #ec4899; }
+.chart-bar.series22 { -fx-bar-fill: #d946ef; }
+.chart-bar.series23 { -fx-bar-fill: #a855f7; }
+.chart-bar.series24 { -fx-bar-fill: #581c87; }
+
+/* GRUPO 6 – Roxo → Índigo */
+.chart-bar.series25 { -fx-bar-fill: #c4b5fd; }
+.chart-bar.series26 { -fx-bar-fill: #818cf8; }
+.chart-bar.series27 { -fx-bar-fill: #6366f1; }
+.chart-bar.series28 { -fx-bar-fill: #4338ca; }
+.chart-bar.series29 { -fx-bar-fill: #1e1b4b; }
+
+/* GRUPO 7 – Ciano → Azul */
+.chart-bar.series30 { -fx-bar-fill: #67e8f9; }
+.chart-bar.series31 { -fx-bar-fill: #22d3ee; }
+.chart-bar.series32 { -fx-bar-fill: #0ea5e9; }
+.chart-bar.series33 { -fx-bar-fill: #0369a1; }
+.chart-bar.series34 { -fx-bar-fill: #082f49; }
+
+/* GRUPO 8 – Neutros contrastantes */
+.chart-bar.series35 { -fx-bar-fill: #e5e7eb; }
+.chart-bar.series36 { -fx-bar-fill: #9ca3af; }
+.chart-bar.series37 { -fx-bar-fill: #6b7280; }
+.chart-bar.series38 { -fx-bar-fill: #374151; }
+.chart-bar.series39 { -fx-bar-fill: #111827; }
+
+/* ============================================================
+   Pie Chart (pie, doughnut)
+   ============================================================ */
+
+/* GRUPO 1 – Azul → Verde (frio, base) */
+.chart-pie.data0  { -fx-pie-color: #2563eb; }
+.chart-pie.data1  { -fx-pie-color: #3b82f6; }
+.chart-pie.data2  { -fx-pie-color: #22c55e; }
+.chart-pie.data3  { -fx-pie-color: #16a34a; }
+.chart-pie.data4  { -fx-pie-color: #14532d; }
+
+/* GRUPO 2 – Verde → Amarelo */
+.chart-pie.data5  { -fx-pie-color: #4ade80; }
+.chart-pie.data6  { -fx-pie-color: #84cc16; }
+.chart-pie.data7  { -fx-pie-color: #eab308; }
+.chart-pie.data8  { -fx-pie-color: #ca8a04; }
+.chart-pie.data9  { -fx-pie-color: #713f12; }
+
+.legend-color.data0  { -fx-fill: #2563eb; }
+.legend-color.data1  { -fx-fill: #3b82f6; }
+.legend-color.data2  { -fx-fill: #22c55e; }
+.legend-color.data3  { -fx-fill: #16a34a; }
+.legend-color.data4  { -fx-fill: #14532d; }
+
+.legend-color.data5  { -fx-fill: #4ade80; }
+.legend-color.data6  { -fx-fill: #84cc16; }
+.legend-color.data7  { -fx-fill: #eab308; }
+.legend-color.data8  { -fx-fill: #ca8a04; }
+.legend-color.data9  { -fx-fill: #713f12; }

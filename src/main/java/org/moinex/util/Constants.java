@@ -193,7 +193,7 @@ public final class Constants {
     // Component styles
     public static final Integer CHARTS_COLORS_COUNT = 20;
     public static final String CHARTS_COLORS_PREFIX = "chart-color-";
-    public static final String CHARTS_LEGEND_RECT_STYLE = "legend-rect";
+    public static final String CHARTS_LEGEND_RECT_STYLE = "legend-color";
 
     public static final String PROGRESS_BAR_RED_COLOR_STYLE = "progress-bar-red";
     public static final String PROGRESS_BAR_YELLOW_COLOR_STYLE = "progress-bar-yellow";
