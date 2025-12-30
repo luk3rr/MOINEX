@@ -22,7 +22,7 @@
                            <children>
                               <AnchorPane fx:id="totalBalancePane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <Label fx:id="totalBalancePaneTitle" styleClass="title" text="Total balance" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                    <Label fx:id="totalBalancePaneTitle" styleClass="title" text="%wallet.totalBalance.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                     <ComboBox fx:id="totalBalancePaneWalletTypeComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                     <VBox fx:id="totalBalancePaneInfoVBox" alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0" />
                                  </children>
@@ -31,7 +31,7 @@
                                  <children>
                                     <HBox layoutX="-21.0" layoutY="25.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <JFXButton fx:id="totalBalancePaneTransferButton" onAction="#handleAddTransfer" stylesheets="@../../css/component/buttons.css" text="Add Transfer">
+                                          <JFXButton fx:id="totalBalancePaneTransferButton" onAction="#handleAddTransfer" stylesheets="@../../css/component/buttons.css" text="%wallet.button.addTransfer">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -40,7 +40,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton fx:id="totalBalancePaneAddWalletButton" onAction="#handleAddWallet" stylesheets="@../../css/component/buttons.css" text="Add Wallet">
+                                          <JFXButton fx:id="totalBalancePaneAddWalletButton" onAction="#handleAddWallet" stylesheets="@../../css/component/buttons.css" text="%wallet.button.addWallet">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -49,7 +49,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton fx:id="totalBalancePaneViewArchivedWalletsButton" onAction="#handleViewArchivedWallets" stylesheets="@../../css/component/buttons.css" text="Wallet Archive">
+                                          <JFXButton fx:id="totalBalancePaneViewArchivedWalletsButton" onAction="#handleViewArchivedWallets" stylesheets="@../../css/component/buttons.css" text="%wallet.button.walletArchive">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -58,7 +58,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleViewTransfers" stylesheets="@../../css/component/buttons.css" text="Transfers">
+                                          <JFXButton onAction="#handleViewTransfers" stylesheets="@../../css/component/buttons.css" text="%wallet.button.transfers">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -75,7 +75,7 @@
                         </VBox>
                         <AnchorPane fx:id="walletPane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label fx:id="walletPaneTitle" styleClass="title" text="Wallets" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Label fx:id="walletPaneTitle" styleClass="title" text="%wallet.wallets.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <JFXButton fx:id="walletPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -112,13 +112,13 @@
                         <AnchorPane minHeight="400.0" minWidth="900.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <ComboBox fx:id="moneyFlowPaneWalletTypeComboBox" layoutX="413.0" layoutY="18.0" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                              <Label fx:id="moneyFlowPaneTitle" layoutX="53.0" layoutY="28.0" styleClass="title" text="Money flow" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Label fx:id="moneyFlowPaneTitle" layoutX="53.0" layoutY="28.0" styleClass="title" text="%wallet.moneyFlow.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <AnchorPane fx:id="moneyFlowBarChartAnchorPane" layoutX="42.0" layoutY="132.0" minWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
                            </children>
                         </AnchorPane>
                         <AnchorPane minHeight="400.0" minWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label styleClass="title" text="Total balance by wallet type" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Label styleClass="title" text="%wallet.balanceByType.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
                                  <children>
                                     <AnchorPane fx:id="balanceByWalletTypePieChartAnchorPane" HBox.hgrow="ALWAYS" />

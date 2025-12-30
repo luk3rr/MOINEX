@@ -37,6 +37,7 @@ import org.moinex.model.creditcard.CreditCardPayment;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.ResumePaneController;
 import org.moinex.ui.dialog.ManageCategoryController;
@@ -94,6 +95,8 @@ public class TransactionController {
 
     private CategoryService categoryService;
 
+    private I18nService i18nService;
+
     private static final Integer DAYS_BEFORE_OFFSET = 30;
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
@@ -110,11 +113,13 @@ public class TransactionController {
             WalletTransactionService walletTransactionService,
             CreditCardService creditCardService,
             CategoryService categoryService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.walletTransactionService = walletTransactionService;
         this.creditCardService = creditCardService;
         this.categoryService = categoryService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -572,7 +577,10 @@ public class TransactionController {
         Year selectedYear = yearResumeComboBox.getValue();
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(Constants.RESUME_PANE_FXML),
+                            i18nService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
@@ -608,7 +616,10 @@ public class TransactionController {
                         monthYearResumeMonthComboBox.getValue().getValue());
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(Constants.RESUME_PANE_FXML),
+                            i18nService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 

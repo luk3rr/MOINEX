@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -23,6 +25,8 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.NonNull;
 import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.model.wallettransaction.WalletType;
+import org.moinex.service.I18nService;
 import org.moinex.service.UserPreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -282,8 +286,19 @@ public final class UIUtils {
             ConfigurableApplicationContext springContext,
             Class<?> resourceClass)
             throws IOException {
+        loadContentIntoTab(tab, fxmlPath, cssPath, springContext, resourceClass, null);
+    }
 
-        FXMLLoader loader = new FXMLLoader(resourceClass.getResource(fxmlPath));
+    public static void loadContentIntoTab(
+            Tab tab,
+            String fxmlPath,
+            String cssPath,
+            ConfigurableApplicationContext springContext,
+            Class<?> resourceClass,
+            ResourceBundle resources)
+            throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(resourceClass.getResource(fxmlPath), resources);
         loader.setControllerFactory(springContext::getBean);
         Parent content = loader.load();
 
@@ -321,5 +336,38 @@ public final class UIUtils {
                         UIUtils.class
                                 .getResource(Constants.CHARTS_COLORS_STYLE_SHEET)
                                 .toExternalForm());
+    }
+
+    /**
+     * Translate wallet type name to localized string
+     * Maps database names to i18n keys
+     *
+     * @param walletType The wallet type to translate
+     * @param i18nService The I18nService instance for translation
+     * @return Translated wallet type name
+     */
+    public static String translateWalletTypeName(WalletType walletType, I18nService i18nService) {
+        String name = walletType.getName().toLowerCase().replace(" ", "");
+
+        // Map common wallet type names to i18n keys
+        Map<String, String> typeKeyMap =
+                Map.of(
+                        "checkingaccount", "wallet.type.checking",
+                        "savingsaccount", "wallet.type.savings",
+                        "broker", "wallet.type.broker",
+                        "criptocurrency", "wallet.type.criptocurrency",
+                        "foodvoucher", "wallet.type.foodVoucher",
+                        "mealvoucher", "wallet.type.mealVoucher",
+                        "wallet", "wallet.type.wallet",
+                        "goal", "wallet.type.goal",
+                        "others", "wallet.type.others");
+
+        String key = typeKeyMap.getOrDefault(name, null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        // Fallback to original name if no translation found
+        return walletType.getName();
     }
 }

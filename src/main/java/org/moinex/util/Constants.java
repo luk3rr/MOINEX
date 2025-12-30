@@ -375,6 +375,72 @@ public final class Constants {
     public static final String BITCOIN_TICKER = "BTC-USD";
     public static final String ETHEREUM_TICKER = "ETH-USD";
 
+    public static final class TranslationKeys {
+        private TranslationKeys() {
+            // Prevent instantiation
+        }
+
+        // App
+        public static final String APP_TITLE = "app.title";
+
+        // Main menu
+        public static final String MAIN_MENU = "main.menu";
+        public static final String MAIN_HOME = "main.home";
+        public static final String MAIN_WALLET = "main.wallet";
+        public static final String MAIN_CREDIT_CARD = "main.creditCard";
+        public static final String MAIN_TRANSACTION = "main.transaction";
+        public static final String MAIN_GOALS_AND_PLANS = "main.goalsAndPlans";
+        public static final String MAIN_SAVINGS = "main.savings";
+        public static final String MAIN_SETTINGS = "main.settings";
+        public static final String MAIN_CALENDAR = "main.calendar";
+        public static final String MAIN_CALCULATOR = "main.calculator";
+
+        // Dialogs
+        public static final String DIALOG_CONFIRMATION_TITLE = "dialog.confirmation.title";
+        public static final String DIALOG_INFO_TITLE = "dialog.info.title";
+        public static final String DIALOG_ERROR_TITLE = "dialog.error.title";
+        public static final String DIALOG_SUCCESS_TITLE = "dialog.success.title";
+
+        // Settings
+        public static final String SETTINGS_LANGUAGE = "settings.language";
+
+        // Wallet
+        public static final String WALLET_ALL_WALLETS = "wallet.allWallets";
+        public static final String WALLET_DIALOG_ADD_TRANSFER_TITLE =
+                "wallet.dialog.addTransfer.title";
+        public static final String WALLET_DIALOG_ADD_WALLET_TITLE = "wallet.dialog.addWallet.title";
+        public static final String WALLET_DIALOG_ARCHIVED_WALLETS_TITLE =
+                "wallet.dialog.archivedWallets.title";
+        public static final String WALLET_DIALOG_VIEW_TRANSFERS_TITLE =
+                "wallet.dialog.viewTransfers.title";
+        public static final String WALLET_TOTAL_BALANCE_FORESEEN = "wallet.totalBalance.foreseen";
+        public static final String WALLET_TOTAL_BALANCE_CORRESPONDS_TO =
+                "wallet.totalBalance.correspondsTo";
+        public static final String WALLET_TOTAL_BALANCE_TITLE = "wallet.totalBalance.title";
+        public static final String WALLET_BUTTON_ADD_TRANSFER = "wallet.button.addTransfer";
+        public static final String WALLET_BUTTON_ADD_WALLET = "wallet.button.addWallet";
+        public static final String WALLET_BUTTON_WALLET_ARCHIVE = "wallet.button.walletArchive";
+        public static final String WALLET_BUTTON_TRANSFERS = "wallet.button.transfers";
+        public static final String WALLET_WALLETS_TITLE = "wallet.wallets.title";
+        public static final String WALLET_MONEY_FLOW_TITLE = "wallet.moneyFlow.title";
+        public static final String WALLET_BALANCE_BY_TYPE_TITLE = "wallet.balanceByType.title";
+
+        // Wallet types
+        public static final String WALLET_TYPE_CHECKING = "wallet.type.checking";
+        public static final String WALLET_TYPE_SAVINGS = "wallet.type.savings";
+        public static final String WALLET_TYPE_BROKER = "wallet.type.broker";
+        public static final String WALLET_TYPE_CRIPTOCURRENCY = "wallet.type.criptocurrency";
+        public static final String WALLET_TYPE_FOOD_VOUCHER = "wallet.type.foodVoucher";
+        public static final String WALLET_TYPE_MEAL_VOUCHER = "wallet.type.mealVoucher";
+        public static final String WALLET_TYPE_GOAL = "wallet.type.goal";
+        public static final String WALLET_TYPE_WALLET = "wallet.type.wallet";
+        public static final String WALLET_TYPE_OTHERS = "wallet.type.others";
+
+        // Transaction types
+        public static final String TRANSACTION_TYPE_EXPENSES = "transaction.type.expenses";
+        public static final String TRANSACTION_TYPE_INCOMES = "transaction.type.incomes";
+    }
+
     // Prevent instantiation
     private Constants() {}
 

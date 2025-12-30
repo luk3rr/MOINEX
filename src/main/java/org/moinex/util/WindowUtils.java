@@ -9,6 +9,7 @@ package org.moinex.util;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -46,6 +47,25 @@ public final class WindowUtils {
         alert.setContentText(message);
     }
 
+    private static String getAlertTitle(AlertType type, ResourceBundle resources) {
+        if (resources == null) {
+            return switch (type) {
+                case CONFIRMATION -> "Confirmation";
+                case INFORMATION -> "Info";
+                case ERROR -> "Error";
+                default -> "";
+            };
+        }
+
+        return switch (type) {
+            case CONFIRMATION ->
+                    resources.getString(Constants.TranslationKeys.DIALOG_CONFIRMATION_TITLE);
+            case INFORMATION -> resources.getString(Constants.TranslationKeys.DIALOG_INFO_TITLE);
+            case ERROR -> resources.getString(Constants.TranslationKeys.DIALOG_ERROR_TITLE);
+            default -> "";
+        };
+    }
+
     /**
      * Shows a confirmation dialog with Yes/No options
      * @param header The header of the dialog
@@ -53,12 +73,18 @@ public final class WindowUtils {
      * @return True if the user clicked Yes, false otherwise
      */
     public static boolean showConfirmationDialog(String header, String message) {
+        return showConfirmationDialog(header, message, null);
+    }
+
+    public static boolean showConfirmationDialog(
+            String header, String message, ResourceBundle resources) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
 
         // Set the confirmation button
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
-        setAlertAttributes(alert, "Confirmation", header, message);
+        setAlertAttributes(
+                alert, getAlertTitle(AlertType.CONFIRMATION, resources), header, message);
 
         ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
         return result == ButtonType.YES;
@@ -70,8 +96,13 @@ public final class WindowUtils {
      * @param message The message to be displayed
      */
     public static void showInformationDialog(String header, String message) {
+        showInformationDialog(header, message, null);
+    }
+
+    public static void showInformationDialog(
+            String header, String message, ResourceBundle resources) {
         Alert alert = new Alert(AlertType.INFORMATION);
-        setAlertAttributes(alert, "Info", header, message);
+        setAlertAttributes(alert, getAlertTitle(AlertType.INFORMATION, resources), header, message);
         alert.showAndWait();
     }
 
@@ -81,8 +112,12 @@ public final class WindowUtils {
      * @param message The message to be displayed
      */
     public static void showErrorDialog(String header, String message) {
+        showErrorDialog(header, message, null);
+    }
+
+    public static void showErrorDialog(String header, String message, ResourceBundle resources) {
         Alert alert = new Alert(AlertType.ERROR);
-        setAlertAttributes(alert, "Error", header, message);
+        setAlertAttributes(alert, getAlertTitle(AlertType.ERROR, resources), header, message);
         alert.showAndWait();
     }
 
@@ -92,6 +127,10 @@ public final class WindowUtils {
      * @param message The message to be displayed
      */
     public static void showSuccessDialog(String header, String message) {
+        showSuccessDialog(header, message, null);
+    }
+
+    public static void showSuccessDialog(String header, String message, ResourceBundle resources) {
         Alert alert = new Alert(AlertType.INFORMATION);
 
         // Set the success icon
@@ -103,7 +142,11 @@ public final class WindowUtils {
                                                         Constants.SUCCESS_ICON))
                                         .toString())));
 
-        setAlertAttributes(alert, "Success", header, message);
+        String title =
+                (resources == null)
+                        ? "Success"
+                        : resources.getString(Constants.TranslationKeys.DIALOG_SUCCESS_TITLE);
+        setAlertAttributes(alert, title, header, message);
         alert.showAndWait();
     }
 
@@ -127,7 +170,7 @@ public final class WindowUtils {
             String title,
             ApplicationContext springContext,
             Consumer<T> controllerSetup) {
-        openModalWindow(fxmlFileName, title, springContext, controllerSetup, List.of());
+        openModalWindow(fxmlFileName, title, springContext, controllerSetup, List.of(), null);
     }
 
     /**
@@ -144,8 +187,19 @@ public final class WindowUtils {
             ApplicationContext springContext,
             Consumer<T> controllerSetup,
             List<Runnable> onHiddenActions) {
+        openModalWindow(fxmlFileName, title, springContext, controllerSetup, onHiddenActions, null);
+    }
+
+    public static <T> void openModalWindow(
+            String fxmlFileName,
+            String title,
+            ApplicationContext springContext,
+            Consumer<T> controllerSetup,
+            List<Runnable> onHiddenActions,
+            ResourceBundle resources) {
         try {
-            FXMLLoader loader = new FXMLLoader(WindowUtils.class.getResource(fxmlFileName));
+            FXMLLoader loader =
+                    new FXMLLoader(WindowUtils.class.getResource(fxmlFileName), resources);
             loader.setControllerFactory(springContext::getBean);
             Parent root = loader.load();
 
@@ -186,7 +240,7 @@ public final class WindowUtils {
             String title,
             ApplicationContext springContext,
             Consumer<T> controllerSetup) {
-        openPopupWindow(fxmlFileName, title, springContext, controllerSetup, List.of());
+        openPopupWindow(fxmlFileName, title, springContext, controllerSetup, List.of(), null);
     }
 
     /**
@@ -203,8 +257,19 @@ public final class WindowUtils {
             ApplicationContext springContext,
             Consumer<T> controllerSetup,
             List<Runnable> onHiddenActions) {
+        openPopupWindow(fxmlFileName, title, springContext, controllerSetup, onHiddenActions, null);
+    }
+
+    public static <T> void openPopupWindow(
+            String fxmlFileName,
+            String title,
+            ApplicationContext springContext,
+            Consumer<T> controllerSetup,
+            List<Runnable> onHiddenActions,
+            ResourceBundle resources) {
         try {
-            FXMLLoader loader = new FXMLLoader(WindowUtils.class.getResource(fxmlFileName));
+            FXMLLoader loader =
+                    new FXMLLoader(WindowUtils.class.getResource(fxmlFileName), resources);
             loader.setControllerFactory(springContext::getBean);
             Parent root = loader.load();
 

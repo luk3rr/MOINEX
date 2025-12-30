@@ -26,6 +26,7 @@ import javafx.scene.layout.AnchorPane;
 import lombok.NoArgsConstructor;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.GoalService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.GoalFullPaneController;
 import org.moinex.ui.dialog.goal.AddGoalController;
@@ -64,6 +65,7 @@ public class GoalController {
     private ConfigurableApplicationContext springContext;
     private GoalService goalService;
     private WalletTransactionService walletTransactionService;
+    private I18nService i18nService;
     private List<Goal> goals;
     private Integer inProgressCurrentPage = 0;
     private Integer accomplishedCurrentPage = 0;
@@ -79,10 +81,12 @@ public class GoalController {
     public GoalController(
             GoalService goalService,
             WalletTransactionService walletTransactionService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.goalService = goalService;
         this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     private static TableColumn<Goal, String> getColumn() {
@@ -397,7 +401,9 @@ public class GoalController {
 
             try {
                 FXMLLoader loader =
-                        new FXMLLoader(getClass().getResource(Constants.GOAL_FULL_PANE_FXML));
+                        new FXMLLoader(
+                                getClass().getResource(Constants.GOAL_FULL_PANE_FXML),
+                                i18nService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
 
                 Parent newContent = loader.load();
@@ -458,7 +464,9 @@ public class GoalController {
 
             try {
                 FXMLLoader loader =
-                        new FXMLLoader(getClass().getResource(Constants.GOAL_FULL_PANE_FXML));
+                        new FXMLLoader(
+                                getClass().getResource(Constants.GOAL_FULL_PANE_FXML),
+                                i18nService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
 
                 Parent newContent = loader.load();

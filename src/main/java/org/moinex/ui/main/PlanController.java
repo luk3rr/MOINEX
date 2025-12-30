@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.chart.DoughnutChart;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
+import org.moinex.service.I18nService;
 import org.moinex.ui.common.BudgetGroupPaneController;
 import org.moinex.ui.dialog.financialplanning.AddPlanController;
 import org.moinex.ui.dialog.financialplanning.EditPlanController;
@@ -59,6 +60,7 @@ public class PlanController {
 
     private ConfigurableApplicationContext springContext;
     private FinancialPlanningService financialPlanningService;
+    private I18nService i18nService;
 
     private FinancialPlan currentPlan;
     private List<FinancialPlanningService.PlanStatusDTO> currentPlanStatus;
@@ -67,9 +69,11 @@ public class PlanController {
     @Autowired
     public PlanController(
             ConfigurableApplicationContext springContext,
-            FinancialPlanningService financialPlanningService) {
+            FinancialPlanningService financialPlanningService,
+            I18nService i18nService) {
         this.springContext = springContext;
         this.financialPlanningService = financialPlanningService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -254,20 +258,20 @@ public class PlanController {
         budgetGroupNextButton.setDisable(currentPage >= maxPages - 1);
     }
 
-    /**
-     * Loads the budget_group_pane.fxml, populates it with data, and adds it to a parent pane.
-     */
     private void loadBudgetGroupPane(
             AnchorPane parent, FinancialPlanningService.PlanStatusDTO status) {
         try {
             FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource(Constants.BUDGET_GROUP_PANE_FXML));
+                    new FXMLLoader(
+                            getClass().getResource(Constants.BUDGET_GROUP_PANE_FXML),
+                            i18nService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent content = loader.load();
 
             BudgetGroupPaneController controller = loader.getController();
             controller.setData(status.group(), status.spentAmount(), currentPlan.getBaseIncome());
 
+            parent.getChildren().clear();
             parent.getChildren().add(content);
             AnchorPane.setTopAnchor(content, 0.0);
             AnchorPane.setBottomAnchor(content, 0.0);

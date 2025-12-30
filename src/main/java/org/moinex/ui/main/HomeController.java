@@ -43,6 +43,7 @@ import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
@@ -104,6 +105,8 @@ public class HomeController {
 
     private WalletTransactionService walletTransactionService;
 
+    private I18nService i18nService;
+
     private RecurringTransactionService recurringTransactionService;
 
     private CreditCardService creditCardService;
@@ -118,6 +121,8 @@ public class HomeController {
      * @param walletTransactionService The wallet transaction service
      * @param recurringTransactionService The recurring transaction service
      * @param creditCardService The credit card service
+     * @param springContext The spring context
+     * @param i18nService The i18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -126,12 +131,14 @@ public class HomeController {
             WalletTransactionService walletTransactionService,
             RecurringTransactionService recurringTransactionService,
             CreditCardService creditCardService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -542,7 +549,10 @@ public class HomeController {
      */
     private void updateMonthResume() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.RESUME_PANE_FXML));
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(Constants.RESUME_PANE_FXML),
+                            i18nService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 

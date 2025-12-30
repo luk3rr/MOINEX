@@ -41,6 +41,7 @@ import org.moinex.model.creditcard.CreditCardDebt;
 import org.moinex.model.creditcard.CreditCardPayment;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.ui.common.CreditCardPaneController;
 import org.moinex.ui.dialog.creditcard.AddCreditCardController;
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController;
@@ -90,6 +91,8 @@ public class CreditCardController {
 
     private CategoryService categoryService;
 
+    private I18nService i18nService;
+
     private List<CreditCard> creditCards;
 
     private Integer crcPaneCurrentPage = 0;
@@ -105,10 +108,12 @@ public class CreditCardController {
     public CreditCardController(
             CreditCardService creditCardService,
             CategoryService categoryService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.creditCardService = creditCardService;
         this.categoryService = categoryService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -406,7 +411,10 @@ public class CreditCardController {
             CreditCard crc = creditCards.get(crcPaneCurrentPage);
 
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.CRC_PANE_FXML));
+                FXMLLoader loader =
+                        new FXMLLoader(
+                                getClass().getResource(Constants.CRC_PANE_FXML),
+                                i18nService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
                 Parent newContent = loader.load();
 
