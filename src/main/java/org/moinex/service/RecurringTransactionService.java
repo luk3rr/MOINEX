@@ -633,7 +633,8 @@ public class RecurringTransactionService {
 
         double expectedAmount = 0.0;
 
-        while (nextDueDate.isBefore(rt.getEndDate()) || nextDueDate.equals(rt.getEndDate())) {
+        while (nextDueDate.toLocalDate().isBefore(rt.getEndDate().toLocalDate())
+                || nextDueDate.toLocalDate().equals(rt.getEndDate().toLocalDate())) {
             expectedAmount += rt.getAmount().doubleValue();
             nextDueDate = calculateNextDueDate(nextDueDate, rt.getFrequency());
         }
