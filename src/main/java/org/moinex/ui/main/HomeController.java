@@ -8,6 +8,7 @@ package org.moinex.ui.main;
 
 import com.jfoenix.controls.JFXButton;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -57,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 
 /**
  * Controller for the home view
@@ -294,7 +294,10 @@ public class HomeController {
 
         TableColumn<WalletTransaction, WalletTransaction> transactionColumn =
                 new TableColumn<>(
-                        "Last " + Constants.HOME_LAST_TRANSACTIONS_SIZE + " Transactions");
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.HOME_TRANSACTIONS_TABLE_TITLE),
+                                Constants.HOME_LAST_TRANSACTIONS_SIZE));
 
         transactionColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue()));
@@ -349,11 +352,8 @@ public class HomeController {
 
                                     Label transactionStatusLabel =
                                             new Label(
-                                                    StringUtils.capitalize(
-                                                            transaction
-                                                                    .getStatus()
-                                                                    .toString()
-                                                                    .toLowerCase()));
+                                                    UIUtils.translateTransactionStatus(
+                                                            transaction.getStatus(), i18nService));
                                     transactionStatusLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH);
 
@@ -475,10 +475,10 @@ public class HomeController {
 
         // Create two series: one for incomes and one for expenses
         XYChart.Series<String, Number> expensesSeries = new XYChart.Series<>();
-        expensesSeries.setName("Expenses");
+        expensesSeries.setName(i18nService.tr(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES));
 
         XYChart.Series<String, Number> incomesSeries = new XYChart.Series<>();
-        incomesSeries.setName("Incomes");
+        incomesSeries.setName(i18nService.tr(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES));
 
         double maxValue = 0.0;
 
@@ -569,7 +569,10 @@ public class HomeController {
             LocalDateTime currentDate = LocalDateTime.now();
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
-            monthResumePaneTitle.setText(currentDate.format(formatter) + " Resume");
+            monthResumePaneTitle.setText(
+                    MessageFormat.format(
+                            i18nService.tr(Constants.TranslationKeys.HOME_RESUME_TITLE),
+                            currentDate.format(formatter)));
 
             resumePaneController.updateResumePane(
                     currentDate.getMonthValue(), currentDate.getYear());
@@ -602,12 +605,18 @@ public class HomeController {
         nameLabel.setMaxWidth(Constants.HOME_ITEM_NODE_NAME_MAX_LENGTH);
         nameLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
         nameLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_NAME_STYLE);
-        UIUtils.addTooltipToNode(nameLabel, "Credit card name");
+        UIUtils.addTooltipToNode(
+                nameLabel,
+                i18nService.tr(
+                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NAME));
 
         Label crcOperatorLabel = new Label(creditCard.getOperator().getName());
         crcOperatorLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_OPERATOR_STYLE);
         crcOperatorLabel.setAlignment(Pos.TOP_LEFT);
-        UIUtils.addTooltipToNode(crcOperatorLabel, "Credit card operator");
+        UIUtils.addTooltipToNode(
+                crcOperatorLabel,
+                i18nService.tr(
+                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_OPERATOR));
 
         Label availableCredit =
                 new Label(
@@ -616,12 +625,18 @@ public class HomeController {
 
         availableCredit.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_BALANCE_STYLE);
 
-        UIUtils.addTooltipToNode(availableCredit, "Available credit");
+        UIUtils.addTooltipToNode(
+                availableCredit,
+                i18nService.tr(
+                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_AVAILABLE_CREDIT));
 
         Label digitsLabel =
                 new Label(UIUtils.formatCreditCardNumber(creditCard.getLastFourDigits()));
         digitsLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_DIGITS_STYLE);
-        UIUtils.addTooltipToNode(digitsLabel, "Credit card number");
+        UIUtils.addTooltipToNode(
+                digitsLabel,
+                i18nService.tr(
+                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER));
 
         infoVbox.getChildren().addAll(nameLabel, crcOperatorLabel, availableCredit, digitsLabel);
 
@@ -660,24 +675,33 @@ public class HomeController {
         nameLabel.setMaxWidth(Constants.HOME_ITEM_NODE_NAME_MAX_LENGTH);
         nameLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
         nameLabel.getStyleClass().add(Constants.HOME_WALLET_ITEM_NAME_STYLE);
-        UIUtils.addTooltipToNode(nameLabel, "Wallet name");
+        UIUtils.addTooltipToNode(
+                nameLabel,
+                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME));
 
-        Label walletTypeLabel = new Label(wallet.getType().getName());
+        Label walletTypeLabel =
+                new Label(UIUtils.translateWalletTypeName(wallet.getType(), i18nService));
         walletTypeLabel.getStyleClass().add(Constants.HOME_WALLET_TYPE_STYLE);
         walletTypeLabel.setAlignment(Pos.TOP_LEFT);
-        UIUtils.addTooltipToNode(walletTypeLabel, "Wallet type");
+        UIUtils.addTooltipToNode(
+                walletTypeLabel,
+                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_TYPE));
 
         Label balanceLabel = new Label(UIUtils.formatCurrency(wallet.getBalance()));
         balanceLabel.getStyleClass().add(Constants.HOME_WALLET_ITEM_BALANCE_STYLE);
-        UIUtils.addTooltipToNode(balanceLabel, "Wallet balance");
+        UIUtils.addTooltipToNode(
+                balanceLabel,
+                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_BALANCE));
 
         if (wallet.isVirtual()) {
-            Label virtualWalletLabel = new Label("Virtual Wallet");
+            Label virtualWalletLabel =
+                    new Label(i18nService.tr(Constants.TranslationKeys.HOME_WALLET_VIRTUAL_WALLET));
 
             virtualWalletLabel.setAlignment(Pos.BOTTOM_LEFT);
             virtualWalletLabel.getStyleClass().add(Constants.HOME_VIRTUAL_WALLET_INFO_STYLE);
 
-            UIUtils.addTooltipToNode(virtualWalletLabel, wallet.getVirtualWalletInfo());
+            UIUtils.addTooltipToNode(
+                    virtualWalletLabel, UIUtils.getVirtualWalletInfo(wallet, i18nService));
 
             infoVbox.getChildren()
                     .addAll(nameLabel, walletTypeLabel, balanceLabel, virtualWalletLabel);

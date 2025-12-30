@@ -245,12 +245,12 @@ public final class Constants {
 
     // Home scene constants
     public static final Integer HOME_LAST_TRANSACTIONS_SIZE = 15;
-    public static final Integer HOME_LAST_TRANSACTIONS_DESCRIPTION_LABEL_WIDTH = 280;
+    public static final Integer HOME_LAST_TRANSACTIONS_DESCRIPTION_LABEL_WIDTH = 290;
     public static final Integer HOME_LAST_TRANSACTIONS_VALUE_LABEL_WIDTH = 70;
     public static final Integer HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH = 80;
     public static final Integer HOME_LAST_TRANSACTIONS_WALLET_LABEL_WIDTH = 100;
     public static final Integer HOME_LAST_TRANSACTIONS_CATEGORY_LABEL_WIDTH = 100;
-    public static final Integer HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH = 80;
+    public static final Integer HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH = 90;
     public static final Integer HOME_PANES_ITEMS_PER_PAGE = 2;
 
     public static final Double EPSILON = 1e-6;
@@ -425,6 +425,33 @@ public final class Constants {
         public static final String WALLET_MONEY_FLOW_TITLE = "wallet.moneyFlow.title";
         public static final String WALLET_BALANCE_BY_TYPE_TITLE = "wallet.balanceByType.title";
 
+        // Home
+        public static final String HOME_WALLET_TITLE = "home.wallet.title";
+        public static final String HOME_CREDIT_CARD_TITLE = "home.creditCard.title";
+        public static final String HOME_MONEY_FLOW_TITLE = "home.moneyFlow.title";
+        public static final String HOME_RESUME_TITLE = "home.resume.title";
+        public static final String HOME_TRANSACTIONS_TITLE = "home.transactions.title";
+        public static final String HOME_TRANSACTIONS_TABLE_TITLE = "home.transactions.table.title";
+        public static final String HOME_WALLET_VIRTUAL_WALLET = "home.wallet.virtualWallet";
+        public static final String HOME_WALLET_TOOLTIP_WALLET_NAME =
+                "home.wallet.tooltip.walletName";
+        public static final String HOME_WALLET_TOOLTIP_WALLET_TYPE =
+                "home.wallet.tooltip.walletType";
+        public static final String HOME_WALLET_TOOLTIP_WALLET_BALANCE =
+                "home.wallet.tooltip.walletBalance";
+        public static final String HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET =
+                "home.wallet.tooltip.isVirtualWallet";
+        public static final String HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET =
+                "home.wallet.tooltip.notVirtualWallet";
+        public static final String HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NAME =
+                "home.creditCard.tooltip.creditCardName";
+        public static final String HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_OPERATOR =
+                "home.creditCard.tooltip.creditCardOperator";
+        public static final String HOME_CREDIT_CARD_TOOLTIP_AVAILABLE_CREDIT =
+                "home.creditCard.tooltip.availableCredit";
+        public static final String HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER =
+                "home.creditCard.tooltip.creditCardNumber";
+
         // Wallet types
         public static final String WALLET_TYPE_CHECKING = "wallet.type.checking";
         public static final String WALLET_TYPE_SAVINGS = "wallet.type.savings";
@@ -439,6 +466,10 @@ public final class Constants {
         // Transaction types
         public static final String TRANSACTION_TYPE_EXPENSES = "transaction.type.expenses";
         public static final String TRANSACTION_TYPE_INCOMES = "transaction.type.incomes";
+
+        // Transaction status
+        public static final String TRANSACTION_STATUS_PENDING = "transaction.status.pending";
+        public static final String TRANSACTION_STATUS_CONFIRMED = "transaction.status.confirmed";
     }
 
     // Prevent instantiation

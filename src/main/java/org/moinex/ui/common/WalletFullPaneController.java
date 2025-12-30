@@ -23,6 +23,7 @@ import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.dialog.wallettransaction.*;
@@ -88,6 +89,8 @@ public class WalletFullPaneController {
 
     @FXML private MenuItem changeWalletTypeMenuItem;
 
+    private I18nService i18nService;
+
     private ConfigurableApplicationContext springContext;
 
     private WalletController walletController;
@@ -122,12 +125,14 @@ public class WalletFullPaneController {
             CreditCardService creditCardService,
             WalletTransactionService walletTransactionService,
             ConfigurableApplicationContext springContext,
-            WalletController walletController) {
+            WalletController walletController,
+            I18nService i18nService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
         this.walletController = walletController;
+        this.i18nService = i18nService;
     }
 
     /**
@@ -434,6 +439,6 @@ public class WalletFullPaneController {
         virtualWalletInfo.setVisible(true);
         virtualWalletInfo.setManaged(true);
 
-        virtualWalletInfo.setText(wallet.getVirtualWalletInfo());
+        virtualWalletInfo.setText(UIUtils.getVirtualWalletInfo(wallet, i18nService));
     }
 }

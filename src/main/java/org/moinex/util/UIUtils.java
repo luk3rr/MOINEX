@@ -9,6 +9,7 @@ package org.moinex.util;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.I18nService;
 import org.moinex.service.UserPreferencesService;
+import org.moinex.util.enums.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -340,7 +342,6 @@ public final class UIUtils {
 
     /**
      * Translate wallet type name to localized string
-     * Maps database names to i18n keys
      *
      * @param walletType The wallet type to translate
      * @param i18nService The I18nService instance for translation
@@ -352,15 +353,15 @@ public final class UIUtils {
         // Map common wallet type names to i18n keys
         Map<String, String> typeKeyMap =
                 Map.of(
-                        "checkingaccount", "wallet.type.checking",
-                        "savingsaccount", "wallet.type.savings",
-                        "broker", "wallet.type.broker",
-                        "criptocurrency", "wallet.type.criptocurrency",
-                        "foodvoucher", "wallet.type.foodVoucher",
-                        "mealvoucher", "wallet.type.mealVoucher",
-                        "wallet", "wallet.type.wallet",
-                        "goal", "wallet.type.goal",
-                        "others", "wallet.type.others");
+                        "checkingaccount", Constants.TranslationKeys.WALLET_TYPE_CHECKING,
+                        "savingsaccount", Constants.TranslationKeys.WALLET_TYPE_SAVINGS,
+                        "broker", Constants.TranslationKeys.WALLET_TYPE_BROKER,
+                        "criptocurrency", Constants.TranslationKeys.WALLET_TYPE_CRIPTOCURRENCY,
+                        "foodvoucher", Constants.TranslationKeys.WALLET_TYPE_FOOD_VOUCHER,
+                        "mealvoucher", Constants.TranslationKeys.WALLET_TYPE_MEAL_VOUCHER,
+                        "wallet", Constants.TranslationKeys.WALLET_TYPE_WALLET,
+                        "goal", Constants.TranslationKeys.WALLET_TYPE_GOAL,
+                        "others", Constants.TranslationKeys.WALLET_TYPE_OTHERS);
 
         String key = typeKeyMap.getOrDefault(name, null);
         if (key != null) {
@@ -369,5 +370,44 @@ public final class UIUtils {
 
         // Fallback to original name if no translation found
         return walletType.getName();
+    }
+
+    /**
+     * Translate transaction status to localized string
+     *
+     * @param transactionStatus The transaction status to translate
+     * @param i18nService The I18nService instance for translation
+     * @return Translated transaction status name
+     */
+    public static String translateTransactionStatus(
+            TransactionStatus transactionStatus, I18nService i18nService) {
+        Map<String, String> statusKeyMap =
+                Map.of(
+                        "pending", Constants.TranslationKeys.TRANSACTION_STATUS_PENDING,
+                        "confirmed", Constants.TranslationKeys.TRANSACTION_STATUS_CONFIRMED);
+
+        String key = statusKeyMap.getOrDefault(transactionStatus.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return transactionStatus.name();
+    }
+
+    /**
+     * Get virtual wallet info
+     *
+     * @param wallet The wallet to get the info
+     * @param i18nService The I18nService instance for translation
+     * @return The virtual wallet info
+     */
+    public static String getVirtualWalletInfo(Wallet wallet, I18nService i18nService) {
+        if (wallet.isMaster()) {
+            return i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET);
+        }
+
+        return MessageFormat.format(
+                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET),
+                wallet.getMasterWallet().getName());
     }
 }

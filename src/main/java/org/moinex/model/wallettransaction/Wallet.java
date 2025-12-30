@@ -86,12 +86,4 @@ public class Wallet {
     public boolean isMaster() {
         return masterWallet == null;
     }
-
-    public String getVirtualWalletInfo() {
-        if (isMaster()) {
-            return "This is a master wallet, not a virtual wallet.";
-        }
-
-        return String.format("Virtual Wallet linked to '%s'", masterWallet.getName());
-    }
 }
