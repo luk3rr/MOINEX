@@ -80,14 +80,27 @@ public final class WindowUtils {
             String header, String message, ResourceBundle resources) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
 
-        // Set the confirmation button
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        ButtonType yesButton;
+        ButtonType noButton;
+
+        if (resources != null) {
+            yesButton =
+                    new ButtonType(
+                            resources.getString(Constants.TranslationKeys.DIALOG_BUTTON_YES));
+            noButton =
+                    new ButtonType(resources.getString(Constants.TranslationKeys.DIALOG_BUTTON_NO));
+        } else {
+            yesButton = ButtonType.YES;
+            noButton = ButtonType.NO;
+        }
+
+        alert.getButtonTypes().setAll(noButton, yesButton);
 
         setAlertAttributes(
                 alert, getAlertTitle(AlertType.CONFIRMATION, resources), header, message);
 
-        ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
-        return result == ButtonType.YES;
+        ButtonType result = alert.showAndWait().orElse(noButton);
+        return result == yesButton;
     }
 
     /**

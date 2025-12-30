@@ -28,7 +28,7 @@
                                  <children>
                                     <AnchorPane fx:id="totalDebts" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                        <children>
-                                          <Label fx:id="totalDebtsTitle" styleClass="title" text="Total debts" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                          <Label fx:id="totalDebtsTitle" styleClass="title" text="%creditCard.totalDebts.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                           <ComboBox fx:id="totalDebtsYearFilterComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
                                           <VBox fx:id="totalDebtsInfoVBox" alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" minWidth="250.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0" />
                                        </children>
@@ -37,7 +37,7 @@
                                        <children>
                                           <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <JFXButton fx:id="AddDebtButton" onAction="#handleAddDebt" stylesheets="@../../css/component/buttons.css" text="Add debt">
+                                                <JFXButton fx:id="AddDebtButton" onAction="#handleAddDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.button.addDebt">
                                                    <graphic>
                                                       <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>
@@ -46,7 +46,7 @@
                                                       </ImageView>
                                                    </graphic>
                                                 </JFXButton>
-                                                <JFXButton fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" stylesheets="@../../css/component/buttons.css" text="Add Credit Card">
+                                                <JFXButton fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" stylesheets="@../../css/component/buttons.css" text="%creditCard.button.addCreditCard">
                                                    <graphic>
                                                       <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>
@@ -55,7 +55,7 @@
                                                       </ImageView>
                                                    </graphic>
                                                 </JFXButton>
-                                                <JFXButton onAction="#handleViewArchivedCreditCards" stylesheets="@../../css/component/buttons.css" text="Credit Card Archive">
+                                                <JFXButton onAction="#handleViewArchivedCreditCards" stylesheets="@../../css/component/buttons.css" text="%creditCard.button.creditCardArchive">
                                                    <graphic>
                                                       <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                          <image>
@@ -76,7 +76,7 @@
                            <children>
                               <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label fx:id="barchartTitle" styleClass="title" text="Debts flow" />
+                                    <Label fx:id="barchartTitle" styleClass="title" text="%creditCard.debtsFlow.title" />
                                     <AnchorPane fx:id="debtsFlowPane" minWidth="400.0" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
@@ -98,12 +98,12 @@
                                        <children>
                                           <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label fx:id="expensesTitle" styleClass="title" text="Debts" />
+                                                <Label fx:id="expensesTitle" styleClass="title" text="%creditCard.debtsList.title" />
                                                 <AnchorPane VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                          <children>
-                                                            <JFXButton onAction="#handleEditDebt" stylesheets="@../../css/component/buttons.css" text="Edit">
+                                                            <JFXButton onAction="#handleEditDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.edit">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -112,7 +112,7 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
-                                                            <JFXButton onAction="#handleDeleteDebt" stylesheets="@../../css/component/buttons.css" text="Delete">
+                                                            <JFXButton onAction="#handleDeleteDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.delete">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -144,7 +144,7 @@
                                                                   <Image url="@../../icon/common/find.png" />
                                                                </image>
                                                             </ImageView>
-                                                            <TextField fx:id="debtSearchField" maxWidth="400.0" promptText="Enter ID or Description" HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="debtSearchField" maxWidth="400.0" promptText="%creditCard.debtsList.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -193,7 +193,7 @@
                         </AnchorPane>
                         <AnchorPane fx:id="creditCards" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
                            <children>
-                              <Label fx:id="creditCardsTitle" styleClass="title" text="Credit Cards" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Label fx:id="creditCardsTitle" styleClass="title" text="%creditCard.creditCards.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <JFXButton fx:id="crcPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

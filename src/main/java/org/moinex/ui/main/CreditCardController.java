@@ -9,6 +9,7 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -148,7 +149,7 @@ public class CreditCardController {
     private void handleAddDebt() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_DEBT_FXML,
-                "Add Credit Card Debt",
+                i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE),
                 springContext,
                 (AddCreditCardDebtController controller) -> {},
                 List.of(this::updateDisplay));
@@ -158,7 +159,7 @@ public class CreditCardController {
     private void handleAddCreditCard() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_FXML,
-                "Add Credit Card",
+                i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE),
                 springContext,
                 (AddCreditCardController controller) -> {},
                 List.of(this::updateDisplayCards));
@@ -170,14 +171,17 @@ public class CreditCardController {
 
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
-                    "No payment selected", "Please select a payment to edit.");
+                    i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE));
 
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_CREDIT_CARD_DEBT_FXML,
-                "Edit Credit Card Debt",
+                i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE),
                 springContext,
                 (EditCreditCardDebtController controller) ->
                         controller.setCreditCardDebt(selectedPayment.getCreditCardDebt()),
@@ -190,8 +194,10 @@ public class CreditCardController {
 
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
-                    "No payment selected",
-                    "Please select a payment to delete the associated debt.");
+                    i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDIT_CARD_DIALOG_NO_SELECTION_DELETE_MESSAGE));
 
             return;
         }
@@ -212,39 +218,84 @@ public class CreditCardController {
 
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
-        message.append("Description: ")
-                .append(debt.getDescription())
-                .append("\n")
-                .append("Amount: ")
-                .append(UIUtils.formatCurrency(debt.getAmount()))
-                .append("\n")
-                .append("Register date: ")
-                .append(debt.getDate().format(Constants.DATE_FORMATTER_NO_TIME))
-                .append("\n")
-                .append("Installments: ")
-                .append(debt.getInstallments())
-                .append("\n")
-                .append("Installments paid: ")
-                .append(installmentsPaid)
-                .append("\n")
-                .append("Category: ")
-                .append(debt.getCategory().getName())
-                .append("\n")
-                .append("Credit card: ")
-                .append(debt.getCreditCard().getName())
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION),
+                                debt.getDescription()))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT),
+                                UIUtils.formatCurrency(debt.getAmount())))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE),
+                                debt.getDate().format(Constants.DATE_FORMATTER_NO_TIME)))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS),
+                                debt.getInstallments()))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID),
+                                installmentsPaid))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY),
+                                debt.getCategory().getName()))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD),
+                                debt.getCreditCard().getName()))
                 .append("\n");
 
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
-            message.append("Refund amount: ")
-                    .append(UIUtils.formatCurrency(refundAmount))
+            message.append(
+                            MessageFormat.format(
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT),
+                                    UIUtils.formatCurrency(refundAmount)))
                     .append("\n");
         } else {
-            message.append("No refund amount");
+            message.append(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_NO_REFUND_AMOUNT));
         }
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Are you sure you want to delete the debt?", message.toString())) {
+                i18nService.tr(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE),
+                message.toString(),
+                i18nService.getBundle())) {
             creditCardService.deleteDebt(debt.getId());
             updateDisplay();
         }
@@ -254,7 +305,8 @@ public class CreditCardController {
     private void handleViewArchivedCreditCards() {
         WindowUtils.openModalWindow(
                 Constants.ARCHIVED_CREDIT_CARDS_FXML,
-                "Archived Credit Cards",
+                i18nService.tr(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE),
                 springContext,
                 (ArchivedCreditCardsController controller) -> {},
                 List.of(this::updateDisplay));
@@ -383,7 +435,12 @@ public class CreditCardController {
         Label totalTotalDebtsLabel = new Label(UIUtils.formatCurrency(totalDebts));
 
         Label totalPendingPaymentsLabel =
-                new Label("Pending payments: " + UIUtils.formatCurrency(totalPendingPayments));
+                new Label(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_TOTAL_DEBTS_PENDING_PAYMENTS),
+                                UIUtils.formatCurrency(totalPendingPayments)));
 
         totalTotalDebtsLabel.getStyleClass().add(Constants.TOTAL_BALANCE_VALUE_LABEL_STYLE);
 
@@ -763,36 +820,60 @@ public class CreditCardController {
      * Configure the table view columns
      */
     private void configureTableView() {
-        TableColumn<CreditCardPayment, Integer> idColumn = getCreditCardPaymentLongTableColumn();
+        TableColumn<CreditCardPayment, Integer> idColumn =
+                getCreditCardPaymentLongTableColumn(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID));
 
-        TableColumn<CreditCardPayment, String> descriptionColumn = new TableColumn<>("Description");
+        TableColumn<CreditCardPayment, String> descriptionColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 param.getValue().getCreditCardDebt().getDescription()));
 
-        TableColumn<CreditCardPayment, String> amountColumn = new TableColumn<>("Amount");
+        TableColumn<CreditCardPayment, String> amountColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
                                 UIUtils.formatCurrency(param.getValue().getAmount())));
 
         TableColumn<CreditCardPayment, String> installmentColumn =
-                getCreditCardPaymentStringTableColumn();
+                getCreditCardPaymentStringTableColumn(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT));
 
-        TableColumn<CreditCardPayment, String> crcColumn = new TableColumn<>("Credit Card");
+        TableColumn<CreditCardPayment, String> crcColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD));
         crcColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 param.getValue().getCreditCardDebt().getCreditCard().getName()));
 
-        TableColumn<CreditCardPayment, String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<CreditCardPayment, String> categoryColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 param.getValue().getCreditCardDebt().getCategory().getName()));
 
-        TableColumn<CreditCardPayment, String> dateColumn = new TableColumn<>("Invoice date");
+        TableColumn<CreditCardPayment, String> dateColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -800,32 +881,46 @@ public class CreditCardController {
                                         .getDate()
                                         .format(Constants.DATE_FORMATTER_NO_TIME)));
 
-        TableColumn<CreditCardPayment, String> statusColumn = new TableColumn<>("Status");
+        TableColumn<CreditCardPayment, String> statusColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS));
         statusColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue().getWallet() == null ? "Pending" : "Paid"));
+                                param.getValue().getWallet() == null
+                                        ? i18nService.tr(
+                                                Constants.TranslationKeys
+                                                        .CREDIT_CARD_DEBTS_LIST_STATUS_PENDING)
+                                        : i18nService.tr(
+                                                Constants.TranslationKeys
+                                                        .CREDIT_CARD_DEBTS_LIST_STATUS_PAID)));
 
-        debtsTableView.getColumns().add(idColumn);
-        debtsTableView.getColumns().add(descriptionColumn);
-        debtsTableView.getColumns().add(amountColumn);
-        debtsTableView.getColumns().add(installmentColumn);
-        debtsTableView.getColumns().add(crcColumn);
-        debtsTableView.getColumns().add(categoryColumn);
-        debtsTableView.getColumns().add(dateColumn);
-        debtsTableView.getColumns().add(statusColumn);
+        debtsTableView
+                .getColumns()
+                .addAll(
+                        idColumn,
+                        descriptionColumn,
+                        amountColumn,
+                        installmentColumn,
+                        crcColumn,
+                        categoryColumn,
+                        dateColumn,
+                        statusColumn);
     }
 
-    private static TableColumn<CreditCardPayment, String> getCreditCardPaymentStringTableColumn() {
-        TableColumn<CreditCardPayment, String> installmentColumn = new TableColumn<>("Installment");
+    private static TableColumn<CreditCardPayment, String> getCreditCardPaymentStringTableColumn(
+            String header) {
+
+        TableColumn<CreditCardPayment, String> installmentColumn = new TableColumn<>(header);
+
         installmentColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
-                                param.getValue().getInstallment().toString()
+                                param.getValue().getInstallment()
                                         + "/"
                                         + param.getValue().getCreditCardDebt().getInstallments()));
 
-        // Align the installment column to the center
         installmentColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
@@ -837,20 +932,22 @@ public class CreditCardController {
                                 } else {
                                     setText(item);
                                     setAlignment(Pos.CENTER);
-                                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                    // ensure the text is centered
+                                    setStyle("-fx-padding: 0;");
                                 }
                             }
                         });
+
         return installmentColumn;
     }
 
-    private static TableColumn<CreditCardPayment, Integer> getCreditCardPaymentLongTableColumn() {
-        TableColumn<CreditCardPayment, Integer> idColumn = new TableColumn<>("Debt ID");
+    private static TableColumn<CreditCardPayment, Integer> getCreditCardPaymentLongTableColumn(
+            String header) {
+
+        TableColumn<CreditCardPayment, Integer> idColumn = new TableColumn<>(header);
+
         idColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getCreditCardDebt().getId()));
 
-        // Align the ID column to the center
         idColumn.setCellFactory(
                 column ->
                         new TableCell<>() {
@@ -862,11 +959,11 @@ public class CreditCardController {
                                 } else {
                                     setText(item.toString());
                                     setAlignment(Pos.CENTER);
-                                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                    // ensure the text is centered
+                                    setStyle("-fx-padding: 0;");
                                 }
                             }
                         });
+
         return idColumn;
     }
 }

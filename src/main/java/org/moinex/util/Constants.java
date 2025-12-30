@@ -400,30 +400,13 @@ public final class Constants {
         public static final String DIALOG_INFO_TITLE = "dialog.info.title";
         public static final String DIALOG_ERROR_TITLE = "dialog.error.title";
         public static final String DIALOG_SUCCESS_TITLE = "dialog.success.title";
+        public static final String DIALOG_BUTTON_YES = "dialog.button.yes";
+        public static final String DIALOG_BUTTON_NO = "dialog.button.no";
+        public static final String DIALOG_BUTTON_OK = "dialog.button.ok";
+        public static final String DIALOG_BUTTON_CANCEL = "dialog.button.cancel";
 
         // Settings
         public static final String SETTINGS_LANGUAGE = "settings.language";
-
-        // Wallet
-        public static final String WALLET_ALL_WALLETS = "wallet.allWallets";
-        public static final String WALLET_DIALOG_ADD_TRANSFER_TITLE =
-                "wallet.dialog.addTransfer.title";
-        public static final String WALLET_DIALOG_ADD_WALLET_TITLE = "wallet.dialog.addWallet.title";
-        public static final String WALLET_DIALOG_ARCHIVED_WALLETS_TITLE =
-                "wallet.dialog.archivedWallets.title";
-        public static final String WALLET_DIALOG_VIEW_TRANSFERS_TITLE =
-                "wallet.dialog.viewTransfers.title";
-        public static final String WALLET_TOTAL_BALANCE_FORESEEN = "wallet.totalBalance.foreseen";
-        public static final String WALLET_TOTAL_BALANCE_CORRESPONDS_TO =
-                "wallet.totalBalance.correspondsTo";
-        public static final String WALLET_TOTAL_BALANCE_TITLE = "wallet.totalBalance.title";
-        public static final String WALLET_BUTTON_ADD_TRANSFER = "wallet.button.addTransfer";
-        public static final String WALLET_BUTTON_ADD_WALLET = "wallet.button.addWallet";
-        public static final String WALLET_BUTTON_WALLET_ARCHIVE = "wallet.button.walletArchive";
-        public static final String WALLET_BUTTON_TRANSFERS = "wallet.button.transfers";
-        public static final String WALLET_WALLETS_TITLE = "wallet.wallets.title";
-        public static final String WALLET_MONEY_FLOW_TITLE = "wallet.moneyFlow.title";
-        public static final String WALLET_BALANCE_BY_TYPE_TITLE = "wallet.balanceByType.title";
 
         // Home
         public static final String HOME_WALLET_TITLE = "home.wallet.title";
@@ -451,6 +434,179 @@ public final class Constants {
                 "home.creditCard.tooltip.availableCredit";
         public static final String HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER =
                 "home.creditCard.tooltip.creditCardNumber";
+
+        // Wallet
+        public static final String WALLET_ALL_WALLETS = "wallet.allWallets";
+        public static final String WALLET_DIALOG_ADD_TRANSFER_TITLE =
+                "wallet.dialog.addTransfer.title";
+        public static final String WALLET_DIALOG_ADD_WALLET_TITLE = "wallet.dialog.addWallet.title";
+        public static final String WALLET_DIALOG_ARCHIVED_WALLETS_TITLE =
+                "wallet.dialog.archivedWallets.title";
+        public static final String WALLET_DIALOG_VIEW_TRANSFERS_TITLE =
+                "wallet.dialog.viewTransfers.title";
+        public static final String WALLET_TOTAL_BALANCE_FORESEEN = "wallet.totalBalance.foreseen";
+        public static final String WALLET_TOTAL_BALANCE_CORRESPONDS_TO =
+                "wallet.totalBalance.correspondsTo";
+        public static final String WALLET_TOTAL_BALANCE_TITLE = "wallet.totalBalance.title";
+        public static final String WALLET_BUTTON_ADD_TRANSFER = "wallet.button.addTransfer";
+        public static final String WALLET_BUTTON_ADD_WALLET = "wallet.button.addWallet";
+        public static final String WALLET_BUTTON_WALLET_ARCHIVE = "wallet.button.walletArchive";
+        public static final String WALLET_BUTTON_TRANSFERS = "wallet.button.transfers";
+        public static final String WALLET_WALLETS_TITLE = "wallet.wallets.title";
+        public static final String WALLET_MONEY_FLOW_TITLE = "wallet.moneyFlow.title";
+        public static final String WALLET_BALANCE_BY_TYPE_TITLE = "wallet.balanceByType.title";
+
+        // Credit Card
+        public static final String CREDIT_CARD_TOTAL_DEBTS_TITLE = "creditCard.totalDebts.title";
+        public static final String CREDIT_CARD_TOTAL_DEBTS_PENDING_PAYMENTS =
+                "creditCard.totalDebts.pendingPayments";
+        public static final String CREDIT_CARD_BUTTON_ADD_DEBT = "creditCard.button.addDebt";
+        public static final String CREDIT_CARD_BUTTON_ADD_CREDIT_CARD =
+                "creditCard.button.addCreditCard";
+        public static final String CREDIT_CARD_BUTTON_CREDIT_CARD_ARCHIVE =
+                "creditCard.button.creditCardArchive";
+        public static final String CREDIT_CARD_DEBTS_FLOW_TITLE = "creditCard.debtsFlow.title";
+        public static final String CREDIT_CARD_DEBTS_LIST_TITLE = "creditCard.debtsList.title";
+        public static final String CREDIT_CARD_DEBTS_LIST_BUTTON_EDIT =
+                "creditCard.debtsList.button.edit";
+        public static final String CREDIT_CARD_DEBTS_LIST_BUTTON_DELETE =
+                "creditCard.debtsList.button.delete";
+        public static final String CREDIT_CARD_DEBTS_LIST_SEARCH_PLACEHOLDER =
+                "creditCard.debtsList.searchPlaceholder";
+        public static final String CREDIT_CARD_CREDIT_CARDS_TITLE = "creditCard.creditCards.title";
+        public static final String CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE =
+                "creditCard.dialog.addCreditCard.title";
+        public static final String CREDIT_CARD_DIALOG_ADD_DEBT_TITLE =
+                "creditCard.dialog.addDebt.title";
+        public static final String CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE =
+                "creditCard.dialog.editDebt.title";
+        public static final String CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE =
+                "creditCard.dialog.creditCardArchive.title";
+        public static final String CREDIT_CARD_DIALOG_NO_SELECTION_TITLE =
+                "creditCard.dialog.noSelection.title";
+        public static final String CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE =
+                "creditCard.dialog.noSelection.edit.message";
+        public static final String CREDIT_CARD_DIALOG_NO_SELECTION_DELETE_MESSAGE =
+                "creditCard.dialog.noSelection.delete.message";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE =
+                "creditCard.dialog.confirmationDelete.title";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION =
+                "creditCard.dialog.confirmationDelete.description";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT =
+                "creditCard.dialog.confirmationDelete.amount";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE =
+                "creditCard.dialog.confirmationDelete.registerDate";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS =
+                "creditCard.dialog.confirmationDelete.installments";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID =
+                "creditCard.dialog.confirmationDelete.installmentsPaid";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY =
+                "creditCard.dialog.confirmationDelete.category";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD =
+                "creditCard.dialog.confirmationDelete.creditCard";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT =
+                "creditCard.dialog.confirmationDelete.refundAmount";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_NO_REFUND_AMOUNT =
+                "creditCard.dialog.confirmationDelete.noRefundAmount";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID =
+                "creditCard.debtsList.header.debtId";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION =
+                "creditCard.debtsList.header.description";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT =
+                "creditCard.debtsList.header.amount";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT =
+                "creditCard.debtsList.header.installment";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD =
+                "creditCard.debtsList.header.creditCard";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY =
+                "creditCard.debtsList.header.category";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE =
+                "creditCard.debtsList.header.invoiceDate";
+        public static final String CREDIT_CARD_DEBTS_LIST_HEADER_STATUS =
+                "creditCard.debtsList.header.status";
+        public static final String CREDIT_CARD_DEBTS_LIST_STATUS_PENDING =
+                "creditCard.debtsList.status.pending";
+        public static final String CREDIT_CARD_DEBTS_LIST_STATUS_PAID =
+                "creditCard.debtsList.status.paid";
+
+        // Transactions
+        public static final String TRANSACTION_MONTHLY_RESUME_TITLE =
+                "transaction.monthlyResume.title";
+        public static final String TRANSACTION_YEARLY_RESUME_TITLE =
+                "transaction.yearlyResume.title";
+        public static final String TRANSACTION_MONEY_FLOW_BY_CATEGORY_TITLE =
+                "transaction.moneyFlowByCategory.title";
+        public static final String TRANSACTION_BUTTON_ADD_INCOME = "transaction.button.addIncome";
+        public static final String TRANSACTION_BUTTON_ADD_EXPENSE = "transaction.button.addExpense";
+        public static final String TRANSACTION_BUTTON_PERIODIC_TRANSACTION =
+                "transaction.button.periodicTransaction";
+        public static final String TRANSACTION_BUTTON_MANAGE_CATEGORIES =
+                "transaction.button.manageCategories";
+        public static final String TRANSACTION_DIALOG_ADD_INCOME_TITLE =
+                "transaction.dialog.addIncome.title";
+        public static final String TRANSACTION_DIALOG_ADD_EXPENSE_TITLE =
+                "transaction.dialog.addExpense.title";
+        public static final String TRANSACTION_DIALOG_EDIT_TRANSACTION_TITLE =
+                "transaction.dialog.editTransaction.title";
+        public static final String TRANSACTION_DIALOG_PERIODIC_TRANSACTION_TITLE =
+                "transaction.dialog.periodicTransaction.title";
+        public static final String TRANSACTION_DIALOG_MANAGE_CATEGORIES_TITLE =
+                "transaction.dialog.manageCategories.title";
+        public static final String TRANSACTION_DIALOG_NO_SELECTION_TITLE =
+                "transaction.dialog.noSelection.title";
+        public static final String TRANSACTION_DIALOG_NO_SELECTION_EDIT_MESSAGE =
+                "transaction.dialog.noSelection.edit.message";
+        public static final String TRANSACTION_DIALOG_NO_SELECTION_DELETE_MESSAGE =
+                "transaction.dialog.noSelection.delete.message";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_TITLE =
+                "transaction.dialog.confirmationDelete.title";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_DESCRIPTION =
+                "transaction.dialog.confirmationDelete.description";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_AMOUNT =
+                "transaction.dialog.confirmationDelete.amount";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE =
+                "transaction.dialog.confirmationDelete.registerDate";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_STATUS =
+                "transaction.dialog.confirmationDelete.status";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET =
+                "transaction.dialog.confirmationDelete.wallet";
+        public static final String TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE =
+                "transaction.dialog.confirmationDelete.walletBalance";
+        public static final String
+                TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE_AFTER_TRANSACTION =
+                        "transaction.dialog.confirmationDelete.walletBalanceAfterTransaction";
+        public static final String TRANSACTION_TRANSACTION_LIST_TITLE =
+                "transaction.transactionList.title";
+        public static final String TRANSACTION_TRANSACTION_LIST_BUTTON_EDIT =
+                "transaction.transactionList.button.edit";
+        public static final String TRANSACTION_TRANSACTION_LIST_BUTTON_DELETE =
+                "transaction.transactionList.button.delete";
+        public static final String TRANSACTION_TRANSACTION_LIST_TYPE =
+                "transaction.transactionList.type";
+        public static final String TRANSACTION_TRANSACTION_LIST_START_DATE =
+                "transaction.transactionList.startDate";
+        public static final String TRANSACTION_TRANSACTION_LIST_END_DATE =
+                "transaction.transactionList.endDate";
+        public static final String TRANSACTION_TRANSACTION_LIST_SEARCH_PLACEHOLDER =
+                "transaction.transactionList.searchPlaceholder";
+
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_ID =
+                "transaction.transactionList.header.id";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_DESCRIPTION =
+                "transaction.transactionList.header.description";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_AMOUNT =
+                "transaction.transactionList.header.amount";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_WALLET =
+                "transaction.transactionList.header.wallet";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_DATE =
+                "transaction.transactionList.header.date";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_TYPE =
+                "transaction.transactionList.header.type";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_CATEGORY =
+                "transaction.transactionList.header.category";
+        public static final String TRANSACTION_TRANSACTION_LIST_HEADER_STATUS =
+                "transaction.transactionList.header.status";
+        public static final String TRANSACTION_FILTER_ALL = "transaction.filter.all";
 
         // Wallet types
         public static final String WALLET_TYPE_CHECKING = "wallet.type.checking";

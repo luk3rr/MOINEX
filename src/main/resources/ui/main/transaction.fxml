@@ -32,7 +32,7 @@
                                              <children>
                                                 <HBox alignment="CENTER">
                                                    <children>
-                                                      <Label fx:id="monthYearResumeTitle" styleClass="title" text="Resume" HBox.hgrow="ALWAYS" />
+                                                      <Label fx:id="monthYearResumeTitle" styleClass="title" text="%transaction.monthlyResume.title" HBox.hgrow="ALWAYS" />
                                                       <AnchorPane HBox.hgrow="ALWAYS">
                                                          <children>
                                                             <HBox alignment="CENTER_RIGHT" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -56,7 +56,7 @@
                                              <children>
                                                 <HBox alignment="CENTER">
                                                    <children>
-                                                      <Label styleClass="title" text="Resume" HBox.hgrow="ALWAYS" />
+                                                      <Label styleClass="title" text="%transaction.yearlyResume.title" HBox.hgrow="ALWAYS" />
                                                       <AnchorPane HBox.hgrow="ALWAYS">
                                                          <children>
                                                             <ComboBox fx:id="yearResumeComboBox" minWidth="90.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="0.0" />
@@ -75,7 +75,7 @@
                                  <children>
                                     <HBox alignment="CENTER" fillHeight="false" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                        <children>
-                                          <JFXButton onAction="#handleAddIncome" stylesheets="@../../css/component/buttons.css" text="Add Income">
+                                          <JFXButton onAction="#handleAddIncome" stylesheets="@../../css/component/buttons.css" text="%transaction.button.addIncome">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -84,7 +84,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleAddExpense" stylesheets="@../../css/component/buttons.css" text="Add Expense">
+                                          <JFXButton onAction="#handleAddExpense" stylesheets="@../../css/component/buttons.css" text="%transaction.button.addExpense">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -93,7 +93,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleRecurringTransactions" stylesheets="@../../css/component/buttons.css" text="Periodic">
+                                          <JFXButton onAction="#handleRecurringTransactions" stylesheets="@../../css/component/buttons.css" text="%transaction.button.periodicTransaction">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -102,7 +102,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleManageCategories" stylesheets="@../../css/component/buttons.css" text="Manage Categories">
+                                          <JFXButton onAction="#handleManageCategories" stylesheets="@../../css/component/buttons.css" text="%transaction.button.manageCategories">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -123,7 +123,7 @@
                                  <children>
                                     <HBox alignment="CENTER">
                                        <children>
-                                          <Label fx:id="moneyFlowTitle" styleClass="title" text="Money flow by category" HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="moneyFlowTitle" styleClass="title" text="%transaction.moneyFlowByCategory.title" HBox.hgrow="ALWAYS" />
                                           <AnchorPane HBox.hgrow="ALWAYS">
                                              <children>
                                                 <ComboBox fx:id="moneyFlowComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="0.0" />
@@ -152,12 +152,12 @@
                                        <children>
                                           <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label fx:id="transactionsPaneTitle" styleClass="title" text="Transactions" />
+                                                <Label fx:id="transactionsPaneTitle" styleClass="title" text="%transaction.transactionList.title" />
                                                 <AnchorPane VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                          <children>
-                                                            <JFXButton onAction="#handleEditTransaction" stylesheets="@../../css/component/buttons.css" text="Edit">
+                                                            <JFXButton onAction="#handleEditTransaction" stylesheets="@../../css/component/buttons.css" text="%transaction.transactionList.button.edit">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -166,7 +166,7 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
-                                                            <JFXButton onAction="#handleDeleteTransaction" stylesheets="@../../css/component/buttons.css" text="Delete">
+                                                            <JFXButton onAction="#handleDeleteTransaction" stylesheets="@../../css/component/buttons.css" text="%transaction.transactionList.button.delete">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -189,7 +189,7 @@
                                                          <children>
                                                             <VBox alignment="CENTER">
                                                                <children>
-                                                                  <Label text="Type">
+                                                                  <Label text="%transaction.transactionList.type">
                                                                      <font>
                                                                         <Font size="10.0" />
                                                                      </font>
@@ -199,7 +199,7 @@
                                                             </VBox>
                                                             <VBox alignment="CENTER">
                                                                <children>
-                                                                  <Label text="Start date">
+                                                                  <Label text="%transaction.transactionList.startDate">
                                                                      <font>
                                                                         <Font size="10.0" />
                                                                      </font>
@@ -209,7 +209,7 @@
                                                             </VBox>
                                                             <VBox alignment="CENTER">
                                                                <children>
-                                                                  <Label text="End date">
+                                                                  <Label text="%transaction.transactionList.endDate">
                                                                      <font>
                                                                         <Font size="10.0" />
                                                                      </font>
@@ -226,7 +226,7 @@
                                                                   <Image url="@../../icon/common/find.png" />
                                                                </image>
                                                             </ImageView>
-                                                            <TextField fx:id="transactionsSearchField" promptText="Enter ID or Description" HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="transactionsSearchField" promptText="%transaction.transactionList.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
                                                    </children>
