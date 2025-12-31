@@ -40,9 +40,9 @@
                      <children>
                         <MenuButton fx:id="addButton" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
-                            <MenuItem fx:id="addIncomeMenuItem" mnemonicParsing="false" onAction="#handleAddIncome" text="Add Income" />
-                            <MenuItem fx:id="addExpenseMenuItem" mnemonicParsing="false" onAction="#handleAddExpense" text="Add Expense" />
-                              <MenuItem fx:id="addTransferMenuItem" mnemonicParsing="false" onAction="#handleAddTransfer" text="Add Transfer" />
+                            <MenuItem fx:id="addIncomeMenuItem" mnemonicParsing="false" onAction="#handleAddIncome" text="%common.wallet.addIncome" />
+                            <MenuItem fx:id="addExpenseMenuItem" mnemonicParsing="false" onAction="#handleAddExpense" text="%common.wallet.addExpense" />
+                              <MenuItem fx:id="addTransferMenuItem" mnemonicParsing="false" onAction="#handleAddTransfer" text="%common.wallet.addTransfer" />
                           </items>
                            <graphic>
                               <ImageView fx:id="addButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -54,11 +54,11 @@
                         </MenuButton>
                         <MenuButton fx:id="menuButton" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
-                            <MenuItem mnemonicParsing="false" onAction="#handleRenameWallet" text="Rename" />
-                            <MenuItem fx:id="changeWalletTypeMenuItem" mnemonicParsing="false" onAction="#handleChangeWalletType" text="Change Type" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleChangeWalletBalance" text="Adjust Balance" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleArchiveWallet" text="Archive" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteWallet" text="Delete" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleRenameWallet" text="%common.wallet.rename" />
+                            <MenuItem fx:id="changeWalletTypeMenuItem" mnemonicParsing="false" onAction="#handleChangeWalletType" text="%common.wallet.changeType" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleChangeWalletBalance" text="%common.wallet.adjustBalance" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleArchiveWallet" text="%common.wallet.archive" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteWallet" text="%common.wallet.delete" />
                           </items>
                            <graphic>
                               <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -79,7 +79,7 @@
                <children>
                   <HBox fx:id="openingBalance" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="openingBalanceDescription" text="Opening balance" />
+                        <Label fx:id="openingBalanceDescription" text="%common.wallet.openingBalance" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="openingBalanceSign" minWidth="10.0" text=" ">
                            <font>
@@ -93,7 +93,7 @@
                      </children></HBox>
                   <HBox fx:id="incomes" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="incomesDescription" text="Incomes" />
+                        <Label fx:id="incomesDescription" text="%common.wallet.incomes" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="incomesSign" minWidth="10.0" text=" ">
                            <font>
@@ -107,7 +107,7 @@
                      </children></HBox>
                   <HBox fx:id="expenses" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="expensesDescription" text="Expenses" />
+                        <Label fx:id="expensesDescription" text="%common.wallet.expenses" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="expensesSign" minWidth="10.0" text=" ">
                            <font>
@@ -121,7 +121,7 @@
                      </children></HBox>
                   <HBox fx:id="creditedTransfers" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="creditedTransfersDescription" text="Credited transfers" />
+                        <Label fx:id="creditedTransfersDescription" text="%common.wallet.creditedTransfers" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="creditedTransfersSign" minWidth="10.0" text=" ">
                            <font>
@@ -135,7 +135,7 @@
                      </children></HBox>
                   <HBox fx:id="debitedTransfers" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="debitedTransfersDescription" text="Debited transfers" />
+                        <Label fx:id="debitedTransfersDescription" text="%common.wallet.debitedTransfers" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="debitedTransfersSign" minWidth="10.0" text=" ">
                            <font>
@@ -149,7 +149,7 @@
                      </children></HBox>
                   <HBox fx:id="currentBalance" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label fx:id="currentBalanceDescription" text="Current balance" HBox.hgrow="ALWAYS" />
+                        <Label fx:id="currentBalanceDescription" text="%common.wallet.currentBalance" HBox.hgrow="ALWAYS" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="currentBalanceSign" minWidth="10.0" text=" ">
                            <font>
@@ -163,7 +163,7 @@
                      </children></HBox>
                   <HBox fx:id="foreseenBalance" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <Label fx:id="foreseenBalanceDescription" text="Foreseen balance" />
+                        <Label fx:id="foreseenBalanceDescription" text="%common.wallet.foreseenBalance" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Label fx:id="foreseenBalanceSign" minWidth="10.0" text=" ">
                            <font>

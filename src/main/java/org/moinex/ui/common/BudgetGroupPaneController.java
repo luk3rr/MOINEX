@@ -7,8 +7,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import lombok.NoArgsConstructor;
 import org.moinex.model.financialplanning.BudgetGroup;
+import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Controller;
 @Scope("prototype") // Each instance of this controller is unique
 @NoArgsConstructor
 public class BudgetGroupPaneController {
+
+    @Autowired private I18nService i18nService;
 
     @FXML private Label groupNameLabel;
     @FXML private Label targetPercentageLabel;
@@ -90,13 +94,15 @@ public class BudgetGroupPaneController {
         BigDecimal remaining = targetAmount.subtract(spentAmount);
 
         if (remaining.compareTo(BigDecimal.ZERO) < 0) {
-            statusPrefixLabel.setText("Overspent: ");
+            statusPrefixLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_BUDGET_GROUP_OVERSPENT));
             statusAmountLabel.setText(UIUtils.formatCurrency(remaining.abs()));
             statusPrefixLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
             statusAmountLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
             progressBar.getStyleClass().add(Constants.PROGRESS_BAR_RED_COLOR_STYLE);
         } else {
-            statusPrefixLabel.setText("Available: ");
+            statusPrefixLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_BUDGET_GROUP_REMAINING));
             statusAmountLabel.setText(UIUtils.formatCurrency(remaining));
 
             if (progress.compareTo(new BigDecimal("75")) > 0) {

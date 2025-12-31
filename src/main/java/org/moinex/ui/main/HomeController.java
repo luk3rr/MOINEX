@@ -680,7 +680,7 @@ public class HomeController {
                 i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME));
 
         Label walletTypeLabel =
-                new Label(UIUtils.translateWalletTypeName(wallet.getType(), i18nService));
+                new Label(UIUtils.translateWalletType(wallet.getType(), i18nService));
         walletTypeLabel.getStyleClass().add(Constants.HOME_WALLET_TYPE_STYLE);
         walletTypeLabel.setAlignment(Pos.TOP_LEFT);
         UIUtils.addTooltipToNode(

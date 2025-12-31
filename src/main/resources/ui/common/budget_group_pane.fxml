@@ -24,7 +24,7 @@
                      <children>
                         <HBox spacing="5.0">
                            <children>
-                              <Label text="Target:" textFill="DIMGRAY" />
+                              <Label text="%common.budgetGroup.target" textFill="DIMGRAY" />
                               <Label fx:id="targetPercentageLabel" text="0.00 %" textFill="DIMGRAY" />
                            </children>
                         </HBox>

@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.moinex.service.CalculatorService;
+import org.moinex.service.I18nService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,7 @@ public class CalculatorController {
     @FXML private TextField expressionDisplay;
 
     private CalculatorService calculatorService;
+    private I18nService i18nService;
 
     private StringBuilder expression = new StringBuilder();
 
@@ -37,8 +40,9 @@ public class CalculatorController {
      * @param calculatorService The service for the calculator
      */
     @Autowired
-    public CalculatorController(CalculatorService calculatorService) {
+    public CalculatorController(CalculatorService calculatorService, I18nService i18nService) {
         this.calculatorService = calculatorService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -96,7 +100,9 @@ public class CalculatorController {
 
             calculatorService.setResult(null);
 
-            WindowUtils.showErrorDialog("Error evaluating expression", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_CALCULATOR_DIALOG_ERROR_TITLE),
+                    e.getMessage());
         }
     }
 

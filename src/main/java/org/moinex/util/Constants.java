@@ -834,6 +834,243 @@ public final class Constants {
                 "savings.stocksFunds.table.header.totalValue";
         public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE =
                 "savings.stocksFunds.table.header.averageUnitPrice";
+
+        // Savings - Brazilian Market Indicators
+        public static final String SAVINGS_INDICATORS_SELIC = "savings.indicators.selic";
+        public static final String SAVINGS_INDICATORS_IPCA_12_MONTHS =
+                "savings.indicators.ipca12Months";
+        public static final String SAVINGS_INDICATORS_LAST_UPDATE = "savings.indicators.lastUpdate";
+
+        // Savings - Market Quotes
+        public static final String SAVINGS_QUOTES_DOLLAR = "savings.quotes.dollar";
+        public static final String SAVINGS_QUOTES_EURO = "savings.quotes.euro";
+        public static final String SAVINGS_QUOTES_IBOVESPA = "savings.quotes.ibovespa";
+        public static final String SAVINGS_QUOTES_BITCOIN = "savings.quotes.bitcoin";
+        public static final String SAVINGS_QUOTES_ETHEREUM = "savings.quotes.ethereum";
+
+        // Savings - Commodities
+        public static final String SAVINGS_COMMODITIES_TITLE = "savings.commodities.title";
+        public static final String SAVINGS_COMMODITIES_GOLD = "savings.commodities.gold";
+        public static final String SAVINGS_COMMODITIES_SOYBEAN = "savings.commodities.soybean";
+        public static final String SAVINGS_COMMODITIES_COFFEE = "savings.commodities.coffee";
+        public static final String SAVINGS_COMMODITIES_WHEAT = "savings.commodities.wheat";
+        public static final String SAVINGS_COMMODITIES_OIL_BRENT = "savings.commodities.oilBrent";
+
+        // Common Components - Budget Group Pane
+        public static final String COMMON_BUDGET_GROUP_TARGET = "common.budgetGroup.target";
+        public static final String COMMON_BUDGET_GROUP_OVERSPENT = "common.budgetGroup.overspent";
+        public static final String COMMON_BUDGET_GROUP_REMAINING = "common.budgetGroup.remaining";
+        public static final String COMMON_BUDGET_GROUP_ON_TRACK = "common.budgetGroup.onTrack";
+
+        // Common Components - Calculator
+        public static final String COMMON_CALCULATOR_INSERT_RESULT =
+                "common.calculator.insertResult";
+
+        // Common Components - Calendar
+        public static final String COMMON_CALENDAR_ADD_EVENT = "common.calendar.addEvent";
+
+        // Common Components - Credit Card Pane
+        public static final String COMMON_CREDIT_CARD_ADD_DEBT = "common.creditCard.addDebt";
+        public static final String COMMON_CREDIT_CARD_ADD_CREDIT = "common.creditCard.addCredit";
+        public static final String COMMON_CREDIT_CARD_EDIT = "common.creditCard.edit";
+        public static final String COMMON_CREDIT_CARD_ARCHIVE = "common.creditCard.archive";
+        public static final String COMMON_CREDIT_CARD_DELETE = "common.creditCard.delete";
+        public static final String COMMON_CREDIT_CARD_SHOW_REBATES =
+                "common.creditCard.showRebates";
+        public static final String COMMON_CREDIT_CARD_LIMIT = "common.creditCard.limit";
+        public static final String COMMON_CREDIT_CARD_PENDING = "common.creditCard.pending";
+        public static final String COMMON_CREDIT_CARD_FREE = "common.creditCard.free";
+        public static final String COMMON_CREDIT_CARD_REBATE = "common.creditCard.rebate";
+        public static final String COMMON_CREDIT_CARD_CLOSURE = "common.creditCard.closure";
+        public static final String COMMON_CREDIT_CARD_NEXT_INVOICE =
+                "common.creditCard.nextInvoice";
+        public static final String COMMON_CREDIT_CARD_DUE_DATE = "common.creditCard.dueDate";
+        public static final String COMMON_CREDIT_CARD_INVOICE = "common.creditCard.invoice";
+        public static final String COMMON_CREDIT_CARD_OPEN = "common.creditCard.open";
+        public static final String COMMON_CREDIT_CARD_CLOSED = "common.creditCard.closed";
+        public static final String COMMON_CREDIT_CARD_REGISTER_PAYMENT =
+                "common.creditCard.registerPayment";
+
+        // Common Components - Goal Full Pane
+        public static final String COMMON_GOAL_ADD_INCOME = "common.goal.addIncome";
+        public static final String COMMON_GOAL_ADD_EXPENSE = "common.goal.addExpense";
+        public static final String COMMON_GOAL_ADD_TRANSFER = "common.goal.addTransfer";
+        public static final String COMMON_GOAL_EDIT = "common.goal.edit";
+        public static final String COMMON_GOAL_COMPLETE_GOAL = "common.goal.completeGoal";
+        public static final String COMMON_GOAL_UNCOMPLETE_GOAL = "common.goal.uncompleteGoal";
+        public static final String COMMON_GOAL_ARCHIVE_GOAL = "common.goal.archiveGoal";
+        public static final String COMMON_GOAL_UNARCHIVE_GOAL = "common.goal.unarchiveGoal";
+        public static final String COMMON_GOAL_DELETE = "common.goal.delete";
+        public static final String COMMON_GOAL_GOAL = "common.goal.goal";
+        public static final String COMMON_GOAL_CURRENT = "common.goal.current";
+        public static final String COMMON_GOAL_EXPECTATION_DATE = "common.goal.expectationDate";
+        public static final String COMMON_GOAL_COMPLETION_DATE = "common.goal.completionDate";
+        public static final String COMMON_GOAL_MISSING_DAYS = "common.goal.missingDays";
+        public static final String COMMON_GOAL_IDEAL_PER_MONTH = "common.goal.idealPerMonth";
+
+        // Common Components - Resume Pane
+        public static final String COMMON_RESUME_INCOMES = "common.resume.incomes";
+        public static final String COMMON_RESUME_EXPENSES = "common.resume.expenses";
+        public static final String COMMON_RESUME_BALANCE = "common.resume.balance";
+        public static final String COMMON_RESUME_SAVINGS = "common.resume.savings";
+        public static final String COMMON_RESUME_NO_SAVINGS = "common.resume.noSavings";
+        public static final String COMMON_RESUME_CREDIT_CARDS = "common.resume.creditCards";
+        public static final String COMMON_RESUME_FORESEEN = "common.resume.foreseen";
+        public static final String COMMON_RESUME_INVOICES_TO_PAY = "common.resume.invoicesToPay";
+
+        // Common Components - Wallet Full Pane
+        public static final String COMMON_WALLET_ADD_INCOME = "common.wallet.addIncome";
+        public static final String COMMON_WALLET_ADD_EXPENSE = "common.wallet.addExpense";
+        public static final String COMMON_WALLET_ADD_TRANSFER = "common.wallet.addTransfer";
+        public static final String COMMON_WALLET_RENAME = "common.wallet.rename";
+        public static final String COMMON_WALLET_CHANGE_TYPE = "common.wallet.changeType";
+        public static final String COMMON_WALLET_ADJUST_BALANCE = "common.wallet.adjustBalance";
+        public static final String COMMON_WALLET_ARCHIVE = "common.wallet.archive";
+        public static final String COMMON_WALLET_DELETE = "common.wallet.delete";
+        public static final String COMMON_WALLET_OPENING_BALANCE = "common.wallet.openingBalance";
+        public static final String COMMON_WALLET_INCOMES = "common.wallet.incomes";
+        public static final String COMMON_WALLET_EXPENSES = "common.wallet.expenses";
+        public static final String COMMON_WALLET_CREDITED_TRANSFERS =
+                "common.wallet.creditedTransfers";
+        public static final String COMMON_WALLET_DEBITED_TRANSFERS =
+                "common.wallet.debitedTransfers";
+        public static final String COMMON_WALLET_CURRENT_BALANCE = "common.wallet.currentBalance";
+        public static final String COMMON_WALLET_FORESEEN_BALANCE = "common.wallet.foreseenBalance";
+
+        // Common Components - Dialogs and Messages
+        // Goal Full Pane Dialogs
+        public static final String COMMON_GOAL_DIALOG_ARCHIVED_TITLE =
+                "common.goal.dialog.archived.title";
+        public static final String COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_INCOME =
+                "common.goal.dialog.archived.cannotAddIncome";
+        public static final String COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_EXPENSE =
+                "common.goal.dialog.archived.cannotAddExpense";
+        public static final String COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_TRANSFER =
+                "common.goal.dialog.archived.cannotAddTransfer";
+        public static final String COMMON_GOAL_DIALOG_REOPEN_TITLE =
+                "common.goal.dialog.reopen.title";
+        public static final String COMMON_GOAL_DIALOG_REOPEN_MESSAGE =
+                "common.goal.dialog.reopen.message";
+        public static final String COMMON_GOAL_DIALOG_COMPLETE_TITLE =
+                "common.goal.dialog.complete.title";
+        public static final String COMMON_GOAL_DIALOG_COMPLETE_MESSAGE =
+                "common.goal.dialog.complete.message";
+        public static final String COMMON_GOAL_DIALOG_COMPLETE_ERROR =
+                "common.goal.dialog.complete.error";
+        public static final String COMMON_GOAL_DIALOG_UNARCHIVE_TITLE =
+                "common.goal.dialog.unarchive.title";
+        public static final String COMMON_GOAL_DIALOG_UNARCHIVE_MESSAGE =
+                "common.goal.dialog.unarchive.message";
+        public static final String COMMON_GOAL_DIALOG_ARCHIVE_TITLE =
+                "common.goal.dialog.archive.title";
+        public static final String COMMON_GOAL_DIALOG_ARCHIVE_MESSAGE =
+                "common.goal.dialog.archive.message";
+        public static final String COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE =
+                "common.goal.dialog.delete.hasTransactions.title";
+        public static final String COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE =
+                "common.goal.dialog.delete.hasTransactions.message";
+        public static final String COMMON_GOAL_DIALOG_DELETE_TITLE =
+                "common.goal.dialog.delete.title";
+        public static final String COMMON_GOAL_DIALOG_DELETE_NAME =
+                "common.goal.dialog.delete.name";
+        public static final String COMMON_GOAL_DIALOG_DELETE_INITIAL_AMOUNT =
+                "common.goal.dialog.delete.initialAmount";
+        public static final String COMMON_GOAL_DIALOG_DELETE_CURRENT_AMOUNT =
+                "common.goal.dialog.delete.currentAmount";
+        public static final String COMMON_GOAL_DIALOG_DELETE_TARGET_AMOUNT =
+                "common.goal.dialog.delete.targetAmount";
+        public static final String COMMON_GOAL_DIALOG_DELETE_TARGET_DATE =
+                "common.goal.dialog.delete.targetDate";
+        public static final String COMMON_GOAL_DIALOG_DELETE_VIRTUAL_WALLETS =
+                "common.goal.dialog.delete.virtualWallets";
+        public static final String COMMON_GOAL_DIALOG_DELETE_ERROR =
+                "common.goal.dialog.delete.error";
+
+        // Wallet Full Pane Dialogs
+        public static final String COMMON_WALLET_DIALOG_ARCHIVE_TITLE =
+                "common.wallet.dialog.archive.title";
+        public static final String COMMON_WALLET_DIALOG_ARCHIVE_MESSAGE =
+                "common.wallet.dialog.archive.message";
+        public static final String COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE =
+                "common.wallet.dialog.delete.hasTransactions.title";
+        public static final String COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE =
+                "common.wallet.dialog.delete.hasTransactions.message";
+        public static final String COMMON_WALLET_DIALOG_DELETE_TITLE =
+                "common.wallet.dialog.delete.title";
+        public static final String COMMON_WALLET_DIALOG_DELETE_MESSAGE =
+                "common.wallet.dialog.delete.message";
+        public static final String COMMON_WALLET_DIALOG_DELETE_VIRTUAL_WALLETS =
+                "common.wallet.dialog.delete.virtualWallets";
+        public static final String COMMON_WALLET_DIALOG_DELETE_SUCCESS_TITLE =
+                "common.wallet.dialog.delete.success.title";
+        public static final String COMMON_WALLET_DIALOG_DELETE_SUCCESS_MESSAGE =
+                "common.wallet.dialog.delete.success.message";
+        public static final String COMMON_WALLET_DIALOG_DELETE_ERROR =
+                "common.wallet.dialog.delete.error";
+
+        // Credit Card Pane Dialogs
+        public static final String COMMON_CREDIT_CARD_DIALOG_ARCHIVE_TITLE =
+                "common.creditCard.dialog.archive.title";
+        public static final String COMMON_CREDIT_CARD_DIALOG_ARCHIVE_MESSAGE =
+                "common.creditCard.dialog.archive.message";
+        public static final String COMMON_CREDIT_CARD_DIALOG_ARCHIVE_SUCCESS_TITLE =
+                "common.creditCard.dialog.archive.success.title";
+        public static final String COMMON_CREDIT_CARD_DIALOG_ARCHIVE_SUCCESS_MESSAGE =
+                "common.creditCard.dialog.archive.success.message";
+        public static final String COMMON_CREDIT_CARD_DIALOG_ARCHIVE_ERROR =
+                "common.creditCard.dialog.archive.error";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_HAS_DEBTS_TITLE =
+                "common.creditCard.dialog.delete.hasDebts.title";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_HAS_DEBTS_MESSAGE =
+                "common.creditCard.dialog.delete.hasDebts.message";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_TITLE =
+                "common.creditCard.dialog.delete.title";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_MESSAGE =
+                "common.creditCard.dialog.delete.message";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE =
+                "common.creditCard.dialog.delete.success.title";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE =
+                "common.creditCard.dialog.delete.success.message";
+        public static final String COMMON_CREDIT_CARD_DIALOG_DELETE_ERROR =
+                "common.creditCard.dialog.delete.error";
+
+        // Calculator Dialog
+        public static final String COMMON_CALCULATOR_DIALOG_ERROR_TITLE =
+                "common.calculator.dialog.error.title";
+
+        // Common Components - Modal Window Titles
+        // Goal Full Pane Modal Titles
+        public static final String COMMON_GOAL_MODAL_ADD_INCOME = "common.goal.modal.addIncome";
+        public static final String COMMON_GOAL_MODAL_ADD_EXPENSE = "common.goal.modal.addExpense";
+        public static final String COMMON_GOAL_MODAL_ADD_TRANSFER = "common.goal.modal.addTransfer";
+        public static final String COMMON_GOAL_MODAL_EDIT_GOAL = "common.goal.modal.editGoal";
+
+        // Wallet Full Pane Modal Titles
+        public static final String COMMON_WALLET_MODAL_ADD_INCOME = "common.wallet.modal.addIncome";
+        public static final String COMMON_WALLET_MODAL_ADD_EXPENSE =
+                "common.wallet.modal.addExpense";
+        public static final String COMMON_WALLET_MODAL_ADD_TRANSFER =
+                "common.wallet.modal.addTransfer";
+        public static final String COMMON_WALLET_MODAL_RENAME = "common.wallet.modal.rename";
+        public static final String COMMON_WALLET_MODAL_CHANGE_TYPE =
+                "common.wallet.modal.changeType";
+        public static final String COMMON_WALLET_MODAL_CHANGE_BALANCE =
+                "common.wallet.modal.changeBalance";
+
+        // Credit Card Pane Modal Titles
+        public static final String COMMON_CREDIT_CARD_MODAL_ADD_DEBT =
+                "common.creditCard.modal.addDebt";
+        public static final String COMMON_CREDIT_CARD_MODAL_ADD_CREDIT =
+                "common.creditCard.modal.addCredit";
+        public static final String COMMON_CREDIT_CARD_MODAL_EDIT = "common.creditCard.modal.edit";
+        public static final String COMMON_CREDIT_CARD_MODAL_SHOW_CREDITS =
+                "common.creditCard.modal.showCredits";
+        public static final String COMMON_CREDIT_CARD_MODAL_REGISTER_PAYMENT =
+                "common.creditCard.modal.registerPayment";
+
+        // Calendar Modal Titles
+        public static final String COMMON_CALENDAR_MODAL_ADD_EVENT =
+                "common.calendar.modal.addEvent";
     }
 
     // Prevent instantiation

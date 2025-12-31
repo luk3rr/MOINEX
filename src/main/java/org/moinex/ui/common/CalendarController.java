@@ -31,6 +31,7 @@ import javafx.scene.text.Text;
 import lombok.NoArgsConstructor;
 import org.moinex.model.CalendarEvent;
 import org.moinex.service.CalendarService;
+import org.moinex.service.I18nService;
 import org.moinex.ui.dialog.AddCalendarEventController;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -58,14 +59,19 @@ public class CalendarController {
 
     private CalendarService calendarService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor for CalendarController
      * @param calendarService The service for the calendar
      */
     @Autowired
     public CalendarController(
-            CalendarService calendarService, ConfigurableApplicationContext springContext) {
+            CalendarService calendarService,
+            I18nService i18nService,
+            ConfigurableApplicationContext springContext) {
         this.calendarService = calendarService;
+        this.i18nService = i18nService;
         this.springContext = springContext;
     }
 
@@ -97,7 +103,7 @@ public class CalendarController {
     private void handleAddEvent() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CALENDAR_EVENT_FXML,
-                "Add Calendar Event",
+                i18nService.tr(Constants.TranslationKeys.COMMON_CALENDAR_MODAL_ADD_EVENT),
                 springContext,
                 (AddCalendarEventController controller) -> {},
                 List.of(this::drawCalendar));

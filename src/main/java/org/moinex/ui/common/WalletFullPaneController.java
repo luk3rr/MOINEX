@@ -8,6 +8,7 @@ package org.moinex.ui.common;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -199,7 +200,7 @@ public class WalletFullPaneController {
         setupDynamicVisibility();
 
         walletName.setText(wallet.getName());
-        walletType.setText(wallet.getType().getName());
+        walletType.setText(UIUtils.translateWalletType(wallet.getType(), i18nService));
         walletIcon.setImage(
                 new Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.getType().getIcon()));
 
@@ -285,7 +286,7 @@ public class WalletFullPaneController {
     private void handleAddIncome() {
         WindowUtils.openModalWindow(
                 Constants.ADD_INCOME_FXML,
-                "Add new income",
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_INCOME),
                 springContext,
                 (AddIncomeController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -295,7 +296,7 @@ public class WalletFullPaneController {
     private void handleAddExpense() {
         WindowUtils.openModalWindow(
                 Constants.ADD_EXPENSE_FXML,
-                "Add new expense",
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_EXPENSE),
                 springContext,
                 (AddExpenseController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -305,7 +306,7 @@ public class WalletFullPaneController {
     private void handleAddTransfer() {
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                "Add new transfer",
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_TRANSFER),
                 springContext,
                 (AddTransferController controller) -> controller.setSenderWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -315,7 +316,7 @@ public class WalletFullPaneController {
     private void handleRenameWallet() {
         WindowUtils.openModalWindow(
                 Constants.RENAME_WALLET_FXML,
-                "Rename wallet",
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_RENAME),
                 springContext,
                 (RenameWalletController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -325,7 +326,7 @@ public class WalletFullPaneController {
     private void handleChangeWalletType() {
         WindowUtils.openModalWindow(
                 Constants.CHANGE_WALLET_TYPE_FXML,
-                "Change wallet type",
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_CHANGE_TYPE),
                 springContext,
                 (ChangeWalletTypeController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -335,7 +336,7 @@ public class WalletFullPaneController {
     private void handleChangeWalletBalance() {
         WindowUtils.openModalWindow(
                 Constants.CHANGE_WALLET_BALANCE_FXML,
-                "Change wallet balance",
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_CHANGE_BALANCE),
                 springContext,
                 (ChangeWalletBalanceController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -344,8 +345,12 @@ public class WalletFullPaneController {
     @FXML
     private void handleArchiveWallet() {
         if (WindowUtils.showConfirmationDialog(
-                "Archive wallet " + wallet.getName(),
-                "Are you sure you want to archive this wallet?")) {
+                MessageFormat.format(
+                        i18nService.tr(
+                                Constants.TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_TITLE),
+                        wallet.getName()),
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_MESSAGE),
+                i18nService.getBundle())) {
             walletService.archiveWallet(wallet.getId());
 
             // Update wallet display in the main window
@@ -358,9 +363,12 @@ public class WalletFullPaneController {
         // Prevent the removal of a wallet with associated transactions
         if (walletTransactionService.getTransactionCountByWallet(wallet.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    "Wallet has transactions",
-                    "Cannot delete a wallet with associated transactions. "
-                            + "Remove the transactions first or archive the wallet");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
@@ -370,26 +378,39 @@ public class WalletFullPaneController {
         String virtualWalletsMessage =
                 totalOfAssociatedVirtualWallets.equals(0)
                         ? ""
-                        : "This wallet has "
-                                + totalOfAssociatedVirtualWallets
-                                + " virtual wallet(s) associated with it. Deleting this wallet all"
-                                + " virtual wallets will be unlinked from it.";
+                        : MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_WALLET_DIALOG_DELETE_VIRTUAL_WALLETS),
+                                totalOfAssociatedVirtualWallets);
 
         if (WindowUtils.showConfirmationDialog(
-                "Delete wallet " + wallet.getName(),
-                "Are you sure you want to remove this wallet?\n"
-                        + "This action cannot be undone.\n"
-                        + virtualWalletsMessage)) {
+                MessageFormat.format(
+                        i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_TITLE),
+                        wallet.getName()),
+                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_MESSAGE)
+                        + "\n"
+                        + virtualWalletsMessage,
+                i18nService.getBundle())) {
             try {
                 walletService.deleteWallet(wallet.getId());
 
                 WindowUtils.showSuccessDialog(
-                        "Wallet deleted", "Wallet " + wallet.getName() + " has been deleted");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .COMMON_WALLET_DIALOG_DELETE_SUCCESS_TITLE),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_WALLET_DIALOG_DELETE_SUCCESS_MESSAGE),
+                                wallet.getName()));
 
                 // Update wallet display in the main window
                 walletController.updateDisplay();
             } catch (EntityNotFoundException | IllegalStateException e) {
-                WindowUtils.showErrorDialog("Error removing wallet", e.getMessage());
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_ERROR),
+                        e.getMessage());
             }
         }
     }

@@ -29,6 +29,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.I18nService;
 import org.moinex.service.UserPreferencesService;
+import org.moinex.util.enums.CreditCardInvoiceStatus;
 import org.moinex.util.enums.TickerType;
 import org.moinex.util.enums.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -348,7 +349,7 @@ public final class UIUtils {
      * @param i18nService The I18nService instance for translation
      * @return Translated wallet type name
      */
-    public static String translateWalletTypeName(WalletType walletType, I18nService i18nService) {
+    public static String translateWalletType(WalletType walletType, I18nService i18nService) {
         String name = walletType.getName().toLowerCase().replace(" ", "");
 
         // Map common wallet type names to i18n keys
@@ -408,6 +409,22 @@ public final class UIUtils {
         }
 
         return tickerType.name();
+    }
+
+    public static String translateCreditCardInvoiceStatus(
+            CreditCardInvoiceStatus crcInvoiceStatus, I18nService i18nService) {
+        Map<String, String> crcInvoiceStatusKeyMap =
+                Map.of(
+                        "open", Constants.TranslationKeys.COMMON_CREDIT_CARD_OPEN,
+                        "closed", Constants.TranslationKeys.COMMON_CREDIT_CARD_CLOSED);
+
+        String key =
+                crcInvoiceStatusKeyMap.getOrDefault(crcInvoiceStatus.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return crcInvoiceStatus.name();
     }
 
     /**

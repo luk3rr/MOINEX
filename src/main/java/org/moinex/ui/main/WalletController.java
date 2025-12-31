@@ -128,14 +128,14 @@ public class WalletController {
                 .getItems()
                 .addAll(
                         walletTypes.stream()
-                                .map(wt -> UIUtils.translateWalletTypeName(wt, i18nService))
+                                .map(wt -> UIUtils.translateWalletType(wt, i18nService))
                                 .toList());
 
         moneyFlowPaneWalletTypeComboBox
                 .getItems()
                 .addAll(
                         walletTypes.stream()
-                                .map(wt -> UIUtils.translateWalletTypeName(wt, i18nService))
+                                .map(wt -> UIUtils.translateWalletType(wt, i18nService))
                                 .toList());
 
         // Add the default wallet type and select it
@@ -509,7 +509,7 @@ public class WalletController {
                         walletTypes.stream()
                                 .filter(
                                         type ->
-                                                UIUtils.translateWalletTypeName(type, i18nService)
+                                                UIUtils.translateWalletType(type, i18nService)
                                                         .equals(walletTypeName))
                                 .findFirst()
                                 .orElse(null);
@@ -525,7 +525,7 @@ public class WalletController {
 
                     pieChartData.add(
                             new PieChart.Data(
-                                    UIUtils.translateWalletTypeName(wt, i18nService),
+                                    UIUtils.translateWalletType(wt, i18nService),
                                     totalBalance.doubleValue()));
                 }
             }
@@ -767,7 +767,7 @@ public class WalletController {
         doughnutChartCheckBoxes = new ArrayList<>();
 
         for (WalletType wt : walletTypes) {
-            CheckBox checkBox = new CheckBox(UIUtils.translateWalletTypeName(wt, i18nService));
+            CheckBox checkBox = new CheckBox(UIUtils.translateWalletType(wt, i18nService));
             checkBox.getStyleClass().add(Constants.WALLET_CHECK_BOX_STYLE);
             checkBox.setSelected(true);
             doughnutChartCheckBoxes.add(checkBox);

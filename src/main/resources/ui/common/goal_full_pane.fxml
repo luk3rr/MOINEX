@@ -36,9 +36,9 @@
                      <children>
                         <MenuButton fx:id="addButton" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
-                            <MenuItem fx:id="addIncomeMenuItem" mnemonicParsing="false" onAction="#handleAddIncome" text="Add Income" />
-                            <MenuItem fx:id="addExpenseMenuItem" mnemonicParsing="false" onAction="#handleAddExpense" text="Add Expense" />
-                              <MenuItem fx:id="addTransferMenuItem" mnemonicParsing="false" onAction="#handleAddTransfer" text="Add Transfer" />
+                            <MenuItem fx:id="addIncomeMenuItem" mnemonicParsing="false" onAction="#handleAddIncome" text="%common.goal.addIncome" />
+                            <MenuItem fx:id="addExpenseMenuItem" mnemonicParsing="false" onAction="#handleAddExpense" text="%common.goal.addExpense" />
+                              <MenuItem fx:id="addTransferMenuItem" mnemonicParsing="false" onAction="#handleAddTransfer" text="%common.goal.addTransfer" />
                           </items>
                            <graphic>
                               <ImageView fx:id="addButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -50,10 +50,10 @@
                         </MenuButton>
                         <MenuButton fx:id="menuButton" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
-                            <MenuItem mnemonicParsing="false" onAction="#handleEditGoal" text="Edit" />
-                              <MenuItem fx:id="toggleCompleteGoal" mnemonicParsing="false" onAction="#handleCompleteGoal" text="Complete Goal" />
-                              <MenuItem fx:id="toggleArchiveGoal" mnemonicParsing="false" onAction="#handleArchiveGoal" text="Archive Goal" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteGoal" text="Delete" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleEditGoal" text="%common.goal.edit" />
+                              <MenuItem fx:id="toggleCompleteGoal" mnemonicParsing="false" onAction="#handleCompleteGoal" text="%common.goal.completeGoal" />
+                              <MenuItem fx:id="toggleArchiveGoal" mnemonicParsing="false" onAction="#handleArchiveGoal" text="%common.goal.archiveGoal" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteGoal" text="%common.goal.delete" />
                           </items>
                            <graphic>
                               <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -78,7 +78,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <Label text="Goal">
+                                    <Label text="%common.goal.goal">
                                        <font>
                                           <Font size="12.0" />
                                        </font></Label>
@@ -92,7 +92,7 @@
                               </HBox>
                               <HBox fx:id="currentHBox">
                                  <children>
-                                    <Label fx:id="currentTitleLabel" text="Current">
+                                    <Label fx:id="currentTitleLabel" text="%common.goal.current">
                                        <font>
                                           <Font size="12.0" />
                                        </font>
@@ -107,7 +107,7 @@
                               </HBox>
                               <HBox>
                                  <children>
-                                    <Label fx:id="dateTitleLabel" text="Expectation date">
+                                    <Label fx:id="dateTitleLabel" text="%common.goal.expectationDate">
                                        <font>
                                           <Font size="12.0" />
                                        </font></Label>
@@ -120,7 +120,7 @@
                               </HBox>
                               <HBox>
                                  <children>
-                                    <Label fx:id="daysTitleLabel" text="Missing days">
+                                    <Label fx:id="daysTitleLabel" text="%common.goal.missingDays">
                                        <font>
                                           <Font size="12.0" />
                                        </font></Label>
@@ -133,7 +133,7 @@
                               </HBox>
                               <HBox fx:id="idealPerMonthHBox">
                                  <children>
-                                    <Label fx:id="idealPerMonthTitleLabel" text="Ideal per month">
+                                    <Label fx:id="idealPerMonthTitleLabel" text="%common.goal.idealPerMonth">
                                        <font>
                                           <Font size="12.0" />
                                        </font></Label>

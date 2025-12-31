@@ -39,8 +39,8 @@
                      <children>
                         <MenuButton fx:id="addButton" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
-                            <MenuItem mnemonicParsing="false" onAction="#handleAddDebt" text="Add Debt" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleAddCredit" text="Add Credit" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleAddDebt" text="%common.creditCard.addDebt" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleAddCredit" text="%common.creditCard.addCredit" />
                           </items>
                            <graphic>
                               <ImageView fx:id="addButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -52,10 +52,10 @@
                         </MenuButton>
                         <MenuButton fx:id="menuButton" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
-                            <MenuItem mnemonicParsing="false" onAction="#handleEditCreditCard" text="Edit" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleArchiveCreditCard" text="Archive" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteCreditCard" text="Delete" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleShowRebates" text="Show rebates" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleEditCreditCard" text="%common.creditCard.edit" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleArchiveCreditCard" text="%common.creditCard.archive" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteCreditCard" text="%common.creditCard.delete" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleShowRebates" text="%common.creditCard.showRebates" />
                           </items>
                            <graphic>
                               <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -81,25 +81,25 @@
                      <children>
                         <VBox alignment="CENTER_LEFT" prefWidth="90.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Limit" VBox.vgrow="ALWAYS" />
+                              <Label text="%common.creditCard.limit" VBox.vgrow="ALWAYS" />
                               <Label fx:id="limitLabel" text="\$ 0.00" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Pending" />
+                              <Label text="%common.creditCard.pending" />
                               <Label fx:id="pendingPaymentsLabel" text="\$ 0.00" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER_RIGHT" prefWidth="90.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Free" VBox.vgrow="ALWAYS" />
+                              <Label text="%common.creditCard.free" VBox.vgrow="ALWAYS" />
                               <Label fx:id="availableLimitLabel" text="\$ 0.00" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER_RIGHT" prefWidth="90.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Rebate" />
+                              <Label text="%common.creditCard.rebate" />
                               <Label fx:id="availableRebateLabel" text="\$ 0.00" />
                            </children>
                         </VBox>
@@ -123,19 +123,19 @@
                      <children>
                         <VBox alignment="CENTER_LEFT" prefWidth="90.0">
                            <children>
-                              <Label text="Closure" />
+                              <Label text="%common.creditCard.closure" />
                               <Label fx:id="closureDayLabel" text="10" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Next invoice" />
+                              <Label text="%common.creditCard.nextInvoice" />
                               <Label fx:id="nextInvoiceLabel" text="MM/DD" />
                            </children>
                         </VBox>
                         <VBox alignment="CENTER_RIGHT" prefWidth="90.0">
                            <children>
-                              <Label text="Due date" />
+                              <Label text="%common.creditCard.dueDate" />
                               <Label fx:id="dueDateLabel" text="10" />
                            </children>
                         </VBox>
@@ -150,7 +150,7 @@
                                  <children>
                                     <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Label text="Invoice" />
+                                          <Label text="%common.creditCard.invoice" />
                                           <Label fx:id="invoiceStatusLabel" text="Open" />
                                        </children>
                                     </VBox>
@@ -161,7 +161,7 @@
                                                 <Label fx:id="invoiceMonthLabel" text="\$ 0.00" />
                                              </children>
                                           </HBox>
-                                          <JFXButton alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="Register payment" textAlignment="RIGHT">
+                                          <JFXButton alignment="CENTER_RIGHT" onAction="#handleRegisterPayment" text="%common.creditCard.registerPayment" textAlignment="RIGHT">
                                              <graphic>
                                                 <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
