@@ -17,7 +17,9 @@ import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,16 +30,23 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
+    private I18nService i18nService;
+
     /**
      * Constructor
      * @param tickerService TickerService
      * @param calculatorService CalculatorService
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public AddCryptoExchangeController(
-            TickerService tickerService, CalculatorService calculatorService) {
+            TickerService tickerService,
+            CalculatorService calculatorService,
+            I18nService i18nService) {
         super(tickerService, calculatorService);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     @FXML
@@ -60,7 +69,9 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                 || description.isBlank()
                 || exchangeDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -80,19 +91,31 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                     description);
 
             WindowUtils.showSuccessDialog(
-                    "Exchange created", "The exchange was successfully created");
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE));
 
             Stage stage = (Stage) cryptoReceivedQuantityField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid exchange quantity", "The quantity must be a number");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
         } catch (MoinexException.SameSourceDestinationException
                 | EntityNotFoundException
                 | MoinexException.InvalidTickerTypeException
                 | IllegalArgumentException
                 | MoinexException.InsufficientResourcesException e) {
-            WindowUtils.showErrorDialog("Error while creating exchange", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_ERROR_CREATING_EXCHANGE_TITLE),
+                    e.getMessage());
         }
     }
 }

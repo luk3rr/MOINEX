@@ -418,36 +418,33 @@ public class GoalFullPaneController {
         }
 
         // Create a message to show to the user
-        StringBuilder message = new StringBuilder();
-
-        message.append(i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_NAME))
-                .append(" ")
-                .append(goal.getName())
-                .append("\n");
-        message.append(
-                        i18nService.tr(
-                                Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_INITIAL_AMOUNT))
-                .append(" ")
-                .append(UIUtils.formatCurrency(goal.getInitialBalance()))
-                .append("\n");
-        message.append(
-                        i18nService.tr(
-                                Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_CURRENT_AMOUNT))
-                .append(" ")
-                .append(UIUtils.formatCurrency(goal.getBalance()))
-                .append("\n");
-        message.append(
-                        i18nService.tr(
-                                Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TARGET_AMOUNT))
-                .append(" ")
-                .append(UIUtils.formatCurrency(goal.getTargetBalance()))
-                .append("\n");
-        message.append(
-                        i18nService.tr(
-                                Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TARGET_DATE))
-                .append(" ")
-                .append(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
-                .append("\n");
+        String message =
+                MessageFormat.format(
+                        "{0}\n{1}\n{2}\n{3}\n{4}",
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_NAME),
+                                goal.getName()),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_INITIAL_AMOUNT),
+                                UIUtils.formatCurrency(goal.getInitialBalance())),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_CURRENT_AMOUNT),
+                                UIUtils.formatCurrency(goal.getBalance())),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_TARGET_AMOUNT),
+                                UIUtils.formatCurrency(goal.getTargetBalance())),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_TARGET_DATE),
+                                goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME)));
 
         Integer totalOfAssociatedVirtualWallets =
                 walletService.getCountOfVirtualWalletsByMasterWalletId(goal.getId());
@@ -459,16 +456,17 @@ public class GoalFullPaneController {
                                     i18nService.tr(
                                             Constants.TranslationKeys
                                                     .COMMON_GOAL_DIALOG_DELETE_VIRTUAL_WALLETS),
-                                    totalOfAssociatedVirtualWallets);
+                                    totalOfAssociatedVirtualWallets)
+                            + "\n";
 
-            message.append(virtualWalletsMessage).append("\n");
+            message = message + virtualWalletsMessage;
         }
 
         try {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
                     i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TITLE),
-                    message.toString(),
+                    message,
                     i18nService.getBundle())) {
                 goalService.deleteGoal(goal.getId());
 

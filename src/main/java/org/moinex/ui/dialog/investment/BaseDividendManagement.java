@@ -22,11 +22,7 @@ import org.moinex.model.Category;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
-import org.moinex.service.CalculatorService;
-import org.moinex.service.CategoryService;
-import org.moinex.service.TickerService;
-import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
+import org.moinex.service.*;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -81,6 +77,8 @@ public abstract class BaseDividendManagement {
 
     protected Ticker ticker = null;
 
+    protected I18nService i18nService;
+
     /**
      * Constructor
      * @param walletService WalletService
@@ -96,12 +94,14 @@ public abstract class BaseDividendManagement {
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
-            TickerService tickerService) {
+            TickerService tickerService,
+            I18nService i18nService) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.categoryService = categoryService;
         this.calculatorService = calculatorService;
         this.tickerService = tickerService;
+        this.i18nService = i18nService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -254,7 +254,8 @@ public abstract class BaseDividendManagement {
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(statusComboBox, TransactionStatus::name);
+        UIUtils.configureComboBox(
+                statusComboBox, s -> UIUtils.translateTransactionStatus(s, i18nService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

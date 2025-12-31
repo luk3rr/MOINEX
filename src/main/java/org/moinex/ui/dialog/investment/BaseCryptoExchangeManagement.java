@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
@@ -57,6 +58,8 @@ public abstract class BaseCryptoExchangeManagement {
 
     protected CalculatorService calculatorService;
 
+    protected I18nService i18nService;
+
     protected List<Ticker> cryptos;
 
     protected Ticker fromCrypto = null;
@@ -72,6 +75,10 @@ public abstract class BaseCryptoExchangeManagement {
             TickerService tickerService, CalculatorService calculatorService) {
         this.tickerService = tickerService;
         this.calculatorService = calculatorService;
+    }
+
+    protected void setI18nService(I18nService i18nService) {
+        this.i18nService = i18nService;
     }
 
     public void setFromCryptoComboBox(Ticker tk) {
@@ -128,7 +135,7 @@ public abstract class BaseCryptoExchangeManagement {
     protected void handleCryptoSoldOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                "Calculator",
+                i18nService.tr(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(
@@ -141,7 +148,7 @@ public abstract class BaseCryptoExchangeManagement {
     protected void handleCryptoReceivedOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                "Calculator",
+                i18nService.tr(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(

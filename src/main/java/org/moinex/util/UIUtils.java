@@ -29,9 +29,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.I18nService;
 import org.moinex.service.UserPreferencesService;
-import org.moinex.util.enums.CreditCardInvoiceStatus;
-import org.moinex.util.enums.TickerType;
-import org.moinex.util.enums.TransactionStatus;
+import org.moinex.util.enums.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -396,6 +394,77 @@ public final class UIUtils {
         return transactionStatus.name();
     }
 
+    public static String translateTransactionType(
+            TransactionType transactionType, I18nService i18nService) {
+        Map<String, String> typeKeyMap =
+                Map.of(
+                        "income", Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
+                        "expense", Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES);
+
+        String key = typeKeyMap.getOrDefault(transactionType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return transactionType.name();
+    }
+
+    public static String translateRecurringTransactionStatus(
+            RecurringTransactionStatus rtStatus, I18nService i18nService) {
+        Map<String, String> statusKeyMap =
+                Map.of(
+                        "active", Constants.TranslationKeys.RECURRING_TRANSACTION_STATUS_ACTIVE,
+                        "inactive",
+                                Constants.TranslationKeys.RECURRING_TRANSACTION_STATUS_INACTIVE);
+
+        String key = statusKeyMap.getOrDefault(rtStatus.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return rtStatus.name();
+    }
+
+    public static String translateRecurringTransactionFrequency(
+            RecurringTransactionFrequency frequency, I18nService i18nService) {
+        Map<String, String> frequencyKeyMap =
+                Map.of(
+                        "daily", Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_DAILY,
+                        "weekly", Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_WEEKLY,
+                        "monthly",
+                                Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_MONTHLY,
+                        "yearly", Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_YEARLY);
+
+        String key = frequencyKeyMap.getOrDefault(frequency.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return frequency.name();
+    }
+
+    public static String translateCalendarEventType(
+            CalendarEventType eventType, I18nService i18nService) {
+        Map<String, String> eventTypeKeyMap =
+                Map.of(
+                        "credit_card_statement_closing",
+                                Constants.TranslationKeys
+                                        .CALENDAR_EVENTTYPE_CREDIT_CARD_STATEMENT_CLOSING,
+                        "credit_card_due_date",
+                                Constants.TranslationKeys.CALENDAR_EVENTTYPE_CREDIT_CARD_DUE_DATE,
+                        "debt_payment_due_date",
+                                Constants.TranslationKeys.CALENDAR_EVENTTYPE_DEBT_PAYMENT_DUE_DATE,
+                        "income_receipt_date",
+                                Constants.TranslationKeys.CALENDAR_EVENTTYPE_INCOME_RECEIPT_DATE);
+
+        String key = eventTypeKeyMap.getOrDefault(eventType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return eventType.getDescription();
+    }
+
     public static String translateTickerType(TickerType tickerType, I18nService i18nService) {
         Map<String, String> tickerKeyMap =
                 Map.of(
@@ -425,6 +494,22 @@ public final class UIUtils {
         }
 
         return crcInvoiceStatus.name();
+    }
+
+    public static String translateCreditCardCreditType(
+            CreditCardCreditType crcCreditType, I18nService i18nService) {
+        Map<String, String> crcCreditTypeKeyMap =
+                Map.of(
+                        "cashback", Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_CASHBACK,
+                        "refund", Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REFUND,
+                        "reward", Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REWARD);
+
+        String key = crcCreditTypeKeyMap.getOrDefault(crcCreditType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return crcCreditType.name();
     }
 
     /**

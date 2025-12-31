@@ -24,6 +24,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.CalculatorController;
@@ -69,6 +70,8 @@ public abstract class BaseWalletTransactionManagement {
 
     protected CalculatorService calculatorService;
 
+    protected I18nService i18nService;
+
     protected List<Wallet> wallets;
 
     protected List<Category> categories;
@@ -94,11 +97,13 @@ public abstract class BaseWalletTransactionManagement {
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
+            I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.categoryService = categoryService;
         this.calculatorService = calculatorService;
+        this.i18nService = i18nService;
         this.springContext = springContext;
     }
 
@@ -155,7 +160,7 @@ public abstract class BaseWalletTransactionManagement {
     protected void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                "Calculator",
+                i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transactionValueField)));
@@ -223,13 +228,16 @@ public abstract class BaseWalletTransactionManagement {
         // to inform the user that a category is needed
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
-                    categoryComboBox, "You need to add a category before adding a transaction");
+                    categoryComboBox,
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY));
         }
     }
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(statusComboBox, TransactionStatus::name);
+        UIUtils.configureComboBox(
+                statusComboBox, w -> UIUtils.translateTransactionStatus(w, i18nService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

@@ -8,6 +8,7 @@ package org.moinex.ui.dialog.creditcard;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.moinex.model.creditcard.CreditCardDebt;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -74,6 +76,8 @@ public abstract class BaseCreditCardDebtManagement {
 
     protected CalculatorService calculatorService;
 
+    protected I18nService i18nService;
+
     protected CreditCard creditCard = null;
 
     protected static final Logger logger =
@@ -89,6 +93,10 @@ public abstract class BaseCreditCardDebtManagement {
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
         this.springContext = springContext;
+    }
+
+    protected void setI18nService(I18nService i18nService) {
+        this.i18nService = i18nService;
     }
 
     public void setCreditCard(CreditCard crc) {
@@ -224,7 +232,8 @@ public abstract class BaseCreditCardDebtManagement {
                         : Integer.parseInt(installmentsField.getText());
 
         if (installments < 1) {
-            msgLabel.setText("Invalid number of installments");
+            msgLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_INSTALLMENTS));
             return;
         }
 
@@ -254,28 +263,28 @@ public abstract class BaseCreditCardDebtManagement {
             boolean exactDivision = remainder.compareTo(BigDecimal.ZERO) == 0;
 
             if (exactDivision) {
-                String msgBase = "Repeat for %d months of %s";
                 msgLabel.setText(
-                        String.format(
-                                msgBase,
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.CREDITCARD_DEBT_REPEAT_MONTHS),
                                 installments,
                                 UIUtils.formatCurrency(exactInstallmentValue)));
             } else {
-                String msgBase =
-                        "Repeat for %d months.\nFirst month of %s and the last " + "%s of %s";
-
                 remainder = remainder.setScale(2, RoundingMode.HALF_UP);
 
                 msgLabel.setText(
-                        String.format(
-                                msgBase,
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDITCARD_DEBT_REPEAT_MONTHS_UNEVEN),
                                 installments,
-                                exactInstallmentValue.add(remainder),
+                                UIUtils.formatCurrency(exactInstallmentValue.add(remainder)),
                                 installments - 1,
-                                exactInstallmentValue));
+                                UIUtils.formatCurrency(exactInstallmentValue)));
             }
         } catch (NumberFormatException e) {
-            msgLabel.setText("Invalid debt value");
+            msgLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_VALUE));
         }
     }
 

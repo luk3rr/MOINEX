@@ -18,9 +18,11 @@ import org.moinex.model.Category;
 import org.moinex.model.investment.TickerSale;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
+import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
@@ -42,6 +44,7 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
      * @param walletTransactionService Wallet transaction service
      * @param categoryService Category service
      * @param tickerService Ticker service
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -49,9 +52,10 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
             WalletService walletService,
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
-            TickerService tickerService) {
-        super(walletService, walletTransactionService, categoryService, tickerService);
-
+            TickerService tickerService,
+            I18nService i18nService) {
+        super(walletService, walletTransactionService, categoryService, tickerService, i18nService);
+        this.i18nService = i18nService;
         transactionType = TransactionType.INCOME;
     }
 
@@ -95,7 +99,9 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                 || quantityStr.isBlank()
                 || saleDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -113,7 +119,12 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                     && sale.getUnitPrice().compareTo(unitPrice) == 0
                     && sale.getQuantity().compareTo(quantity) == 0
                     && sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate)) {
-                WindowUtils.showInformationDialog("No changes", "No changes were made to the sale");
+                WindowUtils.showInformationDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_NO_CHANGES_SALE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 LocalTime currentTime = LocalTime.now();
@@ -130,15 +141,25 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                 tickerService.updateSale(sale);
 
                 WindowUtils.showSuccessDialog(
-                        "TickerSale updated", "TickerSale updated successfully");
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error while updating sale", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_UPDATING_SALE_TITLE),
+                    e.getMessage());
         }
     }
 }

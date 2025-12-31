@@ -17,7 +17,7 @@
     </padding>
    <VBox alignment="CENTER">
       <children>
-         <Label text="Wallet">
+         <Label text="%dialog.label.wallet">
             <font>
                <Font size="10.0" />
             </font>
@@ -43,7 +43,7 @@
          </VBox>
          <VBox alignment="CENTER">
             <children>
-               <Label text="New balance">
+               <Label text="%wallettransaction.label.newBalance">
                   <font>
                      <Font size="10.0" />
                   </font>
@@ -55,8 +55,8 @@
    </HBox>
    <HBox alignment="CENTER" spacing="10.0">
       <children>
-         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
       </children>
       <VBox.margin>
          <Insets />

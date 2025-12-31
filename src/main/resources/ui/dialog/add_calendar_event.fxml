@@ -33,12 +33,12 @@
             </VBox>
             <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Title" VBox.vgrow="ALWAYS">
+                  <Label text="%calendar.label.title" VBox.vgrow="ALWAYS">
                      <font>
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="titleField" promptText="Title" />
+                  <TextField fx:id="titleField" promptText="%calendar.label.title" />
                </children>
             </VBox>
          </children>
@@ -47,7 +47,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Type">
+                  <Label text="%dialog.label.type">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -57,7 +57,7 @@
             </VBox>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Date">
+                  <Label text="%dialog.label.date">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -71,7 +71,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Description (optional)">
+                  <Label text="%calendar.label.descriptionOptional">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -83,8 +83,8 @@
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../css/component/buttons.css" text="Save" />
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../css/component/buttons.css" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

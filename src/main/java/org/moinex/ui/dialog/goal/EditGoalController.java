@@ -18,7 +18,9 @@ import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,14 +37,19 @@ public final class EditGoalController extends BaseGoalManagement {
 
     private Goal goal = null;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      *
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditGoalController(GoalService goalService, WalletService walletService) {
+    public EditGoalController(
+            GoalService goalService, WalletService walletService, I18nService i18nService) {
         super(goalService, walletService);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     public void setGoal(Goal goal) {
@@ -82,7 +89,8 @@ public final class EditGoalController extends BaseGoalManagement {
 
         if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -101,7 +109,8 @@ public final class EditGoalController extends BaseGoalManagement {
                     && goal.isArchived() == archived
                     && goal.isCompleted() == completed) {
                 WindowUtils.showInformationDialog(
-                        "No changes", "No changes were made to the goal.");
+                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_CHANGES_MESSAGE));
             } else // If there is any modification, update the goal
             {
                 goal.setName(goalName);
@@ -124,18 +133,24 @@ public final class EditGoalController extends BaseGoalManagement {
 
                 goalService.updateGoal(goal);
 
-                WindowUtils.showSuccessDialog("Goal updated", "The goal was successfully updated.");
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_TITLE),
+                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid balance", "Please enter a valid balance.");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (EntityNotFoundException
                 | IllegalArgumentException
                 | EntityExistsException
                 | MoinexException.IncompleteGoalException e) {
-            WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ERROR_UPDATING_GOAL_TITLE),
+                    e.getMessage());
         }
     }
 

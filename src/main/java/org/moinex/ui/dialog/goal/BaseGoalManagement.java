@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -41,16 +42,23 @@ public abstract class BaseGoalManagement {
 
     protected GoalService goalService;
 
+    protected I18nService i18nService;
+
     /**
      * Constructor
      *
      * @param goalService GoalService
+     * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     protected BaseGoalManagement(GoalService goalService, WalletService walletService) {
         this.goalService = goalService;
         this.walletService = walletService;
+    }
+
+    protected void setI18nService(I18nService i18nService) {
+        this.i18nService = i18nService;
     }
 
     @FXML

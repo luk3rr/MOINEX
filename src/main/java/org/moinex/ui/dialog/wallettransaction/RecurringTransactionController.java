@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.RecurringTransaction;
+import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -50,6 +51,8 @@ public class RecurringTransactionController {
 
     private RecurringTransactionService recurringTransactionService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor for the RecurringTransactionController
      * @param recurringTransactionService The recurring transaction service
@@ -57,9 +60,11 @@ public class RecurringTransactionController {
     @Autowired
     public RecurringTransactionController(
             RecurringTransactionService recurringTransactionService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.recurringTransactionService = recurringTransactionService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -88,7 +93,9 @@ public class RecurringTransactionController {
     private void handleCreate() {
         WindowUtils.openModalWindow(
                 Constants.ADD_RECURRING_TRANSACTION_FXML,
-                "Create Recurring Transaction",
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .WALLETTRANSACTION_DIALOG_CREATE_RECURRING_TRANSACTION_TITLE),
                 springContext,
                 (AddRecurringTransactionController controller) -> {},
                 List.of(
@@ -105,14 +112,20 @@ public class RecurringTransactionController {
 
         if (selectedRt == null) {
             WindowUtils.showInformationDialog(
-                    "No recurring transaction selected",
-                    "Please select a recurring transaction to edit");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_EDIT_MESSAGE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_RECURRING_TRANSACTION_FXML,
-                "Edit Recurring Transaction",
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .WALLETTRANSACTION_DIALOG_EDIT_RECURRING_TRANSACTION_TITLE),
                 springContext,
                 (EditRecurringTransactionController controller) ->
                         controller.setRecurringTransaction(selectedRt),
@@ -130,14 +143,25 @@ public class RecurringTransactionController {
 
         if (selectedRt == null) {
             WindowUtils.showInformationDialog(
-                    "No recurring transaction selected",
-                    "Please select a recurring transaction to delete");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_DELETE_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Remove recurring transaction with ID " + selectedRt.getId(),
-                "Are you sure you want to delete this recurring transaction?")) {
+                i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_REMOVE_RECURRING_TRANSACTION_TITLE)
+                        + " "
+                        + selectedRt.getId(),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .WALLETTRANSACTION_DIALOG_REMOVE_RECURRING_TRANSACTION_MESSAGE),
+                i18nService.getBundle())) {
             recurringTransactionService.deleteRecurringTransaction(selectedRt.getId());
             loadRecurringTransactionsFromDatabase();
             updateRecurringTransactionTableView();
@@ -208,37 +232,64 @@ public class RecurringTransactionController {
                 getRecurringTransactionLongTableColumn();
 
         TableColumn<RecurringTransaction, String> descriptionColumn =
-                new TableColumn<>("Description");
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getDescription()));
 
-        TableColumn<RecurringTransaction, String> amountColumn = new TableColumn<>("Amount");
+        TableColumn<RecurringTransaction, String> amountColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
                                 UIUtils.formatCurrency(param.getValue().getAmount())));
 
-        TableColumn<RecurringTransaction, String> walletColumn = new TableColumn<>("Wallet");
+        TableColumn<RecurringTransaction, String> walletColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_WALLET));
         walletColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
 
-        TableColumn<RecurringTransaction, String> typeColumn = new TableColumn<>("Type");
+        TableColumn<RecurringTransaction, String> typeColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_TYPE));
         typeColumn.setCellValueFactory(
-                param -> new SimpleStringProperty(param.getValue().getType().name()));
+                param ->
+                        new SimpleStringProperty(
+                                UIUtils.translateTransactionType(
+                                        param.getValue().getType(), i18nService)));
 
-        TableColumn<RecurringTransaction, String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<RecurringTransaction, String> categoryColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getCategory().getName()));
 
-        TableColumn<RecurringTransaction, String> statusColumn = new TableColumn<>("Status");
+        TableColumn<RecurringTransaction, String> statusColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_STATUS));
         statusColumn.setCellValueFactory(
-                param -> new SimpleStringProperty(param.getValue().getStatus().name()));
+                param ->
+                        new SimpleStringProperty(
+                                UIUtils.translateRecurringTransactionStatus(
+                                        param.getValue().getStatus(), i18nService)));
 
-        TableColumn<RecurringTransaction, String> frequencyColumn = new TableColumn<>("Frequency");
+        TableColumn<RecurringTransaction, String> frequencyColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_FREQUENCY));
         frequencyColumn.setCellValueFactory(
-                param -> new SimpleStringProperty(param.getValue().getFrequency().name()));
+                param ->
+                        new SimpleStringProperty(
+                                UIUtils.translateRecurringTransactionFrequency(
+                                        param.getValue().getFrequency(), i18nService)));
 
-        TableColumn<RecurringTransaction, String> startDateColumn = new TableColumn<>("Start Date");
+        TableColumn<RecurringTransaction, String> startDateColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_START_DATE));
         startDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -271,7 +322,10 @@ public class RecurringTransactionController {
 
     private TableColumn<RecurringTransaction, String> getStringTableColumn() {
         TableColumn<RecurringTransaction, String> expectedRemainingAmountColumn =
-                new TableColumn<>("Expected Remaining Amount");
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_TABLE_EXPECTED_REMAINING_AMOUNT));
         expectedRemainingAmountColumn.setCellValueFactory(
                 param -> {
                     RecurringTransaction rt = param.getValue();
@@ -292,9 +346,11 @@ public class RecurringTransactionController {
         return expectedRemainingAmountColumn;
     }
 
-    private static TableColumn<RecurringTransaction, String> getTransactionStringTableColumn() {
+    private TableColumn<RecurringTransaction, String> getTransactionStringTableColumn() {
         TableColumn<RecurringTransaction, String> nextDueDateColumn =
-                new TableColumn<>("Next Due Date");
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_NEXT_DUE_DATE));
         nextDueDateColumn.setCellValueFactory(
                 param -> {
                     if (param.getValue().getStatus().equals(RecurringTransactionStatus.INACTIVE)) {
@@ -325,9 +381,10 @@ public class RecurringTransactionController {
         return nextDueDateColumn;
     }
 
-    private static TableColumn<RecurringTransaction, String>
-            getRecurringTransactionStringTableColumn() {
-        TableColumn<RecurringTransaction, String> endDateColumn = new TableColumn<>("End Date");
+    private TableColumn<RecurringTransaction, String> getRecurringTransactionStringTableColumn() {
+        TableColumn<RecurringTransaction, String> endDateColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_END_DATE));
         endDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -348,7 +405,10 @@ public class RecurringTransactionController {
                                     if (item.equals(
                                             Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.format(
                                                     Constants.DATE_FORMATTER_NO_TIME))) {
-                                        setText("Indefinite");
+                                        setText(
+                                                i18nService.tr(
+                                                        Constants.TranslationKeys
+                                                                .WALLETTRANSACTION_TABLE_INDEFINITE));
                                     } else {
                                         setText(item);
                                     }
@@ -358,9 +418,10 @@ public class RecurringTransactionController {
         return endDateColumn;
     }
 
-    private static TableColumn<RecurringTransaction, Integer>
-            getRecurringTransactionLongTableColumn() {
-        TableColumn<RecurringTransaction, Integer> idColumn = new TableColumn<>("ID");
+    private TableColumn<RecurringTransaction, Integer> getRecurringTransactionLongTableColumn() {
+        TableColumn<RecurringTransaction, Integer> idColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
@@ -399,16 +460,33 @@ public class RecurringTransactionController {
                     @Override
                     public String toString(RecurringTransactionStatus transactionType) {
                         return transactionType != null
-                                ? transactionType.toString()
-                                : "ALL"; // Show "All" instead of null
+                                ? UIUtils.translateRecurringTransactionStatus(
+                                        transactionType, i18nService)
+                                : i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .WALLETTRANSACTION_COMBOBOX_ALL); // Show "All"
+                        // instead of null
                     }
 
                     @Override
                     public RecurringTransactionStatus fromString(String string) {
-                        return string.equals("ALL")
-                                ? null
-                                : RecurringTransactionStatus.valueOf(
-                                        string); // Return null if "All" is selected
+                        if (string.equals(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .WALLETTRANSACTION_COMBOBOX_ALL))) {
+                            return null;
+                        }
+
+                        // Try to match the translated string back to the enum
+                        for (RecurringTransactionStatus status :
+                                RecurringTransactionStatus.values()) {
+                            if (UIUtils.translateRecurringTransactionStatus(status, i18nService)
+                                    .equals(string)) {
+                                return status;
+                            }
+                        }
+
+                        return null;
                     }
                 });
     }

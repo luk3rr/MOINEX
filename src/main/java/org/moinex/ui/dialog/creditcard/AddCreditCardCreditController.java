@@ -24,6 +24,7 @@ import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardCredit;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -60,14 +61,18 @@ public class AddCreditCardCreditController {
 
     private CalculatorService calculatorService;
 
+    private I18nService i18nService;
+
     @Autowired
     public AddCreditCardCreditController(
             CreditCardService creditCardService,
             CalculatorService calculatorService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     public void setCreditCard(CreditCard crc) {
@@ -109,7 +114,9 @@ public class AddCreditCardCreditController {
                 || valueStr.isEmpty()) {
 
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -122,14 +129,26 @@ public class AddCreditCardCreditController {
             creditCardService.addCredit(
                     crc.getId(), dateTimeWithCurrentHour, creditValue, creditType, description);
 
-            WindowUtils.showSuccessDialog("Credit created", "Credit created successfully");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE));
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid expense value", "Credit value must be a number");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
+                    e.getMessage());
         }
     }
 
@@ -168,6 +187,9 @@ public class AddCreditCardCreditController {
 
     private void configureComboBoxes() {
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
+        UIUtils.configureComboBox(
+                creditTypeComboBox,
+                type -> UIUtils.translateCreditCardCreditType(type, i18nService));
     }
 
     private void configureSuggestions() {

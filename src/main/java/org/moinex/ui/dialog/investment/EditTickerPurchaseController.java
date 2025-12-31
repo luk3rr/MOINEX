@@ -18,8 +18,11 @@ import org.moinex.model.Category;
 import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
+import org.moinex.service.WalletTransactionService;
+import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
@@ -38,19 +41,21 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
     /**
      * Constructor
      * @param walletService Wallet service
+     * @param walletTransactionService Wallet transaction service
      * @param categoryService Category service
      * @param tickerService Ticker service
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public EditTickerPurchaseController(
             WalletService walletService,
+            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
-            TickerService tickerService) {
-        this.walletService = walletService;
-        this.categoryService = categoryService;
-        this.tickerService = tickerService;
-
+            TickerService tickerService,
+            I18nService i18nService) {
+        super(walletService, walletTransactionService, categoryService, tickerService, i18nService);
+        this.i18nService = i18nService;
         transactionType = TransactionType.EXPENSE;
     }
 
@@ -95,7 +100,9 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                 || quantityStr.isBlank()
                 || buyDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -117,7 +124,11 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                     && purchase.getQuantity().compareTo(quantity) == 0
                     && purchase.getWalletTransaction().getDate().toLocalDate().equals(buyDate)) {
                 WindowUtils.showInformationDialog(
-                        "No changes", "No changes were made to the purchase.");
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_NO_CHANGES_PURCHASE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 LocalTime currentTime = LocalTime.now();
@@ -134,15 +145,27 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                 tickerService.updatePurchase(purchase);
 
                 WindowUtils.showSuccessDialog(
-                        "TickerPurchase updated", "TickerPurchase updated successfully");
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_PURCHASE_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_PURCHASE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error while updating purchase", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_ERROR_UPDATING_PURCHASE_TITLE),
+                    e.getMessage());
         }
     }
 }

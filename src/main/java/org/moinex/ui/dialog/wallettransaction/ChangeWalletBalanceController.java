@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -36,14 +37,17 @@ public class ChangeWalletBalanceController {
 
     private WalletService walletService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ChangeWalletBalanceController(WalletService walletService) {
+    public ChangeWalletBalanceController(WalletService walletService, I18nService i18nService) {
         this.walletService = walletService;
+        this.i18nService = i18nService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -80,7 +84,11 @@ public class ChangeWalletBalanceController {
 
         if (wt == null || newBalanceStr.isBlank()) {
             WindowUtils.showInformationDialog(
-                    "Invalid input", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -89,23 +97,43 @@ public class ChangeWalletBalanceController {
 
             // Check if it has modification
             if (wt.getBalance().compareTo(newBalance) == 0) {
-                WindowUtils.showInformationDialog("No changes", "The balance was not changed.");
+                WindowUtils.showInformationDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_BALANCE_MESSAGE));
                 return;
             } else // Update balance
             {
                 walletService.updateWalletBalance(wt.getId(), newBalance);
 
                 WindowUtils.showSuccessDialog(
-                        "Wallet updated", "The balance was updated successfully.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_WALLET_BALANCE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) balanceField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid input", "Balance must be a number");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
             return;
         } catch (EntityNotFoundException | IllegalStateException e) {
-            WindowUtils.showErrorDialog("Error updating waller", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_UPDATING_BALANCE_TITLE),
+                    e.getMessage());
             return;
         }
 

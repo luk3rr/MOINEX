@@ -13,7 +13,9 @@ import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.investment.Ticker;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +34,13 @@ public final class EditTickerController extends BaseTickerManagement {
     /**
      * Constructor
      * @param tickerService Ticker service
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditTickerController(TickerService tickerService) {
-        super(tickerService);
+    public EditTickerController(TickerService tickerService, I18nService i18nService) {
+        super(tickerService, i18nService);
+        this.i18nService = i18nService;
     }
 
     public void setTicker(Ticker tk) {
@@ -69,7 +73,9 @@ public final class EditTickerController extends BaseTickerManagement {
                 || symbol.isBlank()
                 || currentPriceStr.isBlank()) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -80,8 +86,10 @@ public final class EditTickerController extends BaseTickerManagement {
                 || (avgUnitPriceStr == null || avgUnitPriceStr.isBlank())
                         && !(quantityStr == null || quantityStr.isBlank())) {
             WindowUtils.showInformationDialog(
-                    "Empty fields",
-                    "Quantity must be set if average unit price is set or vice-versa");
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_MESSAGE));
 
             return;
         }
@@ -113,7 +121,12 @@ public final class EditTickerController extends BaseTickerManagement {
                     && ticker.getCurrentQuantity().compareTo(quantity) == 0
                     && ticker.getAverageUnitValue().compareTo(avgUnitPrice) == 0
                     && ticker.isArchived() == archived) {
-                WindowUtils.showInformationDialog("No changes", "No changes were to the ticker");
+                WindowUtils.showInformationDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_NO_CHANGES_TICKER_MESSAGE));
 
                 return;
             } else // If there is any modification, update the ticker
@@ -128,15 +141,28 @@ public final class EditTickerController extends BaseTickerManagement {
 
                 tickerService.updateTicker(ticker);
 
-                WindowUtils.showSuccessDialog("Ticker updated", "The ticker updated successfully.");
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_TICKER_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error while adding ticker", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_ERROR_UPDATING_TICKER_TITLE),
+                    e.getMessage());
         }
     }
 }

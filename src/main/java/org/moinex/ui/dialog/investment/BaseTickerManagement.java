@@ -11,6 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -35,6 +36,7 @@ public abstract class BaseTickerManagement {
     @FXML protected ComboBox<TickerType> typeComboBox;
 
     protected TickerService tickerService;
+    protected I18nService i18nService;
 
     /**
      * Constructor
@@ -42,8 +44,9 @@ public abstract class BaseTickerManagement {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    protected BaseTickerManagement(TickerService tickerService) {
+    protected BaseTickerManagement(TickerService tickerService, I18nService i18nService) {
         this.tickerService = tickerService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -67,7 +70,7 @@ public abstract class BaseTickerManagement {
     }
 
     protected void configureComboBoxes() {
-        UIUtils.configureComboBox(typeComboBox, TickerType::name);
+        UIUtils.configureComboBox(typeComboBox, t -> UIUtils.translateTickerType(t, i18nService));
     }
 
     protected void configureListeners() {

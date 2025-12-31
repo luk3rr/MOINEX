@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
+import org.moinex.service.I18nService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -23,12 +25,16 @@ import org.springframework.stereotype.Controller;
 public class EditPlanController extends BasePlanManagement {
 
     private FinancialPlan financialPlan;
+    private I18nService i18nService;
 
     @Autowired
     public EditPlanController(
             FinancialPlanningService financialPlanningService,
-            ConfigurableApplicationContext applicationContext) {
+            ConfigurableApplicationContext applicationContext,
+            I18nService i18nService) {
         super(financialPlanningService, applicationContext);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     public void setPlan(FinancialPlan plan) {
@@ -49,7 +55,11 @@ public class EditPlanController extends BasePlanManagement {
 
         if (planName.isEmpty() || baseIncomeText.isEmpty()) {
             WindowUtils.showInformationDialog(
-                    "Empty Fields", "Please fill in all required fields.");
+                    i18nService.tr(
+                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -64,7 +74,12 @@ public class EditPlanController extends BasePlanManagement {
                     && baseIncome.compareTo(financialPlan.getBaseIncome()) == 0
                     && areBudgetGroupsEqual()) {
                 WindowUtils.showInformationDialog(
-                        "No Changes Detected", "No changes were made to the financial plan.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FINANCIALPLANNING_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FINANCIALPLANNING_DIALOG_NO_CHANGES_MESSAGE));
                 return;
             }
 
@@ -75,15 +90,27 @@ public class EditPlanController extends BasePlanManagement {
             financialPlanningService.updatePlan(financialPlan);
 
             WindowUtils.showSuccessDialog(
-                    "Financial Plan Updated", "The financial plan has been successfully updated.");
+                    i18nService.tr(
+                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE));
 
             planNameField.getScene().getWindow().hide();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid Base Income",
-                    "Base income must be a valid monetary value. Please check your input.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error while updating financial plan", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_ERROR_UPDATING_PLAN_TITLE),
+                    e.getMessage());
         }
     }
 

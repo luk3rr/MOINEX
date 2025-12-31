@@ -404,6 +404,15 @@ public final class Constants {
         public static final String DIALOG_BUTTON_NO = "dialog.button.no";
         public static final String DIALOG_BUTTON_OK = "dialog.button.ok";
         public static final String DIALOG_BUTTON_CANCEL = "dialog.button.cancel";
+        public static final String DIALOG_BUTTON_SAVE = "dialog.button.save";
+        public static final String DIALOG_BUTTON_ADD = "dialog.button.add";
+        public static final String DIALOG_BUTTON_EDIT = "dialog.button.edit";
+        public static final String DIALOG_BUTTON_DELETE = "dialog.button.delete";
+        public static final String DIALOG_BUTTON_CREATE = "dialog.button.create";
+        public static final String DIALOG_BUTTON_CONFIRM = "dialog.button.confirm";
+        public static final String DIALOG_BUTTON_CLOSE = "dialog.button.close";
+        public static final String DIALOG_BUTTON_UNARCHIVE = "dialog.button.unarchive";
+        public static final String DIALOG_BUTTON_ARCHIVE = "dialog.button.archive";
 
         // Settings
         public static final String SETTINGS_LANGUAGE = "settings.language";
@@ -622,15 +631,39 @@ public final class Constants {
         // Transaction types
         public static final String TRANSACTION_TYPE_EXPENSES = "transaction.type.expenses";
         public static final String TRANSACTION_TYPE_INCOMES = "transaction.type.incomes";
+        public static final String TRANSACTION_TYPE_INCOME = "transaction.type.income";
+        public static final String TRANSACTION_TYPE_EXPENSE = "transaction.type.expense";
 
         // Ticker types
         public static final String TICKER_TYPE_STOCK = "ticker.type.stock";
         public static final String TICKER_TYPE_FUND = "ticker.type.fund";
         public static final String TICKER_TYPE_CRYPTO = "ticker.type.crypto";
 
+        // Credit Card Credit types
+        public static final String CREDIT_CARD_CREDIT_TYPE_CASHBACK =
+                "creditCard.credit.type.cashback";
+        public static final String CREDIT_CARD_CREDIT_TYPE_REFUND = "creditCard.credit.type.refund";
+        public static final String CREDIT_CARD_CREDIT_TYPE_REWARD = "creditCard.credit.type.reward";
+
         // Transaction status
         public static final String TRANSACTION_STATUS_PENDING = "transaction.status.pending";
         public static final String TRANSACTION_STATUS_CONFIRMED = "transaction.status.confirmed";
+
+        // Recurring Transaction status
+        public static final String RECURRING_TRANSACTION_STATUS_ACTIVE =
+                "recurringtransaction.status.active";
+        public static final String RECURRING_TRANSACTION_STATUS_INACTIVE =
+                "recurringtransaction.status.inactive";
+
+        // Recurring Transaction frequency
+        public static final String RECURRING_TRANSACTION_FREQUENCY_DAILY =
+                "recurringtransaction.frequency.daily";
+        public static final String RECURRING_TRANSACTION_FREQUENCY_WEEKLY =
+                "recurringtransaction.frequency.weekly";
+        public static final String RECURRING_TRANSACTION_FREQUENCY_MONTHLY =
+                "recurringtransaction.frequency.monthly";
+        public static final String RECURRING_TRANSACTION_FREQUENCY_YEARLY =
+                "recurringtransaction.frequency.yearly";
 
         // Goals and Plans
         public static final String GOALS_PLANS_TAB_GOALS = "goalsPlans.tab.goals";
@@ -1071,6 +1104,905 @@ public final class Constants {
         // Calendar Modal Titles
         public static final String COMMON_CALENDAR_MODAL_ADD_EVENT =
                 "common.calendar.modal.addEvent";
+
+        // Common Dialog Elements
+
+        // Dialog Labels
+        public static final String DIALOG_LABEL_NAME = "dialog.label.name";
+        public static final String DIALOG_LABEL_DESCRIPTION = "dialog.label.description";
+        public static final String DIALOG_LABEL_AMOUNT = "dialog.label.amount";
+        public static final String DIALOG_LABEL_DATE = "dialog.label.date";
+        public static final String DIALOG_LABEL_CATEGORY = "dialog.label.category";
+        public static final String DIALOG_LABEL_WALLET = "dialog.label.wallet";
+        public static final String DIALOG_LABEL_TYPE = "dialog.label.type";
+        public static final String DIALOG_LABEL_STATUS = "dialog.label.status";
+        public static final String DIALOG_LABEL_VALUE = "dialog.label.value";
+        public static final String DIALOG_LABEL_QUANTITY = "dialog.label.quantity";
+        public static final String DIALOG_LABEL_NOTES = "dialog.label.notes";
+        public static final String DIALOG_LABEL_ARCHIVED = "dialog.label.archived";
+        public static final String DIALOG_LABEL_INSTALLMENTS = "dialog.label.installments";
+        public static final String DIALOG_LABEL_FREQUENCY = "dialog.label.frequency";
+        public static final String DIALOG_LABEL_START_DATE = "dialog.label.startDate";
+        public static final String DIALOG_LABEL_END_DATE = "dialog.label.endDate";
+        public static final String DIALOG_LABEL_DUE_DATE = "dialog.label.dueDate";
+        public static final String DIALOG_LABEL_PAYMENT_DATE = "dialog.label.paymentDate";
+
+        // Credit Card Dialog Messages
+        public static final String CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE =
+                "creditcard.dialog.emptyFields.title";
+        public static final String CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "creditcard.dialog.emptyFields.message";
+        public static final String CREDITCARD_DIALOG_CREATED_TITLE =
+                "creditcard.dialog.created.title";
+        public static final String CREDITCARD_DIALOG_CREATED_MESSAGE =
+                "creditcard.dialog.created.message";
+        public static final String CREDITCARD_DIALOG_UPDATED_TITLE =
+                "creditcard.dialog.updated.title";
+        public static final String CREDITCARD_DIALOG_UPDATED_MESSAGE =
+                "creditcard.dialog.updated.message";
+        public static final String CREDITCARD_DIALOG_INVALID_LIMIT_TITLE =
+                "creditcard.dialog.invalidLimit.title";
+        public static final String CREDITCARD_DIALOG_INVALID_LIMIT_MESSAGE =
+                "creditcard.dialog.invalidLimit.message";
+        public static final String CREDITCARD_DIALOG_ERROR_CREATING_TITLE =
+                "creditcard.dialog.errorCreating.title";
+        public static final String CREDITCARD_DIALOG_NO_CHANGES_TITLE =
+                "creditcard.dialog.noChanges.title";
+        public static final String CREDITCARD_DIALOG_NO_CHANGES_MESSAGE =
+                "creditcard.dialog.noChanges.message";
+        public static final String CREDITCARD_DIALOG_DEBT_CREATED_TITLE =
+                "creditcard.dialog.debtCreated.title";
+        public static final String CREDITCARD_DIALOG_DEBT_CREATED_MESSAGE =
+                "creditcard.dialog.debtCreated.message";
+        public static final String CREDITCARD_DIALOG_INVALID_VALUE_TITLE =
+                "creditcard.dialog.invalidValue.title";
+        public static final String CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE =
+                "creditcard.dialog.invalidValue.message";
+        public static final String CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE =
+                "creditcard.dialog.errorCreatingDebt.title";
+        public static final String CREDITCARD_DIALOG_TRANSACTION_UPDATED_TITLE =
+                "creditcard.dialog.transactionUpdated.title";
+        public static final String CREDITCARD_DIALOG_TRANSACTION_UPDATED_MESSAGE =
+                "creditcard.dialog.transactionUpdated.message";
+        public static final String CREDITCARD_DIALOG_NO_CHANGES_DEBT_TITLE =
+                "creditcard.dialog.noChangesDebt.title";
+        public static final String CREDITCARD_DIALOG_NO_CHANGES_DEBT_MESSAGE =
+                "creditcard.dialog.noChangesDebt.message";
+        public static final String CREDITCARD_DIALOG_CREDIT_CREATED_TITLE =
+                "creditcard.dialog.creditCreated.title";
+        public static final String CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE =
+                "creditcard.dialog.creditCreated.message";
+        public static final String CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_TITLE =
+                "creditcard.dialog.invalidCreditValue.title";
+        public static final String CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_MESSAGE =
+                "creditcard.dialog.invalidCreditValue.message";
+        public static final String CREDITCARD_DIALOG_NO_SELECTION_TITLE =
+                "creditcard.dialog.noSelection.title";
+        public static final String CREDITCARD_DIALOG_NO_SELECTION_UNARCHIVE =
+                "creditcard.dialog.noSelection.unarchive";
+        public static final String CREDITCARD_DIALOG_NO_SELECTION_DELETE =
+                "creditcard.dialog.noSelection.delete";
+        public static final String CREDITCARD_DIALOG_UNARCHIVE_TITLE =
+                "creditcard.dialog.unarchive.title";
+        public static final String CREDITCARD_DIALOG_UNARCHIVE_MESSAGE =
+                "creditcard.dialog.unarchive.message";
+        public static final String CREDITCARD_DIALOG_UNARCHIVED_TITLE =
+                "creditcard.dialog.unarchived.title";
+        public static final String CREDITCARD_DIALOG_UNARCHIVED_MESSAGE =
+                "creditcard.dialog.unarchived.message";
+        public static final String CREDITCARD_DIALOG_ERROR_UNARCHIVING_TITLE =
+                "creditcard.dialog.errorUnarchiving.title";
+        public static final String CREDITCARD_DIALOG_HAS_DEBTS_TITLE =
+                "creditcard.dialog.hasDebts.title";
+        public static final String CREDITCARD_DIALOG_HAS_DEBTS_MESSAGE =
+                "creditcard.dialog.hasDebts.message";
+        public static final String CREDITCARD_DIALOG_DELETE_TITLE =
+                "creditcard.dialog.delete.title";
+        public static final String CREDITCARD_DIALOG_DELETE_MESSAGE =
+                "creditcard.dialog.delete.message";
+        public static final String CREDITCARD_DIALOG_DELETED_TITLE =
+                "creditcard.dialog.deleted.title";
+        public static final String CREDITCARD_DIALOG_DELETED_MESSAGE =
+                "creditcard.dialog.deleted.message";
+        public static final String CREDITCARD_DIALOG_ERROR_DELETING_TITLE =
+                "creditcard.dialog.errorDeleting.title";
+        public static final String CREDITCARD_DIALOG_WALLET_NOT_SELECTED_TITLE =
+                "creditcard.dialog.walletNotSelected.title";
+        public static final String CREDITCARD_DIALOG_WALLET_NOT_SELECTED_MESSAGE =
+                "creditcard.dialog.walletNotSelected.message";
+        public static final String CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_TITLE =
+                "creditcard.dialog.invoiceAlreadyPaid.title";
+        public static final String CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_MESSAGE =
+                "creditcard.dialog.invoiceAlreadyPaid.message";
+        public static final String CREDITCARD_DIALOG_INVOICE_PAID_TITLE =
+                "creditcard.dialog.invoicePaid.title";
+        public static final String CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE =
+                "creditcard.dialog.invoicePaid.message";
+        public static final String CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE =
+                "creditcard.dialog.errorPayingInvoice.title";
+
+        // Credit Card Table Columns
+        public static final String CREDITCARD_TABLE_ID = "creditcard.table.id";
+        public static final String CREDITCARD_TABLE_CREDIT_CARD = "creditcard.table.creditCard";
+        public static final String CREDITCARD_TABLE_OPERATOR = "creditcard.table.operator";
+        public static final String CREDITCARD_TABLE_ASSOCIATED_DEBTS =
+                "creditcard.table.associatedDebts";
+        public static final String CREDITCARD_TABLE_DESCRIPTION = "creditcard.table.description";
+        public static final String CREDITCARD_TABLE_AMOUNT = "creditcard.table.amount";
+        public static final String CREDITCARD_TABLE_TYPE = "creditcard.table.type";
+        public static final String CREDITCARD_TABLE_DATE = "creditcard.table.date";
+
+        // Credit Card Debt Management Messages
+        public static final String CREDITCARD_DEBT_INVALID_INSTALLMENTS =
+                "creditcard.debt.invalidInstallments";
+        public static final String CREDITCARD_DEBT_REPEAT_MONTHS = "creditcard.debt.repeatMonths";
+        public static final String CREDITCARD_DEBT_REPEAT_MONTHS_UNEVEN =
+                "creditcard.debt.repeatMonthsUneven";
+        public static final String CREDITCARD_DEBT_INVALID_VALUE = "creditcard.debt.invalidValue";
+
+        // Credit Card Credits Dialog
+        public static final String CREDITCARD_CREDITS_ADD_TITLE = "creditcard.credits.addTitle";
+
+        // Credit Card FXML Labels
+        public static final String CREDITCARD_LABEL_CREDIT_CARD = "creditcard.label.creditCard";
+        public static final String CREDITCARD_LABEL_LIMIT = "creditcard.label.limit";
+        public static final String CREDITCARD_LABEL_LIMIT_AVAILABLE =
+                "creditcard.label.limitAvailable";
+        public static final String CREDITCARD_LABEL_LIMIT_AVAILABLE_AFTER_DEBT =
+                "creditcard.label.limitAvailableAfterDebt";
+        public static final String CREDITCARD_LABEL_TOTAL = "creditcard.label.total";
+        public static final String CREDITCARD_LABEL_INSTALLMENTS = "creditcard.label.installments";
+        public static final String CREDITCARD_LABEL_INVOICE = "creditcard.label.invoice";
+        public static final String CREDITCARD_LABEL_CREDIT_CARD_NAME =
+                "creditcard.label.creditCardName";
+        public static final String CREDITCARD_LABEL_LAST_FOUR_DIGITS =
+                "creditcard.label.lastFourDigits";
+        public static final String CREDITCARD_LABEL_OPERATOR = "creditcard.label.operator";
+        public static final String CREDITCARD_LABEL_DEFAULT_BILLING_WALLET =
+                "creditcard.label.defaultBillingWallet";
+        public static final String CREDITCARD_LABEL_CLOSING_DAY = "creditcard.label.closingDay";
+        public static final String CREDITCARD_LABEL_DUE_DAY = "creditcard.label.dueDay";
+        public static final String CREDITCARD_LABEL_CURRENT_BALANCE =
+                "creditcard.label.currentBalance";
+        public static final String CREDITCARD_LABEL_BALANCE_AFTER_PAYMENT =
+                "creditcard.label.balanceAfterPayment";
+        public static final String CREDITCARD_LABEL_INVOICE_DUE = "creditcard.label.invoiceDue";
+        public static final String CREDITCARD_LABEL_INVOICE_MONTH = "creditcard.label.invoiceMonth";
+        public static final String CREDITCARD_LABEL_AVAILABLE_REBATE =
+                "creditcard.label.availableRebate";
+        public static final String CREDITCARD_LABEL_USE_REBATE = "creditcard.label.useRebate";
+        public static final String CREDITCARD_LABEL_TOTAL_TO_PAY = "creditcard.label.totalToPay";
+        public static final String CREDITCARD_LABEL_SELECT_CREDIT_CARD =
+                "creditcard.label.selectCreditCard";
+        public static final String CREDITCARD_LABEL_SELECT_CREDIT_CARD_CREDIT =
+                "creditcard.label.selectCreditCardCredit";
+        public static final String CREDITCARD_PROMPT_TEXT_SEARCH_ID_OR_DESCRIPTION =
+                "creditcard.promptText.searchIdOrDescription";
+
+        // Financial Planning Dialog Messages
+        public static final String FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE =
+                "financialplanning.dialog.emptyFields.title";
+        public static final String FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "financialplanning.dialog.emptyFields.message";
+        public static final String FINANCIALPLANNING_DIALOG_PLAN_CREATED_TITLE =
+                "financialplanning.dialog.planCreated.title";
+        public static final String FINANCIALPLANNING_DIALOG_PLAN_CREATED_MESSAGE =
+                "financialplanning.dialog.planCreated.message";
+        public static final String FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE =
+                "financialplanning.dialog.planUpdated.title";
+        public static final String FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE =
+                "financialplanning.dialog.planUpdated.message";
+        public static final String FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_TITLE =
+                "financialplanning.dialog.invalidBaseIncome.title";
+        public static final String FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_MESSAGE =
+                "financialplanning.dialog.invalidBaseIncome.message";
+        public static final String FINANCIALPLANNING_DIALOG_ERROR_CREATING_PLAN_TITLE =
+                "financialplanning.dialog.errorCreatingPlan.title";
+        public static final String FINANCIALPLANNING_DIALOG_ERROR_UPDATING_PLAN_TITLE =
+                "financialplanning.dialog.errorUpdatingPlan.title";
+        public static final String FINANCIALPLANNING_DIALOG_NO_CHANGES_TITLE =
+                "financialplanning.dialog.noChanges.title";
+        public static final String FINANCIALPLANNING_DIALOG_NO_CHANGES_MESSAGE =
+                "financialplanning.dialog.noChanges.message";
+        public static final String FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_TITLE =
+                "financialplanning.dialog.requiredFields.title";
+        public static final String FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_MESSAGE =
+                "financialplanning.dialog.requiredFields.message";
+        public static final String FINANCIALPLANNING_DIALOG_INVALID_INPUT_TITLE =
+                "financialplanning.dialog.invalidInput.title";
+        public static final String FINANCIALPLANNING_DIALOG_INVALID_INPUT_MESSAGE =
+                "financialplanning.dialog.invalidInput.message";
+        public static final String FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_TITLE =
+                "financialplanning.dialog.insufficientGroups.title";
+        public static final String FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_MESSAGE =
+                "financialplanning.dialog.insufficientGroups.message";
+        public static final String FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_TITLE =
+                "financialplanning.dialog.invalidPercentages.title";
+        public static final String FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_MESSAGE =
+                "financialplanning.dialog.invalidPercentages.message";
+        public static final String FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_TITLE =
+                "financialplanning.dialog.emptyGroups.title";
+        public static final String FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_MESSAGE =
+                "financialplanning.dialog.emptyGroups.message";
+        public static final String FINANCIALPLANNING_DIALOG_ADD_BUDGET_GROUP_TITLE =
+                "financialplanning.dialog.addBudgetGroup.title";
+        public static final String FINANCIALPLANNING_DIALOG_EDIT_BUDGET_GROUP_TITLE =
+                "financialplanning.dialog.editBudgetGroup.title";
+
+        // Financial Planning FXML Labels
+        public static final String FINANCIALPLANNING_LABEL_GROUP_NAME =
+                "financialplanning.label.groupName";
+        public static final String FINANCIALPLANNING_LABEL_TARGET_PERCENTAGE =
+                "financialplanning.label.targetPercentage";
+        public static final String FINANCIALPLANNING_LABEL_ASSOCIATED_CATEGORIES =
+                "financialplanning.label.associatedCategories";
+        public static final String FINANCIALPLANNING_LABEL_AVAILABLE_CATEGORIES =
+                "financialplanning.label.availableCategories";
+        public static final String FINANCIALPLANNING_LABEL_CATEGORIES_IN_GROUP =
+                "financialplanning.label.categoriesInGroup";
+        public static final String FINANCIALPLANNING_LABEL_PLAN_NAME =
+                "financialplanning.label.planName";
+        public static final String FINANCIALPLANNING_LABEL_BASE_MONTHLY_INCOME =
+                "financialplanning.label.baseMonthlyIncome";
+        public static final String FINANCIALPLANNING_LABEL_BUDGET_GROUPS =
+                "financialplanning.label.budgetGroups";
+        public static final String FINANCIALPLANNING_LABEL_INFORMATION =
+                "financialplanning.label.information";
+        public static final String FINANCIALPLANNING_LABEL_ADD_NEW_GROUP =
+                "financialplanning.label.addNewGroup";
+        public static final String FINANCIALPLANNING_LABEL_BUDGET_TEMPLATE =
+                "financialplanning.label.budgetTemplate";
+        public static final String FINANCIALPLANNING_PROMPT_TEXT_GROUP_NAME =
+                "financialplanning.promptText.groupName";
+        public static final String FINANCIALPLANNING_PROMPT_TEXT_TARGET_PERCENTAGE =
+                "financialplanning.promptText.targetPercentage";
+        public static final String FINANCIALPLANNING_PROMPT_TEXT_PLAN_NAME =
+                "financialplanning.promptText.planName";
+
+        // Financial Planning Budget Templates
+        public static final String FINANCIALPLANNING_TEMPLATE_50_30_20_NAME =
+                "financialplanning.template.50-30-20.name";
+        public static final String FINANCIALPLANNING_TEMPLATE_50_30_20_DESCRIPTION =
+                "financialplanning.template.50-30-20.description";
+        public static final String FINANCIALPLANNING_TEMPLATE_30_30_40_NAME =
+                "financialplanning.template.30-30-40.name";
+        public static final String FINANCIALPLANNING_TEMPLATE_30_30_40_DESCRIPTION =
+                "financialplanning.template.30-30-40.description";
+        public static final String FINANCIALPLANNING_TEMPLATE_CUSTOM_NAME =
+                "financialplanning.template.custom.name";
+        public static final String FINANCIALPLANNING_TEMPLATE_CUSTOM_DESCRIPTION =
+                "financialplanning.template.custom.description";
+        public static final String FINANCIALPLANNING_TEMPLATE_ESSENTIALS =
+                "financialplanning.template.essentials";
+        public static final String FINANCIALPLANNING_TEMPLATE_WANTS =
+                "financialplanning.template.wants";
+        public static final String FINANCIALPLANNING_TEMPLATE_INVESTMENTS =
+                "financialplanning.template.investments";
+
+        // Financial Planning Context Menu
+        public static final String FINANCIALPLANNING_CONTEXT_MENU_EDIT =
+                "financialplanning.contextMenu.edit";
+        public static final String FINANCIALPLANNING_CONTEXT_MENU_DELETE =
+                "financialplanning.contextMenu.delete";
+
+        // Financial Planning Info Messages
+        public static final String FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS =
+                "financialplanning.info.percentageExceeds";
+        public static final String FINANCIALPLANNING_INFO_EMPTY_GROUPS =
+                "financialplanning.info.emptyGroups";
+        public static final String FINANCIALPLANNING_INFO_PERCENTAGE_BELOW =
+                "financialplanning.info.percentageBelow";
+        public static final String FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED =
+                "financialplanning.info.correctlyConfigured";
+
+        // Goal Dialog Messages
+        public static final String GOAL_DIALOG_EMPTY_FIELDS_TITLE = "goal.dialog.emptyFields.title";
+        public static final String GOAL_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "goal.dialog.emptyFields.message";
+        public static final String GOAL_DIALOG_STRATEGY_REQUIRED_TITLE =
+                "goal.dialog.strategyRequired.title";
+        public static final String GOAL_DIALOG_STRATEGY_REQUIRED_MESSAGE =
+                "goal.dialog.strategyRequired.message";
+        public static final String GOAL_DIALOG_GOAL_CREATED_TITLE = "goal.dialog.goalCreated.title";
+        public static final String GOAL_DIALOG_GOAL_CREATED_MESSAGE =
+                "goal.dialog.goalCreated.message";
+        public static final String GOAL_DIALOG_GOAL_UPDATED_TITLE = "goal.dialog.goalUpdated.title";
+        public static final String GOAL_DIALOG_GOAL_UPDATED_MESSAGE =
+                "goal.dialog.goalUpdated.message";
+        public static final String GOAL_DIALOG_INVALID_BALANCE_TITLE =
+                "goal.dialog.invalidBalance.title";
+        public static final String GOAL_DIALOG_INVALID_BALANCE_MESSAGE =
+                "goal.dialog.invalidBalance.message";
+        public static final String GOAL_DIALOG_ERROR_CREATING_GOAL_TITLE =
+                "goal.dialog.errorCreatingGoal.title";
+        public static final String GOAL_DIALOG_ERROR_UPDATING_GOAL_TITLE =
+                "goal.dialog.errorUpdatingGoal.title";
+        public static final String GOAL_DIALOG_NO_CHANGES_TITLE = "goal.dialog.noChanges.title";
+        public static final String GOAL_DIALOG_NO_CHANGES_MESSAGE = "goal.dialog.noChanges.message";
+
+        // Goal FXML Labels
+        public static final String GOAL_LABEL_GOAL_NAME = "goal.label.goalName";
+        public static final String GOAL_LABEL_INITIAL_BALANCE = "goal.label.initialBalance";
+        public static final String GOAL_LABEL_CURRENT_BALANCE = "goal.label.currentBalance";
+        public static final String GOAL_LABEL_TARGET_BALANCE = "goal.label.targetBalance";
+        public static final String GOAL_LABEL_TARGET_DATE = "goal.label.targetDate";
+        public static final String GOAL_LABEL_MOTIVATION = "goal.label.motivation";
+        public static final String GOAL_LABEL_MASTER_WALLET = "goal.label.masterWallet";
+        public static final String GOAL_LABEL_GOAL_FUNDING_STRATEGY =
+                "goal.label.goalFundingStrategy";
+        public static final String GOAL_LABEL_ADDS_TO_MASTER_WALLET =
+                "goal.label.addsToMasterWallet";
+        public static final String GOAL_LABEL_ALLOCATES_FROM_MASTER_WALLET =
+                "goal.label.allocatesFromMasterWallet";
+        public static final String GOAL_LABEL_COMPLETED = "goal.label.completed";
+
+        // Investment Dialog Messages
+        public static final String INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE =
+                "investment.dialog.emptyFields.title";
+        public static final String INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "investment.dialog.emptyFields.message";
+        public static final String INVESTMENT_DIALOG_INVALID_FIELDS_TITLE =
+                "investment.dialog.invalidFields.title";
+        public static final String INVESTMENT_DIALOG_INVALID_FIELDS_MESSAGE =
+                "investment.dialog.invalidFields.message";
+        public static final String INVESTMENT_DIALOG_TICKER_ADDED_TITLE =
+                "investment.dialog.tickerAdded.title";
+        public static final String INVESTMENT_DIALOG_TICKER_ADDED_MESSAGE =
+                "investment.dialog.tickerAdded.message";
+        public static final String INVESTMENT_DIALOG_TICKER_UPDATED_TITLE =
+                "investment.dialog.tickerUpdated.title";
+        public static final String INVESTMENT_DIALOG_TICKER_UPDATED_MESSAGE =
+                "investment.dialog.tickerUpdated.message";
+        public static final String INVESTMENT_DIALOG_INVALID_NUMBER_TITLE =
+                "investment.dialog.invalidNumber.title";
+        public static final String INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE =
+                "investment.dialog.invalidNumber.message";
+        public static final String INVESTMENT_DIALOG_ERROR_ADDING_TICKER_TITLE =
+                "investment.dialog.errorAddingTicker.title";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_TICKER_TITLE =
+                "investment.dialog.errorUpdatingTicker.title";
+        public static final String INVESTMENT_DIALOG_PURCHASE_ADDED_TITLE =
+                "investment.dialog.purchaseAdded.title";
+        public static final String INVESTMENT_DIALOG_PURCHASE_ADDED_MESSAGE =
+                "investment.dialog.purchaseAdded.message";
+        public static final String INVESTMENT_DIALOG_PURCHASE_UPDATED_TITLE =
+                "investment.dialog.purchaseUpdated.title";
+        public static final String INVESTMENT_DIALOG_PURCHASE_UPDATED_MESSAGE =
+                "investment.dialog.purchaseUpdated.message";
+        public static final String INVESTMENT_DIALOG_ERROR_BUYING_TICKER_TITLE =
+                "investment.dialog.errorBuyingTicker.title";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_PURCHASE_TITLE =
+                "investment.dialog.errorUpdatingPurchase.title";
+        public static final String INVESTMENT_DIALOG_SALE_ADDED_TITLE =
+                "investment.dialog.saleAdded.title";
+        public static final String INVESTMENT_DIALOG_SALE_ADDED_MESSAGE =
+                "investment.dialog.saleAdded.message";
+        public static final String INVESTMENT_DIALOG_SALE_UPDATED_TITLE =
+                "investment.dialog.saleUpdated.title";
+        public static final String INVESTMENT_DIALOG_SALE_UPDATED_MESSAGE =
+                "investment.dialog.saleUpdated.message";
+        public static final String INVESTMENT_DIALOG_ERROR_SELLING_TICKER_TITLE =
+                "investment.dialog.errorSellingTicker.title";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_SALE_TITLE =
+                "investment.dialog.errorUpdatingSale.title";
+        public static final String INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE =
+                "investment.dialog.dividendCreated.title";
+        public static final String INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE =
+                "investment.dialog.dividendCreated.message";
+        public static final String INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE =
+                "investment.dialog.dividendUpdated.title";
+        public static final String INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE =
+                "investment.dialog.dividendUpdated.message";
+        public static final String INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE =
+                "investment.dialog.invalidDividendValue.title";
+        public static final String INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE =
+                "investment.dialog.invalidDividendValue.message";
+        public static final String INVESTMENT_DIALOG_ERROR_CREATING_DIVIDEND_TITLE =
+                "investment.dialog.errorCreatingDividend.title";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_DIVIDEND_TITLE =
+                "investment.dialog.errorUpdatingDividend.title";
+        public static final String INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE =
+                "investment.dialog.exchangeCreated.title";
+        public static final String INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE =
+                "investment.dialog.exchangeCreated.message";
+        public static final String INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE =
+                "investment.dialog.exchangeUpdated.title";
+        public static final String INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE =
+                "investment.dialog.exchangeUpdated.message";
+        public static final String INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE =
+                "investment.dialog.invalidExchangeQuantity.title";
+        public static final String INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE =
+                "investment.dialog.invalidExchangeQuantity.message";
+        public static final String INVESTMENT_DIALOG_ERROR_CREATING_EXCHANGE_TITLE =
+                "investment.dialog.errorCreatingExchange.title";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_EXCHANGE_TITLE =
+                "investment.dialog.errorUpdatingExchange.title";
+        public static final String INVESTMENT_DIALOG_NO_CHANGES_TITLE =
+                "investment.dialog.noChanges.title";
+        public static final String INVESTMENT_DIALOG_NO_CHANGES_PURCHASE_MESSAGE =
+                "investment.dialog.noChangesPurchase.message";
+        public static final String INVESTMENT_DIALOG_NO_CHANGES_SALE_MESSAGE =
+                "investment.dialog.noChangesSale.message";
+        public static final String INVESTMENT_DIALOG_NO_CHANGES_DIVIDEND_MESSAGE =
+                "investment.dialog.noChangesDividend.message";
+        public static final String INVESTMENT_DIALOG_NO_CHANGES_EXCHANGE_MESSAGE =
+                "investment.dialog.noChangesExchange.message";
+        public static final String INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_TITLE =
+                "investment.dialog.noPurchaseSelected.title";
+        public static final String INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_MESSAGE =
+                "investment.dialog.noPurchaseSelected.message";
+        public static final String INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_DELETE_MESSAGE =
+                "investment.dialog.noPurchaseSelectedDelete.message";
+        public static final String INVESTMENT_DIALOG_NO_SALE_SELECTED_TITLE =
+                "investment.dialog.noSaleSelected.title";
+        public static final String INVESTMENT_DIALOG_NO_SALE_SELECTED_MESSAGE =
+                "investment.dialog.noSaleSelected.message";
+        public static final String INVESTMENT_DIALOG_NO_SALE_SELECTED_DELETE_MESSAGE =
+                "investment.dialog.noSaleSelectedDelete.message";
+        public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_TITLE =
+                "investment.dialog.noDividendSelected.title";
+        public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_MESSAGE =
+                "investment.dialog.noDividendSelected.message";
+        public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_DELETE_MESSAGE =
+                "investment.dialog.noDividendSelectedDelete.message";
+        public static final String INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_TITLE =
+                "investment.dialog.noExchangeSelected.title";
+        public static final String INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_MESSAGE =
+                "investment.dialog.noExchangeSelected.message";
+        public static final String INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_DELETE_MESSAGE =
+                "investment.dialog.noExchangeSelectedDelete.message";
+        public static final String INVESTMENT_DIALOG_CONFIRM_DELETE_PURCHASE_TITLE =
+                "investment.dialog.confirmDeletePurchase.title";
+        public static final String INVESTMENT_DIALOG_CONFIRM_DELETE_SALE_TITLE =
+                "investment.dialog.confirmDeleteSale.title";
+        public static final String INVESTMENT_DIALOG_CONFIRM_DELETE_DIVIDEND_TITLE =
+                "investment.dialog.confirmDeleteDividend.title";
+        public static final String INVESTMENT_DIALOG_CONFIRM_DELETE_EXCHANGE_TITLE =
+                "investment.dialog.confirmDeleteExchange.title";
+        public static final String INVESTMENT_DIALOG_NO_TICKER_SELECTED_TITLE =
+                "investment.dialog.noTickerSelected.title";
+        public static final String INVESTMENT_DIALOG_NO_TICKER_SELECTED_UNARCHIVE =
+                "investment.dialog.noTickerSelected.unarchive";
+        public static final String INVESTMENT_DIALOG_NO_TICKER_SELECTED_DELETE =
+                "investment.dialog.noTickerSelected.delete";
+        public static final String INVESTMENT_DIALOG_CONFIRM_UNARCHIVE_TICKER_TITLE =
+                "investment.dialog.confirmUnarchiveTicker.title";
+        public static final String INVESTMENT_DIALOG_CONFIRM_UNARCHIVE_TICKER_MESSAGE =
+                "investment.dialog.confirmUnarchiveTicker.message";
+        public static final String INVESTMENT_DIALOG_TICKER_UNARCHIVED_TITLE =
+                "investment.dialog.tickerUnarchived.title";
+        public static final String INVESTMENT_DIALOG_TICKER_UNARCHIVED_MESSAGE =
+                "investment.dialog.tickerUnarchived.message";
+        public static final String INVESTMENT_DIALOG_ERROR_UNARCHIVING_TICKER_TITLE =
+                "investment.dialog.errorUnarchivingTicker.title";
+        public static final String INVESTMENT_DIALOG_CONFIRM_DELETE_TICKER_TITLE =
+                "investment.dialog.confirmDeleteTicker.title";
+        public static final String INVESTMENT_DIALOG_CONFIRM_DELETE_TICKER_MESSAGE =
+                "investment.dialog.confirmDeleteTicker.message";
+        public static final String INVESTMENT_DIALOG_TICKER_DELETED_TITLE =
+                "investment.dialog.tickerDeleted.title";
+        public static final String INVESTMENT_DIALOG_TICKER_DELETED_MESSAGE =
+                "investment.dialog.tickerDeleted.message";
+        public static final String INVESTMENT_DIALOG_ERROR_DELETING_TICKER_TITLE =
+                "investment.dialog.errorDeletingTicker.title";
+        public static final String INVESTMENT_DIALOG_TICKER_HAS_TRANSACTIONS_TITLE =
+                "investment.dialog.tickerHasTransactions.title";
+        public static final String INVESTMENT_DIALOG_TICKER_HAS_TRANSACTIONS_MESSAGE =
+                "investment.dialog.tickerHasTransactions.message";
+
+        // Investment FXML Labels
+        public static final String INVESTMENT_LABEL_NAME = "investment.label.name";
+        public static final String INVESTMENT_LABEL_SYMBOL = "investment.label.symbol";
+        public static final String INVESTMENT_LABEL_TYPE = "investment.label.type";
+        public static final String INVESTMENT_LABEL_CURRENT_PRICE = "investment.label.currentPrice";
+        public static final String INVESTMENT_LABEL_QUANTITY_IN_PORTFOLIO =
+                "investment.label.quantityInPortfolio";
+        public static final String INVESTMENT_LABEL_AVG_UNIT_PRICE =
+                "investment.label.avgUnitPrice";
+        public static final String INVESTMENT_LABEL_TICKER = "investment.label.ticker";
+        public static final String INVESTMENT_LABEL_CURRENT_BALANCE =
+                "investment.label.currentBalance";
+        public static final String INVESTMENT_LABEL_BALANCE_AFTER_DIVIDEND =
+                "investment.label.balanceAfterDividend";
+        public static final String INVESTMENT_LABEL_BALANCE_AFTER_SALE =
+                "investment.label.balanceAfterSale";
+        public static final String INVESTMENT_LABEL_BALANCE_AFTER_PURCHASE =
+                "investment.label.balanceAfterPurchase";
+        public static final String INVESTMENT_LABEL_UNIT_PRICE = "investment.label.unitPrice";
+        public static final String INVESTMENT_LABEL_QUANTITY = "investment.label.quantity";
+        public static final String INVESTMENT_LABEL_TOTAL = "investment.label.total";
+        public static final String INVESTMENT_LABEL_CRYPTO_SOLD = "investment.label.cryptoSold";
+        public static final String INVESTMENT_LABEL_CRYPTO_RECEIVED =
+                "investment.label.cryptoReceived";
+        public static final String INVESTMENT_LABEL_CURRENT_QUANTITY =
+                "investment.label.currentQuantity";
+        public static final String INVESTMENT_LABEL_QUANTITY_AFTER_EXCHANGE =
+                "investment.label.quantityAfterExchange";
+        public static final String INVESTMENT_LABEL_QUANTITY_SOLD = "investment.label.quantitySold";
+        public static final String INVESTMENT_LABEL_QUANTITY_RECEIVED =
+                "investment.label.quantityReceived";
+        public static final String INVESTMENT_LABEL_SELECT_TICKER = "investment.label.selectTicker";
+        public static final String INVESTMENT_PROMPT_TEXT_SEARCH_ID_OR_DESCRIPTION =
+                "investment.promptText.searchIdOrDescription";
+        public static final String INVESTMENT_PROMPT_TEXT_SYMBOL = "investment.promptText.symbol";
+
+        // Additional Investment Labels and Messages
+        public static final String INVESTMENT_LABEL_CALCULATOR = "investment.label.calculator";
+        public static final String INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_TITLE =
+                "investment.dialog.invalidNumberCalculation.title";
+        public static final String INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_MESSAGE =
+                "investment.dialog.invalidNumberCalculation.message";
+        public static final String INVESTMENT_TOOLTIP_CATEGORY_REQUIRED =
+                "investment.tooltip.categoryRequired";
+        public static final String INVESTMENT_DIALOG_NO_CHANGES_TICKER_MESSAGE =
+                "investment.dialog.noChangesTickerMessage";
+
+        // Table Column Headers
+        public static final String INVESTMENT_TABLE_ID = "investment.table.id";
+        public static final String INVESTMENT_TABLE_NAME = "investment.table.name";
+        public static final String INVESTMENT_TABLE_SYMBOL = "investment.table.symbol";
+        public static final String INVESTMENT_TABLE_TYPE = "investment.table.type";
+        public static final String INVESTMENT_TABLE_QUANTITY_OWNED =
+                "investment.table.quantityOwned";
+        public static final String INVESTMENT_TABLE_UNIT_PRICE = "investment.table.unitPrice";
+        public static final String INVESTMENT_TABLE_TOTAL_VALUE = "investment.table.totalValue";
+        public static final String INVESTMENT_TABLE_AVERAGE_UNIT_PRICE =
+                "investment.table.averageUnitPrice";
+        public static final String INVESTMENT_TABLE_TICKER = "investment.table.ticker";
+        public static final String INVESTMENT_TABLE_DATE = "investment.table.date";
+        public static final String INVESTMENT_TABLE_QUANTITY = "investment.table.quantity";
+        public static final String INVESTMENT_TABLE_TOTAL_AMOUNT = "investment.table.totalAmount";
+        public static final String INVESTMENT_TABLE_WALLET = "investment.table.wallet";
+        public static final String INVESTMENT_TABLE_STATUS = "investment.table.status";
+        public static final String INVESTMENT_TABLE_DESCRIPTION = "investment.table.description";
+        public static final String INVESTMENT_TABLE_CATEGORY = "investment.table.category";
+        public static final String INVESTMENT_TABLE_CRYPTO_SOLD = "investment.table.cryptoSold";
+        public static final String INVESTMENT_TABLE_CRYPTO_RECEIVED =
+                "investment.table.cryptoReceived";
+        public static final String INVESTMENT_TABLE_QUANTITY_SOLD = "investment.table.quantitySold";
+        public static final String INVESTMENT_TABLE_QUANTITY_RECEIVED =
+                "investment.table.quantityReceived";
+        public static final String INVESTMENT_TABLE_DIVIDEND_VALUE =
+                "investment.table.dividendValue";
+
+        // Investment Transaction Dialog Titles
+        public static final String INVESTMENT_DIALOG_EDIT_TICKER_PURCHASE =
+                "investment.dialog.editTickerPurchase";
+        public static final String INVESTMENT_DIALOG_EDIT_TICKER_SALE =
+                "investment.dialog.editTickerSale";
+        public static final String INVESTMENT_DIALOG_EDIT_DIVIDEND =
+                "investment.dialog.editDividend";
+        public static final String INVESTMENT_DIALOG_EDIT_CRYPTO_EXCHANGE =
+                "investment.dialog.editCryptoExchange";
+
+        // Investment Delete Message Labels
+        public static final String INVESTMENT_DELETE_DESCRIPTION = "investment.delete.description";
+        public static final String INVESTMENT_DELETE_AMOUNT = "investment.delete.amount";
+        public static final String INVESTMENT_DELETE_DATE = "investment.delete.date";
+        public static final String INVESTMENT_DELETE_STATUS = "investment.delete.status";
+        public static final String INVESTMENT_DELETE_WALLET = "investment.delete.wallet";
+        public static final String INVESTMENT_DELETE_WALLET_BALANCE =
+                "investment.delete.walletBalance";
+        public static final String INVESTMENT_DELETE_WALLET_BALANCE_AFTER_DELETION =
+                "investment.delete.walletBalanceAfterDeletion";
+        public static final String INVESTMENT_DELETE_SOURCE_CRYPTO =
+                "investment.delete.sourceCrypto";
+        public static final String INVESTMENT_DELETE_TARGET_CRYPTO =
+                "investment.delete.targetCrypto";
+        public static final String INVESTMENT_DELETE_SOURCE_QUANTITY =
+                "investment.delete.sourceQuantity";
+        public static final String INVESTMENT_DELETE_SOURCE_QUANTITY_AFTER_DELETION =
+                "investment.delete.sourceQuantityAfterDeletion";
+        public static final String INVESTMENT_DELETE_TARGET_QUANTITY =
+                "investment.delete.targetQuantity";
+        public static final String INVESTMENT_DELETE_TARGET_QUANTITY_AFTER_DELETION =
+                "investment.delete.targetQuantityAfterDeletion";
+
+        // Wallet Transaction Labels
+        public static final String WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY =
+                "wallettransaction.tooltip.needCategory";
+        public static final String WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY_RECURRING =
+                "wallettransaction.tooltip.needCategoryRecurring";
+        public static final String WALLETTRANSACTION_LABEL_CALCULATOR =
+                "wallettransaction.label.calculator";
+        public static final String WALLETTRANSACTION_SUGGESTION_FROM =
+                "wallettransaction.suggestion.from";
+        public static final String WALLETTRANSACTION_SUGGESTION_TO =
+                "wallettransaction.suggestion.to";
+        public static final String WALLETTRANSACTION_SUGGESTION_NO_CATEGORY =
+                "wallettransaction.suggestion.noCategory";
+        public static final String WALLETTRANSACTION_INFO_STARTS_ON =
+                "wallettransaction.info.startsOn";
+        public static final String WALLETTRANSACTION_INFO_ENDS_ON = "wallettransaction.info.endsOn";
+        public static final String WALLETTRANSACTION_INFO_FREQUENCY =
+                "wallettransaction.info.frequency";
+        public static final String WALLETTRANSACTION_INFO_LAST_TRANSACTION =
+                "wallettransaction.info.lastTransaction";
+
+        // Wallet Transaction Dialog Messages
+        public static final String WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE =
+                "wallettransaction.dialog.emptyFields.title";
+        public static final String WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "wallettransaction.dialog.emptyFields.message";
+        public static final String WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_TITLE =
+                "wallettransaction.dialog.expenseCreated.title";
+        public static final String WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_MESSAGE =
+                "wallettransaction.dialog.expenseCreated.message";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_EXPENSE_VALUE_TITLE =
+                "wallettransaction.dialog.invalidExpenseValue.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_EXPENSE_VALUE_MESSAGE =
+                "wallettransaction.dialog.invalidExpenseValue.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_CREATING_EXPENSE_TITLE =
+                "wallettransaction.dialog.errorCreatingExpense.title";
+        public static final String WALLETTRANSACTION_DIALOG_INCOME_CREATED_TITLE =
+                "wallettransaction.dialog.incomeCreated.title";
+        public static final String WALLETTRANSACTION_DIALOG_INCOME_CREATED_MESSAGE =
+                "wallettransaction.dialog.incomeCreated.message";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_INCOME_VALUE_TITLE =
+                "wallettransaction.dialog.invalidIncomeValue.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_INCOME_VALUE_MESSAGE =
+                "wallettransaction.dialog.invalidIncomeValue.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_CREATING_INCOME_TITLE =
+                "wallettransaction.dialog.errorCreatingIncome.title";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_TITLE =
+                "wallettransaction.dialog.transferCreated.title";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_MESSAGE =
+                "wallettransaction.dialog.transferCreated.message";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_TITLE =
+                "wallettransaction.dialog.invalidTransferValue.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_MESSAGE =
+                "wallettransaction.dialog.invalidTransferValue.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_CREATING_TRANSFER_TITLE =
+                "wallettransaction.dialog.errorCreatingTransfer.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_TITLE =
+                "wallettransaction.dialog.invalidTransfer.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_MESSAGE =
+                "wallettransaction.dialog.invalidTransfer.message";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_TITLE =
+                "wallettransaction.dialog.transactionUpdated.title";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_MESSAGE =
+                "wallettransaction.dialog.transactionUpdated.message";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_TITLE =
+                "wallettransaction.dialog.invalidTransactionValue.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_MESSAGE =
+                "wallettransaction.dialog.invalidTransactionValue.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_UPDATING_TRANSACTION_TITLE =
+                "wallettransaction.dialog.errorUpdatingTransaction.title";
+        public static final String WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE =
+                "wallettransaction.dialog.noChangesMade.title";
+        public static final String WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE =
+                "wallettransaction.dialog.noChangesMade.message";
+        public static final String WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TRANSFER_MESSAGE =
+                "wallettransaction.dialog.noChangesMadeTransfer.message";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_TITLE =
+                "wallettransaction.dialog.transferUpdated.title";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_MESSAGE =
+                "wallettransaction.dialog.transferUpdated.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_UPDATING_TRANSFER_TITLE =
+                "wallettransaction.dialog.errorUpdatingTransfer.title";
+        public static final String WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_TITLE =
+                "wallettransaction.dialog.recurringTransactionCreated.title";
+        public static final String WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_MESSAGE =
+                "wallettransaction.dialog.recurringTransactionCreated.message";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE =
+                "wallettransaction.dialog.invalidRecurringValue.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_MESSAGE =
+                "wallettransaction.dialog.invalidRecurringValue.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_CREATING_RECURRING_TITLE =
+                "wallettransaction.dialog.errorCreatingRecurring.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_CREATED_TITLE =
+                "wallettransaction.dialog.walletCreated.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_CREATED_MESSAGE =
+                "wallettransaction.dialog.walletCreated.message";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_BALANCE_TITLE =
+                "wallettransaction.dialog.invalidBalance.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE =
+                "wallettransaction.dialog.invalidBalance.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_CREATING_WALLET_TITLE =
+                "wallettransaction.dialog.errorCreatingWallet.title";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_RENAMING_WALLET_TITLE =
+                "wallettransaction.dialog.errorRenamingWallet.title";
+        public static final String WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE =
+                "wallettransaction.dialog.invalidInput.title";
+        public static final String WALLETTRANSACTION_DIALOG_NO_CHANGES_BALANCE_MESSAGE =
+                "wallettransaction.dialog.noChangesBalance.message";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE =
+                "wallettransaction.dialog.walletUpdated.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_BALANCE_UPDATED_MESSAGE =
+                "wallettransaction.dialog.walletBalanceUpdated.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_UPDATING_BALANCE_TITLE =
+                "wallettransaction.dialog.errorUpdatingBalance.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_TITLE =
+                "wallettransaction.dialog.walletTypeChanged.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE =
+                "wallettransaction.dialog.walletTypeChanged.message";
+        public static final String WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_TITLE =
+                "wallettransaction.dialog.noWalletSelected.title";
+        public static final String WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_UNARCHIVE_MESSAGE =
+                "wallettransaction.dialog.noWalletSelectedUnarchive.message";
+        public static final String WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_DELETE_MESSAGE =
+                "wallettransaction.dialog.noWalletSelectedDelete.message";
+        public static final String WALLETTRANSACTION_DIALOG_UNARCHIVE_WALLET_TITLE =
+                "wallettransaction.dialog.unarchiveWallet.title";
+        public static final String WALLETTRANSACTION_DIALOG_UNARCHIVE_WALLET_MESSAGE =
+                "wallettransaction.dialog.unarchiveWallet.message";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_TITLE =
+                "wallettransaction.dialog.walletUnarchived.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_MESSAGE =
+                "wallettransaction.dialog.walletUnarchived.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_UNARCHIVING_WALLET_TITLE =
+                "wallettransaction.dialog.errorUnarchivingWallet.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_HAS_TRANSACTIONS_TITLE =
+                "wallettransaction.dialog.walletHasTransactions.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_HAS_TRANSACTIONS_MESSAGE =
+                "wallettransaction.dialog.walletHasTransactions.message";
+        public static final String WALLETTRANSACTION_DIALOG_REMOVE_WALLET_TITLE =
+                "wallettransaction.dialog.removeWallet.title";
+        public static final String WALLETTRANSACTION_DIALOG_REMOVE_WALLET_MESSAGE =
+                "wallettransaction.dialog.removeWallet.message";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_DELETED_TITLE =
+                "wallettransaction.dialog.walletDeleted.title";
+        public static final String WALLETTRANSACTION_DIALOG_WALLET_DELETED_MESSAGE =
+                "wallettransaction.dialog.walletDeleted.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_REMOVING_WALLET_TITLE =
+                "wallettransaction.dialog.errorRemovingWallet.title";
+        public static final String WALLETTRANSACTION_DIALOG_CONFIRM_DELETE =
+                "wallettransaction.dialog.confirmDelete";
+        public static final String WALLETTRANSACTION_LABEL_DESCRIPTION =
+                "wallettransaction.label.description";
+        public static final String WALLETTRANSACTION_LABEL_AMOUNT =
+                "wallettransaction.label.amount";
+        public static final String WALLETTRANSACTION_LABEL_DATE = "wallettransaction.label.date";
+        public static final String WALLETTRANSACTION_LABEL_STATUS =
+                "wallettransaction.label.status";
+        public static final String WALLETTRANSACTION_LABEL_WALLET =
+                "wallettransaction.label.wallet";
+        public static final String WALLETTRANSACTION_LABEL_WALLET_BALANCE =
+                "wallettransaction.label.walletBalance";
+        public static final String WALLETTRANSACTION_LABEL_WALLET_BALANCE_AFTER_DELETION =
+                "wallettransaction.label.walletBalanceAfterDeletion";
+        public static final String WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE =
+                "wallettransaction.dialog.noTransferSelected.title";
+        public static final String WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_EDIT_MESSAGE =
+                "wallettransaction.dialog.noTransferSelectedEdit.message";
+        public static final String WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_DELETE_MESSAGE =
+                "wallettransaction.dialog.noTransferSelectedDelete.message";
+        public static final String WALLETTRANSACTION_DIALOG_ADD_NEW_TRANSFER_TITLE =
+                "wallettransaction.dialog.addNewTransfer.title";
+        public static final String WALLETTRANSACTION_DIALOG_EDIT_TRANSFER_TITLE =
+                "wallettransaction.dialog.editTransfer.title";
+        public static final String WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_TITLE =
+                "wallettransaction.dialog.deleteTransfer.title";
+        public static final String WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_MESSAGE =
+                "wallettransaction.dialog.deleteTransfer.message";
+        public static final String WALLETTRANSACTION_DIALOG_SUCCESS_TITLE =
+                "wallettransaction.dialog.success.title";
+        public static final String WALLETTRANSACTION_DIALOG_TRANSFER_DELETED_MESSAGE =
+                "wallettransaction.dialog.transferDeleted.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_TITLE =
+                "wallettransaction.dialog.error.title";
+        public static final String WALLETTRANSACTION_TABLE_ID = "wallettransaction.table.id";
+        public static final String WALLETTRANSACTION_TABLE_DATE = "wallettransaction.table.date";
+        public static final String WALLETTRANSACTION_TABLE_DESCRIPTION =
+                "wallettransaction.table.description";
+        public static final String WALLETTRANSACTION_TABLE_AMOUNT =
+                "wallettransaction.table.amount";
+        public static final String WALLETTRANSACTION_TABLE_SENDER =
+                "wallettransaction.table.sender";
+        public static final String WALLETTRANSACTION_TABLE_RECEIVER =
+                "wallettransaction.table.receiver";
+        public static final String WALLETTRANSACTION_TABLE_CATEGORY =
+                "wallettransaction.table.category";
+        public static final String WALLETTRANSACTION_TABLE_WALLET =
+                "wallettransaction.table.wallet";
+        public static final String WALLETTRANSACTION_TABLE_TYPE = "wallettransaction.table.type";
+        public static final String WALLETTRANSACTION_TABLE_STATUS =
+                "wallettransaction.table.status";
+        public static final String WALLETTRANSACTION_TABLE_FREQUENCY =
+                "wallettransaction.table.frequency";
+        public static final String WALLETTRANSACTION_TABLE_START_DATE =
+                "wallettransaction.table.startDate";
+        public static final String WALLETTRANSACTION_TABLE_END_DATE =
+                "wallettransaction.table.endDate";
+        public static final String WALLETTRANSACTION_TABLE_NEXT_DUE_DATE =
+                "wallettransaction.table.nextDueDate";
+        public static final String WALLETTRANSACTION_TABLE_EXPECTED_REMAINING_AMOUNT =
+                "wallettransaction.table.expectedRemainingAmount";
+        public static final String WALLETTRANSACTION_TABLE_INDEFINITE =
+                "wallettransaction.table.indefinite";
+        public static final String WALLETTRANSACTION_COMBOBOX_ALL =
+                "wallettransaction.combobox.all";
+        public static final String WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_TITLE =
+                "wallettransaction.dialog.noRecurringSelected.title";
+        public static final String WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_EDIT_MESSAGE =
+                "wallettransaction.dialog.noRecurringSelectedEdit.message";
+        public static final String WALLETTRANSACTION_DIALOG_NO_RECURRING_SELECTED_DELETE_MESSAGE =
+                "wallettransaction.dialog.noRecurringSelectedDelete.message";
+        public static final String WALLETTRANSACTION_DIALOG_CREATE_RECURRING_TRANSACTION_TITLE =
+                "wallettransaction.dialog.createRecurringTransaction.title";
+        public static final String WALLETTRANSACTION_DIALOG_EDIT_RECURRING_TRANSACTION_TITLE =
+                "wallettransaction.dialog.editRecurringTransaction.title";
+        public static final String WALLETTRANSACTION_DIALOG_REMOVE_RECURRING_TRANSACTION_TITLE =
+                "wallettransaction.dialog.removeRecurringTransaction.title";
+        public static final String WALLETTRANSACTION_DIALOG_REMOVE_RECURRING_TRANSACTION_MESSAGE =
+                "wallettransaction.dialog.removeRecurringTransaction.message";
+        public static final String WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_TITLE =
+                "wallettransaction.dialog.recurringTransactionUpdated.title";
+        public static final String WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_MESSAGE =
+                "wallettransaction.dialog.recurringTransactionUpdated.message";
+        public static final String WALLETTRANSACTION_DIALOG_ERROR_EDITING_RECURRING_TITLE =
+                "wallettransaction.dialog.errorEditingRecurring.title";
+        public static final String WALLETTRANSACTION_INFO_RECURRING_INACTIVE =
+                "wallettransaction.info.recurringInactive";
+
+        // Calendar Event Dialog Messages
+        public static final String CALENDAR_DIALOG_EVENT_CREATED_TITLE =
+                "calendar.dialog.eventCreated.title";
+        public static final String CALENDAR_DIALOG_EVENT_CREATED_MESSAGE =
+                "calendar.dialog.eventCreated.message";
+        public static final String CALENDAR_DIALOG_ERROR_CREATING_EVENT_TITLE =
+                "calendar.dialog.errorCreatingEvent.title";
+
+        // Calendar Event Types
+        public static final String CALENDAR_EVENTTYPE_CREDIT_CARD_STATEMENT_CLOSING =
+                "calendar.eventtype.creditCardStatementClosing";
+        public static final String CALENDAR_EVENTTYPE_CREDIT_CARD_DUE_DATE =
+                "calendar.eventtype.creditCardDueDate";
+        public static final String CALENDAR_EVENTTYPE_DEBT_PAYMENT_DUE_DATE =
+                "calendar.eventtype.debtPaymentDueDate";
+        public static final String CALENDAR_EVENTTYPE_INCOME_RECEIPT_DATE =
+                "calendar.eventtype.incomeReceiptDate";
+
+        // Category Dialog Messages
+        public static final String CATEGORY_DIALOG_CATEGORY_ADDED_TITLE =
+                "category.dialog.categoryAdded.title";
+        public static final String CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE =
+                "category.dialog.categoryAdded.message";
+        public static final String CATEGORY_DIALOG_ERROR_ADDING_CATEGORY_TITLE =
+                "category.dialog.errorAddingCategory.title";
+        public static final String CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_NAME_TITLE =
+                "category.dialog.errorUpdatingCategoryName.title";
+        public static final String CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE =
+                "category.dialog.errorUpdatingCategory.title";
+        public static final String CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE =
+                "category.dialog.categoryUpdated.title";
+        public static final String CATEGORY_DIALOG_CATEGORY_NAME_AND_ARCHIVED_UPDATED_MESSAGE =
+                "category.dialog.categoryNameAndArchivedUpdated.message";
+        public static final String CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE =
+                "category.dialog.categoryArchivedUpdated.message";
+        public static final String CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE =
+                "category.dialog.categoryNameUpdated.message";
+        public static final String CATEGORY_DIALOG_NO_CATEGORY_SELECTED_TITLE =
+                "category.dialog.noCategorySelected.title";
+        public static final String CATEGORY_DIALOG_NO_CATEGORY_SELECTED_EDIT_MESSAGE =
+                "category.dialog.noCategorySelectedEdit.message";
+        public static final String CATEGORY_DIALOG_NO_CATEGORY_SELECTED_REMOVE_MESSAGE =
+                "category.dialog.noCategorySelectedRemove.message";
+        public static final String CATEGORY_DIALOG_CATEGORY_HAS_TRANSACTIONS_TITLE =
+                "category.dialog.categoryHasTransactions.title";
+        public static final String CATEGORY_DIALOG_CATEGORY_HAS_TRANSACTIONS_MESSAGE =
+                "category.dialog.categoryHasTransactions.message";
+        public static final String CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE =
+                "category.dialog.removeCategory.title";
+        public static final String CATEGORY_DIALOG_REMOVE_CATEGORY_MESSAGE =
+                "category.dialog.removeCategory.message";
+        public static final String CATEGORY_DIALOG_ERROR_REMOVING_CATEGORY_TITLE =
+                "category.dialog.errorRemovingCategory.title";
+        public static final String CATEGORY_DIALOG_ADD_CATEGORY_TITLE =
+                "category.dialog.addCategory.title";
+        public static final String CATEGORY_DIALOG_EDIT_CATEGORY_TITLE =
+                "category.dialog.editCategory.title";
+        public static final String CATEGORY_TABLE_CATEGORY = "category.table.category";
+        public static final String CATEGORY_TABLE_ARCHIVED = "category.table.archived";
+        public static final String CATEGORY_TABLE_ASSOCIATED_TRANSACTIONS =
+                "category.table.associatedTransactions";
+        public static final String CATEGORY_TABLE_YES = "category.table.yes";
+        public static final String CATEGORY_TABLE_NO = "category.table.no";
+        public static final String WALLETTRANSACTION_TABLE_ASSOCIATED_TRANSACTIONS =
+                "wallettransaction.table.associatedTransactions";
+        public static final String WALLETTRANSACTION_LABEL_TYPE = "wallettransaction.label.type";
+        public static final String WALLETTRANSACTION_LABEL_FREQUENCY =
+                "wallettransaction.label.frequency";
     }
 
     // Prevent instantiation

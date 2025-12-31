@@ -23,6 +23,7 @@ import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.CalculatorController;
@@ -68,6 +69,8 @@ public abstract class BaseTransferManagement {
 
     protected CategoryService categoryService;
 
+    protected I18nService i18nService;
+
     protected List<Wallet> wallets;
 
     protected List<Category> categories;
@@ -82,11 +85,13 @@ public abstract class BaseTransferManagement {
             WalletTransactionService walletTransactionService,
             CalculatorService calculatorService,
             CategoryService categoryService,
+            I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.calculatorService = calculatorService;
         this.categoryService = categoryService;
+        this.i18nService = i18nService;
         this.springContext = springContext;
     }
 
@@ -140,7 +145,7 @@ public abstract class BaseTransferManagement {
     protected void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                "Calculator",
+                i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transferValueField)));
@@ -257,14 +262,24 @@ public abstract class BaseTransferManagement {
         Function<Transfer, String> displayFunction =
                 tf ->
                         String.format(
-                                "%s%n%s | From: %s | To: %s | %s ",
+                                "%s%n%s | "
+                                        + i18nService.tr(
+                                                Constants.TranslationKeys
+                                                        .WALLETTRANSACTION_SUGGESTION_FROM)
+                                        + " %s | "
+                                        + i18nService.tr(
+                                                Constants.TranslationKeys
+                                                        .WALLETTRANSACTION_SUGGESTION_TO)
+                                        + " %s | %s ",
                                 tf.getDescription(),
                                 UIUtils.formatCurrency(tf.getAmount()),
                                 tf.getSenderWallet().getName(),
                                 tf.getReceiverWallet().getName(),
                                 tf.getCategory() != null
                                         ? tf.getCategory().getName()
-                                        : "No Category");
+                                        : i18nService.tr(
+                                                Constants.TranslationKeys
+                                                        .WALLETTRANSACTION_SUGGESTION_NO_CATEGORY));
 
         Consumer<Transfer> onSelectCallback = this::fillFieldsWithTransaction;
 

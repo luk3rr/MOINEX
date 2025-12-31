@@ -18,7 +18,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Wallet">
+                  <Label text="%dialog.label.wallet">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -28,7 +28,7 @@
             </VBox>
             <HBox alignment="CENTER" spacing="20.0">
                <children>
-                  <Label text="Current balance:" />
+                  <Label text="%wallettransaction.label.currentBalance" />
                   <Label fx:id="walletCurrentBalanceValueLabel" text="-">
                      <font>
                         <Font name="System Bold" size="13.0" />
@@ -37,7 +37,7 @@
             </HBox>
             <HBox alignment="CENTER" spacing="20.0">
                <children>
-                  <Label text="Balance after income:" />
+                  <Label text="%wallettransaction.label.balanceAfterIncome" />
                   <Label fx:id="walletAfterBalanceValueLabel" text="-">
                      <font>
                         <Font name="System Bold" size="13.0" />
@@ -53,7 +53,7 @@
                   <Image url="@../../../icon/common/pencil.png" />
                </image>
             </ImageView>
-            <TextField fx:id="descriptionField" promptText="Description" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="descriptionField" promptText="%dialog.label.description" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
@@ -79,7 +79,7 @@
          <children>
             <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Status">
+                  <Label text="%dialog.label.status">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -89,7 +89,7 @@
             </VBox>
             <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Category">
+                  <Label text="%dialog.label.category">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -101,7 +101,7 @@
       </HBox>
       <VBox alignment="CENTER">
          <children>
-            <Label text="Date">
+            <Label text="%dialog.label.date">
                <font>
                   <Font size="10.0" />
                </font>
@@ -111,8 +111,8 @@
       </VBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

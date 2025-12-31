@@ -18,9 +18,11 @@ import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddDividendController extends BaseDividendManagement {
+
     /**
      * Constructor
      * @param walletService WalletService
@@ -39,6 +42,7 @@ public final class AddDividendController extends BaseDividendManagement {
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
      * @param tickerService TickerService
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -47,13 +51,15 @@ public final class AddDividendController extends BaseDividendManagement {
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
-            TickerService tickerService) {
+            TickerService tickerService,
+            I18nService i18nService) {
         super(
                 walletService,
                 walletTransactionService,
                 categoryService,
                 calculatorService,
-                tickerService);
+                tickerService,
+                i18nService);
     }
 
     @FXML
@@ -75,7 +81,9 @@ public final class AddDividendController extends BaseDividendManagement {
                 || category == null
                 || dividendDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -95,15 +103,27 @@ public final class AddDividendController extends BaseDividendManagement {
                     status);
 
             WindowUtils.showSuccessDialog(
-                    "Dividend created", "The dividend was successfully created.");
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE));
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid dividend value", "Dividend value must be a number.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error while creating dividend", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_ERROR_CREATING_DIVIDEND_TITLE),
+                    e.getMessage());
         }
     }
 }

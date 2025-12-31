@@ -18,7 +18,9 @@ import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.GoalFundingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +41,19 @@ public final class AddGoalController extends BaseGoalManagement {
 
     private ToggleGroup strategyToggleGroup;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      *
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddGoalController(GoalService goalService, WalletService walletService) {
+    public AddGoalController(
+            GoalService goalService, WalletService walletService, I18nService i18nService) {
         super(goalService, walletService);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     @Override
@@ -70,7 +77,8 @@ public final class AddGoalController extends BaseGoalManagement {
 
         if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -81,7 +89,10 @@ public final class AddGoalController extends BaseGoalManagement {
             Toggle selectedToggle = strategyToggleGroup.getSelectedToggle();
             if (selectedToggle == null) {
                 WindowUtils.showInformationDialog(
-                        "Strategy required", "Please select an initial balance strategy.");
+                        i18nService.tr(
+                                Constants.TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_MESSAGE));
                 return;
             }
             strategy = (GoalFundingStrategy) selectedToggle.getUserData();
@@ -101,17 +112,23 @@ public final class AddGoalController extends BaseGoalManagement {
                     masterWallet,
                     strategy);
 
-            WindowUtils.showSuccessDialog("Goal created", "The goal was successfully created.");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE));
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid balance", "Please enter a valid balance.");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (IllegalArgumentException
                 | EntityExistsException
                 | EntityNotFoundException
                 | MoinexException.InsufficientResourcesException e) {
-            WindowUtils.showErrorDialog("Error creating goal", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ERROR_CREATING_GOAL_TITLE),
+                    e.getMessage());
         }
     }
 

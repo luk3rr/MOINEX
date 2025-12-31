@@ -152,7 +152,8 @@ public class CreditCardController {
                 i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE),
                 springContext,
                 (AddCreditCardDebtController controller) -> {},
-                List.of(this::updateDisplay));
+                List.of(this::updateDisplay),
+                i18nService.getBundle());
     }
 
     @FXML
@@ -162,7 +163,8 @@ public class CreditCardController {
                 i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE),
                 springContext,
                 (AddCreditCardController controller) -> {},
-                List.of(this::updateDisplayCards));
+                List.of(this::updateDisplayCards),
+                i18nService.getBundle());
     }
 
     @FXML
@@ -185,7 +187,8 @@ public class CreditCardController {
                 springContext,
                 (EditCreditCardDebtController controller) ->
                         controller.setCreditCardDebt(selectedPayment.getCreditCardDebt()),
-                List.of(this::updateDisplay));
+                List.of(this::updateDisplay),
+                i18nService.getBundle());
     }
 
     @FXML
@@ -309,7 +312,8 @@ public class CreditCardController {
                         Constants.TranslationKeys.CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE),
                 springContext,
                 (ArchivedCreditCardsController controller) -> {},
-                List.of(this::updateDisplay));
+                List.of(this::updateDisplay),
+                i18nService.getBundle());
     }
 
     @FXML

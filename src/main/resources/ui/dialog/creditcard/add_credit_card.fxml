@@ -31,12 +31,12 @@
             </VBox>
             <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Credit Card Name" VBox.vgrow="ALWAYS">
+                  <Label text="%creditcard.label.creditCardName" VBox.vgrow="ALWAYS">
                      <font>
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="nameField" promptText="Name" />
+                  <TextField fx:id="nameField" promptText="%dialog.label.name" />
                </children>
             </VBox>
          </children>
@@ -61,7 +61,7 @@
                   </VBox>
                   <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                      <children>
-                        <Label text="Limit">
+                        <Label text="%creditcard.label.limit">
                            <font>
                               <Font size="10.0" />
                            </font>
@@ -89,7 +89,7 @@
                   </VBox>
                   <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                      <children>
-                        <Label text="Last four digits">
+                        <Label text="%creditcard.label.lastFourDigits">
                            <font>
                               <Font size="10.0" />
                            </font>
@@ -105,7 +105,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Operator">
+                  <Label text="%creditcard.label.operator">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -115,7 +115,7 @@
             </VBox>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Default billing wallet (optional)">
+                  <Label text="%creditcard.label.defaultBillingWallet">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -129,7 +129,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Closing day">
+                  <Label text="%creditcard.label.closingDay">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -139,7 +139,7 @@
             </VBox>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Due day">
+                  <Label text="%creditcard.label.dueDay">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -151,8 +151,8 @@
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

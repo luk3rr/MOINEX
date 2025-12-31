@@ -21,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.moinex.service.I18nService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -183,7 +184,14 @@ public final class WindowUtils {
             String title,
             ApplicationContext springContext,
             Consumer<T> controllerSetup) {
-        openModalWindow(fxmlFileName, title, springContext, controllerSetup, List.of(), null);
+        I18nService i18nService = springContext.getBean(I18nService.class);
+        openModalWindow(
+                fxmlFileName,
+                title,
+                springContext,
+                controllerSetup,
+                List.of(),
+                i18nService.getBundle());
     }
 
     /**
@@ -200,7 +208,14 @@ public final class WindowUtils {
             ApplicationContext springContext,
             Consumer<T> controllerSetup,
             List<Runnable> onHiddenActions) {
-        openModalWindow(fxmlFileName, title, springContext, controllerSetup, onHiddenActions, null);
+        I18nService i18nService = springContext.getBean(I18nService.class);
+        openModalWindow(
+                fxmlFileName,
+                title,
+                springContext,
+                controllerSetup,
+                onHiddenActions,
+                i18nService.getBundle());
     }
 
     public static <T> void openModalWindow(
@@ -237,7 +252,7 @@ public final class WindowUtils {
 
             modalStage.showAndWait();
         } catch (IOException e) {
-            logger.error("Error loading FXML file: '{}'", fxmlFileName);
+            logger.error("Error loading FXML file: '{}'", fxmlFileName, e);
         }
     }
 
@@ -253,7 +268,14 @@ public final class WindowUtils {
             String title,
             ApplicationContext springContext,
             Consumer<T> controllerSetup) {
-        openPopupWindow(fxmlFileName, title, springContext, controllerSetup, List.of(), null);
+        I18nService i18nService = springContext.getBean(I18nService.class);
+        openPopupWindow(
+                fxmlFileName,
+                title,
+                springContext,
+                controllerSetup,
+                List.of(),
+                i18nService.getBundle());
     }
 
     /**
@@ -270,7 +292,14 @@ public final class WindowUtils {
             ApplicationContext springContext,
             Consumer<T> controllerSetup,
             List<Runnable> onHiddenActions) {
-        openPopupWindow(fxmlFileName, title, springContext, controllerSetup, onHiddenActions, null);
+        I18nService i18nService = springContext.getBean(I18nService.class);
+        openPopupWindow(
+                fxmlFileName,
+                title,
+                springContext,
+                controllerSetup,
+                onHiddenActions,
+                i18nService.getBundle());
     }
 
     public static <T> void openPopupWindow(
@@ -306,7 +335,7 @@ public final class WindowUtils {
 
             popupStage.showAndWait();
         } catch (IOException e) {
-            logger.error("Error loading FXML file: '{}'", fxmlFileName);
+            logger.error("Error loading FXML file: '{}'", fxmlFileName, e);
         }
     }
 }

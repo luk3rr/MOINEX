@@ -20,6 +20,7 @@ import org.moinex.model.creditcard.CreditCardPayment;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -34,14 +35,18 @@ import org.springframework.stereotype.Controller;
 @NoArgsConstructor
 public final class EditCreditCardDebtController extends BaseCreditCardDebtManagement {
     private CreditCardDebt crcDebt = null;
+    private I18nService i18nService;
 
     @Autowired
     public EditCreditCardDebtController(
             CategoryService categoryService,
             CreditCardService creditCardService,
             CalculatorService calculatorService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         super(categoryService, creditCardService, calculatorService, springContext);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     public void setCreditCardDebt(CreditCardDebt crcDebt) {
@@ -96,7 +101,9 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 || valueStr.isEmpty()
                 || invoiceMonth == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -122,7 +129,12 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                     && crcDebt.getInstallments().equals(installments)
                     && crcDebt.getDescription().equals(description)
                     && invoice.equals(invoiceMonth)) {
-                WindowUtils.showInformationDialog("No changes", "No changes were made.");
+                WindowUtils.showInformationDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_DEBT_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDITCARD_DIALOG_NO_CHANGES_DEBT_MESSAGE));
             } else // If there is any modification, update the debt
             {
                 crcDebt.setCreditCard(crc);
@@ -134,15 +146,26 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 creditCardService.updateCreditCardDebt(crcDebt, invoiceMonth);
 
                 WindowUtils.showSuccessDialog(
-                        "Transaction updated", "Transaction updated successfully.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDITCARD_DIALOG_TRANSACTION_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDITCARD_DIALOG_TRANSACTION_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid expense value", "Debt value must be a number");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
+                    e.getMessage());
         }
     }
 
