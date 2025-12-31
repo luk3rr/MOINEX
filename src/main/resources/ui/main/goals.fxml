@@ -30,8 +30,8 @@
                                        <children>
                                           <AnchorPane minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label styleClass="title" text="In Progress" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                                <Text fontSmoothingType="LCD" layoutX="21.0" layoutY="367.0" strokeType="OUTSIDE" strokeWidth="0.0" text="&quot;Time to dream&quot;" textAlignment="CENTER" AnchorPane.bottomAnchor="10.0">
+                                                <Label styleClass="title" text="%goal.inProgress.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                                <Text fontSmoothingType="LCD" layoutX="21.0" layoutY="367.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%goal.inProgress.footnote" textAlignment="CENTER" AnchorPane.bottomAnchor="10.0">
                                                    <font>
                                                       <Font name="System Italic" size="15.0" />
                                                    </font>
@@ -67,7 +67,7 @@
                                           </AnchorPane>
                                           <AnchorPane minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label styleClass="title" text="Accomplished" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                                <Label styleClass="title" text="%goal.accomplished.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                                 <JFXButton fx:id="accomplishedPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
                                                    <graphic>
                                                       <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -116,12 +116,12 @@
                                        <children>
                                           <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label styleClass="title" text="Goals" />
+                                                <Label styleClass="title" text="%goal.title" />
                                                 <AnchorPane VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                          <children>
-                                                            <JFXButton onAction="#handleAddGoal" stylesheets="@../../css/component/buttons.css" text="Add goal">
+                                                            <JFXButton onAction="#handleAddGoal" stylesheets="@../../css/component/buttons.css" text="%goal.button.addGoal">
                                                                <graphic>
                                                                   <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -130,7 +130,7 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
-                                                            <JFXButton onAction="#handleAddDeposit" stylesheets="@../../css/component/buttons.css" text="Add Deposit">
+                                                            <JFXButton onAction="#handleAddDeposit" stylesheets="@../../css/component/buttons.css" text="%goal.button.addDeposit">
                                                                <graphic>
                                                                   <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -139,7 +139,7 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
-                                                            <JFXButton onAction="#handleEditGoal" stylesheets="@../../css/component/buttons.css" text="Edit Goal">
+                                                            <JFXButton onAction="#handleEditGoal" stylesheets="@../../css/component/buttons.css" text="%goal.button.editGoal">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -148,7 +148,7 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
-                                                            <JFXButton onAction="#handleDeleteGoal" stylesheets="@../../css/component/buttons.css" text="Delete Goal">
+                                                            <JFXButton onAction="#handleDeleteGoal" stylesheets="@../../css/component/buttons.css" text="%goal.button.deleteGoal">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                      <image>
@@ -171,7 +171,7 @@
                                                          <children>
                                                             <VBox alignment="CENTER">
                                                                <children>
-                                                                  <Label text="Status">
+                                                                  <Label text="%goal.filter.status">
                                                                      <font>
                                                                         <Font size="10.0" />
                                                                      </font>
@@ -188,7 +188,7 @@
                                                                   <Image url="@../../icon/common/find.png" />
                                                                </image>
                                                             </ImageView>
-                                                            <TextField fx:id="goalSearchField" maxWidth="400.0" promptText="Enter ID or Description" HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="goalSearchField" maxWidth="400.0" promptText="%goal.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
                                                    </children>

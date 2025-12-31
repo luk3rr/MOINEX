@@ -626,6 +626,87 @@ public final class Constants {
         // Transaction status
         public static final String TRANSACTION_STATUS_PENDING = "transaction.status.pending";
         public static final String TRANSACTION_STATUS_CONFIRMED = "transaction.status.confirmed";
+
+        // Goals and Plans
+        public static final String GOALS_PLANS_TAB_GOALS = "goalsPlans.tab.goals";
+        public static final String GOALS_PLANS_TAB_PLANS = "goalsPlans.tab.plans";
+
+        // Goals
+        public static final String GOAL_IN_PROGRESS_TITLE = "goal.inProgress.title";
+        public static final String GOAL_ACCOMPLISHED_TITLE = "goal.accomplished.title";
+        public static final String GOAL_TITLE = "goal.title";
+        public static final String GOAL_BUTTON_ADD_GOAL = "goal.button.addGoal";
+        public static final String GOAL_BUTTON_ADD_DEPOSIT = "goal.button.addDeposit";
+        public static final String GOAL_BUTTON_EDIT_GOAL = "goal.button.editGoal";
+        public static final String GOAL_BUTTON_DELETE_GOAL = "goal.button.deleteGoal";
+        public static final String GOAL_FILTER_STATUS = "goal.filter.status";
+        public static final String GOAL_FILTER_ALL = "goal.filter.all";
+        public static final String GOAL_FILTER_ACTIVE = "goal.filter.active";
+        public static final String GOAL_FILTER_COMPLETED = "goal.filter.completed";
+        public static final String GOAL_FILTER_ARCHIVED = "goal.filter.archived";
+        public static final String GOAL_SEARCH_PLACEHOLDER = "goal.searchPlaceholder";
+        public static final String GOAL_DIALOG_ADD_GOAL_TITLE = "goal.dialog.addGoal.title";
+        public static final String GOAL_DIALOG_EDIT_GOAL_TITLE = "goal.dialog.editGoal.title";
+        public static final String GOAL_DIALOG_ADD_TRANSFER_TITLE = "goal.dialog.addTransfer.title";
+        public static final String GOAL_DIALOG_NO_SELECTION_TITLE = "goal.dialog.noSelection.title";
+        public static final String GOAL_DIALOG_NO_SELECTION_EDIT_MESSAGE =
+                "goal.dialog.noSelection.edit.message";
+        public static final String GOAL_DIALOG_NO_SELECTION_DELETE_MESSAGE =
+                "goal.dialog.noSelection.delete.message";
+        public static final String GOAL_DIALOG_NO_SELECTION_ADD_DEPOSIT_MESSAGE =
+                "goal.dialog.noSelection.addDeposit.message";
+        public static final String GOAL_DIALOG_ARCHIVED_TITLE = "goal.dialog.archived.title";
+        public static final String GOAL_DIALOG_ARCHIVED_MESSAGE = "goal.dialog.archived.message";
+        public static final String GOAL_DIALOG_HAS_TRANSACTIONS_TITLE =
+                "goal.dialog.hasTransactions.title";
+        public static final String GOAL_DIALOG_HAS_TRANSACTIONS_MESSAGE =
+                "goal.dialog.hasTransactions.message";
+        public static final String GOAL_DIALOG_CONFIRMATION_DELETE_TITLE =
+                "goal.dialog.confirmationDelete.title";
+        public static final String GOAL_DIALOG_CONFIRMATION_DELETE_NAME =
+                "goal.dialog.confirmationDelete.name";
+        public static final String GOAL_DIALOG_CONFIRMATION_DELETE_INITIAL_AMOUNT =
+                "goal.dialog.confirmationDelete.initialAmount";
+        public static final String GOAL_DIALOG_CONFIRMATION_DELETE_CURRENT_AMOUNT =
+                "goal.dialog.confirmationDelete.currentAmount";
+        public static final String GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_AMOUNT =
+                "goal.dialog.confirmationDelete.targetAmount";
+        public static final String GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE =
+                "goal.dialog.confirmationDelete.targetDate";
+        public static final String GOAL_TABLE_HEADER_ID = "goal.table.header.id";
+        public static final String GOAL_TABLE_HEADER_NAME = "goal.table.header.name";
+        public static final String GOAL_TABLE_HEADER_INITIAL_AMOUNT =
+                "goal.table.header.initialAmount";
+        public static final String GOAL_TABLE_HEADER_CURRENT_AMOUNT =
+                "goal.table.header.currentAmount";
+        public static final String GOAL_TABLE_HEADER_TARGET_AMOUNT = "goal.table.header.targetAmount";
+        public static final String GOAL_TABLE_HEADER_PROGRESS = "goal.table.header.progress";
+        public static final String GOAL_TABLE_HEADER_TARGET_DATE = "goal.table.header.targetDate";
+        public static final String GOAL_TABLE_HEADER_COMPLETION_DATE =
+                "goal.table.header.completionDate";
+        public static final String GOAL_TABLE_HEADER_STATUS = "goal.table.header.status";
+        public static final String GOAL_TABLE_HEADER_MONTHS_UNTIL_TARGET =
+                "goal.table.header.monthsUntilTarget";
+        public static final String GOAL_TABLE_HEADER_RECOMMENDED_MONTHLY_DEPOSIT =
+                "goal.table.header.recommendedMonthlyDeposit";
+        public static final String GOAL_TABLE_TOOLTIP_MOTIVATION = "goal.table.tooltip.motivation";
+        public static final String GOAL_STATUS_ACTIVE = "goal.status.active";
+        public static final String GOAL_STATUS_COMPLETED = "goal.status.completed";
+        public static final String GOAL_STATUS_ARCHIVED = "goal.status.archived";
+
+        // Plans
+        public static final String PLAN_TITLE = "plan.title";
+        public static final String PLAN_BASE_MONTHLY_INCOME = "plan.baseMonthlyIncome";
+        public static final String PLAN_BUTTON_NEW_PLAN = "plan.button.newPlan";
+        public static final String PLAN_BUTTON_EDIT_PLAN = "plan.button.editPlan";
+        public static final String PLAN_DISTRIBUTION_TITLE = "plan.planDistribution.title";
+        public static final String PLAN_BUDGET_GROUPS_TITLE = "plan.budgetGroups.title";
+        public static final String PLAN_DIALOG_ADD_PLAN_TITLE = "plan.dialog.addPlan.title";
+        public static final String PLAN_DIALOG_EDIT_PLAN_TITLE = "plan.dialog.editPlan.title";
+        public static final String PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE =
+                "plan.dialog.noActivePlan.title";
+        public static final String PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE =
+                "plan.dialog.noActivePlan.message";
     }
 
     // Prevent instantiation

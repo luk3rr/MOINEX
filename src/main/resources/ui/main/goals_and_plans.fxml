@@ -9,8 +9,8 @@
    <children>
       <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
-          <Tab fx:id="goalsTab" text="Goals" />
-          <Tab fx:id="plansTab" text="Plans" />
+          <Tab fx:id="goalsTab" text="%goalsPlans.tab.goals" />
+          <Tab fx:id="plansTab" text="%goalsPlans.tab.plans" />
         </tabs>
       </TabPane>
    </children>

@@ -94,7 +94,7 @@ public class PlanController {
     private void handleNewPlan() {
         WindowUtils.openModalWindow(
                 Constants.ADD_PLAN_FXML,
-                "Add New Financial Plan",
+                i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_ADD_PLAN_TITLE),
                 springContext,
                 (AddPlanController controller) -> {},
                 List.of(this::updateView));
@@ -104,13 +104,14 @@ public class PlanController {
     private void handleEditPlan() {
         if (currentPlan == null) {
             WindowUtils.showInformationDialog(
-                    "No Active Plan", "Please create a financial plan before editing.");
+                    i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_PLAN_FXML,
-                "Edit Financial Plan",
+                i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
                 springContext,
                 (EditPlanController controller) -> controller.setPlan(currentPlan),
                 List.of(this::updateView));
