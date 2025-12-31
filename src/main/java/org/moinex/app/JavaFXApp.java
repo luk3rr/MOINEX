@@ -57,7 +57,9 @@ public class JavaFXApp extends Application {
 
                                 Platform.runLater(
                                         () -> {
-                                            primaryStage.setTitle(i18nService.tr("app.title"));
+                                            primaryStage.setTitle(
+                                                    i18nService.tr(
+                                                            Constants.TranslationKeys.APP_TITLE));
                                             primaryStage.setScene(new Scene(mainRoot));
                                             primaryStage.show();
                                             splashStage.close();

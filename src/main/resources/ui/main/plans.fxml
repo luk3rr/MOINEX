@@ -27,7 +27,7 @@
                   <ComboBox fx:id="periodComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
                </children>
             </HBox>
-            <AnchorPane>
+            <AnchorPane prefHeight="500.0">
                <children>
                   <HBox layoutX="89.0" layoutY="40.0" minHeight="300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -94,7 +94,7 @@
                   </HBox>
                </children>
             </AnchorPane>
-            <AnchorPane minHeight="350.0" VBox.vgrow="ALWAYS">
+            <AnchorPane minHeight="350.0" prefHeight="350.0" VBox.vgrow="ALWAYS">
                <children>
                   <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
