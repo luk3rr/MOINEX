@@ -21,7 +21,7 @@
    <children>
       <TabPane layoutX="59.0" layoutY="71.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
-          <Tab closable="false" text="Overview">
+          <Tab closable="false" text="%savings.tab.overview">
             <content>
               <AnchorPane>
                      <children>
@@ -33,7 +33,7 @@
                                        <children>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Total Invested" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.totalInvested" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -47,7 +47,7 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Gains with Interest and Appreciation" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.gainsWithInterest" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -61,7 +61,7 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Losses with Depreciation" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.lossesWithDepreciation" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -75,7 +75,7 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Total Value" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.totalValue" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -97,7 +97,7 @@
                                        <children>
                                           <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="Portfolio" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="%savings.overview.portfolio" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <padding>
                                                       <Insets left="10.0" top="10.0" />
                                                    </padding>
@@ -110,7 +110,7 @@
                                                    <children>
                                                       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
-                                                            <Label fx:id="overviewTabBottonPaneTitle111" styleClass="title" text="Brazilian Market Indicators" />
+                                                            <Label fx:id="overviewTabBottonPaneTitle111" styleClass="title" text="%savings.overview.brazilianMarketIndicators" />
                                                             <AnchorPane fx:id="overviewTabBottonPaneChart111" VBox.vgrow="ALWAYS">
                                                                <children>
                                                                   <VBox fx:id="body11" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -201,7 +201,7 @@
                                                    <children>
                                                       <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
-                                                            <Label fx:id="overviewTabBottonPaneTitle1111" styleClass="title" text="Market Quotes" />
+                                                            <Label fx:id="overviewTabBottonPaneTitle1111" styleClass="title" text="%savings.overview.marketQuotes" />
                                                             <AnchorPane fx:id="overviewTabBottonPaneChart1111" VBox.vgrow="ALWAYS">
                                                                <children>
                                                                   <VBox fx:id="body111" alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -458,7 +458,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab closable="false" text="Stocks &amp; Funds">
+            <Tab closable="false" text="%savings.tab.stocksFunds">
                <content>
                   <AnchorPane>
                      <children>
@@ -470,7 +470,7 @@
                                        <children>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Net Capital Invested" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.stocksFunds.netCapitalInvested" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -484,7 +484,7 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Current Value" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.stocksFunds.currentValue" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -498,7 +498,7 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Profit/Loss" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.stocksFunds.profitLoss" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -512,7 +512,7 @@
                                           </VBox>
                                           <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dividends received" textAlignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.stocksFunds.dividendsReceived" textAlignment="CENTER">
                                                    <font>
                                                       <Font size="20.0" />
                                                    </font>
@@ -532,7 +532,7 @@
                                  <children>
                                     <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <JFXButton onAction="#handleRegisterTicker" stylesheets="@../../css/component/buttons.css" text="Register Ticker">
+                                          <JFXButton onAction="#handleRegisterTicker" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.registerTicker">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -541,7 +541,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleOpenTickerArchive" stylesheets="@../../css/component/buttons.css" text="Ticker Archive">
+                                          <JFXButton onAction="#handleOpenTickerArchive" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.tickerArchive">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -550,7 +550,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleShowTransactions" stylesheets="@../../css/component/buttons.css" text="Show Transactions">
+                                          <JFXButton onAction="#handleShowTransactions" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.showTransactions">
                                              <graphic>
                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -560,7 +560,7 @@
                                              </graphic>
                                           </JFXButton>
                                           <Region HBox.hgrow="ALWAYS" />
-                                          <JFXButton fx:id="updatePortfolioPricesButton" onAction="#handleUpdatePortfolioPrices" stylesheets="@../../css/component/buttons.css" text="Update Prices">
+                                          <JFXButton fx:id="updatePortfolioPricesButton" onAction="#handleUpdatePortfolioPrices" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.updatePrices">
                                              <graphic>
                                                 <ImageView fx:id="updatePricesButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -581,12 +581,12 @@
                                              <children>
                                                 <VBox HBox.hgrow="ALWAYS">
                                                    <children>
-                                                      <Label fx:id="stocksFundsTabBottonPaneTitle" styleClass="title" text="Portfolio" />
+                                                      <Label fx:id="stocksFundsTabBottonPaneTitle" styleClass="title" text="%savings.stocksFunds.portfolio" />
                                                       <AnchorPane VBox.vgrow="ALWAYS">
                                                          <children>
                                                             <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                                <children>
-                                                                  <JFXButton onAction="#handleEditTicker" stylesheets="@../../css/component/buttons.css" text="Edit">
+                                                                  <JFXButton onAction="#handleEditTicker" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.edit">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -595,7 +595,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton onAction="#handleDeleteTicker" stylesheets="@../../css/component/buttons.css" text="Delete">
+                                                                  <JFXButton onAction="#handleDeleteTicker" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.delete">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -604,7 +604,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton onAction="#handleBuyTicker" stylesheets="@../../css/component/buttons.css" text="Buy Ticker">
+                                                                  <JFXButton onAction="#handleBuyTicker" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.buyTicker">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -613,7 +613,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton onAction="#handleSellTicker" stylesheets="@../../css/component/buttons.css" text="Sell Ticker">
+                                                                  <JFXButton onAction="#handleSellTicker" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.sellTicker">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -622,7 +622,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton onAction="#handleAddDividend" stylesheets="@../../css/component/buttons.css" text="Add Dividend">
+                                                                  <JFXButton onAction="#handleAddDividend" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.addDividend">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -631,7 +631,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton onAction="#handleAddCryptoExchange" stylesheets="@../../css/component/buttons.css" text="Exchange Cryptos">
+                                                                  <JFXButton onAction="#handleAddCryptoExchange" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.exchangeCryptos">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>
@@ -654,7 +654,7 @@
                                                                <children>
                                                                   <VBox alignment="CENTER">
                                                                      <children>
-                                                                        <Label text="Type">
+                                                                        <Label text="%savings.stocksFunds.filter.type">
                                                                            <font>
                                                                               <Font size="10.0" />
                                                                            </font>
@@ -671,7 +671,7 @@
                                                                         <Image url="@../../icon/common/find.png" />
                                                                      </image>
                                                                   </ImageView>
-                                                                  <TextField fx:id="stocksFundsTabTickerSearchField" prefWidth="300.0" promptText="Enter ID or Description" HBox.hgrow="ALWAYS" />
+                                                                  <TextField fx:id="stocksFundsTabTickerSearchField" prefWidth="300.0" promptText="%savings.stocksFunds.searchPlaceholder" HBox.hgrow="ALWAYS" />
                                                                </children>
                                                             </HBox>
                                                          </children>
@@ -698,7 +698,7 @@
                   </AnchorPane>
                </content>
             </Tab>
-            <Tab closable="false" text="Bonds">
+            <Tab closable="false" text="%savings.tab.bonds">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
               </content>

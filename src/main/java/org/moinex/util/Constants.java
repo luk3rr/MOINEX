@@ -345,7 +345,7 @@ public final class Constants {
             DateTimeFormatter.ofPattern(DB_MONTH_YEAR_FORMAT);
 
     // Define the pattern for positive and negative currency values
-    public static final String CURRENCY_FORMAT = "$ #,##0.00; - $ #,##0.00";
+    public static final String CURRENCY_FORMAT = "R$ #,##0.00; - R$ #,##0.00";
 
     // Percentage with two decimal places
     public static final String PERCENTAGE_FORMAT = "0.00";
@@ -623,6 +623,11 @@ public final class Constants {
         public static final String TRANSACTION_TYPE_EXPENSES = "transaction.type.expenses";
         public static final String TRANSACTION_TYPE_INCOMES = "transaction.type.incomes";
 
+        // Ticker types
+        public static final String TICKER_TYPE_STOCK = "ticker.type.stock";
+        public static final String TICKER_TYPE_FUND = "ticker.type.fund";
+        public static final String TICKER_TYPE_CRYPTO = "ticker.type.crypto";
+
         // Transaction status
         public static final String TRANSACTION_STATUS_PENDING = "transaction.status.pending";
         public static final String TRANSACTION_STATUS_CONFIRMED = "transaction.status.confirmed";
@@ -679,7 +684,8 @@ public final class Constants {
                 "goal.table.header.initialAmount";
         public static final String GOAL_TABLE_HEADER_CURRENT_AMOUNT =
                 "goal.table.header.currentAmount";
-        public static final String GOAL_TABLE_HEADER_TARGET_AMOUNT = "goal.table.header.targetAmount";
+        public static final String GOAL_TABLE_HEADER_TARGET_AMOUNT =
+                "goal.table.header.targetAmount";
         public static final String GOAL_TABLE_HEADER_PROGRESS = "goal.table.header.progress";
         public static final String GOAL_TABLE_HEADER_TARGET_DATE = "goal.table.header.targetDate";
         public static final String GOAL_TABLE_HEADER_COMPLETION_DATE =
@@ -707,6 +713,127 @@ public final class Constants {
                 "plan.dialog.noActivePlan.title";
         public static final String PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE =
                 "plan.dialog.noActivePlan.message";
+
+        // Savings
+        public static final String SAVINGS_TAB_OVERVIEW = "savings.tab.overview";
+        public static final String SAVINGS_TAB_STOCKS_FUNDS = "savings.tab.stocksFunds";
+        public static final String SAVINGS_TAB_BONDS = "savings.tab.bonds";
+
+        // Savings Overview
+        public static final String SAVINGS_OVERVIEW_TOTAL_INVESTED =
+                "savings.overview.totalInvested";
+        public static final String SAVINGS_OVERVIEW_GAINS_WITH_INTEREST =
+                "savings.overview.gainsWithInterest";
+        public static final String SAVINGS_OVERVIEW_LOSSES_WITH_DEPRECIATION =
+                "savings.overview.lossesWithDepreciation";
+        public static final String SAVINGS_OVERVIEW_TOTAL_VALUE = "savings.overview.totalValue";
+        public static final String SAVINGS_OVERVIEW_PORTFOLIO = "savings.overview.portfolio";
+        public static final String SAVINGS_OVERVIEW_BRAZILIAN_MARKET_INDICATORS =
+                "savings.overview.brazilianMarketIndicators";
+        public static final String SAVINGS_OVERVIEW_MARKET_QUOTES = "savings.overview.marketQuotes";
+        public static final String SAVINGS_OVERVIEW_COMMODITIES = "savings.overview.commodities";
+        public static final String SAVINGS_OVERVIEW_LAST_UPDATE = "savings.overview.lastUpdate";
+        public static final String SAVINGS_OVERVIEW_IPCA_12_MONTHS =
+                "savings.overview.ipca12Months";
+
+        // Savings Stocks & Funds
+        public static final String SAVINGS_STOCKS_FUNDS_NET_CAPITAL_INVESTED =
+                "savings.stocksFunds.netCapitalInvested";
+        public static final String SAVINGS_STOCKS_FUNDS_CURRENT_VALUE =
+                "savings.stocksFunds.currentValue";
+        public static final String SAVINGS_STOCKS_FUNDS_PROFIT_LOSS =
+                "savings.stocksFunds.profitLoss";
+        public static final String SAVINGS_STOCKS_FUNDS_DIVIDENDS_RECEIVED =
+                "savings.stocksFunds.dividendsReceived";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_REGISTER_TICKER =
+                "savings.stocksFunds.button.registerTicker";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_TICKER_ARCHIVE =
+                "savings.stocksFunds.button.tickerArchive";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_SHOW_TRANSACTIONS =
+                "savings.stocksFunds.button.showTransactions";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES =
+                "savings.stocksFunds.button.updatePrices";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_UPDATING =
+                "savings.stocksFunds.button.updating";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_EDIT =
+                "savings.stocksFunds.button.edit";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_DELETE =
+                "savings.stocksFunds.button.delete";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_BUY_TICKER =
+                "savings.stocksFunds.button.buyTicker";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_SELL_TICKER =
+                "savings.stocksFunds.button.sellTicker";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_ADD_DIVIDEND =
+                "savings.stocksFunds.button.addDividend";
+        public static final String SAVINGS_STOCKS_FUNDS_BUTTON_EXCHANGE_CRYPTOS =
+                "savings.stocksFunds.button.exchangeCryptos";
+        public static final String SAVINGS_STOCKS_FUNDS_FILTER_TYPE =
+                "savings.stocksFunds.filter.type";
+        public static final String SAVINGS_STOCKS_FUNDS_FILTER_ALL =
+                "savings.stocksFunds.filter.all";
+        public static final String SAVINGS_STOCKS_FUNDS_SEARCH_PLACEHOLDER =
+                "savings.stocksFunds.searchPlaceholder";
+        public static final String SAVINGS_STOCKS_FUNDS_PORTFOLIO = "savings.stocksFunds.portfolio";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_ADD_TICKER_TITLE =
+                "savings.stocksFunds.dialog.addTicker.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_BUY_TICKER_TITLE =
+                "savings.stocksFunds.dialog.buyTicker.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_SELL_TICKER_TITLE =
+                "savings.stocksFunds.dialog.sellTicker.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_ADD_DIVIDEND_TITLE =
+                "savings.stocksFunds.dialog.addDividend.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_ADD_CRYPTO_EXCHANGE_TITLE =
+                "savings.stocksFunds.dialog.addCryptoExchange.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_TICKER_ARCHIVE_TITLE =
+                "savings.stocksFunds.dialog.tickerArchive.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_INVESTMENT_TRANSACTIONS_TITLE =
+                "savings.stocksFunds.dialog.investmentTransactions.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_EDIT_TICKER_TITLE =
+                "savings.stocksFunds.dialog.editTicker.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE =
+                "savings.stocksFunds.dialog.noSelection.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_BUY_MESSAGE =
+                "savings.stocksFunds.dialog.noSelection.buy.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_SELL_MESSAGE =
+                "savings.stocksFunds.dialog.noSelection.sell.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_ADD_DIVIDEND_MESSAGE =
+                "savings.stocksFunds.dialog.noSelection.addDividend.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_EDIT_MESSAGE =
+                "savings.stocksFunds.dialog.noSelection.edit.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_DELETE_MESSAGE =
+                "savings.stocksFunds.dialog.noSelection.delete.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_TITLE =
+                "savings.stocksFunds.dialog.hasTransactions.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_MESSAGE =
+                "savings.stocksFunds.dialog.hasTransactions.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE =
+                "savings.stocksFunds.dialog.confirmationDelete.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE =
+                "savings.stocksFunds.dialog.updatePrices.success.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE =
+                "savings.stocksFunds.dialog.updatePrices.success.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE =
+                "savings.stocksFunds.dialog.updatePrices.error.title";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED =
+                "savings.stocksFunds.dialog.updatePrices.error.allFailed";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED =
+                "savings.stocksFunds.dialog.updatePrices.error.someFailed";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID =
+                "savings.stocksFunds.table.header.id";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_NAME =
+                "savings.stocksFunds.table.header.name";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_SYMBOL =
+                "savings.stocksFunds.table.header.symbol";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TYPE =
+                "savings.stocksFunds.table.header.type";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED =
+                "savings.stocksFunds.table.header.quantityOwned";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_UNIT_PRICE =
+                "savings.stocksFunds.table.header.unitPrice";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TOTAL_VALUE =
+                "savings.stocksFunds.table.header.totalValue";
+        public static final String SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE =
+                "savings.stocksFunds.table.header.averageUnitPrice";
     }
 
     // Prevent instantiation

@@ -29,6 +29,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.I18nService;
 import org.moinex.service.UserPreferencesService;
+import org.moinex.util.enums.TickerType;
 import org.moinex.util.enums.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -392,6 +393,21 @@ public final class UIUtils {
         }
 
         return transactionStatus.name();
+    }
+
+    public static String translateTickerType(TickerType tickerType, I18nService i18nService) {
+        Map<String, String> tickerKeyMap =
+                Map.of(
+                        "stock", Constants.TranslationKeys.TICKER_TYPE_STOCK,
+                        "fund", Constants.TranslationKeys.TICKER_TYPE_FUND,
+                        "cryptocurrency", Constants.TranslationKeys.TICKER_TYPE_CRYPTO);
+
+        String key = tickerKeyMap.getOrDefault(tickerType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return tickerType.name();
     }
 
     /**
