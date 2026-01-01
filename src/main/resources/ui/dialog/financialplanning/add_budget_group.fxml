@@ -22,32 +22,32 @@
             <children>
                 <VBox HBox.hgrow="ALWAYS">
                     <children>
-                        <Label text="Group Name">
+                        <Label text="%financialplanning.label.groupName">
                             <font><Font size="10.0" /></font>
                         </Label>
-                        <TextField fx:id="groupNameField" promptText="Ex: Essential Expenses" />
+                        <TextField fx:id="groupNameField" promptText="%financialplanning.promptText.groupName" />
                     </children>
                 </VBox>
                 <VBox>
                     <children>
-                        <Label text="Target Percentage (%)">
+                        <Label text="%financialplanning.label.targetPercentage">
                             <font><Font size="10.0" /></font>
                         </Label>
-                        <TextField fx:id="targetPercentageField" prefWidth="120.0" promptText="Ex: 50" />
+                        <TextField fx:id="targetPercentageField" prefWidth="120.0" promptText="%financialplanning.promptText.targetPercentage" />
                     </children>
                 </VBox>
             </children>
         </HBox>
 
         <!-- Category Association Section -->
-        <TitledPane alignment="CENTER" animated="false" collapsible="false" text="Associated Categories" textAlignment="CENTER" VBox.vgrow="ALWAYS">
+        <TitledPane alignment="CENTER" animated="false" collapsible="false" text="%financialplanning.label.associatedCategories" textAlignment="CENTER" VBox.vgrow="ALWAYS">
             <content>
                 <HBox alignment="CENTER" spacing="10.0" style="-fx-padding: 10;">
                     <children>
                         <!-- Available Categories List -->
                         <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                             <children>
-                                <Label text="Available Categories" />
+                                <Label text="%financialplanning.label.availableCategories" />
                                 <ListView fx:id="availableCategoriesListView" />
                             </children>
                         </VBox>
@@ -75,7 +75,7 @@
                         <!-- Selected Categories List -->
                         <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                             <children>
-                                <Label text="Categories in Group" />
+                                <Label text="%financialplanning.label.categoriesInGroup" />
                                 <ListView fx:id="selectedCategoriesListView" />
                             </children>
                         </VBox>
@@ -87,8 +87,8 @@
         <!-- Action Buttons -->
         <HBox alignment="CENTER" spacing="10.0">
             <children>
-                <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-                <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+                <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+                <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
             </children>
             <padding>
                 <Insets top="10.0" />

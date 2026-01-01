@@ -18,7 +18,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Sender wallet">
+                  <Label text="%wallettransaction.label.senderWallet">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -55,7 +55,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Receiver wallet">
+                  <Label text="%wallettransaction.label.receiverWallet">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -90,7 +90,7 @@
                   <Image url="@../../../icon/common/pencil.png" />
                </image>
             </ImageView>
-            <TextField fx:id="descriptionField" promptText="Description" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="descriptionField" promptText="%dialog.label.description" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" spacing="5.0">
@@ -116,7 +116,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Date">
+                  <Label text="%dialog.label.date">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -138,8 +138,8 @@
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

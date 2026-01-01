@@ -9,7 +9,6 @@ package org.moinex.ui.dialog.creditcard;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -23,6 +22,7 @@ import org.moinex.model.creditcard.CreditCardPayment;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
@@ -64,6 +64,8 @@ public class CreditCardInvoicePaymentController {
 
     private CalculatorService calculatorService;
 
+    private I18nService i18nService;
+
     private List<Wallet> wallets;
 
     private CreditCard creditCard = null;
@@ -75,6 +77,7 @@ public class CreditCardInvoicePaymentController {
      * @param walletService WalletService
      * @param creditCardService CreditCardService
      * @param calculatorService CalculatorService
+     * @param i18nService I18nService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -82,11 +85,13 @@ public class CreditCardInvoicePaymentController {
             WalletService walletService,
             CreditCardService creditCardService,
             CalculatorService calculatorService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
         this.springContext = springContext;
+        this.i18nService = i18nService;
     }
 
     public void setCreditCard(CreditCard crc, YearMonth invoiceDate) {
@@ -110,9 +115,7 @@ public class CreditCardInvoicePaymentController {
 
         totalToPayLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
-
-        crcInvoiceMonthLabel.setText(invoiceDate.format(formatter));
+        crcInvoiceMonthLabel.setText(UIUtils.formatShortMonthYear(invoiceDate, i18nService));
 
         crcAvailableRebateLabel.setText(UIUtils.formatCurrency(creditCard.getAvailableRebate()));
 
@@ -176,7 +179,12 @@ public class CreditCardInvoicePaymentController {
         Wallet wallet = walletComboBox.getValue();
 
         if (wallet == null) {
-            WindowUtils.showInformationDialog("Wallet not selected", "Please select a wallet");
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_WALLET_NOT_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDITCARD_DIALOG_WALLET_NOT_SELECTED_MESSAGE));
             return;
         }
 
@@ -197,7 +205,11 @@ public class CreditCardInvoicePaymentController {
 
         if (invoiceAmount.compareTo(BigDecimal.ZERO) == 0) {
             WindowUtils.showInformationDialog(
-                    "Invoice already paid", "This invoice has already been paid");
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_MESSAGE));
         } else {
             try {
                 creditCardService.payInvoice(
@@ -207,14 +219,22 @@ public class CreditCardInvoicePaymentController {
                         invoiceDate.getYear(),
                         rebateValue);
 
-                WindowUtils.showSuccessDialog("Invoice paid", "Invoice was successfully paid");
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE));
 
                 Stage stage = (Stage) crcNameLabel.getScene().getWindow();
                 stage.close();
             } catch (EntityNotFoundException
                     | IllegalArgumentException
                     | MoinexException.InsufficientResourcesException e) {
-                WindowUtils.showErrorDialog("Error paying invoice", e.getMessage());
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE),
+                        e.getMessage());
             }
         }
 

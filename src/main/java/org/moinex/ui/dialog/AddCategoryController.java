@@ -7,11 +7,14 @@
 package org.moinex.ui.dialog;
 
 import jakarta.persistence.EntityExistsException;
+import java.text.MessageFormat;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,9 +29,12 @@ public class AddCategoryController {
 
     private CategoryService categoryService;
 
+    private I18nService i18nService;
+
     @Autowired
-    public AddCategoryController(CategoryService categoryService) {
+    public AddCategoryController(CategoryService categoryService, I18nService i18nService) {
         this.categoryService = categoryService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -44,12 +50,20 @@ public class AddCategoryController {
             categoryService.addCategory(name);
 
             WindowUtils.showSuccessDialog(
-                    "Category added", "Category " + name + " added successfully");
+                    i18nService.tr(Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
+                    MessageFormat.format(
+                            i18nService.tr(
+                                    Constants.TranslationKeys
+                                            .CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE),
+                            name));
 
             Stage stage = (Stage) categoryNameField.getScene().getWindow();
             stage.close();
         } catch (IllegalArgumentException | EntityExistsException e) {
-            WindowUtils.showErrorDialog("Error adding category", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CATEGORY_DIALOG_ERROR_ADDING_CATEGORY_TITLE),
+                    e.getMessage());
         }
     }
 

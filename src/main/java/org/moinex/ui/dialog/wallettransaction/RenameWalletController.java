@@ -15,7 +15,9 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
+import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +37,17 @@ public class RenameWalletController {
 
     private WalletService walletService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public RenameWalletController(WalletService walletService) {
+    public RenameWalletController(WalletService walletService, I18nService i18nService) {
         this.walletService = walletService;
+        this.i18nService = i18nService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -67,14 +72,22 @@ public class RenameWalletController {
 
         if (wt == null || walletNewName.isBlank()) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
         try {
             walletService.renameWallet(wt.getId(), walletNewName);
         } catch (IllegalArgumentException | EntityNotFoundException | EntityExistsException e) {
-            WindowUtils.showErrorDialog("Error renaming wallet", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_RENAMING_WALLET_TITLE),
+                    e.getMessage());
             return;
         }
 

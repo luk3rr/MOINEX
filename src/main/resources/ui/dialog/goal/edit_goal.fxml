@@ -34,12 +34,12 @@
             </VBox>
             <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Goal name" VBox.vgrow="ALWAYS">
+                  <Label text="%goal.label.goalName" VBox.vgrow="ALWAYS">
                      <font>
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="nameField" promptText="Name" />
+                  <TextField fx:id="nameField" promptText="%dialog.label.name" />
                </children>
             </VBox>
          </children>
@@ -64,7 +64,7 @@
                   </VBox>
                   <VBox alignment="CENTER">
                      <children>
-                        <Label text="Current balance">
+                        <Label text="%goal.label.currentBalance">
                            <font>
                               <Font size="10.0" />
                            </font>
@@ -74,7 +74,7 @@
                   </VBox>
                   <VBox alignment="CENTER">
                      <children>
-                        <Label text="Target balance">
+                        <Label text="%goal.label.targetBalance">
                            <font>
                               <Font size="10.0" />
                            </font>
@@ -103,7 +103,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Target date">
+                  <Label text="%goal.label.targetDate">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -117,7 +117,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Motivation">
+                  <Label text="%goal.label.motivation">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -131,7 +131,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Master Wallet (optional)">
+                  <Label text="%goal.label.masterWallet">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -143,14 +143,14 @@
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <CheckBox fx:id="archivedCheckBox" mnemonicParsing="false" text="Archived" />
-            <CheckBox fx:id="completedCheckBox" mnemonicParsing="false" text="Completed" />
+            <CheckBox fx:id="archivedCheckBox" mnemonicParsing="false" text="%dialog.label.archived" />
+            <CheckBox fx:id="completedCheckBox" mnemonicParsing="false" text="%goal.label.completed" />
          </children>
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

@@ -160,6 +160,10 @@ public class SuggestionsHandlerHelper<T> {
     }
 
     private void showPopup() {
+        if (componentField.getScene() == null || componentField.getScene().getWindow() == null) {
+            return;
+        }
+
         suggestionsPopup.show(
                 componentField,
                 componentField.localToScene(0, 0).getX()

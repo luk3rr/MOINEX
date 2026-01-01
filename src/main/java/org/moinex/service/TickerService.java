@@ -123,6 +123,7 @@ public class TickerService {
                         .type(type)
                         .currentUnitValue(price)
                         .averageUnitValue(avgUnitPrice)
+                        .averageUnitValueCount(BigDecimal.ONE)
                         .currentQuantity(quantity)
                         .lastUpdate(LocalDateTime.now())
                         .build();

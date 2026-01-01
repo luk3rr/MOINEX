@@ -25,6 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.NoArgsConstructor;
+import org.moinex.service.I18nService;
 import org.moinex.service.UserPreferencesService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.ui.common.CalendarController;
@@ -62,6 +63,8 @@ public class MainController {
 
     @FXML private Button savingsButton;
 
+    @FXML private Button settingsButton;
+
     @FXML private AnchorPane contentArea;
 
     @FXML private ImageView toggleMonetaryValuesIcon;
@@ -69,6 +72,8 @@ public class MainController {
     private ConfigurableApplicationContext springContext;
 
     private UserPreferencesService userPreferencesService;
+
+    private I18nService i18nService;
 
     private Pair<String, String> currentContent;
 
@@ -80,9 +85,11 @@ public class MainController {
     @Autowired
     public MainController(
             ConfigurableApplicationContext springContext,
-            UserPreferencesService userPreferencesService) {
+            UserPreferencesService userPreferencesService,
+            I18nService i18nService) {
         this.springContext = springContext;
         this.userPreferencesService = userPreferencesService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -94,7 +101,7 @@ public class MainController {
                 new Button[] {
                     menuButton, homeButton, walletButton,
                     creditCardButton, transactionButton, goalsAndPlanButton,
-                    savingsButton
+                    savingsButton, settingsButton
                 };
 
         rootPane.getStylesheets()
@@ -147,6 +154,12 @@ public class MainController {
                     updateSelectedButton(savingsButton);
                 });
 
+        settingsButton.setOnAction(
+                event -> {
+                    loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET);
+                    updateSelectedButton(settingsButton);
+                });
+
         // Load start page
         loadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET);
         updateSelectedButton(homeButton);
@@ -156,20 +169,28 @@ public class MainController {
     private void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                "Calculator",
+                i18nService.tr("main.calculator"),
                 springContext,
                 (CalculatorController controller) -> {},
-                List.of(() -> {}));
+                List.of(() -> {}),
+                i18nService.getBundle());
     }
 
     @FXML
     private void handleOpenCalendar() {
         WindowUtils.openPopupWindow(
                 Constants.CALENDAR_FXML,
-                "Calendar",
+                i18nService.tr("main.calendar"),
                 springContext,
                 (CalendarController controller) -> {},
-                List.of(() -> {}));
+                List.of(() -> {}),
+                i18nService.getBundle());
+    }
+
+    @FXML
+    private void handleOpenSettings() {
+        loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET);
+        updateSelectedButton(settingsButton);
     }
 
     @FXML
@@ -193,7 +214,8 @@ public class MainController {
      */
     public void loadContent(String fxmlFile, String styleSheet) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource(fxmlFile), i18nService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 

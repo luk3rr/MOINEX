@@ -18,9 +18,11 @@ import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
 import org.moinex.util.enums.TransactionType;
@@ -39,6 +41,7 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
      * @param walletTransactionService Wallet transaction service
      * @param categoryService Category service
      * @param tickerService Ticker service
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -46,9 +49,10 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
             WalletService walletService,
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
-            TickerService tickerService) {
-        super(walletService, walletTransactionService, categoryService, tickerService);
-
+            TickerService tickerService,
+            I18nService i18nService) {
+        super(walletService, walletTransactionService, categoryService, tickerService, i18nService);
+        this.i18nService = i18nService;
         transactionType = TransactionType.INCOME;
     }
 
@@ -74,7 +78,9 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
                 || quantityStr.isBlank()
                 || buyDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -97,16 +103,25 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
                     description,
                     status);
 
-            WindowUtils.showSuccessDialog("Sale added", "Sale added successfully");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_ADDED_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_ADDED_MESSAGE));
 
             Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException
                 | IllegalArgumentException
                 | MoinexException.InsufficientResourcesException e) {
-            WindowUtils.showErrorDialog("Error while selling ticker", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_SELLING_TICKER_TITLE),
+                    e.getMessage());
         }
     }
 }

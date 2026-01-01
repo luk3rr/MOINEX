@@ -33,20 +33,20 @@
          </VBox>
          <VBox alignment="CENTER">
             <children>
-               <Label text="Category name">
+               <Label text="%category.label.categoryName">
                   <font>
                      <Font size="10.0" />
                   </font>
                </Label>
-                <TextField fx:id="categoryNameField" promptText="Category name" />
+                <TextField fx:id="categoryNameField" promptText="%category.label.categoryName" />
             </children>
          </VBox>
       </children>
    </HBox>
    <HBox alignment="CENTER" spacing="10.0">
       <children>
-         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../css/component/buttons.css" text="Cancel" />
-         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleSave" stylesheets="@../../css/component/buttons.css" text="Save" />
+         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../css/component/buttons.css" text="%dialog.button.cancel" />
+         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleSave" stylesheets="@../../css/component/buttons.css" text="%dialog.button.save" />
       </children>
       <VBox.margin>
          <Insets />

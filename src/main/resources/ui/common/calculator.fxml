@@ -87,7 +87,7 @@
                               <Font size="25.0" />
                            </font>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#finish" prefHeight="50.0" prefWidth="120.0" text="Insert result" textAlignment="CENTER">
+                        <Button mnemonicParsing="false" onAction="#finish" prefHeight="50.0" prefWidth="120.0" text="%common.calculator.insertResult" textAlignment="CENTER">
                            <font>
                               <Font size="12.0" />
                            </font>

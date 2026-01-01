@@ -15,8 +15,10 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.RecurringTransactionFrequency;
 import org.moinex.util.enums.TransactionType;
@@ -40,8 +42,9 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
     public AddRecurringTransactionController(
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
-            CategoryService categoryService) {
-        super(walletService, recurringTransactionService, categoryService);
+            CategoryService categoryService,
+            I18nService i18nService) {
+        super(walletService, recurringTransactionService, categoryService, i18nService);
     }
 
     @FXML
@@ -66,7 +69,11 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
                 || startDate == null
                 || frequency == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -95,16 +102,29 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
             }
 
             WindowUtils.showSuccessDialog(
-                    "Recurring transaction created", "Recurring transaction created successfully.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_MESSAGE));
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid transaction value", "Transaction value must be a number.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    "Error while creating recurring transaction", e.getMessage());
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_CREATING_RECURRING_TITLE),
+                    e.getMessage());
         }
     }
 }

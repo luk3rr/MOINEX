@@ -7,6 +7,7 @@
 package org.moinex.ui.dialog.wallettransaction;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.text.MessageFormat;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,8 +20,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
+import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,6 +45,8 @@ public class ArchivedWalletsController {
 
     private WalletTransactionService walletTransactionService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      * @param walletService WalletService
@@ -48,9 +54,12 @@ public class ArchivedWalletsController {
      */
     @Autowired
     public ArchivedWalletsController(
-            WalletService walletService, WalletTransactionService walletTransactionService) {
+            WalletService walletService,
+            WalletTransactionService walletTransactionService,
+            I18nService i18nService) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -73,25 +82,47 @@ public class ArchivedWalletsController {
 
         if (selectedWallet == null) {
             WindowUtils.showInformationDialog(
-                    "No wallet selected", "Please select a wallet to unarchive");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_UNARCHIVE_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Unarchive wallet " + selectedWallet.getName(),
-                "Are you sure you want to unarchive this wallet?")) {
+                i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_UNARCHIVE_WALLET_TITLE)
+                        + " "
+                        + selectedWallet.getName(),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .WALLETTRANSACTION_DIALOG_UNARCHIVE_WALLET_MESSAGE),
+                i18nService.getBundle())) {
             try {
                 walletService.unarchiveWallet(selectedWallet.getId());
 
                 WindowUtils.showSuccessDialog(
-                        "Wallet unarchived",
-                        "Wallet " + selectedWallet.getName() + " has been unarchived");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_TITLE),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_MESSAGE),
+                                selectedWallet.getName()));
 
                 // Remove this wallet from the list and update the table view
                 archivedWallets.remove(selectedWallet);
                 updateWalletTableView();
             } catch (EntityNotFoundException e) {
-                WindowUtils.showErrorDialog("Error unarchiving wallet", e.getMessage());
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_ERROR_UNARCHIVING_WALLET_TITLE),
+                        e.getMessage());
             }
         }
     }
@@ -102,34 +133,58 @@ public class ArchivedWalletsController {
 
         if (selectedWallet == null) {
             WindowUtils.showInformationDialog(
-                    "No wallet selected", "Please select a wallet to delete");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_DELETE_MESSAGE));
             return;
         }
 
         // Prevent the removal of a wallet with associated transactions
         if (walletTransactionService.getTransactionCountByWallet(selectedWallet.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    "Wallet has transactions",
-                    "Cannot delete a wallet with associated transactions. You can "
-                            + "archive it instead.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_WALLET_HAS_TRANSACTIONS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_WALLET_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Remove wallet " + selectedWallet.getName(),
-                "Are you sure you want to remove this wallet?")) {
+                i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_REMOVE_WALLET_TITLE)
+                        + " "
+                        + selectedWallet.getName(),
+                i18nService.tr(
+                        Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_REMOVE_WALLET_MESSAGE),
+                i18nService.getBundle())) {
             try {
                 walletService.deleteWallet(selectedWallet.getId());
 
                 WindowUtils.showSuccessDialog(
-                        "Wallet deleted",
-                        "Wallet " + selectedWallet.getName() + " has been deleted");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_WALLET_DELETED_TITLE),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .WALLETTRANSACTION_DIALOG_WALLET_DELETED_MESSAGE),
+                                selectedWallet.getName()));
 
                 // Remove this wallet from the list and update the table view
                 archivedWallets.remove(selectedWallet);
                 updateWalletTableView();
             } catch (EntityNotFoundException | IllegalStateException e) {
-                WindowUtils.showErrorDialog("Error removing wallet", e.getMessage());
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_ERROR_REMOVING_WALLET_TITLE),
+                        e.getMessage());
             }
         }
     }
@@ -182,13 +237,20 @@ public class ArchivedWalletsController {
     private void configureTableView() {
         TableColumn<Wallet, Integer> idColumn = getWalletLongTableColumn();
 
-        TableColumn<Wallet, String> walletColumn = new TableColumn<>("Wallet");
+        TableColumn<Wallet, String> walletColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_WALLET));
         walletColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
-        TableColumn<Wallet, String> typeColumn = new TableColumn<>("Type");
+        TableColumn<Wallet, String> typeColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_TYPE));
         typeColumn.setCellValueFactory(
-                param -> new SimpleStringProperty(param.getValue().getType().getName()));
+                param ->
+                        new SimpleStringProperty(
+                                UIUtils.translateWalletType(
+                                        param.getValue().getType(), i18nService)));
 
         TableColumn<Wallet, Integer> numOfTransactionsColumn = getLongTableColumn();
 
@@ -200,7 +262,10 @@ public class ArchivedWalletsController {
 
     private TableColumn<Wallet, Integer> getLongTableColumn() {
         TableColumn<Wallet, Integer> numOfTransactionsColumn =
-                new TableColumn<>("Associated Transactions");
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_TABLE_ASSOCIATED_TRANSACTIONS));
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -225,8 +290,10 @@ public class ArchivedWalletsController {
         return numOfTransactionsColumn;
     }
 
-    private static TableColumn<Wallet, Integer> getWalletLongTableColumn() {
-        TableColumn<Wallet, Integer> idColumn = new TableColumn<>("ID");
+    private TableColumn<Wallet, Integer> getWalletLongTableColumn() {
+        TableColumn<Wallet, Integer> idColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(

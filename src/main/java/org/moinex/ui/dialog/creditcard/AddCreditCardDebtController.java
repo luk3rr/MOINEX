@@ -19,6 +19,8 @@ import org.moinex.model.creditcard.CreditCard;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -30,13 +32,18 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddCreditCardDebtController extends BaseCreditCardDebtManagement {
+    private I18nService i18nService;
+
     @Autowired
     public AddCreditCardDebtController(
             CategoryService categoryService,
             CreditCardService creditCardService,
             CalculatorService calculatorService,
-            ConfigurableApplicationContext springContext) {
+            ConfigurableApplicationContext springContext,
+            I18nService i18nService) {
         super(categoryService, creditCardService, calculatorService, springContext);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     @Override
@@ -55,7 +62,9 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                 || valueStr.isEmpty()
                 || invoiceMonth == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -74,16 +83,25 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                     installments,
                     description);
 
-            WindowUtils.showSuccessDialog("Debt created", "Debt created successfully");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_MESSAGE));
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid expense value", "Debt value must be a number");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
         } catch (EntityNotFoundException
                 | IllegalArgumentException
                 | MoinexException.InsufficientResourcesException e) {
-            WindowUtils.showErrorDialog("Error creating debt", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
+                    e.getMessage());
         }
     }
 }

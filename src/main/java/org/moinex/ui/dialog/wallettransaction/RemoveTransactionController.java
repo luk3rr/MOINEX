@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.WalletTransaction;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -45,6 +46,8 @@ public class RemoveTransactionController {
 
     private WalletTransactionService walletTransactionService;
 
+    private I18nService i18nService;
+
     private TransactionType transactionType;
 
     /**
@@ -53,8 +56,10 @@ public class RemoveTransactionController {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public RemoveTransactionController(WalletTransactionService walletTransactionService) {
+    public RemoveTransactionController(
+            WalletTransactionService walletTransactionService, I18nService i18nService) {
         this.walletTransactionService = walletTransactionService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -96,25 +101,41 @@ public class RemoveTransactionController {
 
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
-        message.append("Description: ")
+        message.append(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_LABEL_DESCRIPTION))
+                .append(" ")
                 .append(selectedTransaction.getDescription())
                 .append("\n")
-                .append("Amount: ")
+                .append(i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_AMOUNT))
+                .append(" ")
                 .append(UIUtils.formatCurrency(selectedTransaction.getAmount()))
                 .append("\n")
-                .append("Date: ")
-                .append(selectedTransaction.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+                .append(i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_DATE))
+                .append(" ")
+                .append(
+                        UIUtils.formatDateTimeForDisplay(
+                                selectedTransaction.getDate(), i18nService))
                 .append("\n")
-                .append("Status: ")
+                .append(i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_STATUS))
+                .append(" ")
                 .append(selectedTransaction.getStatus().toString())
                 .append("\n")
-                .append("Wallet: ")
+                .append(i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_WALLET))
+                .append(" ")
                 .append(selectedTransaction.getWallet().getName())
                 .append("\n")
-                .append("Wallet balance: ")
+                .append(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_LABEL_WALLET_BALANCE))
+                .append(" ")
                 .append(UIUtils.formatCurrency(selectedTransaction.getWallet().getBalance()))
                 .append("\n")
-                .append("Wallet balance after deletion: ");
+                .append(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_LABEL_WALLET_BALANCE_AFTER_DELETION))
+                .append(" ");
 
         // if the transaction is confirmed, add the amount to the wallet balance
         // otherwise, the wallet balance remains the same
@@ -133,7 +154,8 @@ public class RemoveTransactionController {
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                "Are you sure you want to remove this "
+                i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_CONFIRM_DELETE)
+                        + " "
                         + transactionType.toString().toLowerCase()
                         + "?",
                 message.toString())) {
@@ -183,33 +205,45 @@ public class RemoveTransactionController {
     private void configureTableView() {
         TableColumn<WalletTransaction, Integer> idColumn = getWalletTransactionLongTableColumn();
 
-        TableColumn<WalletTransaction, String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<WalletTransaction, String> categoryColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getCategory().getName()));
 
-        TableColumn<WalletTransaction, String> statusColumn = new TableColumn<>("Status");
+        TableColumn<WalletTransaction, String> statusColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_STATUS));
         statusColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getStatus().name()));
 
-        TableColumn<WalletTransaction, String> dateColumn = new TableColumn<>("Date");
+        TableColumn<WalletTransaction, String> dateColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
-        TableColumn<WalletTransaction, String> walletNameColumn = new TableColumn<>("Wallet");
+        TableColumn<WalletTransaction, String> walletNameColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_WALLET));
         walletNameColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getWallet().getName()));
 
-        TableColumn<WalletTransaction, String> amountColumn = new TableColumn<>("Amount");
+        TableColumn<WalletTransaction, String> amountColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
                                 UIUtils.formatCurrency(param.getValue().getAmount())));
 
-        TableColumn<WalletTransaction, String> descriptionColumn = new TableColumn<>("Description");
+        TableColumn<WalletTransaction, String> descriptionColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getDescription()));
 
@@ -222,8 +256,10 @@ public class RemoveTransactionController {
         transactionsTableView.getColumns().add(statusColumn);
     }
 
-    private static TableColumn<WalletTransaction, Integer> getWalletTransactionLongTableColumn() {
-        TableColumn<WalletTransaction, Integer> idColumn = new TableColumn<>("ID");
+    private TableColumn<WalletTransaction, Integer> getWalletTransactionLongTableColumn() {
+        TableColumn<WalletTransaction, Integer> idColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center

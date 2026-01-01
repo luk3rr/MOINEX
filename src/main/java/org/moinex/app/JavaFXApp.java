@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.moinex.service.I18nService;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -44,8 +45,11 @@ public class JavaFXApp extends Application {
                 .start(
                         () -> {
                             try {
+                                I18nService i18nService = springContext.getBean(I18nService.class);
                                 FXMLLoader loader =
-                                        new FXMLLoader(getClass().getResource(Constants.MAIN_FXML));
+                                        new FXMLLoader(
+                                                getClass().getResource(Constants.MAIN_FXML),
+                                                i18nService.getBundle());
                                 loader.setControllerFactory(springContext::getBean);
                                 Parent mainRoot = loader.load();
 
@@ -53,7 +57,9 @@ public class JavaFXApp extends Application {
 
                                 Platform.runLater(
                                         () -> {
-                                            primaryStage.setTitle(Constants.APP_NAME);
+                                            primaryStage.setTitle(
+                                                    i18nService.tr(
+                                                            Constants.TranslationKeys.APP_TITLE));
                                             primaryStage.setScene(new Scene(mainRoot));
                                             primaryStage.show();
                                             splashStage.close();

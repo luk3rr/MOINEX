@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefWidth="600.0" spacing="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.financialplanning.EditPlanController">
+<VBox alignment="CENTER" minWidth="900.0" prefWidth="900.0" spacing="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.financialplanning.EditPlanController">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>
@@ -21,15 +21,15 @@
             <children>
                 <VBox HBox.hgrow="ALWAYS">
                     <children>
-                        <Label text="Plan Name">
+                        <Label text="%financialplanning.label.planName">
                             <font><Font size="10.0" /></font>
                         </Label>
-                        <TextField fx:id="planNameField" promptText="Ex: Monthly Budget 2025" />
+                        <TextField fx:id="planNameField" promptText="%financialplanning.promptText.planName" />
                     </children>
                 </VBox>
                 <VBox>
                     <children>
-                        <Label text="Base Monthly Income">
+                        <Label text="%financialplanning.label.baseMonthlyIncome">
                             <font><Font size="10.0" /></font>
                         </Label>
                         <TextField fx:id="baseIncomeField" prefWidth="150.0" promptText="\$ 0.00" />
@@ -39,7 +39,7 @@
         </HBox>
 
         <!-- Budget Groups and Category Association Section -->
-        <Label style="-fx-font-weight: bold;" text="Budget Groups" />
+        <Label style="-fx-font-weight: bold;" text="%financialplanning.label.budgetGroups" />
       <VBox minHeight="150.0">
          <children>
             <HBox alignment="CENTER" minHeight="130.0" spacing="10.0">
@@ -51,7 +51,7 @@
             </HBox>
             <AnchorPane>
                <children>
-                  <Label fx:id="budgetGroupInfo" alignment="CENTER" text="Information" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <Label fx:id="budgetGroupInfo" alignment="CENTER" text="%financialplanning.label.information" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />
@@ -84,7 +84,7 @@
             </HBox>
          </children>
       </VBox>
-        <JFXButton onAction="#handleAddBudgetGroup" style="-fx-text-fill: #0d9488; -fx-font-weight: bold;" text="Add New Group">
+        <JFXButton onAction="#handleAddBudgetGroup" style="-fx-text-fill: #0d9488; -fx-font-weight: bold;" text="%financialplanning.label.addNewGroup">
             <graphic>
                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                     <image><Image url="@../../../icon/common/add.png" /></image>
@@ -95,8 +95,8 @@
         <!-- Action Buttons -->
         <HBox alignment="CENTER" spacing="10.0">
             <children>
-                <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-                <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+                <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+                <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
             </children>
             <padding>
                 <Insets top="10.0" />

@@ -7,6 +7,7 @@
 package org.moinex.ui.dialog.creditcard;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.text.MessageFormat;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,6 +21,8 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,14 +41,19 @@ public class ArchivedCreditCardsController {
 
     private CreditCardService creditCardService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      * @param creditCardService CreditCardService
+     * @param i18nService I18nService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ArchivedCreditCardsController(CreditCardService creditCardService) {
+    public ArchivedCreditCardsController(
+            CreditCardService creditCardService, I18nService i18nService) {
         this.creditCardService = creditCardService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -68,25 +76,38 @@ public class ArchivedCreditCardsController {
 
         if (selectedCrc == null) {
             WindowUtils.showErrorDialog(
-                    "No credit card selected", "Please select a credit card to unarchive");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_UNARCHIVE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Unarchive credit card " + selectedCrc.getName(),
-                "Are you sure you want to unarchive this credit card?")) {
+                MessageFormat.format(
+                        i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_UNARCHIVE_TITLE),
+                        selectedCrc.getName()),
+                i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_UNARCHIVE_MESSAGE))) {
             try {
                 creditCardService.unarchiveCreditCard(selectedCrc.getId());
 
                 WindowUtils.showSuccessDialog(
-                        "Credit Card unarchived",
-                        "Credit Card " + selectedCrc.getName() + " has been unarchived");
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_TITLE),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDITCARD_DIALOG_UNARCHIVED_MESSAGE),
+                                selectedCrc.getName()));
 
                 // Remove this credit card from the list and update the table view
                 archivedCreditCards.remove(selectedCrc);
                 updateCreditCardTableView();
             } catch (EntityNotFoundException e) {
-                WindowUtils.showErrorDialog("Error unarchiving credit card", e.getMessage());
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .CREDITCARD_DIALOG_ERROR_UNARCHIVING_TITLE),
+                        e.getMessage());
             }
         }
     }
@@ -97,34 +118,44 @@ public class ArchivedCreditCardsController {
 
         if (selectedCrc == null) {
             WindowUtils.showInformationDialog(
-                    "No credit card selected", "Please select a credit card to delete");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_DELETE));
             return;
         }
 
         // Prevent the removal of a credit card with associated transactions
         if (creditCardService.getDebtCountByCreditCard(selectedCrc.getId()) > 0) {
             WindowUtils.showErrorDialog(
-                    "Credit Card has debts",
-                    "Cannot delete a credit card with associated debts. You can "
-                            + "archive it instead.");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_HAS_DEBTS_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_HAS_DEBTS_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                "Delete credit card " + selectedCrc.getName(),
-                "Are you sure you want to remove this credit card?")) {
+                MessageFormat.format(
+                        i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DELETE_TITLE),
+                        selectedCrc.getName()),
+                i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DELETE_MESSAGE))) {
             try {
                 creditCardService.deleteCreditCard(selectedCrc.getId());
 
                 WindowUtils.showSuccessDialog(
-                        "Credit card deleted",
-                        "Credit card " + selectedCrc.getName() + " has been deleted");
+                        i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DELETED_TITLE),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDITCARD_DIALOG_DELETED_MESSAGE),
+                                selectedCrc.getName()));
 
                 // Remove this credit card from the list and update the table view
                 archivedCreditCards.remove(selectedCrc);
                 updateCreditCardTableView();
             } catch (EntityNotFoundException | IllegalStateException e) {
-                WindowUtils.showErrorDialog("Error removing credit card", e.getMessage());
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_DELETING_TITLE),
+                        e.getMessage());
             }
         }
     }
@@ -175,17 +206,42 @@ public class ArchivedCreditCardsController {
      * Configures the table view columns
      */
     private void configureTableView() {
-        TableColumn<CreditCard, Integer> idColumn = getCreditCardLongTableColumn();
+        TableColumn<CreditCard, Integer> idColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.CREDITCARD_TABLE_ID));
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
-        TableColumn<CreditCard, String> crcColumn = new TableColumn<>("Credit Card");
+        idColumn.setCellFactory(
+                column ->
+                        new TableCell<>() {
+                            @Override
+                            protected void updateItem(Integer item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item == null || empty) {
+                                    setText(null);
+                                } else {
+                                    setText(item.toString());
+                                    setAlignment(Pos.CENTER);
+                                    setStyle("-fx-padding: 0;");
+                                }
+                            }
+                        });
+
+        TableColumn<CreditCard, String> crcColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.CREDITCARD_TABLE_CREDIT_CARD));
         crcColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
-        TableColumn<CreditCard, String> operatorColumn = new TableColumn<>("Operator");
+        TableColumn<CreditCard, String> operatorColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.CREDITCARD_TABLE_OPERATOR));
         operatorColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getOperator().getName()));
 
-        TableColumn<CreditCard, Integer> numOfDebtsColumn = new TableColumn<>("Associated Debts");
+        TableColumn<CreditCard, Integer> numOfDebtsColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_TABLE_ASSOCIATED_DEBTS));
         numOfDebtsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -212,27 +268,5 @@ public class ArchivedCreditCardsController {
         creditCardTableView.getColumns().add(crcColumn);
         creditCardTableView.getColumns().add(operatorColumn);
         creditCardTableView.getColumns().add(numOfDebtsColumn);
-    }
-
-    private static TableColumn<CreditCard, Integer> getCreditCardLongTableColumn() {
-        TableColumn<CreditCard, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        idColumn.setCellFactory(
-                column ->
-                        new TableCell<>() {
-                            @Override
-                            protected void updateItem(Integer item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (item == null || empty) {
-                                    setText(null);
-                                } else {
-                                    setText(item.toString());
-                                    setAlignment(Pos.CENTER);
-                                    setStyle("-fx-padding: 0;");
-                                }
-                            }
-                        });
-        return idColumn;
     }
 }

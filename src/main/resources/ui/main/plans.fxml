@@ -18,7 +18,7 @@
          <children>
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
-                  <Label styleClass="title" text="Monthly Planning">
+                  <Label styleClass="title" text="%plan.title">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -27,7 +27,7 @@
                   <ComboBox fx:id="periodComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
                </children>
             </HBox>
-            <AnchorPane>
+            <AnchorPane prefHeight="500.0">
                <children>
                   <HBox layoutX="89.0" layoutY="40.0" minHeight="300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -37,7 +37,7 @@
                                  <children>
                                     <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                        <children>
-                                          <Label text="Base Monthly Income">
+                                          <Label text="%plan.baseMonthlyIncome">
                                              <font>
                                                 <Font name="System Bold" size="18.0" />
                                              </font>
@@ -55,7 +55,7 @@
                                  <children>
                                     <HBox alignment="CENTER" layoutX="-21.0" layoutY="25.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <JFXButton onAction="#handleNewPlan" stylesheets="@../../css/component/buttons.css" text="New Plan">
+                                          <JFXButton onAction="#handleNewPlan" stylesheets="@../../css/component/buttons.css" text="%plan.button.newPlan">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -64,7 +64,7 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
-                                          <JFXButton onAction="#handleEditPlan" stylesheets="@../../css/component/buttons.css" text="Edit Plan">
+                                          <JFXButton onAction="#handleEditPlan" stylesheets="@../../css/component/buttons.css" text="%plan.button.editPlan">
                                              <graphic>
                                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
@@ -81,7 +81,7 @@
                         </VBox>
                         <AnchorPane minHeight="400.0" minWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label styleClass="title" text="Plan Distribution" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Label styleClass="title" text="%plan.planDistribution.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
                                  <children>
                                     <AnchorPane fx:id="pieChartAnchorPane" minWidth="500.0" HBox.hgrow="ALWAYS" />
@@ -94,13 +94,13 @@
                   </HBox>
                </children>
             </AnchorPane>
-            <AnchorPane minHeight="350.0" VBox.vgrow="ALWAYS">
+            <AnchorPane minHeight="350.0" prefHeight="350.0" VBox.vgrow="ALWAYS">
                <children>
                   <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label styleClass="title" text="Budget Groups" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Label styleClass="title" text="%plan.budgetGroups.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <JFXButton fx:id="budgetGroupPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

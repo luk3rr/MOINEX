@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +25,16 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddTickerController extends BaseTickerManagement {
+
     /**
      * Constructor
      * @param tickerService Ticker service
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddTickerController(TickerService tickerService) {
-        super(tickerService);
+    public AddTickerController(TickerService tickerService, I18nService i18nService) {
+        super(tickerService, i18nService);
     }
 
     @FXML
@@ -51,7 +55,9 @@ public final class AddTickerController extends BaseTickerManagement {
                 || symbol.isBlank()
                 || currentPriceStr.isBlank()) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -62,8 +68,10 @@ public final class AddTickerController extends BaseTickerManagement {
                 || (avgUnitPriceStr == null || avgUnitPriceStr.isBlank())
                         && !(quantityStr == null || quantityStr.isBlank())) {
             WindowUtils.showInformationDialog(
-                    "Invalid fields",
-                    "Quantity must be set if average unit price is set or vice-versa");
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_MESSAGE));
 
             return;
         }
@@ -87,14 +95,24 @@ public final class AddTickerController extends BaseTickerManagement {
 
             tickerService.addTicker(name, symbol, type, currentPrice, avgUnitPrice, quantity);
 
-            WindowUtils.showSuccessDialog("Ticker added", "Ticker added successfully.");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_MESSAGE));
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid number", "Invalid price or quantity");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (IllegalArgumentException | EntityExistsException e) {
-            WindowUtils.showErrorDialog("Error while adding ticker", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_ADDING_TICKER_TITLE),
+                    e.getMessage());
         }
     }
 }

@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
@@ -82,6 +83,7 @@ public class ResumePaneController {
     private RecurringTransactionService recurringTransactionService;
 
     private CreditCardService creditCardService;
+    private I18nService i18nService;
 
     /**
      * Constructor
@@ -95,10 +97,12 @@ public class ResumePaneController {
     public ResumePaneController(
             WalletTransactionService walletTransactionService,
             RecurringTransactionService recurringTransactionService,
-            CreditCardService creditCardService) {
+            CreditCardService creditCardService,
+            I18nService i18nService) {
         this.walletTransactionService = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -272,7 +276,7 @@ public class ResumePaneController {
         UIUtils.removeTooltipFromNode(savingsCurrentValue);
 
         if (savingsPercentage > 0) {
-            savingsLabel.setText("Savings");
+            savingsLabel.setText(i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_SAVINGS));
             savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
             savingsCurrentSign.setText("+");
 
@@ -282,7 +286,8 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().clear();
             savingsCurrentSign.getStyleClass().add(Constants.POSITIVE_BALANCE_STYLE);
         } else if (savingsPercentage < 0) {
-            savingsLabel.setText("No savings");
+            savingsLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
             savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
 
             if (savingsPercentage < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
@@ -299,7 +304,8 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().clear();
             savingsCurrentSign.getStyleClass().add(Constants.NEGATIVE_BALANCE_STYLE);
         } else {
-            savingsLabel.setText("No savings");
+            savingsLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
             savingsCurrentValue.setText(UIUtils.formatPercentage(0.0));
             savingsCurrentSign.setText(" ");
 

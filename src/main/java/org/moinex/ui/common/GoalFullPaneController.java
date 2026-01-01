@@ -9,6 +9,7 @@ package org.moinex.ui.common;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -24,6 +25,7 @@ import org.moinex.chart.CircularProgressBar;
 import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.GoalService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.dialog.goal.EditGoalController;
@@ -92,6 +94,8 @@ public class GoalFullPaneController {
 
     private WalletTransactionService walletTransactionService;
 
+    private I18nService i18nService;
+
     private Goal goal;
 
     /**
@@ -107,12 +111,14 @@ public class GoalFullPaneController {
             WalletTransactionService walletTransactionService,
             ConfigurableApplicationContext springContext,
             GoalController goalController,
-            WalletService walletService) {
+            WalletService walletService,
+            I18nService i18nService) {
         this.goalService = goalService;
         this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
         this.goalController = goalController;
         this.walletService = walletService;
+        this.i18nService = i18nService;
     }
 
     /**
@@ -155,7 +161,7 @@ public class GoalFullPaneController {
                                 : Constants.WALLET_TYPE_ICONS_PATH + goal.getType().getIcon()));
 
         goalTargetAmount.setText(UIUtils.formatCurrency(goal.getTargetBalance()));
-        goalTargetDate.setText(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME));
+        goalTargetDate.setText(UIUtils.formatDateForDisplay(goal.getTargetDate(), i18nService));
 
         // Create a tooltip for name and motivation
         UIUtils.addTooltipToNode(goalName, goal.getName());
@@ -174,15 +180,18 @@ public class GoalFullPaneController {
 
         if (goal.isArchived()) {
             // Set the button text according to the goal status
-            toggleArchiveGoal.setText("Unarchive Goal");
+            toggleArchiveGoal.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_UNARCHIVE_GOAL));
         }
 
         if (goal.isCompleted()) {
-            dateTitleLabel.setText("Achieved");
+            dateTitleLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_COMPLETION_DATE));
             goalTargetDate.setText(
-                    goal.getCompletionDate().format(Constants.DATE_FORMATTER_NO_TIME));
+                    UIUtils.formatDateForDisplay(goal.getCompletionDate(), i18nService));
 
-            daysTitleLabel.setText("Days ahead of target");
+            daysTitleLabel.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_MISSING_DAYS));
             missingDays.setText(
                     String.valueOf(
                             Constants.calculateDaysUntilTarget(
@@ -196,7 +205,8 @@ public class GoalFullPaneController {
             percentage = 100.0;
 
             // Set the button text according to the goal status
-            toggleCompleteGoal.setText("Reopen Goal");
+            toggleCompleteGoal.setText(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_UNCOMPLETE_GOAL));
         } else {
             // Show the current amount
             goalCurrentAmount.setText(UIUtils.formatCurrency(goal.getBalance()));
@@ -260,14 +270,16 @@ public class GoalFullPaneController {
     private void handleAddIncome() {
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
-                    "Goal is archived",
-                    "Cannot add income to an archived goal. Unarchive the goal first");
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_INCOME));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_INCOME_FXML,
-                "Add new income",
+                i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_MODAL_ADD_INCOME),
                 springContext,
                 (AddIncomeController controller) -> controller.setWalletComboBox(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -277,14 +289,16 @@ public class GoalFullPaneController {
     private void handleAddExpense() {
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
-                    "Goal is archived",
-                    "Cannot add expense to an archived goal. Unarchive the goal first");
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_EXPENSE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_EXPENSE_FXML,
-                "Add new expense",
+                i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_MODAL_ADD_EXPENSE),
                 springContext,
                 (AddExpenseController controller) -> controller.setWalletComboBox(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -294,14 +308,16 @@ public class GoalFullPaneController {
     private void handleAddTransfer() {
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
-                    "Goal is archived",
-                    "Cannot add transfer to an archived goal. Unarchive the goal first");
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_TRANSFER));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                "Add new transfer",
+                i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_MODAL_ADD_TRANSFER),
                 springContext,
                 (AddTransferController controller) -> controller.setReceiverWalletComboBox(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -311,7 +327,7 @@ public class GoalFullPaneController {
     private void handleEditGoal() {
         WindowUtils.openModalWindow(
                 Constants.EDIT_GOAL_FXML,
-                "Edit goal",
+                i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_MODAL_EDIT_GOAL),
                 springContext,
                 (EditGoalController controller) -> controller.setGoal(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -321,8 +337,12 @@ public class GoalFullPaneController {
     private void handleCompleteGoal() {
         if (goal.isCompleted()) {
             if (WindowUtils.showConfirmationDialog(
-                    "Reopen goal " + goal.getName(),
-                    "Are you sure you want to reopen this goal?")) {
+                    MessageFormat.format(
+                            i18nService.tr(
+                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_REOPEN_TITLE),
+                            goal.getName()),
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_REOPEN_MESSAGE),
+                    i18nService.getBundle())) {
                 goalService.reopenGoal(goal.getId());
 
                 // Update goal display in the main window
@@ -330,12 +350,19 @@ public class GoalFullPaneController {
             }
         } else {
             if (WindowUtils.showConfirmationDialog(
-                    "Complete goal " + goal.getName(),
-                    "Are you sure you want to complete this goal?")) {
+                    MessageFormat.format(
+                            i18nService.tr(
+                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_TITLE),
+                            goal.getName()),
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_MESSAGE),
+                    i18nService.getBundle())) {
                 try {
                     goalService.completeGoal(goal.getId());
                 } catch (EntityNotFoundException | MoinexException.IncompleteGoalException e) {
-                    WindowUtils.showErrorDialog("Error completing goal", e.getMessage());
+                    WindowUtils.showErrorDialog(
+                            i18nService.tr(
+                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_ERROR),
+                            e.getMessage());
                     return;
                 }
 
@@ -349,8 +376,12 @@ public class GoalFullPaneController {
     private void handleArchiveGoal() {
         if (goal.isArchived()) {
             if (WindowUtils.showConfirmationDialog(
-                    "Unarchive goal " + goal.getName(),
-                    "Are you sure you want to unarchive this goal?")) {
+                    MessageFormat.format(
+                            i18nService.tr(
+                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_UNARCHIVE_TITLE),
+                            goal.getName()),
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_UNARCHIVE_MESSAGE),
+                    i18nService.getBundle())) {
                 goalService.unarchiveGoal(goal.getId());
 
                 // Update goal display in the main window
@@ -358,8 +389,12 @@ public class GoalFullPaneController {
             }
         } else {
             if (WindowUtils.showConfirmationDialog(
-                    "Archive goal " + goal.getName(),
-                    "Are you sure you want to archive this goal?")) {
+                    MessageFormat.format(
+                            i18nService.tr(
+                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVE_TITLE),
+                            goal.getName()),
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVE_MESSAGE),
+                    i18nService.getBundle())) {
                 goalService.archiveGoal(goal.getId());
 
                 // Update goal display in the main window
@@ -373,53 +408,75 @@ public class GoalFullPaneController {
         // Prevent the removal of a wallet with associated transactions
         if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    "Goal wallet has transactions",
-                    "Cannot delete a goal wallet with associated transactions. "
-                            + "Remove the transactions first or archive the goal");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
         // Create a message to show to the user
-        StringBuilder message = new StringBuilder();
-
-        message.append("Name: ").append(goal.getName()).append("\n");
-        message.append("Initial Amount: ")
-                .append(UIUtils.formatCurrency(goal.getInitialBalance()))
-                .append("\n");
-        message.append("Current Amount: ")
-                .append(UIUtils.formatCurrency(goal.getBalance()))
-                .append("\n");
-        message.append("Target Amount: ")
-                .append(UIUtils.formatCurrency(goal.getTargetBalance()))
-                .append("\n");
-        message.append("Target Date: ")
-                .append(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME))
-                .append("\n");
+        String message =
+                MessageFormat.format(
+                        "{0}\n{1}\n{2}\n{3}\n{4}",
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_NAME),
+                                goal.getName()),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_INITIAL_AMOUNT),
+                                UIUtils.formatCurrency(goal.getInitialBalance())),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_CURRENT_AMOUNT),
+                                UIUtils.formatCurrency(goal.getBalance())),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_TARGET_AMOUNT),
+                                UIUtils.formatCurrency(goal.getTargetBalance())),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .COMMON_GOAL_DIALOG_DELETE_TARGET_DATE),
+                                UIUtils.formatDateForDisplay(goal.getTargetDate(), i18nService)));
 
         Integer totalOfAssociatedVirtualWallets =
                 walletService.getCountOfVirtualWalletsByMasterWalletId(goal.getId());
 
         if (!totalOfAssociatedVirtualWallets.equals(0)) {
             String virtualWalletsMessage =
-                    "\nThis goal has "
-                            + totalOfAssociatedVirtualWallets
-                            + " virtual wallet(s) associated with it. Deleting this goal all"
-                            + " virtual wallets will be unlinked from it.";
+                    "\n"
+                            + MessageFormat.format(
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .COMMON_GOAL_DIALOG_DELETE_VIRTUAL_WALLETS),
+                                    totalOfAssociatedVirtualWallets)
+                            + "\n";
 
-            message.append(virtualWalletsMessage).append("\n");
+            message = message + virtualWalletsMessage;
         }
 
         try {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
-                    "Are you sure you want to delete this goal?", message.toString())) {
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TITLE),
+                    message,
+                    i18nService.getBundle())) {
                 goalService.deleteGoal(goal.getId());
 
                 // Update goal display in the main window
                 goalController.updateDisplay();
             }
         } catch (EntityNotFoundException | IllegalStateException e) {
-            WindowUtils.showErrorDialog("Error deleting goal", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_ERROR),
+                    e.getMessage());
         }
     }
 

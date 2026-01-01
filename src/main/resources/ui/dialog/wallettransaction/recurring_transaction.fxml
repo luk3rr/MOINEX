@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefWidth="1400.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wallettransaction.RecurringTransactionController">
+<VBox alignment="CENTER" prefWidth="1800.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wallettransaction.RecurringTransactionController">
    <children>
       <VBox alignment="CENTER_RIGHT" spacing="10.0" VBox.vgrow="ALWAYS">
          <children>
@@ -20,7 +20,7 @@
                <children>
                   <VBox alignment="CENTER">
                      <children>
-                        <Label text="Status">
+                        <Label text="%dialog.label.status">
                            <font>
                               <Font size="10.0" />
                            </font>
@@ -37,7 +37,7 @@
                         <Image url="@../../../icon/common/find.png" />
                      </image>
                   </ImageView>
-                  <TextField fx:id="searchField" maxWidth="500.0" promptText="Enter ID or Description" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="searchField" promptText="%wallettransaction.prompt.enterIdOrDescription" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>
@@ -50,10 +50,10 @@
 
       <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
          <children>
-            <JFXButton minWidth="90.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="90.0" onAction="#handleDelete" stylesheets="@../../../css/component/buttons.css" text="Delete" />
-            <JFXButton minWidth="90.0" onAction="#handleEdit" stylesheets="@../../../css/component/buttons.css" text="Edit" />
-            <JFXButton minWidth="90.0" onAction="#handleCreate" stylesheets="@../../../css/component/buttons.css" text="Create" />
+            <JFXButton minWidth="90.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="90.0" onAction="#handleDelete" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.delete" />
+            <JFXButton minWidth="90.0" onAction="#handleEdit" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.edit" />
+            <JFXButton minWidth="90.0" onAction="#handleCreate" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.create" />
          </children>
       </HBox>
    </children>

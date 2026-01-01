@@ -22,13 +22,13 @@
                   <Image url="@../../../icon/common/find.png" />
                </image>
             </ImageView>
-            <TextField fx:id="searchField" promptText="Enter ID or Description" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="searchField" promptText="%investment.promptText.searchIdOrDescription" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <Label text="Select the transaction" />
+      <Label text="%investment.label.selectTransaction" />
       <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
-          <Tab closable="false" text="Purchase">
+          <Tab closable="false" text="%investment.tab.purchase">
             <content>
               <AnchorPane>
                      <children>
@@ -40,7 +40,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab closable="false" text="Sale">
+            <Tab closable="false" text="%investment.tab.sale">
                <content>
                   <AnchorPane>
                      <children>
@@ -52,7 +52,7 @@
                   </AnchorPane>
                </content>
             </Tab>
-          <Tab closable="false" text="Dividend">
+          <Tab closable="false" text="%investment.tab.dividend">
             <content>
               <AnchorPane>
                      <children>
@@ -64,7 +64,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab closable="false" text="Crypto Exchange">
+            <Tab closable="false" text="%investment.tab.cryptoExchange">
                <content>
                   <AnchorPane>
                      <children>
@@ -82,9 +82,9 @@
 
       <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
          <children>
-            <JFXButton minWidth="110.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="110.0" onAction="#handleDelete" stylesheets="@../../../css/component/buttons.css" text="Delete" />
-            <JFXButton minWidth="110.0" onAction="#handleEdit" stylesheets="@../../../css/component/buttons.css" text="Edit" />
+            <JFXButton minWidth="110.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="110.0" onAction="#handleDelete" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.delete" />
+            <JFXButton minWidth="110.0" onAction="#handleEdit" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.edit" />
          </children>
       </HBox>
    </children>

@@ -17,7 +17,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Credit Card">
+                  <Label text="%creditcard.label.creditCard">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -27,7 +27,7 @@
             </VBox>
             <HBox alignment="CENTER" spacing="20.0">
                <children>
-                  <Label text="Limit:" />
+                  <Label text="%creditcard.label.limit" />
                   <Label fx:id="crcLimitLabel" text="-">
                      <font>
                         <Font name="System Bold" size="13.0" />
@@ -36,7 +36,7 @@
             </HBox>
             <HBox alignment="CENTER" spacing="20.0">
                <children>
-                  <Label text="Limit available" />
+                  <Label text="%creditcard.label.limitAvailable" />
                   <Label fx:id="crcAvailableLimitLabel" text="-">
                      <font>
                         <Font name="System Bold" size="13.0" />
@@ -46,7 +46,7 @@
             </HBox>
             <HBox alignment="CENTER" spacing="20.0">
                <children>
-                  <Label text="Limit available after debt:" />
+                  <Label text="%creditcard.label.limitAvailableAfterDebt" />
                   <Label fx:id="crcLimitAvailableAfterDebtLabel" text="-">
                      <font>
                         <Font name="System Bold" size="13.0" />
@@ -62,7 +62,7 @@
                   <Image url="@../../../icon/common/pencil.png" />
                </image>
             </ImageView>
-            <TextField fx:id="descriptionField" promptText="Description" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="descriptionField" promptText="%dialog.label.description" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
@@ -87,7 +87,7 @@
                         </VBox>
                         <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
                            <children>
-                              <Label text="Total">
+                              <Label text="%creditcard.label.total">
                                  <font>
                                     <Font size="10.0" />
                                  </font>
@@ -137,7 +137,7 @@
                         </VBox>
                         <VBox alignment="CENTER">
                            <children>
-                              <Label text="Installments">
+                              <Label text="%creditcard.label.installments">
                                  <font>
                                     <Font size="10.0" />
                                  </font>
@@ -163,7 +163,7 @@
          <children>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Category">
+                  <Label text="%dialog.label.category">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -173,7 +173,7 @@
             </VBox>
             <VBox alignment="CENTER">
                <children>
-                  <Label text="Invoice">
+                  <Label text="%creditcard.label.invoice">
                      <font>
                         <Font size="10.0" />
                      </font>
@@ -185,8 +185,8 @@
       </HBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
-            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
          </children>
       </HBox>
    </children>

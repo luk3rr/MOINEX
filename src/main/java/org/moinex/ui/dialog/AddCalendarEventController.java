@@ -15,6 +15,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.service.CalendarService;
+import org.moinex.service.I18nService;
+import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.CalendarEventType;
@@ -37,20 +39,23 @@ public class AddCalendarEventController {
 
     private CalendarService calendarService;
 
+    private I18nService i18nService;
+
     /**
      * Constructor
      * @param calendarService The CalendarService instance
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddCalendarEventController(CalendarService calendarService) {
+    public AddCalendarEventController(CalendarService calendarService, I18nService i18nService) {
         this.calendarService = calendarService;
+        this.i18nService = i18nService;
     }
 
     @FXML
     private void initialize() {
         configureComboBoxes();
-        UIUtils.setDatePickerFormat(datePicker);
+        UIUtils.setDatePickerFormat(datePicker, i18nService);
         populateComboBoxes();
     }
 
@@ -71,7 +76,11 @@ public class AddCalendarEventController {
 
         if (eventTitle.isEmpty() || eventDate == null || eventType == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -79,12 +88,18 @@ public class AddCalendarEventController {
         try {
             calendarService.addEvent(eventTitle, description, eventDate.atStartOfDay(), eventType);
 
-            WindowUtils.showSuccessDialog("Event created", "The event was successfully created.");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_MESSAGE));
 
             Stage stage = (Stage) titleField.getScene().getWindow();
             stage.close();
         } catch (IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error creating event", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CALENDAR_DIALOG_ERROR_CREATING_EVENT_TITLE),
+                    e.getMessage());
         }
     }
 
@@ -93,6 +108,7 @@ public class AddCalendarEventController {
     }
 
     private void configureComboBoxes() {
-        UIUtils.configureComboBox(typeComboBox, CalendarEventType::getDescription);
+        UIUtils.configureComboBox(
+                typeComboBox, t -> UIUtils.translateCalendarEventType(t, i18nService));
     }
 }

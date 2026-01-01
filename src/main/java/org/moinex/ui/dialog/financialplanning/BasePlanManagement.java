@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.FinancialPlanningService;
+import org.moinex.service.I18nService;
 import org.moinex.ui.common.BudgetGroupPreviewController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -48,6 +49,7 @@ public abstract class BasePlanManagement {
 
     protected FinancialPlanningService financialPlanningService;
     protected ConfigurableApplicationContext springContext;
+    protected I18nService i18nService;
 
     protected List<BudgetGroup> budgetGroups = new ArrayList<>();
     protected Integer paneCurrentPage = 0;
@@ -58,6 +60,10 @@ public abstract class BasePlanManagement {
             ConfigurableApplicationContext springContext) {
         this.financialPlanningService = financialPlanningService;
         this.springContext = springContext;
+    }
+
+    protected void setI18nService(I18nService i18nService) {
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -83,7 +89,8 @@ public abstract class BasePlanManagement {
     private void handleAddBudgetGroup() {
         WindowUtils.openModalWindow(
                 Constants.ADD_BUDGET_GROUP_FXML,
-                "Add Budget Group",
+                i18nService.tr(
+                        Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_ADD_BUDGET_GROUP_TITLE),
                 springContext,
                 (AddBudgetGroupController controller) -> {
                     controller.setAssignedCategories(getAssignedCategories());
@@ -193,24 +200,34 @@ public abstract class BasePlanManagement {
     protected boolean isPlanValid() {
         if (budgetGroups.isEmpty() || budgetGroups.size() < 2) {
             WindowUtils.showInformationDialog(
-                    "Insufficient Budget Groups",
-                    "You must have at least two budget groups to create a financial plan.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_MESSAGE));
 
             return false;
         }
 
         if (calculateTotalPercentage().compareTo(new BigDecimal("100")) != 0) {
             WindowUtils.showInformationDialog(
-                    "Invalid Budget Group Percentages",
-                    "Total percentage must equal 100%. Please adjust the budget group"
-                            + " percentages.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_MESSAGE));
             return false;
         }
 
         if (hasEmptyGroups()) {
             WindowUtils.showInformationDialog(
-                    "Empty Budget Groups",
-                    "One or more budget groups have no categories assigned. Please edit them.");
+                    i18nService.tr(
+                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_MESSAGE));
             return false;
         }
 
@@ -225,9 +242,15 @@ public abstract class BasePlanManagement {
      */
     private void addContextMenu(Node node, BudgetGroup group) {
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem editItem = new MenuItem("Edit");
+        MenuItem editItem =
+                new MenuItem(
+                        i18nService.tr(
+                                Constants.TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_EDIT));
         editItem.setOnAction(event -> handleEditBudgetGroup(group));
-        MenuItem deleteItem = new MenuItem("Delete");
+        MenuItem deleteItem =
+                new MenuItem(
+                        i18nService.tr(
+                                Constants.TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_DELETE));
         deleteItem.setOnAction(event -> handleDeleteBudgetGroup(group));
         contextMenu.getItems().addAll(editItem, deleteItem);
 
@@ -249,7 +272,8 @@ public abstract class BasePlanManagement {
     private void handleEditBudgetGroup(BudgetGroup groupToEdit) {
         WindowUtils.openModalWindow(
                 Constants.EDIT_BUDGET_GROUP_FXML,
-                "Edit Budget Group",
+                i18nService.tr(
+                        Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EDIT_BUDGET_GROUP_TITLE),
                 springContext,
                 (EditBudgetGroupController controller) -> {
                     controller.setAssignedCategories(getAssignedCategories());
@@ -337,26 +361,29 @@ public abstract class BasePlanManagement {
         if (totalPercentage.compareTo(new BigDecimal("100")) > 0) {
             budgetGroupInfo.setText(
                     MessageFormat.format(
-                            "Total percentage is {0}, which exceeds 100%. Please adjust the group"
-                                    + " percentages.",
+                            i18nService.tr(
+                                    Constants.TranslationKeys
+                                            .FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS),
                             UIUtils.formatPercentage(totalPercentage)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
         } else if (hasEmptyGroups) {
             budgetGroupInfo.setText(
-                    "One or more budget groups have no categories assigned. Right-click a group to"
-                            + " edit it.");
+                    i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_INFO_EMPTY_GROUPS));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else if (totalPercentage.compareTo(new BigDecimal("100")) < 0) {
             BigDecimal remaining = new BigDecimal("100").subtract(totalPercentage);
             budgetGroupInfo.setText(
                     MessageFormat.format(
-                            "Total percentage is {0}. You can adjust percentages or add a new group"
-                                    + " to allocate the remaining {1}",
+                            i18nService.tr(
+                                    Constants.TranslationKeys
+                                            .FINANCIALPLANNING_INFO_PERCENTAGE_BELOW),
                             UIUtils.formatPercentage(totalPercentage),
                             UIUtils.formatPercentage(remaining)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else {
-            budgetGroupInfo.setText("Your budget plan is correctly configured!");
+            budgetGroupInfo.setText(
+                    i18nService.tr(
+                            Constants.TranslationKeys.FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
         }
         budgetGroupInfo.setVisible(true);

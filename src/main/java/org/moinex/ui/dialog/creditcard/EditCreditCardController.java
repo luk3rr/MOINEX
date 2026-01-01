@@ -15,7 +15,9 @@ import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardOperator;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CreditCardService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,17 +29,22 @@ import org.springframework.stereotype.Controller;
 @NoArgsConstructor
 public final class EditCreditCardController extends BaseCreditCardManagement {
     private CreditCard creditCard = null;
+    private I18nService i18nService;
 
     /**
      * Constructor
      * @param creditCardService The credit card service
      * @param walletService The wallet service
+     * @param i18nService The internationalization service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public EditCreditCardController(
-            CreditCardService creditCardService, WalletService walletService) {
+            CreditCardService creditCardService,
+            WalletService walletService,
+            I18nService i18nService) {
         super(creditCardService, walletService);
+        this.i18nService = i18nService;
     }
 
     public void setCreditCard(CreditCard crc) {
@@ -71,7 +78,9 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
                 || crcClosingDayStr == null
                 || crcDueDayStr == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -99,7 +108,10 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
                     && creditCard.getOperator().getId().equals(crcOperator.getId())
                     && defaultWalletChanged) {
                 WindowUtils.showInformationDialog(
-                        "No changes", "No changes were made to the credit card.");
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_MESSAGE));
             } else // If there is any modification, update the credit card
             {
                 creditCard.setName(crcName);
@@ -113,15 +125,23 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
                 creditCardService.updateCreditCard(creditCard);
 
                 WindowUtils.showSuccessDialog(
-                        "Credit card updated", "The credit card updated successfully.");
+                        i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys.CREDITCARD_DIALOG_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid limit", "Please enter a valid limit");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
-            WindowUtils.showErrorDialog("Error creating credit card", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_TITLE),
+                    e.getMessage());
         }
     }
 }

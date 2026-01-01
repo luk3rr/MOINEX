@@ -18,8 +18,10 @@ import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.TransactionStatus;
 import org.moinex.util.enums.TransactionType;
@@ -47,12 +49,14 @@ public final class AddExpenseController extends BaseWalletTransactionManagement 
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
+            I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
                 walletTransactionService,
                 categoryService,
                 calculatorService,
+                i18nService,
                 springContext);
 
         transactionType = TransactionType.EXPENSE;
@@ -77,7 +81,11 @@ public final class AddExpenseController extends BaseWalletTransactionManagement 
                 || category == null
                 || expenseDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -95,14 +103,30 @@ public final class AddExpenseController extends BaseWalletTransactionManagement 
                     description,
                     status);
 
-            WindowUtils.showSuccessDialog("Expense created", "Expense created successfully");
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_MESSAGE));
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid expense value", "Expense value must be a number");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_EXPENSE_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_EXPENSE_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
-            WindowUtils.showErrorDialog("Error creating expense", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_CREATING_EXPENSE_TITLE),
+                    e.getMessage());
         }
     }
 

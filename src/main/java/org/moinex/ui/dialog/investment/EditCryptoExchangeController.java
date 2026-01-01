@@ -18,7 +18,9 @@ import org.moinex.error.MoinexException;
 import org.moinex.model.investment.CryptoExchange;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
+import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
+import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,17 +32,23 @@ import org.springframework.stereotype.Controller;
 @NoArgsConstructor
 public final class EditCryptoExchangeController extends BaseCryptoExchangeManagement {
     private CryptoExchange cryptoExchange = null;
+    private I18nService i18nService;
 
     /**
      * Constructor
      * @param tickerService TickerService
      * @param calculatorService CalculatorService
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public EditCryptoExchangeController(
-            TickerService tickerService, CalculatorService calculatorService) {
+            TickerService tickerService,
+            CalculatorService calculatorService,
+            I18nService i18nService) {
         super(tickerService, calculatorService);
+        this.i18nService = i18nService;
+        setI18nService(i18nService);
     }
 
     public void setCryptoExchange(CryptoExchange cryptoExchange) {
@@ -79,7 +87,9 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
                 || description.isBlank()
                 || exchangeDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -104,7 +114,11 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
                             .toLocalDate()
                             .equals(dateTimeWithCurrentHour.toLocalDate())) {
                 WindowUtils.showInformationDialog(
-                        "No changes", "No changes were made to the exchange");
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_NO_CHANGES_EXCHANGE_MESSAGE));
             } else // If there is any modification, update the exchange
             {
                 cryptoExchange.setSoldCrypto(soldCrypto);
@@ -116,18 +130,32 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
 
                 tickerService.updateCryptoExchange(cryptoExchange);
 
-                WindowUtils.showSuccessDialog("Exchange updated", "Exchange updated successfully");
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) cryptoReceivedQuantityField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid exchange quantity", "The quantity must be a number");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
         } catch (EntityNotFoundException
                 | MoinexException.SameSourceDestinationException
                 | IllegalArgumentException e) {
-            WindowUtils.showErrorDialog("Error while creating exchange", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_ERROR_UPDATING_EXCHANGE_TITLE),
+                    e.getMessage());
         }
     }
 }

@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -58,6 +59,8 @@ public abstract class BaseRecurringTransactionManagement {
 
     protected CategoryService categoryService;
 
+    protected I18nService i18nService;
+
     protected List<Wallet> wallets;
 
     protected List<Category> categories;
@@ -73,10 +76,12 @@ public abstract class BaseRecurringTransactionManagement {
     protected BaseRecurringTransactionManagement(
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
-            CategoryService categoryService) {
+            CategoryService categoryService,
+            I18nService i18nService) {
         this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
         this.categoryService = categoryService;
+        this.i18nService = i18nService;
     }
 
     @FXML
@@ -89,8 +94,8 @@ public abstract class BaseRecurringTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(startDatePicker);
-        UIUtils.setDatePickerFormat(endDatePicker);
+        UIUtils.setDatePickerFormat(startDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(endDatePicker, i18nService);
 
         startDatePicker.setOnAction(e -> updateInfoLabel());
 
@@ -139,24 +144,45 @@ public abstract class BaseRecurringTransactionManagement {
         if (startDate != null && frequency != null) {
             if (endDate != null) {
                 msg =
-                        "Starts on "
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
+                                + " "
                                 + startDate
-                                + ", ends on "
+                                + ", "
+                                + i18nService.tr(
+                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_ENDS_ON)
+                                + " "
                                 + endDate
-                                + ", frequency "
-                                + frequency;
+                                + ", "
+                                + i18nService.tr(
+                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
+                                + " "
+                                + UIUtils.translateRecurringTransactionFrequency(
+                                        frequency, i18nService);
 
                 try {
 
                     msg +=
-                            "\nLast transaction: "
+                            "\n"
+                                    + i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .WALLETTRANSACTION_INFO_LAST_TRANSACTION)
+                                    + " "
                                     + recurringTransactionService.getLastTransactionDate(
                                             startDate, endDate, frequency);
                 } catch (IllegalArgumentException | IllegalStateException e) {
                     // Do nothing
                 }
             } else {
-                msg = "Starts on " + startDate + ", frequency " + frequency;
+                msg =
+                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
+                                + " "
+                                + startDate
+                                + ", "
+                                + i18nService.tr(
+                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
+                                + " "
+                                + UIUtils.translateRecurringTransactionFrequency(
+                                        frequency, i18nService);
             }
         }
 
@@ -182,13 +208,19 @@ public abstract class BaseRecurringTransactionManagement {
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
-                    "You need to add a category before adding an recurring transaction");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY_RECURRING));
         }
     }
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(typeComboBox, TransactionType::name);
+        UIUtils.configureComboBox(
+                typeComboBox, t -> UIUtils.translateTransactionType(t, i18nService));
+        UIUtils.configureComboBox(
+                frequencyComboBox,
+                f -> UIUtils.translateRecurringTransactionFrequency(f, i18nService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 }

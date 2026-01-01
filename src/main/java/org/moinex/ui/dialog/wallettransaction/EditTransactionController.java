@@ -21,6 +21,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
@@ -59,12 +60,14 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
+            I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
                 walletTransactionService,
                 categoryService,
                 calculatorService,
+                i18nService,
                 springContext);
     }
 
@@ -128,7 +131,11 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 || category == null
                 || transactionDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -149,7 +156,12 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                             .toLocalDate()
                             .equals(walletTransaction.getDate().toLocalDate())) {
                 WindowUtils.showInformationDialog(
-                        "No changes", "No changes were made to the transaction.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 walletTransaction.setWallet(wallet);
@@ -163,15 +175,30 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 walletTransactionService.updateTransaction(walletTransaction);
 
                 WindowUtils.showSuccessDialog(
-                        "Transaction updated", "Transaction updated successfully.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
-            WindowUtils.showErrorDialog("Invalid income value", "Income value must be a number.");
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
-            WindowUtils.showErrorDialog("Error while updating transaction", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_UPDATING_TRANSACTION_TITLE),
+                    e.getMessage());
         }
     }
 

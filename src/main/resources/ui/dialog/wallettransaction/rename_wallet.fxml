@@ -17,7 +17,7 @@
     </padding>
    <VBox alignment="CENTER">
       <children>
-         <Label text="Wallet">
+         <Label text="%dialog.label.wallet">
             <font>
                <Font size="10.0" />
             </font>
@@ -43,20 +43,20 @@
          </VBox>
          <VBox alignment="CENTER">
             <children>
-               <Label text="New name">
+               <Label text="%wallettransaction.label.walletName">
                   <font>
                      <Font size="10.0" />
                   </font>
                </Label>
-                <TextField fx:id="walletNewNameField" promptText="New name" />
+                <TextField fx:id="walletNewNameField" promptText="%wallettransaction.label.newWalletName" />
             </children>
          </VBox>
       </children>
    </HBox>
    <HBox alignment="CENTER" spacing="10.0">
       <children>
-         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="Cancel" />
-         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="Save" />
+         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+         <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
       </children>
       <VBox.margin>
          <Insets />

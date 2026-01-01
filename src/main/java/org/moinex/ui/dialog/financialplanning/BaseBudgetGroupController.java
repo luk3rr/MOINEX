@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +40,13 @@ public class BaseBudgetGroupController {
 
     protected Consumer<BudgetGroup> onSaveCallback;
     protected CategoryService categoryService;
+    protected I18nService i18nService;
     protected Set<Category> assignedCategories;
 
     @Autowired
-    public BaseBudgetGroupController(CategoryService categoryService) {
+    public BaseBudgetGroupController(CategoryService categoryService, I18nService i18nService) {
         this.categoryService = categoryService;
+        this.i18nService = i18nService;
     }
 
     /**
@@ -171,7 +174,12 @@ public class BaseBudgetGroupController {
 
         if (groupName.isEmpty() || targetPercentageText.isEmpty()) {
             WindowUtils.showInformationDialog(
-                    "Required Fields", "Please fill in all required fields");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_MESSAGE));
             return;
         }
 
@@ -180,7 +188,11 @@ public class BaseBudgetGroupController {
             targetPercentage = Double.parseDouble(targetPercentageText);
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid Input", "Target percentage must be a valid number");
+                    i18nService.tr(
+                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_INPUT_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FINANCIALPLANNING_DIALOG_INVALID_INPUT_MESSAGE));
             return;
         }
 

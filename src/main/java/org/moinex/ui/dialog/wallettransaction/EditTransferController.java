@@ -23,6 +23,7 @@ import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
@@ -54,12 +55,14 @@ public class EditTransferController extends BaseTransferManagement {
             WalletTransactionService walletTransactionService,
             CalculatorService calculatorService,
             CategoryService categoryService,
+            I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
                 walletTransactionService,
                 calculatorService,
                 categoryService,
+                i18nService,
                 springContext);
     }
 
@@ -124,7 +127,11 @@ public class EditTransferController extends BaseTransferManagement {
                 || description.isBlank()
                 || transferDate == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -146,7 +153,12 @@ public class EditTransferController extends BaseTransferManagement {
                             category != null ? category.getId() : null)
                     && LocalDate.from(oldTransfer.getDate()).equals(transferDate)) {
                 WindowUtils.showInformationDialog(
-                        "No changes made", "No changes were made to the transfer.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TRANSFER_MESSAGE));
                 return;
             } else // If there is any modification, update the transaction
             {
@@ -159,18 +171,32 @@ public class EditTransferController extends BaseTransferManagement {
                 walletTransactionService.updateTransfer(oldTransfer);
 
                 WindowUtils.showSuccessDialog(
-                        "Transfer created", "The transfer was successfully created.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_MESSAGE));
             }
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid transfer value", "Transfer value must be a number.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_MESSAGE));
         } catch (MoinexException.SameSourceDestinationException
                 | IllegalArgumentException
                 | EntityNotFoundException
                 | IllegalStateException
                 | MoinexException.InsufficientResourcesException
                 | MoinexException.TransferFromMasterToVirtualWalletException e) {
-            WindowUtils.showErrorDialog("Error while creating transfer", e.getMessage());
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_UPDATING_TRANSFER_TITLE),
+                    e.getMessage());
         }
 
         Stage stage = (Stage) descriptionField.getScene().getWindow();
@@ -223,8 +249,12 @@ public class EditTransferController extends BaseTransferManagement {
                             && otherWallet.isVirtual()
                             && otherWallet.getMasterWallet().equals(currentWallet)) {
                         WindowUtils.showInformationDialog(
-                                "Invalid Transfer",
-                                "Cannot transfer from a master wallet to its virtual wallet.");
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_TITLE),
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_MESSAGE));
                         return;
                     }
                     afterBalance = balance.subtract(newAmount);

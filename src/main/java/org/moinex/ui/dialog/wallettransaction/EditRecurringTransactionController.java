@@ -17,6 +17,7 @@ import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
+import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -48,8 +49,9 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
     public EditRecurringTransactionController(
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
-            CategoryService categoryService) {
-        super(walletService, recurringTransactionService, categoryService);
+            CategoryService categoryService,
+            I18nService i18nService) {
+        super(walletService, recurringTransactionService, categoryService, i18nService);
     }
 
     public void setRecurringTransaction(RecurringTransaction rt) {
@@ -107,7 +109,11 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                 || nextDueDate == null
                 || frequency == null) {
             WindowUtils.showInformationDialog(
-                    "Empty fields", "Please fill all required fields before saving");
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -138,7 +144,12 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                                             ? RecurringTransactionStatus.ACTIVE
                                             : RecurringTransactionStatus.INACTIVE)) {
                 WindowUtils.showInformationDialog(
-                        "No changes", "No changes were made to the transaction.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 rt.setWallet(wallet);
@@ -164,25 +175,39 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                 recurringTransactionService.updateRecurringTransaction(rt);
 
                 WindowUtils.showSuccessDialog(
-                        "Recurring transaction updated",
-                        "Recurring transaction updated successfully.");
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    "Invalid transaction value", "Transaction value must be a number.");
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    "Error while editing recurring transaction", e.getMessage());
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .WALLETTRANSACTION_DIALOG_ERROR_EDITING_RECURRING_TITLE),
+                    e.getMessage());
         }
     }
 
     @Override
     protected void updateInfoLabel() {
         if (!activeCheckBox.isSelected()) {
-            infoLabel.setText("Recurring transaction is inactive");
+            infoLabel.setText(
+                    i18nService.tr(
+                            Constants.TranslationKeys.WALLETTRANSACTION_INFO_RECURRING_INACTIVE));
         } else {
             super.updateInfoLabel();
         }

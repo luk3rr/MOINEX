@@ -12,4 +12,5 @@ package org.moinex.util.enums;
 public enum CreditCardCreditType {
     CASHBACK, // Cashback credit
     REFUND, // Refund credit
+    REWARD, // Reward credit
 }
