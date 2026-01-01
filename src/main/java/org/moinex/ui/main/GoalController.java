@@ -148,9 +148,8 @@ public class GoalController {
                     if (param.getValue().isCompleted()
                             && param.getValue().getCompletionDate() != null) {
                         return new SimpleStringProperty(
-                                param.getValue()
-                                        .getCompletionDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getCompletionDate(), i18nService));
                     }
 
                     return new SimpleObjectProperty<>("-");
@@ -390,7 +389,7 @@ public class GoalController {
                                 i18nService.tr(
                                         Constants.TranslationKeys
                                                 .GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE),
-                                goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME)))
+                                UIUtils.formatDateForDisplay(goal.getTargetDate(), i18nService)))
                 .append("\n");
 
         try {
@@ -605,12 +604,13 @@ public class GoalController {
                                 String currentAmount = g.getBalance().toString();
                                 String targetAmount = g.getTargetBalance().toString();
                                 String targetDate =
-                                        g.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME);
+                                        UIUtils.formatDateForDisplay(
+                                                g.getTargetDate(), i18nService);
 
                                 String completionDate =
                                         g.getCompletionDate() != null
-                                                ? g.getCompletionDate()
-                                                        .format(Constants.DATE_FORMATTER_NO_TIME)
+                                                ? UIUtils.formatDateForDisplay(
+                                                        g.getCompletionDate(), i18nService)
                                                 : "-";
 
                                 String status = g.isCompleted() ? "completed" : "active";
@@ -735,9 +735,8 @@ public class GoalController {
         targetDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getTargetDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getTargetDate(), i18nService)));
 
         TableColumn<Goal, String> completionDateColumn = getStringTableColumn();
 

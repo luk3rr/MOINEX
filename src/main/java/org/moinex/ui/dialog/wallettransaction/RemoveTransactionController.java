@@ -113,7 +113,9 @@ public class RemoveTransactionController {
                 .append("\n")
                 .append(i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_DATE))
                 .append(" ")
-                .append(selectedTransaction.getDate().format(Constants.DATE_FORMATTER_WITH_TIME))
+                .append(
+                        UIUtils.formatDateTimeForDisplay(
+                                selectedTransaction.getDate(), i18nService))
                 .append("\n")
                 .append(i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_STATUS))
                 .append(" ")
@@ -221,9 +223,8 @@ public class RemoveTransactionController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
         TableColumn<WalletTransaction, String> walletNameColumn =
                 new TableColumn<>(

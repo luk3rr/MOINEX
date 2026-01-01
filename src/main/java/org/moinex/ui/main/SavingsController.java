@@ -896,7 +896,8 @@ public class SavingsController {
                 UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months()));
 
         overviewTabBrazilianMarketIndicatorsLastUpdate.setText(
-                brazilianMarketIndicators.getLastUpdate().format(Constants.DATE_FORMATTER_NO_TIME));
+                UIUtils.formatDateForDisplay(
+                        brazilianMarketIndicators.getLastUpdate(), i18nService));
     }
 
     private void updateMarketQuotesAndCommodities() {
@@ -935,14 +936,12 @@ public class SavingsController {
                 UIUtils.formatCurrency(marketQuotesAndCommodities.getOilBrent()));
 
         overviewTabMarketQuotesLastUpdate.setText(
-                marketQuotesAndCommodities
-                        .getLastUpdate()
-                        .format(Constants.DATE_FORMATTER_NO_TIME));
+                UIUtils.formatDateForDisplay(
+                        marketQuotesAndCommodities.getLastUpdate(), i18nService));
 
         overviewTabCommoditiesLastUpdate.setText(
-                marketQuotesAndCommodities
-                        .getLastUpdate()
-                        .format(Constants.DATE_FORMATTER_NO_TIME));
+                UIUtils.formatDateForDisplay(
+                        marketQuotesAndCommodities.getLastUpdate(), i18nService));
     }
 
     /**

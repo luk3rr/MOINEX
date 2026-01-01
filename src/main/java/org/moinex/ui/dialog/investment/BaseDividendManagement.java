@@ -134,7 +134,7 @@ public abstract class BaseDividendManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(dividendDatePicker);
+        UIUtils.setDatePickerFormat(dividendDatePicker, i18nService);
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);

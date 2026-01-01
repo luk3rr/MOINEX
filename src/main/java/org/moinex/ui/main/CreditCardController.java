@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.util.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -243,7 +242,7 @@ public class CreditCardController {
                                 i18nService.tr(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE),
-                                debt.getDate().format(Constants.DATE_FORMATTER_NO_TIME)))
+                                UIUtils.formatDateForDisplay(debt.getDate(), i18nService)))
                 .append("\n");
 
         message.append(
@@ -529,7 +528,7 @@ public class CreditCardController {
         debtsFlowStackedBarChart.getData().clear();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
+        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
 
         List<Category> categories = categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
@@ -703,9 +702,7 @@ public class CreditCardController {
                 new StringConverter<>() {
                     @Override
                     public String toString(Month month) {
-                        return month != null
-                                ? month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                : "";
+                        return month != null ? UIUtils.getMonthDisplayName(month, i18nService) : "";
                     }
 
                     @Override
@@ -742,7 +739,8 @@ public class CreditCardController {
         // Custom string converter to format the Year as "Year"
         totalDebtsYearFilterComboBox.setConverter(
                 new StringConverter<>() {
-                    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+                    private final DateTimeFormatter formatter =
+                            UIUtils.getYearFormatter(i18nService.getLocale());
 
                     @Override
                     public String toString(Year year) {
@@ -789,12 +787,11 @@ public class CreditCardController {
                 .valueProperty()
                 .addListener(
                         (observable, oldValue, newMonth) -> {
-                            final DateTimeFormatter formatter =
-                                    DateTimeFormatter.ofPattern("MMM/yy");
-
                             if (newMonth != null
                                     && debtsListYearFilterComboBox.getValue() != null) {
-                                invoiceMonth.setText(getTableCurrentMonthYear().format(formatter));
+                                invoiceMonth.setText(
+                                        UIUtils.formatShortMonthYear(
+                                                getTableCurrentMonthYear(), i18nService));
                             }
 
                             updateDebtsTableView();
@@ -804,12 +801,11 @@ public class CreditCardController {
                 .valueProperty()
                 .addListener(
                         (observable, oldValue, newYear) -> {
-                            final DateTimeFormatter formatter =
-                                    DateTimeFormatter.ofPattern("MMM/yy");
-
                             if (newYear != null
                                     && debtsListMonthFilterComboBox.getValue() != null) {
-                                invoiceMonth.setText(getTableCurrentMonthYear().format(formatter));
+                                invoiceMonth.setText(
+                                        UIUtils.formatShortMonthYear(
+                                                getTableCurrentMonthYear(), i18nService));
                             }
 
                             updateDebtsTableView();
@@ -881,9 +877,8 @@ public class CreditCardController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
         TableColumn<CreditCardPayment, String> statusColumn =
                 new TableColumn<>(

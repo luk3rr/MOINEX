@@ -94,8 +94,8 @@ public abstract class BaseRecurringTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(startDatePicker);
-        UIUtils.setDatePickerFormat(endDatePicker);
+        UIUtils.setDatePickerFormat(startDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(endDatePicker, i18nService);
 
         startDatePicker.setOnAction(e -> updateInfoLabel());
 

@@ -205,9 +205,8 @@ public class CreditCardCreditsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
         creditCardCreditsTableView.getColumns().add(idColumn);
         creditCardCreditsTableView.getColumns().add(descriptionColumn);

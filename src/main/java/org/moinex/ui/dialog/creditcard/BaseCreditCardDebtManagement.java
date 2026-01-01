@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -313,8 +312,7 @@ public abstract class BaseCreditCardDebtManagement {
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
         UIUtils.configureComboBox(
-                invoiceComboBox,
-                yearMonth -> yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
+                invoiceComboBox, yearMonth -> UIUtils.formatFullMonthYear(yearMonth, i18nService));
     }
 
     protected void configureSuggestions() {

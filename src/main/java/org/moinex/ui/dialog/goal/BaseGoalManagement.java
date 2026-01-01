@@ -63,7 +63,7 @@ public abstract class BaseGoalManagement {
 
     @FXML
     protected void initialize() {
-        UIUtils.setDatePickerFormat(targetDatePicker);
+        UIUtils.setDatePickerFormat(targetDatePicker, i18nService);
 
         loadWalletsFromDatabase();
 

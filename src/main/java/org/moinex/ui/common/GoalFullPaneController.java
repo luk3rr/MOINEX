@@ -161,7 +161,7 @@ public class GoalFullPaneController {
                                 : Constants.WALLET_TYPE_ICONS_PATH + goal.getType().getIcon()));
 
         goalTargetAmount.setText(UIUtils.formatCurrency(goal.getTargetBalance()));
-        goalTargetDate.setText(goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME));
+        goalTargetDate.setText(UIUtils.formatDateForDisplay(goal.getTargetDate(), i18nService));
 
         // Create a tooltip for name and motivation
         UIUtils.addTooltipToNode(goalName, goal.getName());
@@ -188,7 +188,7 @@ public class GoalFullPaneController {
             dateTitleLabel.setText(
                     i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_COMPLETION_DATE));
             goalTargetDate.setText(
-                    goal.getCompletionDate().format(Constants.DATE_FORMATTER_NO_TIME));
+                    UIUtils.formatDateForDisplay(goal.getCompletionDate(), i18nService));
 
             daysTitleLabel.setText(
                     i18nService.tr(Constants.TranslationKeys.COMMON_GOAL_MISSING_DAYS));
@@ -444,7 +444,7 @@ public class GoalFullPaneController {
                                 i18nService.tr(
                                         Constants.TranslationKeys
                                                 .COMMON_GOAL_DIALOG_DELETE_TARGET_DATE),
-                                goal.getTargetDate().format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(goal.getTargetDate(), i18nService)));
 
         Integer totalOfAssociatedVirtualWallets =
                 walletService.getCountOfVirtualWalletsByMasterWalletId(goal.getId());

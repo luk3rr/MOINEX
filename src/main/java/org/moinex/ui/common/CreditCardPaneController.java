@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -310,11 +309,9 @@ public class CreditCardPaneController {
 
         closureDayLabel.setText(creditCard.getClosingDay().toString());
 
-        // Format LocalDateTime to MM/YYYY
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
-
         nextInvoiceLabel.setText(
-                creditCardService.getNextInvoiceDate(creditCard.getId()).format(formatter));
+                UIUtils.formatShortMonthYear(
+                        creditCardService.getNextInvoiceDate(creditCard.getId()), i18nService));
 
         updateInvoiceInfo();
 
@@ -329,9 +326,8 @@ public class CreditCardPaneController {
             return;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
-
-        invoiceMonthNavigatorBarLabel.setText(currentDisplayedMonth.format(formatter));
+        invoiceMonthNavigatorBarLabel.setText(
+                UIUtils.formatShortMonthYear(currentDisplayedMonth, i18nService));
 
         BigDecimal totalDebts =
                 creditCardService.getInvoiceAmount(

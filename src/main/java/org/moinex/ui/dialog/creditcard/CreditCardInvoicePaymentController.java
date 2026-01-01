@@ -9,7 +9,6 @@ package org.moinex.ui.dialog.creditcard;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -116,9 +115,7 @@ public class CreditCardInvoicePaymentController {
 
         totalToPayLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
-
-        crcInvoiceMonthLabel.setText(invoiceDate.format(formatter));
+        crcInvoiceMonthLabel.setText(UIUtils.formatShortMonthYear(invoiceDate, i18nService));
 
         crcAvailableRebateLabel.setText(UIUtils.formatCurrency(creditCard.getAvailableRebate()));
 

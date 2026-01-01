@@ -99,7 +99,7 @@ public abstract class BaseCryptoExchangeManagement {
         populateCryptoComboBoxes();
 
         // Configure the date picker
-        UIUtils.setDatePickerFormat(exchangeDatePicker);
+        UIUtils.setDatePickerFormat(exchangeDatePicker, i18nService);
 
         // Reset all labels
         UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);

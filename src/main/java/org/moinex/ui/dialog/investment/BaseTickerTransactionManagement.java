@@ -139,7 +139,7 @@ public abstract class BaseTickerTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(transactionDatePicker);
+        UIUtils.setDatePickerFormat(transactionDatePicker, i18nService);
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);

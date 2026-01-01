@@ -34,6 +34,7 @@ import org.moinex.service.CalendarService;
 import org.moinex.service.I18nService;
 import org.moinex.ui.dialog.AddCalendarEventController;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -120,7 +121,8 @@ public class CalendarController {
      * Draw the calendar grid
      */
     private void drawCalendar() {
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
+        final DateTimeFormatter formatter =
+                UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
         currentMonth.setText(dateFocus.format(formatter));
 
         Integer monthMaxDate = dateFocus.getMonth().maxLength();
@@ -151,8 +153,9 @@ public class CalendarController {
         double calendarHeight = calendar.getPrefHeight();
 
         // Create the weekday labels
-        for (int j = 0; j < Constants.WEEKDAY_ABBREVIATIONS.length; j++) {
-            Text dayLabel = new Text(Constants.WEEKDAY_ABBREVIATIONS[j]);
+        String[] weekdayAbbreviations = UIUtils.getWeekdayAbbreviations(i18nService);
+        for (int j = 0; j < weekdayAbbreviations.length; j++) {
+            Text dayLabel = new Text(weekdayAbbreviations[j]);
             dayLabel.setFont(Constants.CALENDAR_WEEKDAY_FONT_CONFIG);
 
             StackPane dayContainer = new StackPane(dayLabel);

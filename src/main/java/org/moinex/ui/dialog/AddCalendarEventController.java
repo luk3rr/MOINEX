@@ -55,7 +55,7 @@ public class AddCalendarEventController {
     @FXML
     private void initialize() {
         configureComboBoxes();
-        UIUtils.setDatePickerFormat(datePicker);
+        UIUtils.setDatePickerFormat(datePicker, i18nService);
         populateComboBoxes();
     }
 

@@ -293,9 +293,8 @@ public class RecurringTransactionController {
         startDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getStartDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getStartDate(), i18nService)));
 
         TableColumn<RecurringTransaction, String> endDateColumn =
                 getRecurringTransactionStringTableColumn();
@@ -357,9 +356,8 @@ public class RecurringTransactionController {
                         return new SimpleStringProperty("-");
                     } else {
                         return new SimpleStringProperty(
-                                param.getValue()
-                                        .getNextDueDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getNextDueDate(), i18nService));
                     }
                 });
 
@@ -388,23 +386,27 @@ public class RecurringTransactionController {
         endDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getEndDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getEndDate(), i18nService)));
 
         // If the end date is the default date, show "Indefinite"
         endDateColumn.setCellFactory(
                 column ->
-                        new TableCell<>() {
+                        new TableCell<RecurringTransaction, String>() {
                             @Override
                             protected void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
-                                if (item == null || empty) {
+                                if (empty
+                                        || getTableRow() == null
+                                        || getTableRow().getItem() == null) {
                                     setText(null);
                                 } else {
-                                    if (item.equals(
-                                            Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.format(
-                                                    Constants.DATE_FORMATTER_NO_TIME))) {
+                                    RecurringTransaction rt = getTableRow().getItem();
+                                    if (rt.getEndDate()
+                                            .toLocalDate()
+                                            .equals(
+                                                    Constants
+                                                            .RECURRING_TRANSACTION_DEFAULT_END_DATE)) {
                                         setText(
                                                 i18nService.tr(
                                                         Constants.TranslationKeys

@@ -341,12 +341,8 @@ public class HomeController {
 
                                     Label dateLabel =
                                             new Label(
-                                                    transaction
-                                                            .getDate()
-                                                            .format(
-                                                                    DateTimeFormatter.ofPattern(
-                                                                            Constants
-                                                                                    .DATE_FORMAT_NO_TIME)));
+                                                    UIUtils.formatDateForDisplay(
+                                                            transaction.getDate(), i18nService));
                                     dateLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH);
 
@@ -417,7 +413,7 @@ public class HomeController {
 
         LocalDateTime maxMonth =
                 LocalDateTime.now().plusMonths(Constants.XYBAR_CHART_FUTURE_MONTHS);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
+        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
 
         int totalMonths = Constants.XYBAR_CHART_MONTHS + Constants.XYBAR_CHART_FUTURE_MONTHS;
 
@@ -568,11 +564,10 @@ public class HomeController {
 
             LocalDateTime currentDate = LocalDateTime.now();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
             monthResumePaneTitle.setText(
                     MessageFormat.format(
                             i18nService.tr(Constants.TranslationKeys.HOME_RESUME_TITLE),
-                            currentDate.format(formatter)));
+                            UIUtils.formatShortMonthYear(currentDate, i18nService)));
 
             resumePaneController.updateResumePane(
                     currentDate.getMonthValue(), currentDate.getYear());

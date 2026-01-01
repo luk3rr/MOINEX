@@ -10,8 +10,16 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -167,7 +175,9 @@ public final class UIUtils {
      * Format the date picker to display the date in a specific format
      *
      * @param datePicker The date picker to format
+     * @deprecated Use {@link #setDatePickerFormat(DatePicker, I18nService)} instead
      */
+    @Deprecated
     public static void setDatePickerFormat(DatePicker datePicker) {
         // Set how the date is displayed in the date picker
         datePicker.setConverter(
@@ -182,6 +192,47 @@ public final class UIUtils {
                         return LocalDate.parse(string, Constants.DATE_FORMATTER_NO_TIME);
                     }
                 });
+    }
+
+    /**
+     * Format the date picker to display the date according to the locale
+     * This also configures the internal DatePicker popup calendar to use the locale
+     *
+     * @param datePicker The date picker to format
+     * @param i18nService The I18nService instance for locale
+     */
+    public static void setDatePickerFormat(DatePicker datePicker, I18nService i18nService) {
+        Locale locale = i18nService.getLocale();
+
+        Locale.setDefault(locale);
+
+        // Configure the date formatter for the text field
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.SHORT)
+                        .withLocale(locale);
+
+        datePicker.setConverter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(LocalDate date) {
+                        return date != null ? date.format(formatter) : "";
+                    }
+
+                    @Override
+                    public LocalDate fromString(String string) {
+                        if (string == null || string.trim().isEmpty()) {
+                            return null;
+                        }
+                        try {
+                            return LocalDate.parse(string, formatter);
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }
+                });
+
+        // Set the chronology to use the locale
+        datePicker.setChronology(java.time.chrono.IsoChronology.INSTANCE);
     }
 
     /**
@@ -527,5 +578,174 @@ public final class UIUtils {
         return MessageFormat.format(
                 i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET),
                 wallet.getMasterWallet().getName());
+    }
+
+    /**
+     * Get a DateTimeFormatter for short month/year format (MMM/yy) with locale
+     *
+     * @param locale The locale to use for formatting
+     * @return DateTimeFormatter configured with the locale
+     */
+    public static DateTimeFormatter getShortMonthYearFormatter(Locale locale) {
+        return DateTimeFormatter.ofPattern("MMM/yy", locale);
+    }
+
+    /**
+     * Get a DateTimeFormatter for full month and year format (MMMM yyyy) with locale
+     *
+     * @param locale The locale to use for formatting
+     * @return DateTimeFormatter configured with the locale
+     */
+    public static DateTimeFormatter getFullMonthYearFormatter(Locale locale) {
+        return DateTimeFormatter.ofPattern("MMMM yyyy", locale);
+    }
+
+    /**
+     * Get a DateTimeFormatter for year format (yyyy) with locale
+     *
+     * @param locale The locale to use for formatting
+     * @return DateTimeFormatter configured with the locale
+     */
+    public static DateTimeFormatter getYearFormatter(Locale locale) {
+        return DateTimeFormatter.ofPattern("yyyy", locale);
+    }
+
+    /**
+     * Format a LocalDateTime to short month/year format with locale
+     *
+     * @param dateTime The date to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted date string
+     */
+    public static String formatShortMonthYear(LocalDateTime dateTime, I18nService i18nService) {
+        return dateTime.format(getShortMonthYearFormatter(i18nService.getLocale()));
+    }
+
+    /**
+     * Format a YearMonth to short month/year format with locale
+     *
+     * @param yearMonth The YearMonth to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted date string
+     */
+    public static String formatShortMonthYear(YearMonth yearMonth, I18nService i18nService) {
+        return yearMonth.format(getShortMonthYearFormatter(i18nService.getLocale()));
+    }
+
+    /**
+     * Format a YearMonth to full month and year format with locale
+     *
+     * @param yearMonth The YearMonth to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted date string
+     */
+    public static String formatFullMonthYear(YearMonth yearMonth, I18nService i18nService) {
+        return yearMonth.format(getFullMonthYearFormatter(i18nService.getLocale()));
+    }
+
+    /**
+     * Format a Year to year format with locale
+     *
+     * @param year The Year to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted year string
+     */
+    public static String formatYear(Year year, I18nService i18nService) {
+        return year.format(getYearFormatter(i18nService.getLocale()));
+    }
+
+    /**
+     * Get weekday abbreviations in the current locale
+     *
+     * @param i18nService The I18nService instance for locale
+     * @return Array of weekday abbreviations starting from Sunday
+     */
+    public static String[] getWeekdayAbbreviations(I18nService i18nService) {
+        Locale locale = i18nService.getLocale();
+        return new String[] {
+            DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, locale),
+            DayOfWeek.MONDAY.getDisplayName(TextStyle.SHORT, locale),
+            DayOfWeek.TUESDAY.getDisplayName(TextStyle.SHORT, locale),
+            DayOfWeek.WEDNESDAY.getDisplayName(TextStyle.SHORT, locale),
+            DayOfWeek.THURSDAY.getDisplayName(TextStyle.SHORT, locale),
+            DayOfWeek.FRIDAY.getDisplayName(TextStyle.SHORT, locale),
+            DayOfWeek.SATURDAY.getDisplayName(TextStyle.SHORT, locale)
+        };
+    }
+
+    /**
+     * Get month display name in the current locale
+     *
+     * @param month The Month to get display name for
+     * @param i18nService The I18nService instance for locale
+     * @return Display name of the month
+     */
+    public static String getMonthDisplayName(Month month, I18nService i18nService) {
+        return month.getDisplayName(TextStyle.FULL, i18nService.getLocale());
+    }
+
+    /**
+     * Get month short display name in the current locale
+     *
+     * @param month The Month to get short display name for
+     * @param i18nService The I18nService instance for locale
+     * @return Short display name of the month
+     */
+    public static String getMonthShortDisplayName(Month month, I18nService i18nService) {
+        return month.getDisplayName(TextStyle.SHORT, i18nService.getLocale());
+    }
+
+    /**
+     * Format a LocalDate for display according to the locale
+     * Uses SHORT format style (e.g., dd/MM/yyyy for pt-BR, M/d/yy for en)
+     *
+     * @param date The LocalDate to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted date string for display
+     */
+    public static String formatDateForDisplay(LocalDate date, I18nService i18nService) {
+        if (date == null) {
+            return "";
+        }
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.SHORT)
+                        .withLocale(i18nService.getLocale());
+        return date.format(formatter);
+    }
+
+    /**
+     * Format a LocalDateTime for display according to the locale
+     * Uses SHORT format style for date (e.g., dd/MM/yyyy for pt-BR, M/d/yy for en)
+     *
+     * @param dateTime The LocalDateTime to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted date string for display
+     */
+    public static String formatDateForDisplay(LocalDateTime dateTime, I18nService i18nService) {
+        if (dateTime == null) {
+            return "";
+        }
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.SHORT)
+                        .withLocale(i18nService.getLocale());
+        return dateTime.format(formatter);
+    }
+
+    /**
+     * Format a LocalDateTime with time for display according to the locale
+     * Uses SHORT format style (e.g., dd/MM/yyyy HH:mm for pt-BR)
+     *
+     * @param dateTime The LocalDateTime to format
+     * @param i18nService The I18nService instance for locale
+     * @return Formatted date and time string for display
+     */
+    public static String formatDateTimeForDisplay(LocalDateTime dateTime, I18nService i18nService) {
+        if (dateTime == null) {
+            return "";
+        }
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofLocalizedDateTime(java.time.format.FormatStyle.SHORT)
+                        .withLocale(i18nService.getLocale());
+        return dateTime.format(formatter);
     }
 }

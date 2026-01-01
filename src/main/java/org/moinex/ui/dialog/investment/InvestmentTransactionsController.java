@@ -230,9 +230,8 @@ public class InvestmentTransactionsController {
                                                 .getName()
                                                 .toLowerCase();
                                 String date =
-                                        d.getWalletTransaction()
-                                                .getDate()
-                                                .format(Constants.DATE_FORMATTER_WITH_TIME);
+                                        UIUtils.formatDateTimeForDisplay(
+                                                d.getWalletTransaction().getDate(), i18nService);
                                 String status =
                                         d.getWalletTransaction().getStatus().name().toLowerCase();
 
@@ -269,9 +268,8 @@ public class InvestmentTransactionsController {
                                 String tickerName = p.getTicker().getName().toLowerCase();
                                 String tickerSymbol = p.getTicker().getSymbol().toLowerCase();
                                 String date =
-                                        p.getWalletTransaction()
-                                                .getDate()
-                                                .format(Constants.DATE_FORMATTER_WITH_TIME);
+                                        UIUtils.formatDateTimeForDisplay(
+                                                p.getWalletTransaction().getDate(), i18nService);
                                 String quantity = p.getQuantity().toString();
                                 String unitPrice = p.getUnitPrice().toString();
                                 String amount = p.getWalletTransaction().getAmount().toString();
@@ -318,9 +316,8 @@ public class InvestmentTransactionsController {
                                 String tickerName = s.getTicker().getName().toLowerCase();
                                 String tickerSymbol = s.getTicker().getSymbol().toLowerCase();
                                 String date =
-                                        s.getWalletTransaction()
-                                                .getDate()
-                                                .format(Constants.DATE_FORMATTER_WITH_TIME);
+                                        UIUtils.formatDateTimeForDisplay(
+                                                s.getWalletTransaction().getDate(), i18nService);
                                 String quantity = s.getQuantity().toString();
                                 String unitPrice = s.getUnitPrice().toString();
                                 String amount = s.getWalletTransaction().getAmount().toString();
@@ -368,7 +365,7 @@ public class InvestmentTransactionsController {
                                 String targetCrypto =
                                         ce.getReceivedCrypto().getName().toLowerCase();
                                 String date =
-                                        ce.getDate().format(Constants.DATE_FORMATTER_WITH_TIME);
+                                        UIUtils.formatDateTimeForDisplay(ce.getDate(), i18nService);
                                 String sourceQuantity = ce.getSoldQuantity().toString();
                                 String targetQuantity = ce.getReceivedQuantity().toString();
                                 String description = ce.getDescription().toLowerCase();
@@ -417,10 +414,9 @@ public class InvestmentTransactionsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getWalletTransaction()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getWalletTransaction().getDate(),
+                                        i18nService)));
 
         TableColumn<TickerPurchase, String> quantityColumn =
                 new TableColumn<>(
@@ -530,10 +526,9 @@ public class InvestmentTransactionsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getWalletTransaction()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getWalletTransaction().getDate(),
+                                        i18nService)));
 
         TableColumn<TickerSale, String> quantityColumn =
                 new TableColumn<>(
@@ -643,10 +638,9 @@ public class InvestmentTransactionsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getWalletTransaction()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getWalletTransaction().getDate(),
+                                        i18nService)));
 
         TableColumn<Dividend, String> amountColumn =
                 new TableColumn<>(
@@ -756,9 +750,8 @@ public class InvestmentTransactionsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
         TableColumn<CryptoExchange, String> descriptionColumn =
                 new TableColumn<>(
@@ -1022,9 +1015,8 @@ public class InvestmentTransactionsController {
                                         .subtract(cryptoExchange.getReceivedQuantity())),
                         MessageFormat.format(
                                 i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_DATE),
-                                cryptoExchange
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)),
+                                UIUtils.formatDateTimeForDisplay(
+                                        cryptoExchange.getDate(), i18nService)),
                         MessageFormat.format(
                                 i18nService.tr(
                                         Constants.TranslationKeys.INVESTMENT_DELETE_DESCRIPTION),
@@ -1063,7 +1055,7 @@ public class InvestmentTransactionsController {
                         UIUtils.formatCurrency(wt.getAmount())),
                 MessageFormat.format(
                         i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_DATE),
-                        wt.getDate().format(Constants.DATE_FORMATTER_WITH_TIME)),
+                        UIUtils.formatDateTimeForDisplay(wt.getDate(), i18nService)),
                 MessageFormat.format(
                         i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_STATUS),
                         UIUtils.translateTransactionStatus(wt.getStatus(), i18nService)),

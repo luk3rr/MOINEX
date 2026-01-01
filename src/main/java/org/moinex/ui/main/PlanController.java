@@ -132,7 +132,8 @@ public class PlanController {
 
         periodComboBox.setConverter(
                 new StringConverter<>() {
-                    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+                    final DateTimeFormatter formatter =
+                            UIUtils.getFullMonthYearFormatter(i18nService.getLocale());
 
                     @Override
                     public String toString(YearMonth yearMonth) {

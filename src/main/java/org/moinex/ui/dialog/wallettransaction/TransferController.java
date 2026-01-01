@@ -82,9 +82,8 @@ public class TransferController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_NO_TIME)));
+                                UIUtils.formatDateForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
         TableColumn<Transfer, String> descriptionColumn =
                 new TableColumn<>(
@@ -147,8 +146,8 @@ public class TransferController {
      * Configures the date pickers with appropriate formatters and default values.
      */
     private void configureDatePickers() {
-        UIUtils.setDatePickerFormat(transfersStartDatePicker);
-        UIUtils.setDatePickerFormat(transfersEndDatePicker);
+        UIUtils.setDatePickerFormat(transfersStartDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transfersEndDatePicker, i18nService);
 
         transfersStartDatePicker.setValue(LocalDate.now().withDayOfMonth(1));
         transfersEndDatePicker.setValue(LocalDate.now().plusMonths(1).withDayOfMonth(1));

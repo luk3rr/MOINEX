@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.util.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -132,8 +131,8 @@ public class TransactionController {
         populateTransactionTypeComboBox();
 
         // Format the date pickers
-        UIUtils.setDatePickerFormat(transactionsStartDatePicker);
-        UIUtils.setDatePickerFormat(transactionsEndDatePicker);
+        UIUtils.setDatePickerFormat(transactionsStartDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transactionsEndDatePicker, i18nService);
 
         LocalDateTime currentDate = LocalDateTime.now();
 
@@ -282,9 +281,8 @@ public class TransactionController {
                                 i18nService.tr(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE),
-                                selectedTransaction
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)))
+                                UIUtils.formatDateTimeForDisplay(
+                                        selectedTransaction.getDate(), i18nService)))
                 .append("\n");
 
         message.append(
@@ -473,7 +471,7 @@ public class TransactionController {
         moneyFlowStackedBarChart.getData().clear();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
+        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
 
         List<Category> categories = categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
@@ -728,7 +726,8 @@ public class TransactionController {
         // Custom string converter to format the Year as "Year"
         yearResumeComboBox.setConverter(
                 new StringConverter<>() {
-                    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+                    private final DateTimeFormatter formatter =
+                            UIUtils.getYearFormatter(i18nService.getLocale());
 
                     @Override
                     public String toString(Year year) {
@@ -860,9 +859,7 @@ public class TransactionController {
                 new StringConverter<>() {
                     @Override
                     public String toString(Month month) {
-                        return month != null
-                                ? month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                : "";
+                        return month != null ? UIUtils.getMonthDisplayName(month, i18nService) : "";
                     }
 
                     @Override
@@ -931,9 +928,8 @@ public class TransactionController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                param.getValue()
-                                        .getDate()
-                                        .format(Constants.DATE_FORMATTER_WITH_TIME)));
+                                UIUtils.formatDateTimeForDisplay(
+                                        param.getValue().getDate(), i18nService)));
 
         TableColumn<WalletTransaction, String> amountColumn =
                 new TableColumn<>(
