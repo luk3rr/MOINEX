@@ -110,7 +110,8 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 });
 
         typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
-        UIUtils.configureComboBox(typeComboBox, TransactionType::name);
+        UIUtils.configureComboBox(
+                typeComboBox, t -> UIUtils.translateTransactionType(t, i18nService));
     }
 
     @FXML

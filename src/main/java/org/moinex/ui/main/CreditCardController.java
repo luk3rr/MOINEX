@@ -134,6 +134,8 @@ public class CreditCardController {
         debtsListMonthFilterComboBox.setValue(now.getMonth());
         debtsListYearFilterComboBox.setValue(Year.of(now.getYear()));
 
+        invoiceMonth.setText(UIUtils.formatShortMonthYear(getTableCurrentMonthYear(), i18nService));
+
         debtsListMonthFilterComboBox.setOnAction(event -> updateDebtsTableView());
 
         updateTotalDebtsInfo();
