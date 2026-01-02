@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -36,7 +37,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -46,23 +50,23 @@ import org.moinex.chart.DoughnutChart;
 import org.moinex.dto.AllocationDTO;
 import org.moinex.dto.ProfitabilityMetricsDTO;
 import org.moinex.dto.TickerPerformanceDTO;
+import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BrazilianMarketIndicators;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.model.investment.MarketQuotesAndCommodities;
 import org.moinex.model.investment.Ticker;
-import org.moinex.service.*;
-import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
-import org.moinex.ui.dialog.investment.AddDividendController;
-import org.moinex.ui.dialog.investment.AddTickerController;
-import org.moinex.ui.dialog.investment.AddTickerPurchaseController;
-import org.moinex.ui.dialog.investment.AddTickerSaleController;
-import org.moinex.ui.dialog.investment.ArchivedTickersController;
-import org.moinex.ui.dialog.investment.EditTickerController;
-import org.moinex.ui.dialog.investment.InvestmentTransactionsController;
+import org.moinex.service.BondService;
+import org.moinex.service.I18nService;
+import org.moinex.service.InvestmentTargetService;
+import org.moinex.service.MarketService;
+import org.moinex.service.TickerService;
+import org.moinex.service.WalletService;
+import org.moinex.ui.dialog.investment.*;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.AssetType;
 import org.moinex.util.enums.TickerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +93,18 @@ public class SavingsController {
     @FXML private TextField stocksFundsTabTickerSearchField;
 
     @FXML private ComboBox<TickerType> stocksFundsTabTickerTypeComboBox;
+
+    @FXML private Text bondsTabTotalInvestedField;
+
+    @FXML private Text bondsTabCurrentValueField;
+
+    @FXML private Text bondsTabProfitLossField;
+
+    @FXML private Text bondsTabInterestReceivedField;
+
+    @FXML private TableView<Bond> bondsTabBondTable;
+
+    @FXML private TextField bondsTabBondSearchField;
 
     @FXML private JFXButton updatePortfolioPricesButton;
 
@@ -174,6 +190,8 @@ public class SavingsController {
 
     private InvestmentTargetService investmentTargetService;
 
+    private BondService bondService;
+
     private List<Ticker> tickers;
 
     private List<Dividend> dividends;
@@ -215,13 +233,15 @@ public class SavingsController {
             ConfigurableApplicationContext springContext,
             I18nService i18nService,
             WalletService walletService,
-            InvestmentTargetService investmentTargetService) {
+            InvestmentTargetService investmentTargetService,
+            BondService bondService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
         this.i18nService = i18nService;
         this.walletService = walletService;
         this.investmentTargetService = investmentTargetService;
+        this.bondService = bondService;
     }
 
     @FXML
@@ -230,10 +250,13 @@ public class SavingsController {
         loadMarketQuotesAndCommoditiesFromDatabase();
 
         configureTableView();
+        configureBondTableView();
         populateTickerTypeComboBox();
 
         updateTransactionTableView();
+        updateBondTableView();
         updatePortfolioIndicators();
+        updateBondTabFields();
         updateBrazilianMarketIndicators();
         updateMarketQuotesAndCommodities();
         updateInvestmentDistributionChart();
@@ -249,6 +272,7 @@ public class SavingsController {
         }
 
         configureListeners();
+        configureBondListeners();
     }
 
     @FXML
@@ -1221,6 +1245,7 @@ public class SavingsController {
         Map<String, BigDecimal> investmentByType = new HashMap<>();
 
         List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
+        List<Bond> allBonds = bondService.getAllNonArchivedBonds();
 
         for (Ticker ticker : allTickers) {
             BigDecimal tickerCurrentValue =
@@ -1229,6 +1254,13 @@ public class SavingsController {
             String typeName = UIUtils.translateTickerType(ticker.getType(), i18nService);
 
             investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add);
+        }
+
+        for (Bond bond : allBonds) {
+            BigDecimal bondCurrentValue = bond.getCurrentUnitValue();
+            String typeName = UIUtils.translateBondType(bond.getType(), i18nService);
+
+            investmentByType.merge(typeName, bondCurrentValue, BigDecimal::add);
         }
 
         return investmentByType;
@@ -1623,14 +1655,15 @@ public class SavingsController {
     }
 
     private List<AllocationDTO> calculateAllocationVsTarget() {
-        loadTickersFromDatabase();
+        Map<TickerType, BigDecimal> currentAllocation = new HashMap<>();
 
         BigDecimal totalValue =
                 tickers.stream()
                         .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Map<TickerType, BigDecimal> currentAllocation = new HashMap<>();
+        BigDecimal totalBondValue = bondService.getTotalBondValue();
+        totalValue = totalValue.add(totalBondValue);
 
         for (Ticker ticker : tickers) {
             BigDecimal value = ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
@@ -1642,8 +1675,19 @@ public class SavingsController {
         List<AllocationDTO> allocations = new ArrayList<>();
 
         for (InvestmentTarget target : targets) {
-            BigDecimal currentValue =
-                    currentAllocation.getOrDefault(target.getTickerType(), BigDecimal.ZERO);
+            AssetType assetType = target.getAssetType();
+            BigDecimal currentValue = BigDecimal.ZERO;
+            String typeName;
+
+            if (assetType == AssetType.BOND) {
+                currentValue = bondService.getTotalBondValue();
+                typeName = i18nService.tr("Títulos de Renda Fixa");
+            } else {
+                TickerType tickerType = TickerType.valueOf(assetType.name());
+                currentValue = currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO);
+                typeName = UIUtils.translateTickerType(tickerType, i18nService);
+            }
+
             BigDecimal currentPercentage =
                     totalValue.compareTo(BigDecimal.ZERO) > 0
                             ? currentValue
@@ -1652,11 +1696,10 @@ public class SavingsController {
                             : BigDecimal.ZERO;
 
             BigDecimal difference = currentPercentage.subtract(target.getTargetPercentage());
-            String typeName = UIUtils.translateTickerType(target.getTickerType(), i18nService);
 
             allocations.add(
                     new AllocationDTO(
-                            target.getTickerType(),
+                            assetType,
                             typeName,
                             currentPercentage,
                             target.getTargetPercentage(),
@@ -1676,16 +1719,21 @@ public class SavingsController {
 
         List<AllocationDTO> allocations = calculateAllocationVsTarget();
 
-        HBox columnsContainer = new HBox(ALLOCATION_PANEL_COLUMNS_SPACING);
-        columnsContainer.setAlignment(Pos.CENTER);
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(ALLOCATION_PANEL_COLUMNS_SPACING);
+        gridPane.setAlignment(Pos.CENTER);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(50);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(50);
+        gridPane.getColumnConstraints().addAll(col1, col2);
 
         VBox leftColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
         leftColumn.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(leftColumn, javafx.scene.layout.Priority.ALWAYS);
 
         VBox rightColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
         rightColumn.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(rightColumn, javafx.scene.layout.Priority.ALWAYS);
 
         for (int i = 0; i < allocations.size(); i++) {
             if (i < ALLOCATION_ITEMS_PER_COLUMN) {
@@ -1695,8 +1743,10 @@ public class SavingsController {
             }
         }
 
-        columnsContainer.getChildren().addAll(leftColumn, rightColumn);
-        container.getChildren().add(columnsContainer);
+        gridPane.add(leftColumn, 0, 0);
+        gridPane.add(rightColumn, 1, 0);
+
+        container.getChildren().add(gridPane);
 
         portfolioP5.getChildren().add(container);
         HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
@@ -1711,7 +1761,6 @@ public class SavingsController {
         HBox progressBar = new HBox();
         progressBar.getStyleClass().add(Constants.ALLOCATION_PROGRESS_BAR_STYLE);
         progressBar.setPrefHeight(ALLOCATION_PROGRESS_BAR_HEIGHT);
-        progressBar.setMaxWidth(Double.MAX_VALUE);
 
         double fillPercentage = allocation.currentPercentage().doubleValue();
         BigDecimal achievementPercentage = allocation.getAchievementPercentage();
@@ -1754,6 +1803,7 @@ public class SavingsController {
                                         Constants.TranslationKeys.SAVINGS_ALLOCATION_TARGET)
                                 + ")");
         currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
+        currentLabel.setMinWidth(Region.USE_PREF_SIZE);
 
         javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
@@ -1761,6 +1811,7 @@ public class SavingsController {
         String statusText = getStatusText(allocation);
         Label statusLabel = new Label(statusText);
         statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_LABEL_STYLE);
+        statusLabel.setMinWidth(Region.USE_PREF_SIZE);
 
         if (!allocation.isNotInStrategy()) {
             if (allocation.isCriticalLow()) {
@@ -1814,5 +1865,173 @@ public class SavingsController {
         }
 
         return "";
+    }
+
+    @FXML
+    private void handleRegisterBond() {
+        WindowUtils.openModalWindow(
+                Constants.ADD_BOND_FXML,
+                i18nService.tr("Adicionar Título de Renda Fixa"),
+                springContext,
+                (AddBondController controller) -> {},
+                List.of(this::updateBondTableView, this::updateBondTabFields));
+    }
+
+    @FXML
+    private void handleEditBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr("Nenhum título selecionado"),
+                    i18nService.tr("Por favor, selecione um título para editar."));
+            return;
+        }
+
+        WindowUtils.showInformationDialog(
+                "Funcionalidade em desenvolvimento",
+                "A edição de títulos será implementada em breve.");
+    }
+
+    @FXML
+    private void handleDeleteBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr("Nenhum título selecionado"),
+                    i18nService.tr("Por favor, selecione um título para excluir."));
+            return;
+        }
+
+        boolean confirmed =
+                WindowUtils.showConfirmationDialog(
+                        i18nService.tr("Confirmar exclusão"),
+                        i18nService.tr("Tem certeza que deseja arquivar o título ")
+                                + selectedBond.getName()
+                                + "?");
+
+        if (confirmed) {
+            bondService.archiveBond(selectedBond.getId());
+            updateBondTableView();
+            updateBondTabFields();
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr("Título arquivado"),
+                    i18nService.tr("O título foi arquivado com sucesso."));
+        }
+    }
+
+    @FXML
+    private void handleOpenBondArchive() {
+        WindowUtils.showInformationDialog(
+                "Funcionalidade em desenvolvimento",
+                "O arquivo de títulos será implementado em breve.");
+    }
+
+    private void configureBondTableView() {
+        TableColumn<Bond, String> nameColumn = new TableColumn<>("Nome");
+        nameColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+        nameColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.25));
+
+        TableColumn<Bond, String> symbolColumn = new TableColumn<>("Símbolo");
+        symbolColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(cellData.getValue().getSymbol()));
+        symbolColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
+
+        TableColumn<Bond, String> typeColumn = new TableColumn<>("Tipo");
+        typeColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(cellData.getValue().getType().name()));
+        typeColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
+
+        TableColumn<Bond, String> currentValueColumn = new TableColumn<>("Valor Atual");
+        currentValueColumn.setCellValueFactory(
+                cellData ->
+                        new SimpleStringProperty(
+                                UIUtils.formatCurrency(cellData.getValue().getCurrentUnitValue())));
+        currentValueColumn
+                .prefWidthProperty()
+                .bind(bondsTabBondTable.widthProperty().multiply(0.15));
+
+        TableColumn<Bond, String> investedValueColumn = new TableColumn<>("Valor Investido");
+        investedValueColumn.setCellValueFactory(
+                cellData ->
+                        new SimpleStringProperty(
+                                UIUtils.formatCurrency(cellData.getValue().getAverageUnitValue())));
+        investedValueColumn
+                .prefWidthProperty()
+                .bind(bondsTabBondTable.widthProperty().multiply(0.15));
+
+        TableColumn<Bond, String> profitLossColumn = new TableColumn<>("Lucro/Prejuízo");
+        profitLossColumn.setCellValueFactory(
+                cellData -> {
+                    BigDecimal profitLoss =
+                            cellData.getValue()
+                                    .getCurrentUnitValue()
+                                    .subtract(cellData.getValue().getAverageUnitValue());
+                    return new SimpleStringProperty(UIUtils.formatCurrency(profitLoss));
+                });
+        profitLossColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
+
+        bondsTabBondTable
+                .getColumns()
+                .addAll(
+                        nameColumn,
+                        symbolColumn,
+                        typeColumn,
+                        currentValueColumn,
+                        investedValueColumn,
+                        profitLossColumn);
+    }
+
+    private void updateBondTableView() {
+        List<Bond> bonds = bondService.getAllNonArchivedBonds();
+
+        String searchText = bondsTabBondSearchField.getText().toLowerCase();
+        if (!searchText.isEmpty()) {
+            bonds =
+                    bonds.stream()
+                            .filter(
+                                    bond ->
+                                            bond.getName().toLowerCase().contains(searchText)
+                                                    || bond.getSymbol()
+                                                            .toLowerCase()
+                                                            .contains(searchText))
+                            .collect(Collectors.toList());
+        }
+
+        bondsTabBondTable.getItems().setAll(bonds);
+    }
+
+    private void updateBondTabFields() {
+        List<Bond> bonds = bondService.getAllNonArchivedBonds();
+
+        BigDecimal totalInvested =
+                bonds.stream()
+                        .map(Bond::getAverageUnitValue)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal currentValue =
+                bonds.stream()
+                        .map(Bond::getCurrentUnitValue)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal profitLoss = currentValue.subtract(totalInvested);
+
+        BigDecimal interestReceived = BigDecimal.ZERO;
+
+        bondsTabTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
+        bondsTabCurrentValueField.setText(UIUtils.formatCurrency(currentValue));
+        bondsTabProfitLossField.setText(UIUtils.formatCurrency(profitLoss));
+        bondsTabInterestReceivedField.setText(UIUtils.formatCurrency(interestReceived));
+    }
+
+    private void configureBondListeners() {
+        bondsTabBondSearchField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            updateBondTableView();
+                        });
     }
 }

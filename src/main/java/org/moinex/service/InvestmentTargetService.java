@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.repository.investment.InvestmentTargetRepository;
+import org.moinex.util.enums.AssetType;
 import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,20 +25,25 @@ public class InvestmentTargetService {
     @Autowired private InvestmentTargetRepository investmentTargetRepository;
 
     public List<InvestmentTarget> getAllActiveTargets() {
-        return investmentTargetRepository.findAllByIsActiveTrueOrderByTickerTypeAsc();
+        return investmentTargetRepository.findAllByIsActiveTrueOrderByAssetTypeAsc();
     }
 
-    public InvestmentTarget getTargetByType(TickerType tickerType) {
+    public InvestmentTarget getTargetByType(AssetType assetType) {
         return investmentTargetRepository
-                .findByTickerTypeAndIsActiveTrue(tickerType)
+                .findByAssetTypeAndIsActiveTrue(assetType)
                 .orElseThrow(
                         () ->
                                 new EntityNotFoundException(
-                                        "Investment target not found for type: " + tickerType));
+                                        "Investment target not found for type: " + assetType));
+    }
+
+    public InvestmentTarget getTargetByTickerType(TickerType tickerType) {
+        AssetType assetType = AssetType.valueOf(tickerType.name());
+        return getTargetByType(assetType);
     }
 
     @Transactional
-    public InvestmentTarget setTarget(TickerType tickerType, BigDecimal targetPercentage) {
+    public InvestmentTarget setTarget(AssetType assetType, BigDecimal targetPercentage) {
         if (targetPercentage.compareTo(BigDecimal.ZERO) < 0
                 || targetPercentage.compareTo(new BigDecimal("100")) > 0) {
             throw new IllegalArgumentException("Target percentage must be between 0 and 100");
@@ -45,10 +51,10 @@ public class InvestmentTargetService {
 
         InvestmentTarget target =
                 investmentTargetRepository
-                        .findByTickerTypeAndIsActiveTrue(tickerType)
+                        .findByAssetTypeAndIsActiveTrue(assetType)
                         .orElse(
                                 InvestmentTarget.builder()
-                                        .tickerType(tickerType)
+                                        .assetType(assetType)
                                         .isActive(true)
                                         .build());
 

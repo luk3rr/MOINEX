@@ -522,7 +522,6 @@ public final class UIUtils {
                         "stock", Constants.TranslationKeys.TICKER_TYPE_STOCK,
                         "fund", Constants.TranslationKeys.TICKER_TYPE_FUND,
                         "cryptocurrency", Constants.TranslationKeys.TICKER_TYPE_CRYPTO,
-                        "bond", Constants.TranslationKeys.TICKER_TYPE_BOND,
                         "reit", Constants.TranslationKeys.TICKER_TYPE_REIT,
                         "etf", Constants.TranslationKeys.TICKER_TYPE_ETF);
 
@@ -532,6 +531,78 @@ public final class UIUtils {
         }
 
         return tickerType.name();
+    }
+
+    public static String translateAssetType(AssetType assetType, I18nService i18nService) {
+        Map<String, String> assetKeyMap =
+                Map.of(
+                        "stock", Constants.TranslationKeys.ASSET_TYPE_STOCK,
+                        "fund", Constants.TranslationKeys.ASSET_TYPE_FUND,
+                        "cryptocurrency", Constants.TranslationKeys.ASSET_TYPE_CRYPTO,
+                        "reit", Constants.TranslationKeys.ASSET_TYPE_REIT,
+                        "etf", Constants.TranslationKeys.ASSET_TYPE_ETF,
+                        "bond", Constants.TranslationKeys.ASSET_TYPE_BOND);
+
+        String key = assetKeyMap.getOrDefault(assetType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return assetType.name();
+    }
+
+    public static String translateBondType(BondType bondType, I18nService i18nService) {
+        Map<String, String> bondTypeKeyMap =
+                Map.of(
+                        "cdb", Constants.TranslationKeys.BOND_TYPE_CDB,
+                        "lci", Constants.TranslationKeys.BOND_TYPE_LCI,
+                        "lca", Constants.TranslationKeys.BOND_TYPE_LCA,
+                        "treasury_prefixed", Constants.TranslationKeys.BOND_TYPE_TREASURY_PREFIXED,
+                        "treasury_postfixed",
+                                Constants.TranslationKeys.BOND_TYPE_TREASURY_POSTFIXED,
+                        "international", Constants.TranslationKeys.BOND_TYPE_INTERNATIONAL,
+                        "other", Constants.TranslationKeys.BOND_TYPE_OTHER);
+
+        String key = bondTypeKeyMap.getOrDefault(bondType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return bondType.name();
+    }
+
+    public static String translateInterestType(InterestType interestType, I18nService i18nService) {
+        Map<String, String> interestTypeKeyMap =
+                Map.of(
+                        "fixed", Constants.TranslationKeys.INTEREST_TYPE_FIXED,
+                        "floating", Constants.TranslationKeys.INTEREST_TYPE_FLOATING,
+                        "zero_coupon", Constants.TranslationKeys.INTEREST_TYPE_ZERO_COUPON);
+
+        String key = interestTypeKeyMap.getOrDefault(interestType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return interestType.name();
+    }
+
+    public static String translateInterestIndex(
+            InterestIndex interestIndex, I18nService i18nService) {
+        Map<String, String> interestIndexKeyMap =
+                Map.of(
+                        "cdi", Constants.TranslationKeys.INTEREST_INDEX_CDI,
+                        "selic", Constants.TranslationKeys.INTEREST_INDEX_SELIC,
+                        "ipca", Constants.TranslationKeys.INTEREST_INDEX_IPCA,
+                        "libor", Constants.TranslationKeys.INTEREST_INDEX_LIBOR,
+                        "sofr", Constants.TranslationKeys.INTEREST_INDEX_SOFR,
+                        "other", Constants.TranslationKeys.INTEREST_INDEX_OTHER);
+
+        String key = interestIndexKeyMap.getOrDefault(interestIndex.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return interestIndex.name();
     }
 
     public static String translateCreditCardInvoiceStatus(

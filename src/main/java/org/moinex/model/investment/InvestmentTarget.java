@@ -9,7 +9,7 @@ package org.moinex.model.investment;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.*;
-import org.moinex.util.enums.TickerType;
+import org.moinex.util.enums.AssetType;
 
 @Entity
 @Table(name = "investment_target")
@@ -26,8 +26,8 @@ public class InvestmentTarget {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ticker_type", nullable = false, unique = true)
-    private TickerType tickerType;
+    @Column(name = "type", nullable = false, unique = true)
+    private AssetType assetType;
 
     @Column(name = "target_percentage", nullable = false)
     private BigDecimal targetPercentage;

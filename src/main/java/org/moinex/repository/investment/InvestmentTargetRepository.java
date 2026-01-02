@@ -9,15 +9,15 @@ package org.moinex.repository.investment;
 import java.util.List;
 import java.util.Optional;
 import org.moinex.model.investment.InvestmentTarget;
-import org.moinex.util.enums.TickerType;
+import org.moinex.util.enums.AssetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InvestmentTargetRepository extends JpaRepository<InvestmentTarget, Integer> {
-    List<InvestmentTarget> findAllByIsActiveTrueOrderByTickerTypeAsc();
+    List<InvestmentTarget> findAllByIsActiveTrueOrderByAssetTypeAsc();
 
-    Optional<InvestmentTarget> findByTickerTypeAndIsActiveTrue(TickerType tickerType);
+    Optional<InvestmentTarget> findByAssetTypeAndIsActiveTrue(AssetType assetType);
 
-    boolean existsByTickerType(TickerType tickerType);
+    boolean existsByAssetType(AssetType assetType);
 }

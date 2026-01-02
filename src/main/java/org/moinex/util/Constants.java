@@ -67,6 +67,7 @@ public final class Constants {
     public static final String BUY_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "buy_ticker.fxml";
     public static final String SALE_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "sale_ticker.fxml";
     public static final String ADD_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "add_ticker.fxml";
+    public static final String ADD_BOND_FXML = UI_DIALOG_INVESTMENT_PATH + "add_bond.fxml";
     public static final String ADD_DIVIDEND_FXML =
             UI_DIALOG_INVESTMENT_PATH + ("add_dividend." + "fxml");
     public static final String ADD_CRYPTO_EXCHANGE_FXML =
@@ -396,6 +397,7 @@ public final class Constants {
     public static final String DIGITS_ONLY_REGEX = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
     public static final String BUDGET_GROUP_PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
+    public static final String INTEREST_RATE_REGEX = "\\d{0,3}(\\.\\d{0,4})?";
 
     public static final Integer INVESTMENT_CALCULATION_PRECISION = 8;
     public static final String INVESTMENT_VALUE_REGEX =
@@ -678,9 +680,38 @@ public final class Constants {
         public static final String TICKER_TYPE_STOCK = "ticker.type.stock";
         public static final String TICKER_TYPE_FUND = "ticker.type.fund";
         public static final String TICKER_TYPE_CRYPTO = "ticker.type.crypto";
-        public static final String TICKER_TYPE_BOND = "ticker.type.bond";
         public static final String TICKER_TYPE_REIT = "ticker.type.reit";
         public static final String TICKER_TYPE_ETF = "ticker.type.etf";
+
+        // Asset types
+        public static final String ASSET_TYPE_STOCK = "ticker.type.stock";
+        public static final String ASSET_TYPE_FUND = "ticker.type.fund";
+        public static final String ASSET_TYPE_CRYPTO = "ticker.type.crypto";
+        public static final String ASSET_TYPE_REIT = "ticker.type.reit";
+        public static final String ASSET_TYPE_ETF = "ticker.type.etf";
+        public static final String ASSET_TYPE_BOND = "bond.type.bond";
+
+        // Bond types
+        public static final String BOND_TYPE_CDB = "bond.type.cdb";
+        public static final String BOND_TYPE_LCI = "bond.type.lci";
+        public static final String BOND_TYPE_LCA = "bond.type.lca";
+        public static final String BOND_TYPE_TREASURY_PREFIXED = "bond.type.treasuryPrefixed";
+        public static final String BOND_TYPE_TREASURY_POSTFIXED = "bond.type.treasuryPostfixed";
+        public static final String BOND_TYPE_INTERNATIONAL = "bond.type.international";
+        public static final String BOND_TYPE_OTHER = "bond.type.other";
+
+        // Interest types
+        public static final String INTEREST_TYPE_FIXED = "interest.type.fixed";
+        public static final String INTEREST_TYPE_FLOATING = "interest.type.floating";
+        public static final String INTEREST_TYPE_ZERO_COUPON = "interest.type.zeroCoupon";
+
+        // Interest indices
+        public static final String INTEREST_INDEX_CDI = "interest.index.cdi";
+        public static final String INTEREST_INDEX_SELIC = "interest.index.selic";
+        public static final String INTEREST_INDEX_IPCA = "interest.index.ipca";
+        public static final String INTEREST_INDEX_LIBOR = "interest.index.libor";
+        public static final String INTEREST_INDEX_SOFR = "interest.index.sofr";
+        public static final String INTEREST_INDEX_OTHER = "interest.index.other";
 
         // Credit Card Credit types
         public static final String CREDIT_CARD_CREDIT_TYPE_CASHBACK =
@@ -1618,6 +1649,21 @@ public final class Constants {
                 "investment.dialog.noDividendSelected.title";
         public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_MESSAGE =
                 "investment.dialog.noDividendSelected.message";
+
+        // Bond Dialog Messages
+        public static final String BOND_DIALOG_EMPTY_FIELDS_TITLE = "bond.dialog.emptyFields.title";
+        public static final String BOND_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "bond.dialog.emptyFields.message";
+        public static final String BOND_DIALOG_ADDED_TITLE = "bond.dialog.added.title";
+        public static final String BOND_DIALOG_ADDED_MESSAGE = "bond.dialog.added.message";
+        public static final String BOND_DIALOG_INVALID_NUMBER_TITLE =
+                "bond.dialog.invalidNumber.title";
+        public static final String BOND_DIALOG_INVALID_NUMBER_MESSAGE =
+                "bond.dialog.invalidNumber.message";
+        public static final String BOND_DIALOG_ALREADY_EXISTS_TITLE =
+                "bond.dialog.alreadyExists.title";
+        public static final String BOND_DIALOG_ALREADY_EXISTS_MESSAGE =
+                "bond.dialog.alreadyExists.message";
         public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_DELETE_MESSAGE =
                 "investment.dialog.noDividendSelectedDelete.message";
         public static final String INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_TITLE =

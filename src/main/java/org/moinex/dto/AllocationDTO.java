@@ -9,10 +9,10 @@ package org.moinex.dto;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.TickerType;
+import org.moinex.util.enums.AssetType;
 
 public record AllocationDTO(
-        TickerType tickerType,
+        AssetType assetType,
         String typeName,
         BigDecimal currentPercentage,
         BigDecimal targetPercentage,

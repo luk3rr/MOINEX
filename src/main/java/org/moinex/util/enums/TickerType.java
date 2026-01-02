@@ -13,7 +13,6 @@ public enum TickerType {
     STOCK,
     FUND,
     CRYPTOCURRENCY,
-    BOND,
     REIT,
     ETF
 }
