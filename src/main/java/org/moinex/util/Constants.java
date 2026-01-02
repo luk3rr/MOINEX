@@ -227,6 +227,35 @@ public final class Constants {
     public static final String CUSTOM_TABLE_HEADER_STYLE = "custom-table-header";
     public static final String CUSTOM_TABLE_CELL_STYLE = "custom-table-cell";
 
+    // Allocation Panel Styles
+    public static final String ALLOCATION_TYPE_LABEL_STYLE = "allocation-type-label";
+    public static final String ALLOCATION_PROGRESS_BAR_STYLE = "allocation-progress-bar";
+    public static final String ALLOCATION_FILLED_BAR_CRITICAL_LOW_STYLE =
+            "allocation-filled-bar-critical-low";
+    public static final String ALLOCATION_FILLED_BAR_WARNING_LOW_STYLE =
+            "allocation-filled-bar-warning-low";
+    public static final String ALLOCATION_FILLED_BAR_ON_TARGET_STYLE =
+            "allocation-filled-bar-on-target";
+    public static final String ALLOCATION_FILLED_BAR_WARNING_HIGH_STYLE =
+            "allocation-filled-bar-warning-high";
+    public static final String ALLOCATION_FILLED_BAR_CRITICAL_HIGH_STYLE =
+            "allocation-filled-bar-critical-high";
+    public static final String ALLOCATION_INFO_LABEL_STYLE = "allocation-info-label";
+    public static final String ALLOCATION_DIFF_LABEL_STYLE = "allocation-diff-label";
+    public static final String ALLOCATION_DIFF_CRITICAL_LOW_STYLE = "allocation-diff-critical-low";
+    public static final String ALLOCATION_DIFF_WARNING_LOW_STYLE = "allocation-diff-warning-low";
+    public static final String ALLOCATION_DIFF_ON_TARGET_STYLE = "allocation-diff-on-target";
+    public static final String ALLOCATION_DIFF_WARNING_HIGH_STYLE = "allocation-diff-warning-high";
+    public static final String ALLOCATION_DIFF_CRITICAL_HIGH_STYLE =
+            "allocation-diff-critical-high";
+
+    // Allocation Panel Thresholds
+    public static final Double ALLOCATION_CRITICAL_LOW_THRESHOLD = 0.0;
+    public static final Double ALLOCATION_WARNING_LOW_THRESHOLD = 80.0;
+    public static final Double ALLOCATION_ON_TARGET_LOW_THRESHOLD = 95.0;
+    public static final Double ALLOCATION_ON_TARGET_HIGH_THRESHOLD = 105.0;
+    public static final Double ALLOCATION_WARNING_HIGH_THRESHOLD = 120.0;
+
     // Credit Card Item Styles
     public static final String HOME_CREDIT_CARD_ITEM_NAME_STYLE = "credit-card-item-name";
     public static final String HOME_CREDIT_CARD_ITEM_BALANCE_STYLE = "credit-card-item-balance";
@@ -649,6 +678,9 @@ public final class Constants {
         public static final String TICKER_TYPE_STOCK = "ticker.type.stock";
         public static final String TICKER_TYPE_FUND = "ticker.type.fund";
         public static final String TICKER_TYPE_CRYPTO = "ticker.type.crypto";
+        public static final String TICKER_TYPE_BOND = "ticker.type.bond";
+        public static final String TICKER_TYPE_REIT = "ticker.type.reit";
+        public static final String TICKER_TYPE_ETF = "ticker.type.etf";
 
         // Credit Card Credit types
         public static final String CREDIT_CARD_CREDIT_TYPE_CASHBACK =
@@ -908,6 +940,19 @@ public final class Constants {
         public static final String SAVINGS_METRICS_PROFIT_LOSS = "savings.metrics.profitLoss";
         public static final String SAVINGS_METRICS_TOTAL_DIVIDENDS =
                 "savings.metrics.totalDividends";
+
+        // Savings - Allocation
+        public static final String SAVINGS_ALLOCATION_TARGET = "savings.allocation.target";
+        public static final String SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW =
+                "savings.allocation.status.criticalLow";
+        public static final String SAVINGS_ALLOCATION_STATUS_WARNING_LOW =
+                "savings.allocation.status.warningLow";
+        public static final String SAVINGS_ALLOCATION_STATUS_ON_TARGET =
+                "savings.allocation.status.onTarget";
+        public static final String SAVINGS_ALLOCATION_STATUS_WARNING_HIGH =
+                "savings.allocation.status.warningHigh";
+        public static final String SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH =
+                "savings.allocation.status.criticalHigh";
 
         // Savings - Top Performers
         public static final String SAVINGS_TOP_PERFORMERS_BEST = "savings.topPerformers.best";

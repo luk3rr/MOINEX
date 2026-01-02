@@ -521,7 +521,10 @@ public final class UIUtils {
                 Map.of(
                         "stock", Constants.TranslationKeys.TICKER_TYPE_STOCK,
                         "fund", Constants.TranslationKeys.TICKER_TYPE_FUND,
-                        "cryptocurrency", Constants.TranslationKeys.TICKER_TYPE_CRYPTO);
+                        "cryptocurrency", Constants.TranslationKeys.TICKER_TYPE_CRYPTO,
+                        "bond", Constants.TranslationKeys.TICKER_TYPE_BOND,
+                        "reit", Constants.TranslationKeys.TICKER_TYPE_REIT,
+                        "etf", Constants.TranslationKeys.TICKER_TYPE_ETF);
 
         String key = tickerKeyMap.getOrDefault(tickerType.name().toLowerCase(), null);
         if (key != null) {

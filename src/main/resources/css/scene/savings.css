@@ -3,3 +3,67 @@
  * Created on: October 10, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
+
+.allocation-type-label {
+  -fx-font-size: 13px;
+  -fx-font-weight: bold;
+}
+
+.allocation-progress-bar {
+  -fx-background-color: #e5e7eb;
+  -fx-background-radius: 5;
+}
+
+.allocation-filled-bar-critical-low {
+  -fx-background-color: #dc3545;
+  -fx-background-radius: 5;
+}
+
+.allocation-filled-bar-warning-low {
+  -fx-background-color: #F5B427;
+  -fx-background-radius: 5;
+}
+
+.allocation-filled-bar-on-target {
+  -fx-background-color: #28a745;
+  -fx-background-radius: 5;
+}
+
+.allocation-filled-bar-warning-high {
+  -fx-background-color: #F5B427;
+  -fx-background-radius: 5;
+}
+
+.allocation-filled-bar-critical-high {
+  -fx-background-color: #dc3545;
+  -fx-background-radius: 5;
+}
+
+.allocation-info-label {
+  -fx-font-size: 11px;
+}
+
+.allocation-diff-label {
+  -fx-font-size: 11px;
+  -fx-font-weight: bold;
+}
+
+.allocation-diff-critical-low {
+  -fx-text-fill: #dc3545;
+}
+
+.allocation-diff-warning-low {
+  -fx-text-fill: #F5B427;
+}
+
+.allocation-diff-on-target {
+  -fx-text-fill: #28a745;
+}
+
+.allocation-diff-warning-high {
+  -fx-text-fill: #F5B427;
+}
+
+.allocation-diff-critical-high {
+  -fx-text-fill: #dc3545;
+}

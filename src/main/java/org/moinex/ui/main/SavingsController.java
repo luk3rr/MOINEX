@@ -9,6 +9,8 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,14 +43,14 @@ import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.DoughnutChart;
+import org.moinex.dto.AllocationDTO;
 import org.moinex.dto.ProfitabilityMetricsDTO;
 import org.moinex.dto.TickerPerformanceDTO;
 import org.moinex.model.investment.BrazilianMarketIndicators;
 import org.moinex.model.investment.Dividend;
+import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.model.investment.MarketQuotesAndCommodities;
 import org.moinex.model.investment.Ticker;
-import org.moinex.model.wallettransaction.Wallet;
-import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.*;
 import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
 import org.moinex.ui.dialog.investment.AddDividendController;
@@ -140,6 +142,8 @@ public class SavingsController {
 
     @FXML private HBox portfolioP2;
 
+    @FXML private HBox portfolioP5;
+
     @FXML private HBox portfolioP4;
 
     private ConfigurableApplicationContext springContext;
@@ -168,6 +172,8 @@ public class SavingsController {
 
     private WalletService walletService;
 
+    private InvestmentTargetService investmentTargetService;
+
     private List<Ticker> tickers;
 
     private List<Dividend> dividends;
@@ -184,6 +190,16 @@ public class SavingsController {
 
     private static final int TOP_PERFORMERS_LIMIT = 5;
 
+    private static final int ALLOCATION_PANEL_CONTAINER_SPACING = 10;
+    private static final int ALLOCATION_PANEL_COLUMNS_SPACING = 20;
+    private static final int ALLOCATION_PANEL_ITEMS_SPACING = 8;
+    private static final int ALLOCATION_BAR_CONTAINER_SPACING = 3;
+    private static final int ALLOCATION_INFO_BOX_SPACING = 10;
+    private static final double ALLOCATION_PROGRESS_BAR_HEIGHT = 10.0;
+    private static final double ALLOCATION_FILLED_BAR_HEIGHT = 20.0;
+    private static final int ALLOCATION_ITEMS_PER_COLUMN = 3;
+    private static final double PERCENTAGE_DIVISOR = 100.0;
+
     private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
 
     /**
@@ -198,12 +214,14 @@ public class SavingsController {
             MarketService marketService,
             ConfigurableApplicationContext springContext,
             I18nService i18nService,
-            WalletService walletService) {
+            WalletService walletService,
+            InvestmentTargetService investmentTargetService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
         this.i18nService = i18nService;
         this.walletService = walletService;
+        this.investmentTargetService = investmentTargetService;
     }
 
     @FXML
@@ -221,6 +239,7 @@ public class SavingsController {
         updateInvestmentDistributionChart();
         updateOverviewTabFields();
         updateTopPerformersPanel();
+        updateAllocationVsTargetPanel();
         updateProfitabilityMetricsPanel();
 
         if (isUpdatingPortfolioPrices) {
@@ -247,6 +266,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -279,6 +299,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -311,6 +332,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -343,6 +365,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -367,6 +390,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -386,6 +410,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -406,6 +431,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -510,6 +536,7 @@ public class SavingsController {
                             updateInvestmentDistributionChart();
                             updateOverviewTabFields();
                             updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
     }
@@ -559,6 +586,7 @@ public class SavingsController {
                 updateInvestmentDistributionChart();
                 updateOverviewTabFields();
                 updateTopPerformersPanel();
+                updateAllocationVsTargetPanel();
                 updateProfitabilityMetricsPanel();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
@@ -1203,26 +1231,6 @@ public class SavingsController {
             investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add);
         }
 
-        List<Wallet> allWallets = walletService.getAllNonArchivedWalletsOrderedByName();
-        List<WalletType> allWalletTypes = walletService.getAllWalletTypes();
-
-        for (WalletType walletType : allWalletTypes) {
-            if (walletType.getName().equalsIgnoreCase("Poupança")
-                    || walletType.getName().equalsIgnoreCase("Savings Account")) {
-                BigDecimal totalBalance =
-                        allWallets.stream()
-                                .filter(w -> w.getType().getId().equals(walletType.getId()))
-                                .filter(Wallet::isMaster)
-                                .map(Wallet::getBalance)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                if (totalBalance.compareTo(BigDecimal.ZERO) > 0) {
-                    String typeName = UIUtils.translateWalletType(walletType, i18nService);
-                    investmentByType.merge(typeName, totalBalance, BigDecimal::add);
-                }
-            }
-        }
-
         return investmentByType;
     }
 
@@ -1242,24 +1250,6 @@ public class SavingsController {
                 tickers.stream()
                         .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        List<Wallet> allWallets = walletService.getAllNonArchivedWalletsOrderedByName();
-        List<WalletType> allWalletTypes = walletService.getAllWalletTypes();
-
-        for (WalletType walletType : allWalletTypes) {
-            if (walletType.getName().equalsIgnoreCase("Poupança")
-                    || walletType.getName().equalsIgnoreCase("Savings Account")) {
-                BigDecimal savingsBalance =
-                        allWallets.stream()
-                                .filter(w -> w.getType().getId().equals(walletType.getId()))
-                                .filter(Wallet::isMaster)
-                                .map(Wallet::getBalance)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                totalInvested = totalInvested.add(savingsBalance);
-                portfolioCurrentValue = portfolioCurrentValue.add(savingsBalance);
-            }
-        }
 
         BigDecimal gains = BigDecimal.ZERO;
         BigDecimal losses = BigDecimal.ZERO;
@@ -1630,5 +1620,199 @@ public class SavingsController {
         row.getChildren().addAll(symbolLabel, spacerA, percentageLabel, spacerB, valueLabel);
 
         return row;
+    }
+
+    private List<AllocationDTO> calculateAllocationVsTarget() {
+        loadTickersFromDatabase();
+
+        BigDecimal totalValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Map<TickerType, BigDecimal> currentAllocation = new HashMap<>();
+
+        for (Ticker ticker : tickers) {
+            BigDecimal value = ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
+            currentAllocation.merge(ticker.getType(), value, BigDecimal::add);
+        }
+
+        List<InvestmentTarget> targets = investmentTargetService.getAllActiveTargets();
+
+        List<AllocationDTO> allocations = new ArrayList<>();
+
+        for (InvestmentTarget target : targets) {
+            BigDecimal currentValue =
+                    currentAllocation.getOrDefault(target.getTickerType(), BigDecimal.ZERO);
+            BigDecimal currentPercentage =
+                    totalValue.compareTo(BigDecimal.ZERO) > 0
+                            ? currentValue
+                                    .divide(totalValue, 4, RoundingMode.HALF_UP)
+                                    .multiply(new BigDecimal("100"))
+                            : BigDecimal.ZERO;
+
+            BigDecimal difference = currentPercentage.subtract(target.getTargetPercentage());
+            String typeName = UIUtils.translateTickerType(target.getTickerType(), i18nService);
+
+            allocations.add(
+                    new AllocationDTO(
+                            target.getTickerType(),
+                            typeName,
+                            currentPercentage,
+                            target.getTargetPercentage(),
+                            currentValue,
+                            difference));
+        }
+
+        return allocations;
+    }
+
+    private void updateAllocationVsTargetPanel() {
+        portfolioP5.getChildren().clear();
+
+        VBox container = new VBox(ALLOCATION_PANEL_CONTAINER_SPACING);
+        container.setAlignment(Pos.CENTER);
+        container.setStyle("-fx-padding: " + ALLOCATION_PANEL_CONTAINER_SPACING + ";");
+
+        List<AllocationDTO> allocations = calculateAllocationVsTarget();
+
+        HBox columnsContainer = new HBox(ALLOCATION_PANEL_COLUMNS_SPACING);
+        columnsContainer.setAlignment(Pos.CENTER);
+
+        VBox leftColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
+        leftColumn.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(leftColumn, javafx.scene.layout.Priority.ALWAYS);
+
+        VBox rightColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
+        rightColumn.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(rightColumn, javafx.scene.layout.Priority.ALWAYS);
+
+        for (int i = 0; i < allocations.size(); i++) {
+            if (i < ALLOCATION_ITEMS_PER_COLUMN) {
+                leftColumn.getChildren().add(createAllocationBar(allocations.get(i)));
+            } else {
+                rightColumn.getChildren().add(createAllocationBar(allocations.get(i)));
+            }
+        }
+
+        columnsContainer.getChildren().addAll(leftColumn, rightColumn);
+        container.getChildren().add(columnsContainer);
+
+        portfolioP5.getChildren().add(container);
+        HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
+    }
+
+    private VBox createAllocationBar(AllocationDTO allocation) {
+        VBox barContainer = new VBox(ALLOCATION_BAR_CONTAINER_SPACING);
+
+        Label typeLabel = new Label(allocation.typeName());
+        typeLabel.getStyleClass().add(Constants.ALLOCATION_TYPE_LABEL_STYLE);
+
+        HBox progressBar = new HBox();
+        progressBar.getStyleClass().add(Constants.ALLOCATION_PROGRESS_BAR_STYLE);
+        progressBar.setPrefHeight(ALLOCATION_PROGRESS_BAR_HEIGHT);
+        progressBar.setMaxWidth(Double.MAX_VALUE);
+
+        double fillPercentage = allocation.currentPercentage().doubleValue();
+        BigDecimal achievementPercentage = allocation.getAchievementPercentage();
+
+        if (achievementPercentage.compareTo(BigDecimal.valueOf(100)) >= 0) {
+            fillPercentage = 100.0;
+        }
+
+        HBox filledBar = new HBox();
+
+        if (allocation.isCriticalLow()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_CRITICAL_LOW_STYLE);
+        } else if (allocation.isWarningLow()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_WARNING_LOW_STYLE);
+        } else if (allocation.isOnTargetRange()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_ON_TARGET_STYLE);
+        } else if (allocation.isWarningHigh()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_WARNING_HIGH_STYLE);
+        } else if (allocation.isCriticalHigh()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_CRITICAL_HIGH_STYLE);
+        }
+
+        filledBar.setPrefHeight(ALLOCATION_FILLED_BAR_HEIGHT);
+        filledBar
+                .prefWidthProperty()
+                .bind(progressBar.widthProperty().multiply(fillPercentage / PERCENTAGE_DIVISOR));
+
+        progressBar.getChildren().add(filledBar);
+
+        HBox infoBox = new HBox(ALLOCATION_INFO_BOX_SPACING);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label currentLabel =
+                new Label(
+                        UIUtils.formatPercentage(allocation.currentPercentage())
+                                + " / "
+                                + UIUtils.formatPercentage(allocation.targetPercentage())
+                                + " ("
+                                + i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_ALLOCATION_TARGET)
+                                + ")");
+        currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
+
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        String statusText = getStatusText(allocation);
+        Label statusLabel = new Label(statusText);
+        statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_LABEL_STYLE);
+
+        if (!allocation.isNotInStrategy()) {
+            if (allocation.isCriticalLow()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_CRITICAL_LOW_STYLE);
+            } else if (allocation.isWarningLow()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_WARNING_LOW_STYLE);
+            } else if (allocation.isOnTargetRange()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_ON_TARGET_STYLE);
+            } else if (allocation.isWarningHigh()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_WARNING_HIGH_STYLE);
+            } else if (allocation.isCriticalHigh()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_CRITICAL_HIGH_STYLE);
+            }
+        }
+
+        infoBox.getChildren().addAll(currentLabel, spacer, statusLabel);
+
+        barContainer.getChildren().addAll(typeLabel, progressBar, infoBox);
+
+        return barContainer;
+    }
+
+    private String getStatusText(AllocationDTO allocation) {
+        if (allocation.isNotInStrategy()) {
+            return "";
+        }
+
+        if (allocation.isOnTargetRange()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET);
+        }
+
+        BigDecimal absDifference = allocation.difference().abs();
+        String formattedDiff = UIUtils.formatPercentage(absDifference);
+
+        if (allocation.isCriticalLow()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)
+                    + " "
+                    + formattedDiff;
+        } else if (allocation.isWarningLow()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_LOW)
+                    + " "
+                    + formattedDiff;
+        } else if (allocation.isWarningHigh()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)
+                    + " "
+                    + formattedDiff;
+        } else if (allocation.isCriticalHigh()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)
+                    + " "
+                    + formattedDiff;
+        }
+
+        return "";
     }
 }
