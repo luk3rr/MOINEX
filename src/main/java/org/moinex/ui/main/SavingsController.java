@@ -9,7 +9,9 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,6 +23,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -29,16 +33,23 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
+import org.moinex.chart.DoughnutChart;
+import org.moinex.dto.ProfitabilityMetricsDTO;
+import org.moinex.dto.TickerPerformanceDTO;
 import org.moinex.model.investment.BrazilianMarketIndicators;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.MarketQuotesAndCommodities;
 import org.moinex.model.investment.Ticker;
-import org.moinex.service.I18nService;
-import org.moinex.service.MarketService;
-import org.moinex.service.TickerService;
+import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.model.wallettransaction.WalletType;
+import org.moinex.service.*;
 import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
 import org.moinex.ui.dialog.investment.AddDividendController;
 import org.moinex.ui.dialog.investment.AddTickerController;
@@ -109,11 +120,27 @@ public class SavingsController {
 
     @FXML private Label overviewTabOilBrentValueField;
 
-    @FXML private Label overviewTabBrazilianMarketIndicatorsLastUpdate;
+    @FXML private Label brazilianMarketIndicatorsLastUpdateValue;
 
-    @FXML private Label overviewTabMarketQuotesLastUpdate;
+    @FXML private Label marketQuotesLastUpdateValue;
 
-    @FXML private Label overviewTabCommoditiesLastUpdate;
+    @FXML private Label commoditiesLastUpdateValue;
+
+    @FXML private AnchorPane pieChartAnchorPane;
+
+    @FXML private VBox pieChartLegendVBox;
+
+    @FXML private Text overviewTotalInvestedField;
+
+    @FXML private Text overviewTabGainsField;
+
+    @FXML private Text overviewTabLossesField;
+
+    @FXML private Text overviewTabTotalValueField;
+
+    @FXML private HBox portfolioP2;
+
+    @FXML private HBox portfolioP4;
 
     private ConfigurableApplicationContext springContext;
 
@@ -139,6 +166,8 @@ public class SavingsController {
 
     private I18nService i18nService;
 
+    private WalletService walletService;
+
     private List<Ticker> tickers;
 
     private List<Dividend> dividends;
@@ -149,6 +178,11 @@ public class SavingsController {
 
     private BigDecimal netCapitalInvested;
     private BigDecimal currentValue;
+
+    private Map<String, BigDecimal> currentInvestmentByType;
+    private BigDecimal currentTotalInvestment;
+
+    private static final int TOP_PERFORMERS_LIMIT = 5;
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
 
@@ -163,11 +197,13 @@ public class SavingsController {
             TickerService tickerService,
             MarketService marketService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            I18nService i18nService,
+            WalletService walletService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
         this.i18nService = i18nService;
+        this.walletService = walletService;
     }
 
     @FXML
@@ -182,6 +218,10 @@ public class SavingsController {
         updatePortfolioIndicators();
         updateBrazilianMarketIndicators();
         updateMarketQuotesAndCommodities();
+        updateInvestmentDistributionChart();
+        updateOverviewTabFields();
+        updateTopPerformersPanel();
+        updateProfitabilityMetricsPanel();
 
         if (isUpdatingPortfolioPrices) {
             setOffUpdatePortfolioPricesButton();
@@ -204,6 +244,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -232,6 +276,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -260,6 +308,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -288,6 +340,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -308,6 +364,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -323,6 +383,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -339,6 +403,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -409,6 +477,8 @@ public class SavingsController {
                                             setOnUpdatePortfolioPricesButton();
                                             updateTransactionTableView();
                                             updatePortfolioIndicators();
+                                            updateInvestmentDistributionChart();
+                                            updateOverviewTabFields();
                                         }));
     }
 
@@ -437,6 +507,10 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -481,6 +555,11 @@ public class SavingsController {
             try {
                 tickerService.deleteTicker(selectedTicker.getId());
                 updateTransactionTableView();
+                updatePortfolioIndicators();
+                updateInvestmentDistributionChart();
+                updateOverviewTabFields();
+                updateTopPerformersPanel();
+                updateProfitabilityMetricsPanel();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
@@ -895,7 +974,7 @@ public class SavingsController {
         overviewTabIPCA12MonthsValueField.setText(
                 UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months()));
 
-        overviewTabBrazilianMarketIndicatorsLastUpdate.setText(
+        brazilianMarketIndicatorsLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
                         brazilianMarketIndicators.getLastUpdate(), i18nService));
     }
@@ -935,11 +1014,11 @@ public class SavingsController {
         overviewTabOilBrentValueField.setText(
                 UIUtils.formatCurrency(marketQuotesAndCommodities.getOilBrent()));
 
-        overviewTabMarketQuotesLastUpdate.setText(
+        marketQuotesLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
                         marketQuotesAndCommodities.getLastUpdate(), i18nService));
 
-        overviewTabCommoditiesLastUpdate.setText(
+        commoditiesLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
                         marketQuotesAndCommodities.getLastUpdate(), i18nService));
     }
@@ -998,5 +1077,558 @@ public class SavingsController {
                 },
                 SCHEDULE_DELAY_IN_SECONDS,
                 TimeUnit.SECONDS);
+    }
+
+    /**
+     * Update the investment distribution pie chart
+     */
+    private void updateInvestmentDistributionChart() {
+        pieChartAnchorPane.getChildren().clear();
+
+        Map<String, BigDecimal> investmentByType = calculateInvestmentDistributionByType();
+
+        if (investmentByType.isEmpty()) {
+            return;
+        }
+
+        BigDecimal totalInvestment =
+                investmentByType.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+
+        for (Map.Entry<String, BigDecimal> entry : investmentByType.entrySet()) {
+            if (entry.getValue().compareTo(BigDecimal.ZERO) > 0) {
+                pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue().doubleValue()));
+            }
+        }
+
+        DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
+        doughnutChart.setLabelsVisible(false);
+        doughnutChart.setLegendVisible(false);
+
+        for (PieChart.Data data : doughnutChart.getData()) {
+            Node node = data.getNode();
+
+            BigDecimal value = BigDecimal.valueOf(data.getPieValue());
+            BigDecimal percentage =
+                    value.divide(totalInvestment, 4, java.math.RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal("100"));
+
+            String tooltipText =
+                    data.getName()
+                            + "\n"
+                            + UIUtils.formatCurrency(value)
+                            + " ("
+                            + UIUtils.formatPercentage(percentage)
+                            + ")";
+
+            UIUtils.addTooltipToNode(node, tooltipText);
+        }
+
+        UIUtils.applyDefaultChartStyle(doughnutChart);
+
+        pieChartAnchorPane.getChildren().removeIf(this::isDoughnutChart);
+
+        pieChartAnchorPane.getChildren().add(doughnutChart);
+
+        AnchorPane.setTopAnchor(doughnutChart, 0.0);
+        AnchorPane.setBottomAnchor(doughnutChart, 0.0);
+        AnchorPane.setLeftAnchor(doughnutChart, 0.0);
+        AnchorPane.setRightAnchor(doughnutChart, 0.0);
+
+        currentInvestmentByType = investmentByType;
+        currentTotalInvestment = totalInvestment;
+        updateChartLegend();
+    }
+
+    /**
+     * Creates a custom legend and populates it in the designated VBox.
+     */
+    private void updateChartLegend() {
+        pieChartLegendVBox.getChildren().clear();
+
+        if (currentInvestmentByType == null || currentInvestmentByType.isEmpty()) {
+            return;
+        }
+
+        int index = 0;
+
+        for (Map.Entry<String, BigDecimal> entry : currentInvestmentByType.entrySet()) {
+            if (entry.getValue().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            HBox legendItem = new HBox(5);
+            legendItem.setAlignment(Pos.CENTER_LEFT);
+
+            Rectangle colorRect = new Rectangle(10, 10);
+            colorRect.getStyleClass().addAll(Constants.CHARTS_LEGEND_RECT_STYLE, "data" + index);
+
+            BigDecimal percentage =
+                    entry.getValue()
+                            .divide(currentTotalInvestment, 4, java.math.RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal("100"));
+
+            Label legendLabel =
+                    new Label(
+                            entry.getKey()
+                                    + " ("
+                                    + UIUtils.formatCurrency(entry.getValue())
+                                    + " | "
+                                    + UIUtils.formatPercentage(percentage)
+                                    + ")");
+
+            legendItem.getChildren().addAll(colorRect, legendLabel);
+            pieChartLegendVBox.getChildren().add(legendItem);
+
+            index++;
+        }
+    }
+
+    /**
+     * Calculate the investment distribution by type
+     * Includes both ticker investments and savings account wallets
+     */
+    private Map<String, BigDecimal> calculateInvestmentDistributionByType() {
+        Map<String, BigDecimal> investmentByType = new HashMap<>();
+
+        List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
+
+        for (Ticker ticker : allTickers) {
+            BigDecimal tickerCurrentValue =
+                    ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
+
+            String typeName = UIUtils.translateTickerType(ticker.getType(), i18nService);
+
+            investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add);
+        }
+
+        List<Wallet> allWallets = walletService.getAllNonArchivedWalletsOrderedByName();
+        List<WalletType> allWalletTypes = walletService.getAllWalletTypes();
+
+        for (WalletType walletType : allWalletTypes) {
+            if (walletType.getName().equalsIgnoreCase("Poupança")
+                    || walletType.getName().equalsIgnoreCase("Savings Account")) {
+                BigDecimal totalBalance =
+                        allWallets.stream()
+                                .filter(w -> w.getType().getId().equals(walletType.getId()))
+                                .filter(Wallet::isMaster)
+                                .map(Wallet::getBalance)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                if (totalBalance.compareTo(BigDecimal.ZERO) > 0) {
+                    String typeName = UIUtils.translateWalletType(walletType, i18nService);
+                    investmentByType.merge(typeName, totalBalance, BigDecimal::add);
+                }
+            }
+        }
+
+        return investmentByType;
+    }
+
+    /**
+     * Update the overview tab fields with investment totals
+     */
+    private void updateOverviewTabFields() {
+        loadTickersFromDatabase();
+        loadDividendsFromDatabase();
+
+        BigDecimal totalInvested =
+                tickers.stream()
+                        .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal portfolioCurrentValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<Wallet> allWallets = walletService.getAllNonArchivedWalletsOrderedByName();
+        List<WalletType> allWalletTypes = walletService.getAllWalletTypes();
+
+        for (WalletType walletType : allWalletTypes) {
+            if (walletType.getName().equalsIgnoreCase("Poupança")
+                    || walletType.getName().equalsIgnoreCase("Savings Account")) {
+                BigDecimal savingsBalance =
+                        allWallets.stream()
+                                .filter(w -> w.getType().getId().equals(walletType.getId()))
+                                .filter(Wallet::isMaster)
+                                .map(Wallet::getBalance)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                totalInvested = totalInvested.add(savingsBalance);
+                portfolioCurrentValue = portfolioCurrentValue.add(savingsBalance);
+            }
+        }
+
+        BigDecimal gains = BigDecimal.ZERO;
+        BigDecimal losses = BigDecimal.ZERO;
+
+        BigDecimal profitLoss = portfolioCurrentValue.subtract(totalInvested);
+
+        if (profitLoss.compareTo(BigDecimal.ZERO) > 0) {
+            gains = profitLoss;
+        } else {
+            losses = profitLoss.abs();
+        }
+
+        overviewTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
+        overviewTabGainsField.setText(UIUtils.formatCurrency(gains));
+        overviewTabLossesField.setText(UIUtils.formatCurrency(losses));
+        overviewTabTotalValueField.setText(UIUtils.formatCurrency(currentValue));
+    }
+
+    private boolean isDoughnutChart(Node node) {
+        return node instanceof DoughnutChart;
+    }
+
+    /**
+     * Calculate profitability metrics
+     */
+    private ProfitabilityMetricsDTO calculateProfitabilityMetrics() {
+        loadTickersFromDatabase();
+        loadDividendsFromDatabase();
+
+        BigDecimal totalInvested =
+                tickers.stream()
+                        .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal currentValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal profitLoss = currentValue.subtract(totalInvested);
+
+        BigDecimal returnPercentage =
+                totalInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? profitLoss
+                                .divide(totalInvested, 4, java.math.RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100"))
+                        : BigDecimal.ZERO;
+
+        BigDecimal totalDividends =
+                dividends.stream()
+                        .map(d -> d.getWalletTransaction().getAmount())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal dividendYield =
+                totalInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? totalDividends
+                                .divide(totalInvested, 4, java.math.RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100"))
+                        : BigDecimal.ZERO;
+
+        return new ProfitabilityMetricsDTO(
+                totalInvested,
+                currentValue,
+                profitLoss,
+                returnPercentage,
+                dividendYield,
+                totalDividends);
+    }
+
+    /**
+     * Calculate top performers (best and worst)
+     */
+    private List<TickerPerformanceDTO> calculateTopPerformers(int limit, boolean best) {
+        loadTickersFromDatabase();
+
+        return tickers.stream()
+                .filter(t -> t.getCurrentQuantity().compareTo(BigDecimal.ZERO) > 0)
+                .map(
+                        t -> {
+                            BigDecimal invested =
+                                    t.getAverageUnitValue().multiply(t.getCurrentQuantity());
+                            BigDecimal current =
+                                    t.getCurrentQuantity().multiply(t.getCurrentUnitValue());
+                            BigDecimal profitLoss = current.subtract(invested);
+                            BigDecimal percentage =
+                                    invested.compareTo(BigDecimal.ZERO) > 0
+                                            ? profitLoss
+                                                    .divide(
+                                                            invested,
+                                                            4,
+                                                            java.math.RoundingMode.HALF_UP)
+                                                    .multiply(new BigDecimal("100"))
+                                            : BigDecimal.ZERO;
+
+                            return new TickerPerformanceDTO(
+                                    t.getName(), t.getSymbol(), percentage, profitLoss, current);
+                        })
+                .sorted(
+                        best
+                                ? java.util.Comparator.comparing(
+                                                TickerPerformanceDTO::profitLossPercentage)
+                                        .reversed()
+                                : java.util.Comparator.comparing(
+                                        TickerPerformanceDTO::profitLossPercentage))
+                .limit(limit)
+                .toList();
+    }
+
+    /**
+     * Update the profitability metrics panel (P4)
+     */
+    private void updateProfitabilityMetricsPanel() {
+        portfolioP4.getChildren().clear();
+
+        ProfitabilityMetricsDTO metrics = calculateProfitabilityMetrics();
+
+        VBox metricsContainer = new VBox(10);
+        metricsContainer.setAlignment(Pos.CENTER);
+        metricsContainer.setStyle("-fx-padding: 10;");
+
+        VBox metricsBox = new VBox(8);
+        metricsBox.setAlignment(Pos.CENTER_LEFT);
+
+        metricsBox
+                .getChildren()
+                .addAll(
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_RETURN),
+                                metrics.returnPercentage(),
+                                true,
+                                true,
+                                true),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_DIVIDEND_YIELD),
+                                metrics.dividendYield(),
+                                true,
+                                false,
+                                true),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_INVESTED),
+                                metrics.totalInvested(),
+                                true,
+                                false,
+                                false),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_CURRENT_VALUE),
+                                metrics.currentValue(),
+                                true,
+                                false,
+                                false),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_PROFIT_LOSS),
+                                metrics.profitLoss(),
+                                true,
+                                true,
+                                false),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_DIVIDENDS),
+                                metrics.totalDividends(),
+                                true,
+                                false,
+                                false));
+
+        metricsContainer.getChildren().addAll(metricsBox);
+
+        portfolioP4.getChildren().add(metricsContainer);
+        HBox.setHgrow(metricsContainer, javafx.scene.layout.Priority.ALWAYS);
+    }
+
+    /**
+     * Create a metric row with label and value
+     */
+    private HBox createMetricRow(
+            String label,
+            BigDecimal value,
+            boolean alwaysGreen,
+            boolean dynamicColor,
+            boolean isPercentage) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        Label labelNode = new Label(label);
+
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        String sign = "";
+        if (dynamicColor) {
+            if (value.compareTo(BigDecimal.ZERO) > 0) {
+                sign = "+ ";
+            } else if (value.compareTo(BigDecimal.ZERO) < 0) {
+                sign = "- ";
+            }
+        }
+
+        String formattedValue =
+                isPercentage
+                        ? UIUtils.formatPercentage(value.abs())
+                        : UIUtils.formatCurrency(value.abs());
+
+        Label valueNode = new Label(sign + formattedValue);
+
+        if (alwaysGreen && !dynamicColor) {
+            valueNode.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+        } else if (dynamicColor) {
+            if (value.compareTo(BigDecimal.ZERO) < 0) {
+                valueNode.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
+            } else if (value.compareTo(BigDecimal.ZERO) > 0) {
+                valueNode.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+            } else {
+                valueNode.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
+            }
+        } else {
+            valueNode.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
+        }
+
+        row.getChildren().addAll(labelNode, spacer, valueNode);
+
+        return row;
+    }
+
+    /**
+     * Update the top performers panel (P2)
+     */
+    private void updateTopPerformersPanel() {
+        portfolioP2.getChildren().clear();
+
+        VBox container = new VBox(30);
+        container.setAlignment(Pos.CENTER);
+
+        List<TickerPerformanceDTO> bestPerformers =
+                calculateTopPerformers(TOP_PERFORMERS_LIMIT, true);
+        List<TickerPerformanceDTO> worstPerformers =
+                calculateTopPerformers(TOP_PERFORMERS_LIMIT, false);
+
+        VBox bestBox = new VBox(5);
+        Label bestLabel =
+                new Label(i18nService.tr(Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST));
+        bestLabel.getStyleClass().add(Constants.CUSTOM_TABLE_TITLE_STYLE);
+        bestLabel.setAlignment(Pos.CENTER);
+        bestBox.getChildren().add(bestLabel);
+        bestBox.setAlignment(Pos.CENTER);
+
+        // Add header row
+        bestBox.getChildren().add(createTableHeader());
+
+        for (TickerPerformanceDTO performer : bestPerformers) {
+            bestBox.getChildren().add(createPerformerRow(performer));
+        }
+
+        VBox worstBox = new VBox(5);
+        Label worstLabel =
+                new Label(i18nService.tr(Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST));
+        worstLabel.getStyleClass().add(Constants.CUSTOM_TABLE_TITLE_STYLE);
+        worstLabel.setAlignment(Pos.CENTER);
+        worstBox.getChildren().add(worstLabel);
+        worstBox.setAlignment(Pos.CENTER);
+
+        // Add header row
+        worstBox.getChildren().add(createTableHeader());
+
+        for (TickerPerformanceDTO performer : worstPerformers) {
+            worstBox.getChildren().add(createPerformerRow(performer));
+        }
+
+        container.getChildren().addAll(bestBox, worstBox);
+
+        portfolioP2.getChildren().add(container);
+        HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
+    }
+
+    /**
+     * Create table header row
+     */
+    private HBox createTableHeader() {
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label assetHeader =
+                new Label(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_ASSET));
+        assetHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
+        configureColumnWidth(assetHeader, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
+        assetHeader.setAlignment(Pos.CENTER_LEFT);
+
+        javafx.scene.layout.Region spacerA = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerA, javafx.scene.layout.Priority.ALWAYS);
+
+        javafx.scene.layout.Region spacerB = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerB, javafx.scene.layout.Priority.ALWAYS);
+
+        Label returnHeader =
+                new Label(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_RETURN));
+        returnHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
+        configureColumnWidth(returnHeader, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
+        returnHeader.setAlignment(Pos.CENTER);
+
+        Label valueHeader =
+                new Label(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_VALUE));
+        valueHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
+        configureColumnWidth(valueHeader, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
+        valueHeader.setAlignment(Pos.CENTER_RIGHT);
+
+        header.getChildren().addAll(assetHeader, spacerA, returnHeader, spacerB, valueHeader);
+
+        return header;
+    }
+
+    /**
+     * Configure min and max width for a label column
+     */
+    private void configureColumnWidth(Label label, Double width) {
+        label.setMinWidth(width);
+        label.setMaxWidth(width);
+    }
+
+    /**
+     * Create a performer row with ticker info
+     */
+    private HBox createPerformerRow(TickerPerformanceDTO performer) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        Label symbolLabel = new Label(performer.symbol());
+        symbolLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
+        configureColumnWidth(symbolLabel, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
+        symbolLabel.setAlignment(Pos.CENTER_LEFT);
+
+        javafx.scene.layout.Region spacerA = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerA, javafx.scene.layout.Priority.ALWAYS);
+
+        javafx.scene.layout.Region spacerB = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerB, javafx.scene.layout.Priority.ALWAYS);
+
+        Label percentageLabel =
+                new Label(
+                        performer.getSign()
+                                + UIUtils.formatPercentage(performer.profitLossPercentage()));
+        percentageLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
+
+        if (performer.isPositive()) {
+            percentageLabel.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+        } else if (performer.isNegative()) {
+            percentageLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
+        } else {
+            percentageLabel.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
+        }
+
+        configureColumnWidth(percentageLabel, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
+        percentageLabel.setAlignment(Pos.CENTER);
+
+        Label valueLabel = new Label(UIUtils.formatCurrency(performer.currentValue()));
+        valueLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
+        configureColumnWidth(valueLabel, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
+        valueLabel.setAlignment(Pos.CENTER_RIGHT);
+
+        row.getChildren().addAll(symbolLabel, spacerA, percentageLabel, spacerB, valueLabel);
+
+        return row;
     }
 }

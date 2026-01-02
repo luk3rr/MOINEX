@@ -205,6 +205,7 @@ public final class Constants {
     public static final String INFO_LABEL_RED_STYLE = "info-label-red";
     public static final String INFO_LABEL_GREEN_STYLE = "info-label-green";
     public static final String INFO_LABEL_YELLOW_STYLE = "info-label-yellow";
+    public static final String INFO_LABEL_NEUTRAL_STYLE = "info-label-neutral";
 
     // Main pane styles
     public static final String SIDEBAR_SELECTED_BUTTON_STYLE = "sidebar-button-selected";
@@ -217,6 +218,16 @@ public final class Constants {
     public static final String HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE = "expense-item";
 
     public static final String HOME_CREDIT_CARD_ITEM_STYLE = "credit-card-item";
+
+    // Top Performers Table Styles
+    public static final Double TOP_PERFORMERS_ASSET_COLUMN_WIDTH = 90.0;
+    public static final Double TOP_PERFORMERS_RETURN_COLUMN_WIDTH = 90.0;
+    public static final Double TOP_PERFORMERS_VALUE_COLUMN_WIDTH = 90.0;
+    public static final String CUSTOM_TABLE_TITLE_STYLE = "custom-table-title";
+    public static final String CUSTOM_TABLE_HEADER_STYLE = "custom-table-header";
+    public static final String CUSTOM_TABLE_CELL_STYLE = "custom-table-cell";
+
+    // Credit Card Item Styles
     public static final String HOME_CREDIT_CARD_ITEM_NAME_STYLE = "credit-card-item-name";
     public static final String HOME_CREDIT_CARD_ITEM_BALANCE_STYLE = "credit-card-item-balance";
     public static final String HOME_CREDIT_CARD_ITEM_DIGITS_STYLE = "credit-card-item-digits";
@@ -888,6 +899,25 @@ public final class Constants {
         public static final String SAVINGS_COMMODITIES_COFFEE = "savings.commodities.coffee";
         public static final String SAVINGS_COMMODITIES_WHEAT = "savings.commodities.wheat";
         public static final String SAVINGS_COMMODITIES_OIL_BRENT = "savings.commodities.oilBrent";
+
+        // Savings - Metrics
+        public static final String SAVINGS_METRICS_TOTAL_RETURN = "savings.metrics.totalReturn";
+        public static final String SAVINGS_METRICS_DIVIDEND_YIELD = "savings.metrics.dividendYield";
+        public static final String SAVINGS_METRICS_TOTAL_INVESTED = "savings.metrics.totalInvested";
+        public static final String SAVINGS_METRICS_CURRENT_VALUE = "savings.metrics.currentValue";
+        public static final String SAVINGS_METRICS_PROFIT_LOSS = "savings.metrics.profitLoss";
+        public static final String SAVINGS_METRICS_TOTAL_DIVIDENDS =
+                "savings.metrics.totalDividends";
+
+        // Savings - Top Performers
+        public static final String SAVINGS_TOP_PERFORMERS_BEST = "savings.topPerformers.best";
+        public static final String SAVINGS_TOP_PERFORMERS_WORST = "savings.topPerformers.worst";
+        public static final String SAVINGS_TOP_PERFORMERS_HEADER_ASSET =
+                "savings.topPerformers.header.asset";
+        public static final String SAVINGS_TOP_PERFORMERS_HEADER_RETURN =
+                "savings.topPerformers.header.return";
+        public static final String SAVINGS_TOP_PERFORMERS_HEADER_VALUE =
+                "savings.topPerformers.header.value";
 
         // Common Components - Budget Group Pane
         public static final String COMMON_BUDGET_GROUP_TARGET = "common.budgetGroup.target";

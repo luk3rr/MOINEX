@@ -49,3 +49,24 @@
   -fx-font-weight: bold;
   -fx-font-size: 13px;
 }
+
+.info-label-neutral {
+  -fx-text-fill: black;
+  -fx-font-weight: bold;
+  -fx-font-size: 13px;
+}
+
+.custom-table-title {
+  -fx-font-size: 13px;
+  -fx-font-weight: bold;
+}
+
+.custom-table-header {
+  -fx-font-size: 11px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #6b7280;
+}
+
+.custom-table-cell {
+  -fx-font-size: 12px;
+}
