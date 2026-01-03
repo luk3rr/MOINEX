@@ -528,6 +528,9 @@ public class SavingsController {
                                             updatePortfolioIndicators();
                                             updateInvestmentDistributionChart();
                                             updateOverviewTabFields();
+                                            updateTopPerformersPanel();
+                                            updateAllocationVsTargetPanel();
+                                            updateProfitabilityMetricsPanel();
                                         }));
     }
 
@@ -1915,7 +1918,14 @@ public class SavingsController {
                 i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
                 springContext,
                 (AddBondController controller) -> {},
-                List.of(this::updateBondTableView, this::updateBondTabFields));
+                List.of(() -> {
+                    updateBondTableView();
+                    updateBondTabFields();
+                    updateInvestmentDistributionChart();
+                    updateOverviewTabFields();
+                    updateAllocationVsTargetPanel();
+                    updateProfitabilityMetricsPanel();
+                }));
     }
 
     @FXML
@@ -1937,11 +1947,13 @@ public class SavingsController {
                 i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
                 springContext,
                 (EditBondController controller) -> controller.setBond(selectedBond),
-                List.of(
-                        () -> {
+                        List.of(() -> {
                             updateBondTableView();
                             updateBondTabFields();
+                            updateInvestmentDistributionChart();
                             updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -1993,7 +2005,10 @@ public class SavingsController {
 
                 updateBondTableView();
                 updateBondTabFields();
+                updateInvestmentDistributionChart();
                 updateOverviewTabFields();
+                updateAllocationVsTargetPanel();
+                updateProfitabilityMetricsPanel();
             } catch (IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         i18nService.tr(
@@ -2019,7 +2034,10 @@ public class SavingsController {
                         () -> {
                             updateBondTableView();
                             updateBondTabFields();
+                            updateInvestmentDistributionChart();
                             updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -2044,7 +2062,15 @@ public class SavingsController {
                 (AddBondPurchaseController controller) -> {
                     controller.setBond(selectedBond);
                 },
-                List.of(this::updateBondTableView, this::updateBondTabFields));
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
     }
 
     @FXML
@@ -2068,7 +2094,15 @@ public class SavingsController {
                 (AddBondSaleController controller) -> {
                     controller.setBond(selectedBond);
                 },
-                List.of(this::updateBondTableView, this::updateBondTabFields));
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
     }
 
     @FXML
@@ -2078,7 +2112,15 @@ public class SavingsController {
                 i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
                 springContext,
                 (BondTransactionsController controller) -> {},
-                List.of());
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
     }
 
     @FXML
