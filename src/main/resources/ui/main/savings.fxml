@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="800.0" minWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsController">
+<AnchorPane maxHeight="800.0" maxWidth="1600.0" stylesheets="@../../css/component/charts.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SavingsController">
    <children>
       <TabPane layoutX="59.0" layoutY="71.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -27,7 +27,7 @@
                      <children>
                         <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
                                  <children>
                                     <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
@@ -95,18 +95,63 @@
                                  <children>
                                     <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                                          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="%savings.overview.portfolio" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <padding>
-                                                      <Insets left="10.0" top="10.0" />
-                                                   </padding>
-                                                </Label>
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="%savings.overview.portfolio" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <padding>
+                                                            <Insets left="10.0" top="10.0" />
+                                                         </padding>
+                                                      </Label>
+                                                      <HBox fx:id="portfolioP1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+                                                         <children>
+                                                            <AnchorPane fx:id="pieChartAnchorPane" HBox.hgrow="ALWAYS" />
+                                                            <VBox fx:id="pieChartLegendVBox" alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                                                   <children>
+                                                      <Label fx:id="overviewTabBottonPaneTitle1" styleClass="title" text="%savings.allocation.title" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <padding>
+                                                            <Insets left="10.0" top="10.0" />
+                                                         </padding>
+                                                      </Label>
+                                                      <JFXButton onAction="#handleEditInvestmentTarget" stylesheets="@../../css/component/buttons.css" text="%investment.button.editInvestmentTarget" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                         <graphic>
+                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../icon/common/edit.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                         </graphic>
+                                                      </JFXButton>
+                                                      <HBox fx:id="portfolioP5" alignment="CENTER" prefHeight="190.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                                                   </children>
+                                                </AnchorPane>
                                              </children>
-                                          </AnchorPane>
-                                          <VBox spacing="10.0">
+                                          </VBox>
+                                          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <AnchorPane prefWidth="300.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <Label fx:id="overviewTabBottonPaneTitle111111" styleClass="title" text="%savings.topPerformers.title" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                      <HBox fx:id="portfolioP2" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                                                   <children>
+                                                      <Label fx:id="overviewTabBottonPaneTitle1111111" styleClass="title" text="%savings.metrics.title" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                      <HBox fx:id="portfolioP4" minHeight="190.0" prefHeight="190.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                             </children>
+                                          </VBox>
+                                          <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
@@ -178,12 +223,12 @@
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <Label fx:id="overviewTabEthereumValueField11" text="%savings.indicators.lastUpdate">
+                                                                  <Label fx:id="brazilianMarketIndicatorsLastUpdateTitle" text="%savings.indicators.lastUpdate">
                                                                      <font>
                                                                         <Font name="System Italic" size="10.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <Label fx:id="overviewTabBrazilianMarketIndicatorsLastUpdate" text="DD/MM/YYYY">
+                                                                  <Label fx:id="brazilianMarketIndicatorsLastUpdateValue" text="DD/MM/YYYY">
                                                                      <font>
                                                                         <Font name="System Italic" size="10.0" />
                                                                      </font>
@@ -294,12 +339,12 @@
                                                                                     <Font name="System Bold" size="13.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="overviewTabEthereumValueField1" text="%savings.indicators.lastUpdate">
+                                                                              <Label fx:id="marketQuotesLastUpdateTitle" text="%savings.indicators.lastUpdate">
                                                                                  <font>
                                                                                     <Font name="System Italic" size="10.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <Label fx:id="overviewTabMarketQuotesLastUpdate" text="DD/MM/YYYY">
+                                                                              <Label fx:id="marketQuotesLastUpdateValue" text="DD/MM/YYYY">
                                                                                  <font>
                                                                                     <Font name="System Italic" size="10.0" />
                                                                                  </font>
@@ -322,7 +367,7 @@
                                                 </AnchorPane>
                                                 <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
                                                    <children>
-                                                      <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                      <VBox minHeight="220.0" prefHeight="220.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
                                                             <Label fx:id="overviewTabBottonPaneTitle11111" styleClass="title" text="%savings.commodities.title" />
                                                             <AnchorPane fx:id="overviewTabBottonPaneChart11111" VBox.vgrow="ALWAYS">
@@ -424,12 +469,12 @@
                                                                         <Font name="System Bold" size="13.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <Label fx:id="overviewTabEthereumValueField11" text="Last update">
+                                                                  <Label fx:id="commoditiesLastUpdateTitle" text="%savings.indicators.lastUpdate">
                                                                      <font>
                                                                         <Font name="System Italic" size="10.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <Label fx:id="overviewTabCommoditiesLastUpdate" text="DD/MM/YYYY">
+                                                                  <Label fx:id="commoditiesLastUpdateValue" text="DD/MM/YYYY">
                                                                      <font>
                                                                         <Font name="System Italic" size="10.0" />
                                                                      </font>
@@ -699,9 +744,213 @@
                </content>
             </Tab>
             <Tab closable="false" text="%savings.tab.bonds">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
+               <content>
+                  <AnchorPane>
+                     <children>
+                        <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <AnchorPane prefHeight="120.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                                 <children>
+                                    <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.totalInvested" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text fx:id="bondsTabTotalInvestedField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.currentValue" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text fx:id="bondsTabCurrentValueField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.profitLoss" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text fx:id="bondsTabProfitLossField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.interestReceived" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text fx:id="bondsTabInterestReceivedField" strokeType="OUTSIDE" strokeWidth="0.0" text="\$ 0.00">
+                                                   <font>
+                                                      <Font size="17.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+                                 <children>
+                                    <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <JFXButton onAction="#handleRegisterBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.registerBond">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/add.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleOpenBondArchive" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.bondArchive">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/archive.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton onAction="#handleShowBondTransactions" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.showTransactions">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/list.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
+                                          <Region HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <VBox HBox.hgrow="ALWAYS">
+                                                   <children>
+                                                      <Label fx:id="bondsTabBottonPaneTitle" styleClass="title" text="%savings.bonds.portfolio" />
+                                                      <AnchorPane VBox.vgrow="ALWAYS">
+                                                         <children>
+                                                            <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                                               <children>
+                                                                  <JFXButton onAction="#handleEditBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.edit">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/edit.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleDeleteBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.delete">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/remove.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleBuyBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.buyBond">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/sign_in.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleSellBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.sellBond">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/sign_out.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" spacing="10.0">
+                                                   <children>
+                                                      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                         <children>
+                                                            <VBox alignment="CENTER">
+                                                               <children>
+                                                                  <Label text="%savings.bonds.filter.type">
+                                                                     <font>
+                                                                        <Font size="10.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <ComboBox fx:id="bondsTabBondTypeComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
+                                                               </children>
+                                                            </VBox>
+                                                         </children>
+                                                      </HBox>
+                                                      <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+                                                         <children>
+                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../icon/common/find.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                            <TextField fx:id="bondsTabBondSearchField" prefWidth="300.0" promptText="%savings.bonds.searchPlaceholder" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <TableView fx:id="bondsTabBondTable" stylesheets="@../../css/component/table-view.css" VBox.vgrow="ALWAYS">
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                           <padding>
+                              <Insets top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+               </content>
             </Tab>
         </tabs>
       </TabPane>

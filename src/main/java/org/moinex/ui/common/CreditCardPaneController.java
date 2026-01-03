@@ -303,7 +303,8 @@ public class CreditCardPaneController {
                         : pendingPayments.divide(limit, 2, RoundingMode.HALF_UP);
 
         limitProgressBar.setProgress(limitProgress.doubleValue());
-        limitProgressLabel.setText(UIUtils.formatPercentage(limitProgress.doubleValue() * 100));
+        limitProgressLabel.setText(
+                UIUtils.formatPercentage(limitProgress.doubleValue() * 100, i18nService));
 
         dueDateLabel.setText(creditCard.getBillingDueDay().toString());
 

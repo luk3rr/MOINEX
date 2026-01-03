@@ -12,5 +12,7 @@ package org.moinex.util.enums;
 public enum TickerType {
     STOCK,
     FUND,
-    CRYPTOCURRENCY
+    CRYPTOCURRENCY,
+    REIT,
+    ETF
 }

@@ -12,6 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.text.TextAlignment;
+import org.moinex.service.I18nService;
 import org.moinex.util.UIUtils;
 
 public class CircularProgressBar extends Canvas {
@@ -19,6 +20,7 @@ public class CircularProgressBar extends Canvas {
     private final Color backgroundColor;
     private final Color fontColor;
     private final Double progressWidth;
+    private I18nService i18nService;
 
     public CircularProgressBar(Double radius, Double progressWidth) {
         super(radius, radius);
@@ -34,6 +36,10 @@ public class CircularProgressBar extends Canvas {
         progressColor = Color.web("#3498db");
         backgroundColor = Color.web("#D3D3D3");
         fontColor = Color.web("#000000");
+    }
+
+    public void setI18nService(I18nService i18nService) {
+        this.i18nService = i18nService;
     }
 
     public void draw(Double percent) {
@@ -68,6 +74,10 @@ public class CircularProgressBar extends Canvas {
                 ArcType.OPEN);
 
         gc.setFill(fontColor);
-        gc.fillText(UIUtils.formatPercentage(percent), getWidth() / 2, getHeight() / 2);
+        String formattedPercent =
+                i18nService != null
+                        ? UIUtils.formatPercentage(percent, i18nService)
+                        : String.format("%.1f %%", percent);
+        gc.fillText(formattedPercent, getWidth() / 2, getHeight() / 2);
     }
 }

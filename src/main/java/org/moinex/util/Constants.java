@@ -67,23 +67,37 @@ public final class Constants {
     public static final String BUY_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "buy_ticker.fxml";
     public static final String SALE_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "sale_ticker.fxml";
     public static final String ADD_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "add_ticker.fxml";
+    public static final String ADD_BOND_FXML = UI_DIALOG_INVESTMENT_PATH + "add_bond.fxml";
+    public static final String EDIT_BOND_FXML = UI_DIALOG_INVESTMENT_PATH + "edit_bond.fxml";
+    public static final String BUY_BOND_FXML = UI_DIALOG_INVESTMENT_PATH + "buy_bond.fxml";
+    public static final String SALE_BOND_FXML = UI_DIALOG_INVESTMENT_PATH + "sale_bond.fxml";
+    public static final String BOND_TRANSACTIONS_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "bond_transactions.fxml";
     public static final String ADD_DIVIDEND_FXML =
             UI_DIALOG_INVESTMENT_PATH + ("add_dividend." + "fxml");
     public static final String ADD_CRYPTO_EXCHANGE_FXML =
             UI_DIALOG_INVESTMENT_PATH + "add_crypto_exchange.fxml";
     public static final String ARCHIVED_TICKERS_FXML =
             UI_DIALOG_INVESTMENT_PATH + "archived_tickers.fxml";
+    public static final String ARCHIVED_BONDS_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "archived_bonds.fxml";
     public static final String EDIT_TICKER_FXML = UI_DIALOG_INVESTMENT_PATH + "edit_ticker.fxml";
     public static final String EDIT_TICKER_PURCHASE_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_ticker_purchase.fxml";
     public static final String EDIT_TICKER_SALE_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_ticker_sale.fxml";
+    public static final String EDIT_BOND_PURCHASE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_bond_purchase.fxml";
+    public static final String EDIT_BOND_SALE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_bond_sale.fxml";
     public static final String EDIT_DIVIDEND_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_dividend.fxml";
     public static final String EDIT_CRYPTO_EXCHANGE_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_crypto_exchange.fxml";
     public static final String INVESTMENT_TRANSACTIONS_FXML =
             UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
+    public static final String EDIT_INVESTMENT_TARGET_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_investment_target.fxml";
     public static final String UI_DIALOG_WALLETTRANSACTION_PATH =
             UI_DIALOG_PATH + "wallettransaction/";
     // UI wallettransaction package
@@ -205,6 +219,7 @@ public final class Constants {
     public static final String INFO_LABEL_RED_STYLE = "info-label-red";
     public static final String INFO_LABEL_GREEN_STYLE = "info-label-green";
     public static final String INFO_LABEL_YELLOW_STYLE = "info-label-yellow";
+    public static final String INFO_LABEL_NEUTRAL_STYLE = "info-label-neutral";
 
     // Main pane styles
     public static final String SIDEBAR_SELECTED_BUTTON_STYLE = "sidebar-button-selected";
@@ -217,6 +232,45 @@ public final class Constants {
     public static final String HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE = "expense-item";
 
     public static final String HOME_CREDIT_CARD_ITEM_STYLE = "credit-card-item";
+
+    // Top Performers Table Styles
+    public static final Double TOP_PERFORMERS_ASSET_COLUMN_WIDTH = 90.0;
+    public static final Double TOP_PERFORMERS_RETURN_COLUMN_WIDTH = 90.0;
+    public static final Double TOP_PERFORMERS_VALUE_COLUMN_WIDTH = 90.0;
+    public static final String CUSTOM_TABLE_TITLE_STYLE = "custom-table-title";
+    public static final String CUSTOM_TABLE_HEADER_STYLE = "custom-table-header";
+    public static final String CUSTOM_TABLE_CELL_STYLE = "custom-table-cell";
+
+    // Allocation Panel Styles
+    public static final String ALLOCATION_TYPE_LABEL_STYLE = "allocation-type-label";
+    public static final String ALLOCATION_PROGRESS_BAR_STYLE = "allocation-progress-bar";
+    public static final String ALLOCATION_FILLED_BAR_CRITICAL_LOW_STYLE =
+            "allocation-filled-bar-critical-low";
+    public static final String ALLOCATION_FILLED_BAR_WARNING_LOW_STYLE =
+            "allocation-filled-bar-warning-low";
+    public static final String ALLOCATION_FILLED_BAR_ON_TARGET_STYLE =
+            "allocation-filled-bar-on-target";
+    public static final String ALLOCATION_FILLED_BAR_WARNING_HIGH_STYLE =
+            "allocation-filled-bar-warning-high";
+    public static final String ALLOCATION_FILLED_BAR_CRITICAL_HIGH_STYLE =
+            "allocation-filled-bar-critical-high";
+    public static final String ALLOCATION_INFO_LABEL_STYLE = "allocation-info-label";
+    public static final String ALLOCATION_DIFF_LABEL_STYLE = "allocation-diff-label";
+    public static final String ALLOCATION_DIFF_CRITICAL_LOW_STYLE = "allocation-diff-critical-low";
+    public static final String ALLOCATION_DIFF_WARNING_LOW_STYLE = "allocation-diff-warning-low";
+    public static final String ALLOCATION_DIFF_ON_TARGET_STYLE = "allocation-diff-on-target";
+    public static final String ALLOCATION_DIFF_WARNING_HIGH_STYLE = "allocation-diff-warning-high";
+    public static final String ALLOCATION_DIFF_CRITICAL_HIGH_STYLE =
+            "allocation-diff-critical-high";
+
+    // Allocation Panel Thresholds
+    public static final Double ALLOCATION_CRITICAL_LOW_THRESHOLD = 0.0;
+    public static final Double ALLOCATION_WARNING_LOW_THRESHOLD = 80.0;
+    public static final Double ALLOCATION_ON_TARGET_LOW_THRESHOLD = 95.0;
+    public static final Double ALLOCATION_ON_TARGET_HIGH_THRESHOLD = 105.0;
+    public static final Double ALLOCATION_WARNING_HIGH_THRESHOLD = 120.0;
+
+    // Credit Card Item Styles
     public static final String HOME_CREDIT_CARD_ITEM_NAME_STYLE = "credit-card-item-name";
     public static final String HOME_CREDIT_CARD_ITEM_BALANCE_STYLE = "credit-card-item-balance";
     public static final String HOME_CREDIT_CARD_ITEM_DIGITS_STYLE = "credit-card-item-digits";
@@ -345,7 +399,7 @@ public final class Constants {
             DateTimeFormatter.ofPattern(DB_MONTH_YEAR_FORMAT);
 
     // Define the pattern for positive and negative currency values
-    public static final String CURRENCY_FORMAT = "R$ #,##0.00; - R$ #,##0.00";
+    public static final String CURRENCY_FORMAT = "R$ #,##0.00;- R$ #,##0.00";
 
     // Percentage with two decimal places
     public static final String PERCENTAGE_FORMAT = "0.00";
@@ -355,7 +409,9 @@ public final class Constants {
     // Regex
     public static final String DIGITS_ONLY_REGEX = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
-    public static final String BUDGET_GROUP_PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
+    public static final String SIGNED_MONETARY_VALUE_REGEX = "-?\\d*\\.?\\d{0,2}";
+    public static final String PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
+    public static final String INTEREST_RATE_REGEX = "\\d{0,3}(\\.\\d{0,4})?";
 
     public static final Integer INVESTMENT_CALCULATION_PRECISION = 8;
     public static final String INVESTMENT_VALUE_REGEX =
@@ -394,6 +450,9 @@ public final class Constants {
         public static final String MAIN_SETTINGS = "main.settings";
         public static final String MAIN_CALENDAR = "main.calendar";
         public static final String MAIN_CALCULATOR = "main.calculator";
+
+        public static final String UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE =
+                "uiutils.formatPercentage.tooMuchNegative";
 
         // Dialogs
         public static final String DIALOG_CONFIRMATION_TITLE = "dialog.confirmation.title";
@@ -638,12 +697,48 @@ public final class Constants {
         public static final String TICKER_TYPE_STOCK = "ticker.type.stock";
         public static final String TICKER_TYPE_FUND = "ticker.type.fund";
         public static final String TICKER_TYPE_CRYPTO = "ticker.type.crypto";
+        public static final String TICKER_TYPE_REIT = "ticker.type.reit";
+        public static final String TICKER_TYPE_ETF = "ticker.type.etf";
+
+        // Asset types
+        public static final String ASSET_TYPE_STOCK = "ticker.type.stock";
+        public static final String ASSET_TYPE_FUND = "ticker.type.fund";
+        public static final String ASSET_TYPE_CRYPTO = "ticker.type.crypto";
+        public static final String ASSET_TYPE_REIT = "ticker.type.reit";
+        public static final String ASSET_TYPE_ETF = "ticker.type.etf";
+        public static final String ASSET_TYPE_BOND = "bond.type.bond";
+
+        // Bond types
+        public static final String BOND_TYPE_CDB = "bond.type.cdb";
+        public static final String BOND_TYPE_LCI = "bond.type.lci";
+        public static final String BOND_TYPE_LCA = "bond.type.lca";
+        public static final String BOND_TYPE_TREASURY_PREFIXED = "bond.type.treasuryPrefixed";
+        public static final String BOND_TYPE_TREASURY_POSTFIXED = "bond.type.treasuryPostfixed";
+        public static final String BOND_TYPE_INTERNATIONAL = "bond.type.international";
+        public static final String BOND_TYPE_OTHER = "bond.type.other";
+
+        // Interest types
+        public static final String INTEREST_TYPE_FIXED = "interest.type.fixed";
+        public static final String INTEREST_TYPE_FLOATING = "interest.type.floating";
+        public static final String INTEREST_TYPE_ZERO_COUPON = "interest.type.zeroCoupon";
+
+        // Interest indices
+        public static final String INTEREST_INDEX_CDI = "interest.index.cdi";
+        public static final String INTEREST_INDEX_SELIC = "interest.index.selic";
+        public static final String INTEREST_INDEX_IPCA = "interest.index.ipca";
+        public static final String INTEREST_INDEX_LIBOR = "interest.index.libor";
+        public static final String INTEREST_INDEX_SOFR = "interest.index.sofr";
+        public static final String INTEREST_INDEX_OTHER = "interest.index.other";
 
         // Credit Card Credit types
         public static final String CREDIT_CARD_CREDIT_TYPE_CASHBACK =
                 "creditCard.credit.type.cashback";
         public static final String CREDIT_CARD_CREDIT_TYPE_REFUND = "creditCard.credit.type.refund";
         public static final String CREDIT_CARD_CREDIT_TYPE_REWARD = "creditCard.credit.type.reward";
+
+        // Operation types
+        public static final String OPERATION_TYPE_BUY = "operation.type.buy";
+        public static final String OPERATION_TYPE_SELL = "operation.type.sell";
 
         // Transaction status
         public static final String TRANSACTION_STATUS_PENDING = "transaction.status.pending";
@@ -888,6 +983,162 @@ public final class Constants {
         public static final String SAVINGS_COMMODITIES_COFFEE = "savings.commodities.coffee";
         public static final String SAVINGS_COMMODITIES_WHEAT = "savings.commodities.wheat";
         public static final String SAVINGS_COMMODITIES_OIL_BRENT = "savings.commodities.oilBrent";
+
+        // Savings - Metrics
+        public static final String SAVINGS_METRICS_TOTAL_RETURN = "savings.metrics.totalReturn";
+        public static final String SAVINGS_METRICS_DIVIDEND_YIELD = "savings.metrics.dividendYield";
+        public static final String SAVINGS_METRICS_TOTAL_INVESTED = "savings.metrics.totalInvested";
+        public static final String SAVINGS_METRICS_CURRENT_VALUE = "savings.metrics.currentValue";
+        public static final String SAVINGS_METRICS_PROFIT_LOSS = "savings.metrics.profitLoss";
+        public static final String SAVINGS_METRICS_TOTAL_DIVIDENDS =
+                "savings.metrics.totalDividends";
+
+        // Savings - Allocation
+        public static final String SAVINGS_ALLOCATION_TARGET = "savings.allocation.target";
+        public static final String SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW =
+                "savings.allocation.status.criticalLow";
+        public static final String SAVINGS_ALLOCATION_STATUS_WARNING_LOW =
+                "savings.allocation.status.warningLow";
+        public static final String SAVINGS_ALLOCATION_STATUS_ON_TARGET =
+                "savings.allocation.status.onTarget";
+        public static final String SAVINGS_ALLOCATION_STATUS_WARNING_HIGH =
+                "savings.allocation.status.warningHigh";
+        public static final String SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH =
+                "savings.allocation.status.criticalHigh";
+
+        // Savings - Top Performers
+        public static final String SAVINGS_TOP_PERFORMERS_BEST = "savings.topPerformers.best";
+        public static final String SAVINGS_TOP_PERFORMERS_WORST = "savings.topPerformers.worst";
+        public static final String SAVINGS_TOP_PERFORMERS_HEADER_ASSET =
+                "savings.topPerformers.header.asset";
+        public static final String SAVINGS_TOP_PERFORMERS_HEADER_RETURN =
+                "savings.topPerformers.header.return";
+        public static final String SAVINGS_TOP_PERFORMERS_HEADER_VALUE =
+                "savings.topPerformers.header.value";
+
+        // Investment Target
+        public static final String INVESTMENT_DIALOG_EDIT_TARGET_TITLE =
+                "investment.dialog.editTarget.title";
+        public static final String INVESTMENT_DIALOG_TARGET_UPDATED_TITLE =
+                "investment.dialog.targetUpdated.title";
+        public static final String INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE =
+                "investment.dialog.targetUpdated.message";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_TARGET_TITLE =
+                "investment.dialog.errorUpdatingTarget.title";
+        public static final String INVESTMENT_DIALOG_INVALID_PERCENTAGE_TITLE =
+                "investment.dialog.invalidPercentage.title";
+        public static final String INVESTMENT_DIALOG_INVALID_PERCENTAGE_MESSAGE =
+                "investment.dialog.invalidPercentage.message";
+        public static final String INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE =
+                "investment.dialog.totalPercentageValidation.title";
+        public static final String INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION =
+                "investment.dialog.totalPercentageValidation.message";
+
+        // Savings - Bonds
+        public static final String SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE =
+                "savings.bonds.dialog.addBond.title";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE =
+                "savings.bonds.dialog.noSelection.title";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE =
+                "savings.bonds.dialog.noSelection.edit.message";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE =
+                "savings.bonds.dialog.noSelection.delete.message";
+        public static final String SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_TITLE =
+                "savings.bonds.dialog.editInDevelopment.title";
+        public static final String SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_MESSAGE =
+                "savings.bonds.dialog.editInDevelopment.message";
+        public static final String SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_TITLE =
+                "savings.bonds.dialog.archiveInDevelopment.title";
+        public static final String SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_MESSAGE =
+                "savings.bonds.dialog.archiveInDevelopment.message";
+        public static final String SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE =
+                "savings.bonds.dialog.editBond.title";
+        public static final String SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE =
+                "savings.bonds.dialog.confirmDelete.title";
+        public static final String SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE =
+                "savings.bonds.dialog.confirmDelete.message";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE =
+                "savings.bonds.dialog.bondDeleted.title";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE =
+                "savings.bonds.dialog.bondDeleted.message";
+        public static final String SAVINGS_BONDS_DIALOG_ERROR_DELETING_BOND_TITLE =
+                "savings.bonds.dialog.errorDeletingBond.title";
+        public static final String SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_TITLE =
+                "savings.bonds.dialog.hasOperations.title";
+        public static final String SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_MESSAGE =
+                "savings.bonds.dialog.hasOperations.message";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_TITLE =
+                "savings.bonds.dialog.bondArchived.title";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_MESSAGE =
+                "savings.bonds.dialog.bondArchived.message";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE =
+                "savings.bonds.dialog.bondArchive.title";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_NAME =
+                "savings.bonds.table.header.name";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_SYMBOL =
+                "savings.bonds.table.header.symbol";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_TYPE =
+                "savings.bonds.table.header.type";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE =
+                "savings.bonds.table.header.currentValue";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE =
+                "savings.bonds.table.header.investedValue";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS =
+                "savings.bonds.table.header.profitLoss";
+        public static final String SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE =
+                "savings.bonds.dialog.buyBond.title";
+        public static final String SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE =
+                "savings.bonds.dialog.sellBond.title";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_BUY_MESSAGE =
+                "savings.bonds.dialog.noSelection.buy.message";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE =
+                "savings.bonds.dialog.noSelection.sell.message";
+
+        // Bond Labels
+        public static final String BOND_LABEL_BOND = "bond.label.bond";
+        public static final String BOND_LABEL_PROFIT = "bond.label.profit";
+
+        // Bond Dialog Messages
+        public static final String BOND_DIALOG_PURCHASE_ADDED_TITLE =
+                "bond.dialog.purchaseAdded.title";
+        public static final String BOND_DIALOG_PURCHASE_ADDED_MESSAGE =
+                "bond.dialog.purchaseAdded.message";
+        public static final String BOND_DIALOG_SALE_ADDED_TITLE = "bond.dialog.saleAdded.title";
+        public static final String BOND_DIALOG_SALE_ADDED_MESSAGE = "bond.dialog.saleAdded.message";
+        public static final String BOND_DIALOG_ERROR_BUYING_TITLE = "bond.dialog.errorBuying.title";
+        public static final String BOND_DIALOG_ERROR_SELLING_TITLE =
+                "bond.dialog.errorSelling.title";
+
+        // Bond Table Headers
+        public static final String BOND_TABLE_ID = "bond.table.id";
+        public static final String BOND_TABLE_NAME = "bond.table.name";
+        public static final String BOND_TABLE_SYMBOL = "bond.table.symbol";
+        public static final String BOND_TABLE_ISSUER = "bond.table.issuer";
+        public static final String BOND_TABLE_INVESTED_VALUE = "bond.table.investedValue";
+        public static final String BOND_TABLE_OPERATION_TYPE = "bond.table.operationType";
+        public static final String BOND_TABLE_BOND = "bond.table.bond";
+        public static final String BOND_TABLE_TYPE = "bond.table.type";
+        public static final String BOND_TABLE_DATE = "bond.table.date";
+        public static final String BOND_TABLE_QUANTITY = "bond.table.quantity";
+        public static final String BOND_TABLE_UNIT_PRICE = "bond.table.unitPrice";
+        public static final String BOND_TABLE_FEES = "bond.table.fees";
+        public static final String BOND_TABLE_TAXES = "bond.table.taxes";
+        public static final String BOND_TABLE_PROFIT_LOSS = "bond.table.profitLoss";
+        public static final String BOND_TABLE_TOTAL_AMOUNT = "bond.table.totalAmount";
+        public static final String BOND_TABLE_WALLET = "bond.table.wallet";
+        public static final String BOND_TABLE_STATUS = "bond.table.status";
+        public static final String BOND_MATURITY_DATE = "bond.maturityDate";
+        public static final String BOND_INTEREST_RATE = "bond.interestRate";
+
+        // Bond Tabs
+        public static final String BOND_TAB_PURCHASE = "bond.tab.purchase";
+        public static final String BOND_TAB_SALE = "bond.tab.sale";
+
+        public static final String BOND_LABEL_SELECT_TRANSACTION = "bond.label.selectTransaction";
+
+        // Bond Transactions Dialog
+        public static final String BOND_DIALOG_TRANSACTIONS_TITLE =
+                "bond.dialog.transactions.title";
 
         // Common Components - Budget Group Pane
         public static final String COMMON_BUDGET_GROUP_TARGET = "common.budgetGroup.target";
@@ -1543,6 +1794,94 @@ public final class Constants {
                 "investment.dialog.noDividendSelected.title";
         public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_MESSAGE =
                 "investment.dialog.noDividendSelected.message";
+
+        // Bond Dialog Messages
+        public static final String BOND_DIALOG_EMPTY_FIELDS_TITLE = "bond.dialog.emptyFields.title";
+        public static final String BOND_DIALOG_EMPTY_FIELDS_MESSAGE =
+                "bond.dialog.emptyFields.message";
+        public static final String BOND_DIALOG_ADDED_TITLE = "bond.dialog.added.title";
+        public static final String BOND_DIALOG_ADDED_MESSAGE = "bond.dialog.added.message";
+        public static final String BOND_DIALOG_INVALID_NUMBER_TITLE =
+                "bond.dialog.invalidNumber.title";
+        public static final String BOND_DIALOG_INVALID_NUMBER_MESSAGE =
+                "bond.dialog.invalidNumber.message";
+        public static final String BOND_DIALOG_ALREADY_EXISTS_TITLE =
+                "bond.dialog.alreadyExists.title";
+        public static final String BOND_DIALOG_ALREADY_EXISTS_MESSAGE =
+                "bond.dialog.alreadyExists.message";
+        public static final String BOND_DIALOG_UPDATED_TITLE = "bond.dialog.updated.title";
+        public static final String BOND_DIALOG_UPDATED_MESSAGE = "bond.dialog.updated.message";
+        public static final String BOND_DIALOG_NO_CHANGES_MESSAGE = "bond.dialog.noChanges.message";
+        public static final String BOND_DIALOG_ERROR_UPDATING_TITLE =
+                "bond.dialog.errorUpdating.title";
+        public static final String BOND_DIALOG_NO_BOND_SELECTED_TITLE =
+                "bond.dialog.noBondSelected.title";
+        public static final String BOND_DIALOG_NO_BOND_SELECTED_UNARCHIVE =
+                "bond.dialog.noBondSelected.unarchive";
+        public static final String BOND_DIALOG_NO_BOND_SELECTED_DELETE =
+                "bond.dialog.noBondSelected.delete";
+        public static final String BOND_DIALOG_CONFIRM_UNARCHIVE_TITLE =
+                "bond.dialog.confirmUnarchive.title";
+        public static final String BOND_DIALOG_CONFIRM_UNARCHIVE_MESSAGE =
+                "bond.dialog.confirmUnarchive.message";
+        public static final String BOND_DIALOG_BOND_UNARCHIVED_TITLE =
+                "bond.dialog.bondUnarchived.title";
+        public static final String BOND_DIALOG_BOND_UNARCHIVED_MESSAGE =
+                "bond.dialog.bondUnarchived.message";
+        public static final String BOND_DIALOG_ERROR_UNARCHIVING_TITLE =
+                "bond.dialog.errorUnarchiving.title";
+        public static final String BOND_DIALOG_CONFIRM_DELETE_TITLE =
+                "bond.dialog.confirmDelete.title";
+        public static final String BOND_DIALOG_CONFIRM_DELETE_MESSAGE =
+                "bond.dialog.confirmDelete.message";
+        public static final String BOND_DIALOG_BOND_DELETED_TITLE = "bond.dialog.bondDeleted.title";
+        public static final String BOND_DIALOG_BOND_DELETED_MESSAGE =
+                "bond.dialog.bondDeleted.message";
+        public static final String BOND_DIALOG_ERROR_DELETING_TITLE =
+                "bond.dialog.errorDeleting.title";
+        public static final String BOND_DIALOG_HAS_OPERATIONS_TITLE =
+                "bond.dialog.hasOperations.title";
+        public static final String BOND_DIALOG_HAS_OPERATIONS_MESSAGE =
+                "bond.dialog.hasOperations.message";
+        public static final String BOND_LABEL_ARCHIVED = "bond.label.archived";
+        public static final String BOND_LABEL_SELECT_BOND = "bond.label.selectBond";
+        public static final String BOND_PROMPT_TEXT_SEARCH_ID_OR_DESCRIPTION =
+                "bond.promptText.searchIdOrDescription";
+
+        // Bond Operation Edit/Delete
+        public static final String BOND_DIALOG_NO_OPERATION_SELECTED_TITLE =
+                "bond.dialog.noOperationSelected.title";
+        public static final String BOND_DIALOG_NO_OPERATION_SELECTED_EDIT_MESSAGE =
+                "bond.dialog.noOperationSelected.edit";
+        public static final String BOND_DIALOG_NO_OPERATION_SELECTED_DELETE_MESSAGE =
+                "bond.dialog.noOperationSelected.delete";
+        public static final String BOND_DIALOG_EDIT_PURCHASE_TITLE =
+                "bond.dialog.editPurchase.title";
+        public static final String BOND_DIALOG_EDIT_SALE_TITLE = "bond.dialog.editSale.title";
+        public static final String BOND_DIALOG_PURCHASE_UPDATED_TITLE =
+                "bond.dialog.purchaseUpdated.title";
+        public static final String BOND_DIALOG_PURCHASE_UPDATED_MESSAGE =
+                "bond.dialog.purchaseUpdated.message";
+        public static final String BOND_DIALOG_SALE_UPDATED_TITLE = "bond.dialog.saleUpdated.title";
+        public static final String BOND_DIALOG_SALE_UPDATED_MESSAGE =
+                "bond.dialog.saleUpdated.message";
+        public static final String BOND_DIALOG_NO_CHANGES_TITLE = "bond.dialog.noChanges.title";
+        public static final String BOND_DIALOG_NO_CHANGES_PURCHASE_MESSAGE =
+                "bond.dialog.noChanges.purchase";
+        public static final String BOND_DIALOG_NO_CHANGES_SALE_MESSAGE =
+                "bond.dialog.noChanges.sale";
+        public static final String BOND_DIALOG_ERROR_UPDATING_PURCHASE_TITLE =
+                "bond.dialog.errorUpdatingPurchase.title";
+        public static final String BOND_DIALOG_ERROR_UPDATING_SALE_TITLE =
+                "bond.dialog.errorUpdatingSale.title";
+        public static final String BOND_DIALOG_CONFIRM_DELETE_OPERATION_TITLE =
+                "bond.dialog.confirmDeleteOperation.title";
+        public static final String BOND_DIALOG_CONFIRM_DELETE_OPERATION_MESSAGE =
+                "bond.dialog.confirmDeleteOperation.message";
+        public static final String BOND_DIALOG_OPERATION_DELETED_TITLE =
+                "bond.dialog.operationDeleted.title";
+        public static final String BOND_DIALOG_OPERATION_DELETED_MESSAGE =
+                "bond.dialog.operationDeleted.message";
         public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_DELETE_MESSAGE =
                 "investment.dialog.noDividendSelectedDelete.message";
         public static final String INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_TITLE =

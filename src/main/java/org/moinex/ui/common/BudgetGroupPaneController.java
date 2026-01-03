@@ -56,10 +56,11 @@ public class BudgetGroupPaneController {
         }
 
         groupNameLabel.setText(group.getName());
-        targetPercentageLabel.setText(UIUtils.formatPercentage(group.getTargetPercentage()));
+        targetPercentageLabel.setText(
+                UIUtils.formatPercentage(group.getTargetPercentage(), i18nService));
         targetAmountLabel.setText(UIUtils.formatCurrency(targetAmount));
         spentAmountLabel.setText(UIUtils.formatCurrency(spentAmount));
-        progressPercentageLabel.setText(UIUtils.formatPercentage(progress));
+        progressPercentageLabel.setText(UIUtils.formatPercentage(progress, i18nService));
 
         progressBar.setProgress(
                 progress.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP).doubleValue());

@@ -532,6 +532,7 @@ public class WalletController {
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
+        doughnutChart.setI18nService(i18nService);
         doughnutChart.setLabelsVisible(false);
 
         UIUtils.applyDefaultChartStyle(doughnutChart);

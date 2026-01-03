@@ -8,7 +8,9 @@ import javafx.scene.layout.VBox;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.moinex.model.financialplanning.BudgetGroup;
+import org.moinex.service.I18nService;
 import org.moinex.util.UIUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Controller;
 @Scope("prototype") // Each instance of this controller is unique
 @NoArgsConstructor
 public class BudgetGroupPreviewController {
+
+    private I18nService i18nService;
 
     @FXML @Getter private VBox rootPane;
 
@@ -25,6 +29,11 @@ public class BudgetGroupPreviewController {
 
     @FXML private Label targetValueLabel;
 
+    @Autowired
+    public BudgetGroupPreviewController(I18nService i18nService) {
+        this.i18nService = i18nService;
+    }
+
     /**
      * Populates the preview pane with data from a BudgetGroup object
      *
@@ -33,7 +42,8 @@ public class BudgetGroupPreviewController {
      */
     public void populate(BudgetGroup budgetGroup, BigDecimal planTotal) {
         groupNameLabel.setText(budgetGroup.getName());
-        targetPercentageLabel.setText(UIUtils.formatPercentage(budgetGroup.getTargetPercentage()));
+        targetPercentageLabel.setText(
+                UIUtils.formatPercentage(budgetGroup.getTargetPercentage(), i18nService));
         targetValueLabel.setText(
                 UIUtils.formatCurrency(
                         budgetGroup

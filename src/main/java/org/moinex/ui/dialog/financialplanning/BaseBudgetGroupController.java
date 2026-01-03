@@ -124,7 +124,7 @@ public class BaseBudgetGroupController {
     protected void configureListeners() {
         ChangeListener<String> targetPercentageListener =
                 (observable, oldValue, newValue) -> {
-                    if (!newValue.matches(Constants.BUDGET_GROUP_PERCENTAGE_REGEX)) {
+                    if (!newValue.matches(Constants.PERCENTAGE_REGEX)) {
                         targetPercentageField.setText(oldValue);
                     }
                 };

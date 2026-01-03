@@ -86,7 +86,7 @@
                   </HBox>
                </children>
             </AnchorPane>
-            <AnchorPane VBox.vgrow="ALWAYS">
+            <AnchorPane minHeight="600.0" VBox.vgrow="ALWAYS">
                <children>
                   <HBox fx:id="rootHBoxBottom" maxWidth="1.7976931348623157E308" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>

@@ -9,11 +9,17 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,6 +27,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -29,27 +37,33 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
-import org.moinex.model.investment.BrazilianMarketIndicators;
-import org.moinex.model.investment.Dividend;
-import org.moinex.model.investment.MarketQuotesAndCommodities;
-import org.moinex.model.investment.Ticker;
+import org.moinex.chart.DoughnutChart;
+import org.moinex.dto.AllocationDTO;
+import org.moinex.dto.ProfitabilityMetricsDTO;
+import org.moinex.dto.TickerPerformanceDTO;
+import org.moinex.model.investment.*;
+import org.moinex.service.BondService;
 import org.moinex.service.I18nService;
+import org.moinex.service.InvestmentTargetService;
 import org.moinex.service.MarketService;
 import org.moinex.service.TickerService;
-import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
-import org.moinex.ui.dialog.investment.AddDividendController;
-import org.moinex.ui.dialog.investment.AddTickerController;
-import org.moinex.ui.dialog.investment.AddTickerPurchaseController;
-import org.moinex.ui.dialog.investment.AddTickerSaleController;
-import org.moinex.ui.dialog.investment.ArchivedTickersController;
-import org.moinex.ui.dialog.investment.EditTickerController;
-import org.moinex.ui.dialog.investment.InvestmentTransactionsController;
+import org.moinex.service.WalletService;
+import org.moinex.ui.dialog.investment.*;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.AssetType;
+import org.moinex.util.enums.BondType;
 import org.moinex.util.enums.TickerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +90,20 @@ public class SavingsController {
     @FXML private TextField stocksFundsTabTickerSearchField;
 
     @FXML private ComboBox<TickerType> stocksFundsTabTickerTypeComboBox;
+
+    @FXML private Text bondsTabTotalInvestedField;
+
+    @FXML private Text bondsTabCurrentValueField;
+
+    @FXML private Text bondsTabProfitLossField;
+
+    @FXML private Text bondsTabInterestReceivedField;
+
+    @FXML private TableView<Bond> bondsTabBondTable;
+
+    @FXML private TextField bondsTabBondSearchField;
+
+    @FXML private ComboBox<BondType> bondsTabBondTypeComboBox;
 
     @FXML private JFXButton updatePortfolioPricesButton;
 
@@ -109,11 +137,29 @@ public class SavingsController {
 
     @FXML private Label overviewTabOilBrentValueField;
 
-    @FXML private Label overviewTabBrazilianMarketIndicatorsLastUpdate;
+    @FXML private Label brazilianMarketIndicatorsLastUpdateValue;
 
-    @FXML private Label overviewTabMarketQuotesLastUpdate;
+    @FXML private Label marketQuotesLastUpdateValue;
 
-    @FXML private Label overviewTabCommoditiesLastUpdate;
+    @FXML private Label commoditiesLastUpdateValue;
+
+    @FXML private AnchorPane pieChartAnchorPane;
+
+    @FXML private VBox pieChartLegendVBox;
+
+    @FXML private Text overviewTotalInvestedField;
+
+    @FXML private Text overviewTabGainsField;
+
+    @FXML private Text overviewTabLossesField;
+
+    @FXML private Text overviewTabTotalValueField;
+
+    @FXML private HBox portfolioP2;
+
+    @FXML private HBox portfolioP5;
+
+    @FXML private HBox portfolioP4;
 
     private ConfigurableApplicationContext springContext;
 
@@ -139,6 +185,12 @@ public class SavingsController {
 
     private I18nService i18nService;
 
+    private WalletService walletService;
+
+    private InvestmentTargetService investmentTargetService;
+
+    private BondService bondService;
+
     private List<Ticker> tickers;
 
     private List<Dividend> dividends;
@@ -149,6 +201,21 @@ public class SavingsController {
 
     private BigDecimal netCapitalInvested;
     private BigDecimal currentValue;
+
+    private Map<String, BigDecimal> currentInvestmentByType;
+    private BigDecimal currentTotalInvestment;
+
+    private static final int TOP_PERFORMERS_LIMIT = 5;
+
+    private static final int ALLOCATION_PANEL_CONTAINER_SPACING = 10;
+    private static final int ALLOCATION_PANEL_COLUMNS_SPACING = 20;
+    private static final int ALLOCATION_PANEL_ITEMS_SPACING = 8;
+    private static final int ALLOCATION_BAR_CONTAINER_SPACING = 3;
+    private static final int ALLOCATION_INFO_BOX_SPACING = 10;
+    private static final double ALLOCATION_PROGRESS_BAR_HEIGHT = 10.0;
+    private static final double ALLOCATION_FILLED_BAR_HEIGHT = 20.0;
+    private static final int ALLOCATION_ITEMS_PER_COLUMN = 3;
+    private static final double PERCENTAGE_DIVISOR = 100.0;
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
 
@@ -163,11 +230,17 @@ public class SavingsController {
             TickerService tickerService,
             MarketService marketService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            I18nService i18nService,
+            WalletService walletService,
+            InvestmentTargetService investmentTargetService,
+            BondService bondService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
         this.i18nService = i18nService;
+        this.walletService = walletService;
+        this.investmentTargetService = investmentTargetService;
+        this.bondService = bondService;
     }
 
     @FXML
@@ -176,12 +249,20 @@ public class SavingsController {
         loadMarketQuotesAndCommoditiesFromDatabase();
 
         configureTableView();
+        configureBondTableView();
         populateTickerTypeComboBox();
 
         updateTransactionTableView();
+        updateBondTableView();
         updatePortfolioIndicators();
+        updateBondTabFields();
         updateBrazilianMarketIndicators();
         updateMarketQuotesAndCommodities();
+        updateInvestmentDistributionChart();
+        updateOverviewTabFields();
+        updateTopPerformersPanel();
+        updateAllocationVsTargetPanel();
+        updateProfitabilityMetricsPanel();
 
         if (isUpdatingPortfolioPrices) {
             setOffUpdatePortfolioPricesButton();
@@ -190,6 +271,7 @@ public class SavingsController {
         }
 
         configureListeners();
+        configureBondListeners();
     }
 
     @FXML
@@ -204,6 +286,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -232,6 +319,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -260,6 +352,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -288,6 +385,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -308,6 +410,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -323,6 +430,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -339,6 +451,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -409,6 +526,11 @@ public class SavingsController {
                                             setOnUpdatePortfolioPricesButton();
                                             updateTransactionTableView();
                                             updatePortfolioIndicators();
+                                            updateInvestmentDistributionChart();
+                                            updateOverviewTabFields();
+                                            updateTopPerformersPanel();
+                                            updateAllocationVsTargetPanel();
+                                            updateProfitabilityMetricsPanel();
                                         }));
     }
 
@@ -437,6 +559,11 @@ public class SavingsController {
                         () -> {
                             updateTransactionTableView();
                             updatePortfolioIndicators();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateTopPerformersPanel();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
                         }));
     }
 
@@ -481,6 +608,12 @@ public class SavingsController {
             try {
                 tickerService.deleteTicker(selectedTicker.getId());
                 updateTransactionTableView();
+                updatePortfolioIndicators();
+                updateInvestmentDistributionChart();
+                updateOverviewTabFields();
+                updateTopPerformersPanel();
+                updateAllocationVsTargetPanel();
+                updateProfitabilityMetricsPanel();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
@@ -884,18 +1017,19 @@ public class SavingsController {
         }
 
         overviewTabSelicValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getSelicTarget()));
+                UIUtils.formatPercentage(brazilianMarketIndicators.getSelicTarget(), i18nService));
 
         overviewTabIPCALastMonthValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getIpcaLastMonth()));
+                UIUtils.formatPercentage(
+                        brazilianMarketIndicators.getIpcaLastMonth(), i18nService));
 
         overviewTabIPCALastMonthDescriptionField.setText(
                 "IPCA " + brazilianMarketIndicators.getIpcaLastMonthReference());
 
         overviewTabIPCA12MonthsValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months()));
+                UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months(), i18nService));
 
-        overviewTabBrazilianMarketIndicatorsLastUpdate.setText(
+        brazilianMarketIndicatorsLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
                         brazilianMarketIndicators.getLastUpdate(), i18nService));
     }
@@ -935,11 +1069,11 @@ public class SavingsController {
         overviewTabOilBrentValueField.setText(
                 UIUtils.formatCurrency(marketQuotesAndCommodities.getOilBrent()));
 
-        overviewTabMarketQuotesLastUpdate.setText(
+        marketQuotesLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
                         marketQuotesAndCommodities.getLastUpdate(), i18nService));
 
-        overviewTabCommoditiesLastUpdate.setText(
+        commoditiesLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
                         marketQuotesAndCommodities.getLastUpdate(), i18nService));
     }
@@ -998,5 +1132,1250 @@ public class SavingsController {
                 },
                 SCHEDULE_DELAY_IN_SECONDS,
                 TimeUnit.SECONDS);
+    }
+
+    /**
+     * Update the investment distribution pie chart
+     */
+    private void updateInvestmentDistributionChart() {
+        pieChartAnchorPane.getChildren().clear();
+
+        Map<String, BigDecimal> investmentByType = calculateInvestmentDistributionByType();
+
+        if (investmentByType.isEmpty()) {
+            return;
+        }
+
+        BigDecimal totalInvestment =
+                investmentByType.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+
+        for (Map.Entry<String, BigDecimal> entry : investmentByType.entrySet()) {
+            if (entry.getValue().compareTo(BigDecimal.ZERO) > 0) {
+                pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue().doubleValue()));
+            }
+        }
+
+        DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
+        doughnutChart.setI18nService(i18nService);
+        doughnutChart.setLabelsVisible(false);
+        doughnutChart.setLegendVisible(false);
+
+        for (PieChart.Data data : doughnutChart.getData()) {
+            Node node = data.getNode();
+
+            BigDecimal value = BigDecimal.valueOf(data.getPieValue());
+            BigDecimal percentage =
+                    value.divide(totalInvestment, 4, java.math.RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal("100"));
+
+            String tooltipText =
+                    data.getName()
+                            + "\n"
+                            + UIUtils.formatCurrency(value)
+                            + " ("
+                            + UIUtils.formatPercentage(percentage, i18nService)
+                            + ")";
+
+            UIUtils.addTooltipToNode(node, tooltipText);
+        }
+
+        UIUtils.applyDefaultChartStyle(doughnutChart);
+
+        pieChartAnchorPane.getChildren().removeIf(this::isDoughnutChart);
+
+        pieChartAnchorPane.getChildren().add(doughnutChart);
+
+        AnchorPane.setTopAnchor(doughnutChart, 0.0);
+        AnchorPane.setBottomAnchor(doughnutChart, 0.0);
+        AnchorPane.setLeftAnchor(doughnutChart, 0.0);
+        AnchorPane.setRightAnchor(doughnutChart, 0.0);
+
+        currentInvestmentByType = investmentByType;
+        currentTotalInvestment = totalInvestment;
+        updateChartLegend();
+    }
+
+    /**
+     * Creates a custom legend and populates it in the designated VBox.
+     */
+    private void updateChartLegend() {
+        pieChartLegendVBox.getChildren().clear();
+
+        if (currentInvestmentByType == null || currentInvestmentByType.isEmpty()) {
+            return;
+        }
+
+        int index = 0;
+
+        for (Map.Entry<String, BigDecimal> entry : currentInvestmentByType.entrySet()) {
+            if (entry.getValue().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            HBox legendItem = new HBox(5);
+            legendItem.setAlignment(Pos.CENTER_LEFT);
+
+            Rectangle colorRect = new Rectangle(10, 10);
+            colorRect.getStyleClass().addAll(Constants.CHARTS_LEGEND_RECT_STYLE, "data" + index);
+
+            BigDecimal percentage =
+                    entry.getValue()
+                            .divide(currentTotalInvestment, 4, java.math.RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal("100"));
+
+            Label legendLabel =
+                    new Label(
+                            entry.getKey()
+                                    + " ("
+                                    + UIUtils.formatCurrency(entry.getValue())
+                                    + " | "
+                                    + UIUtils.formatPercentage(percentage, i18nService)
+                                    + ")");
+
+            legendItem.getChildren().addAll(colorRect, legendLabel);
+            pieChartLegendVBox.getChildren().add(legendItem);
+
+            index++;
+        }
+    }
+
+    /**
+     * Calculate the investment distribution by type
+     * Includes both ticker investments and savings account wallets
+     */
+    private Map<String, BigDecimal> calculateInvestmentDistributionByType() {
+        Map<String, BigDecimal> investmentByType = new HashMap<>();
+
+        List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
+        List<Bond> allBonds = bondService.getAllNonArchivedBonds();
+
+        for (Ticker ticker : allTickers) {
+            BigDecimal tickerCurrentValue =
+                    ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
+
+            String typeName = UIUtils.translateTickerType(ticker.getType(), i18nService);
+
+            investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add);
+        }
+
+        for (Bond bond : allBonds) {
+            BigDecimal bondInvestedValue = bondService.getInvestedValue(bond);
+            String typeName = UIUtils.translateBondType(bond.getType(), i18nService);
+
+            investmentByType.merge(typeName, bondInvestedValue, BigDecimal::add);
+        }
+
+        return investmentByType;
+    }
+
+    /**
+     * Update the overview tab fields with investment totals
+     */
+    private void updateOverviewTabFields() {
+        loadTickersFromDatabase();
+        loadDividendsFromDatabase();
+
+        BigDecimal totalInvested =
+                tickers.stream()
+                        .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal portfolioCurrentValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal bondsTotalInvested = bondService.getTotalInvestedValue();
+        BigDecimal bondsProfitLoss =
+                bondService.getAllNonArchivedBonds().stream()
+                        .map(bondService::calculateProfit)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal bondsCurrentValue = bondsTotalInvested;
+
+        totalInvested = totalInvested.add(bondsTotalInvested);
+        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue).add(bondsProfitLoss);
+
+        BigDecimal totalDividends =
+                dividends.stream()
+                        .map(d -> d.getWalletTransaction().getAmount())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<TickerSale> tickerSales = tickerService.getAllSales();
+        BigDecimal tickerRealizedProfit =
+                tickerSales.stream()
+                        .map(
+                                sale -> {
+                                    BigDecimal saleValue =
+                                            sale.getUnitPrice().multiply(sale.getQuantity());
+                                    BigDecimal costBasis =
+                                            sale.getAverageCost().multiply(sale.getQuantity());
+                                    return saleValue.subtract(costBasis);
+                                })
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal unrealizedProfitLoss = portfolioCurrentValue.subtract(totalInvested);
+
+        BigDecimal totalGains = BigDecimal.ZERO;
+        BigDecimal totalLosses = BigDecimal.ZERO;
+
+        if (unrealizedProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(unrealizedProfitLoss);
+        } else {
+            totalLosses = totalLosses.add(unrealizedProfitLoss.abs());
+        }
+
+        totalGains = totalGains.add(totalDividends);
+
+        if (bondsProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(bondsProfitLoss);
+        } else {
+            totalLosses = totalLosses.add(bondsProfitLoss.abs());
+        }
+
+        if (tickerRealizedProfit.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(tickerRealizedProfit);
+        } else {
+            totalLosses = totalLosses.add(tickerRealizedProfit.abs());
+        }
+
+        overviewTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
+        overviewTabGainsField.setText(UIUtils.formatCurrency(totalGains));
+        overviewTabLossesField.setText(UIUtils.formatCurrency(totalLosses));
+        overviewTabTotalValueField.setText(UIUtils.formatCurrency(portfolioCurrentValue));
+    }
+
+    private boolean isDoughnutChart(Node node) {
+        return node instanceof DoughnutChart;
+    }
+
+    /**
+     * Calculate profitability metrics
+     */
+    private ProfitabilityMetricsDTO calculateProfitabilityMetrics() {
+        loadTickersFromDatabase();
+        loadDividendsFromDatabase();
+
+        BigDecimal totalInvested =
+                tickers.stream()
+                        .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal currentValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal profitLoss = currentValue.subtract(totalInvested);
+
+        BigDecimal returnPercentage =
+                totalInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? profitLoss
+                                .divide(totalInvested, 4, java.math.RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100"))
+                        : BigDecimal.ZERO;
+
+        BigDecimal totalDividends =
+                dividends.stream()
+                        .map(d -> d.getWalletTransaction().getAmount())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal dividendYield =
+                totalInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? totalDividends
+                                .divide(totalInvested, 4, java.math.RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100"))
+                        : BigDecimal.ZERO;
+
+        return new ProfitabilityMetricsDTO(
+                totalInvested,
+                currentValue,
+                profitLoss,
+                returnPercentage,
+                dividendYield,
+                totalDividends);
+    }
+
+    /**
+     * Calculate top performers (best and worst)
+     */
+    private List<TickerPerformanceDTO> calculateTopPerformers(int limit, boolean best) {
+        loadTickersFromDatabase();
+
+        return tickers.stream()
+                .filter(t -> t.getCurrentQuantity().compareTo(BigDecimal.ZERO) > 0)
+                .map(
+                        t -> {
+                            BigDecimal invested =
+                                    t.getAverageUnitValue().multiply(t.getCurrentQuantity());
+                            BigDecimal current =
+                                    t.getCurrentQuantity().multiply(t.getCurrentUnitValue());
+                            BigDecimal profitLoss = current.subtract(invested);
+                            BigDecimal percentage =
+                                    invested.compareTo(BigDecimal.ZERO) > 0
+                                            ? profitLoss
+                                                    .divide(
+                                                            invested,
+                                                            4,
+                                                            java.math.RoundingMode.HALF_UP)
+                                                    .multiply(new BigDecimal("100"))
+                                            : BigDecimal.ZERO;
+
+                            return new TickerPerformanceDTO(
+                                    t.getName(), t.getSymbol(), percentage, profitLoss, current);
+                        })
+                .sorted(
+                        best
+                                ? java.util.Comparator.comparing(
+                                                TickerPerformanceDTO::profitLossPercentage)
+                                        .reversed()
+                                : java.util.Comparator.comparing(
+                                        TickerPerformanceDTO::profitLossPercentage))
+                .limit(limit)
+                .toList();
+    }
+
+    /**
+     * Update the profitability metrics panel (P4)
+     */
+    private void updateProfitabilityMetricsPanel() {
+        portfolioP4.getChildren().clear();
+
+        ProfitabilityMetricsDTO metrics = calculateProfitabilityMetrics();
+
+        VBox metricsContainer = new VBox(10);
+        metricsContainer.setAlignment(Pos.CENTER);
+        metricsContainer.setStyle("-fx-padding: 10;");
+
+        VBox metricsBox = new VBox(8);
+        metricsBox.setAlignment(Pos.CENTER_LEFT);
+
+        metricsBox
+                .getChildren()
+                .addAll(
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_RETURN),
+                                metrics.returnPercentage(),
+                                true,
+                                true,
+                                true),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_DIVIDEND_YIELD),
+                                metrics.dividendYield(),
+                                true,
+                                false,
+                                true),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_INVESTED),
+                                metrics.totalInvested(),
+                                true,
+                                false,
+                                false),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_CURRENT_VALUE),
+                                metrics.currentValue(),
+                                true,
+                                false,
+                                false),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_PROFIT_LOSS),
+                                metrics.profitLoss(),
+                                true,
+                                true,
+                                false),
+                        createMetricRow(
+                                i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_DIVIDENDS),
+                                metrics.totalDividends(),
+                                true,
+                                false,
+                                false));
+
+        metricsContainer.getChildren().addAll(metricsBox);
+
+        portfolioP4.getChildren().add(metricsContainer);
+        HBox.setHgrow(metricsContainer, javafx.scene.layout.Priority.ALWAYS);
+    }
+
+    /**
+     * Create a metric row with label and value
+     */
+    private HBox createMetricRow(
+            String label,
+            BigDecimal value,
+            boolean alwaysGreen,
+            boolean dynamicColor,
+            boolean isPercentage) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        Label labelNode = new Label(label);
+
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        String sign = "";
+        if (dynamicColor) {
+            if (value.compareTo(BigDecimal.ZERO) > 0) {
+                sign = "+ ";
+            } else if (value.compareTo(BigDecimal.ZERO) < 0) {
+                sign = "- ";
+            }
+        }
+
+        String formattedValue =
+                isPercentage
+                        ? UIUtils.formatPercentage(value.abs(), i18nService)
+                        : UIUtils.formatCurrency(value.abs());
+
+        Label valueNode = new Label(sign + formattedValue);
+
+        if (alwaysGreen && !dynamicColor) {
+            valueNode.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+        } else if (dynamicColor) {
+            if (value.compareTo(BigDecimal.ZERO) < 0) {
+                valueNode.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
+            } else if (value.compareTo(BigDecimal.ZERO) > 0) {
+                valueNode.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+            } else {
+                valueNode.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
+            }
+        } else {
+            valueNode.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
+        }
+
+        row.getChildren().addAll(labelNode, spacer, valueNode);
+
+        return row;
+    }
+
+    /**
+     * Update the top performers panel (P2)
+     */
+    private void updateTopPerformersPanel() {
+        portfolioP2.getChildren().clear();
+
+        VBox container = new VBox(30);
+        container.setAlignment(Pos.CENTER);
+
+        List<TickerPerformanceDTO> bestPerformers =
+                calculateTopPerformers(TOP_PERFORMERS_LIMIT, true);
+        List<TickerPerformanceDTO> worstPerformers =
+                calculateTopPerformers(TOP_PERFORMERS_LIMIT, false);
+
+        VBox bestBox = new VBox(5);
+        Label bestLabel =
+                new Label(i18nService.tr(Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST));
+        bestLabel.getStyleClass().add(Constants.CUSTOM_TABLE_TITLE_STYLE);
+        bestLabel.setAlignment(Pos.CENTER);
+        bestBox.getChildren().add(bestLabel);
+        bestBox.setAlignment(Pos.CENTER);
+
+        // Add header row
+        bestBox.getChildren().add(createTableHeader());
+
+        for (TickerPerformanceDTO performer : bestPerformers) {
+            bestBox.getChildren().add(createPerformerRow(performer));
+        }
+
+        VBox worstBox = new VBox(5);
+        Label worstLabel =
+                new Label(i18nService.tr(Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST));
+        worstLabel.getStyleClass().add(Constants.CUSTOM_TABLE_TITLE_STYLE);
+        worstLabel.setAlignment(Pos.CENTER);
+        worstBox.getChildren().add(worstLabel);
+        worstBox.setAlignment(Pos.CENTER);
+
+        // Add header row
+        worstBox.getChildren().add(createTableHeader());
+
+        for (TickerPerformanceDTO performer : worstPerformers) {
+            worstBox.getChildren().add(createPerformerRow(performer));
+        }
+
+        container.getChildren().addAll(bestBox, worstBox);
+
+        portfolioP2.getChildren().add(container);
+        HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
+    }
+
+    /**
+     * Create table header row
+     */
+    private HBox createTableHeader() {
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label assetHeader =
+                new Label(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_ASSET));
+        assetHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
+        configureColumnWidth(assetHeader, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
+        assetHeader.setAlignment(Pos.CENTER_LEFT);
+
+        javafx.scene.layout.Region spacerA = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerA, javafx.scene.layout.Priority.ALWAYS);
+
+        javafx.scene.layout.Region spacerB = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerB, javafx.scene.layout.Priority.ALWAYS);
+
+        Label returnHeader =
+                new Label(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_RETURN));
+        returnHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
+        configureColumnWidth(returnHeader, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
+        returnHeader.setAlignment(Pos.CENTER);
+
+        Label valueHeader =
+                new Label(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_VALUE));
+        valueHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
+        configureColumnWidth(valueHeader, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
+        valueHeader.setAlignment(Pos.CENTER_RIGHT);
+
+        header.getChildren().addAll(assetHeader, spacerA, returnHeader, spacerB, valueHeader);
+
+        return header;
+    }
+
+    /**
+     * Configure min and max width for a label column
+     */
+    private void configureColumnWidth(Label label, Double width) {
+        label.setMinWidth(width);
+        label.setMaxWidth(width);
+    }
+
+    /**
+     * Create a performer row with ticker info
+     */
+    private HBox createPerformerRow(TickerPerformanceDTO performer) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        Label symbolLabel = new Label(performer.symbol());
+        symbolLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
+        configureColumnWidth(symbolLabel, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
+        symbolLabel.setAlignment(Pos.CENTER_LEFT);
+
+        javafx.scene.layout.Region spacerA = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerA, javafx.scene.layout.Priority.ALWAYS);
+
+        javafx.scene.layout.Region spacerB = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacerB, javafx.scene.layout.Priority.ALWAYS);
+
+        Label percentageLabel =
+                new Label(
+                        performer.getSign()
+                                + UIUtils.formatPercentage(
+                                        performer.profitLossPercentage(), i18nService));
+        percentageLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
+
+        if (performer.isPositive()) {
+            percentageLabel.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
+        } else if (performer.isNegative()) {
+            percentageLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
+        } else {
+            percentageLabel.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
+        }
+
+        configureColumnWidth(percentageLabel, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
+        percentageLabel.setAlignment(Pos.CENTER);
+
+        Label valueLabel = new Label(UIUtils.formatCurrencyDynamic(performer.currentValue()));
+        valueLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
+        configureColumnWidth(valueLabel, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
+        valueLabel.setAlignment(Pos.CENTER_RIGHT);
+
+        row.getChildren().addAll(symbolLabel, spacerA, percentageLabel, spacerB, valueLabel);
+
+        return row;
+    }
+
+    private List<AllocationDTO> calculateAllocationVsTarget() {
+        Map<TickerType, BigDecimal> currentAllocation = new HashMap<>();
+
+        BigDecimal totalValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalBondValue = bondService.getTotalInvestedValue();
+        totalValue = totalValue.add(totalBondValue);
+
+        for (Ticker ticker : tickers) {
+            BigDecimal value = ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
+            currentAllocation.merge(ticker.getType(), value, BigDecimal::add);
+        }
+
+        List<InvestmentTarget> targets = investmentTargetService.getAllActiveTargets();
+
+        List<AllocationDTO> allocations = new ArrayList<>();
+
+        for (InvestmentTarget target : targets) {
+            AssetType assetType = target.getAssetType();
+            BigDecimal currentValue = BigDecimal.ZERO;
+            String typeName;
+
+            if (assetType == AssetType.BOND) {
+                currentValue = bondService.getTotalInvestedValue();
+                typeName = i18nService.tr("Títulos de Renda Fixa");
+            } else {
+                TickerType tickerType = TickerType.valueOf(assetType.name());
+                currentValue = currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO);
+                typeName = UIUtils.translateTickerType(tickerType, i18nService);
+            }
+
+            BigDecimal currentPercentage =
+                    totalValue.compareTo(BigDecimal.ZERO) > 0
+                            ? currentValue
+                                    .divide(totalValue, 4, RoundingMode.HALF_UP)
+                                    .multiply(new BigDecimal("100"))
+                            : BigDecimal.ZERO;
+
+            BigDecimal difference = currentPercentage.subtract(target.getTargetPercentage());
+
+            allocations.add(
+                    new AllocationDTO(
+                            assetType,
+                            typeName,
+                            currentPercentage,
+                            target.getTargetPercentage(),
+                            currentValue,
+                            difference));
+        }
+
+        return allocations;
+    }
+
+    private void updateAllocationVsTargetPanel() {
+        portfolioP5.getChildren().clear();
+
+        VBox container = new VBox(ALLOCATION_PANEL_CONTAINER_SPACING);
+        container.setAlignment(Pos.CENTER);
+        container.setStyle("-fx-padding: " + ALLOCATION_PANEL_CONTAINER_SPACING + ";");
+
+        List<AllocationDTO> allocations = calculateAllocationVsTarget();
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(ALLOCATION_PANEL_COLUMNS_SPACING);
+        gridPane.setAlignment(Pos.CENTER);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(50);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(50);
+        gridPane.getColumnConstraints().addAll(col1, col2);
+
+        VBox leftColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
+        leftColumn.setAlignment(Pos.CENTER_LEFT);
+
+        VBox rightColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
+        rightColumn.setAlignment(Pos.CENTER_LEFT);
+
+        for (int i = 0; i < allocations.size(); i++) {
+            if (i % 2 == 0) {
+                leftColumn.getChildren().add(createAllocationBar(allocations.get(i)));
+            } else {
+                rightColumn.getChildren().add(createAllocationBar(allocations.get(i)));
+            }
+        }
+
+        gridPane.add(leftColumn, 0, 0);
+        gridPane.add(rightColumn, 1, 0);
+
+        container.getChildren().add(gridPane);
+
+        portfolioP5.getChildren().add(container);
+        HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
+    }
+
+    private VBox createAllocationBar(AllocationDTO allocation) {
+        VBox barContainer = new VBox(ALLOCATION_BAR_CONTAINER_SPACING);
+
+        Label typeLabel = new Label(allocation.typeName());
+        typeLabel.getStyleClass().add(Constants.ALLOCATION_TYPE_LABEL_STYLE);
+
+        HBox progressBar = new HBox();
+        progressBar.getStyleClass().add(Constants.ALLOCATION_PROGRESS_BAR_STYLE);
+        progressBar.setPrefHeight(ALLOCATION_PROGRESS_BAR_HEIGHT);
+
+        BigDecimal achievementPercentage = allocation.getAchievementPercentage();
+        double fillPercentage = achievementPercentage.doubleValue();
+
+        if (achievementPercentage.compareTo(BigDecimal.valueOf(100)) >= 0) {
+            fillPercentage = 100.0;
+        }
+
+        HBox filledBar = new HBox();
+
+        if (allocation.isCriticalLow()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_CRITICAL_LOW_STYLE);
+        } else if (allocation.isWarningLow()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_WARNING_LOW_STYLE);
+        } else if (allocation.isOnTargetRange()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_ON_TARGET_STYLE);
+        } else if (allocation.isWarningHigh()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_WARNING_HIGH_STYLE);
+        } else if (allocation.isCriticalHigh()) {
+            filledBar.getStyleClass().add(Constants.ALLOCATION_FILLED_BAR_CRITICAL_HIGH_STYLE);
+        }
+
+        filledBar.setPrefHeight(ALLOCATION_FILLED_BAR_HEIGHT);
+        filledBar
+                .prefWidthProperty()
+                .bind(progressBar.widthProperty().multiply(fillPercentage / PERCENTAGE_DIVISOR));
+
+        progressBar.getChildren().add(filledBar);
+
+        HBox infoBox = new HBox(ALLOCATION_INFO_BOX_SPACING);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label currentLabel =
+                new Label(
+                        UIUtils.formatPercentage(allocation.currentPercentage(), i18nService)
+                                + " / "
+                                + UIUtils.formatPercentage(
+                                        allocation.targetPercentage(), i18nService)
+                                + " ("
+                                + i18nService.tr(
+                                        Constants.TranslationKeys.SAVINGS_ALLOCATION_TARGET)
+                                + ")");
+        currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
+        currentLabel.setMinWidth(Region.USE_PREF_SIZE);
+
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        String statusText = getStatusText(allocation);
+        Label statusLabel = new Label(statusText);
+        statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_LABEL_STYLE);
+        statusLabel.setMinWidth(Region.USE_PREF_SIZE);
+
+        if (!allocation.isNotInStrategy()) {
+            if (allocation.isCriticalLow()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_CRITICAL_LOW_STYLE);
+            } else if (allocation.isWarningLow()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_WARNING_LOW_STYLE);
+            } else if (allocation.isOnTargetRange()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_ON_TARGET_STYLE);
+            } else if (allocation.isWarningHigh()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_WARNING_HIGH_STYLE);
+            } else if (allocation.isCriticalHigh()) {
+                statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_CRITICAL_HIGH_STYLE);
+            }
+        }
+
+        infoBox.getChildren().addAll(currentLabel, spacer, statusLabel);
+
+        barContainer.getChildren().addAll(typeLabel, progressBar, infoBox);
+
+        return barContainer;
+    }
+
+    private String getStatusText(AllocationDTO allocation) {
+        if (allocation.isNotInStrategy()) {
+            return "";
+        }
+
+        if (allocation.isOnTargetRange()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET);
+        }
+
+        BigDecimal absDifference = allocation.difference().abs();
+        String formattedDiff = UIUtils.formatPercentage(absDifference, i18nService);
+
+        if (allocation.isCriticalLow()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)
+                    + " "
+                    + formattedDiff;
+        } else if (allocation.isWarningLow()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_LOW)
+                    + " "
+                    + formattedDiff;
+        } else if (allocation.isWarningHigh()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)
+                    + " "
+                    + formattedDiff;
+        } else if (allocation.isCriticalHigh()) {
+            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)
+                    + " "
+                    + formattedDiff;
+        }
+
+        return "";
+    }
+
+    @FXML
+    private void handleRegisterBond() {
+        WindowUtils.openModalWindow(
+                Constants.ADD_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
+                springContext,
+                (AddBondController controller) -> {},
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
+    }
+
+    @FXML
+    private void handleEditBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.EDIT_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
+                springContext,
+                (EditBondController controller) -> controller.setBond(selectedBond),
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
+    }
+
+    @FXML
+    private void handleDeleteBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE));
+            return;
+        }
+
+        // Prevent the removal of a bond with associated operations
+        if (bondService.getOperationCountByBond(selectedBond.getId()) > 0) {
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_MESSAGE));
+            return;
+        }
+
+        boolean confirmed =
+                WindowUtils.showConfirmationDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE),
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE),
+                                selectedBond.getName()));
+
+        if (confirmed) {
+            try {
+                bondService.deleteBond(selectedBond.getId());
+
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE));
+
+                updateBondTableView();
+                updateBondTabFields();
+                updateInvestmentDistributionChart();
+                updateOverviewTabFields();
+                updateAllocationVsTargetPanel();
+                updateProfitabilityMetricsPanel();
+            } catch (IllegalStateException e) {
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_DIALOG_ERROR_DELETING_BOND_TITLE),
+                        e.getMessage());
+            } catch (Exception e) {
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void handleOpenBondArchive() {
+        WindowUtils.openModalWindow(
+                Constants.ARCHIVED_BONDS_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
+                springContext,
+                (ArchivedBondsController controller) -> {},
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
+    }
+
+    @FXML
+    private void handleBuyBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_BUY_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.BUY_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
+                springContext,
+                (AddBondPurchaseController controller) -> {
+                    controller.setBond(selectedBond);
+                },
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
+    }
+
+    @FXML
+    private void handleSellBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.SALE_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
+                springContext,
+                (AddBondSaleController controller) -> {
+                    controller.setBond(selectedBond);
+                },
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
+    }
+
+    @FXML
+    private void handleShowBondTransactions() {
+        WindowUtils.openModalWindow(
+                Constants.BOND_TRANSACTIONS_FXML,
+                i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
+                springContext,
+                (BondTransactionsController controller) -> {},
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
+    }
+
+    @FXML
+    private void handleEditInvestmentTarget() {
+        WindowUtils.openModalWindow(
+                Constants.EDIT_INVESTMENT_TARGET_FXML,
+                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE),
+                springContext,
+                (EditInvestmentTargetController controller) -> {},
+                List.of(this::updateAllocationVsTargetPanel));
+    }
+
+    private void configureBondTableView() {
+        TableColumn<Bond, String> nameColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME));
+        nameColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+
+        TableColumn<Bond, String> symbolColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL));
+        symbolColumn.setCellValueFactory(
+                cellData -> new SimpleStringProperty(cellData.getValue().getSymbol()));
+
+        TableColumn<Bond, String> typeColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE));
+        typeColumn.setCellValueFactory(
+                cellData ->
+                        new SimpleStringProperty(
+                                UIUtils.translateBondType(
+                                        cellData.getValue().getType(), i18nService)));
+
+        TableColumn<Bond, String> quantityColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_QUANTITY));
+        quantityColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal quantity = bondService.getCurrentQuantity(bond);
+                    return new SimpleStringProperty(quantity.toString());
+                });
+
+        TableColumn<Bond, String> avgPriceColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
+        avgPriceColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal avgPrice = bondService.getAverageUnitPrice(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(avgPrice));
+                });
+
+        TableColumn<Bond, String> currentValueColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE));
+        currentValueColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal currentValue = bondService.getInvestedValue(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(currentValue));
+                });
+
+        TableColumn<Bond, String> investedValueColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE));
+        investedValueColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal invested = bondService.getInvestedValue(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(invested));
+                });
+
+        TableColumn<Bond, String> profitLossColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS));
+        profitLossColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal profitLoss = bondService.calculateProfit(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrencySigned(profitLoss));
+                });
+
+        TableColumn<Bond, String> maturityDateColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_MATURITY_DATE));
+        maturityDateColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    if (bond.getMaturityDate() != null) {
+                        return new SimpleStringProperty(
+                                UIUtils.formatDateForDisplay(bond.getMaturityDate(), i18nService));
+                    }
+                    return new SimpleStringProperty("-");
+                });
+
+        TableColumn<Bond, String> interestRateColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_INTEREST_RATE));
+        interestRateColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    if (bond.getInterestRate() != null) {
+                        return new SimpleStringProperty(bond.getInterestRate() + "%");
+                    }
+                    return new SimpleStringProperty("-");
+                });
+
+        bondsTabBondTable
+                .getColumns()
+                .addAll(
+                        nameColumn,
+                        symbolColumn,
+                        typeColumn,
+                        quantityColumn,
+                        avgPriceColumn,
+                        currentValueColumn,
+                        profitLossColumn,
+                        maturityDateColumn,
+                        interestRateColumn);
+    }
+
+    private void updateBondTableView() {
+        List<Bond> bonds = bondService.getAllNonArchivedBonds();
+
+        // Filter by bond type if selected
+        BondType selectedType = bondsTabBondTypeComboBox.getValue();
+        if (selectedType != null) {
+            bonds =
+                    bonds.stream()
+                            .filter(bond -> bond.getType().equals(selectedType))
+                            .collect(Collectors.toList());
+        }
+
+        // Filter by search text considering all columns
+        String searchText = bondsTabBondSearchField.getText().toLowerCase();
+        if (!searchText.isEmpty()) {
+            bonds =
+                    bonds.stream()
+                            .filter(
+                                    bond -> {
+                                        String name = bond.getName().toLowerCase();
+                                        String symbol =
+                                                bond.getSymbol() != null
+                                                        ? bond.getSymbol().toLowerCase()
+                                                        : "";
+                                        String type =
+                                                UIUtils.translateBondType(
+                                                                bond.getType(), i18nService)
+                                                        .toLowerCase();
+                                        String issuer =
+                                                bond.getIssuer() != null
+                                                        ? bond.getIssuer().toLowerCase()
+                                                        : "";
+                                        String quantity =
+                                                bondService.getCurrentQuantity(bond).toString();
+                                        String avgPrice =
+                                                bondService.getAverageUnitPrice(bond).toString();
+                                        String investedValue =
+                                                bondService.getInvestedValue(bond).toString();
+                                        String profitLoss =
+                                                bondService.calculateProfit(bond).toString();
+                                        String maturityDate =
+                                                bond.getMaturityDate() != null
+                                                        ? UIUtils.formatDateForDisplay(
+                                                                        bond.getMaturityDate(),
+                                                                        i18nService)
+                                                                .toLowerCase()
+                                                        : "";
+                                        String interestRate =
+                                                bond.getInterestRate() != null
+                                                        ? bond.getInterestRate().toString()
+                                                        : "";
+
+                                        return name.contains(searchText)
+                                                || symbol.contains(searchText)
+                                                || type.contains(searchText)
+                                                || issuer.contains(searchText)
+                                                || quantity.contains(searchText)
+                                                || avgPrice.contains(searchText)
+                                                || investedValue.contains(searchText)
+                                                || profitLoss.contains(searchText)
+                                                || maturityDate.contains(searchText)
+                                                || interestRate.contains(searchText);
+                                    })
+                            .collect(Collectors.toList());
+        }
+
+        bondsTabBondTable.getItems().setAll(bonds);
+    }
+
+    private void updateBondTabFields() {
+        List<Bond> bonds = bondService.getAllNonArchivedBonds();
+
+        BigDecimal totalInvested = bondService.getTotalInvestedValue();
+
+        BigDecimal profitLoss =
+                bonds.stream()
+                        .map(bondService::calculateProfit)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal currentValue = totalInvested;
+
+        BigDecimal interestReceived = bondService.getTotalInterestReceived();
+
+        bondsTabTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
+        bondsTabCurrentValueField.setText(UIUtils.formatCurrency(currentValue));
+        bondsTabProfitLossField.setText(UIUtils.formatCurrencySigned(profitLoss));
+        bondsTabInterestReceivedField.setText(UIUtils.formatCurrency(interestReceived));
+    }
+
+    private void configureBondListeners() {
+        bondsTabBondTypeComboBox.setConverter(
+                new StringConverter<BondType>() {
+                    @Override
+                    public String toString(BondType bondType) {
+                        if (bondType == null) {
+                            return i18nService.tr(
+                                    Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL);
+                        }
+                        return UIUtils.translateBondType(bondType, i18nService);
+                    }
+
+                    @Override
+                    public BondType fromString(String string) {
+                        return null;
+                    }
+                });
+
+        bondsTabBondTypeComboBox.getItems().clear();
+        bondsTabBondTypeComboBox.getItems().add(null); // "All" option
+        bondsTabBondTypeComboBox.getItems().addAll(BondType.values());
+        bondsTabBondTypeComboBox.setValue(null); // Select "All" by default
+
+        bondsTabBondTypeComboBox
+                .valueProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            updateBondTableView();
+                        });
+
+        bondsTabBondSearchField
+                .textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            updateBondTableView();
+                        });
     }
 }
