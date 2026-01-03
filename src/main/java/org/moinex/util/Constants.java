@@ -85,6 +85,8 @@ public final class Constants {
             UI_DIALOG_INVESTMENT_PATH + "edit_crypto_exchange.fxml";
     public static final String INVESTMENT_TRANSACTIONS_FXML =
             UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
+    public static final String EDIT_INVESTMENT_TARGET_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_investment_target.fxml";
     public static final String UI_DIALOG_WALLETTRANSACTION_PATH =
             UI_DIALOG_PATH + "wallettransaction/";
     // UI wallettransaction package
@@ -396,7 +398,7 @@ public final class Constants {
     // Regex
     public static final String DIGITS_ONLY_REGEX = "\\d*";
     public static final String MONETARY_VALUE_REGEX = "\\d*\\.?\\d{0,2}";
-    public static final String BUDGET_GROUP_PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
+    public static final String PERCENTAGE_REGEX = "\\d{0,2}(\\.\\d{0,2})?|100(\\.00)?";
     public static final String INTEREST_RATE_REGEX = "\\d{0,3}(\\.\\d{0,4})?";
 
     public static final Integer INVESTMENT_CALCULATION_PRECISION = 8;
@@ -994,6 +996,62 @@ public final class Constants {
                 "savings.topPerformers.header.return";
         public static final String SAVINGS_TOP_PERFORMERS_HEADER_VALUE =
                 "savings.topPerformers.header.value";
+
+        // Investment Target
+        public static final String INVESTMENT_DIALOG_EDIT_TARGET_TITLE =
+                "investment.dialog.editTarget.title";
+        public static final String INVESTMENT_DIALOG_TARGET_UPDATED_TITLE =
+                "investment.dialog.targetUpdated.title";
+        public static final String INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE =
+                "investment.dialog.targetUpdated.message";
+        public static final String INVESTMENT_DIALOG_ERROR_UPDATING_TARGET_TITLE =
+                "investment.dialog.errorUpdatingTarget.title";
+        public static final String INVESTMENT_DIALOG_INVALID_PERCENTAGE_TITLE =
+                "investment.dialog.invalidPercentage.title";
+        public static final String INVESTMENT_DIALOG_INVALID_PERCENTAGE_MESSAGE =
+                "investment.dialog.invalidPercentage.message";
+        public static final String INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE =
+                "investment.dialog.totalPercentageValidation.title";
+        public static final String INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION =
+                "investment.dialog.totalPercentageValidation.message";
+
+        // Savings - Bonds
+        public static final String SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE =
+                "savings.bonds.dialog.addBond.title";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE =
+                "savings.bonds.dialog.noSelection.title";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE =
+                "savings.bonds.dialog.noSelection.edit.message";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE =
+                "savings.bonds.dialog.noSelection.delete.message";
+        public static final String SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_TITLE =
+                "savings.bonds.dialog.editInDevelopment.title";
+        public static final String SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_MESSAGE =
+                "savings.bonds.dialog.editInDevelopment.message";
+        public static final String SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_TITLE =
+                "savings.bonds.dialog.archiveInDevelopment.title";
+        public static final String SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_MESSAGE =
+                "savings.bonds.dialog.archiveInDevelopment.message";
+        public static final String SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE =
+                "savings.bonds.dialog.confirmDelete.title";
+        public static final String SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE =
+                "savings.bonds.dialog.confirmDelete.message";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_TITLE =
+                "savings.bonds.dialog.bondArchived.title";
+        public static final String SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_MESSAGE =
+                "savings.bonds.dialog.bondArchived.message";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_NAME =
+                "savings.bonds.table.header.name";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_SYMBOL =
+                "savings.bonds.table.header.symbol";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_TYPE =
+                "savings.bonds.table.header.type";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE =
+                "savings.bonds.table.header.currentValue";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE =
+                "savings.bonds.table.header.investedValue";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS =
+                "savings.bonds.table.header.profitLoss";
 
         // Common Components - Budget Group Pane
         public static final String COMMON_BUDGET_GROUP_TARGET = "common.budgetGroup.target";

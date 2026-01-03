@@ -1283,6 +1283,20 @@ public class SavingsController {
                         .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        List<Bond> bonds = bondService.getAllNonArchivedBonds();
+        BigDecimal bondsTotalInvested =
+                bonds.stream()
+                        .map(Bond::getAverageUnitValue)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal bondsCurrentValue =
+                bonds.stream()
+                        .map(Bond::getCurrentUnitValue)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        totalInvested = totalInvested.add(bondsTotalInvested);
+        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue);
+
         BigDecimal gains = BigDecimal.ZERO;
         BigDecimal losses = BigDecimal.ZERO;
 
@@ -1297,7 +1311,7 @@ public class SavingsController {
         overviewTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
         overviewTabGainsField.setText(UIUtils.formatCurrency(gains));
         overviewTabLossesField.setText(UIUtils.formatCurrency(losses));
-        overviewTabTotalValueField.setText(UIUtils.formatCurrency(currentValue));
+        overviewTabTotalValueField.setText(UIUtils.formatCurrency(portfolioCurrentValue));
     }
 
     private boolean isDoughnutChart(Node node) {
@@ -1736,7 +1750,7 @@ public class SavingsController {
         rightColumn.setAlignment(Pos.CENTER_LEFT);
 
         for (int i = 0; i < allocations.size(); i++) {
-            if (i < ALLOCATION_ITEMS_PER_COLUMN) {
+            if (i % 2 == 0) {
                 leftColumn.getChildren().add(createAllocationBar(allocations.get(i)));
             } else {
                 rightColumn.getChildren().add(createAllocationBar(allocations.get(i)));
@@ -1762,8 +1776,8 @@ public class SavingsController {
         progressBar.getStyleClass().add(Constants.ALLOCATION_PROGRESS_BAR_STYLE);
         progressBar.setPrefHeight(ALLOCATION_PROGRESS_BAR_HEIGHT);
 
-        double fillPercentage = allocation.currentPercentage().doubleValue();
         BigDecimal achievementPercentage = allocation.getAchievementPercentage();
+        double fillPercentage = achievementPercentage.doubleValue();
 
         if (achievementPercentage.compareTo(BigDecimal.valueOf(100)) >= 0) {
             fillPercentage = 100.0;
@@ -1871,7 +1885,7 @@ public class SavingsController {
     private void handleRegisterBond() {
         WindowUtils.openModalWindow(
                 Constants.ADD_BOND_FXML,
-                i18nService.tr("Adicionar Título de Renda Fixa"),
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
                 springContext,
                 (AddBondController controller) -> {},
                 List.of(this::updateBondTableView, this::updateBondTabFields));
@@ -1883,14 +1897,20 @@ public class SavingsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr("Nenhum título selecionado"),
-                    i18nService.tr("Por favor, selecione um título para editar."));
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE));
             return;
         }
 
         WindowUtils.showInformationDialog(
-                "Funcionalidade em desenvolvimento",
-                "A edição de títulos será implementada em breve.");
+                i18nService.tr(
+                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_TITLE),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_MESSAGE));
     }
 
     @FXML
@@ -1899,15 +1919,22 @@ public class SavingsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr("Nenhum título selecionado"),
-                    i18nService.tr("Por favor, selecione um título para excluir."));
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE));
             return;
         }
 
         boolean confirmed =
                 WindowUtils.showConfirmationDialog(
-                        i18nService.tr("Confirmar exclusão"),
-                        i18nService.tr("Tem certeza que deseja arquivar o título ")
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE),
+                        i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE)
                                 + selectedBond.getName()
                                 + "?");
 
@@ -1916,35 +1943,62 @@ public class SavingsController {
             updateBondTableView();
             updateBondTabFields();
             WindowUtils.showSuccessDialog(
-                    i18nService.tr("Título arquivado"),
-                    i18nService.tr("O título foi arquivado com sucesso."));
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_MESSAGE));
         }
     }
 
     @FXML
     private void handleOpenBondArchive() {
         WindowUtils.showInformationDialog(
-                "Funcionalidade em desenvolvimento",
-                "O arquivo de títulos será implementado em breve.");
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_TITLE),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_MESSAGE));
+    }
+
+    @FXML
+    private void handleEditInvestmentTarget() {
+        WindowUtils.openModalWindow(
+                Constants.EDIT_INVESTMENT_TARGET_FXML,
+                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE),
+                springContext,
+                (EditInvestmentTargetController controller) -> {},
+                List.of(this::updateAllocationVsTargetPanel));
     }
 
     private void configureBondTableView() {
-        TableColumn<Bond, String> nameColumn = new TableColumn<>("Nome");
+        TableColumn<Bond, String> nameColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME));
         nameColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         nameColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.25));
 
-        TableColumn<Bond, String> symbolColumn = new TableColumn<>("Símbolo");
+        TableColumn<Bond, String> symbolColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL));
         symbolColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getSymbol()));
         symbolColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
 
-        TableColumn<Bond, String> typeColumn = new TableColumn<>("Tipo");
+        TableColumn<Bond, String> typeColumn =
+                new TableColumn<>(
+                        i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE));
         typeColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getType().name()));
         typeColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
 
-        TableColumn<Bond, String> currentValueColumn = new TableColumn<>("Valor Atual");
+        TableColumn<Bond, String> currentValueColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE));
         currentValueColumn.setCellValueFactory(
                 cellData ->
                         new SimpleStringProperty(
@@ -1953,7 +2007,11 @@ public class SavingsController {
                 .prefWidthProperty()
                 .bind(bondsTabBondTable.widthProperty().multiply(0.15));
 
-        TableColumn<Bond, String> investedValueColumn = new TableColumn<>("Valor Investido");
+        TableColumn<Bond, String> investedValueColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE));
         investedValueColumn.setCellValueFactory(
                 cellData ->
                         new SimpleStringProperty(
@@ -1962,7 +2020,10 @@ public class SavingsController {
                 .prefWidthProperty()
                 .bind(bondsTabBondTable.widthProperty().multiply(0.15));
 
-        TableColumn<Bond, String> profitLossColumn = new TableColumn<>("Lucro/Prejuízo");
+        TableColumn<Bond, String> profitLossColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS));
         profitLossColumn.setCellValueFactory(
                 cellData -> {
                     BigDecimal profitLoss =
