@@ -21,7 +21,7 @@
                      <children>
                         <VBox alignment="CENTER" spacing="10.0">
                            <children>
-                              <AnchorPane fx:id="totalBalancePane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                              <AnchorPane fx:id="totalBalancePane" minWidth="400.0" prefWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label fx:id="totalBalancePaneTitle" styleClass="title" text="%wallet.totalBalance.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                     <ComboBox fx:id="totalBalancePaneWalletTypeComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
