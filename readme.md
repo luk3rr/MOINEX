@@ -16,6 +16,29 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 
 ![Main Screen](./docs/img/screenshots/home.png)
 
+### Mais Capturas de Tela
+
+<details>
+<summary>Clique para ver mais imagens da aplicação</summary>
+
+#### Carteiras
+![Wallet](./docs/img/screenshots/wallet.png)
+
+#### Cartão de Crédito
+![Credit Card](./docs/img/screenshots/credit_card.png)
+
+#### Gestão de Transações
+![Transactions](./docs/img/screenshots/transactions.png)
+
+#### Metas 
+![Goals](./docs/img/screenshots/goals.png)
+
+#### Investimentos
+![Savings](./docs/img/screenshots/savings.png)
+
+
+</details>
+
 ## Funcionalidades Principais
 
 - **Gestão de Múltiplas Carteiras:** Controle contas correntes, poupanças, investimentos e muito mais.
@@ -88,5 +111,5 @@ Para remover completamente o Moinex e todos os seus dados do seu sistema, execut
 sh scripts/uninstall.sh
 ```
 
-:warning: Este comando irá apagar permanentemente a sua base de dados com todas as suas transações. Faça um backup do
-diretório $HOME/.moinex/data/ se desejar restaurar os seus dados no futuro.
+> [!WARNING]
+> Este comando irá apagar permanentemente a sua base de dados com todas as suas transações. Faça um backup do diretório `$HOME/.moinex/data/` se desejar restaurar os seus dados no futuro.
