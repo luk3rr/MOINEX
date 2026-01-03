@@ -17,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
 import lombok.NoArgsConstructor;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.moinex.dto.AffectedGoalInfo;
+import org.moinex.dto.AssetSaleDistribution;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.investment.*;
@@ -24,6 +26,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.*;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
+import org.moinex.util.enums.GoalAssetType;
 import org.moinex.util.enums.TickerType;
 import org.moinex.util.enums.TransactionStatus;
 import org.slf4j.Logger;
@@ -45,6 +48,7 @@ public class TickerService {
     private DividendRepository dividendRepository;
     private CryptoExchangeRepository cryptoExchangeRepository;
     private WalletTransactionService walletTransactionService;
+    private AssetSaleDistributionService saleDistributionService;
 
     @Autowired
     public TickerService(
@@ -53,13 +57,15 @@ public class TickerService {
             TickerSaleRepository tickerSaleRepository,
             DividendRepository dividendRepository,
             CryptoExchangeRepository cryptoExchangeRepository,
-            WalletTransactionService walletTransactionService) {
+            WalletTransactionService walletTransactionService,
+            AssetSaleDistributionService saleDistributionService) {
         this.tickerRepository = tickerRepository;
         this.tickerPurchaseRepository = tickerPurchaseRepository;
         this.tickerSaleRepository = tickerSaleRepository;
         this.dividendRepository = dividendRepository;
         this.cryptoExchangeRepository = cryptoExchangeRepository;
         this.walletTransactionService = walletTransactionService;
+        this.saleDistributionService = saleDistributionService;
     }
 
     /**
@@ -448,6 +454,20 @@ public class TickerService {
             LocalDateTime date,
             String description,
             TransactionStatus status) {
+        addSale(tickerId, walletId, quantity, unitPrice, category, date, description, status, null);
+    }
+
+    @Transactional
+    public void addSale(
+            Integer tickerId,
+            Integer walletId,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            Category category,
+            LocalDateTime date,
+            String description,
+            TransactionStatus status,
+            AssetSaleDistribution saleDistribution) {
         Ticker ticker =
                 tickerRepository
                         .findById(tickerId)
@@ -510,6 +530,15 @@ public class TickerService {
                 ticker.getSymbol(),
                 id,
                 walletId);
+
+        // Process sale distribution for goals if provided
+        if (saleDistribution != null) {
+            BigDecimal saleValue = unitPrice.multiply(quantity);
+            saleDistributionService.processAssetSale(
+                    GoalAssetType.TICKER, tickerId, saleValue, saleDistribution);
+            logger.info("Sale distribution processed for ticker {} with strategy {}", 
+                       tickerId, saleDistribution.getStrategy());
+        }
     }
 
     /**
@@ -859,6 +888,11 @@ public class TickerService {
      */
     @Transactional
     public void updateSale(TickerSale sale) {
+        updateSale(sale, null);
+    }
+
+    @Transactional
+    public void updateSale(TickerSale sale, AssetSaleDistribution saleDistribution) {
         TickerSale oldSale =
                 tickerSaleRepository
                         .findById(sale.getId())
@@ -895,6 +929,14 @@ public class TickerService {
         tickerSaleRepository.save(oldSale);
 
         logger.info("TickerSale with id {} was updated", sale.getId());
+
+        // Process sale distribution for goals if provided
+        if (saleDistribution != null) {
+            BigDecimal saleValue = sale.getUnitPrice().multiply(sale.getQuantity());
+            saleDistributionService.processAssetSale(
+                    GoalAssetType.TICKER, sale.getTicker().getId(), saleValue, saleDistribution);
+            logger.info("Sale distribution processed for updated ticker sale {}", sale.getId());
+        }
     }
 
     /**
@@ -1202,6 +1244,29 @@ public class TickerService {
      */
     public Integer getDividendCountByTicker(Integer tickerId) {
         return tickerRepository.getDividendCountByTicker(tickerId);
+    }
+
+    /**
+     * Get goals affected by a ticker sale
+     *
+     * @param tickerId ID of the ticker
+     * @param saleValue Value being sold
+     * @return List of affected goals with allocation info
+     */
+    @Transactional(readOnly = true)
+    public List<AffectedGoalInfo> getGoalsAffectedBySale(Integer tickerId, BigDecimal saleValue) {
+        return saleDistributionService.getAffectedGoals(GoalAssetType.TICKER, tickerId, saleValue);
+    }
+
+    /**
+     * Check if a ticker has goals linked to it
+     *
+     * @param tickerId ID of the ticker
+     * @return true if there are goals linked
+     */
+    @Transactional(readOnly = true)
+    public boolean hasLinkedGoals(Integer tickerId) {
+        return saleDistributionService.hasLinkedGoals(GoalAssetType.TICKER, tickerId);
     }
 
     /**

@@ -25,6 +25,7 @@ import org.moinex.repository.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.enums.GoalFundingStrategy;
+import org.moinex.util.enums.GoalTrackingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class GoalService {
     private WalletTransactionRepository walletTransactionRepository;
     private WalletTypeRepository walletTypeRepository;
     private WalletService walletService;
+    private GoalAssetAllocationService allocationService;
 
     @Autowired
     public GoalService(
@@ -52,13 +54,15 @@ public class GoalService {
             TransferRepository transfersRepository,
             WalletTransactionRepository walletTransactionRepository,
             WalletTypeRepository walletTypeRepository,
-            WalletService walletService) {
+            WalletService walletService,
+            GoalAssetAllocationService allocationService) {
         this.goalRepository = goalRepository;
         this.walletRepository = walletRepository;
         this.transfersRepository = transfersRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.walletTypeRepository = walletTypeRepository;
         this.walletService = walletService;
+        this.allocationService = allocationService;
     }
 
     /**
@@ -122,7 +126,7 @@ public class GoalService {
             BigDecimal targetBalance,
             LocalDate targetDate,
             String motivation) {
-        return addGoal(name, initialBalance, targetBalance, targetDate, motivation, null, null);
+        return addGoal(name, initialBalance, targetBalance, targetDate, motivation, null, null, GoalTrackingMode.WALLET);
     }
 
     /**
@@ -154,6 +158,41 @@ public class GoalService {
             String motivation,
             Wallet masterWallet,
             GoalFundingStrategy strategy) {
+        return addGoal(name, initialBalance, targetBalance, targetDate, motivation, masterWallet, strategy, GoalTrackingMode.WALLET);
+    }
+
+    /**
+     * Creates a new goal with tracking mode
+     *
+     * @param name           The name of the goal
+     * @param initialBalance The initial balance of the goal
+     * @param targetBalance  The targetBalance balance of the goal
+     * @param targetDate     The targetBalance date of the goal
+     * @param motivation     The motivation for the goal
+     * @param masterWallet   The master wallet of the goal, can be null if the goal does not
+     * @param strategy       The funding strategy for the goal
+     * @param trackingMode   The tracking mode (WALLET or ASSET_ALLOCATION)
+     * @return The id of the created goal
+     * @throws IllegalArgumentException If the name of the goal is empty
+     * @throws EntityExistsException    If a goal with the same name already exists
+     * @throws EntityExistsException    If a wallet with the same name already exists
+     * @throws IllegalArgumentException If the target date is in the past
+     * @throws IllegalArgumentException If the initial balance is negative
+     * @throws IllegalArgumentException If the target balance is negative or zero
+     * @throws IllegalArgumentException If the initial balance is greater than the
+     *                                  target balance
+     * @throws EntityNotFoundException  If the goal wallet type is not found
+     */
+    @Transactional
+    public Integer addGoal(
+            String name,
+            BigDecimal initialBalance,
+            BigDecimal targetBalance,
+            LocalDate targetDate,
+            String motivation,
+            Wallet masterWallet,
+            GoalFundingStrategy strategy,
+            GoalTrackingMode trackingMode) {
         // Remove leading and trailing whitespaces
         name = name.strip();
 
@@ -185,6 +224,11 @@ public class GoalService {
                         .orElseThrow(
                                 () -> new EntityNotFoundException("Goal wallet type not found"));
 
+        if (trackingMode == GoalTrackingMode.ASSET_ALLOCATION && masterWallet != null) {
+            throw new IllegalArgumentException(
+                    "Goals with ASSET_ALLOCATION tracking mode cannot have a master wallet");
+        }
+
         Goal goal =
                 Goal.builder()
                         .name(name)
@@ -195,6 +239,7 @@ public class GoalService {
                         .motivation(motivation)
                         .type(walletType)
                         .masterWallet(masterWallet)
+                        .trackingMode(trackingMode)
                         .build();
 
         handleFundingStrategy(goal, strategy, goal.getBalance());
@@ -290,6 +335,22 @@ public class GoalService {
         goalRepository.delete(goal);
 
         logger.info("Goal {} was permanently deleted", goal.getName());
+    }
+
+    /**
+     * Get the current value of a goal
+     * For wallet-based goals, returns the balance
+     * For asset-based goals, calculates from allocations
+     *
+     * @param goal The goal to get the value for
+     * @return The current value of the goal
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal getGoalCurrentValue(Goal goal) {
+        if (goal.isAssetBased()) {
+            return allocationService.calculateGoalTotalValue(goal);
+        }
+        return goal.getBalance();
     }
 
     /**

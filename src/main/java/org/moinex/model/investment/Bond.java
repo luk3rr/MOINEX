@@ -76,6 +76,9 @@ public class Bond {
     @Column(name = "archived", nullable = false)
     private boolean archived = false;
 
+    @Column(name = "current_unit_value", precision = 38, scale = 2)
+    private BigDecimal currentUnitValue;
+
     public abstract static class BondBuilder<C extends Bond, B extends BondBuilder<C, B>> {
         public B maturityDate(LocalDateTime maturityDate) {
             this.maturityDate = maturityDate.format(Constants.DB_DATE_FORMATTER);

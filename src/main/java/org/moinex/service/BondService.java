@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.moinex.dto.AffectedGoalInfo;
+import org.moinex.dto.AssetSaleDistribution;
 import org.moinex.model.Category;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BondOperation;
@@ -20,6 +22,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.BondOperationRepository;
 import org.moinex.repository.investment.BondRepository;
 import org.moinex.util.enums.BondType;
+import org.moinex.util.enums.GoalAssetType;
 import org.moinex.util.enums.InterestIndex;
 import org.moinex.util.enums.InterestType;
 import org.moinex.util.enums.OperationType;
@@ -36,17 +39,20 @@ public class BondService {
     private final BondOperationRepository bondOperationRepository;
     private final WalletTransactionService walletTransactionService;
     private final WalletService walletService;
+    private final AssetSaleDistributionService saleDistributionService;
 
     @Autowired
     public BondService(
             BondRepository bondRepository,
             BondOperationRepository bondOperationRepository,
             WalletTransactionService walletTransactionService,
-            WalletService walletService) {
+            WalletService walletService,
+            AssetSaleDistributionService saleDistributionService) {
         this.bondRepository = bondRepository;
         this.bondOperationRepository = bondOperationRepository;
         this.walletTransactionService = walletTransactionService;
         this.walletService = walletService;
+        this.saleDistributionService = saleDistributionService;
     }
 
     @Transactional
@@ -246,6 +252,25 @@ public class BondService {
             Category category,
             String description,
             TransactionStatus status) {
+        addOperation(bondId, walletId, operationType, quantity, unitPrice, operationDate, 
+                    fees, taxes, netProfit, category, description, status, null);
+    }
+
+    @Transactional
+    public void addOperation(
+            Integer bondId,
+            Integer walletId,
+            OperationType operationType,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            LocalDate operationDate,
+            BigDecimal fees,
+            BigDecimal taxes,
+            BigDecimal netProfit,
+            Category category,
+            String description,
+            TransactionStatus status,
+            AssetSaleDistribution saleDistribution) {
         Bond bond =
                 bondRepository
                         .findById(bondId)
@@ -323,6 +348,15 @@ public class BondService {
                 operation.getId(),
                 bond.getName(),
                 transactionId);
+
+        // Process sale distribution for goals if it's a SELL operation
+        if (operationType == OperationType.SELL && saleDistribution != null) {
+            BigDecimal saleValue = unitPrice.multiply(quantity);
+            saleDistributionService.processAssetSale(
+                    GoalAssetType.BOND, bondId, saleValue, saleDistribution);
+            log.info("Sale distribution processed for bond {} with strategy {}", 
+                     bondId, saleDistribution.getStrategy());
+        }
     }
 
     @Transactional(readOnly = true)
@@ -427,6 +461,24 @@ public class BondService {
             Category category,
             String description,
             TransactionStatus status) {
+        updateOperation(operationId, walletId, quantity, unitPrice, operationDate,
+                       fees, taxes, netProfit, category, description, status, null);
+    }
+
+    @Transactional
+    public void updateOperation(
+            Integer operationId,
+            Integer walletId,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            LocalDate operationDate,
+            BigDecimal fees,
+            BigDecimal taxes,
+            BigDecimal netProfit,
+            Category category,
+            String description,
+            TransactionStatus status,
+            AssetSaleDistribution saleDistribution) {
         BondOperation operation =
                 bondOperationRepository
                         .findById(operationId)
@@ -489,6 +541,14 @@ public class BondService {
         bondOperationRepository.save(operation);
 
         log.info("BondOperation with id {} updated successfully", operationId);
+
+        // Process sale distribution for goals if it's a SELL operation and quantity changed
+        if (operation.getOperationType() == OperationType.SELL && saleDistribution != null) {
+            BigDecimal saleValue = unitPrice.multiply(quantity);
+            saleDistributionService.processAssetSale(
+                    GoalAssetType.BOND, operation.getBond().getId(), saleValue, saleDistribution);
+            log.info("Sale distribution processed for updated bond operation {}", operationId);
+        }
     }
 
     @Transactional
@@ -520,5 +580,45 @@ public class BondService {
                         () ->
                                 new EntityNotFoundException(
                                         "BondOperation not found with id: " + operationId));
+    }
+
+    /**
+     * Get goals affected by a bond sale
+     *
+     * @param bondId ID of the bond
+     * @param saleValue Value being sold
+     * @return List of affected goals with allocation info
+     */
+    @Transactional(readOnly = true)
+    public List<AffectedGoalInfo> getGoalsAffectedBySale(Integer bondId, BigDecimal saleValue) {
+        return saleDistributionService.getAffectedGoals(GoalAssetType.BOND, bondId, saleValue);
+    }
+
+    /**
+     * Update the current unit value of a bond
+     *
+     * @param bondId ID of the bond
+     * @param currentUnitValue New current unit value
+     */
+    @Transactional
+    public void updateBondCurrentValue(Integer bondId, BigDecimal currentUnitValue) {
+        Bond bond = bondRepository
+                .findById(bondId)
+                .orElseThrow(() -> new EntityNotFoundException("Bond not found with id: " + bondId));
+
+        bond.setCurrentUnitValue(currentUnitValue);
+        bondRepository.save(bond);
+        log.info("Bond {} current unit value updated to {}", bond.getName(), currentUnitValue);
+    }
+
+    /**
+     * Check if a bond has goals linked to it
+     *
+     * @param bondId ID of the bond
+     * @return true if there are goals linked
+     */
+    @Transactional(readOnly = true)
+    public boolean hasLinkedGoals(Integer bondId) {
+        return saleDistributionService.hasLinkedGoals(GoalAssetType.BOND, bondId);
     }
 }

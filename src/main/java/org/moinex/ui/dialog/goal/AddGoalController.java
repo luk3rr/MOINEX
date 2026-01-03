@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog.goal;
 
+import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -13,6 +14,8 @@ import java.time.LocalDate;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
@@ -39,9 +42,31 @@ public final class AddGoalController extends BaseGoalManagement {
 
     @FXML private RadioButton allocateFromMasterWalletRadioButton;
 
+    @FXML private RadioButton walletModeRadioButton;
+
+    @FXML private RadioButton assetModeRadioButton;
+
+    @FXML private HBox walletBasedFieldsPane;
+
+    @FXML private HBox masterWalletPane;
+
+    @FXML private VBox assetAllocationsPane;
+
+    @FXML private JFXButton configureAllocationsButton;
+
+    @FXML private Label allocationsStatusLabel;
+
     private ToggleGroup strategyToggleGroup;
 
+    private ToggleGroup trackingModeToggleGroup;
+
     private I18nService i18nService;
+    
+    private org.springframework.context.ConfigurableApplicationContext springContext;
+
+    private org.moinex.service.GoalAssetAllocationService allocationService;
+
+    private java.util.List<org.moinex.dto.GoalAssetAllocationDTO> tempAllocations = new java.util.ArrayList<>();
 
     /**
      * Constructor
@@ -50,9 +75,15 @@ public final class AddGoalController extends BaseGoalManagement {
      */
     @Autowired
     public AddGoalController(
-            GoalService goalService, WalletService walletService, I18nService i18nService) {
+            GoalService goalService, 
+            WalletService walletService, 
+            I18nService i18nService,
+            org.springframework.context.ConfigurableApplicationContext springContext,
+            org.moinex.service.GoalAssetAllocationService allocationService) {
         super(goalService, walletService);
         this.i18nService = i18nService;
+        this.springContext = springContext;
+        this.allocationService = allocationService;
         setI18nService(i18nService);
     }
 
@@ -60,6 +91,7 @@ public final class AddGoalController extends BaseGoalManagement {
     @FXML
     protected void initialize() {
         super.initialize();
+        setupTrackingModeToggleGroup();
         setupDynamicVisibilityListeners();
     }
 
@@ -67,25 +99,26 @@ public final class AddGoalController extends BaseGoalManagement {
     @FXML
     protected void handleSave() {
         String goalName = nameField.getText();
-        goalName = goalName.strip(); // Remove leading and trailing whitespaces
+        goalName = goalName.strip();
 
-        String initialBalanceStr = balanceField.getText();
         String targetBalanceStr = targetBalanceField.getText();
         LocalDate targetDate = targetDatePicker.getValue();
         String motivation = motivationTextArea.getText();
-        Wallet masterWallet = masterWalletComboBox.getValue();
+
+        boolean isAssetBased = assetModeRadioButton.isSelected();
 
         if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
                     i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
-
             return;
         }
 
+        String initialBalanceStr = balanceField.getText();
+        Wallet masterWallet = masterWalletComboBox.getValue();
         GoalFundingStrategy strategy = null;
 
-        if (goalFundingStrategyPane.isVisible()) {
+        if (!isAssetBased && goalFundingStrategyPane.isVisible()) {
             Toggle selectedToggle = strategyToggleGroup.getSelectedToggle();
             if (selectedToggle == null) {
                 WindowUtils.showInformationDialog(
@@ -99,18 +132,32 @@ public final class AddGoalController extends BaseGoalManagement {
         }
 
         try {
-            BigDecimal initialBalance =
-                    new BigDecimal(initialBalanceStr.isEmpty() ? "0" : initialBalanceStr);
+            BigDecimal initialBalance = isAssetBased 
+                    ? BigDecimal.ZERO 
+                    : new BigDecimal(initialBalanceStr.isEmpty() ? "0" : initialBalanceStr);
             BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
-            goalService.addGoal(
+            org.moinex.util.enums.GoalTrackingMode trackingMode = isAssetBased
+                    ? org.moinex.util.enums.GoalTrackingMode.ASSET_ALLOCATION
+                    : org.moinex.util.enums.GoalTrackingMode.WALLET;
+
+            Integer goalId = goalService.addGoal(
                     goalName,
                     initialBalance,
                     targetBalance,
                     targetDate,
                     motivation,
                     masterWallet,
-                    strategy);
+                    strategy,
+                    trackingMode);
+
+            // Create allocations if asset-based goal
+            if (isAssetBased && !tempAllocations.isEmpty()) {
+                for (org.moinex.dto.GoalAssetAllocationDTO allocation : tempAllocations) {
+                    allocation.setGoalId(goalId);
+                    allocationService.addAllocation(allocation);
+                }
+            }
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
@@ -132,9 +179,31 @@ public final class AddGoalController extends BaseGoalManagement {
         }
     }
 
-    /**
-     * Configures the listeners to dynamically show/hide the initial balance strategy options
-     */
+    private void setupTrackingModeToggleGroup() {
+        trackingModeToggleGroup = new ToggleGroup();
+        walletModeRadioButton.setToggleGroup(trackingModeToggleGroup);
+        assetModeRadioButton.setToggleGroup(trackingModeToggleGroup);
+
+        trackingModeToggleGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+            boolean isWalletBased = walletModeRadioButton.isSelected();
+            
+            walletBasedFieldsPane.setVisible(isWalletBased);
+            walletBasedFieldsPane.setManaged(isWalletBased);
+            masterWalletPane.setVisible(isWalletBased);
+            masterWalletPane.setManaged(isWalletBased);
+            goalFundingStrategyPane.setVisible(false);
+            goalFundingStrategyPane.setManaged(false);
+            
+            assetAllocationsPane.setVisible(!isWalletBased);
+            assetAllocationsPane.setManaged(!isWalletBased);
+
+            if (walletModeRadioButton.getScene() != null
+                    && walletModeRadioButton.getScene().getWindow() != null) {
+                walletModeRadioButton.getScene().getWindow().sizeToScene();
+            }
+        });
+    }
+
     private void setupDynamicVisibilityListeners() {
         strategyToggleGroup = new ToggleGroup();
         newDepositRadioButton.setToggleGroup(strategyToggleGroup);
@@ -148,6 +217,10 @@ public final class AddGoalController extends BaseGoalManagement {
 
         ChangeListener<Object> listener =
                 (observable, oldValue, newValue) -> {
+                    if (!walletModeRadioButton.isSelected()) {
+                        return;
+                    }
+
                     boolean masterWalletSelected = masterWalletComboBox.getValue() != null;
                     boolean initialBalanceFilled =
                             balanceField.getText() != null && !balanceField.getText().isBlank();
@@ -157,7 +230,6 @@ public final class AddGoalController extends BaseGoalManagement {
                     goalFundingStrategyPane.setVisible(showOptions);
                     goalFundingStrategyPane.setManaged(showOptions);
 
-                    // Resize the window to accommodate new components
                     if (goalFundingStrategyPane.getScene() != null
                             && goalFundingStrategyPane.getScene().getWindow() != null) {
                         goalFundingStrategyPane.getScene().getWindow().sizeToScene();
@@ -166,5 +238,66 @@ public final class AddGoalController extends BaseGoalManagement {
 
         masterWalletComboBox.valueProperty().addListener(listener);
         balanceField.textProperty().addListener(listener);
+    }
+
+    @FXML
+    protected void handleConfigureAllocations() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                getClass().getResource("/ui/dialog/goal/add_goal_asset_allocation.fxml"));
+            loader.setControllerFactory(springContext::getBean);
+            
+            javafx.scene.Parent root = loader.load();
+            
+            org.moinex.ui.dialog.goal.AddGoalAssetAllocationController controller = loader.getController();
+            
+            // Set temporary mode and parent controller
+            controller.setTemporaryMode(true);
+            controller.setParentController(this);
+            
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle(i18nService.tr(Constants.TranslationKeys.GOAL_LABEL_ADD_ASSET_ALLOCATION));
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            
+            stage.showAndWait();
+            
+            // After dialog closes, check if allocation was added
+            // For now, we'll add a simple counter
+            updateAllocationsStatus();
+            
+        } catch (java.io.IOException e) {
+            WindowUtils.showErrorDialog(
+                i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                "Failed to open allocation dialog: " + e.getMessage());
+        }
+    }
+
+    private void updateAllocationsStatus() {
+        if (tempAllocations.isEmpty()) {
+            allocationsStatusLabel.setText(
+                i18nService.tr("goal.label.noAllocationsConfigured"));
+        } else {
+            allocationsStatusLabel.setText(
+                java.text.MessageFormat.format(
+                    i18nService.tr("goal.label.allocationsConfigured"),
+                    tempAllocations.size()));
+        }
+    }
+
+    /**
+     * Adds a temporary allocation (called from allocation dialog)
+     */
+    public void addTempAllocation(org.moinex.dto.GoalAssetAllocationDTO allocation) {
+        tempAllocations.add(allocation);
+        updateAllocationsStatus();
+    }
+
+    /**
+     * Gets the list of temporary allocations
+     */
+    public java.util.List<org.moinex.dto.GoalAssetAllocationDTO> getTempAllocations() {
+        return tempAllocations;
     }
 }

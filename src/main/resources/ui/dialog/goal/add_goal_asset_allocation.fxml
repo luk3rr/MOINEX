@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefWidth="450.0" spacing="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.goal.AddGoalAssetAllocationController">
+   <children>
+      <Label text="%goal.label.addAssetAllocation">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      
+      <!-- Asset Type Selection -->
+      <VBox spacing="10.0">
+         <children>
+            <Label text="%goal.label.assetType">
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Label>
+            <HBox spacing="20.0">
+               <children>
+                  <RadioButton fx:id="bondRadioButton" mnemonicParsing="false" selected="true" text="%goal.label.bond" />
+                  <RadioButton fx:id="tickerRadioButton" mnemonicParsing="false" text="%goal.label.ticker" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      
+      <!-- Asset Selection -->
+      <HBox alignment="CENTER" spacing="5.0">
+         <children>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label>
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../icon/common/chart.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="%goal.label.selectAsset">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="assetComboBox" minWidth="200.0" stylesheets="@../../../css/component/combo-box.css" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      
+      <!-- Allocation Type Selection -->
+      <VBox spacing="10.0">
+         <children>
+            <Label text="%goal.label.allocationType">
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Label>
+            <HBox spacing="15.0">
+               <children>
+                  <RadioButton fx:id="percentageRadioButton" mnemonicParsing="false" selected="true" text="%goal.label.percentage" />
+                  <RadioButton fx:id="quantityRadioButton" mnemonicParsing="false" text="%goal.label.quantity" />
+                  <RadioButton fx:id="valueRadioButton" mnemonicParsing="false" text="%goal.label.value" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      
+      <!-- Allocation Value -->
+      <HBox alignment="CENTER" spacing="5.0">
+         <children>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label>
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../icon/common/coin.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="allocationValueLabel" text="%goal.label.allocationValue">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="allocationValueField" promptText="0.00" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      
+      <!-- Current Asset Info -->
+      <VBox fx:id="assetInfoPane" spacing="5.0" style="-fx-background-color: #f0f0f0; -fx-padding: 10; -fx-background-radius: 5;">
+         <children>
+            <Label text="%goal.label.assetInfo">
+               <font>
+                  <Font name="System Bold" size="10.0" />
+               </font>
+            </Label>
+            <HBox spacing="10.0">
+               <children>
+                  <Label text="%goal.label.currentValue" />
+                  <Label fx:id="currentValueLabel" text="\$0.00">
+                     <font>
+                        <Font name="System Bold" size="10.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox spacing="10.0">
+               <children>
+                  <Label text="%goal.label.availableQuantity" />
+                  <Label fx:id="availableQuantityLabel" text="0">
+                     <font>
+                        <Font name="System Bold" size="10.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      
+      <!-- Buttons -->
+      <HBox alignment="CENTER" spacing="10.0">
+         <children>
+            <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+            <JFXButton minWidth="80.0" onAction="#handleSave" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.save" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+</VBox>

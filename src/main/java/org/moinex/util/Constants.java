@@ -1670,6 +1670,44 @@ public final class Constants {
                 "goal.dialog.errorUpdatingGoal.title";
         public static final String GOAL_DIALOG_NO_CHANGES_TITLE = "goal.dialog.noChanges.title";
         public static final String GOAL_DIALOG_NO_CHANGES_MESSAGE = "goal.dialog.noChanges.message";
+        
+        // Goal Asset Allocation
+        public static final String GOAL_LABEL_ADD_ASSET_ALLOCATION = "goal.label.addAssetAllocation";
+        public static final String GOAL_LABEL_ASSET_TYPE = "goal.label.assetType";
+        public static final String GOAL_LABEL_BOND = "goal.label.bond";
+        public static final String GOAL_LABEL_TICKER = "goal.label.ticker";
+        public static final String GOAL_LABEL_SELECT_ASSET = "goal.label.selectAsset";
+        public static final String GOAL_LABEL_ALLOCATION_TYPE = "goal.label.allocationType";
+        public static final String GOAL_LABEL_PERCENTAGE = "goal.label.percentage";
+        public static final String GOAL_LABEL_QUANTITY = "goal.label.quantity";
+        public static final String GOAL_LABEL_VALUE = "goal.label.value";
+        public static final String GOAL_LABEL_ALLOCATION_VALUE = "goal.label.allocationValue";
+        public static final String GOAL_LABEL_ASSET_INFO = "goal.label.assetInfo";
+        public static final String GOAL_LABEL_CURRENT_VALUE = "goal.label.currentValue";
+        public static final String GOAL_LABEL_AVAILABLE_QUANTITY = "goal.label.availableQuantity";
+        public static final String GOAL_LABEL_MANAGE_ALLOCATIONS = "goal.label.manageAllocations";
+        public static final String GOAL_LABEL_TOTAL_ALLOCATED_VALUE = "goal.label.totalAllocatedValue";
+        public static final String GOAL_LABEL_ASSET_NAME = "goal.label.assetName";
+        public static final String GOAL_LABEL_ACTIONS = "goal.label.actions";
+        public static final String GOAL_BUTTON_ADD_ALLOCATION = "goal.button.addAllocation";
+        public static final String GOAL_BUTTON_REFRESH = "goal.button.refresh";
+        public static final String GOAL_DIALOG_ALLOCATION_ADDED_TITLE = "goal.dialog.allocationAdded.title";
+        public static final String GOAL_DIALOG_ALLOCATION_ADDED_MESSAGE = "goal.dialog.allocationAdded.message";
+        public static final String GOAL_DIALOG_ALLOCATION_UPDATED_TITLE = "goal.dialog.allocationUpdated.title";
+        public static final String GOAL_DIALOG_ALLOCATION_UPDATED_MESSAGE = "goal.dialog.allocationUpdated.message";
+        public static final String GOAL_DIALOG_ALLOCATION_DELETED_TITLE = "goal.dialog.allocationDeleted.title";
+        public static final String GOAL_DIALOG_ALLOCATION_DELETED_MESSAGE = "goal.dialog.allocationDeleted.message";
+        public static final String GOAL_DIALOG_NO_ASSET_SELECTED_TITLE = "goal.dialog.noAssetSelected.title";
+        public static final String GOAL_DIALOG_NO_ASSET_SELECTED_MESSAGE = "goal.dialog.noAssetSelected.message";
+        public static final String GOAL_DIALOG_INVALID_ALLOCATION_VALUE_TITLE = "goal.dialog.invalidAllocationValue.title";
+        public static final String GOAL_DIALOG_INVALID_ALLOCATION_VALUE_MESSAGE = "goal.dialog.invalidAllocationValue.message";
+        public static final String GOAL_DIALOG_ERROR_ADDING_ALLOCATION_TITLE = "goal.dialog.errorAddingAllocation.title";
+        public static final String GOAL_DIALOG_ERROR_UPDATING_ALLOCATION_TITLE = "goal.dialog.errorUpdatingAllocation.title";
+        public static final String GOAL_DIALOG_ERROR_DELETING_ALLOCATION_TITLE = "goal.dialog.errorDeletingAllocation.title";
+        public static final String GOAL_DIALOG_CONFIRM_DELETE_ALLOCATION_TITLE = "goal.dialog.confirmDeleteAllocation.title";
+        public static final String GOAL_DIALOG_CONFIRM_DELETE_ALLOCATION_MESSAGE = "goal.dialog.confirmDeleteAllocation.message";
+        public static final String GOAL_DIALOG_NO_GOAL_SELECTED_TITLE = "goal.dialog.noGoalSelected.title";
+        public static final String GOAL_DIALOG_NO_GOAL_SELECTED_MESSAGE = "goal.dialog.noGoalSelected.message";
 
         // Goal FXML Labels
         public static final String GOAL_LABEL_GOAL_NAME = "goal.label.goalName";
