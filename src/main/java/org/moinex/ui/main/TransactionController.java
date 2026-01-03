@@ -605,7 +605,7 @@ public class TransactionController {
                                 + ": "
                                 + UIUtils.formatCurrency(value)
                                 + " ("
-                                + UIUtils.formatPercentage(percentage)
+                                + UIUtils.formatPercentage(percentage, i18nService)
                                 + ")\nTotal: "
                                 + UIUtils.formatCurrency(monthTotal));
 

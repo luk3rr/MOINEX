@@ -184,9 +184,10 @@ public final class UIUtils {
      *
      * @param value The value to be formatted
      */
-    public static String formatPercentage(Number value) {
+    public static String formatPercentage(Number value, I18nService i18nService) {
         if (value.doubleValue() < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
-            return "Too much negative";
+            return i18nService.tr(
+                    Constants.TranslationKeys.UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE);
         }
 
         return percentageFormat.format(Math.abs(value.doubleValue())) + " %";

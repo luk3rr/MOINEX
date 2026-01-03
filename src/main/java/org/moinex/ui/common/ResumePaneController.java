@@ -277,7 +277,7 @@ public class ResumePaneController {
 
         if (savingsPercentage > 0) {
             savingsLabel.setText(i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_SAVINGS));
-            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage, i18nService));
             savingsCurrentSign.setText("+");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -288,12 +288,13 @@ public class ResumePaneController {
         } else if (savingsPercentage < 0) {
             savingsLabel.setText(
                     i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
-            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage, i18nService));
 
             if (savingsPercentage < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
                 savingsCurrentSign.setText(" ");
                 UIUtils.addTooltipToNode(
-                        savingsCurrentValue, "- " + UIUtils.formatPercentage(-savingsPercentage));
+                        savingsCurrentValue,
+                        "- " + UIUtils.formatPercentage(-savingsPercentage, i18nService));
             } else {
                 savingsCurrentSign.setText("-");
             }
@@ -306,7 +307,7 @@ public class ResumePaneController {
         } else {
             savingsLabel.setText(
                     i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
-            savingsCurrentValue.setText(UIUtils.formatPercentage(0.0));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(0.0, i18nService));
             savingsCurrentSign.setText(" ");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -326,13 +327,15 @@ public class ResumePaneController {
         }
 
         if (foreseenSavingsPercentage > 0) {
-            savingsForeseenValue.setText(UIUtils.formatPercentage(foreseenSavingsPercentage));
+            savingsForeseenValue.setText(
+                    UIUtils.formatPercentage(foreseenSavingsPercentage, i18nService));
             savingsForeseenSign.setText("+");
         } else if (foreseenSavingsPercentage < 0) {
-            savingsForeseenValue.setText(UIUtils.formatPercentage(-foreseenSavingsPercentage));
+            savingsForeseenValue.setText(
+                    UIUtils.formatPercentage(-foreseenSavingsPercentage, i18nService));
             savingsForeseenSign.setText("-");
         } else {
-            savingsForeseenValue.setText(UIUtils.formatPercentage(0.0));
+            savingsForeseenValue.setText(UIUtils.formatPercentage(0.0, i18nService));
             savingsForeseenSign.setText(" ");
         }
 

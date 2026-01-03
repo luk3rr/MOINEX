@@ -1017,16 +1017,17 @@ public class SavingsController {
         }
 
         overviewTabSelicValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getSelicTarget()));
+                UIUtils.formatPercentage(brazilianMarketIndicators.getSelicTarget(), i18nService));
 
         overviewTabIPCALastMonthValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getIpcaLastMonth()));
+                UIUtils.formatPercentage(
+                        brazilianMarketIndicators.getIpcaLastMonth(), i18nService));
 
         overviewTabIPCALastMonthDescriptionField.setText(
                 "IPCA " + brazilianMarketIndicators.getIpcaLastMonthReference());
 
         overviewTabIPCA12MonthsValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months()));
+                UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months(), i18nService));
 
         brazilianMarketIndicatorsLastUpdateValue.setText(
                 UIUtils.formatDateForDisplay(
@@ -1157,6 +1158,7 @@ public class SavingsController {
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
+        doughnutChart.setI18nService(i18nService);
         doughnutChart.setLabelsVisible(false);
         doughnutChart.setLegendVisible(false);
 
@@ -1173,7 +1175,7 @@ public class SavingsController {
                             + "\n"
                             + UIUtils.formatCurrency(value)
                             + " ("
-                            + UIUtils.formatPercentage(percentage)
+                            + UIUtils.formatPercentage(percentage, i18nService)
                             + ")";
 
             UIUtils.addTooltipToNode(node, tooltipText);
@@ -1229,7 +1231,7 @@ public class SavingsController {
                                     + " ("
                                     + UIUtils.formatCurrency(entry.getValue())
                                     + " | "
-                                    + UIUtils.formatPercentage(percentage)
+                                    + UIUtils.formatPercentage(percentage, i18nService)
                                     + ")");
 
             legendItem.getChildren().addAll(colorRect, legendLabel);
@@ -1529,7 +1531,7 @@ public class SavingsController {
 
         String formattedValue =
                 isPercentage
-                        ? UIUtils.formatPercentage(value.abs())
+                        ? UIUtils.formatPercentage(value.abs(), i18nService)
                         : UIUtils.formatCurrency(value.abs());
 
         Label valueNode = new Label(sign + formattedValue);
@@ -1674,7 +1676,8 @@ public class SavingsController {
         Label percentageLabel =
                 new Label(
                         performer.getSign()
-                                + UIUtils.formatPercentage(performer.profitLossPercentage()));
+                                + UIUtils.formatPercentage(
+                                        performer.profitLossPercentage(), i18nService));
         percentageLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
 
         if (performer.isPositive()) {
@@ -1839,9 +1842,10 @@ public class SavingsController {
 
         Label currentLabel =
                 new Label(
-                        UIUtils.formatPercentage(allocation.currentPercentage())
+                        UIUtils.formatPercentage(allocation.currentPercentage(), i18nService)
                                 + " / "
-                                + UIUtils.formatPercentage(allocation.targetPercentage())
+                                + UIUtils.formatPercentage(
+                                        allocation.targetPercentage(), i18nService)
                                 + " ("
                                 + i18nService.tr(
                                         Constants.TranslationKeys.SAVINGS_ALLOCATION_TARGET)
@@ -1888,7 +1892,7 @@ public class SavingsController {
         }
 
         BigDecimal absDifference = allocation.difference().abs();
-        String formattedDiff = UIUtils.formatPercentage(absDifference);
+        String formattedDiff = UIUtils.formatPercentage(absDifference, i18nService);
 
         if (allocation.isCriticalLow()) {
             return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)
@@ -1918,14 +1922,15 @@ public class SavingsController {
                 i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
                 springContext,
                 (AddBondController controller) -> {},
-                List.of(() -> {
-                    updateBondTableView();
-                    updateBondTabFields();
-                    updateInvestmentDistributionChart();
-                    updateOverviewTabFields();
-                    updateAllocationVsTargetPanel();
-                    updateProfitabilityMetricsPanel();
-                }));
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateInvestmentDistributionChart();
+                            updateOverviewTabFields();
+                            updateAllocationVsTargetPanel();
+                            updateProfitabilityMetricsPanel();
+                        }));
     }
 
     @FXML
@@ -1947,7 +1952,8 @@ public class SavingsController {
                 i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
                 springContext,
                 (EditBondController controller) -> controller.setBond(selectedBond),
-                        List.of(() -> {
+                List.of(
+                        () -> {
                             updateBondTableView();
                             updateBondTabFields();
                             updateInvestmentDistributionChart();

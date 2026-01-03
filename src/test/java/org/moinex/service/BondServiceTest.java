@@ -23,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -46,6 +47,8 @@ class BondServiceTest {
     @Mock private BondOperationRepository bondOperationRepository;
 
     @Mock private WalletTransactionService walletTransactionService;
+
+    @Mock private WalletService walletService;
 
     @InjectMocks private BondService bondService;
 
@@ -1103,6 +1106,413 @@ class BondServiceTest {
                             eq("Buy operation"),
                             eq(TransactionStatus.CONFIRMED));
             verify(bondOperationRepository).save(any(BondOperation.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("Update Operation Tests")
+    class UpdateOperationTests {
+        private Category category;
+        private LocalDate operationDate;
+        private BondOperation existingBuyOperation;
+        private BondOperation existingSellOperation;
+
+        @BeforeEach
+        void setUp() {
+            category = Category.builder().name("Investment").build();
+            operationDate = LocalDate.now();
+
+            existingBuyOperation =
+                    BondOperation.builder()
+                            .id(1)
+                            .bond(bond1)
+                            .operationType(OperationType.BUY)
+                            .quantity(BigDecimal.valueOf(10))
+                            .unitPrice(BigDecimal.valueOf(100))
+                            .fees(BigDecimal.valueOf(5))
+                            .taxes(BigDecimal.valueOf(2))
+                            .walletTransaction(walletTransaction)
+                            .build();
+
+            existingSellOperation =
+                    BondOperation.builder()
+                            .id(2)
+                            .bond(bond1)
+                            .operationType(OperationType.SELL)
+                            .quantity(BigDecimal.valueOf(5))
+                            .unitPrice(BigDecimal.valueOf(110))
+                            .netProfit(BigDecimal.valueOf(50))
+                            .walletTransaction(walletTransaction)
+                            .build();
+        }
+
+        @Test
+        @DisplayName("Should update buy operation successfully")
+        void shouldUpdateBuyOperationSuccessfully() {
+            Integer walletId = 1;
+            BigDecimal newQuantity = BigDecimal.valueOf(15);
+            BigDecimal newUnitPrice = BigDecimal.valueOf(105);
+            BigDecimal newFees = BigDecimal.valueOf(7);
+            BigDecimal newTaxes = BigDecimal.valueOf(3);
+
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+            when(walletService.getWalletById(walletId)).thenReturn(wallet);
+
+            bondService.updateOperation(
+                    1,
+                    walletId,
+                    newQuantity,
+                    newUnitPrice,
+                    operationDate,
+                    newFees,
+                    newTaxes,
+                    null,
+                    category,
+                    "Updated buy operation",
+                    TransactionStatus.CONFIRMED);
+
+            verify(bondOperationRepository).findById(1);
+            verify(walletTransactionService).updateTransaction(any(WalletTransaction.class));
+            verify(bondOperationRepository).save(existingBuyOperation);
+            assertEquals(0, newQuantity.compareTo(existingBuyOperation.getQuantity()));
+            assertEquals(0, newUnitPrice.compareTo(existingBuyOperation.getUnitPrice()));
+        }
+
+        @Test
+        @DisplayName("Should update sell operation successfully")
+        void shouldUpdateSellOperationSuccessfully() {
+            Integer walletId = 1;
+            BigDecimal newQuantity = BigDecimal.valueOf(3);
+            BigDecimal newUnitPrice = BigDecimal.valueOf(115);
+            BigDecimal newNetProfit = BigDecimal.valueOf(45);
+
+            when(bondOperationRepository.findById(2))
+                    .thenReturn(Optional.of(existingSellOperation));
+            when(bondOperationRepository.findByBondOrderByOperationDateAsc(bond1))
+                    .thenReturn(Collections.singletonList(buyOperation));
+            when(walletService.getWalletById(walletId)).thenReturn(wallet);
+
+            bondService.updateOperation(
+                    2,
+                    walletId,
+                    newQuantity,
+                    newUnitPrice,
+                    operationDate,
+                    null,
+                    null,
+                    newNetProfit,
+                    category,
+                    "Updated sell operation",
+                    TransactionStatus.CONFIRMED);
+
+            verify(bondOperationRepository).findById(2);
+            verify(walletTransactionService).updateTransaction(any(WalletTransaction.class));
+            verify(bondOperationRepository).save(existingSellOperation);
+            assertEquals(0, newQuantity.compareTo(existingSellOperation.getQuantity()));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when operation not found")
+        void shouldThrowExceptionWhenOperationNotFound() {
+            when(bondOperationRepository.findById(999)).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () ->
+                            bondService.updateOperation(
+                                    999,
+                                    1,
+                                    BigDecimal.valueOf(10),
+                                    BigDecimal.valueOf(100),
+                                    operationDate,
+                                    null,
+                                    null,
+                                    null,
+                                    category,
+                                    "Test",
+                                    TransactionStatus.CONFIRMED));
+
+            verify(bondOperationRepository).findById(999);
+            verify(bondOperationRepository, never()).save(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when quantity is zero")
+        void shouldThrowExceptionWhenQuantityIsZero() {
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            bondService.updateOperation(
+                                    1,
+                                    1,
+                                    BigDecimal.ZERO,
+                                    BigDecimal.valueOf(100),
+                                    operationDate,
+                                    null,
+                                    null,
+                                    null,
+                                    category,
+                                    "Test",
+                                    TransactionStatus.CONFIRMED));
+
+            verify(bondOperationRepository, never()).save(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when quantity is negative")
+        void shouldThrowExceptionWhenQuantityIsNegative() {
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            bondService.updateOperation(
+                                    1,
+                                    1,
+                                    BigDecimal.valueOf(-5),
+                                    BigDecimal.valueOf(100),
+                                    operationDate,
+                                    null,
+                                    null,
+                                    null,
+                                    category,
+                                    "Test",
+                                    TransactionStatus.CONFIRMED));
+
+            verify(bondOperationRepository, never()).save(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when unit price is zero")
+        void shouldThrowExceptionWhenUnitPriceIsZero() {
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            bondService.updateOperation(
+                                    1,
+                                    1,
+                                    BigDecimal.valueOf(10),
+                                    BigDecimal.ZERO,
+                                    operationDate,
+                                    null,
+                                    null,
+                                    null,
+                                    category,
+                                    "Test",
+                                    TransactionStatus.CONFIRMED));
+
+            verify(bondOperationRepository, never()).save(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when unit price is negative")
+        void shouldThrowExceptionWhenUnitPriceIsNegative() {
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            bondService.updateOperation(
+                                    1,
+                                    1,
+                                    BigDecimal.valueOf(10),
+                                    BigDecimal.valueOf(-100),
+                                    operationDate,
+                                    null,
+                                    null,
+                                    null,
+                                    category,
+                                    "Test",
+                                    TransactionStatus.CONFIRMED));
+
+            verify(bondOperationRepository, never()).save(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should throw exception when updating sell with insufficient quantity")
+        void shouldThrowExceptionWhenUpdatingSellWithInsufficientQuantity() {
+            when(bondOperationRepository.findById(2))
+                    .thenReturn(Optional.of(existingSellOperation));
+            when(bondOperationRepository.findByBondOrderByOperationDateAsc(bond1))
+                    .thenReturn(Collections.singletonList(buyOperation));
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () ->
+                            bondService.updateOperation(
+                                    2,
+                                    1,
+                                    BigDecimal.valueOf(20),
+                                    BigDecimal.valueOf(110),
+                                    operationDate,
+                                    null,
+                                    null,
+                                    null,
+                                    category,
+                                    "Test",
+                                    TransactionStatus.CONFIRMED));
+
+            verify(bondOperationRepository, never()).save(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should handle null fees and taxes correctly")
+        void shouldHandleNullFeesAndTaxesCorrectly() {
+            Integer walletId = 1;
+            BigDecimal newQuantity = BigDecimal.valueOf(12);
+            BigDecimal newUnitPrice = BigDecimal.valueOf(102);
+
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+            when(walletService.getWalletById(walletId)).thenReturn(wallet);
+
+            bondService.updateOperation(
+                    1,
+                    walletId,
+                    newQuantity,
+                    newUnitPrice,
+                    operationDate,
+                    null,
+                    null,
+                    null,
+                    category,
+                    "Updated operation",
+                    TransactionStatus.CONFIRMED);
+
+            verify(walletTransactionService).updateTransaction(any(WalletTransaction.class));
+            verify(bondOperationRepository).save(existingBuyOperation);
+        }
+
+        @Test
+        @DisplayName("Should update wallet transaction correctly")
+        void shouldUpdateWalletTransactionCorrectly() {
+            Integer walletId = 1;
+            BigDecimal newQuantity = BigDecimal.valueOf(8);
+            BigDecimal newUnitPrice = BigDecimal.valueOf(98);
+
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(existingBuyOperation));
+            when(walletService.getWalletById(walletId)).thenReturn(wallet);
+
+            bondService.updateOperation(
+                    1,
+                    walletId,
+                    newQuantity,
+                    newUnitPrice,
+                    operationDate,
+                    BigDecimal.valueOf(4),
+                    BigDecimal.valueOf(1),
+                    null,
+                    category,
+                    "Updated operation",
+                    TransactionStatus.CONFIRMED);
+
+            ArgumentCaptor<WalletTransaction> captor =
+                    ArgumentCaptor.forClass(WalletTransaction.class);
+            verify(walletTransactionService).updateTransaction(captor.capture());
+
+            WalletTransaction updatedTransaction = captor.getValue();
+            assertEquals(wallet, updatedTransaction.getWallet());
+            assertEquals(category, updatedTransaction.getCategory());
+            assertEquals("Updated operation", updatedTransaction.getDescription());
+        }
+    }
+
+    @Nested
+    @DisplayName("Delete Operation Tests")
+    class DeleteOperationTests {
+        private BondOperation operationToDelete;
+
+        @BeforeEach
+        void setUp() {
+            operationToDelete =
+                    BondOperation.builder()
+                            .id(1)
+                            .bond(bond1)
+                            .operationType(OperationType.BUY)
+                            .quantity(BigDecimal.valueOf(10))
+                            .unitPrice(BigDecimal.valueOf(100))
+                            .walletTransaction(walletTransaction)
+                            .build();
+        }
+
+        @Test
+        @DisplayName("Should delete operation successfully")
+        void shouldDeleteOperationSuccessfully() {
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(operationToDelete));
+
+            bondService.deleteOperation(1);
+
+            verify(bondOperationRepository).findById(1);
+            verify(bondOperationRepository).delete(operationToDelete);
+            verify(walletTransactionService).deleteTransaction(walletTransaction.getId());
+        }
+
+        @Test
+        @DisplayName("Should throw exception when operation not found")
+        void shouldThrowExceptionWhenOperationNotFound() {
+            when(bondOperationRepository.findById(999)).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> bondService.deleteOperation(999));
+
+            verify(bondOperationRepository).findById(999);
+            verify(bondOperationRepository, never()).delete(any(BondOperation.class));
+        }
+
+        @Test
+        @DisplayName("Should delete operation without wallet transaction")
+        void shouldDeleteOperationWithoutWalletTransaction() {
+            BondOperation operationWithoutTransaction =
+                    BondOperation.builder()
+                            .id(2)
+                            .bond(bond1)
+                            .operationType(OperationType.BUY)
+                            .quantity(BigDecimal.valueOf(5))
+                            .unitPrice(BigDecimal.valueOf(100))
+                            .walletTransaction(null)
+                            .build();
+
+            when(bondOperationRepository.findById(2))
+                    .thenReturn(Optional.of(operationWithoutTransaction));
+
+            bondService.deleteOperation(2);
+
+            verify(bondOperationRepository).delete(operationWithoutTransaction);
+            verify(walletTransactionService, never()).deleteTransaction(any());
+        }
+
+        @Test
+        @DisplayName("Should delete operation and its wallet transaction")
+        void shouldDeleteOperationAndItsWalletTransaction() {
+            when(bondOperationRepository.findById(1)).thenReturn(Optional.of(operationToDelete));
+
+            bondService.deleteOperation(1);
+
+            verify(bondOperationRepository).delete(operationToDelete);
+            verify(walletTransactionService).deleteTransaction(walletTransaction.getId());
+        }
+
+        @Test
+        @DisplayName("Should handle deletion of sell operation")
+        void shouldHandleDeletionOfSellOperation() {
+            BondOperation sellOperation =
+                    BondOperation.builder()
+                            .id(3)
+                            .bond(bond1)
+                            .operationType(OperationType.SELL)
+                            .quantity(BigDecimal.valueOf(5))
+                            .unitPrice(BigDecimal.valueOf(110))
+                            .walletTransaction(walletTransaction)
+                            .build();
+
+            when(bondOperationRepository.findById(3)).thenReturn(Optional.of(sellOperation));
+
+            bondService.deleteOperation(3);
+
+            verify(bondOperationRepository).delete(sellOperation);
+            verify(walletTransactionService).deleteTransaction(walletTransaction.getId());
         }
     }
 }

@@ -18,6 +18,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import org.moinex.service.I18nService;
 import org.moinex.util.UIUtils;
 
 public class DoughnutChart extends PieChart {
@@ -26,6 +27,7 @@ public class DoughnutChart extends PieChart {
     private final StackPane stackPane;
     private final double seriesTotal;
     private boolean showCenterLabel = true;
+    private I18nService i18nService;
 
     public DoughnutChart(ObservableList<Data> pieData) {
         super(pieData);
@@ -54,7 +56,11 @@ public class DoughnutChart extends PieChart {
             Node node = data.getNode();
 
             double percentage = (data.getPieValue() / seriesTotal) * 100;
-            Tooltip tooltip = new Tooltip(UIUtils.formatPercentage(percentage));
+            String formattedPercent =
+                    i18nService != null
+                            ? UIUtils.formatPercentage(percentage, i18nService)
+                            : String.format("%.1f %%", percentage);
+            Tooltip tooltip = new Tooltip(formattedPercent);
 
             // Set the tooltip behavior
             tooltip.showDelayProperty().setValue(Duration.ZERO);
@@ -149,6 +155,10 @@ public class DoughnutChart extends PieChart {
 
         // background transparent
         stackPane.setStyle("-fx-background-color: transparent;");
+    }
+
+    public void setI18nService(I18nService i18nService) {
+        this.i18nService = i18nService;
     }
 
     public void setShowCenterLabel(boolean show) {

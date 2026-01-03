@@ -120,7 +120,7 @@ public class EditInvestmentTargetController {
             }
         }
 
-        totalPercentageLabel.setText(UIUtils.formatPercentage(total));
+        totalPercentageLabel.setText(UIUtils.formatPercentage(total, i18nService));
 
         if (total.compareTo(new BigDecimal("100")) == 0) {
             totalPercentageLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: green;");

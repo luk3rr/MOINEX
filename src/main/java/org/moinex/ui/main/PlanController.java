@@ -222,6 +222,7 @@ public class PlanController {
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
+        doughnutChart.setI18nService(i18nService);
         doughnutChart.setShowCenterLabel(false);
         doughnutChart.setLegendVisible(false);
         doughnutChart.setLabelsVisible(false);

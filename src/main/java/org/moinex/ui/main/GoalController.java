@@ -165,7 +165,8 @@ public class GoalController {
                 param -> {
                     // If the goal is archived, return 100 %
                     if (param.getValue().isCompleted())
-                        return new SimpleObjectProperty<>(UIUtils.formatPercentage(100));
+                        return new SimpleObjectProperty<>(
+                                UIUtils.formatPercentage(100, i18nService));
 
                     return new SimpleObjectProperty<>(
                             UIUtils.formatPercentage(
@@ -176,7 +177,8 @@ public class GoalController {
                                                     / param.getValue()
                                                             .getTargetBalance()
                                                             .doubleValue()
-                                                    * 100));
+                                                    * 100,
+                                    i18nService));
                 });
         return progressColumn;
     }

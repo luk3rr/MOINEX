@@ -35,15 +35,18 @@ public class BondService {
     private final BondRepository bondRepository;
     private final BondOperationRepository bondOperationRepository;
     private final WalletTransactionService walletTransactionService;
+    private final WalletService walletService;
 
     @Autowired
     public BondService(
             BondRepository bondRepository,
             BondOperationRepository bondOperationRepository,
-            WalletTransactionService walletTransactionService) {
+            WalletTransactionService walletTransactionService,
+            WalletService walletService) {
         this.bondRepository = bondRepository;
         this.bondOperationRepository = bondOperationRepository;
         this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
     }
 
     @Transactional
@@ -409,5 +412,113 @@ public class BondService {
         }
 
         return operation.getNetProfit() != null ? operation.getNetProfit() : BigDecimal.ZERO;
+    }
+
+    @Transactional
+    public void updateOperation(
+            Integer operationId,
+            Integer walletId,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            LocalDate operationDate,
+            BigDecimal fees,
+            BigDecimal taxes,
+            BigDecimal netProfit,
+            Category category,
+            String description,
+            TransactionStatus status) {
+        BondOperation operation =
+                bondOperationRepository
+                        .findById(operationId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "BondOperation not found with id: " + operationId));
+
+        if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
+
+        if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Unit price must be greater than zero");
+        }
+
+        if (operation.getOperationType() == OperationType.SELL) {
+            BigDecimal currentQuantity = getCurrentQuantity(operation.getBond());
+            BigDecimal availableQuantity = currentQuantity.add(operation.getQuantity());
+            if (availableQuantity.compareTo(quantity) < 0) {
+                throw new IllegalArgumentException(
+                        "Insufficient bond quantity. Available: "
+                                + availableQuantity
+                                + ", Requested: "
+                                + quantity);
+            }
+        }
+
+        BigDecimal feesAmount = fees != null ? fees : BigDecimal.ZERO;
+        BigDecimal taxesAmount = taxes != null ? taxes : BigDecimal.ZERO;
+        BigDecimal netProfitAmount = netProfit != null ? netProfit : BigDecimal.ZERO;
+
+        BigDecimal baseAmount = unitPrice.multiply(quantity);
+        BigDecimal amount;
+
+        if (operation.getOperationType() == OperationType.BUY) {
+            amount = baseAmount.add(feesAmount).add(taxesAmount);
+        } else {
+            amount = baseAmount.add(netProfitAmount);
+        }
+
+        LocalDateTime dateTime = operationDate.atStartOfDay();
+
+        WalletTransaction walletTransaction = operation.getWalletTransaction();
+        walletTransaction.setWallet(walletService.getWalletById(walletId));
+        walletTransaction.setCategory(category);
+        walletTransaction.setDate(dateTime);
+        walletTransaction.setAmount(amount);
+        walletTransaction.setDescription(description);
+        walletTransaction.setStatus(status);
+
+        walletTransactionService.updateTransaction(walletTransaction);
+
+        operation.setQuantity(quantity);
+        operation.setUnitPrice(unitPrice);
+        operation.setFees(fees);
+        operation.setTaxes(taxes);
+        operation.setNetProfit(netProfit);
+
+        bondOperationRepository.save(operation);
+
+        log.info("BondOperation with id {} updated successfully", operationId);
+    }
+
+    @Transactional
+    public void deleteOperation(Integer operationId) {
+        BondOperation operation =
+                bondOperationRepository
+                        .findById(operationId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "BondOperation not found with id: " + operationId));
+
+        WalletTransaction walletTransaction = operation.getWalletTransaction();
+
+        bondOperationRepository.delete(operation);
+
+        if (walletTransaction != null) {
+            walletTransactionService.deleteTransaction(walletTransaction.getId());
+        }
+
+        log.info("BondOperation with id {} deleted successfully", operationId);
+    }
+
+    @Transactional(readOnly = true)
+    public BondOperation getOperationById(Integer operationId) {
+        return bondOperationRepository
+                .findById(operationId)
+                .orElseThrow(
+                        () ->
+                                new EntityNotFoundException(
+                                        "BondOperation not found with id: " + operationId));
     }
 }

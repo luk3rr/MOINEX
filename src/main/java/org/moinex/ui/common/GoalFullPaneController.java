@@ -175,6 +175,7 @@ public class GoalFullPaneController {
                 new CircularProgressBar(
                         Constants.GOAL_PANE_PROGRESS_BAR_RADIUS,
                         Constants.GOAL_PANE_PROGRESS_BAR_WIDTH);
+        progressBar.setI18nService(i18nService);
 
         double percentage;
 

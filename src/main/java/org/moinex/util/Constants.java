@@ -86,6 +86,10 @@ public final class Constants {
             UI_DIALOG_INVESTMENT_PATH + "edit_ticker_purchase.fxml";
     public static final String EDIT_TICKER_SALE_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_ticker_sale.fxml";
+    public static final String EDIT_BOND_PURCHASE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_bond_purchase.fxml";
+    public static final String EDIT_BOND_SALE_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "edit_bond_sale.fxml";
     public static final String EDIT_DIVIDEND_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_dividend.fxml";
     public static final String EDIT_CRYPTO_EXCHANGE_FXML =
@@ -446,6 +450,9 @@ public final class Constants {
         public static final String MAIN_SETTINGS = "main.settings";
         public static final String MAIN_CALENDAR = "main.calendar";
         public static final String MAIN_CALCULATOR = "main.calculator";
+
+        public static final String UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE =
+                "uiutils.formatPercentage.tooMuchNegative";
 
         // Dialogs
         public static final String DIALOG_CONFIRMATION_TITLE = "dialog.confirmation.title";
@@ -1840,6 +1847,41 @@ public final class Constants {
         public static final String BOND_LABEL_SELECT_BOND = "bond.label.selectBond";
         public static final String BOND_PROMPT_TEXT_SEARCH_ID_OR_DESCRIPTION =
                 "bond.promptText.searchIdOrDescription";
+
+        // Bond Operation Edit/Delete
+        public static final String BOND_DIALOG_NO_OPERATION_SELECTED_TITLE =
+                "bond.dialog.noOperationSelected.title";
+        public static final String BOND_DIALOG_NO_OPERATION_SELECTED_EDIT_MESSAGE =
+                "bond.dialog.noOperationSelected.edit";
+        public static final String BOND_DIALOG_NO_OPERATION_SELECTED_DELETE_MESSAGE =
+                "bond.dialog.noOperationSelected.delete";
+        public static final String BOND_DIALOG_EDIT_PURCHASE_TITLE =
+                "bond.dialog.editPurchase.title";
+        public static final String BOND_DIALOG_EDIT_SALE_TITLE = "bond.dialog.editSale.title";
+        public static final String BOND_DIALOG_PURCHASE_UPDATED_TITLE =
+                "bond.dialog.purchaseUpdated.title";
+        public static final String BOND_DIALOG_PURCHASE_UPDATED_MESSAGE =
+                "bond.dialog.purchaseUpdated.message";
+        public static final String BOND_DIALOG_SALE_UPDATED_TITLE = "bond.dialog.saleUpdated.title";
+        public static final String BOND_DIALOG_SALE_UPDATED_MESSAGE =
+                "bond.dialog.saleUpdated.message";
+        public static final String BOND_DIALOG_NO_CHANGES_TITLE = "bond.dialog.noChanges.title";
+        public static final String BOND_DIALOG_NO_CHANGES_PURCHASE_MESSAGE =
+                "bond.dialog.noChanges.purchase";
+        public static final String BOND_DIALOG_NO_CHANGES_SALE_MESSAGE =
+                "bond.dialog.noChanges.sale";
+        public static final String BOND_DIALOG_ERROR_UPDATING_PURCHASE_TITLE =
+                "bond.dialog.errorUpdatingPurchase.title";
+        public static final String BOND_DIALOG_ERROR_UPDATING_SALE_TITLE =
+                "bond.dialog.errorUpdatingSale.title";
+        public static final String BOND_DIALOG_CONFIRM_DELETE_OPERATION_TITLE =
+                "bond.dialog.confirmDeleteOperation.title";
+        public static final String BOND_DIALOG_CONFIRM_DELETE_OPERATION_MESSAGE =
+                "bond.dialog.confirmDeleteOperation.message";
+        public static final String BOND_DIALOG_OPERATION_DELETED_TITLE =
+                "bond.dialog.operationDeleted.title";
+        public static final String BOND_DIALOG_OPERATION_DELETED_MESSAGE =
+                "bond.dialog.operationDeleted.message";
         public static final String INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_DELETE_MESSAGE =
                 "investment.dialog.noDividendSelectedDelete.message";
         public static final String INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_TITLE =

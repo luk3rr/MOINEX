@@ -23,6 +23,7 @@ import org.moinex.service.BondService;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
+import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.OperationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -74,6 +75,97 @@ public class BondTransactionsController {
     private void handleCancel() {
         Stage stage = (Stage) searchField.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void handleEditOperation() {
+        BondOperation selectedOperation = operationTableView.getSelectionModel().getSelectedItem();
+
+        if (selectedOperation == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.BOND_DIALOG_NO_OPERATION_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .BOND_DIALOG_NO_OPERATION_SELECTED_EDIT_MESSAGE));
+            return;
+        }
+
+        if (selectedOperation.getOperationType() == OperationType.BUY) {
+            WindowUtils.openModalWindow(
+                    Constants.EDIT_BOND_PURCHASE_FXML,
+                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EDIT_PURCHASE_TITLE),
+                    springContext,
+                    (EditBondPurchaseController controller) ->
+                            controller.setOperation(selectedOperation),
+                    List.of(
+                            () -> {
+                                loadOperationsFromDatabase();
+                                updateOperationTableView();
+                            }));
+        } else {
+            WindowUtils.openModalWindow(
+                    Constants.EDIT_BOND_SALE_FXML,
+                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EDIT_SALE_TITLE),
+                    springContext,
+                    (EditBondSaleController controller) ->
+                            controller.setOperation(selectedOperation),
+                    List.of(
+                            () -> {
+                                loadOperationsFromDatabase();
+                                updateOperationTableView();
+                            }));
+        }
+    }
+
+    @FXML
+    private void handleDeleteOperation() {
+        BondOperation selectedOperation = operationTableView.getSelectionModel().getSelectedItem();
+
+        if (selectedOperation == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.BOND_DIALOG_NO_OPERATION_SELECTED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .BOND_DIALOG_NO_OPERATION_SELECTED_DELETE_MESSAGE));
+            return;
+        }
+
+        String operationType =
+                UIUtils.translateOperationType(selectedOperation.getOperationType(), i18nService);
+        String bondName = selectedOperation.getBond().getName();
+        String symbol = selectedOperation.getBond().getSymbol();
+        String bondDisplay =
+                bondName + (symbol != null && !symbol.isBlank() ? " (" + symbol + ")" : "");
+
+        String message =
+                i18nService
+                        .tr(Constants.TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_OPERATION_MESSAGE)
+                        .replace("{operationType}", operationType)
+                        .replace("{bond}", bondDisplay);
+
+        if (WindowUtils.showConfirmationDialog(
+                i18nService.tr(
+                        Constants.TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_OPERATION_TITLE),
+                message,
+                i18nService.getBundle())) {
+            try {
+                bondService.deleteOperation(selectedOperation.getId());
+                loadOperationsFromDatabase();
+                updateOperationTableView();
+
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.BOND_DIALOG_OPERATION_DELETED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys.BOND_DIALOG_OPERATION_DELETED_MESSAGE));
+            } catch (Exception e) {
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        e.getMessage());
+            }
+        }
     }
 
     private void loadOperationsFromDatabase() {
