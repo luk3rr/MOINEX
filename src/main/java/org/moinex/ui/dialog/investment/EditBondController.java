@@ -1,21 +1,23 @@
 /*
- * Filename: AddBondController.java
- * Created on: January  2, 2026
+ * Filename: EditBondController.java
+ * Created on: January  3, 2026
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
 package org.moinex.ui.dialog.investment;
 
 import com.jfoenix.controls.JFXButton;
-import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.investment.Bond;
 import org.moinex.service.BondService;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
@@ -29,7 +31,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @NoArgsConstructor
-public final class AddBondController {
+public final class EditBondController {
 
     @FXML private TextField nameField;
     @FXML private TextField symbolField;
@@ -39,14 +41,16 @@ public final class AddBondController {
     @FXML private ComboBox<InterestType> interestTypeComboBox;
     @FXML private ComboBox<InterestIndex> interestIndexComboBox;
     @FXML private TextField interestRateField;
+    @FXML private CheckBox archivedCheckBox;
     @FXML private JFXButton saveButton;
     @FXML private JFXButton cancelButton;
 
     private BondService bondService;
     private I18nService i18nService;
+    private Bond bond = null;
 
     @Autowired
-    public AddBondController(BondService bondService, I18nService i18nService) {
+    public EditBondController(BondService bondService, I18nService i18nService) {
         this.bondService = bondService;
         this.i18nService = i18nService;
     }
@@ -60,6 +64,27 @@ public final class AddBondController {
         UIUtils.setDatePickerFormat(maturityDatePicker, i18nService);
     }
 
+    public void setBond(Bond bond) {
+        this.bond = bond;
+        nameField.setText(bond.getName());
+        symbolField.setText(bond.getSymbol());
+        bondTypeComboBox.setValue(bond.getType());
+        issuerField.setText(bond.getIssuer());
+
+        if (bond.getMaturityDate() != null) {
+            maturityDatePicker.setValue(bond.getMaturityDate().toLocalDate());
+        }
+
+        interestTypeComboBox.setValue(bond.getInterestType());
+        interestIndexComboBox.setValue(bond.getInterestIndex());
+
+        if (bond.getInterestRate() != null) {
+            interestRateField.setText(bond.getInterestRate().toString());
+        }
+
+        archivedCheckBox.setSelected(bond.isArchived());
+    }
+
     @FXML
     protected void handleSave() {
         String name = nameField.getText();
@@ -70,6 +95,7 @@ public final class AddBondController {
         InterestType interestType = interestTypeComboBox.getValue();
         InterestIndex interestIndex = interestIndexComboBox.getValue();
         String interestRateStr = interestRateField.getText();
+        boolean archived = archivedCheckBox.isSelected();
 
         if (name == null || bondType == null || name.isBlank() || maturityDate == null) {
             WindowUtils.showInformationDialog(
@@ -92,8 +118,56 @@ public final class AddBondController {
             }
         }
 
+        // Check if there are any modifications
+        boolean hasChanges =
+                !bond.getName().equals(name)
+                        || !bondType.equals(bond.getType())
+                        || !maturityDate.atStartOfDay().equals(bond.getMaturityDate())
+                        || archived != bond.isArchived();
+
+        if (symbol != null && !symbol.isBlank()) {
+            hasChanges = hasChanges || !symbol.equals(bond.getSymbol());
+        } else {
+            hasChanges = hasChanges || bond.getSymbol() != null;
+        }
+
+        if (issuer != null && !issuer.isBlank()) {
+            hasChanges = hasChanges || !issuer.equals(bond.getIssuer());
+        } else {
+            hasChanges = hasChanges || bond.getIssuer() != null;
+        }
+
+        if (interestType != null) {
+            hasChanges = hasChanges || !interestType.equals(bond.getInterestType());
+        } else {
+            hasChanges = hasChanges || bond.getInterestType() != null;
+        }
+
+        if (interestIndex != null) {
+            hasChanges = hasChanges || !interestIndex.equals(bond.getInterestIndex());
+        } else {
+            hasChanges = hasChanges || bond.getInterestIndex() != null;
+        }
+
+        if (interestRate != null) {
+            hasChanges =
+                    hasChanges
+                            || (bond.getInterestRate() == null
+                                    || interestRate.compareTo(bond.getInterestRate()) != 0);
+        } else {
+            hasChanges = hasChanges || bond.getInterestRate() != null;
+        }
+
+        if (!hasChanges) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_MESSAGE));
+            return;
+        }
+
         try {
-            bondService.addBond(
+            bondService.updateBond(
+                    bond.getId(),
                     name,
                     symbol != null && !symbol.isBlank() ? symbol : null,
                     bondType,
@@ -103,17 +177,26 @@ public final class AddBondController {
                     interestIndex,
                     interestRate);
 
+            // Update archived status if changed
+            if (archived != bond.isArchived()) {
+                if (archived) {
+                    bondService.archiveBond(bond.getId());
+                } else {
+                    bondService.unarchiveBond(bond.getId());
+                }
+            }
+
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ADDED_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ADDED_MESSAGE));
+                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
+                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE));
 
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
 
-        } catch (EntityExistsException e) {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_MESSAGE));
+                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_TITLE),
+                    e.getMessage());
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
                     i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE), e.getMessage());

@@ -112,6 +112,27 @@ public final class UIUtils {
     }
 
     /**
+     * Format a number to currency string signed
+     *
+     * @param value The value to be formatted
+     * @return Currency formatted string with explicit + or - sign
+     * @note Automatically formats to 2 fraction digits, rounding half up
+     */
+    public static String formatCurrencySigned(Number value) {
+        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+            return "****";
+        }
+
+        String formatted = currencyFormat.format(value);
+
+        if (value.doubleValue() > 0) {
+            return "+ " + formatted;
+        }
+
+        return formatted;
+    }
+
+    /**
      * Format a number to a currency string with dynamic precision
      *
      * @param value The value to be formatted
@@ -635,6 +656,21 @@ public final class UIUtils {
         }
 
         return crcCreditType.name();
+    }
+
+    public static String translateOperationType(
+            OperationType operationType, I18nService i18nService) {
+        Map<String, String> operationTypeKeyMap =
+                Map.of(
+                        "buy", Constants.TranslationKeys.OPERATION_TYPE_BUY,
+                        "sell", Constants.TranslationKeys.OPERATION_TYPE_SELL);
+
+        String key = operationTypeKeyMap.getOrDefault(operationType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return operationType.name();
     }
 
     /**

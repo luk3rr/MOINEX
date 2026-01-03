@@ -10,6 +10,7 @@ import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,12 +51,7 @@ import org.moinex.chart.DoughnutChart;
 import org.moinex.dto.AllocationDTO;
 import org.moinex.dto.ProfitabilityMetricsDTO;
 import org.moinex.dto.TickerPerformanceDTO;
-import org.moinex.model.investment.Bond;
-import org.moinex.model.investment.BrazilianMarketIndicators;
-import org.moinex.model.investment.Dividend;
-import org.moinex.model.investment.InvestmentTarget;
-import org.moinex.model.investment.MarketQuotesAndCommodities;
-import org.moinex.model.investment.Ticker;
+import org.moinex.model.investment.*;
 import org.moinex.service.BondService;
 import org.moinex.service.I18nService;
 import org.moinex.service.InvestmentTargetService;
@@ -67,6 +63,7 @@ import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.moinex.util.enums.AssetType;
+import org.moinex.util.enums.BondType;
 import org.moinex.util.enums.TickerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +102,8 @@ public class SavingsController {
     @FXML private TableView<Bond> bondsTabBondTable;
 
     @FXML private TextField bondsTabBondSearchField;
+
+    @FXML private ComboBox<BondType> bondsTabBondTypeComboBox;
 
     @FXML private JFXButton updatePortfolioPricesButton;
 
@@ -1257,10 +1256,10 @@ public class SavingsController {
         }
 
         for (Bond bond : allBonds) {
-            BigDecimal bondCurrentValue = bond.getCurrentUnitValue();
+            BigDecimal bondInvestedValue = bondService.getInvestedValue(bond);
             String typeName = UIUtils.translateBondType(bond.getType(), i18nService);
 
-            investmentByType.merge(typeName, bondCurrentValue, BigDecimal::add);
+            investmentByType.merge(typeName, bondInvestedValue, BigDecimal::add);
         }
 
         return investmentByType;
@@ -1283,34 +1282,62 @@ public class SavingsController {
                         .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<Bond> bonds = bondService.getAllNonArchivedBonds();
-        BigDecimal bondsTotalInvested =
-                bonds.stream()
-                        .map(Bond::getAverageUnitValue)
+        BigDecimal bondsTotalInvested = bondService.getTotalInvestedValue();
+        BigDecimal bondsProfitLoss =
+                bondService.getAllNonArchivedBonds().stream()
+                        .map(bondService::calculateProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal bondsCurrentValue =
-                bonds.stream()
-                        .map(Bond::getCurrentUnitValue)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal bondsCurrentValue = bondsTotalInvested;
 
         totalInvested = totalInvested.add(bondsTotalInvested);
-        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue);
+        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue).add(bondsProfitLoss);
 
-        BigDecimal gains = BigDecimal.ZERO;
-        BigDecimal losses = BigDecimal.ZERO;
+        BigDecimal totalDividends =
+                dividends.stream()
+                        .map(d -> d.getWalletTransaction().getAmount())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal profitLoss = portfolioCurrentValue.subtract(totalInvested);
+        List<TickerSale> tickerSales = tickerService.getAllSales();
+        BigDecimal tickerRealizedProfit =
+                tickerSales.stream()
+                        .map(
+                                sale -> {
+                                    BigDecimal saleValue =
+                                            sale.getUnitPrice().multiply(sale.getQuantity());
+                                    BigDecimal costBasis =
+                                            sale.getAverageCost().multiply(sale.getQuantity());
+                                    return saleValue.subtract(costBasis);
+                                })
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (profitLoss.compareTo(BigDecimal.ZERO) > 0) {
-            gains = profitLoss;
+        BigDecimal unrealizedProfitLoss = portfolioCurrentValue.subtract(totalInvested);
+
+        BigDecimal totalGains = BigDecimal.ZERO;
+        BigDecimal totalLosses = BigDecimal.ZERO;
+
+        if (unrealizedProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(unrealizedProfitLoss);
         } else {
-            losses = profitLoss.abs();
+            totalLosses = totalLosses.add(unrealizedProfitLoss.abs());
+        }
+
+        totalGains = totalGains.add(totalDividends);
+
+        if (bondsProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(bondsProfitLoss);
+        } else {
+            totalLosses = totalLosses.add(bondsProfitLoss.abs());
+        }
+
+        if (tickerRealizedProfit.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(tickerRealizedProfit);
+        } else {
+            totalLosses = totalLosses.add(tickerRealizedProfit.abs());
         }
 
         overviewTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
-        overviewTabGainsField.setText(UIUtils.formatCurrency(gains));
-        overviewTabLossesField.setText(UIUtils.formatCurrency(losses));
+        overviewTabGainsField.setText(UIUtils.formatCurrency(totalGains));
+        overviewTabLossesField.setText(UIUtils.formatCurrency(totalLosses));
         overviewTabTotalValueField.setText(UIUtils.formatCurrency(portfolioCurrentValue));
     }
 
@@ -1658,7 +1685,7 @@ public class SavingsController {
         configureColumnWidth(percentageLabel, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
         percentageLabel.setAlignment(Pos.CENTER);
 
-        Label valueLabel = new Label(UIUtils.formatCurrency(performer.currentValue()));
+        Label valueLabel = new Label(UIUtils.formatCurrencyDynamic(performer.currentValue()));
         valueLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
         configureColumnWidth(valueLabel, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
         valueLabel.setAlignment(Pos.CENTER_RIGHT);
@@ -1676,7 +1703,7 @@ public class SavingsController {
                         .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalBondValue = bondService.getTotalBondValue();
+        BigDecimal totalBondValue = bondService.getTotalInvestedValue();
         totalValue = totalValue.add(totalBondValue);
 
         for (Ticker ticker : tickers) {
@@ -1694,7 +1721,7 @@ public class SavingsController {
             String typeName;
 
             if (assetType == AssetType.BOND) {
-                currentValue = bondService.getTotalBondValue();
+                currentValue = bondService.getTotalInvestedValue();
                 typeName = i18nService.tr("Títulos de Renda Fixa");
             } else {
                 TickerType tickerType = TickerType.valueOf(assetType.name());
@@ -1905,12 +1932,17 @@ public class SavingsController {
             return;
         }
 
-        WindowUtils.showInformationDialog(
-                i18nService.tr(
-                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_TITLE),
-                i18nService.tr(
-                        Constants.TranslationKeys
-                                .SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_MESSAGE));
+        WindowUtils.openModalWindow(
+                Constants.EDIT_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
+                springContext,
+                (EditBondController controller) -> controller.setBond(selectedBond),
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateOverviewTabFields();
+                        }));
     }
 
     @FXML
@@ -1927,38 +1959,126 @@ public class SavingsController {
             return;
         }
 
+        // Prevent the removal of a bond with associated operations
+        if (bondService.getOperationCountByBond(selectedBond.getId()) > 0) {
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_MESSAGE));
+            return;
+        }
+
         boolean confirmed =
                 WindowUtils.showConfirmationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE),
-                        i18nService.tr(
+                        MessageFormat.format(
+                                i18nService.tr(
                                         Constants.TranslationKeys
-                                                .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE)
-                                + selectedBond.getName()
-                                + "?");
+                                                .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE),
+                                selectedBond.getName()));
 
         if (confirmed) {
-            bondService.archiveBond(selectedBond.getId());
-            updateBondTableView();
-            updateBondTabFields();
-            WindowUtils.showSuccessDialog(
-                    i18nService.tr(
-                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_TITLE),
-                    i18nService.tr(
-                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVED_MESSAGE));
+            try {
+                bondService.deleteBond(selectedBond.getId());
+
+                WindowUtils.showSuccessDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE),
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE));
+
+                updateBondTableView();
+                updateBondTabFields();
+                updateOverviewTabFields();
+            } catch (IllegalStateException e) {
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_DIALOG_ERROR_DELETING_BOND_TITLE),
+                        e.getMessage());
+            } catch (Exception e) {
+                WindowUtils.showErrorDialog(
+                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        e.getMessage());
+            }
         }
     }
 
     @FXML
     private void handleOpenBondArchive() {
-        WindowUtils.showInformationDialog(
-                i18nService.tr(
-                        Constants.TranslationKeys
-                                .SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_TITLE),
-                i18nService.tr(
-                        Constants.TranslationKeys
-                                .SAVINGS_BONDS_DIALOG_ARCHIVE_IN_DEVELOPMENT_MESSAGE));
+        WindowUtils.openModalWindow(
+                Constants.ARCHIVED_BONDS_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
+                springContext,
+                (ArchivedBondsController controller) -> {},
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                            updateOverviewTabFields();
+                        }));
+    }
+
+    @FXML
+    private void handleBuyBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_BUY_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.BUY_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
+                springContext,
+                (AddBondPurchaseController controller) -> {
+                    controller.setBond(selectedBond);
+                },
+                List.of(this::updateBondTableView, this::updateBondTabFields));
+    }
+
+    @FXML
+    private void handleSellBond() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.SALE_BOND_FXML,
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
+                springContext,
+                (AddBondSaleController controller) -> {
+                    controller.setBond(selectedBond);
+                },
+                List.of(this::updateBondTableView, this::updateBondTabFields));
+    }
+
+    @FXML
+    private void handleShowBondTransactions() {
+        WindowUtils.openModalWindow(
+                Constants.BOND_TRANSACTIONS_FXML,
+                i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
+                springContext,
+                (BondTransactionsController controller) -> {},
+                List.of());
     }
 
     @FXML
@@ -1977,7 +2097,6 @@ public class SavingsController {
                         i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME));
         nameColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-        nameColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.25));
 
         TableColumn<Bond, String> symbolColumn =
                 new TableColumn<>(
@@ -1985,14 +2104,33 @@ public class SavingsController {
                                 Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL));
         symbolColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getSymbol()));
-        symbolColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
 
         TableColumn<Bond, String> typeColumn =
                 new TableColumn<>(
                         i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE));
         typeColumn.setCellValueFactory(
-                cellData -> new SimpleStringProperty(cellData.getValue().getType().name()));
-        typeColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
+                cellData ->
+                        new SimpleStringProperty(
+                                UIUtils.translateBondType(
+                                        cellData.getValue().getType(), i18nService)));
+
+        TableColumn<Bond, String> quantityColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_QUANTITY));
+        quantityColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal quantity = bondService.getCurrentQuantity(bond);
+                    return new SimpleStringProperty(quantity.toString());
+                });
+
+        TableColumn<Bond, String> avgPriceColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
+        avgPriceColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal avgPrice = bondService.getAverageUnitPrice(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(avgPrice));
+                });
 
         TableColumn<Bond, String> currentValueColumn =
                 new TableColumn<>(
@@ -2000,12 +2138,11 @@ public class SavingsController {
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE));
         currentValueColumn.setCellValueFactory(
-                cellData ->
-                        new SimpleStringProperty(
-                                UIUtils.formatCurrency(cellData.getValue().getCurrentUnitValue())));
-        currentValueColumn
-                .prefWidthProperty()
-                .bind(bondsTabBondTable.widthProperty().multiply(0.15));
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal currentValue = bondService.getInvestedValue(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(currentValue));
+                });
 
         TableColumn<Bond, String> investedValueColumn =
                 new TableColumn<>(
@@ -2013,12 +2150,11 @@ public class SavingsController {
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE));
         investedValueColumn.setCellValueFactory(
-                cellData ->
-                        new SimpleStringProperty(
-                                UIUtils.formatCurrency(cellData.getValue().getAverageUnitValue())));
-        investedValueColumn
-                .prefWidthProperty()
-                .bind(bondsTabBondTable.widthProperty().multiply(0.15));
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal invested = bondService.getInvestedValue(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(invested));
+                });
 
         TableColumn<Bond, String> profitLossColumn =
                 new TableColumn<>(
@@ -2026,13 +2162,33 @@ public class SavingsController {
                                 Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS));
         profitLossColumn.setCellValueFactory(
                 cellData -> {
-                    BigDecimal profitLoss =
-                            cellData.getValue()
-                                    .getCurrentUnitValue()
-                                    .subtract(cellData.getValue().getAverageUnitValue());
-                    return new SimpleStringProperty(UIUtils.formatCurrency(profitLoss));
+                    Bond bond = cellData.getValue();
+                    BigDecimal profitLoss = bondService.calculateProfit(bond);
+                    return new SimpleStringProperty(UIUtils.formatCurrencySigned(profitLoss));
                 });
-        profitLossColumn.prefWidthProperty().bind(bondsTabBondTable.widthProperty().multiply(0.15));
+
+        TableColumn<Bond, String> maturityDateColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_MATURITY_DATE));
+        maturityDateColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    if (bond.getMaturityDate() != null) {
+                        return new SimpleStringProperty(
+                                UIUtils.formatDateForDisplay(bond.getMaturityDate(), i18nService));
+                    }
+                    return new SimpleStringProperty("-");
+                });
+
+        TableColumn<Bond, String> interestRateColumn =
+                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_INTEREST_RATE));
+        interestRateColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    if (bond.getInterestRate() != null) {
+                        return new SimpleStringProperty(bond.getInterestRate() + "%");
+                    }
+                    return new SimpleStringProperty("-");
+                });
 
         bondsTabBondTable
                 .getColumns()
@@ -2040,24 +2196,77 @@ public class SavingsController {
                         nameColumn,
                         symbolColumn,
                         typeColumn,
+                        quantityColumn,
+                        avgPriceColumn,
                         currentValueColumn,
-                        investedValueColumn,
-                        profitLossColumn);
+                        profitLossColumn,
+                        maturityDateColumn,
+                        interestRateColumn);
     }
 
     private void updateBondTableView() {
         List<Bond> bonds = bondService.getAllNonArchivedBonds();
 
+        // Filter by bond type if selected
+        BondType selectedType = bondsTabBondTypeComboBox.getValue();
+        if (selectedType != null) {
+            bonds =
+                    bonds.stream()
+                            .filter(bond -> bond.getType().equals(selectedType))
+                            .collect(Collectors.toList());
+        }
+
+        // Filter by search text considering all columns
         String searchText = bondsTabBondSearchField.getText().toLowerCase();
         if (!searchText.isEmpty()) {
             bonds =
                     bonds.stream()
                             .filter(
-                                    bond ->
-                                            bond.getName().toLowerCase().contains(searchText)
-                                                    || bond.getSymbol()
-                                                            .toLowerCase()
-                                                            .contains(searchText))
+                                    bond -> {
+                                        String name = bond.getName().toLowerCase();
+                                        String symbol =
+                                                bond.getSymbol() != null
+                                                        ? bond.getSymbol().toLowerCase()
+                                                        : "";
+                                        String type =
+                                                UIUtils.translateBondType(
+                                                                bond.getType(), i18nService)
+                                                        .toLowerCase();
+                                        String issuer =
+                                                bond.getIssuer() != null
+                                                        ? bond.getIssuer().toLowerCase()
+                                                        : "";
+                                        String quantity =
+                                                bondService.getCurrentQuantity(bond).toString();
+                                        String avgPrice =
+                                                bondService.getAverageUnitPrice(bond).toString();
+                                        String investedValue =
+                                                bondService.getInvestedValue(bond).toString();
+                                        String profitLoss =
+                                                bondService.calculateProfit(bond).toString();
+                                        String maturityDate =
+                                                bond.getMaturityDate() != null
+                                                        ? UIUtils.formatDateForDisplay(
+                                                                        bond.getMaturityDate(),
+                                                                        i18nService)
+                                                                .toLowerCase()
+                                                        : "";
+                                        String interestRate =
+                                                bond.getInterestRate() != null
+                                                        ? bond.getInterestRate().toString()
+                                                        : "";
+
+                                        return name.contains(searchText)
+                                                || symbol.contains(searchText)
+                                                || type.contains(searchText)
+                                                || issuer.contains(searchText)
+                                                || quantity.contains(searchText)
+                                                || avgPrice.contains(searchText)
+                                                || investedValue.contains(searchText)
+                                                || profitLoss.contains(searchText)
+                                                || maturityDate.contains(searchText)
+                                                || interestRate.contains(searchText);
+                                    })
                             .collect(Collectors.toList());
         }
 
@@ -2067,27 +2276,53 @@ public class SavingsController {
     private void updateBondTabFields() {
         List<Bond> bonds = bondService.getAllNonArchivedBonds();
 
-        BigDecimal totalInvested =
+        BigDecimal totalInvested = bondService.getTotalInvestedValue();
+
+        BigDecimal profitLoss =
                 bonds.stream()
-                        .map(Bond::getAverageUnitValue)
+                        .map(bondService::calculateProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal currentValue =
-                bonds.stream()
-                        .map(Bond::getCurrentUnitValue)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal currentValue = totalInvested;
 
-        BigDecimal profitLoss = currentValue.subtract(totalInvested);
-
-        BigDecimal interestReceived = BigDecimal.ZERO;
+        BigDecimal interestReceived = bondService.getTotalInterestReceived();
 
         bondsTabTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
         bondsTabCurrentValueField.setText(UIUtils.formatCurrency(currentValue));
-        bondsTabProfitLossField.setText(UIUtils.formatCurrency(profitLoss));
+        bondsTabProfitLossField.setText(UIUtils.formatCurrencySigned(profitLoss));
         bondsTabInterestReceivedField.setText(UIUtils.formatCurrency(interestReceived));
     }
 
     private void configureBondListeners() {
+        bondsTabBondTypeComboBox.setConverter(
+                new StringConverter<BondType>() {
+                    @Override
+                    public String toString(BondType bondType) {
+                        if (bondType == null) {
+                            return i18nService.tr(
+                                    Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL);
+                        }
+                        return UIUtils.translateBondType(bondType, i18nService);
+                    }
+
+                    @Override
+                    public BondType fromString(String string) {
+                        return null;
+                    }
+                });
+
+        bondsTabBondTypeComboBox.getItems().clear();
+        bondsTabBondTypeComboBox.getItems().add(null); // "All" option
+        bondsTabBondTypeComboBox.getItems().addAll(BondType.values());
+        bondsTabBondTypeComboBox.setValue(null); // Select "All" by default
+
+        bondsTabBondTypeComboBox
+                .valueProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            updateBondTableView();
+                        });
+
         bondsTabBondSearchField
                 .textProperty()
                 .addListener(

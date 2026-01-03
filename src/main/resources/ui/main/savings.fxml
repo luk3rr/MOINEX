@@ -835,6 +835,15 @@
                                                 </ImageView>
                                              </graphic>
                                           </JFXButton>
+                                          <JFXButton onAction="#handleShowBondTransactions" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.showTransactions">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../icon/common/list.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </JFXButton>
                                           <Region HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
@@ -871,30 +880,58 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
+                                                                  <JFXButton onAction="#handleBuyBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.buyBond">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/sign_in.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
+                                                                  <JFXButton onAction="#handleSellBond" stylesheets="@../../css/component/buttons.css" text="%savings.bonds.button.sellBond">
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="@../../icon/common/sign_out.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </JFXButton>
                                                                </children>
                                                             </HBox>
                                                          </children>
                                                       </AnchorPane>
                                                    </children>
                                                 </VBox>
-                                                <AnchorPane HBox.hgrow="ALWAYS">
+                                                <VBox alignment="CENTER_LEFT" spacing="10.0">
                                                    <children>
-                                                      <VBox alignment="CENTER_LEFT" spacing="10.0" AnchorPane.rightAnchor="0.0">
+                                                      <HBox alignment="CENTER_RIGHT" spacing="10.0">
                                                          <children>
-                                                            <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+                                                            <VBox alignment="CENTER">
                                                                <children>
-                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                                     <image>
-                                                                        <Image url="@../../icon/common/find.png" />
-                                                                     </image>
-                                                                  </ImageView>
-                                                                  <TextField fx:id="bondsTabBondSearchField" prefWidth="300.0" promptText="%savings.bonds.searchPlaceholder" HBox.hgrow="ALWAYS" />
+                                                                  <Label text="%savings.bonds.filter.type">
+                                                                     <font>
+                                                                        <Font size="10.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <ComboBox fx:id="bondsTabBondTypeComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
                                                                </children>
-                                                            </HBox>
+                                                            </VBox>
                                                          </children>
-                                                      </VBox>
+                                                      </HBox>
+                                                      <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+                                                         <children>
+                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../icon/common/find.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                            <TextField fx:id="bondsTabBondSearchField" prefWidth="300.0" promptText="%savings.bonds.searchPlaceholder" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
                                                    </children>
-                                                </AnchorPane>
+                                                </VBox>
                                              </children>
                                           </HBox>
                                           <TableView fx:id="bondsTabBondTable" stylesheets="@../../css/component/table-view.css" VBox.vgrow="ALWAYS">

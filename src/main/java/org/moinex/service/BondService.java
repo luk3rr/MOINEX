@@ -10,13 +10,20 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.moinex.model.Category;
 import org.moinex.model.investment.Bond;
+import org.moinex.model.investment.BondOperation;
+import org.moinex.model.wallettransaction.WalletTransaction;
+import org.moinex.repository.investment.BondOperationRepository;
 import org.moinex.repository.investment.BondRepository;
 import org.moinex.util.enums.BondType;
 import org.moinex.util.enums.InterestIndex;
 import org.moinex.util.enums.InterestType;
+import org.moinex.util.enums.OperationType;
+import org.moinex.util.enums.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +33,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class BondService {
 
     private final BondRepository bondRepository;
+    private final BondOperationRepository bondOperationRepository;
+    private final WalletTransactionService walletTransactionService;
 
     @Autowired
-    public BondService(BondRepository bondRepository) {
+    public BondService(
+            BondRepository bondRepository,
+            BondOperationRepository bondOperationRepository,
+            WalletTransactionService walletTransactionService) {
         this.bondRepository = bondRepository;
+        this.bondOperationRepository = bondOperationRepository;
+        this.walletTransactionService = walletTransactionService;
     }
 
     @Transactional
@@ -37,15 +51,13 @@ public class BondService {
             String name,
             String symbol,
             BondType bondType,
-            BigDecimal currentValue,
-            BigDecimal averageValue,
-            BigDecimal quantity,
+            String issuer,
+            LocalDateTime maturityDate,
             InterestType interestType,
             InterestIndex interestIndex,
-            BigDecimal interestRate,
-            LocalDate maturityDate) {
+            BigDecimal interestRate) {
 
-        if (bondRepository.existsBySymbol(symbol)) {
+        if (symbol != null && !symbol.isBlank() && bondRepository.existsBySymbol(symbol)) {
             throw new EntityExistsException("Bond with symbol " + symbol + " already exists");
         }
 
@@ -54,19 +66,16 @@ public class BondService {
                         .name(name)
                         .symbol(symbol)
                         .type(bondType)
-                        .currentUnitValue(currentValue)
-                        .averageUnitValue(averageValue)
-                        .currentQuantity(quantity)
-                        .averageUnitValueCount(BigDecimal.ONE)
+                        .issuer(issuer)
+                        .maturityDate(maturityDate)
                         .interestType(interestType)
                         .interestIndex(interestIndex)
                         .interestRate(interestRate)
-                        .maturityDate(maturityDate != null ? maturityDate.toString() : null)
                         .archived(false)
                         .build();
 
         bondRepository.save(bond);
-        log.info("Bond {} added successfully", symbol);
+        log.info("Bond {} added successfully", name);
     }
 
     @Transactional(readOnly = true)
@@ -80,10 +89,10 @@ public class BondService {
     }
 
     @Transactional(readOnly = true)
-    public Bond getBondBySymbol(String symbol) {
+    public Bond getBondById(Integer id) {
         return bondRepository
-                .findBySymbol(symbol)
-                .orElseThrow(() -> new EntityNotFoundException("Bond not found: " + symbol));
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Bond not found with id: " + id));
     }
 
     @Transactional
@@ -92,11 +101,11 @@ public class BondService {
             String name,
             String symbol,
             BondType bondType,
-            BigDecimal currentValue,
+            String issuer,
+            LocalDateTime maturityDate,
             InterestType interestType,
             InterestIndex interestIndex,
-            BigDecimal interestRate,
-            LocalDate maturityDate) {
+            BigDecimal interestRate) {
 
         Bond bond =
                 bondRepository
@@ -107,14 +116,50 @@ public class BondService {
         bond.setName(name);
         bond.setSymbol(symbol);
         bond.setType(bondType);
-        bond.setCurrentUnitValue(currentValue);
+        bond.setIssuer(issuer);
+        bond.setMaturityDate(maturityDate);
         bond.setInterestType(interestType);
         bond.setInterestIndex(interestIndex);
         bond.setInterestRate(interestRate);
-        bond.setMaturityDate(maturityDate != null ? maturityDate.toString() : null);
 
         bondRepository.save(bond);
-        log.info("Bond {} updated successfully", symbol);
+        log.info("Bond {} updated successfully", name);
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getOperationCountByBond(Integer bondId) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+
+        return bondOperationRepository.findByBondOrderByOperationDateAsc(bond).size();
+    }
+
+    @Transactional
+    public void deleteBond(Integer id) {
+        Bond bond =
+                bondRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new EntityNotFoundException("Bond not found with id: " + id));
+
+        // Check if the bond has operations associated with it
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+        if (!operations.isEmpty()) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Bond with id %d has operations associated with it and cannot be"
+                                    + " deleted. Remove the operations first or archive the bond",
+                            id));
+        }
+
+        bondRepository.delete(bond);
+        log.info("Bond {} was permanently deleted", bond.getName());
     }
 
     @Transactional
@@ -127,7 +172,7 @@ public class BondService {
 
         bond.setArchived(true);
         bondRepository.save(bond);
-        log.info("Bond {} archived", bond.getSymbol());
+        log.info("Bond {} archived", bond.getName());
     }
 
     @Transactional
@@ -140,13 +185,229 @@ public class BondService {
 
         bond.setArchived(false);
         bondRepository.save(bond);
-        log.info("Bond {} unarchived", bond.getSymbol());
+        log.info("Bond {} unarchived", bond.getName());
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal getTotalBondValue() {
-        return bondRepository.findByArchivedFalseOrderByNameAsc().stream()
-                .map(bond -> bond.getCurrentQuantity().multiply(bond.getCurrentUnitValue()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal getCurrentQuantity(Bond bond) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        BigDecimal quantity = BigDecimal.ZERO;
+        for (BondOperation op : operations) {
+            if (op.getOperationType() == OperationType.BUY) {
+                quantity = quantity.add(op.getQuantity());
+            } else {
+                quantity = quantity.subtract(op.getQuantity());
+            }
+        }
+        return quantity;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getAverageUnitPrice(Bond bond) {
+        List<BondOperation> purchases =
+                bondOperationRepository.findByBondAndOperationTypeOrderByOperationDateAsc(
+                        bond, OperationType.BUY);
+
+        if (purchases.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalQuantity = BigDecimal.ZERO;
+
+        for (BondOperation purchase : purchases) {
+            totalValue = totalValue.add(purchase.getUnitPrice().multiply(purchase.getQuantity()));
+            totalQuantity = totalQuantity.add(purchase.getQuantity());
+        }
+
+        if (totalQuantity.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return totalValue.divide(totalQuantity, 8, java.math.RoundingMode.HALF_UP);
+    }
+
+    @Transactional
+    public void addOperation(
+            Integer bondId,
+            Integer walletId,
+            OperationType operationType,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            LocalDate operationDate,
+            BigDecimal fees,
+            BigDecimal taxes,
+            BigDecimal netProfit,
+            Category category,
+            String description,
+            TransactionStatus status) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+
+        if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
+
+        if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Unit price must be greater than zero");
+        }
+
+        if (operationType == OperationType.SELL) {
+            BigDecimal currentQuantity = getCurrentQuantity(bond);
+            if (currentQuantity.compareTo(quantity) < 0) {
+                throw new IllegalArgumentException(
+                        "Insufficient bond quantity. Available: "
+                                + currentQuantity
+                                + ", Requested: "
+                                + quantity);
+            }
+        }
+
+        BigDecimal feesAmount = fees != null ? fees : BigDecimal.ZERO;
+        BigDecimal taxesAmount = taxes != null ? taxes : BigDecimal.ZERO;
+        BigDecimal netProfitAmount = netProfit != null ? netProfit : BigDecimal.ZERO;
+
+        BigDecimal baseAmount = unitPrice.multiply(quantity);
+        BigDecimal amount;
+
+        if (operationType == OperationType.BUY) {
+            amount = baseAmount.add(feesAmount).add(taxesAmount);
+        } else {
+            amount = baseAmount.add(netProfitAmount);
+        }
+
+        LocalDateTime dateTime = operationDate.atStartOfDay();
+        Integer transactionId;
+
+        if (operationType == OperationType.BUY) {
+            transactionId =
+                    walletTransactionService.addExpense(
+                            walletId, category, dateTime, amount, description, status);
+        } else {
+            transactionId =
+                    walletTransactionService.addIncome(
+                            walletId, category, dateTime, amount, description, status);
+        }
+
+        WalletTransaction walletTransaction =
+                walletTransactionService.getTransactionById(transactionId);
+
+        BondOperation operation =
+                BondOperation.builder()
+                        .bond(bond)
+                        .operationType(operationType)
+                        .quantity(quantity)
+                        .unitPrice(unitPrice)
+                        .fees(fees)
+                        .taxes(taxes)
+                        .netProfit(netProfit)
+                        .walletTransaction(walletTransaction)
+                        .build();
+
+        bondOperationRepository.save(operation);
+
+        log.info(
+                "BondOperation {} with id {} added to bond {}. Wallet transaction with id {}"
+                        + " created",
+                operationType,
+                operation.getId(),
+                bond.getName(),
+                transactionId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BondOperation> getAllOperations() {
+        return bondOperationRepository.findAllByOrderByOperationDateDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BondOperation> getOperationsByBond(Bond bond) {
+        return bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal calculateProfit(Bond bond) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        BigDecimal totalProfit = BigDecimal.ZERO;
+
+        for (BondOperation op : operations) {
+            if (op.getOperationType() == OperationType.SELL && op.getNetProfit() != null) {
+                totalProfit = totalProfit.add(op.getNetProfit());
+            }
+        }
+
+        return totalProfit;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getTotalInvestedValue() {
+        List<Bond> bonds = bondRepository.findByArchivedFalseOrderByNameAsc();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Bond bond : bonds) {
+            BigDecimal currentQuantity = getCurrentQuantity(bond);
+            if (currentQuantity.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal averagePrice = getAverageUnitPrice(bond);
+                total = total.add(averagePrice.multiply(currentQuantity));
+            }
+        }
+
+        return total;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getTotalCurrentValue(BigDecimal currentMarketPrice) {
+        List<Bond> bonds = bondRepository.findByArchivedFalseOrderByNameAsc();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Bond bond : bonds) {
+            total = total.add(currentMarketPrice.multiply(getCurrentQuantity(bond)));
+        }
+
+        return total;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getInvestedValue(Bond bond) {
+        return getAverageUnitPrice(bond).multiply(getCurrentQuantity(bond));
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getTotalInterestReceived() {
+        List<Bond> bonds = bondRepository.findByArchivedFalseOrderByNameAsc();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Bond bond : bonds) {
+            List<BondOperation> operations =
+                    bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+            for (BondOperation op : operations) {
+                if (op.getOperationType() == OperationType.SELL && op.getNetProfit() != null) {
+                    if (op.getNetProfit().compareTo(BigDecimal.ZERO) > 0) {
+                        total = total.add(op.getNetProfit());
+                    }
+                }
+            }
+        }
+
+        return total;
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal calculateOperationProfitLoss(BondOperation operation) {
+        if (operation.getOperationType() == OperationType.BUY) {
+            return BigDecimal.ZERO;
+        }
+
+        return operation.getNetProfit() != null ? operation.getNetProfit() : BigDecimal.ZERO;
     }
 }
