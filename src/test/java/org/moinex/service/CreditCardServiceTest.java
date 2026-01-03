@@ -34,6 +34,7 @@ import org.moinex.repository.creditcard.*;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.enums.CreditCardCreditType;
+import org.moinex.util.enums.CreditCardInvoiceStatus;
 
 @ExtendWith(MockitoExtension.class)
 class CreditCardServiceTest {
@@ -1395,6 +1396,150 @@ class CreditCardServiceTest {
 
             assertThrows(
                     EntityNotFoundException.class, () -> creditCardService.getNextInvoiceDate(999));
+        }
+    }
+
+    @Nested
+    @DisplayName("Invoice Status Tests (getInvoiceStatus)")
+    class GetInvoiceStatusTests {
+        @Test
+        @DisplayName("Should return OPEN when date is after next invoice date")
+        void getInvoiceStatus_ReturnsOpen_WhenDateIsAfterNextInvoiceDate() {
+            LocalDateTime nextInvoiceDate = LocalDateTime.of(2026, 2, 10, 0, 0);
+            when(creditCardPaymentRepository.getNextInvoiceDate(creditCard.getId()))
+                    .thenReturn(nextInvoiceDate.format(Constants.DB_DATE_FORMATTER));
+
+            CreditCardInvoiceStatus status =
+                    creditCardService.getInvoiceStatus(creditCard.getId(), 3, 2026);
+
+            assertEquals(CreditCardInvoiceStatus.OPEN, status);
+        }
+
+        @Test
+        @DisplayName("Should return OPEN when date is equal to next invoice date")
+        void getInvoiceStatus_ReturnsOpen_WhenDateIsEqualToNextInvoiceDate() {
+            LocalDateTime nextInvoiceDate = LocalDateTime.of(2026, 2, 10, 0, 0);
+            when(creditCardPaymentRepository.getNextInvoiceDate(creditCard.getId()))
+                    .thenReturn(nextInvoiceDate.format(Constants.DB_DATE_FORMATTER));
+
+            CreditCardInvoiceStatus status =
+                    creditCardService.getInvoiceStatus(creditCard.getId(), 2, 2026);
+
+            assertEquals(CreditCardInvoiceStatus.OPEN, status);
+        }
+
+        @Test
+        @DisplayName("Should return CLOSED when date is before next invoice date")
+        void getInvoiceStatus_ReturnsClosed_WhenDateIsBeforeNextInvoiceDate() {
+            LocalDateTime nextInvoiceDate = LocalDateTime.of(2026, 3, 10, 0, 0);
+            when(creditCardPaymentRepository.getNextInvoiceDate(creditCard.getId()))
+                    .thenReturn(nextInvoiceDate.format(Constants.DB_DATE_FORMATTER));
+
+            CreditCardInvoiceStatus status =
+                    creditCardService.getInvoiceStatus(creditCard.getId(), 2, 2026);
+
+            assertEquals(CreditCardInvoiceStatus.CLOSED, status);
+        }
+
+        @Test
+        @DisplayName("Should handle invoice status when next invoice date is calculated")
+        void getInvoiceStatus_HandlesCalculatedNextInvoiceDate() {
+            LocalDateTime futureInvoiceDate =
+                    LocalDateTime.now().plusMonths(1).withDayOfMonth(creditCard.getBillingDueDay());
+            when(creditCardPaymentRepository.getNextInvoiceDate(creditCard.getId()))
+                    .thenReturn(futureInvoiceDate.format(Constants.DB_DATE_FORMATTER));
+
+            CreditCardInvoiceStatus status =
+                    creditCardService.getInvoiceStatus(
+                            creditCard.getId(),
+                            futureInvoiceDate.getMonthValue(),
+                            futureInvoiceDate.getYear());
+
+            assertEquals(CreditCardInvoiceStatus.OPEN, status);
+        }
+    }
+
+    @Nested
+    @DisplayName("Payment Date Tests")
+    class PaymentDateTests {
+        @Test
+        @DisplayName("Should return earliest payment date when debts exist")
+        void getEarliestPaymentDate_ReturnsDate_WhenDebtsExist() {
+            LocalDateTime expectedDate = LocalDateTime.of(2025, 1, 15, 10, 30);
+            when(creditCardDebtRepository.findEarliestPaymentDate())
+                    .thenReturn(expectedDate.format(Constants.DB_DATE_FORMATTER));
+
+            LocalDateTime result = creditCardService.getEarliestPaymentDate();
+
+            assertEquals(expectedDate, result);
+            verify(creditCardDebtRepository).findEarliestPaymentDate();
+        }
+
+        @Test
+        @DisplayName("Should return current date when no debts exist for earliest date")
+        void getEarliestPaymentDate_ReturnsNow_WhenNoDebtsExist() {
+            when(creditCardDebtRepository.findEarliestPaymentDate()).thenReturn(null);
+
+            try (MockedStatic<LocalDateTime> mockedDateTime =
+                    org.mockito.Mockito.mockStatic(LocalDateTime.class)) {
+                LocalDateTime now = LocalDateTime.of(2026, 1, 3, 16, 30);
+                mockedDateTime.when(LocalDateTime::now).thenReturn(now);
+
+                LocalDateTime result = creditCardService.getEarliestPaymentDate();
+
+                assertEquals(now, result);
+            }
+        }
+
+        @Test
+        @DisplayName("Should return latest payment date when debts exist")
+        void getLatestPaymentDate_ReturnsDate_WhenDebtsExist() {
+            LocalDateTime expectedDate = LocalDateTime.of(2026, 12, 25, 14, 45);
+            when(creditCardDebtRepository.findLatestPaymentDate())
+                    .thenReturn(expectedDate.format(Constants.DB_DATE_FORMATTER));
+
+            LocalDateTime result = creditCardService.getLatestPaymentDate();
+
+            assertEquals(expectedDate, result);
+            verify(creditCardDebtRepository).findLatestPaymentDate();
+        }
+
+        @Test
+        @DisplayName("Should return current date when no debts exist for latest date")
+        void getLatestPaymentDate_ReturnsNow_WhenNoDebtsExist() {
+            when(creditCardDebtRepository.findLatestPaymentDate()).thenReturn(null);
+
+            try (MockedStatic<LocalDateTime> mockedDateTime =
+                    org.mockito.Mockito.mockStatic(LocalDateTime.class)) {
+                LocalDateTime now = LocalDateTime.of(2026, 1, 3, 16, 30);
+                mockedDateTime.when(LocalDateTime::now).thenReturn(now);
+
+                LocalDateTime result = creditCardService.getLatestPaymentDate();
+
+                assertEquals(now, result);
+            }
+        }
+
+        @Test
+        @DisplayName("Should handle date parsing correctly for earliest date")
+        void getEarliestPaymentDate_ParsesDateCorrectly() {
+            String dateString = "2025-06-15T08:30:00";
+            when(creditCardDebtRepository.findEarliestPaymentDate()).thenReturn(dateString);
+
+            LocalDateTime result = creditCardService.getEarliestPaymentDate();
+
+            assertEquals(LocalDateTime.of(2025, 6, 15, 8, 30, 0), result);
+        }
+
+        @Test
+        @DisplayName("Should handle date parsing correctly for latest date")
+        void getLatestPaymentDate_ParsesDateCorrectly() {
+            String dateString = "2027-03-20T18:45:30";
+            when(creditCardDebtRepository.findLatestPaymentDate()).thenReturn(dateString);
+
+            LocalDateTime result = creditCardService.getLatestPaymentDate();
+
+            assertEquals(LocalDateTime.of(2027, 3, 20, 18, 45, 30), result);
         }
     }
 }
