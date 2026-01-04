@@ -71,10 +71,6 @@ echo [INFO] Gerando instalador Windows com jpackage...
 echo [INFO]   Versao: %VERSION%
 echo [INFO]   Isso pode levar alguns minutos...
 
-REM Copy Python embedded to target for packaging
-echo [INFO] Copiando Python embarcado para o pacote...
-xcopy /E /I /Y python-embedded target\python-embedded
-
 REM Run jpackage to create Windows installer
 jpackage ^
     --input target ^
@@ -86,14 +82,22 @@ jpackage ^
     --app-version "%VERSION%" ^
     --vendor "Lucas Araujo" ^
     --description "Aplicacao de gestao financeira pessoal" ^
-    --icon docs\img\icons\moinex-icon-256.png ^
+    --icon docs\img\icons\moinex-icon.ico ^
     --win-dir-chooser ^
     --win-menu ^
     --win-shortcut ^
     --win-menu-group "Moinex" ^
     --java-options "-Xmx512m" ^
-    --java-options "-Dapp.dir=$APPDIR" ^
     --verbose
+
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Erro ao gerar o instalador.
+    exit /b 1
+)
+
+REM Copy Python embedded to the installation directory structure
+echo [INFO] Copiando Python embarcado para o diretorio de instalacao...
+xcopy /E /I /Y python-embedded "%OUTPUT_DIR%\Moinex\python-embedded"
 
 if %ERRORLEVEL% EQU 0 (
     echo.

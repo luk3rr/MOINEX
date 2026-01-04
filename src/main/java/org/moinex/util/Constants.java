@@ -38,11 +38,19 @@ public final class Constants {
 
         if (os.contains("win")) {
             // Check if running from jpackage installation (embedded Python)
-            String appDir = System.getProperty("app.dir");
-            if (appDir != null) {
-                String embeddedPython = appDir + "\\python-embedded\\python.exe";
-                if (new java.io.File(embeddedPython).exists()) {
-                    return embeddedPython;
+            // jpackage creates: InstallDir/app/ with the JAR and resources
+            String appPath = System.getProperty("jpackage.app-path");
+
+            if (appPath != null) {
+                // Running from jpackage installation
+                java.io.File appDir = new java.io.File(appPath).getParentFile();
+                if (appDir != null) {
+                    String embeddedPython =
+                            new java.io.File(appDir, "python-embedded\\python.exe")
+                                    .getAbsolutePath();
+                    if (new java.io.File(embeddedPython).exists()) {
+                        return embeddedPython;
+                    }
                 }
             }
 
