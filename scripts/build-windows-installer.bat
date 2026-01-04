@@ -76,7 +76,7 @@ jpackage ^
     --input target ^
     --name Moinex ^
     --main-jar moinex.jar ^
-    --main-class org.moinex.app.App ^
+    --main-class org.springframework.boot.loader.launch.JarLauncher ^
     --type exe ^
     --dest "%OUTPUT_DIR%" ^
     --app-version "%VERSION%" ^
