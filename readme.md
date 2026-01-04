@@ -7,7 +7,7 @@
 <p align="center">
 <img src="https://img.shields.io/github/v/tag/luk3rr/MOINEX" alt="Última Versão">
 <img src="https://img.shields.io/github/license/luk3rr/MOINEX" alt="Licença">
-<img src="https://img.shields.io/badge/platform-Linux-lightgrey" alt="Plataforma">
+<img src="https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey" alt="Plataforma">
 </p>
 
 MOINEX é uma aplicação de gestão financeira pessoal que permite aos utilizadores registar, visualizar e acompanhar as
@@ -58,54 +58,73 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 
 ## Compatibilidade
 
-A aplicação e o script de instalação foram desenvolvidos e testados para ambientes **Linux**.
-
-A aplicação Java (.jar) em si é multiplataforma e pode rodar em macOS e Windows, mas o script de
-instalação atual ([scripts/install.sh](https://github.com/luk3rr/MOINEX/blob/main/scripts/install.sh)) é específico para Linux e não funcionará nesses sistemas.
+O Moinex está disponível para **Linux** e **Windows**.
 
 ## Instalação
 
-A instalação é feita através de um script interativo que lhe permite escolher a versão do Moinex que deseja instalar.
+### Windows 
 
-### Pré-requisitos
+1. Acesse a [página de releases](https://github.com/luk3rr/MOINEX/releases/latest)
+2. Baixe o arquivo `Moinex-X.X.X.exe` da última versão
+3. Execute o instalador
+4. Siga o assistente de instalação
+5. Pronto! Encontre o Moinex no Menu Iniciar
 
-Antes de começar, certifique-se de que tem as seguintes ferramentas instaladas:
+**Localização dos arquivos:**
+- Aplicação: `%USERPROFILE%\.moinex\`
+- Base de dados: `%USERPROFILE%\.moinex\data\`
+- Logs: `%LOCALAPPDATA%\moinex\state`
 
+### Linux
+
+**Instalação via script interativo**
+
+#### Pré-requisitos
+
+Certifique-se de ter instalado:
 - Git
 - Java 21
 - Maven
+- Python 3 (com pip)
 
-### Passos de Instalação
+#### Passos
 
-Abra o seu terminal e clone o projeto para a sua máquina.
-
+1. Clone o repositório:
 ```bash
 git clone https://github.com/luk3rr/MOINEX.git
 cd MOINEX
 ```
 
-Execute o script de instalação:
-
+2. Execute o script de instalação:
 ```bash
 sh scripts/install.sh
 ```
 
-Durante a execução do script, você terá a opção de selecionar qual versão do app será instalada.
-Use o teclado para digitar o número da versão que deseja instalar e pressione Enter.
+3. Escolha a versão desejada:
+   - **main** - versão de desenvolvimento (pode ser instável)
+   - **Versões estáveis** - recomendadas para uso diário
 
-- **Versão de Desenvolvimento:** Escolha a opção **main** para instalar a versão mais recente, que pode conter novas
-  funcionalidades ainda em teste.
-- **Versões Estáveis:** Recomenda-se escolher a última versão estável para uma melhor experiência.
-
-O script irá então compilar a aplicação, criar os diretórios necessários e instalar o Moinex no seu sistema.
-
-- **Arquivos da Aplicação:** $HOME/.moinex/
-- **Base de Dados:** $HOME/.moinex/data/
-- **Arquivos de Log:** $HOME/.local/state/moinex
+**Localização dos arquivos:**
+- Aplicação: `$HOME/.moinex/`
+- Base de dados: `$HOME/.moinex/data/`
+- Logs: `$HOME/.local/state/moinex`
 
 ## Desinstalação
 
-Para remover completamente o Moinex e todos os seus dados do seu sistema, execute o script de desinstalação:
+### Windows
+
+1. Abra **Configurações** do Windows
+2. Vá em **Aplicativos** → **Aplicativos instalados**
+3. Procure por **Moinex**
+4. Clique em **Desinstalar**
+5. Siga o assistente de desinstalação
+
+> [!WARNING]
+> A desinstalação remove a aplicação, mas seus dados em `%USERPROFILE%\.moinex\` são preservados. Para remover completamente, delete manualmente esta pasta após desinstalar.
+
+### Linux
+
+Execute o script de desinstalação:
 
 ```bash
 sh scripts/uninstall.sh
