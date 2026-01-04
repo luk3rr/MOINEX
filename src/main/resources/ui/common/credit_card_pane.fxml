@@ -37,7 +37,7 @@
                   </VBox>
                   <HBox alignment="CENTER_RIGHT" HBox.hgrow="NEVER">
                      <children>
-                        <MenuButton fx:id="addButton" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
+                        <MenuButton fx:id="addButton" maxWidth="40.0" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleAddDebt" text="%common.creditCard.addDebt" />
                               <MenuItem mnemonicParsing="false" onAction="#handleAddCredit" text="%common.creditCard.addCredit" />
@@ -50,7 +50,7 @@
                               </ImageView>
                            </graphic>
                         </MenuButton>
-                        <MenuButton fx:id="menuButton" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
+                        <MenuButton fx:id="menuButton" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleEditCreditCard" text="%common.creditCard.edit" />
                               <MenuItem mnemonicParsing="false" onAction="#handleArchiveCreditCard" text="%common.creditCard.archive" />

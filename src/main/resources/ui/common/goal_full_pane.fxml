@@ -34,7 +34,7 @@
                   </VBox>
                   <HBox alignment="CENTER_RIGHT" HBox.hgrow="NEVER">
                      <children>
-                        <MenuButton fx:id="addButton" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
+                        <MenuButton fx:id="addButton" maxWidth="40.0" minWidth="40.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
                             <MenuItem fx:id="addIncomeMenuItem" mnemonicParsing="false" onAction="#handleAddIncome" text="%common.goal.addIncome" />
                             <MenuItem fx:id="addExpenseMenuItem" mnemonicParsing="false" onAction="#handleAddExpense" text="%common.goal.addExpense" />
@@ -48,7 +48,7 @@
                               </ImageView>
                            </graphic>
                         </MenuButton>
-                        <MenuButton fx:id="menuButton" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
+                        <MenuButton fx:id="menuButton" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" stylesheets="@../../css/component/menu-button.css">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleEditGoal" text="%common.goal.edit" />
                               <MenuItem fx:id="toggleCompleteGoal" mnemonicParsing="false" onAction="#handleCompleteGoal" text="%common.goal.completeGoal" />
