@@ -30,3 +30,7 @@ buildNumber.properties
 *.log*
 *.idea
 .factorypath
+
+# Python embedded for Windows installer
+python-embedded/
+installer-output/

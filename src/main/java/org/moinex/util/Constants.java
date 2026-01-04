@@ -24,9 +24,35 @@ public final class Constants {
 
     public static final String SCRIPT_PATH = "/scripts/";
 
-    public static final String PYTHON_INTERPRETER = "/usr/bin/python3";
+    public static final String PYTHON_INTERPRETER = getPythonInterpreter();
 
     public static final String GET_STOCK_PRICE_SCRIPT = "get_stock_price.py";
+
+    /**
+     * Get the Python interpreter path based on the operating system
+     * For Windows with embedded Python, use the bundled interpreter
+     * For Linux/Mac, use the system Python
+     */
+    private static String getPythonInterpreter() {
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("win")) {
+            // Check if running from jpackage installation (embedded Python)
+            String appDir = System.getProperty("app.dir");
+            if (appDir != null) {
+                String embeddedPython = appDir + "\\python-embedded\\python.exe";
+                if (new java.io.File(embeddedPython).exists()) {
+                    return embeddedPython;
+                }
+            }
+
+            // Fallback to system Python on Windows
+            return "python";
+        } else {
+            // Linux/Mac
+            return "/usr/bin/python3";
+        }
+    }
 
     public static final String GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT =
             "get_brazilian_market_indicators.py";
