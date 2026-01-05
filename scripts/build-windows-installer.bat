@@ -80,11 +80,18 @@ if "%VERSION%"=="1.0-SNAPSHOT" (
     )
 )
 
+REM Copy Python embedded to target directory so jpackage can include it
+echo [INFO] Copiando Python embarcado para o diretorio target...
+if not exist "target\python-embedded" mkdir "target\python-embedded"
+xcopy /E /I /Y python-embedded\* target\python-embedded\
+
 echo [INFO] Gerando instalador Windows com jpackage...
 echo [INFO]   Versao: %VERSION%
 echo [INFO]   Isso pode levar alguns minutos...
 
 REM Run jpackage to create Windows installer
+REM Spring Boot JARs need to be launched with org.springframework.boot.loader.launch.JarLauncher
+REM --app-content includes additional files/directories in the application image
 jpackage ^
     --input target ^
     --name Moinex ^
@@ -96,21 +103,13 @@ jpackage ^
     --vendor "Lucas Araujo" ^
     --description "Aplicacao de gestao financeira pessoal" ^
     --icon docs\img\icons\moinex-icon.ico ^
+    --app-content target\python-embedded ^
     --win-dir-chooser ^
     --win-menu ^
     --win-shortcut ^
     --win-menu-group "Moinex" ^
     --java-options "-Xmx512m" ^
     --verbose
-
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Erro ao gerar o instalador.
-    exit /b 1
-)
-
-REM Copy Python embedded to the installation directory structure
-echo [INFO] Copiando Python embarcado para o diretorio de instalacao...
-xcopy /E /I /Y python-embedded "%OUTPUT_DIR%\Moinex\python-embedded"
 
 if %ERRORLEVEL% EQU 0 (
     echo.

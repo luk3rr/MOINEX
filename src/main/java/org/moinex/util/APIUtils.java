@@ -196,13 +196,20 @@ public class APIUtils {
             registerProcess(process);
 
             try (BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                            new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    BufferedReader errorReader =
+                            new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                
                 String output = reader.lines().collect(Collectors.joining());
+                String errorOutput = errorReader.lines().collect(Collectors.joining());
                 int exitCode = process.waitFor();
 
                 if (exitCode != 0) {
+                    logger.error("Python script failed with exit code: {}", exitCode);
+                    logger.error("Error output: {}", errorOutput);
                     throw new MoinexException.APIFetchException(
-                            "Error executing Python script. Exit code: " + exitCode);
+                            "Error executing Python script. Exit code: " + exitCode + 
+                            ". Error: " + errorOutput);
                 }
 
                 JSONObject jsonObject = new JSONObject(output);
@@ -234,7 +241,11 @@ public class APIUtils {
      * @param file The file to set permissions for
      */
     private static void setSecurePermissions(Path file) throws IOException {
-        // Set file permissions to be readable and writable only by the owner
-        Files.setPosixFilePermissions(file, PosixFilePermissions.fromString("rw-------"));
+        String os = System.getProperty("os.name").toLowerCase();
+        
+        if (!os.contains("win")) {
+            Files.setPosixFilePermissions(file, PosixFilePermissions.fromString("rw-------"));
+        }
+        // On Windows, temp files are already created with restricted permissions by default
     }
 }
