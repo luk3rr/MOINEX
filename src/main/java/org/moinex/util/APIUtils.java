@@ -199,17 +199,20 @@ public class APIUtils {
                             new BufferedReader(new InputStreamReader(process.getInputStream()));
                     BufferedReader errorReader =
                             new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                
+
                 String output = reader.lines().collect(Collectors.joining());
                 String errorOutput = errorReader.lines().collect(Collectors.joining());
                 int exitCode = process.waitFor();
 
                 if (exitCode != 0) {
                     logger.error("Python script failed with exit code: {}", exitCode);
-                    logger.error("Error output: {}", errorOutput);
+
+                    if (!errorOutput.isEmpty()) {
+                        logger.debug("Error output: {}", errorOutput);
+                    }
+
                     throw new MoinexException.APIFetchException(
-                            "Error executing Python script. Exit code: " + exitCode + 
-                            ". Error: " + errorOutput);
+                            "Error executing Python script. Exit code: " + exitCode);
                 }
 
                 JSONObject jsonObject = new JSONObject(output);
@@ -242,7 +245,7 @@ public class APIUtils {
      */
     private static void setSecurePermissions(Path file) throws IOException {
         String os = System.getProperty("os.name").toLowerCase();
-        
+
         if (!os.contains("win")) {
             Files.setPosixFilePermissions(file, PosixFilePermissions.fromString("rw-------"));
         }

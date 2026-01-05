@@ -15,14 +15,11 @@ import java.time.temporal.ChronoUnit;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.moinex.util.enums.TickerType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Constants used in the application
  */
 public final class Constants {
-    private static final Logger logger = LoggerFactory.getLogger(Constants.class);
     public static final String APP_NAME = "Moinex";
 
     public static final String SCRIPT_PATH = "/scripts/";
@@ -42,44 +39,23 @@ public final class Constants {
         if (os.contains("win")) {
             // Check if running from jpackage installation (embedded Python)
             String appPath = System.getProperty("jpackage.app-path");
-            
-            // Use System.out for early initialization logging since logger may not be ready
-            System.out.println("[Constants] OS: " + os);
-            System.out.println("[Constants] jpackage.app-path: " + appPath);
 
             if (appPath != null) {
                 // Running from jpackage installation
                 java.io.File appDir = new java.io.File(appPath).getParentFile();
-                System.out.println("[Constants] App directory: " + (appDir != null ? appDir.getAbsolutePath() : "null"));
-                
+
                 if (appDir != null) {
                     String embeddedPython =
                             new java.io.File(appDir, "python-embedded\\python.exe")
                                     .getAbsolutePath();
-                    System.out.println("[Constants] Checking for embedded Python at: " + embeddedPython);
-                    
+
                     if (new java.io.File(embeddedPython).exists()) {
-                        System.out.println("[Constants] ✓ Using embedded Python: " + embeddedPython);
                         return embeddedPython;
-                    } else {
-                        System.out.println("[Constants] ✗ Embedded Python not found at: " + embeddedPython);
-                        
-                        // List contents of app directory for debugging
-                        java.io.File[] files = appDir.listFiles();
-                        if (files != null) {
-                            System.out.println("[Constants] Contents of app directory:");
-                            for (java.io.File file : files) {
-                                System.out.println("[Constants]   - " + file.getName());
-                            }
-                        }
                     }
                 }
-            } else {
-                System.out.println("[Constants] Not running from jpackage (jpackage.app-path is null)");
             }
 
             // Fallback to system Python on Windows
-            System.out.println("[Constants] ⚠ Falling back to system Python - this may not work if Python is not in PATH");
             return "python";
         } else {
             // Linux/Mac

@@ -90,8 +90,6 @@ echo [INFO]   Versao: %VERSION%
 echo [INFO]   Isso pode levar alguns minutos...
 
 REM Run jpackage to create Windows installer
-REM Spring Boot JARs need to be launched with org.springframework.boot.loader.launch.JarLauncher
-REM --app-content includes additional files/directories in the application image
 jpackage ^
     --input target ^
     --name Moinex ^
@@ -102,13 +100,16 @@ jpackage ^
     --app-version "%VERSION%" ^
     --vendor "Lucas Araujo" ^
     --description "Aplicacao de gestao financeira pessoal" ^
+    --copyright "Copyright (c) 2024-2026 Lucas Araujo. Licensed under GPL-3.0" ^
     --icon docs\img\icons\moinex-icon.ico ^
     --app-content target\python-embedded ^
     --win-dir-chooser ^
     --win-menu ^
     --win-shortcut ^
+    --win-shortcut-prompt ^
     --win-menu-group "Moinex" ^
-    --java-options "-Xmx512m" ^
+    --win-update-url "https://github.com/luk3rr/MOINEX/releases" ^
+    --java-options "-Xmx1g" ^
     --verbose
 
 if %ERRORLEVEL% EQU 0 (
