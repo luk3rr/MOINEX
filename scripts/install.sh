@@ -131,10 +131,10 @@ else
     exit 1
 fi
 
-cp img/icons/moinex-icon-256.png "$DOT_LOCAL_DIR/share/icons/moinex-icon.png"
-cp img/icons/moinex-icon-128.png "$DOT_LOCAL_DIR/share/icons/moinex-icon-128.png"
-cp img/icons/moinex-icon-64.png "$DOT_LOCAL_DIR/share/icons/moinex-icon-64.png"
-cp img/icons/moinex-icon-32.png "$DOT_LOCAL_DIR/share/icons/moinex-icon-32.png"
+cp docs/img/icons/moinex-icon-256.png "$DOT_LOCAL_DIR/share/icons/moinex-icon.png"
+cp docs/img/icons/moinex-icon-128.png "$DOT_LOCAL_DIR/share/icons/moinex-icon-128.png"
+cp docs/img/icons/moinex-icon-64.png "$DOT_LOCAL_DIR/share/icons/moinex-icon-64.png"
+cp docs/img/icons/moinex-icon-32.png "$DOT_LOCAL_DIR/share/icons/moinex-icon-32.png"
 print_success ">> Ícones copiados"
 
 if cp docs/moinex.desktop "$DOT_LOCAL_DIR/share/applications/moinex.desktop"; then
