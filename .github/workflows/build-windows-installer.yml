@@ -41,14 +41,23 @@ jobs:
           .\scripts\build-windows-installer.bat
         shell: cmd
       
-      - name: Get version from pom.xml
+      - name: Get version from Git tag
         id: get_version
         run: |
-          $version = Select-Xml -Path "pom.xml" -XPath "/*[local-name()='project']/*[local-name()='version']/text()" | Select-Object -ExpandProperty Node | Select-Object -ExpandProperty Value
-          if ([string]::IsNullOrEmpty($version)) {
-            $version = "1.0.0"
+          # Try to get version from Git tag first
+          $gitTag = git describe --tags --abbrev=0 2>$null
+          if ($gitTag) {
+            # Remove 'v' prefix if present
+            $version = $gitTag -replace '^v', ''
+          } else {
+            # Fallback to pom.xml version
+            $version = Select-Xml -Path "pom.xml" -XPath "/*[local-name()='project']/*[local-name()='version']/text()" | Select-Object -ExpandProperty Node | Select-Object -ExpandProperty Value
+            if ([string]::IsNullOrEmpty($version) -or $version -eq "1.0-SNAPSHOT") {
+              $version = "1.0.0"
+            }
           }
           echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Using version: $version"
         shell: pwsh
       
       - name: Find installer file
@@ -56,8 +65,8 @@ jobs:
         run: |
           $installer = Get-ChildItem -Path "installer-output" -Filter "*.exe" | Select-Object -First 1
           if ($installer) {
-            echo "INSTALLER_PATH=$($installer.FullName)" >> $env:GITHUB_OUTPUT
             echo "INSTALLER_NAME=$($installer.Name)" >> $env:GITHUB_OUTPUT
+            echo "Found installer: $($installer.Name)"
           } else {
             echo "Installer not found!"
             exit 1
@@ -68,11 +77,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: moinex-windows-installer
-          path: ${{ steps.find_installer.outputs.INSTALLER_PATH }}
+          path: installer-output/*.exe
           retention-days: 90
       
       - name: Upload installer to release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ steps.find_installer.outputs.INSTALLER_PATH }}
+          files: installer-output/*.exe

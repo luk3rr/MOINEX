@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 REM Filename: build-windows-installer.bat
 REM Created on: January 4, 2026
 REM Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
@@ -64,8 +65,20 @@ REM Create output directory
 set OUTPUT_DIR=installer-output
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
-REM Set version (default if not found)
-set VERSION=1.0.0
+REM Extract version from pom.xml or use git tag
+for /f "tokens=*" %%i in ('powershell -Command "(Select-Xml -Path 'pom.xml' -XPath '/*[local-name()=''project'']/*[local-name()=''version'']/text()').Node.Value"') do set VERSION=%%i
+
+REM If version is empty or SNAPSHOT, try to get from git tag
+if "%VERSION%"=="" set VERSION=1.0.0
+if "%VERSION%"=="1.0-SNAPSHOT" (
+    for /f "tokens=*" %%i in ('git describe --tags --abbrev^=0 2^>nul') do set GIT_TAG=%%i
+    if not "!GIT_TAG!"=="" (
+        REM Remove 'v' prefix if present
+        set VERSION=!GIT_TAG:v=!
+    ) else (
+        set VERSION=1.0.0
+    )
+)
 
 echo [INFO] Gerando instalador Windows com jpackage...
 echo [INFO]   Versao: %VERSION%
