@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane minWidth="1200.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.GoalController">
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.GoalController">
    <children>
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -24,11 +24,11 @@
                      <children>
                         <VBox alignment="TOP_CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <AnchorPane minWidth="250.0" VBox.vgrow="ALWAYS">
+                              <AnchorPane minWidth="200.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <AnchorPane minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                                          <AnchorPane minWidth="280.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                              <children>
                                                 <Label styleClass="title" text="%goal.inProgress.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                                 <Text fontSmoothingType="LCD" layoutX="21.0" layoutY="367.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%goal.inProgress.footnote" textAlignment="CENTER" AnchorPane.bottomAnchor="10.0">
@@ -57,15 +57,15 @@
                                                       <Font />
                                                    </font>
                                                 </JFXButton>
-                                                <HBox minWidth="380.0" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
+                                                <HBox minWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                                    <children>
-                                                      <AnchorPane fx:id="inProgressPane1" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
-                                                      <AnchorPane fx:id="inProgressPane2" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
+                                                      <AnchorPane fx:id="inProgressPane1" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
+                                                      <AnchorPane fx:id="inProgressPane2" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                              </children>
                                           </AnchorPane>
-                                          <AnchorPane minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                                          <AnchorPane minWidth="280.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                                              <children>
                                                 <Label styleClass="title" text="%goal.accomplished.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                                 <JFXButton fx:id="accomplishedPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
@@ -86,10 +86,10 @@
                                                       </ImageView>
                                                    </graphic>
                                                 </JFXButton>
-                                                <HBox layoutX="108.0" minWidth="380.0" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
+                                                <HBox layoutX="108.0" minWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                                    <children>
-                                                      <AnchorPane fx:id="accomplishedPane1" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
-                                                      <AnchorPane fx:id="accomplishedPane2" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
+                                                      <AnchorPane fx:id="accomplishedPane1" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
+                                                      <AnchorPane fx:id="accomplishedPane2" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                              </children>

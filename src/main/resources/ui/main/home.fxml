@@ -15,14 +15,14 @@
    <children>
       <VBox fx:id="rootVBox" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane minHeight="250.0" VBox.vgrow="ALWAYS">
+            <AnchorPane minHeight="300.0">
                <children>
                   <HBox fx:id="rootHBoxUp" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane fx:id="walletPane" minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="walletPane" minWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="walletPaneTitle" styleClass="title" text="%home.wallet.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                              <JFXButton fx:id="walletPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
+                              <JFXButton fx:id="walletPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -30,7 +30,7 @@
                                        </image>
                                     </ImageView>
                                  </graphic></JFXButton>
-                              <JFXButton fx:id="walletNextButton" ellipsisString="" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="0.0">
+                              <JFXButton fx:id="walletNextButton" ellipsisString="" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -41,18 +41,18 @@
                                  <font>
                                     <Font />
                                  </font></JFXButton>
-                              <HBox minWidth="380.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
+                              <HBox minWidth="260.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                  <children>
-                                    <AnchorPane fx:id="walletView1" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
-                                    <AnchorPane fx:id="walletView2" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="walletView1" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="walletView2" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="creditCardPane" minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="creditCardPane" minWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="creditCardPaneTitle" styleClass="title" text="%home.creditCard.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                              <JFXButton fx:id="creditCardPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="60.0">
+                              <JFXButton fx:id="creditCardPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -60,7 +60,7 @@
                                        </image>
                                     </ImageView>
                                  </graphic></JFXButton>
-                              <JFXButton fx:id="creditCardNextButton" graphicTextGap="0.0" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="0.0">
+                              <JFXButton fx:id="creditCardNextButton" graphicTextGap="0.0" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -68,15 +68,15 @@
                                        </image>
                                     </ImageView>
                                  </graphic></JFXButton>
-                              <HBox layoutX="108.0" minWidth="380.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
+                              <HBox layoutX="108.0" minWidth="260.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                  <children>
-                                    <AnchorPane fx:id="creditCardView1" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
-                                    <AnchorPane fx:id="creditCardView2" minHeight="125.0" minWidth="170.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="creditCardView1" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="creditCardView2" minHeight="125.0" minWidth="120.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="monthResumePane" minWidth="390.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="monthResumePane" maxWidth="500.0" minWidth="300.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="monthResumePaneTitle" styleClass="title" text="Resume" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <AnchorPane fx:id="monthResumeView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
@@ -86,17 +86,17 @@
                   </HBox>
                </children>
             </AnchorPane>
-            <AnchorPane minHeight="600.0" VBox.vgrow="ALWAYS">
+            <AnchorPane minHeight="400.0" VBox.vgrow="ALWAYS">
                <children>
                   <HBox fx:id="rootHBoxBottom" maxWidth="1.7976931348623157E308" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane fx:id="graphPane" minWidth="700.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="graphPane" minWidth="800.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="graphTitle" layoutX="32.0" layoutY="10.0" styleClass="title" text="%home.moneyFlow.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                              <AnchorPane fx:id="moneyFlowBarChartAnchorPane" layoutX="52.0" layoutY="142.0" minWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+                              <AnchorPane fx:id="moneyFlowBarChartAnchorPane" layoutX="52.0" layoutY="142.0" minWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="lastTransactionsPane" maxWidth="500.0" minWidth="420.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="lastTransactionsPane" maxWidth="500.0" minWidth="300.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="lastTransactionsPaneTitle" layoutX="10.0" layoutY="17.0" styleClass="title" text="%home.transactions.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <TableView fx:id="transactionsTableView" stylesheets="@../../css/component/table-view.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">

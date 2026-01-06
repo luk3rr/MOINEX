@@ -67,3 +67,9 @@
 .allocation-diff-critical-high {
   -fx-text-fill: #dc3545;
 }
+
+.chart-legend {
+  -fx-background-color: transparent;
+  -fx-font-size: 12px;
+  -fx-text-fill: #555;
+}

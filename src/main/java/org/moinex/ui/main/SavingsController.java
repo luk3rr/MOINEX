@@ -41,9 +41,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
@@ -145,8 +143,6 @@ public class SavingsController {
 
     @FXML private AnchorPane pieChartAnchorPane;
 
-    @FXML private VBox pieChartLegendVBox;
-
     @FXML private Text overviewTotalInvestedField;
 
     @FXML private Text overviewTabGainsField;
@@ -202,9 +198,6 @@ public class SavingsController {
     private BigDecimal netCapitalInvested;
     private BigDecimal currentValue;
 
-    private Map<String, BigDecimal> currentInvestmentByType;
-    private BigDecimal currentTotalInvestment;
-
     private static final int TOP_PERFORMERS_LIMIT = 5;
 
     private static final int ALLOCATION_PANEL_CONTAINER_SPACING = 10;
@@ -214,7 +207,6 @@ public class SavingsController {
     private static final int ALLOCATION_INFO_BOX_SPACING = 10;
     private static final double ALLOCATION_PROGRESS_BAR_HEIGHT = 10.0;
     private static final double ALLOCATION_FILLED_BAR_HEIGHT = 20.0;
-    private static final int ALLOCATION_ITEMS_PER_COLUMN = 3;
     private static final double PERCENTAGE_DIVISOR = 100.0;
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
@@ -1160,7 +1152,6 @@ public class SavingsController {
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
         doughnutChart.setI18nService(i18nService);
         doughnutChart.setLabelsVisible(false);
-        doughnutChart.setLegendVisible(false);
 
         for (PieChart.Data data : doughnutChart.getData()) {
             Node node = data.getNode();
@@ -1191,54 +1182,6 @@ public class SavingsController {
         AnchorPane.setBottomAnchor(doughnutChart, 0.0);
         AnchorPane.setLeftAnchor(doughnutChart, 0.0);
         AnchorPane.setRightAnchor(doughnutChart, 0.0);
-
-        currentInvestmentByType = investmentByType;
-        currentTotalInvestment = totalInvestment;
-        updateChartLegend();
-    }
-
-    /**
-     * Creates a custom legend and populates it in the designated VBox.
-     */
-    private void updateChartLegend() {
-        pieChartLegendVBox.getChildren().clear();
-
-        if (currentInvestmentByType == null || currentInvestmentByType.isEmpty()) {
-            return;
-        }
-
-        int index = 0;
-
-        for (Map.Entry<String, BigDecimal> entry : currentInvestmentByType.entrySet()) {
-            if (entry.getValue().compareTo(BigDecimal.ZERO) <= 0) {
-                continue;
-            }
-
-            HBox legendItem = new HBox(5);
-            legendItem.setAlignment(Pos.CENTER_LEFT);
-
-            Rectangle colorRect = new Rectangle(10, 10);
-            colorRect.getStyleClass().addAll(Constants.CHARTS_LEGEND_RECT_STYLE, "data" + index);
-
-            BigDecimal percentage =
-                    entry.getValue()
-                            .divide(currentTotalInvestment, 4, java.math.RoundingMode.HALF_UP)
-                            .multiply(new BigDecimal("100"));
-
-            Label legendLabel =
-                    new Label(
-                            entry.getKey()
-                                    + " ("
-                                    + UIUtils.formatCurrency(entry.getValue())
-                                    + " | "
-                                    + UIUtils.formatPercentage(percentage, i18nService)
-                                    + ")");
-
-            legendItem.getChildren().addAll(colorRect, legendLabel);
-            pieChartLegendVBox.getChildren().add(legendItem);
-
-            index++;
-        }
     }
 
     /**
@@ -1446,7 +1389,6 @@ public class SavingsController {
 
         VBox metricsContainer = new VBox(10);
         metricsContainer.setAlignment(Pos.CENTER);
-        metricsContainer.setStyle("-fx-padding: 10;");
 
         VBox metricsBox = new VBox(8);
         metricsBox.setAlignment(Pos.CENTER_LEFT);
@@ -1772,8 +1714,14 @@ public class SavingsController {
 
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setPercentWidth(50);
+        col1.setMinWidth(20);
+        col1.setHgrow(javafx.scene.layout.Priority.ALWAYS);
+
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setPercentWidth(50);
+        col2.setMinWidth(20);
+        col2.setHgrow(javafx.scene.layout.Priority.ALWAYS);
+
         gridPane.getColumnConstraints().addAll(col1, col2);
 
         VBox leftColumn = new VBox(ALLOCATION_PANEL_ITEMS_SPACING);
@@ -1845,13 +1793,8 @@ public class SavingsController {
                         UIUtils.formatPercentage(allocation.currentPercentage(), i18nService)
                                 + " / "
                                 + UIUtils.formatPercentage(
-                                        allocation.targetPercentage(), i18nService)
-                                + " ("
-                                + i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_ALLOCATION_TARGET)
-                                + ")");
+                                        allocation.targetPercentage(), i18nService));
         currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
-        currentLabel.setMinWidth(Region.USE_PREF_SIZE);
 
         javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
@@ -1859,7 +1802,6 @@ public class SavingsController {
         String statusText = getStatusText(allocation);
         Label statusLabel = new Label(statusText);
         statusLabel.getStyleClass().add(Constants.ALLOCATION_DIFF_LABEL_STYLE);
-        statusLabel.setMinWidth(Region.USE_PREF_SIZE);
 
         if (!allocation.isNotInStrategy()) {
             if (allocation.isCriticalLow()) {

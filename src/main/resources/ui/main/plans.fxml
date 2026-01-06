@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minWidth="1200.0" stylesheets="@../../css/component/charts.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.PlanController">
+<AnchorPane stylesheets="@../../css/component/charts.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.PlanController">
    <children>
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -79,13 +79,13 @@
                               </AnchorPane>
                            </children>
                         </VBox>
-                        <AnchorPane minHeight="400.0" minWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane minHeight="300.0" minWidth="300.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label styleClass="title" text="%plan.planDistribution.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
                                  <children>
-                                    <AnchorPane fx:id="pieChartAnchorPane" minWidth="500.0" HBox.hgrow="ALWAYS" />
-                                    <VBox fx:id="budgetGroupVBox" alignment="CENTER_LEFT" minWidth="250.0" spacing="10.0" />
+                                    <AnchorPane fx:id="pieChartAnchorPane" minWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <VBox fx:id="budgetGroupVBox" alignment="CENTER_LEFT" minWidth="150.0" spacing="10.0" />
                                  </children>
                               </HBox>
                            </children>
@@ -121,9 +121,9 @@
                               </JFXButton>
                               <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                  <children>
-                                    <AnchorPane fx:id="budgetGroupPane1" minHeight="150.0" minWidth="250.0" HBox.hgrow="ALWAYS" />
-                                    <AnchorPane fx:id="budgetGroupPane2" minHeight="150.0" minWidth="250.0" HBox.hgrow="ALWAYS" />
-                                    <AnchorPane fx:id="budgetGroupPane3" minHeight="150.0" minWidth="250.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="budgetGroupPane1" minHeight="150.0" minWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="budgetGroupPane2" minHeight="150.0" minWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <AnchorPane fx:id="budgetGroupPane3" minHeight="150.0" minWidth="200.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                            </children>
