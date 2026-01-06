@@ -46,9 +46,12 @@ import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.DoughnutChart;
-import org.moinex.dto.AllocationDTO;
-import org.moinex.dto.ProfitabilityMetricsDTO;
-import org.moinex.dto.TickerPerformanceDTO;
+import org.moinex.model.dto.AllocationDTO;
+import org.moinex.model.dto.ProfitabilityMetricsDTO;
+import org.moinex.model.dto.TickerPerformanceDTO;
+import org.moinex.model.enums.AssetType;
+import org.moinex.model.enums.BondType;
+import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.*;
 import org.moinex.service.BondService;
 import org.moinex.service.I18nService;
@@ -60,9 +63,6 @@ import org.moinex.ui.dialog.investment.*;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.AssetType;
-import org.moinex.util.enums.BondType;
-import org.moinex.util.enums.TickerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1022,7 +1022,7 @@ public class SavingsController {
                 UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months(), i18nService));
 
         brazilianMarketIndicatorsLastUpdateValue.setText(
-                UIUtils.formatDateForDisplay(
+                UIUtils.formatDateTimeForDisplay(
                         brazilianMarketIndicators.getLastUpdate(), i18nService));
     }
 
@@ -1062,11 +1062,11 @@ public class SavingsController {
                 UIUtils.formatCurrency(marketQuotesAndCommodities.getOilBrent()));
 
         marketQuotesLastUpdateValue.setText(
-                UIUtils.formatDateForDisplay(
+                UIUtils.formatDateTimeForDisplay(
                         marketQuotesAndCommodities.getLastUpdate(), i18nService));
 
         commoditiesLastUpdateValue.setText(
-                UIUtils.formatDateForDisplay(
+                UIUtils.formatDateTimeForDisplay(
                         marketQuotesAndCommodities.getLastUpdate(), i18nService));
     }
 

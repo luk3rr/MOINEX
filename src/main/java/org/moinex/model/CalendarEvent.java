@@ -20,8 +20,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.moinex.model.enums.CalendarEventType;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.CalendarEventType;
 
 /**
  * Represents an event in the calendar

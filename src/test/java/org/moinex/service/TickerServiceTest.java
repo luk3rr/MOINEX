@@ -34,14 +34,14 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
+import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.investment.*;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.*;
 import org.moinex.util.APIUtils;
-import org.moinex.util.enums.TickerType;
-import org.moinex.util.enums.TransactionStatus;
-import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class TickerServiceTest {

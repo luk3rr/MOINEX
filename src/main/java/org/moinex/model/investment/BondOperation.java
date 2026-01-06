@@ -23,8 +23,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.moinex.model.enums.OperationType;
 import org.moinex.model.wallettransaction.WalletTransaction;
-import org.moinex.util.enums.OperationType;
 
 @Entity
 @Table(name = "bond_operation")

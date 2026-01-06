@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.I18nService;
@@ -23,7 +24,6 @@ import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 

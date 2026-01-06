@@ -17,15 +17,15 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.enums.BondType;
+import org.moinex.model.enums.InterestIndex;
+import org.moinex.model.enums.InterestType;
 import org.moinex.model.investment.Bond;
 import org.moinex.service.BondService;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.BondType;
-import org.moinex.util.enums.InterestIndex;
-import org.moinex.util.enums.InterestType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

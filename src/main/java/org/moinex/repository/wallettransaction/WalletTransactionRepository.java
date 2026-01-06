@@ -8,8 +8,8 @@ package org.moinex.repository.wallettransaction;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
-import org.moinex.util.enums.TransactionType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

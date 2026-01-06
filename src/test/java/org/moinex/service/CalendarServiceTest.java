@@ -17,8 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.model.CalendarEvent;
+import org.moinex.model.enums.CalendarEventType;
 import org.moinex.repository.CalendarEventRepository;
-import org.moinex.util.enums.CalendarEventType;
 
 @ExtendWith(MockitoExtension.class)
 class CalendarServiceTest {

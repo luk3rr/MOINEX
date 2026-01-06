@@ -12,12 +12,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

@@ -19,6 +19,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
+import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -31,8 +33,6 @@ import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.TransactionStatus;
-import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

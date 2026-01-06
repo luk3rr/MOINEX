@@ -7,8 +7,8 @@
 package org.moinex.repository.investment;
 
 import java.util.List;
+import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.Ticker;
-import org.moinex.util.enums.TickerType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -4,12 +4,12 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.dto;
+package org.moinex.model.dto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import org.moinex.model.enums.AssetType;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.AssetType;
 
 public record AllocationDTO(
         AssetType assetType,

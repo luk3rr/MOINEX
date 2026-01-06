@@ -28,13 +28,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.*;
+import org.moinex.model.enums.CreditCardCreditType;
+import org.moinex.model.enums.CreditCardInvoiceStatus;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.repository.CategoryRepository;
 import org.moinex.repository.creditcard.*;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.CreditCardCreditType;
-import org.moinex.util.enums.CreditCardInvoiceStatus;
 
 @ExtendWith(MockitoExtension.class)
 class CreditCardServiceTest {

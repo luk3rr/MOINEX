@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.error.MoinexException;
+import org.moinex.model.enums.GoalFundingStrategy;
 import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
@@ -30,7 +31,6 @@ import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.repository.wallettransaction.WalletTypeRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.GoalFundingStrategy;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {

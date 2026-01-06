@@ -24,15 +24,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
+import org.moinex.model.enums.RecurringTransactionFrequency;
+import org.moinex.model.enums.RecurringTransactionStatus;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.RecurringTransactionFrequency;
-import org.moinex.util.enums.RecurringTransactionStatus;
-import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class RecurringTransactionServiceTest {

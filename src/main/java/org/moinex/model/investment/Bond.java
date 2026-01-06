@@ -23,10 +23,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.moinex.model.enums.BondType;
+import org.moinex.model.enums.InterestIndex;
+import org.moinex.model.enums.InterestType;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.BondType;
-import org.moinex.util.enums.InterestIndex;
-import org.moinex.util.enums.InterestType;
 
 /**
  * Class that represents a bond

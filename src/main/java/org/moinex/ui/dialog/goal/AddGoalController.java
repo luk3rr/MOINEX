@@ -16,13 +16,13 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
+import org.moinex.model.enums.GoalFundingStrategy;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.GoalFundingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

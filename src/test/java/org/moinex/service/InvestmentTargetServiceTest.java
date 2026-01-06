@@ -19,10 +19,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.moinex.model.enums.AssetType;
+import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.repository.investment.InvestmentTargetRepository;
-import org.moinex.util.enums.AssetType;
-import org.moinex.util.enums.TickerType;
 
 @ExtendWith(MockitoExtension.class)
 class InvestmentTargetServiceTest {

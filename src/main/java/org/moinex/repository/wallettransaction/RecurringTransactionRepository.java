@@ -7,8 +7,8 @@
 package org.moinex.repository.wallettransaction;
 
 import java.util.List;
+import org.moinex.model.enums.RecurringTransactionStatus;
 import org.moinex.model.wallettransaction.RecurringTransaction;
-import org.moinex.util.enums.RecurringTransactionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

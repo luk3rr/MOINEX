@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.*;
 import org.moinex.model.Category;
-import org.moinex.util.enums.BudgetGroupTransactionFilter;
+import org.moinex.model.enums.BudgetGroupTransactionFilter;
 
 @Entity
 @Table(name = "budget_group")

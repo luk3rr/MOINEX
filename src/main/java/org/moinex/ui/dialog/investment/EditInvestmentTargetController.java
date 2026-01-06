@@ -17,13 +17,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.service.I18nService;
 import org.moinex.service.InvestmentTargetService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.AssetType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

@@ -12,18 +12,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
+import org.moinex.chart.BudgetGroupTimelineChart;
 import org.moinex.chart.DoughnutChart;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
@@ -59,7 +56,7 @@ public class PlanController {
     @FXML private AnchorPane budgetGroupPane2;
     @FXML private AnchorPane budgetGroupPane3;
 
-    @FXML private VBox budgetGroupVBox;
+    @FXML private AnchorPane timelineChartAnchorPane;
 
     private ConfigurableApplicationContext springContext;
     private FinancialPlanningService financialPlanningService;
@@ -68,6 +65,7 @@ public class PlanController {
     private FinancialPlan currentPlan;
     private List<FinancialPlanningService.PlanStatusDTO> currentPlanStatus;
     private int currentPage = 0;
+    private final int historicalDataMonths = 12;
 
     @Autowired
     public PlanController(
@@ -205,6 +203,7 @@ public class PlanController {
             updateDoughnutChart();
             currentPage = 0;
             updateBudgetGroupPanes();
+            updateTimelineChart();
 
         } catch (EntityNotFoundException e) {
             logger.warn("Financial plan not found. Please create a new plan.");
@@ -227,7 +226,7 @@ public class PlanController {
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
         doughnutChart.setI18nService(i18nService);
         doughnutChart.setShowCenterLabel(false);
-        doughnutChart.setLegendVisible(false);
+        doughnutChart.setLegendVisible(true);
         doughnutChart.setLabelsVisible(false);
 
         for (PieChart.Data data : doughnutChart.getData()) {
@@ -259,8 +258,6 @@ public class PlanController {
         AnchorPane.setBottomAnchor(doughnutChart, 0.0);
         AnchorPane.setLeftAnchor(doughnutChart, 0.0);
         AnchorPane.setRightAnchor(doughnutChart, 0.0);
-
-        updateChartLegend();
     }
 
     /**
@@ -310,32 +307,36 @@ public class PlanController {
         }
     }
 
-    /**
-     * Creates a custom legend and populates it in the designated VBox.
-     */
-    private void updateChartLegend() {
-        budgetGroupVBox.getChildren().clear();
-
-        int index = 0;
-
-        for (FinancialPlanningService.PlanStatusDTO status : currentPlanStatus) {
-            HBox legendItem = new HBox(5);
-            legendItem.setAlignment(Pos.CENTER_LEFT);
-
-            Rectangle colorRect = new Rectangle(10, 10);
-            colorRect.getStyleClass().addAll(Constants.CHARTS_LEGEND_RECT_STYLE, "data" + index);
-
-            Label legendLabel =
-                    new Label(
-                            String.format(
-                                    "%s (%.0f%%)",
-                                    status.group().getName(),
-                                    status.group().getTargetPercentage()));
-
-            legendItem.getChildren().addAll(colorRect, legendLabel);
-            budgetGroupVBox.getChildren().add(legendItem);
-
-            index++;
+    private void updateTimelineChart() {
+        if (currentPlan == null) {
+            return;
         }
+
+        YearMonth currentPeriod = periodComboBox.getValue();
+        if (currentPeriod == null) {
+            return;
+        }
+
+        YearMonth startPeriod = currentPeriod.minusMonths(historicalDataMonths);
+        YearMonth endPeriod = currentPeriod;
+
+        List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                financialPlanningService.getHistoricalData(
+                        currentPlan.getId(), startPeriod, endPeriod);
+
+        BudgetGroupTimelineChart timelineChart = new BudgetGroupTimelineChart();
+        timelineChart.setI18nService(i18nService);
+        timelineChart.setXAxisLabel(i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_X_AXIS));
+        timelineChart.setYAxisLabel(i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_Y_AXIS));
+        timelineChart.updateData(historicalData);
+
+        UIUtils.applyDefaultChartStyle(timelineChart);
+
+        timelineChartAnchorPane.getChildren().clear();
+        timelineChartAnchorPane.getChildren().add(timelineChart);
+        AnchorPane.setTopAnchor(timelineChart, 0.0);
+        AnchorPane.setBottomAnchor(timelineChart, 0.0);
+        AnchorPane.setLeftAnchor(timelineChart, 0.0);
+        AnchorPane.setRightAnchor(timelineChart, 0.0);
     }
 }

@@ -22,6 +22,8 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
+import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -29,8 +31,6 @@ import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.TransactionStatus;
-import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class WalletTransactionServiceTest {

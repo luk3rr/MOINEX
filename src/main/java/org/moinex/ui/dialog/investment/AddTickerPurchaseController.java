@@ -15,6 +15,8 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
+import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
@@ -23,8 +25,6 @@ import org.moinex.service.WalletService;
 import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
-import org.moinex.util.enums.TransactionStatus;
-import org.moinex.util.enums.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

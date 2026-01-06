@@ -9,7 +9,7 @@ package org.moinex.model.investment;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.*;
-import org.moinex.util.enums.AssetType;
+import org.moinex.model.enums.AssetType;
 
 @Entity
 @Table(name = "investment_target")

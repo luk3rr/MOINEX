@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.moinex.util.enums.CreditCardCreditType;
+import org.moinex.model.enums.CreditCardCreditType;
 
 /**
  * Represents a credit card credit

@@ -4,7 +4,7 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.util.enums;
+package org.moinex.model.enums;
 
 /**
  * ENUM that represents the transaction type filter for budget groups

@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.moinex.model.Category;
+import org.moinex.model.enums.BudgetGroupTransactionFilter;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
@@ -18,8 +20,6 @@ import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
-import org.moinex.util.enums.BudgetGroupTransactionFilter;
-import org.moinex.util.enums.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,5 +286,52 @@ public class FinancialPlanningService {
                                         "No active financial plan found. Please create one."));
     }
 
+    /**
+     * Gets historical spending data for all budget groups in a plan over multiple months
+     *
+     * @param planId The ID of the financial plan
+     * @param startPeriod The starting month (inclusive)
+     * @param endPeriod The ending month (inclusive)
+     * @return List of historical data points for each budget group and month
+     */
+    @Transactional(readOnly = true)
+    public List<BudgetGroupHistoricalDataDTO> getHistoricalData(
+            Integer planId, YearMonth startPeriod, YearMonth endPeriod) {
+        FinancialPlan plan =
+                financialPlanRepository
+                        .findById(planId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Financial plan with ID " + planId + " not found"));
+
+        List<BudgetGroupHistoricalDataDTO> historicalData = new java.util.ArrayList<>();
+
+        for (YearMonth period = startPeriod;
+                !period.isAfter(endPeriod);
+                period = period.plusMonths(1)) {
+            List<PlanStatusDTO> statusList = getPlanStatus(planId, period);
+
+            for (PlanStatusDTO status : statusList) {
+                BigDecimal targetAmount =
+                        plan.getBaseIncome()
+                                .multiply(status.group().getTargetPercentage())
+                                .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+
+                historicalData.add(
+                        new BudgetGroupHistoricalDataDTO(
+                                status.group().getName(),
+                                period,
+                                status.spentAmount(),
+                                targetAmount));
+            }
+        }
+
+        return historicalData;
+    }
+
     public record PlanStatusDTO(BudgetGroup group, BigDecimal spentAmount) {}
+
+    public record BudgetGroupHistoricalDataDTO(
+            String groupName, YearMonth period, BigDecimal spentAmount, BigDecimal targetAmount) {}
 }

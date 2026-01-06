@@ -4,7 +4,7 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.dto;
+package org.moinex.model.dto;
 
 import java.math.BigDecimal;
 

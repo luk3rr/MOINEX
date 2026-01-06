@@ -8,8 +8,8 @@ package org.moinex.repository.investment;
 
 import java.util.List;
 import java.util.Optional;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.InvestmentTarget;
-import org.moinex.util.enums.AssetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

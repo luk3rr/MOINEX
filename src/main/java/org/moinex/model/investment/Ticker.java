@@ -22,8 +22,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.moinex.model.enums.TickerType;
 import org.moinex.util.Constants;
-import org.moinex.util.enums.TickerType;
 
 /**
  * Class that represents a ticker

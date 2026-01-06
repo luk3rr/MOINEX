@@ -28,17 +28,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.model.Category;
+import org.moinex.model.enums.BondType;
+import org.moinex.model.enums.InterestIndex;
+import org.moinex.model.enums.InterestType;
+import org.moinex.model.enums.OperationType;
+import org.moinex.model.enums.TransactionStatus;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.BondOperationRepository;
 import org.moinex.repository.investment.BondRepository;
-import org.moinex.util.enums.BondType;
-import org.moinex.util.enums.InterestIndex;
-import org.moinex.util.enums.InterestType;
-import org.moinex.util.enums.OperationType;
-import org.moinex.util.enums.TransactionStatus;
 
 @ExtendWith(MockitoExtension.class)
 class BondServiceTest {

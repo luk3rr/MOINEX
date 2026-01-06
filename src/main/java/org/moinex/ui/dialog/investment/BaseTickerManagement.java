@@ -11,11 +11,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.enums.TickerType;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
-import org.moinex.util.enums.TickerType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

@@ -1,4 +1,4 @@
-package org.moinex.util.enums;
+package org.moinex.model.enums;
 
 public enum GoalFundingStrategy {
     NEW_DEPOSIT,

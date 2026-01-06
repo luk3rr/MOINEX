@@ -20,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.model.Category;
+import org.moinex.model.enums.BudgetGroupTransactionFilter;
+import org.moinex.model.enums.TransactionType;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
@@ -28,8 +30,6 @@ import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
-import org.moinex.util.enums.BudgetGroupTransactionFilter;
-import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
 class FinancialPlanningServiceTest {
@@ -663,6 +663,211 @@ class FinancialPlanningServiceTest {
             verify(walletTransactionRepository, never())
                     .getSumAmountByCategoriesAndDateBetween(
                             anyList(), eq(TransactionType.INCOME), anyString(), anyString());
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Historical Data Tests")
+    class GetHistoricalDataTests {
+
+        @Test
+        @DisplayName("Should return historical data for multiple months and budget groups")
+        void getHistoricalData_MultipleMonthsAndGroups_Success() {
+            YearMonth startPeriod = YearMonth.of(2025, 1);
+            YearMonth endPeriod = YearMonth.of(2025, 3);
+
+            when(financialPlanRepository.findById(financialPlan.getId()))
+                    .thenReturn(Optional.of(financialPlan));
+
+            // Mock getPlanStatus for each month
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("500.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("100.00"));
+
+            List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                    financialPlanningService.getHistoricalData(
+                            financialPlan.getId(), startPeriod, endPeriod);
+
+            assertNotNull(historicalData);
+            // 3 months * 2 budget groups = 6 data points
+            assertEquals(6, historicalData.size());
+
+            // Verify first data point
+            FinancialPlanningService.BudgetGroupHistoricalDataDTO firstData = historicalData.get(0);
+            assertEquals("Essentials", firstData.groupName());
+            assertEquals(YearMonth.of(2025, 1), firstData.period());
+            assertEquals(0, new BigDecimal("600.00").compareTo(firstData.spentAmount()));
+            assertEquals(
+                    0, new BigDecimal("1500.00").compareTo(firstData.targetAmount())); // 3000 * 50%
+        }
+
+        @Test
+        @DisplayName("Should return historical data for a single month")
+        void getHistoricalData_SingleMonth_Success() {
+            YearMonth period = YearMonth.of(2025, 7);
+
+            when(financialPlanRepository.findById(financialPlan.getId()))
+                    .thenReturn(Optional.of(financialPlan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("1000.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(BigDecimal.ZERO);
+
+            List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                    financialPlanningService.getHistoricalData(
+                            financialPlan.getId(), period, period);
+
+            assertNotNull(historicalData);
+            assertEquals(2, historicalData.size()); // 2 budget groups
+
+            // Verify data for first group
+            FinancialPlanningService.BudgetGroupHistoricalDataDTO data = historicalData.get(0);
+            assertEquals("Essentials", data.groupName());
+            assertEquals(period, data.period());
+            assertEquals(0, new BigDecimal("1000.00").compareTo(data.spentAmount()));
+            assertEquals(0, new BigDecimal("1500.00").compareTo(data.targetAmount()));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when plan is not found")
+        void getHistoricalData_PlanNotFound_ThrowsException() {
+            when(financialPlanRepository.findById(999)).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () ->
+                            financialPlanningService.getHistoricalData(
+                                    999, YearMonth.of(2025, 1), YearMonth.of(2025, 3)));
+        }
+
+        @Test
+        @DisplayName("Should calculate target amount correctly based on base income and percentage")
+        void getHistoricalData_CalculatesTargetAmountCorrectly() {
+            YearMonth period = YearMonth.of(2025, 7);
+
+            // Create a plan with specific base income
+            FinancialPlan testPlan =
+                    FinancialPlan.builder()
+                            .id(2)
+                            .name("Test Plan")
+                            .baseIncome(new BigDecimal("5000.00"))
+                            .budgetGroups(
+                                    List.of(
+                                            BudgetGroup.builder()
+                                                    .name("Test Group")
+                                                    .targetPercentage(new BigDecimal("30.00"))
+                                                    .categories(Set.of(category1))
+                                                    .transactionTypeFilter(
+                                                            BudgetGroupTransactionFilter.EXPENSE)
+                                                    .build()))
+                            .build();
+
+            when(financialPlanRepository.findById(2)).thenReturn(Optional.of(testPlan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("1200.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(BigDecimal.ZERO);
+
+            List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                    financialPlanningService.getHistoricalData(2, period, period);
+
+            assertEquals(1, historicalData.size());
+            FinancialPlanningService.BudgetGroupHistoricalDataDTO data = historicalData.get(0);
+
+            // Target should be 5000 * 30% = 1500.00
+            assertEquals(0, new BigDecimal("1500.00").compareTo(data.targetAmount()));
+        }
+
+        @Test
+        @DisplayName("Should return data in chronological order")
+        void getHistoricalData_ReturnsDataInChronologicalOrder() {
+            YearMonth startPeriod = YearMonth.of(2025, 1);
+            YearMonth endPeriod = YearMonth.of(2025, 3);
+
+            when(financialPlanRepository.findById(financialPlan.getId()))
+                    .thenReturn(Optional.of(financialPlan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("500.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(BigDecimal.ZERO);
+
+            List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                    financialPlanningService.getHistoricalData(
+                            financialPlan.getId(), startPeriod, endPeriod);
+
+            // Verify periods are in order
+            assertEquals(YearMonth.of(2025, 1), historicalData.get(0).period());
+            assertEquals(YearMonth.of(2025, 1), historicalData.get(1).period());
+            assertEquals(YearMonth.of(2025, 2), historicalData.get(2).period());
+            assertEquals(YearMonth.of(2025, 2), historicalData.get(3).period());
+            assertEquals(YearMonth.of(2025, 3), historicalData.get(4).period());
+            assertEquals(YearMonth.of(2025, 3), historicalData.get(5).period());
+        }
+
+        @Test
+        @DisplayName("Should handle 12-month period correctly")
+        void getHistoricalData_TwelveMonths_Success() {
+            YearMonth startPeriod = YearMonth.of(2024, 7);
+            YearMonth endPeriod = YearMonth.of(2025, 6);
+
+            when(financialPlanRepository.findById(financialPlan.getId()))
+                    .thenReturn(Optional.of(financialPlan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("800.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("200.00"));
+
+            List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                    financialPlanningService.getHistoricalData(
+                            financialPlan.getId(), startPeriod, endPeriod);
+
+            assertNotNull(historicalData);
+            // 12 months * 2 budget groups = 24 data points
+            assertEquals(24, historicalData.size());
+
+            // Verify first and last periods
+            assertEquals(YearMonth.of(2024, 7), historicalData.get(0).period());
+            assertEquals(YearMonth.of(2025, 6), historicalData.get(23).period());
+        }
+
+        @Test
+        @DisplayName("Should include all budget groups in each period")
+        void getHistoricalData_IncludesAllBudgetGroups() {
+            YearMonth period = YearMonth.of(2025, 7);
+
+            when(financialPlanRepository.findById(financialPlan.getId()))
+                    .thenReturn(Optional.of(financialPlan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), any(TransactionType.class), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("500.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(BigDecimal.ZERO);
+
+            List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+                    financialPlanningService.getHistoricalData(
+                            financialPlan.getId(), period, period);
+
+            // Should have data for both budget groups
+            Set<String> groupNames =
+                    historicalData.stream()
+                            .map(FinancialPlanningService.BudgetGroupHistoricalDataDTO::groupName)
+                            .collect(java.util.stream.Collectors.toSet());
+
+            assertTrue(groupNames.contains("Essentials"));
+            assertTrue(groupNames.contains("Savings"));
+            assertEquals(2, groupNames.size());
         }
     }
 }

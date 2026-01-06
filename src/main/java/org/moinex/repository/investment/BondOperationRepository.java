@@ -7,9 +7,9 @@
 package org.moinex.repository.investment;
 
 import java.util.List;
+import org.moinex.model.enums.OperationType;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BondOperation;
-import org.moinex.util.enums.OperationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

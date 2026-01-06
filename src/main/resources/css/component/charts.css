@@ -62,28 +62,25 @@
    Pie Chart (pie, doughnut)
    ============================================================ */
 
-/* GRUPO 1 – Azul → Verde (frio, base) */
+/* Pie chart colors matching timeline chart actual series */
 .chart-pie.data0  { -fx-pie-color: #2563eb; }
-.chart-pie.data1  { -fx-pie-color: #3b82f6; }
-.chart-pie.data2  { -fx-pie-color: #22c55e; }
-.chart-pie.data3  { -fx-pie-color: #16a34a; }
-.chart-pie.data4  { -fx-pie-color: #14532d; }
-
-/* GRUPO 2 – Verde → Amarelo */
-.chart-pie.data5  { -fx-pie-color: #4ade80; }
-.chart-pie.data6  { -fx-pie-color: #84cc16; }
-.chart-pie.data7  { -fx-pie-color: #eab308; }
+.chart-pie.data1  { -fx-pie-color: #22c55e; }
+.chart-pie.data2  { -fx-pie-color: #eab308; }
+.chart-pie.data3  { -fx-pie-color: #ef4444; }
+.chart-pie.data4  { -fx-pie-color: #a855f7; }
+.chart-pie.data5  { -fx-pie-color: #0ea5e9; }
+.chart-pie.data6  { -fx-pie-color: #3b82f6; }
+.chart-pie.data7  { -fx-pie-color: #16a34a; }
 .chart-pie.data8  { -fx-pie-color: #ca8a04; }
-.chart-pie.data9  { -fx-pie-color: #713f12; }
+.chart-pie.data9  { -fx-pie-color: #b91c1c; }
 
 .legend-color.data0  { -fx-fill: #2563eb; }
-.legend-color.data1  { -fx-fill: #3b82f6; }
-.legend-color.data2  { -fx-fill: #22c55e; }
-.legend-color.data3  { -fx-fill: #16a34a; }
-.legend-color.data4  { -fx-fill: #14532d; }
-
-.legend-color.data5  { -fx-fill: #4ade80; }
-.legend-color.data6  { -fx-fill: #84cc16; }
-.legend-color.data7  { -fx-fill: #eab308; }
+.legend-color.data1  { -fx-fill: #22c55e; }
+.legend-color.data2  { -fx-fill: #eab308; }
+.legend-color.data3  { -fx-fill: #ef4444; }
+.legend-color.data4  { -fx-fill: #a855f7; }
+.legend-color.data5  { -fx-fill: #0ea5e9; }
+.legend-color.data6  { -fx-fill: #3b82f6; }
+.legend-color.data7  { -fx-fill: #16a34a; }
 .legend-color.data8  { -fx-fill: #ca8a04; }
-.legend-color.data9  { -fx-fill: #713f12; }
+.legend-color.data9  { -fx-fill: #b91c1c; }

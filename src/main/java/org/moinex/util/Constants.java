@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import org.moinex.util.enums.TickerType;
+import org.moinex.model.enums.TickerType;
 
 /**
  * Constants used in the application
@@ -27,41 +27,6 @@ public final class Constants {
     public static final String PYTHON_INTERPRETER = getPythonInterpreter();
 
     public static final String GET_STOCK_PRICE_SCRIPT = "get_stock_price.py";
-
-    /**
-     * Get the Python interpreter path based on the operating system
-     * For Windows with embedded Python, use the bundled interpreter
-     * For Linux/Mac, use the system Python
-     */
-    private static String getPythonInterpreter() {
-        String os = System.getProperty("os.name").toLowerCase();
-
-        if (os.contains("win")) {
-            // Check if running from jpackage installation (embedded Python)
-            String appPath = System.getProperty("jpackage.app-path");
-
-            if (appPath != null) {
-                // Running from jpackage installation
-                java.io.File appDir = new java.io.File(appPath).getParentFile();
-
-                if (appDir != null) {
-                    String embeddedPython =
-                            new java.io.File(appDir, "python-embedded\\python.exe")
-                                    .getAbsolutePath();
-
-                    if (new java.io.File(embeddedPython).exists()) {
-                        return embeddedPython;
-                    }
-                }
-            }
-
-            // Fallback to system Python on Windows
-            return "python";
-        } else {
-            // Linux/Mac
-            return "/usr/bin/python3";
-        }
-    }
 
     public static final String GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT =
             "get_brazilian_market_indicators.py";
@@ -249,6 +214,8 @@ public final class Constants {
     public static final String PROGRESS_BAR_GREEN_COLOR_STYLE = "progress-bar-green";
 
     public static final String COMMON_STYLE_SHEET = CSS_COMMON_PATH + "common-styles.css";
+    public static final String TIMELINE_CHART_STYLE_SHEET =
+            CSS_COMPONENT_PATH + "timeline-chart.css";
 
     // Info styles from common-styles.css
     public static final String INFO_LABEL_RED_STYLE = "info-label-red";
@@ -1688,6 +1655,13 @@ public final class Constants {
                 "financialplanning.filter.expense";
         public static final String FINANCIALPLANNING_FILTER_BOTH = "financialplanning.filter.both";
 
+        // Financial Planning Timeline Chart
+        public static final String PLAN_TIMELINE_TITLE = "plan.timeline.title";
+        public static final String PLAN_TIMELINE_X_AXIS = "plan.timeline.xAxis";
+        public static final String PLAN_TIMELINE_Y_AXIS = "plan.timeline.yAxis";
+        public static final String PLAN_TIMELINE_ACTUAL = "plan.timeline.actual";
+        public static final String PLAN_TIMELINE_TARGET = "plan.timeline.target";
+
         // Goal Dialog Messages
         public static final String GOAL_DIALOG_EMPTY_FIELDS_TITLE = "goal.dialog.emptyFields.title";
         public static final String GOAL_DIALOG_EMPTY_FIELDS_MESSAGE =
@@ -2439,6 +2413,41 @@ public final class Constants {
             return price.setScale(2, RoundingMode.HALF_UP);
         } else {
             return price.setScale(INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP);
+        }
+    }
+
+    /**
+     * Get the Python interpreter path based on the operating system
+     * For Windows with embedded Python, use the bundled interpreter
+     * For Linux/Mac, use the system Python
+     */
+    private static String getPythonInterpreter() {
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("win")) {
+            // Check if running from jpackage installation (embedded Python)
+            String appPath = System.getProperty("jpackage.app-path");
+
+            if (appPath != null) {
+                // Running from jpackage installation
+                java.io.File appDir = new java.io.File(appPath).getParentFile();
+
+                if (appDir != null) {
+                    String embeddedPython =
+                            new java.io.File(appDir, "python-embedded\\python.exe")
+                                    .getAbsolutePath();
+
+                    if (new java.io.File(embeddedPython).exists()) {
+                        return embeddedPython;
+                    }
+                }
+            }
+
+            // Fallback to system Python on Windows
+            return "python";
+        } else {
+            // Linux/Mac
+            return "/usr/bin/python3";
         }
     }
 }

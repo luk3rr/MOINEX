@@ -1,0 +1,212 @@
+/* Timeline Chart Styling */
+
+.chart {
+    -fx-background-color: white;
+}
+
+.chart-content {
+    -fx-background-color: white;
+}
+
+.chart-plot-background {
+    -fx-background-color: white;
+}
+
+/* Legend symbols customization */
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 0 0;
+}
+
+.chart-legend-item {
+    -fx-padding: 5px;
+}
+
+.chart-legend-item-symbol {
+    -fx-padding: 0;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 3px;
+    -fx-min-width: 30px;
+    -fx-min-height: 3px;
+    -fx-max-width: 30px;
+    -fx-max-height: 3px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+/* Solid line symbols for actual/real series (even numbers) - using charts.css palette */
+.chart-legend-item-symbol.series0 {
+    -fx-background-color: #2563eb;
+}
+
+.chart-legend-item-symbol.series2 {
+    -fx-background-color: #22c55e;
+}
+
+.chart-legend-item-symbol.series4 {
+    -fx-background-color: #eab308;
+}
+
+.chart-legend-item-symbol.series6 {
+    -fx-background-color: #ef4444;
+}
+
+.chart-legend-item-symbol.series8 {
+    -fx-background-color: #a855f7;
+}
+
+.chart-legend-item-symbol.series10 {
+    -fx-background-color: #0ea5e9;
+}
+
+/* Dashed line symbols for target/meta series (odd numbers) */
+/* Using border-style for dashed effect */
+.chart-legend-item-symbol.series1 {
+    -fx-background-color: transparent;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+.chart-legend-item-symbol.series3 {
+    -fx-background-color: transparent;
+    -fx-border-color: #22c55e;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+.chart-legend-item-symbol.series5 {
+    -fx-background-color: transparent;
+    -fx-border-color: #eab308;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+.chart-legend-item-symbol.series7 {
+    -fx-background-color: transparent;
+    -fx-border-color: #ef4444;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+.chart-legend-item-symbol.series9 {
+    -fx-background-color: transparent;
+    -fx-border-color: #a855f7;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+.chart-legend-item-symbol.series11 {
+    -fx-background-color: transparent;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+/* Axis styling */
+.axis {
+    -fx-tick-label-fill: #666666;
+    -fx-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Grid lines */
+.chart-vertical-grid-lines {
+    -fx-stroke: #e0e0e0;
+    -fx-stroke-width: 0.5;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #e0e0e0;
+    -fx-stroke-width: 0.5;
+}
+
+/* Series line styling with color pairing - using charts.css palette */
+/* Actual series (solid lines) */
+.chart-series-line.series0 {
+    -fx-stroke: #2563eb;
+    -fx-stroke-width: 3;
+}
+
+.chart-series-line.series2 {
+    -fx-stroke: #22c55e;
+    -fx-stroke-width: 3;
+}
+
+.chart-series-line.series4 {
+    -fx-stroke: #eab308;
+    -fx-stroke-width: 3;
+}
+
+.chart-series-line.series6 {
+    -fx-stroke: #ef4444;
+    -fx-stroke-width: 3;
+}
+
+.chart-series-line.series8 {
+    -fx-stroke: #a855f7;
+    -fx-stroke-width: 3;
+}
+
+.chart-series-line.series10 {
+    -fx-stroke: #0ea5e9;
+    -fx-stroke-width: 3;
+}
+
+/* Target series (dashed lines) */
+.chart-series-line.series1 {
+    -fx-stroke: #2563eb;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.chart-series-line.series3 {
+    -fx-stroke: #22c55e;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.chart-series-line.series5 {
+    -fx-stroke: #eab308;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.chart-series-line.series7 {
+    -fx-stroke: #ef4444;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.chart-series-line.series9 {
+    -fx-stroke: #a855f7;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.chart-series-line.series11 {
+    -fx-stroke: #0ea5e9;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+/* Data point symbols - hidden */
+.chart-line-symbol {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
+.chart-tooltip {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-text-fill: white;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 11px;
+}
