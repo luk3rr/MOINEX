@@ -22,9 +22,9 @@
                <children>
                   <HBox layoutX="89.0" layoutY="40.0" minHeight="300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <VBox alignment="CENTER" spacing="10.0">
+                        <VBox alignment="CENTER" maxWidth="450.0" minWidth="350.0" prefWidth="400.0" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <VBox minWidth="350.0" prefWidth="350.0" spacing="10.0" VBox.vgrow="ALWAYS">
+                              <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <AnchorPane fx:id="totalDebts" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                        <children>
@@ -37,7 +37,7 @@
                               </VBox>
                            </children>
                         </VBox>
-                        <AnchorPane fx:id="barchart" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="barchart" minWidth="700.0" prefWidth="700.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>

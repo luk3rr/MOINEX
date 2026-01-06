@@ -19,9 +19,9 @@
                <children>
                   <HBox layoutX="89.0" layoutY="40.0" minHeight="300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <VBox alignment="CENTER" spacing="10.0">
+                        <VBox alignment="CENTER" maxWidth="450.0" minWidth="350.0" prefWidth="400.0" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <AnchorPane fx:id="totalBalancePane" minWidth="280.0" prefWidth="350.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                              <AnchorPane fx:id="totalBalancePane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
                                     <Label fx:id="totalBalancePaneTitle" styleClass="title" text="%wallet.totalBalance.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                     <ComboBox fx:id="totalBalancePaneWalletTypeComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
@@ -30,7 +30,7 @@
                               </AnchorPane>
                            </children>
                         </VBox>
-                        <AnchorPane fx:id="walletPane" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="walletPane" minWidth="700.0" prefWidth="700.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="walletPaneTitle" styleClass="title" text="%wallet.wallets.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <JFXButton fx:id="walletPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
