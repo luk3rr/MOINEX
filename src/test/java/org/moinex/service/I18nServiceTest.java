@@ -139,8 +139,10 @@ class I18nServiceTest {
             ResourceBundle bundle = i18nService.getBundle();
 
             assertNotNull(bundle);
-            // Should fallback to English
-            assertEquals(Locale.ENGLISH, bundle.getLocale());
+            // Should fallback to English (en or en_US)
+            assertTrue(
+                    bundle.getLocale().getLanguage().equals("en"),
+                    "Expected English locale but got: " + bundle.getLocale());
         }
 
         @Test

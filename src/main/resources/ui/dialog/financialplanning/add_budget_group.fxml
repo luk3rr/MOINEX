@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
@@ -38,6 +39,16 @@
                 </VBox>
             </children>
         </HBox>
+          <VBox alignment="CENTER">
+              <children>
+                  <Label text="%financialplanning.label.transactionTypeFilter">
+                      <font>
+                  <Font size="10.0" />
+               </font>
+                  </Label>
+                  <ComboBox fx:id="transactionTypeFilterComboBox" prefWidth="150.0" stylesheets="@../../../css/component/combo-box.css" />
+              </children>
+          </VBox>
 
         <!-- Category Association Section -->
         <TitledPane alignment="CENTER" animated="false" collapsible="false" text="%financialplanning.label.associatedCategories" textAlignment="CENTER" VBox.vgrow="ALWAYS">

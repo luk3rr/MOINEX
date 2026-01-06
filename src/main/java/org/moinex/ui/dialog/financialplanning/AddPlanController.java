@@ -11,6 +11,7 @@ import org.moinex.service.FinancialPlanningService;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.BudgetGroupTransactionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -167,12 +168,14 @@ public class AddPlanController extends BasePlanManagement {
                                         Constants.TranslationKeys
                                                 .FINANCIALPLANNING_TEMPLATE_ESSENTIALS))
                         .targetPercentage(BigDecimal.valueOf(50))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build(),
                 BudgetGroup.builder()
                         .name(
                                 i18nService.tr(
                                         Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS))
                         .targetPercentage(BigDecimal.valueOf(30))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build(),
                 BudgetGroup.builder()
                         .name(
@@ -180,6 +183,7 @@ public class AddPlanController extends BasePlanManagement {
                                         Constants.TranslationKeys
                                                 .FINANCIALPLANNING_TEMPLATE_INVESTMENTS))
                         .targetPercentage(BigDecimal.valueOf(20))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build());
     }
 
@@ -191,12 +195,14 @@ public class AddPlanController extends BasePlanManagement {
                                         Constants.TranslationKeys
                                                 .FINANCIALPLANNING_TEMPLATE_ESSENTIALS))
                         .targetPercentage(BigDecimal.valueOf(30))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build(),
                 BudgetGroup.builder()
                         .name(
                                 i18nService.tr(
                                         Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS))
                         .targetPercentage(BigDecimal.valueOf(30))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build(),
                 BudgetGroup.builder()
                         .name(
@@ -204,6 +210,7 @@ public class AddPlanController extends BasePlanManagement {
                                         Constants.TranslationKeys
                                                 .FINANCIALPLANNING_TEMPLATE_INVESTMENTS))
                         .targetPercentage(BigDecimal.valueOf(40))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build());
     }
 

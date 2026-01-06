@@ -3,6 +3,8 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -11,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
@@ -226,6 +229,27 @@ public class PlanController {
         doughnutChart.setShowCenterLabel(false);
         doughnutChart.setLegendVisible(false);
         doughnutChart.setLabelsVisible(false);
+
+        for (PieChart.Data data : doughnutChart.getData()) {
+            Node node = data.getNode();
+            BigDecimal percentage = BigDecimal.valueOf(data.getPieValue());
+            BigDecimal value =
+                    currentPlan
+                            .getBaseIncome()
+                            .multiply(
+                                    percentage.divide(
+                                            BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+
+            String tooltipText =
+                    data.getName()
+                            + "\n"
+                            + UIUtils.formatCurrency(value)
+                            + " ("
+                            + UIUtils.formatPercentage(percentage, i18nService)
+                            + ")";
+
+            UIUtils.addTooltipToNode(node, tooltipText);
+        }
 
         UIUtils.applyDefaultChartStyle(doughnutChart);
 

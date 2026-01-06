@@ -18,6 +18,7 @@ import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
+import org.moinex.util.enums.BudgetGroupTransactionFilter;
 import org.moinex.util.enums.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -233,29 +234,45 @@ public class FinancialPlanningService {
                                             .map(Category::getId)
                                             .collect(Collectors.toList());
 
-                            BigDecimal walletTransactionsAmount =
-                                    walletTransactionRepository
-                                            .getSumAmountByCategoriesAndDateBetween(
-                                                    categoryIds,
-                                                    TransactionType.EXPENSE,
-                                                    startDate,
-                                                    endDate);
+                            BigDecimal totalAmount = BigDecimal.ZERO;
 
-                            BigDecimal creditCardTransactionsAmount =
-                                    creditCardPaymentRepository
-                                            .getSumAmountByCategoriesAndDateBetween(
-                                                    categoryIds, startDate, endDate);
+                            BudgetGroupTransactionFilter filter = group.getTransactionTypeFilter();
 
-                            BigDecimal transferAmount =
-                                    transferRepository.getSumAmountByCategoriesAndDateBetween(
-                                            categoryIds, startDate, endDate);
+                            if (filter == BudgetGroupTransactionFilter.EXPENSE
+                                    || filter == BudgetGroupTransactionFilter.BOTH) {
+                                BigDecimal walletExpenses =
+                                        walletTransactionRepository
+                                                .getSumAmountByCategoriesAndDateBetween(
+                                                        categoryIds,
+                                                        TransactionType.EXPENSE,
+                                                        startDate,
+                                                        endDate);
 
-                            BigDecimal spentAmount =
-                                    walletTransactionsAmount
-                                            .add(creditCardTransactionsAmount)
-                                            .add(transferAmount);
+                                BigDecimal creditCardTransactionsAmount =
+                                        creditCardPaymentRepository
+                                                .getSumAmountByCategoriesAndDateBetween(
+                                                        categoryIds, startDate, endDate);
 
-                            return new PlanStatusDTO(group, spentAmount);
+                                totalAmount =
+                                        totalAmount
+                                                .add(walletExpenses)
+                                                .add(creditCardTransactionsAmount);
+                            }
+
+                            if (filter == BudgetGroupTransactionFilter.INCOME
+                                    || filter == BudgetGroupTransactionFilter.BOTH) {
+                                BigDecimal walletIncome =
+                                        walletTransactionRepository
+                                                .getSumAmountByCategoriesAndDateBetween(
+                                                        categoryIds,
+                                                        TransactionType.INCOME,
+                                                        startDate,
+                                                        endDate);
+
+                                totalAmount = totalAmount.add(walletIncome);
+                            }
+
+                            return new PlanStatusDTO(group, totalAmount);
                         })
                 .collect(Collectors.toList());
     }

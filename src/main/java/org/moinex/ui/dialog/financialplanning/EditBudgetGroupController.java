@@ -29,6 +29,8 @@ public class EditBudgetGroupController extends BaseBudgetGroupController {
         populateAvailableCategories();
 
         availableCategoriesListView.getItems().removeAll(group.getCategories());
+
+        transactionTypeFilterComboBox.setValue(group.getTransactionTypeFilter());
     }
 
     @FXML

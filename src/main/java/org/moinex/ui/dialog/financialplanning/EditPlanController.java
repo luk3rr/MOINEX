@@ -161,6 +161,7 @@ public class EditPlanController extends BasePlanManagement {
                             .name(group.getName())
                             .targetPercentage(group.getTargetPercentage())
                             .categories(new HashSet<>(group.getCategories()))
+                            .transactionTypeFilter(group.getTransactionTypeFilter())
                             .build();
             copy.add(newGroup);
         }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.*;
 import org.moinex.model.Category;
+import org.moinex.util.enums.BudgetGroupTransactionFilter;
 
 @Entity
 @Table(name = "budget_group")
@@ -38,10 +39,15 @@ public class BudgetGroup {
     @Builder.Default
     private Set<Category> categories = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type_filter", nullable = false)
+    private BudgetGroupTransactionFilter transactionTypeFilter;
+
     public boolean isSame(BudgetGroup other) {
         if (other == null) return false;
         return this.name.equals(other.name)
                 && this.targetPercentage.compareTo(other.targetPercentage) == 0
-                && this.categories.equals(other.categories);
+                && this.categories.equals(other.categories)
+                && this.transactionTypeFilter == other.transactionTypeFilter;
     }
 }

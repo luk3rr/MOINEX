@@ -9,6 +9,7 @@ package org.moinex.ui.main;
 import com.jfoenix.controls.JFXButton;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -500,6 +501,8 @@ public class WalletController {
     private void updateDoughnutChart() {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
+        BigDecimal totalBalance = BigDecimal.ZERO;
+
         for (CheckBox checkBox : doughnutChartCheckBoxes) {
             checkBox.getStyleClass().add(Constants.WALLET_CHECK_BOX_STYLE);
 
@@ -516,17 +519,19 @@ public class WalletController {
 
                 // If the wallet type is not found, skip
                 if (wt != null) {
-                    BigDecimal totalBalance =
+                    BigDecimal totalBalanceGroup =
                             wallets.stream()
                                     .filter(Wallet::isMaster)
                                     .filter(w -> w.getType().getId().equals(wt.getId()))
                                     .map(Wallet::getBalance)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+                    totalBalance = totalBalance.add(totalBalanceGroup);
+
                     pieChartData.add(
                             new PieChart.Data(
                                     UIUtils.translateWalletType(wt, i18nService),
-                                    totalBalance.doubleValue()));
+                                    totalBalanceGroup.doubleValue()));
                 }
             }
         }
@@ -534,6 +539,24 @@ public class WalletController {
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
         doughnutChart.setI18nService(i18nService);
         doughnutChart.setLabelsVisible(false);
+
+        for (PieChart.Data data : doughnutChart.getData()) {
+            Node node = data.getNode();
+            BigDecimal value = BigDecimal.valueOf(data.getPieValue());
+            BigDecimal percentage =
+                    value.divide(totalBalance, 2, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100));
+
+            String tooltipText =
+                    data.getName()
+                            + "\n"
+                            + UIUtils.formatCurrency(value)
+                            + " ("
+                            + UIUtils.formatPercentage(percentage, i18nService)
+                            + ")";
+
+            UIUtils.addTooltipToNode(node, tooltipText);
+        }
 
         UIUtils.applyDefaultChartStyle(doughnutChart);
 

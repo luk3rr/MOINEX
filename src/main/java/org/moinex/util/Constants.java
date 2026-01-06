@@ -1681,6 +1681,13 @@ public final class Constants {
         public static final String FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED =
                 "financialplanning.info.correctlyConfigured";
 
+        // Financial Planning Transaction Type Filter
+        public static final String FINANCIALPLANNING_FILTER_INCOME =
+                "financialplanning.filter.income";
+        public static final String FINANCIALPLANNING_FILTER_EXPENSE =
+                "financialplanning.filter.expense";
+        public static final String FINANCIALPLANNING_FILTER_BOTH = "financialplanning.filter.both";
+
         // Goal Dialog Messages
         public static final String GOAL_DIALOG_EMPTY_FIELDS_TITLE = "goal.dialog.emptyFields.title";
         public static final String GOAL_DIALOG_EMPTY_FIELDS_MESSAGE =

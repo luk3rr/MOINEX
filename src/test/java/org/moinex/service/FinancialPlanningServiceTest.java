@@ -28,6 +28,7 @@ import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
+import org.moinex.util.enums.BudgetGroupTransactionFilter;
 import org.moinex.util.enums.TransactionType;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +61,7 @@ class FinancialPlanningServiceTest {
                         .name("Essentials")
                         .targetPercentage(new BigDecimal("50.00"))
                         .categories(Set.of(category1, category2))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build();
 
         budgetGroup2 =
@@ -67,6 +69,7 @@ class FinancialPlanningServiceTest {
                         .name("Savings")
                         .targetPercentage(new BigDecimal("50.00"))
                         .categories(Set.of(category3))
+                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
                         .build();
 
         financialPlan =
@@ -495,9 +498,6 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(expectedSpentAmount);
-            when(transferRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
-                    .thenReturn(BigDecimal.ZERO);
             when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), anyString(), anyString()))
                     .thenReturn(BigDecimal.ZERO);
@@ -541,6 +541,128 @@ class FinancialPlanningServiceTest {
             assertThrows(
                     EntityNotFoundException.class,
                     () -> financialPlanningService.getPlanStatus(999, YearMonth.now()));
+        }
+
+        @Test
+        @DisplayName("Should calculate status with INCOME filter")
+        void getPlanStatus_WithIncomeFilter_Success() {
+            BudgetGroup incomeGroup =
+                    BudgetGroup.builder()
+                            .name("Income Group")
+                            .targetPercentage(new BigDecimal("100.00"))
+                            .categories(Set.of(category1))
+                            .transactionTypeFilter(BudgetGroupTransactionFilter.INCOME)
+                            .build();
+
+            FinancialPlan plan =
+                    FinancialPlan.builder()
+                            .id(1)
+                            .name("Income Plan")
+                            .baseIncome(new BigDecimal("3000.00"))
+                            .budgetGroups(List.of(incomeGroup))
+                            .build();
+
+            when(financialPlanRepository.findById(1)).thenReturn(Optional.of(plan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.INCOME), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("500.00"));
+
+            List<FinancialPlanningService.PlanStatusDTO> statusList =
+                    financialPlanningService.getPlanStatus(1, YearMonth.now());
+
+            assertEquals(1, statusList.size());
+            assertEquals(
+                    0, new BigDecimal("500.00").compareTo(statusList.getFirst().spentAmount()));
+            verify(walletTransactionRepository)
+                    .getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.INCOME), anyString(), anyString());
+            verify(creditCardPaymentRepository, never())
+                    .getSumAmountByCategoriesAndDateBetween(anyList(), anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("Should calculate status with BOTH filter")
+        void getPlanStatus_WithBothFilter_Success() {
+            BudgetGroup bothGroup =
+                    BudgetGroup.builder()
+                            .name("Both Group")
+                            .targetPercentage(new BigDecimal("100.00"))
+                            .categories(Set.of(category1))
+                            .transactionTypeFilter(BudgetGroupTransactionFilter.BOTH)
+                            .build();
+
+            FinancialPlan plan =
+                    FinancialPlan.builder()
+                            .id(1)
+                            .name("Both Plan")
+                            .baseIncome(new BigDecimal("3000.00"))
+                            .budgetGroups(List.of(bothGroup))
+                            .build();
+
+            when(financialPlanRepository.findById(1)).thenReturn(Optional.of(plan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.EXPENSE), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("200.00"));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.INCOME), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("500.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("100.00"));
+
+            List<FinancialPlanningService.PlanStatusDTO> statusList =
+                    financialPlanningService.getPlanStatus(1, YearMonth.now());
+
+            assertEquals(1, statusList.size());
+            assertEquals(
+                    0, new BigDecimal("800.00").compareTo(statusList.getFirst().spentAmount()));
+            verify(walletTransactionRepository)
+                    .getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.EXPENSE), anyString(), anyString());
+            verify(walletTransactionRepository)
+                    .getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.INCOME), anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("Should calculate status with EXPENSE filter (default behavior)")
+        void getPlanStatus_WithExpenseFilter_Success() {
+            BudgetGroup expenseGroup =
+                    BudgetGroup.builder()
+                            .name("Expense Group")
+                            .targetPercentage(new BigDecimal("100.00"))
+                            .categories(Set.of(category1))
+                            .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
+                            .build();
+
+            FinancialPlan plan =
+                    FinancialPlan.builder()
+                            .id(1)
+                            .name("Expense Plan")
+                            .baseIncome(new BigDecimal("3000.00"))
+                            .budgetGroups(List.of(expenseGroup))
+                            .build();
+
+            when(financialPlanRepository.findById(1)).thenReturn(Optional.of(plan));
+            when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.EXPENSE), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("200.00"));
+            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
+                            anyList(), anyString(), anyString()))
+                    .thenReturn(new BigDecimal("100.00"));
+
+            List<FinancialPlanningService.PlanStatusDTO> statusList =
+                    financialPlanningService.getPlanStatus(1, YearMonth.now());
+
+            assertEquals(1, statusList.size());
+            assertEquals(
+                    0, new BigDecimal("300.00").compareTo(statusList.getFirst().spentAmount()));
+            verify(walletTransactionRepository)
+                    .getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.EXPENSE), anyString(), anyString());
+            verify(walletTransactionRepository, never())
+                    .getSumAmountByCategoriesAndDateBetween(
+                            anyList(), eq(TransactionType.INCOME), anyString(), anyString());
         }
     }
 }

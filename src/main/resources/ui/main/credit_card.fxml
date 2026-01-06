@@ -29,7 +29,7 @@
                                     <AnchorPane fx:id="totalDebts" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                        <children>
                                           <Label fx:id="totalDebtsTitle" styleClass="title" text="%creditCard.totalDebts.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                          <ComboBox fx:id="totalDebtsYearFilterComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                                          <ComboBox fx:id="totalDebtsYearFilterComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                           <VBox fx:id="totalDebtsInfoVBox" alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0" />
                                        </children>
                                     </AnchorPane>

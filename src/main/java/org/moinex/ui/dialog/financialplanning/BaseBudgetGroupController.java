@@ -6,9 +6,11 @@ import java.util.*;
 import java.util.function.Consumer;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
@@ -16,6 +18,7 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
+import org.moinex.util.enums.BudgetGroupTransactionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -29,6 +32,8 @@ public class BaseBudgetGroupController {
     @FXML protected TextField groupNameField;
 
     @FXML protected TextField targetPercentageField;
+
+    @FXML protected ComboBox<BudgetGroupTransactionFilter> transactionTypeFilterComboBox;
 
     @FXML protected ListView<Category> availableCategoriesListView;
 
@@ -92,6 +97,7 @@ public class BaseBudgetGroupController {
     public void initialize() {
         setupButtonActions();
         configureListeners();
+        setupTransactionTypeFilterComboBox();
     }
 
     /**
@@ -130,6 +136,53 @@ public class BaseBudgetGroupController {
                 };
 
         targetPercentageField.textProperty().addListener(targetPercentageListener);
+    }
+
+    protected void setupTransactionTypeFilterComboBox() {
+        transactionTypeFilterComboBox.getItems().addAll(BudgetGroupTransactionFilter.values());
+        transactionTypeFilterComboBox.setValue(BudgetGroupTransactionFilter.EXPENSE);
+        transactionTypeFilterComboBox.setConverter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(BudgetGroupTransactionFilter filter) {
+                        if (filter == null) return "";
+                        return switch (filter) {
+                            case INCOME ->
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .FINANCIALPLANNING_FILTER_INCOME);
+                            case EXPENSE ->
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .FINANCIALPLANNING_FILTER_EXPENSE);
+                            case BOTH ->
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .FINANCIALPLANNING_FILTER_BOTH);
+                        };
+                    }
+
+                    @Override
+                    public BudgetGroupTransactionFilter fromString(String string) {
+                        if (string == null || string.isEmpty()) return null;
+
+                        String income =
+                                i18nService.tr(
+                                        Constants.TranslationKeys.FINANCIALPLANNING_FILTER_INCOME);
+                        String expense =
+                                i18nService.tr(
+                                        Constants.TranslationKeys.FINANCIALPLANNING_FILTER_EXPENSE);
+                        String both =
+                                i18nService.tr(
+                                        Constants.TranslationKeys.FINANCIALPLANNING_FILTER_BOTH);
+
+                        if (string.equals(income)) return BudgetGroupTransactionFilter.INCOME;
+                        if (string.equals(expense)) return BudgetGroupTransactionFilter.EXPENSE;
+                        if (string.equals(both)) return BudgetGroupTransactionFilter.BOTH;
+
+                        return null;
+                    }
+                });
     }
 
     /**
@@ -197,12 +250,14 @@ public class BaseBudgetGroupController {
         }
 
         List<Category> selectedCategories = selectedCategoriesListView.getItems();
+        BudgetGroupTransactionFilter filter = transactionTypeFilterComboBox.getValue();
 
         BudgetGroup budgetGroup =
                 BudgetGroup.builder()
                         .name(groupName)
                         .targetPercentage(BigDecimal.valueOf(targetPercentage))
                         .categories(new HashSet<>(selectedCategories))
+                        .transactionTypeFilter(filter)
                         .build();
 
         if (onSaveCallback != null) {
