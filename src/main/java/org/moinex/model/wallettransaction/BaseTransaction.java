@@ -48,4 +48,7 @@ public abstract class BaseTransaction {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "include_in_analysis", nullable = false)
+    private Boolean includeInAnalysis;
 }

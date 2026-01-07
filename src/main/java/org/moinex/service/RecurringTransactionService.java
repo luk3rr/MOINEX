@@ -150,7 +150,8 @@ public class RecurringTransactionService {
             BigDecimal amount,
             LocalDate startDate,
             String description,
-            RecurringTransactionFrequency frequency) {
+            RecurringTransactionFrequency frequency,
+            Boolean includeInAnalysis) {
         LocalDate defaultEndDate = Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE;
 
         return addRecurringTransaction(
@@ -161,7 +162,8 @@ public class RecurringTransactionService {
                 startDate,
                 defaultEndDate,
                 description,
-                frequency);
+                frequency,
+                includeInAnalysis);
     }
 
     /**
@@ -193,7 +195,8 @@ public class RecurringTransactionService {
             LocalDate startDate,
             LocalDate endDate,
             String description,
-            RecurringTransactionFrequency frequency) {
+            RecurringTransactionFrequency frequency,
+            Boolean includeInAnalysis) {
         Wallet wt =
                 walletRepository
                         .findById(walletId)
@@ -232,6 +235,7 @@ public class RecurringTransactionService {
                         .nextDueDate(startDateWithTime)
                         .frequency(frequency)
                         .description(description)
+                        .includeInAnalysis(includeInAnalysis)
                         .build();
 
         recurringTransactionRepository.save(recurringTransaction);
@@ -343,6 +347,7 @@ public class RecurringTransactionService {
         rtToUpdate.setDescription(rt.getDescription());
         rtToUpdate.setFrequency(rt.getFrequency());
         rtToUpdate.setStatus(rt.getStatus());
+        rtToUpdate.setIncludeInAnalysis(rt.getIncludeInAnalysis());
 
         recurringTransactionRepository.save(rtToUpdate);
         m_logger.info("Recurring transaction {} successfully updated", rt.getId());
@@ -401,7 +406,8 @@ public class RecurringTransactionService {
                         dueDate,
                         recurring.getAmount(),
                         recurring.getDescription(),
-                        TransactionStatus.PENDING);
+                        TransactionStatus.PENDING,
+                        recurring.getIncludeInAnalysis());
             } else if (recurring.getType().equals(TransactionType.EXPENSE)) {
                 walletTransactionService.addExpense(
                         recurring.getWallet().getId(),
@@ -409,7 +415,8 @@ public class RecurringTransactionService {
                         dueDate,
                         recurring.getAmount(),
                         recurring.getDescription(),
-                        TransactionStatus.PENDING);
+                        TransactionStatus.PENDING,
+                        recurring.getIncludeInAnalysis());
             } else {
                 throw new IllegalStateException("Invalid transaction type");
             }
@@ -544,6 +551,7 @@ public class RecurringTransactionService {
                                     .date(nextDueDate)
                                     .amount(recurring.getAmount())
                                     .description(recurring.getDescription())
+                                    .includeInAnalysis(recurring.getIncludeInAnalysis())
                                     .build());
                 }
 
@@ -562,7 +570,7 @@ public class RecurringTransactionService {
      * @param startMonth The start month
      * @param endMonth   The end month
      */
-    public List<WalletTransaction> getFutureTransactionsByMonth(
+    public List<WalletTransaction> getFutureTransactionsByMonthForAnalysis(
             YearMonth startMonth, YearMonth endMonth) {
         List<RecurringTransaction> recurringTransactions =
                 recurringTransactionRepository.findByStatus(RecurringTransactionStatus.ACTIVE);
@@ -579,8 +587,9 @@ public class RecurringTransactionService {
                     break;
                 }
 
-                if (nextDueDate.isAfter(startMonth.atDay(1).atTime(0, 0, 0, 0))
-                        || nextDueDate.equals(startMonth.atDay(1).atTime(0, 0, 0, 0))) {
+                if ((nextDueDate.isAfter(startMonth.atDay(1).atTime(0, 0, 0, 0))
+                                || nextDueDate.equals(startMonth.atDay(1).atTime(0, 0, 0, 0)))
+                        && Boolean.TRUE.equals(recurring.getIncludeInAnalysis())) {
                     futureTransactions.add(
                             WalletTransaction.builder()
                                     .wallet(recurring.getWallet())
@@ -590,6 +599,7 @@ public class RecurringTransactionService {
                                     .date(nextDueDate)
                                     .amount(recurring.getAmount())
                                     .description(recurring.getDescription())
+                                    .includeInAnalysis(recurring.getIncludeInAnalysis())
                                     .build());
                 }
 

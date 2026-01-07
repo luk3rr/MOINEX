@@ -66,6 +66,7 @@ class WalletTransactionRepositoryTest {
                         .status(TransactionStatus.CONFIRMED)
                         .type(TransactionType.EXPENSE)
                         .category(createCategory("Category"))
+                        .includeInAnalysis(true)
                         .build();
 
         walletTransactionRepository.save(walletTransaction);

@@ -75,6 +75,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
         frequencyComboBox.setValue(rt.getFrequency());
 
         activeCheckBox.setSelected(rt.getStatus() == RecurringTransactionStatus.ACTIVE);
+        includeInAnalysisCheckBox.setSelected(rt.getIncludeInAnalysis());
 
         updateInfoLabel();
     }
@@ -142,7 +143,8 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                             .equals(
                                     activeCheckBox.isSelected()
                                             ? RecurringTransactionStatus.ACTIVE
-                                            : RecurringTransactionStatus.INACTIVE)) {
+                                            : RecurringTransactionStatus.INACTIVE)
+                    && rt.getIncludeInAnalysis().equals(includeInAnalysisCheckBox.isSelected())) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys
@@ -171,6 +173,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                         activeCheckBox.isSelected()
                                 ? RecurringTransactionStatus.ACTIVE
                                 : RecurringTransactionStatus.INACTIVE);
+                rt.setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
 
                 recurringTransactionService.updateRecurringTransaction(rt);
 

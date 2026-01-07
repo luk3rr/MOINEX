@@ -101,7 +101,8 @@ public final class AddExpenseController extends BaseWalletTransactionManagement 
                     dateTimeWithCurrentHour,
                     expenseValue,
                     description,
-                    status);
+                    status,
+                    includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

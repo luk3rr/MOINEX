@@ -154,6 +154,7 @@ public class WalletTransactionService {
      * @param amount      The amount of the income
      * @param description A description of the income
      * @param status      The status of the transaction
+     * @param includeInAnalysis Whether to include this transaction in analysis totals
      * @return The id of the created transaction
      * @throws EntityNotFoundException  If the wallet does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
@@ -165,7 +166,8 @@ public class WalletTransactionService {
             LocalDateTime date,
             BigDecimal amount,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         Wallet wallet =
                 walletRepository
                         .findById(walletId)
@@ -191,6 +193,7 @@ public class WalletTransactionService {
                         .date(date)
                         .amount(amount)
                         .description(description)
+                        .includeInAnalysis(includeInAnalysis)
                         .build();
 
         walletTransactionRepository.save(wt);
@@ -214,6 +217,7 @@ public class WalletTransactionService {
      * @param amount      The amount of the expense
      * @param description A description of the expense
      * @param status      The status of the transaction
+     * @param includeInAnalysis Whether to include this transaction in analysis totals
      * @return The id of the created transaction
      * @throws EntityNotFoundException  If the wallet does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
@@ -225,7 +229,8 @@ public class WalletTransactionService {
             LocalDateTime date,
             BigDecimal amount,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         Wallet wallet =
                 walletRepository
                         .findById(walletId)
@@ -251,6 +256,7 @@ public class WalletTransactionService {
                         .date(date)
                         .amount(amount)
                         .description(description)
+                        .includeInAnalysis(includeInAnalysis)
                         .build();
 
         walletTransactionRepository.save(wt);
@@ -315,6 +321,7 @@ public class WalletTransactionService {
         oldTransaction.setDate(transaction.getDate());
         oldTransaction.setDescription(transaction.getDescription());
         oldTransaction.setCategory(transaction.getCategory());
+        oldTransaction.setIncludeInAnalysis(transaction.getIncludeInAnalysis());
 
         walletTransactionRepository.save(oldTransaction);
 
@@ -784,6 +791,20 @@ public class WalletTransactionService {
      */
     public List<WalletTransaction> getNonArchivedTransactionsByMonth(Integer month, Integer year) {
         return walletTransactionRepository.findNonArchivedTransactionsByMonth(month, year);
+    }
+
+    /**
+     * Get all transactions by month that should be included in analysis
+     * when both wallet and category are not archived
+     *
+     * @param month The month of the transactions
+     * @param year  The year of the transactions
+     * @return A list with all transactions of the month for analysis
+     */
+    public List<WalletTransaction> getNonArchivedTransactionsByMonthForAnalysis(
+            Integer month, Integer year) {
+        return walletTransactionRepository.findNonArchivedTransactionsByMonthForAnalysis(
+                month, year);
     }
 
     /**

@@ -86,6 +86,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             descriptionField.setText(walletTransaction.getDescription());
             transactionDatePicker.setValue(walletTransaction.getDate().toLocalDate());
             transactionValueField.setText(walletTransaction.getAmount().toString());
+            includeInAnalysisCheckBox.setSelected(walletTransaction.getIncludeInAnalysis());
         } finally {
             enableTransactionValueListener();
             suggestionsHandler.enable();
@@ -147,6 +148,11 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             LocalDateTime dateTimeWithCurrentHour = transactionDate.atTime(currentTime);
 
             // Check if it has any modification
+            boolean includeInAnalysisChanged =
+                    includeInAnalysisCheckBox != null
+                            && includeInAnalysisCheckBox.isSelected()
+                                    != walletTransaction.getIncludeInAnalysis();
+
             if (wallet.getName().equals(walletTransaction.getWallet().getName())
                     && category.getName().equals(walletTransaction.getCategory().getName())
                     && transactionValue.compareTo(walletTransaction.getAmount()) == 0
@@ -155,7 +161,8 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                     && type == walletTransaction.getType()
                     && dateTimeWithCurrentHour
                             .toLocalDate()
-                            .equals(walletTransaction.getDate().toLocalDate())) {
+                            .equals(walletTransaction.getDate().toLocalDate())
+                    && !includeInAnalysisChanged) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys
@@ -172,6 +179,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 walletTransaction.setDescription(description);
                 walletTransaction.setStatus(status);
                 walletTransaction.setType(type);
+                if (includeInAnalysisCheckBox != null) {
+                    walletTransaction.setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
+                }
 
                 walletTransactionService.updateTransaction(walletTransaction);
 

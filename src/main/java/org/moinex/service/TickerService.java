@@ -361,7 +361,8 @@ public class TickerService {
             Category category,
             LocalDateTime date,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         Ticker ticker =
                 tickerRepository
                         .findById(tickerId)
@@ -383,10 +384,10 @@ public class TickerService {
 
         BigDecimal amount = unitPrice.multiply(quantity);
 
-        // Create a wallet transaction for the dividend
+        // Create a wallet transaction for the purchase
         Integer id =
                 walletTransactionService.addExpense(
-                        walletId, category, date, amount, description, status);
+                        walletId, category, date, amount, description, status, includeInAnalysis);
 
         WalletTransaction walletTransaction = walletTransactionService.getTransactionById(id);
 
@@ -447,7 +448,8 @@ public class TickerService {
             Category category,
             LocalDateTime date,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         Ticker ticker =
                 tickerRepository
                         .findById(tickerId)
@@ -478,7 +480,7 @@ public class TickerService {
         // Create a wallet transaction for the sale
         Integer id =
                 walletTransactionService.addIncome(
-                        walletId, category, date, amount, description, status);
+                        walletId, category, date, amount, description, status, includeInAnalysis);
 
         WalletTransaction walletTransaction = walletTransactionService.getTransactionById(id);
 
@@ -533,7 +535,8 @@ public class TickerService {
             BigDecimal amount,
             LocalDateTime date,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         Ticker ticker =
                 tickerRepository
                         .findById(tickerId)
@@ -552,7 +555,7 @@ public class TickerService {
         // Create a wallet transaction for the dividend
         Integer id =
                 walletTransactionService.addIncome(
-                        walletId, category, date, amount, description, status);
+                        walletId, category, date, amount, description, status, includeInAnalysis);
 
         WalletTransaction walletTransaction = walletTransactionService.getTransactionById(id);
 

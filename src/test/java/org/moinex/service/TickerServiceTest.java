@@ -937,7 +937,8 @@ class TickerServiceTest {
         void testAddPurchase() {
             when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-            when(walletTransactionService.addExpense(anyInt(), any(), any(), any(), any(), any()))
+            when(walletTransactionService.addExpense(
+                            anyInt(), any(), any(), any(), any(), any(), any()))
                     .thenReturn(100);
 
             when(walletTransactionService.getTransactionById(100))
@@ -960,7 +961,8 @@ class TickerServiceTest {
                     category,
                     LocalDateTime.now(),
                     "TickerPurchase",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             ArgumentCaptor<TickerPurchase> purchaseCaptor =
                     ArgumentCaptor.forClass(TickerPurchase.class);
@@ -995,7 +997,8 @@ class TickerServiceTest {
                                     category,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
         }
@@ -1026,7 +1029,8 @@ class TickerServiceTest {
                                     category,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
         }
@@ -1057,7 +1061,8 @@ class TickerServiceTest {
                                     category,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(tickerPurchaseRepository, never()).save(any(TickerPurchase.class));
         }
@@ -1074,7 +1079,8 @@ class TickerServiceTest {
 
             when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-            when(walletTransactionService.addIncome(anyInt(), any(), any(), any(), any(), any()))
+            when(walletTransactionService.addIncome(
+                            anyInt(), any(), any(), any(), any(), any(), any()))
                     .thenReturn(100);
 
             when(walletTransactionService.getTransactionById(100))
@@ -1093,11 +1099,12 @@ class TickerServiceTest {
                     1,
                     1,
                     new BigDecimal("20"),
-                    new BigDecimal("200"),
+                    new BigDecimal("150"),
                     category,
                     LocalDateTime.now(),
                     "TickerSale",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             ArgumentCaptor<TickerSale> saleCaptor = ArgumentCaptor.forClass(TickerSale.class);
 
@@ -1131,7 +1138,8 @@ class TickerServiceTest {
                                     category,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(tickerSaleRepository, never()).save(any(TickerSale.class));
         }
@@ -1163,7 +1171,8 @@ class TickerServiceTest {
                                     category,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(tickerSaleRepository, never()).save(any(TickerSale.class));
         }
@@ -1187,7 +1196,8 @@ class TickerServiceTest {
                                     category,
                                     LocalDateTime.now(),
                                     "TickerSale",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(tickerSaleRepository, never()).save(any(TickerSale.class));
         }
@@ -1219,7 +1229,8 @@ class TickerServiceTest {
                                     category,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(tickerSaleRepository, never()).save(any(TickerSale.class));
         }
@@ -1234,7 +1245,8 @@ class TickerServiceTest {
         void testAddDividend() {
             when(tickerRepository.findById(1)).thenReturn(Optional.of(ticker1));
 
-            when(walletTransactionService.addIncome(anyInt(), any(), any(), any(), any(), any()))
+            when(walletTransactionService.addIncome(
+                            anyInt(), any(), any(), any(), any(), any(), any()))
                     .thenReturn(100);
 
             when(walletTransactionService.getTransactionById(100))
@@ -1256,7 +1268,8 @@ class TickerServiceTest {
                     new BigDecimal("50"),
                     LocalDateTime.now(),
                     "Dividend Payment",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(dividendRepository).save(any(Dividend.class));
         }
@@ -1283,12 +1296,13 @@ class TickerServiceTest {
                                     amount,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(dividendRepository, never()).save(any(Dividend.class));
 
             verify(walletTransactionService, never())
-                    .addIncome(anyInt(), any(), any(), any(), any(), any());
+                    .addIncome(anyInt(), any(), any(), any(), any(), any(), any());
         }
 
         @Test
@@ -1315,12 +1329,13 @@ class TickerServiceTest {
                                     amount,
                                     date,
                                     description,
-                                    status));
+                                    status,
+                                    true));
 
             verify(dividendRepository, never()).save(any(Dividend.class));
 
             verify(walletTransactionService, never())
-                    .addIncome(anyInt(), any(), any(), any(), any(), any());
+                    .addIncome(anyInt(), any(), any(), any(), any(), any(), any());
         }
     }
 

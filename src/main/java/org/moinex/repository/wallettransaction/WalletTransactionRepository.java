@@ -479,4 +479,47 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
             @Param("transactionType") TransactionType transactionType,
             @Param("startDate") String startDate,
             @Param("endDate") String endDate);
+
+    /**
+     * Get the all transactions by month and year that should be included in analysis
+     * when both the category and wallet are not archived
+     *
+     * @param month The month
+     * @param year  The year
+     * @return A list with the transactions by month and year for analysis
+     */
+    @Query(
+            "SELECT wt "
+                    + "FROM WalletTransaction wt "
+                    + "WHERE strftime('%m', wt.date) = printf('%02d', :month) "
+                    + "AND strftime('%Y', wt.date) = printf('%04d', :year) "
+                    + "AND wt.includeInAnalysis = true "
+                    + "AND wt.category.isArchived = false "
+                    + "AND wt.wallet.isArchived = false "
+                    + "ORDER BY wt.date DESC")
+    List<WalletTransaction> findNonArchivedTransactionsByMonthForAnalysis(
+            @Param("month") Integer month, @Param("year") Integer year);
+
+    /**
+     * Sums the amount of all transactions for a given list of category IDs and a specific date range
+     * Only includes transactions marked for analysis
+     *
+     * @param categoryIds The list of category IDs to filter by.
+     * @param transactionType The type of the transaction (INCOME or EXPENSE).
+     * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @return The total sum of the transaction amounts. Returns 0 if no transactions are found.
+     */
+    @Query(
+            "SELECT COALESCE(SUM(wt.amount), 0) "
+                    + "FROM WalletTransaction wt "
+                    + "WHERE wt.category.id IN :categoryIds "
+                    + "AND wt.type = :transactionType "
+                    + "AND wt.includeInAnalysis = true "
+                    + "AND wt.date BETWEEN :startDate AND :endDate")
+    BigDecimal getSumAmountByCategoriesAndDateBetweenForAnalysis(
+            @Param("categoryIds") List<Integer> categoryIds,
+            @Param("transactionType") TransactionType transactionType,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
 }

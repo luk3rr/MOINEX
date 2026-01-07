@@ -73,6 +73,8 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
         statusComboBox.setValue(purchase.getWalletTransaction().getStatus());
         categoryComboBox.setValue(purchase.getWalletTransaction().getCategory());
         transactionDatePicker.setValue(purchase.getWalletTransaction().getDate().toLocalDate());
+        includeInAnalysisCheckBox.setSelected(
+                purchase.getWalletTransaction().getIncludeInAnalysis());
 
         totalPriceLabel.setText(
                 UIUtils.formatCurrency(purchase.getWalletTransaction().getAmount()));
@@ -122,7 +124,10 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                             .equals(category.getId())
                     && purchase.getUnitPrice().compareTo(unitPrice) == 0
                     && purchase.getQuantity().compareTo(quantity) == 0
-                    && purchase.getWalletTransaction().getDate().toLocalDate().equals(buyDate)) {
+                    && purchase.getWalletTransaction().getDate().toLocalDate().equals(buyDate)
+                    && purchase.getWalletTransaction()
+                            .getIncludeInAnalysis()
+                            .equals(includeInAnalysisCheckBox.isSelected())) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
@@ -141,6 +146,8 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                 purchase.setUnitPrice(unitPrice);
                 purchase.setQuantity(quantity);
                 purchase.getWalletTransaction().setDate(dateTimeWithCurrentHour);
+                purchase.getWalletTransaction()
+                        .setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
 
                 tickerService.updatePurchase(purchase);
 

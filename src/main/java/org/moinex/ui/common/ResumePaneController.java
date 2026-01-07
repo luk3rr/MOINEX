@@ -138,12 +138,12 @@ public class ResumePaneController {
      * Update the display of the month resume
      */
     public void updateResumePane(Integer month, Integer year) {
-        // Get all transactions of the month, including future transactions
+        // Get all transactions of the month that should be included in analysis
         List<WalletTransaction> transactions =
-                walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
+                walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(month, year);
 
         List<WalletTransaction> futureTransactions =
-                recurringTransactionService.getFutureTransactionsByMonth(
+                recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
                         YearMonth.of(year, month), YearMonth.of(year, month));
 
         transactions.addAll(futureTransactions);

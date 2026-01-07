@@ -76,6 +76,8 @@ public final class EditDividendController extends BaseDividendManagement {
         statusComboBox.setValue(dividend.getWalletTransaction().getStatus());
         categoryComboBox.setValue(dividend.getWalletTransaction().getCategory());
         dividendDatePicker.setValue(dividend.getWalletTransaction().getDate().toLocalDate());
+        includeInAnalysisCheckBox.setSelected(
+                dividend.getWalletTransaction().getIncludeInAnalysis());
     }
 
     @Override
@@ -115,7 +117,10 @@ public final class EditDividendController extends BaseDividendManagement {
                     && dividend.getWalletTransaction().getStatus().equals(status)
                     && dividend.getWalletTransaction().getDate().toLocalDate().equals(dividendDate)
                     && dividend.getWalletTransaction().getDescription().equals(description)
-                    && dividend.getWalletTransaction().getWallet().getId().equals(wallet.getId())) {
+                    && dividend.getWalletTransaction().getWallet().getId().equals(wallet.getId())
+                    && dividend.getWalletTransaction()
+                            .getIncludeInAnalysis()
+                            .equals(includeInAnalysisCheckBox.isSelected())) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
@@ -133,6 +138,8 @@ public final class EditDividendController extends BaseDividendManagement {
                 dividend.getWalletTransaction().setDate(dateTimeWithCurrentHour);
                 dividend.getWalletTransaction().setDescription(description);
                 dividend.getWalletTransaction().setWallet(wallet);
+                dividend.getWalletTransaction()
+                        .setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
 
                 tickerService.updateDividend(dividend);
 

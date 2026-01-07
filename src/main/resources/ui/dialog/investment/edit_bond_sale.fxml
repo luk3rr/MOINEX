@@ -2,10 +2,12 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -300,6 +302,11 @@
             </VBox>
          </children>
       </HBox>
+      <CheckBox fx:id="includeInAnalysisCheckBox" selected="true" text="%wallettransaction.label.include_in_analysis">
+         <tooltip>
+            <Tooltip text="%wallettransaction.tooltip.include_in_analysis" />
+         </tooltip>
+      </CheckBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
             <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />

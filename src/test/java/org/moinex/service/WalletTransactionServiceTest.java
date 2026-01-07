@@ -329,7 +329,8 @@ class WalletTransactionServiceTest {
                     date,
                     incomeAmount,
                     description,
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(walletService)
                     .incrementWalletBalance(
@@ -361,7 +362,8 @@ class WalletTransactionServiceTest {
                     date,
                     incomeAmount,
                     description,
-                    TransactionStatus.PENDING);
+                    TransactionStatus.PENDING,
+                    true);
 
             verify(walletRepository, never()).save(any(Wallet.class));
             assertEquals(
@@ -388,7 +390,8 @@ class WalletTransactionServiceTest {
                                     date,
                                     incomeAmount,
                                     description,
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             assertThrows(
                     EntityNotFoundException.class,
@@ -399,7 +402,8 @@ class WalletTransactionServiceTest {
                                     date,
                                     incomeAmount,
                                     description,
-                                    TransactionStatus.PENDING));
+                                    TransactionStatus.PENDING,
+                                    true));
 
             verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
         }
@@ -421,7 +425,8 @@ class WalletTransactionServiceTest {
                                     date,
                                     zeroAmount,
                                     description,
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
         }
@@ -454,7 +459,8 @@ class WalletTransactionServiceTest {
                     date,
                     expenseAmount,
                     description,
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(walletService)
                     .decrementWalletBalance(
@@ -486,7 +492,8 @@ class WalletTransactionServiceTest {
                     date,
                     expenseAmount,
                     description,
-                    TransactionStatus.PENDING);
+                    TransactionStatus.PENDING,
+                    true);
 
             verify(walletRepository, never()).save(wallet1);
             assertEquals(
@@ -513,7 +520,8 @@ class WalletTransactionServiceTest {
                                     date,
                                     expenseAmount,
                                     description,
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             assertThrows(
                     EntityNotFoundException.class,
@@ -524,7 +532,8 @@ class WalletTransactionServiceTest {
                                     date,
                                     expenseAmount,
                                     description,
-                                    TransactionStatus.PENDING));
+                                    TransactionStatus.PENDING,
+                                    true));
 
             verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
         }
@@ -546,7 +555,8 @@ class WalletTransactionServiceTest {
                                     date,
                                     zeroAmount,
                                     description,
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
         }

@@ -827,7 +827,8 @@ class BondServiceTest {
                             any(LocalDateTime.class),
                             any(BigDecimal.class),
                             anyString(),
-                            eq(TransactionStatus.CONFIRMED)))
+                            eq(TransactionStatus.CONFIRMED),
+                            any(Boolean.class)))
                     .thenReturn(transactionId);
             when(walletTransactionService.getTransactionById(transactionId))
                     .thenReturn(walletTransaction);
@@ -844,7 +845,8 @@ class BondServiceTest {
                     null,
                     category,
                     "Buy operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(bondRepository).findById(1);
             verify(walletTransactionService)
@@ -854,7 +856,8 @@ class BondServiceTest {
                             any(LocalDateTime.class),
                             eq(BigDecimal.valueOf(1007)), // 100*10 + 5 + 2
                             eq("Buy operation"),
-                            eq(TransactionStatus.CONFIRMED));
+                            eq(TransactionStatus.CONFIRMED),
+                            eq(true));
             verify(bondOperationRepository).save(any(BondOperation.class));
         }
 
@@ -876,7 +879,8 @@ class BondServiceTest {
                             any(LocalDateTime.class),
                             any(BigDecimal.class),
                             anyString(),
-                            eq(TransactionStatus.CONFIRMED)))
+                            eq(TransactionStatus.CONFIRMED),
+                            any(Boolean.class)))
                     .thenReturn(transactionId);
             when(walletTransactionService.getTransactionById(transactionId))
                     .thenReturn(walletTransaction);
@@ -893,7 +897,8 @@ class BondServiceTest {
                     netProfit,
                     category,
                     "Sell operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(bondRepository).findById(1);
             verify(bondOperationRepository).findByBondOrderByOperationDateAsc(bond1);
@@ -904,7 +909,8 @@ class BondServiceTest {
                             any(LocalDateTime.class),
                             eq(BigDecimal.valueOf(600)), // 110*5 + 50
                             eq("Sell operation"),
-                            eq(TransactionStatus.CONFIRMED));
+                            eq(TransactionStatus.CONFIRMED),
+                            eq(true));
             verify(bondOperationRepository).save(any(BondOperation.class));
         }
 
@@ -922,13 +928,14 @@ class BondServiceTest {
                                     OperationType.BUY,
                                     BigDecimal.valueOf(10),
                                     BigDecimal.valueOf(100),
-                                    operationDate,
+                                    LocalDate.now(),
                                     null,
                                     null,
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondRepository).findById(999);
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
@@ -948,13 +955,14 @@ class BondServiceTest {
                                     OperationType.BUY,
                                     BigDecimal.ZERO,
                                     BigDecimal.valueOf(100),
-                                    operationDate,
+                                    LocalDate.now(),
                                     null,
                                     null,
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -979,7 +987,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -998,13 +1007,14 @@ class BondServiceTest {
                                     OperationType.BUY,
                                     BigDecimal.valueOf(10),
                                     BigDecimal.ZERO,
-                                    operationDate,
+                                    LocalDate.now(),
                                     null,
                                     null,
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1023,13 +1033,14 @@ class BondServiceTest {
                                     OperationType.BUY,
                                     BigDecimal.valueOf(10),
                                     BigDecimal.valueOf(-100),
-                                    operationDate,
+                                    LocalDate.now(),
                                     null,
                                     null,
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1056,7 +1067,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondRepository).findById(1);
             verify(bondOperationRepository).findByBondOrderByOperationDateAsc(bond1);
@@ -1078,7 +1090,8 @@ class BondServiceTest {
                             any(LocalDateTime.class),
                             any(BigDecimal.class),
                             anyString(),
-                            eq(TransactionStatus.CONFIRMED)))
+                            eq(TransactionStatus.CONFIRMED),
+                            any(Boolean.class)))
                     .thenReturn(transactionId);
             when(walletTransactionService.getTransactionById(transactionId))
                     .thenReturn(walletTransaction);
@@ -1095,16 +1108,18 @@ class BondServiceTest {
                     null,
                     category,
                     "Buy operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(walletTransactionService)
                     .addExpense(
                             eq(walletId),
                             eq(category),
                             any(LocalDateTime.class),
-                            eq(BigDecimal.valueOf(1000)), // 100*10 + 0 + 0
+                            eq(BigDecimal.valueOf(1000)), // 100*10
                             eq("Buy operation"),
-                            eq(TransactionStatus.CONFIRMED));
+                            eq(TransactionStatus.CONFIRMED),
+                            eq(true));
             verify(bondOperationRepository).save(any(BondOperation.class));
         }
     }
@@ -1169,7 +1184,8 @@ class BondServiceTest {
                     null,
                     category,
                     "Updated buy operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(bondOperationRepository).findById(1);
             verify(walletTransactionService).updateTransaction(any(WalletTransaction.class));
@@ -1203,7 +1219,8 @@ class BondServiceTest {
                     newNetProfit,
                     category,
                     "Updated sell operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(bondOperationRepository).findById(2);
             verify(walletTransactionService).updateTransaction(any(WalletTransaction.class));
@@ -1230,7 +1247,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository).findById(999);
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
@@ -1255,7 +1273,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1279,7 +1298,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1303,7 +1323,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1327,7 +1348,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1354,7 +1376,8 @@ class BondServiceTest {
                                     null,
                                     category,
                                     "Test",
-                                    TransactionStatus.CONFIRMED));
+                                    TransactionStatus.CONFIRMED,
+                                    true));
 
             verify(bondOperationRepository, never()).save(any(BondOperation.class));
         }
@@ -1380,7 +1403,8 @@ class BondServiceTest {
                     null,
                     category,
                     "Updated operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             verify(walletTransactionService).updateTransaction(any(WalletTransaction.class));
             verify(bondOperationRepository).save(existingBuyOperation);
@@ -1407,7 +1431,8 @@ class BondServiceTest {
                     null,
                     category,
                     "Updated operation",
-                    TransactionStatus.CONFIRMED);
+                    TransactionStatus.CONFIRMED,
+                    true);
 
             ArgumentCaptor<WalletTransaction> captor =
                     ArgumentCaptor.forClass(WalletTransaction.class);

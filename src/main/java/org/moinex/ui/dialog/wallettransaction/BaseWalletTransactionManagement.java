@@ -58,6 +58,8 @@ public abstract class BaseWalletTransactionManagement {
 
     @FXML protected DatePicker transactionDatePicker;
 
+    @FXML protected javafx.scene.control.CheckBox includeInAnalysisCheckBox;
+
     protected ConfigurableApplicationContext springContext;
 
     protected SuggestionsHandlerHelper<WalletTransaction> suggestionsHandler;
@@ -137,6 +139,11 @@ public abstract class BaseWalletTransactionManagement {
 
         // Configure date picker
         UIUtils.setDatePickerFormat(transactionDatePicker, i18nService);
+
+        // Set default value for includeInAnalysis checkbox
+        if (includeInAnalysisCheckBox != null) {
+            includeInAnalysisCheckBox.setSelected(true);
+        }
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);

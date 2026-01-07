@@ -88,7 +88,8 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
                         transactionAmount,
                         startDate,
                         description,
-                        frequency);
+                        frequency,
+                        includeInAnalysisCheckBox.isSelected());
             } else {
                 recurringTransactionService.addRecurringTransaction(
                         wallet.getId(),
@@ -98,7 +99,8 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
                         startDate,
                         endDate,
                         description,
-                        frequency);
+                        frequency,
+                        includeInAnalysisCheckBox.isSelected());
             }
 
             WindowUtils.showSuccessDialog(

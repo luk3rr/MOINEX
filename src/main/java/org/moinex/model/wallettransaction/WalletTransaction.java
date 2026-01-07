@@ -68,7 +68,8 @@ public class WalletTransaction extends BaseTransaction {
                 .type(this.getType())
                 .wallet(this.getWallet())
                 .category(this.getCategory())
-                .description(this.getDescription());
+                .description(this.getDescription())
+                .includeInAnalysis(this.getIncludeInAnalysis());
     }
 
     public LocalDateTime getDate() {

@@ -101,7 +101,8 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
                     dateTimeWithCurrentHour,
                     incomeValue,
                     description,
-                    status);
+                    status,
+                    includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

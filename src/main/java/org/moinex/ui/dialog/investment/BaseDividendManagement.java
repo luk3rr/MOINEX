@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
@@ -54,6 +51,8 @@ public abstract class BaseDividendManagement {
     @FXML protected TextField descriptionField;
 
     @FXML protected DatePicker dividendDatePicker;
+
+    @FXML protected CheckBox includeInAnalysisCheckBox;
 
     protected ConfigurableApplicationContext springContext;
 

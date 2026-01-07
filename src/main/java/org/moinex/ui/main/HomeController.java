@@ -426,11 +426,12 @@ public class HomeController {
 
             // Get transactions
             List<WalletTransaction> nonArchivedTransactions =
-                    walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
+                    walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
+                            month, year);
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonth(
+                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
                             YearMonth.of(year, month), YearMonth.of(year, month));
 
             nonArchivedTransactions.addAll(futureTransactions);

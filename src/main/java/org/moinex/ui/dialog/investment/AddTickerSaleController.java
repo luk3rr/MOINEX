@@ -101,7 +101,8 @@ public final class AddTickerSaleController extends BaseTickerTransactionManageme
                     category,
                     dateTimeWithCurrentHour,
                     description,
-                    status);
+                    status,
+                    includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_ADDED_TITLE),

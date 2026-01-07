@@ -79,6 +79,8 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
         statusComboBox.setValue(operation.getWalletTransaction().getStatus());
         categoryComboBox.setValue(operation.getWalletTransaction().getCategory());
         transactionDatePicker.setValue(operation.getWalletTransaction().getDate().toLocalDate());
+        includeInAnalysisCheckBox.setSelected(
+                operation.getWalletTransaction().getIncludeInAnalysis());
 
         updateTotalPrice();
     }
@@ -216,6 +218,10 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                             .getCategory()
                             .getId()
                             .equals(category.getId())
+                    && operation
+                            .getWalletTransaction()
+                            .getIncludeInAnalysis()
+                            .equals(includeInAnalysisCheckBox.isSelected())
                     && operation.getUnitPrice().compareTo(unitPrice) == 0
                     && operation.getQuantity().compareTo(quantity) == 0
                     && feesEqual
@@ -238,7 +244,8 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                         netProfit,
                         category,
                         description,
-                        status);
+                        status,
+                        includeInAnalysisCheckBox.isSelected());
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_TITLE),

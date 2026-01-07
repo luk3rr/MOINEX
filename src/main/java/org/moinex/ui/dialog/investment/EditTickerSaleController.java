@@ -73,6 +73,7 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
         statusComboBox.setValue(sale.getWalletTransaction().getStatus());
         categoryComboBox.setValue(sale.getWalletTransaction().getCategory());
         transactionDatePicker.setValue(sale.getWalletTransaction().getDate().toLocalDate());
+        includeInAnalysisCheckBox.setSelected(sale.getWalletTransaction().getIncludeInAnalysis());
 
         totalPriceLabel.setText(UIUtils.formatCurrency(sale.getWalletTransaction().getAmount()));
     }
@@ -118,7 +119,10 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                     && sale.getWalletTransaction().getCategory().getId().equals(category.getId())
                     && sale.getUnitPrice().compareTo(unitPrice) == 0
                     && sale.getQuantity().compareTo(quantity) == 0
-                    && sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate)) {
+                    && sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate)
+                    && sale.getWalletTransaction()
+                            .getIncludeInAnalysis()
+                            .equals(includeInAnalysisCheckBox.isSelected())) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
@@ -137,6 +141,8 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                 sale.setUnitPrice(unitPrice);
                 sale.setQuantity(quantity);
                 sale.getWalletTransaction().setDate(dateTimeWithCurrentHour);
+                sale.getWalletTransaction()
+                        .setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
 
                 tickerService.updateSale(sale);
 

@@ -100,7 +100,8 @@ public final class AddDividendController extends BaseDividendManagement {
                     dividendValue,
                     dateTimeWithCurrentHour,
                     description,
-                    status);
+                    status,
+                    includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

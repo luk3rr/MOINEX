@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Controller;
 public final class AddBondSaleController extends BaseBondTransactionManagement {
     @FXML private TextField netProfitField;
     @FXML private TextField grossYieldField;
+    @FXML private CheckBox includeInAnalysisCheckBox;
 
     @Autowired
     public AddBondSaleController(
@@ -169,7 +171,8 @@ public final class AddBondSaleController extends BaseBondTransactionManagement {
                     netProfit,
                     category,
                     description,
-                    status);
+                    status,
+                    includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_SALE_ADDED_TITLE),

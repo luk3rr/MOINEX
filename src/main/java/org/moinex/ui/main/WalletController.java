@@ -607,11 +607,12 @@ public class WalletController {
 
             // Get transactions
             List<WalletTransaction> transactionsList =
-                    walletTransactionService.getNonArchivedTransactionsByMonth(month, year);
+                    walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
+                            month, year);
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonth(
+                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
                             YearMonth.of(year, month), YearMonth.of(year, month));
 
             List<CreditCardPayment> crcPayments =

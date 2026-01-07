@@ -245,7 +245,8 @@ public class BondService {
             BigDecimal netProfit,
             Category category,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         Bond bond =
                 bondRepository
                         .findById(bondId)
@@ -292,11 +293,23 @@ public class BondService {
         if (operationType == OperationType.BUY) {
             transactionId =
                     walletTransactionService.addExpense(
-                            walletId, category, dateTime, amount, description, status);
+                            walletId,
+                            category,
+                            dateTime,
+                            amount,
+                            description,
+                            status,
+                            includeInAnalysis);
         } else {
             transactionId =
                     walletTransactionService.addIncome(
-                            walletId, category, dateTime, amount, description, status);
+                            walletId,
+                            category,
+                            dateTime,
+                            amount,
+                            description,
+                            status,
+                            includeInAnalysis);
         }
 
         WalletTransaction walletTransaction =
@@ -426,7 +439,8 @@ public class BondService {
             BigDecimal netProfit,
             Category category,
             String description,
-            TransactionStatus status) {
+            TransactionStatus status,
+            Boolean includeInAnalysis) {
         BondOperation operation =
                 bondOperationRepository
                         .findById(operationId)
@@ -477,6 +491,7 @@ public class BondService {
         walletTransaction.setAmount(amount);
         walletTransaction.setDescription(description);
         walletTransaction.setStatus(status);
+        walletTransaction.setIncludeInAnalysis(includeInAnalysis);
 
         walletTransactionService.updateTransaction(walletTransaction);
 

@@ -92,7 +92,8 @@ public final class AddBondPurchaseController extends BaseBondTransactionManageme
                     null, // netProfit not applicable for purchases
                     category,
                     description,
-                    status);
+                    status,
+                    includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_PURCHASE_ADDED_TITLE),

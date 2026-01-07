@@ -97,7 +97,7 @@ public class RecurringTransaction extends BaseTransaction {
             LocalDateTime nextDueDate,
             RecurringTransactionFrequency frequency,
             String description) {
-        super(wallet, category, type, amount, description);
+        super(wallet, category, type, amount, description, true);
 
         this.id = id;
         this.startDate = startDate.format(Constants.DB_DATE_FORMATTER);

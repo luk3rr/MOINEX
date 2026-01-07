@@ -73,6 +73,7 @@ class RecurringTransactionServiceTest {
                         .frequency(RecurringTransactionFrequency.MONTHLY)
                         .description("Monthly Rent")
                         .status(RecurringTransactionStatus.ACTIVE)
+                        .includeInAnalysis(true)
                         .build();
     }
 
@@ -92,7 +93,8 @@ class RecurringTransactionServiceTest {
                     LocalDate.now().plusDays(1),
                     LocalDate.now().plusMonths(3),
                     "New recurring expense",
-                    RecurringTransactionFrequency.MONTHLY);
+                    RecurringTransactionFrequency.MONTHLY,
+                    true);
 
             ArgumentCaptor<RecurringTransaction> captor =
                     ArgumentCaptor.forClass(RecurringTransaction.class);
@@ -117,7 +119,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now().minusDays(1),
                                     LocalDate.now().plusMonths(1),
                                     "Past transaction",
-                                    RecurringTransactionFrequency.MONTHLY));
+                                    RecurringTransactionFrequency.MONTHLY,
+                                    true));
         }
 
         @DisplayName("Throws EntityNotFoundException when wallet does not exist")
@@ -136,7 +139,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now(),
                                     LocalDate.now().plusMonths(1),
                                     "Non-existent wallet transaction",
-                                    RecurringTransactionFrequency.MONTHLY));
+                                    RecurringTransactionFrequency.MONTHLY,
+                                    true));
         }
 
         @DisplayName("Throws IllegalArgumentException when start or end date is null")
@@ -155,7 +159,8 @@ class RecurringTransactionServiceTest {
                                     null,
                                     LocalDate.now().plusMonths(1),
                                     "Null start date transaction",
-                                    RecurringTransactionFrequency.MONTHLY));
+                                    RecurringTransactionFrequency.MONTHLY,
+                                    true));
 
             assertThrows(
                     IllegalArgumentException.class,
@@ -168,7 +173,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now(),
                                     null,
                                     "Null end date transaction",
-                                    RecurringTransactionFrequency.MONTHLY));
+                                    RecurringTransactionFrequency.MONTHLY,
+                                    true));
         }
 
         @DisplayName("Throws IllegalArgumentException when amount is less than or equal to zero")
@@ -187,7 +193,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now(),
                                     LocalDate.now().plusMonths(1),
                                     "Zero amount transaction",
-                                    RecurringTransactionFrequency.MONTHLY));
+                                    RecurringTransactionFrequency.MONTHLY,
+                                    true));
 
             assertThrows(
                     IllegalArgumentException.class,
@@ -200,7 +207,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now(),
                                     LocalDate.now().plusMonths(1),
                                     "Negative amount transaction",
-                                    RecurringTransactionFrequency.MONTHLY));
+                                    RecurringTransactionFrequency.MONTHLY,
+                                    true));
         }
     }
 
@@ -218,7 +226,7 @@ class RecurringTransactionServiceTest {
             recurringTransactionService.processRecurringTransactions();
 
             verify(walletTransactionService, times(1))
-                    .addExpense(any(), any(), any(), any(), any(), any());
+                    .addExpense(any(), any(), any(), any(), any(), any(), any());
             verify(recurringTransactionRepository).save(recurringTransaction);
             assertTrue(recurringTransaction.getNextDueDate().isAfter(LocalDateTime.now()));
         }
@@ -234,7 +242,7 @@ class RecurringTransactionServiceTest {
             recurringTransactionService.processRecurringTransactions();
 
             verify(walletTransactionService, times(1))
-                    .addIncome(any(), any(), any(), any(), any(), any());
+                    .addIncome(any(), any(), any(), any(), any(), any(), any());
             verify(recurringTransactionRepository).save(recurringTransaction);
             assertTrue(recurringTransaction.getNextDueDate().isAfter(LocalDateTime.now()));
         }
@@ -264,7 +272,7 @@ class RecurringTransactionServiceTest {
             recurringTransactionService.processRecurringTransactions();
 
             verify(walletTransactionService, never())
-                    .addExpense(any(), any(), any(), any(), any(), any());
+                    .addExpense(any(), any(), any(), any(), any(), any(), any());
             verify(recurringTransactionRepository, never()).save(any());
         }
 
@@ -279,7 +287,7 @@ class RecurringTransactionServiceTest {
             recurringTransactionService.processRecurringTransactions();
 
             verify(walletTransactionService, never())
-                    .addExpense(any(), any(), any(), any(), any(), any());
+                    .addExpense(any(), any(), any(), any(), any(), any(), any());
 
             ArgumentCaptor<RecurringTransaction> captor =
                     ArgumentCaptor.forClass(RecurringTransaction.class);
@@ -303,7 +311,7 @@ class RecurringTransactionServiceTest {
                     .thenReturn(Collections.singletonList(recurringTransaction));
 
             List<WalletTransaction> futureTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonth(
+                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
                             YearMonth.now(), YearMonth.now());
 
             assertTrue(futureTransactions.size() >= 4 && futureTransactions.size() <= 5);
