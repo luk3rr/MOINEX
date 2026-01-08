@@ -7,6 +7,7 @@
 package org.moinex.ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -334,8 +335,11 @@ public class HomeController {
                                     valueLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_VALUE_LABEL_WIDTH);
 
-                                    Label walletLabel =
-                                            new Label(transaction.getWallet().getName());
+                                    String walletName =
+                                            transaction.getWallet() != null
+                                                    ? transaction.getWallet().getName()
+                                                    : "";
+                                    Label walletLabel = new Label(walletName);
                                     walletLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_WALLET_LABEL_WIDTH);
 
@@ -353,8 +357,11 @@ public class HomeController {
                                     transactionStatusLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH);
 
-                                    Label transactionCategoryLabel =
-                                            new Label(transaction.getCategory().getName());
+                                    String categoryName =
+                                            transaction.getCategory() != null
+                                                    ? transaction.getCategory().getName()
+                                                    : "";
+                                    Label transactionCategoryLabel = new Label(categoryName);
                                     transactionCategoryLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_CATEGORY_LABEL_WIDTH);
 
@@ -580,8 +587,14 @@ public class HomeController {
 
             monthResumeView.getChildren().clear();
             monthResumeView.getChildren().add(newContent);
+        } catch (IOException e) {
+            logger.error("Error loading resume pane FXML: '{}'", Constants.RESUME_PANE_FXML, e);
+            logger.error("Failed to update month resume. Error: '{}'", e.getMessage());
+            if (e.getCause() != null) {
+                logger.error("Root cause: {}", e.getCause().getMessage(), e.getCause());
+            }
         } catch (Exception e) {
-            logger.error("Error updating month resume: {}", e.getMessage());
+            logger.error("Unexpected error updating month resume", e);
         }
     }
 

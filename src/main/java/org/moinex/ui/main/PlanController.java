@@ -303,7 +303,23 @@ public class PlanController {
             AnchorPane.setRightAnchor(content, 0.0);
 
         } catch (IOException e) {
-            logger.error("Error loading budget group pane: {}", e.getMessage());
+            logger.error(
+                    "Error loading budget group pane FXML: '{}' for group: '{}'",
+                    Constants.BUDGET_GROUP_PANE_FXML,
+                    status.group() != null ? status.group().getName() : "null",
+                    e);
+            logger.error(
+                    "Budget group details - Spent: {}, Base income: {}",
+                    status.spentAmount(),
+                    currentPlan.getBaseIncome());
+            if (e.getCause() != null) {
+                logger.error("Root cause: {}", e.getCause().getMessage(), e.getCause());
+            }
+        } catch (Exception e) {
+            logger.error(
+                    "Unexpected error loading budget group pane for group: '{}'",
+                    status.group() != null ? status.group().getName() : "null",
+                    e);
         }
     }
 

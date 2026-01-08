@@ -500,7 +500,20 @@ public class CreditCardController {
 
                 crcPane1.getChildren().add(newContent);
             } catch (IOException e) {
-                logger.error("Error while loading credit card pane");
+                logger.error(
+                        "Error loading credit card pane FXML: '{}' for card ID: {}",
+                        Constants.CRC_PANE_FXML,
+                        crc.getId(),
+                        e);
+                logger.error(
+                        "Credit card details - Name: '{}', Last 4 digits: '{}'",
+                        crc.getName(),
+                        crc.getLastFourDigits());
+            } catch (Exception e) {
+                logger.error(
+                        "Unexpected error loading credit card pane for card ID: {}",
+                        crc.getId(),
+                        e);
             }
         }
 

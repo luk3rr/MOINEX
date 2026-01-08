@@ -487,7 +487,18 @@ public class GoalController {
                         break;
                 }
             } catch (IOException e) {
-                logger.error("Error while loading goal full pane");
+                logger.error(
+                        "Error loading goal full pane FXML: '{}' for goal ID: {}",
+                        Constants.GOAL_FULL_PANE_FXML,
+                        goal.getId(),
+                        e);
+                logger.error(
+                        "Goal details - Name: '{}', Target: {}",
+                        goal.getName(),
+                        goal.getTargetBalance());
+            } catch (Exception e) {
+                logger.error(
+                        "Unexpected error loading goal full pane for goal ID: {}", goal.getId(), e);
             }
         }
 
@@ -550,7 +561,20 @@ public class GoalController {
                         break;
                 }
             } catch (IOException e) {
-                logger.error("Error while loading accomplished goal full pane");
+                logger.error(
+                        "Error loading accomplished goal full pane FXML: '{}' for goal ID: {}",
+                        Constants.GOAL_FULL_PANE_FXML,
+                        goal.getId(),
+                        e);
+                logger.error(
+                        "Accomplished goal details - Name: '{}', Target: {}",
+                        goal.getName(),
+                        goal.getTargetBalance());
+            } catch (Exception e) {
+                logger.error(
+                        "Unexpected error loading accomplished goal full pane for goal ID: {}",
+                        goal.getId(),
+                        e);
             }
         }
 

@@ -358,7 +358,12 @@ public class WalletController {
             walletsCurrentBalance =
                     wallets.stream()
                             .filter(Wallet::isMaster)
-                            .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
+                            .filter(
+                                    w ->
+                                            w.getType() != null
+                                                    && w.getType()
+                                                            .getId()
+                                                            .equals(selectedWalletType.getId()))
                             .map(Wallet::getBalance)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -366,10 +371,12 @@ public class WalletController {
                     transactions.stream()
                             .filter(
                                     t ->
-                                            t.getWallet()
-                                                    .getType()
-                                                    .getId()
-                                                    .equals(selectedWalletType.getId()))
+                                            t.getWallet() != null
+                                                    && t.getWallet().getType() != null
+                                                    && t.getWallet()
+                                                            .getType()
+                                                            .getId()
+                                                            .equals(selectedWalletType.getId()))
                             .filter(t -> t.getType().equals(TransactionType.EXPENSE))
                             .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
@@ -379,10 +386,12 @@ public class WalletController {
                     transactions.stream()
                             .filter(
                                     t ->
-                                            t.getWallet()
-                                                    .getType()
-                                                    .getId()
-                                                    .equals(selectedWalletType.getId()))
+                                            t.getWallet() != null
+                                                    && t.getWallet().getType() != null
+                                                    && t.getWallet()
+                                                            .getType()
+                                                            .getId()
+                                                            .equals(selectedWalletType.getId()))
                             .filter(t -> t.getType().equals(TransactionType.INCOME))
                             .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
@@ -391,7 +400,12 @@ public class WalletController {
             totalAmountInWallets =
                     wallets.stream()
                             .filter(Wallet::isMaster)
-                            .filter(w -> w.getType().getId().equals(selectedWalletType.getId()))
+                            .filter(
+                                    w ->
+                                            w.getType() != null
+                                                    && w.getType()
+                                                            .getId()
+                                                            .equals(selectedWalletType.getId()))
                             .map(Wallet::getId)
                             .distinct()
                             .count();
@@ -487,7 +501,20 @@ public class WalletController {
                         break;
                 }
             } catch (IOException e) {
-                logger.error("Error while loading wallet full pane");
+                logger.error(
+                        "Error loading wallet full pane FXML: '{}' for wallet ID: {}",
+                        Constants.WALLET_FULL_PANE_FXML,
+                        wallet.getId(),
+                        e);
+                logger.error(
+                        "Wallet details - Name: '{}', Type: '{}'",
+                        wallet.getName(),
+                        wallet.getType() != null ? wallet.getType().getName() : "null");
+            } catch (Exception e) {
+                logger.error(
+                        "Unexpected error loading wallet full pane for wallet ID: {}",
+                        wallet.getId(),
+                        e);
             }
         }
 
@@ -522,7 +549,12 @@ public class WalletController {
                     BigDecimal totalBalanceGroup =
                             wallets.stream()
                                     .filter(Wallet::isMaster)
-                                    .filter(w -> w.getType().getId().equals(wt.getId()))
+                                    .filter(
+                                            w ->
+                                                    w.getType() != null
+                                                            && w.getType()
+                                                                    .getId()
+                                                                    .equals(wt.getId()))
                                     .map(Wallet::getBalance)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -543,9 +575,13 @@ public class WalletController {
         for (PieChart.Data data : doughnutChart.getData()) {
             Node node = data.getNode();
             BigDecimal value = BigDecimal.valueOf(data.getPieValue());
-            BigDecimal percentage =
-                    value.divide(totalBalance, 2, RoundingMode.HALF_UP)
-                            .multiply(BigDecimal.valueOf(100));
+            BigDecimal percentage = BigDecimal.ZERO;
+
+            if (totalBalance.compareTo(BigDecimal.ZERO) > 0) {
+                percentage =
+                        value.divide(totalBalance, 2, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(100));
+            }
 
             String tooltipText =
                     data.getName()
@@ -658,10 +694,12 @@ public class WalletController {
                         transactionsList.stream()
                                 .filter(
                                         t ->
-                                                t.getWallet()
-                                                        .getType()
-                                                        .getId()
-                                                        .equals(selectedWalletType.getId()))
+                                                t.getWallet() != null
+                                                        && t.getWallet().getType() != null
+                                                        && t.getWallet()
+                                                                .getType()
+                                                                .getId()
+                                                                .equals(selectedWalletType.getId()))
                                 .filter(t -> t.getType().equals(TransactionType.EXPENSE))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -698,10 +736,12 @@ public class WalletController {
                         transactionsList.stream()
                                 .filter(
                                         t ->
-                                                t.getWallet()
-                                                        .getType()
-                                                        .getId()
-                                                        .equals(selectedWalletType.getId()))
+                                                t.getWallet() != null
+                                                        && t.getWallet().getType() != null
+                                                        && t.getWallet()
+                                                                .getType()
+                                                                .getId()
+                                                                .equals(selectedWalletType.getId()))
                                 .filter(t -> t.getType().equals(TransactionType.INCOME))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);

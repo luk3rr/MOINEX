@@ -242,7 +242,21 @@ public class MainController {
 
             currentContent = new Pair<>(fxmlFile, styleSheet);
         } catch (IOException e) {
-            logger.error("Error loading content: '{}'", e.getMessage());
+            logger.error("Error loading FXML file: '{}'", fxmlFile, e);
+            logger.error(
+                    "Failed to load content. FXML: '{}', StyleSheet: '{}', Error: '{}'",
+                    fxmlFile,
+                    styleSheet,
+                    e.getMessage());
+            if (e.getCause() != null) {
+                logger.error("Root cause: {}", e.getCause().getMessage(), e.getCause());
+            }
+        } catch (Exception e) {
+            logger.error(
+                    "Unexpected error loading content. FXML: '{}', StyleSheet: '{}'",
+                    fxmlFile,
+                    styleSheet,
+                    e);
         }
     }
 

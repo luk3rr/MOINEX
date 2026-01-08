@@ -6,6 +6,7 @@
 
 package org.moinex.ui.main;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.*;
@@ -647,8 +648,21 @@ public class TransactionController {
 
             yearResumeView.getChildren().clear();
             yearResumeView.getChildren().add(newContent);
+        } catch (IOException e) {
+            logger.error(
+                    "Error loading resume pane FXML: '{}' for year: {}",
+                    Constants.RESUME_PANE_FXML,
+                    selectedYear.getValue(),
+                    e);
+            logger.error("Failed to update year resume. Error: '{}'", e.getMessage());
+            if (e.getCause() != null) {
+                logger.error("Root cause: {}", e.getCause().getMessage(), e.getCause());
+            }
         } catch (Exception e) {
-            logger.error("Error updating year resume: {}", e.getMessage());
+            logger.error(
+                    "Unexpected error updating year resume for year: {}",
+                    selectedYear.getValue(),
+                    e);
         }
     }
 
@@ -687,8 +701,23 @@ public class TransactionController {
 
             monthYearResumeView.getChildren().clear();
             monthYearResumeView.getChildren().add(newContent);
+        } catch (IOException e) {
+            logger.error(
+                    "Error loading resume pane FXML: '{}' for month/year: {}/{}",
+                    Constants.RESUME_PANE_FXML,
+                    selectedYearMonth.getMonthValue(),
+                    selectedYearMonth.getYear(),
+                    e);
+            logger.error("Failed to update month/year resume. Error: '{}'", e.getMessage());
+            if (e.getCause() != null) {
+                logger.error("Root cause: {}", e.getCause().getMessage(), e.getCause());
+            }
         } catch (Exception e) {
-            logger.error("Error updating month resume: {}", e.getMessage());
+            logger.error(
+                    "Unexpected error updating month/year resume for: {}/{}",
+                    selectedYearMonth.getMonthValue(),
+                    selectedYearMonth.getYear(),
+                    e);
         }
     }
 
