@@ -7,6 +7,8 @@
 package org.moinex.repository.investment;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.Ticker;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -65,6 +67,8 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
                     + "FROM CryptoExchange e "
                     + "WHERE e.soldCrypto.id = :tickerId OR e.receivedCrypto.id = :tickerId")
     Integer getCryptoExchangeCountByTicker(@Param("tickerId") Integer tickerId);
+
+    Optional<Ticker> findBySymbol(String symbol);
 
     /**
      * Findall tickers and order them by symbol in ascending order

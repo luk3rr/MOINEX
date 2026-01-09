@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
+import org.moinex.model.enums.PeriodType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +152,23 @@ public class APIUtils {
                 () ->
                         runPythonScript(
                                 Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT, new String[0]),
+                executorService);
+    }
+
+    /**
+     * Fetch fundamental analysis data asynchronously for a stock symbol
+     *
+     * @param symbol Ticker symbol (e.g., "PETR4.SA")
+     * @param period Period type ("annual" or "quarterly")
+     * @return A CompletableFuture containing the JSON response with fundamental data
+     */
+    public static CompletableFuture<JSONObject> fetchFundamentalAnalysisAsync(
+            String symbol, PeriodType period) {
+        return CompletableFuture.supplyAsync(
+                () ->
+                        runPythonScript(
+                                Constants.GET_FUNDAMENTAL_DATA_SCRIPT,
+                                new String[] {symbol, "--period", period.name().toLowerCase(), "--format", "json"}),
                 executorService);
     }
 

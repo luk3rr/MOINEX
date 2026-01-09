@@ -31,6 +31,8 @@ public final class Constants {
     public static final String GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT =
             "get_brazilian_market_indicators.py";
 
+    public static final String GET_FUNDAMENTAL_DATA_SCRIPT = "get_fundamental_data.py";
+
     // Paths
     public static final String WALLET_TYPE_ICONS_PATH = "/icon/wallet_type/";
     public static final String SIDEBAR_ICONS_PATH = "/icon/sidebar/";
