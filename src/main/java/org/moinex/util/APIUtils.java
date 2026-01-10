@@ -168,7 +168,13 @@ public class APIUtils {
                 () ->
                         runPythonScript(
                                 Constants.GET_FUNDAMENTAL_DATA_SCRIPT,
-                                new String[] {symbol, "--period", period.name().toLowerCase(), "--format", "json"}),
+                                new String[] {
+                                    symbol,
+                                    "--period",
+                                    period.name().toLowerCase(),
+                                    "--format",
+                                    "json"
+                                }),
                 executorService);
     }
 

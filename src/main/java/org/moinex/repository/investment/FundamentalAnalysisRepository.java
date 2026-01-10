@@ -19,8 +19,7 @@ import org.springframework.stereotype.Repository;
  * Repository for FundamentalAnalysis entity
  */
 @Repository
-public interface FundamentalAnalysisRepository
-        extends JpaRepository<FundamentalAnalysis, Integer> {
+public interface FundamentalAnalysisRepository extends JpaRepository<FundamentalAnalysis, Integer> {
 
     /**
      * Find fundamental analysis by ticker and period type
@@ -36,7 +35,8 @@ public interface FundamentalAnalysisRepository
      * @param periodType The period type (ANNUAL, QUARTERLY, etc.)
      * @return Optional containing the analysis if found
      */
-    Optional<FundamentalAnalysis> findByTickerIdAndPeriodType(Integer tickerId, PeriodType periodType);
+    Optional<FundamentalAnalysis> findByTickerIdAndPeriodType(
+            Integer tickerId, PeriodType periodType);
 
     /**
      * Find all fundamental analyses for a ticker (all period types)

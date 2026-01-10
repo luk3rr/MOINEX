@@ -7,7 +7,6 @@
 package org.moinex.model.investment;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -402,6 +402,9 @@ def get_price_performance(ticker):
         
         current_price = hist['Close'].iloc[-1]
         
+        # Get the reference date (last available historical data date)
+        last_date = hist.index[-1].strftime('%Y-%m-%d')
+        
         performance = {
             "current_price": create_currency_object(current_price, "real_time"),
             "day_high": create_currency_object(hist['High'].iloc[-1], "real_time"),
@@ -411,49 +414,49 @@ def get_price_performance(ticker):
         # 1 day change (if we have at least 2 days)
         if len(hist) >= 2:
             prev_close = hist['Close'].iloc[-2]
-            performance["change_1d"] = create_percent_object(calculate_price_change(current_price, prev_close), "historical")
+            performance["change_1d"] = create_percent_object(calculate_price_change(current_price, prev_close), "historical", last_date)
         
         # 5 days (1 week) change
         if len(hist) >= 6:
             price_5d_ago = hist['Close'].iloc[-6]
-            performance["change_5d"] = create_percent_object(calculate_price_change(current_price, price_5d_ago), "historical")
+            performance["change_5d"] = create_percent_object(calculate_price_change(current_price, price_5d_ago), "historical", last_date)
         
         # 1 month change (approximately 21 trading days)
         if len(hist) >= 22:
             price_1m_ago = hist['Close'].iloc[-22]
-            performance["change_1m"] = create_percent_object(calculate_price_change(current_price, price_1m_ago), "historical")
+            performance["change_1m"] = create_percent_object(calculate_price_change(current_price, price_1m_ago), "historical", last_date)
         
         # 3 months change (approximately 63 trading days)
         if len(hist) >= 64:
             price_3m_ago = hist['Close'].iloc[-64]
-            performance["change_3m"] = create_percent_object(calculate_price_change(current_price, price_3m_ago), "historical")
+            performance["change_3m"] = create_percent_object(calculate_price_change(current_price, price_3m_ago), "historical", last_date)
         
         # 6 months change (approximately 126 trading days)
         if len(hist) >= 127:
             price_6m_ago = hist['Close'].iloc[-127]
-            performance["change_6m"] = create_percent_object(calculate_price_change(current_price, price_6m_ago), "historical")
+            performance["change_6m"] = create_percent_object(calculate_price_change(current_price, price_6m_ago), "historical", last_date)
         
         # 52 weeks (1 year) change
         if len(hist) >= 2:
             price_52w_ago = hist['Close'].iloc[0]
-            performance["change_52w"] = create_percent_object(calculate_price_change(current_price, price_52w_ago), "historical")
+            performance["change_52w"] = create_percent_object(calculate_price_change(current_price, price_52w_ago), "historical", last_date)
         
         # Year to Date (YTD) change
         current_year = datetime.now().year
         ytd_data = hist[hist.index.year == current_year]
         if not ytd_data.empty and len(ytd_data) > 1:
             price_ytd_start = ytd_data['Close'].iloc[0]
-            performance["change_ytd"] = create_percent_object(calculate_price_change(current_price, price_ytd_start), "historical")
+            performance["change_ytd"] = create_percent_object(calculate_price_change(current_price, price_ytd_start), "historical", last_date)
         
         # 52-week high and low
         week_52_high = hist['High'].max()
         week_52_low = hist['Low'].min()
-        performance["week_52_high"] = create_currency_object(week_52_high, "historical")
-        performance["week_52_low"] = create_currency_object(week_52_low, "historical")
+        performance["week_52_high"] = create_currency_object(week_52_high, "historical", last_date)
+        performance["week_52_low"] = create_currency_object(week_52_low, "historical", last_date)
         
         # Distance from 52-week high/low
-        performance["distance_from_52w_high"] = create_percent_object(calculate_price_change(current_price, week_52_high), "calculated")
-        performance["distance_from_52w_low"] = create_percent_object(calculate_price_change(current_price, week_52_low), "calculated")
+        performance["distance_from_52w_high"] = create_percent_object(calculate_price_change(current_price, week_52_high), "calculated", last_date)
+        performance["distance_from_52w_low"] = create_percent_object(calculate_price_change(current_price, week_52_low), "calculated", last_date)
         
         return performance
         

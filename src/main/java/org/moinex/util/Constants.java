@@ -176,7 +176,8 @@ public final class Constants {
 
     public static final String RESUME_PANE_FXML = UI_COMMON_PATH + "resume_pane.fxml";
     public static final String CRC_PANE_FXML = UI_COMMON_PATH + ("credit_card_pane." + "fxml");
-    public static final String FUNDAMENTAL_METRIC_PANE_FXML = UI_COMMON_PATH + "fundamental_metric_pane.fxml";
+    public static final String FUNDAMENTAL_METRIC_PANE_FXML =
+            UI_COMMON_PATH + "fundamental_metric_pane.fxml";
 
     public static final String CALCULATOR_FXML = UI_COMMON_PATH + "calculator.fxml";
     public static final String CALENDAR_FXML = UI_COMMON_PATH + "calendar.fxml";
@@ -1137,6 +1138,141 @@ public final class Constants {
         public static final String BOND_TABLE_WALLET = "bond.table.wallet";
         public static final String BOND_TABLE_STATUS = "bond.table.status";
         public static final String BOND_MATURITY_DATE = "bond.maturityDate";
+
+        // Fundamental Analysis
+        public static final String FUNDAMENTAL_ANALYSIS_DIALOG_TITLE =
+                "fundamentalAnalysis.dialog.title";
+        public static final String FUNDAMENTAL_ANALYSIS_COMPANY_NAME =
+                "fundamentalAnalysis.companyName";
+        public static final String FUNDAMENTAL_ANALYSIS_SECTOR = "fundamentalAnalysis.sector";
+        public static final String FUNDAMENTAL_ANALYSIS_INDUSTRY = "fundamentalAnalysis.industry";
+        public static final String FUNDAMENTAL_ANALYSIS_CURRENCY = "fundamentalAnalysis.currency";
+        public static final String FUNDAMENTAL_ANALYSIS_LAST_UPDATE =
+                "fundamentalAnalysis.lastUpdate";
+        public static final String FUNDAMENTAL_ANALYSIS_PERIOD = "fundamentalAnalysis.period";
+        public static final String FUNDAMENTAL_ANALYSIS_BUTTON_REFRESH =
+                "fundamentalAnalysis.button.refresh";
+        public static final String FUNDAMENTAL_ANALYSIS_BUTTON_CLOSE =
+                "fundamentalAnalysis.button.close";
+        public static final String FUNDAMENTAL_ANALYSIS_LOADING = "fundamentalAnalysis.loading";
+        public static final String FUNDAMENTAL_ANALYSIS_ERROR_TITLE =
+                "fundamentalAnalysis.error.title";
+        public static final String FUNDAMENTAL_ANALYSIS_ERROR_CONNECTION_TITLE =
+                "fundamentalAnalysis.error.connection.title";
+        public static final String FUNDAMENTAL_ANALYSIS_ERROR_CONNECTION_MESSAGE =
+                "fundamentalAnalysis.error.connection.message";
+
+        // Fundamental Analysis - Tabs
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_PROFITABILITY =
+                "fundamentalAnalysis.tab.profitability";
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_VALUATION =
+                "fundamentalAnalysis.tab.valuation";
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_GROWTH =
+                "fundamentalAnalysis.tab.growth";
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_DEBT = "fundamentalAnalysis.tab.debt";
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_EFFICIENCY =
+                "fundamentalAnalysis.tab.efficiency";
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_CASH_GENERATION =
+                "fundamentalAnalysis.tab.cashGeneration";
+        public static final String FUNDAMENTAL_ANALYSIS_TAB_PRICE_PERFORMANCE =
+                "fundamentalAnalysis.tab.pricePerformance";
+
+        // Fundamental Analysis - Metrics
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ROE =
+                "fundamentalAnalysis.metric.roe";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ROIC =
+                "fundamentalAnalysis.metric.roic";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN =
+                "fundamentalAnalysis.metric.netMargin";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN =
+                "fundamentalAnalysis.metric.ebitdaMargin";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE =
+                "fundamentalAnalysis.metric.currentPrice";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP =
+                "fundamentalAnalysis.metric.marketCap";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE =
+                "fundamentalAnalysis.metric.enterpriseValue";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO =
+                "fundamentalAnalysis.metric.peRatio";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA =
+                "fundamentalAnalysis.metric.evEbitda";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD =
+                "fundamentalAnalysis.metric.earningsYield";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD =
+                "fundamentalAnalysis.metric.fcfYield";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD =
+                "fundamentalAnalysis.metric.dividendYield";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE =
+                "fundamentalAnalysis.metric.dividendRate";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO =
+                "fundamentalAnalysis.metric.payoutRatio";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER =
+                "fundamentalAnalysis.metric.grahamNumber";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE =
+                "fundamentalAnalysis.metric.grahamFairValue";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY =
+                "fundamentalAnalysis.metric.marginOfSafety";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY =
+                "fundamentalAnalysis.metric.revenueGrowthYoy";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR =
+                "fundamentalAnalysis.metric.revenueGrowthCagr";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS =
+                "fundamentalAnalysis.metric.revenueGrowthYears";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT =
+                "fundamentalAnalysis.metric.totalDebt";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT =
+                "fundamentalAnalysis.metric.netDebt";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA =
+                "fundamentalAnalysis.metric.netDebtEbitda";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO =
+                "fundamentalAnalysis.metric.currentRatio";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER =
+                "fundamentalAnalysis.metric.assetTurnover";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EBITDA =
+                "fundamentalAnalysis.metric.ebitda";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW =
+                "fundamentalAnalysis.metric.freeCashFlow";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW =
+                "fundamentalAnalysis.metric.operatingCashFlow";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CAPEX =
+                "fundamentalAnalysis.metric.capex";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME =
+                "fundamentalAnalysis.metric.fcfNetIncome";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH =
+                "fundamentalAnalysis.metric.dayHigh";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW =
+                "fundamentalAnalysis.metric.dayLow";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D =
+                "fundamentalAnalysis.metric.change1d";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D =
+                "fundamentalAnalysis.metric.change5d";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M =
+                "fundamentalAnalysis.metric.change1m";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M =
+                "fundamentalAnalysis.metric.change3m";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M =
+                "fundamentalAnalysis.metric.change6m";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD =
+                "fundamentalAnalysis.metric.changeYtd";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y =
+                "fundamentalAnalysis.metric.change1y";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH =
+                "fundamentalAnalysis.metric.52wHigh";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW =
+                "fundamentalAnalysis.metric.52wLow";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH =
+                "fundamentalAnalysis.metric.distance52wHigh";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW =
+                "fundamentalAnalysis.metric.distance52wLow";
+
+        // Period Types
+        public static final String PERIOD_TYPE_ANNUAL = "periodType.annual";
+        public static final String PERIOD_TYPE_QUARTERLY = "periodType.quarterly";
+
+        // Fundamental Analysis - Metadata
+        public static final String FUNDAMENTAL_ANALYSIS_REFERENCE_DATE =
+                "fundamentalAnalysis.referenceDate";
+
         public static final String BOND_INTEREST_RATE = "bond.interestRate";
 
         // Bond Tabs
