@@ -13,6 +13,7 @@ buildNumber.properties
 *.class
 *.iso
 *.zip
+*.json
 
 # VSCode
 .vscode/

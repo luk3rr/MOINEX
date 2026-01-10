@@ -53,12 +53,7 @@ import org.moinex.model.enums.AssetType;
 import org.moinex.model.enums.BondType;
 import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.*;
-import org.moinex.service.BondService;
-import org.moinex.service.I18nService;
-import org.moinex.service.InvestmentTargetService;
-import org.moinex.service.MarketService;
-import org.moinex.service.TickerService;
-import org.moinex.service.WalletService;
+import org.moinex.service.*;
 import org.moinex.ui.dialog.investment.*;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -557,6 +552,45 @@ public class SavingsController {
                             updateAllocationVsTargetPanel();
                             updateProfitabilityMetricsPanel();
                         }));
+    }
+
+    @FXML
+    private void handleViewFundamentalAnalysis() {
+        Ticker selectedTicker = stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE));
+            return;
+        }
+
+        if (!FundamentalAnalysisService.tickerIsValidForFundamentalAnalysis(selectedTicker)) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.FUNDAMENTAL_ANALYSIS_FXML,
+                MessageFormat.format(
+                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_DIALOG_TITLE),
+                        selectedTicker.getSymbol()),
+                springContext,
+                (FundamentalAnalysisController controller) -> {
+                    controller.setTicker(selectedTicker);
+                    controller.loadAnalysis();
+                },
+                List.of());
     }
 
     @FXML

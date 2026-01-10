@@ -1,0 +1,31 @@
+/* Fundamental Analysis Dialog Styles */
+
+/* Status Label Base Style */
+.cache-status-label {
+    -fx-font-size: 11px;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 3;
+}
+
+/* Status Label - Expired (Warning) */
+.cache-status-label-expired {
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #856404;
+}
+
+/* Status Label - Valid (Success) */
+.cache-status-label-valid {
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+}
+
+/* Status Label - Not Available (Neutral) */
+.cache-status-label-unavailable {
+    -fx-background-color: #e2e3e5;
+    -fx-text-fill: #383d41;
+}
+
+/* Transparent ScrollPane */
+.transparent-scroll-pane {
+    -fx-background-color: transparent;
+}

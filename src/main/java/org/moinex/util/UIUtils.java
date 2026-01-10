@@ -8,6 +8,7 @@ package org.moinex.util;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -180,7 +181,7 @@ public final class UIUtils {
     }
 
     /**
-     * Format a number to percentage string
+     * Format a number as a percentage
      *
      * @param value The value to be formatted
      */
@@ -191,6 +192,27 @@ public final class UIUtils {
         }
 
         return percentageFormat.format(Math.abs(value.doubleValue())) + " %";
+    }
+
+    /**
+     * Format a number as a percentage for fundamental analysis (no threshold, limited decimals)
+     *
+     * @param value The value to be formatted
+     */
+    public static String formatPercentageForFundamentalAnalysis(Number value) {
+        double percentValue = value.doubleValue();
+
+        // Limit to 2 decimal places
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+
+        return df.format(percentValue) + " %";
+    }
+
+    public static String formatNumWithDecimalPlaces(Number value, int decimalPlaces) {
+        DecimalFormat df = new DecimalFormat("#,##0." + "0".repeat(decimalPlaces));
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(value);
     }
 
     /**
@@ -573,6 +595,20 @@ public final class UIUtils {
         return assetType.name();
     }
 
+    public static String translatePeriodType(PeriodType periodType, I18nService i18nService) {
+        Map<String, String> periodTypeKeyMap =
+                Map.of(
+                        "annual", Constants.TranslationKeys.PERIOD_TYPE_ANNUAL,
+                        "quarterly", Constants.TranslationKeys.PERIOD_TYPE_QUARTERLY);
+
+        String key = periodTypeKeyMap.getOrDefault(periodType.name().toLowerCase(), null);
+        if (key != null) {
+            return i18nService.tr(key);
+        }
+
+        return periodType.name();
+    }
+
     public static String translateBondType(BondType bondType, I18nService i18nService) {
         Map<String, String> bondTypeKeyMap =
                 Map.of(
@@ -858,5 +894,12 @@ public final class UIUtils {
                 DateTimeFormatter.ofLocalizedDateTime(java.time.format.FormatStyle.SHORT)
                         .withLocale(i18nService.getLocale());
         return dateTime.format(formatter);
+    }
+
+    public static Object getOrDefault(Object value, Object d) {
+        if (value == null || value.toString().equals("null")) {
+            return d;
+        }
+        return value;
     }
 }
