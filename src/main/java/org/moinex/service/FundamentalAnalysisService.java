@@ -37,27 +37,26 @@ public class FundamentalAnalysisService {
             LoggerFactory.getLogger(FundamentalAnalysisService.class);
 
     // Cache validity: 24 hours
-    private static final Duration CACHE_VALIDITY = Duration.ofHours(24);
+    private static final Integer CACHE_VALIDITY_HOURS = 24;
 
     private FundamentalAnalysisRepository fundamentalAnalysisRepository;
     private TickerRepository tickerRepository;
-    private FundamentalAnalysisService self;
 
     @Autowired
     public FundamentalAnalysisService(
             FundamentalAnalysisRepository fundamentalAnalysisRepository,
-            TickerRepository tickerRepository,
-            FundamentalAnalysisService self) {
+            TickerRepository tickerRepository) {
         this.fundamentalAnalysisRepository = fundamentalAnalysisRepository;
         this.tickerRepository = tickerRepository;
-        this.self = self;
     }
 
     /**
-     * Get fundamental analysis for a ticker
+     * Get fundamental analysis for a ticker and period type
+     * Checks cache first, fetches new data if cache is invalid or forceRefresh is true
+     * Only works for non-archived tickers
      *
      * @param tickerId Ticker ID
-     * @param periodType Period type ("annual" or "quarterly")
+     * @param periodType Period type (ANNUAL, QUARTERLY, etc.)
      * @param forceRefresh If true, ignores cache and fetches new data
      * @return cached data if available and not expired, otherwise fetches new data
      * @throws MoinexException if data cannot be fetched or ticker is archived
@@ -75,27 +74,25 @@ public class FundamentalAnalysisService {
                     "Cannot fetch analysis for archived ticker: " + ticker.getSymbol());
         }
 
-        // Check cache first
+        // Check cache first for this specific period type
         if (!forceRefresh) {
             Optional<FundamentalAnalysis> cached =
-                    fundamentalAnalysisRepository.findByTicker(ticker);
+                    fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, periodType);
 
             if (cached.isPresent()) {
                 FundamentalAnalysis analysis = cached.get();
-                LocalDateTime lastUpdate = analysis.getLastUpdate();
-                Duration age = Duration.between(lastUpdate, LocalDateTime.now());
-
-                // Return cached data if still valid and same period type
-                if (age.compareTo(CACHE_VALIDITY) < 0 && analysis.getPeriodType().equals(periodType)) {
-                    logger.info("Returning cached analysis for {}", ticker.getSymbol());
+                
+                // Check if cache is still valid (24 hours)
+                if (!isCacheExpired(analysis)) {
+                    logger.info("Returning cached analysis for {} ({})", ticker.getSymbol(), periodType);
                     return analysis;
                 }
 
-                logger.info("Cache expired for {}, fetching new data", ticker.getSymbol());
+                logger.info("Cache expired for {} ({}), fetching new data", ticker.getSymbol(), periodType);
             }
         }
 
-        return self.fetchAndSaveAnalysis(ticker, periodType);
+        return fetchAndSaveAnalysis(ticker, periodType);
     }
 
     /**
@@ -114,57 +111,103 @@ public class FundamentalAnalysisService {
                 .findBySymbol(symbol)
                 .orElseThrow(() -> new EntityNotFoundException("Ticker not found: " + symbol));
 
-        return self.getAnalysis(ticker.getId(), periodType, forceRefresh);
+        return getAnalysis(ticker.getId(), periodType, forceRefresh);
     }
 
     /**
      * Fetch fundamental analysis from Python script and save to database
+     * Implements retry mechanism with exponential backoff
      *
      * @param ticker Ticker entity
      * @param periodType Period type ("annual" or "quarterly")
      * @return FundamentalAnalysis entity
-     * @throws MoinexException if script execution fails
+     * @throws MoinexException if script execution fails after all retries
      */
     @Transactional
     public FundamentalAnalysis fetchAndSaveAnalysis(Ticker ticker, PeriodType periodType)
             throws MoinexException {
-        try {
-            String symbol = ticker.getSymbol();
-            logger.info("Fetching fundamental analysis for {} ({})", symbol, periodType);
+        String symbol = ticker.getSymbol();
+        int maxRetries = 5;
+        int retryDelayMs = 2000; // Start with 2 seconds
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                logger.info("Fetching fundamental analysis for {} ({}) - Attempt {}/{}", 
+                           symbol, periodType, attempt, maxRetries);
 
-            // Use APIUtils to execute Python script asynchronously
-            JSONObject jsonData =
-                    APIUtils.fetchFundamentalAnalysisAsync(symbol, periodType).get();
+                JSONObject jsonData =
+                        APIUtils.fetchFundamentalAnalysisAsync(symbol, periodType).get();
 
-            JSONObject tickerData = jsonData.getJSONObject(symbol);
+                JSONObject tickerData = jsonData.getJSONObject(symbol);
 
-            // Create or update entity
-            FundamentalAnalysis analysis =
-                    fundamentalAnalysisRepository
-                            .findByTicker(ticker)
-                            .orElse(FundamentalAnalysis.builder()
-                                    .ticker(ticker)
-                                    .createdAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER))
-                                    .build());
+                // Check if response contains error
+                if (tickerData.has("error")) {
+                    String errorMsg = tickerData.getString("error");
+                    logger.warn("API returned error for {}: {}", symbol, errorMsg);
+                    
+                    // If this is not the last attempt, retry
+                    if (attempt < maxRetries) {
+                        logger.info("Retrying in {} ms...", retryDelayMs);
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2; // Exponential backoff
+                        continue;
+                    } else {
+                        throw new MoinexException("API error after " + maxRetries + " attempts: " + errorMsg);
+                    }
+                }
 
-            // Update fields
-            analysis.setCompanyName(tickerData.optString("company_name", ""));
-            analysis.setSector(tickerData.optString("sector", ""));
-            analysis.setIndustry(tickerData.optString("industry", ""));
-            analysis.setCurrency(tickerData.optString("currency", "BRL"));
-            analysis.setPeriodType(periodType);
-            analysis.setDataJson(tickerData.toString()); // Store full JSON
-            analysis.setLastUpdate(LocalDateTime.now());
+                // Create or update entity for this specific period type
+                FundamentalAnalysis analysis =
+                        fundamentalAnalysisRepository
+                                .findByTickerAndPeriodType(ticker, periodType)
+                                .orElse(FundamentalAnalysis.builder()
+                                        .ticker(ticker)
+                                        .createdAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER))
+                                        .build());
 
-            analysis = fundamentalAnalysisRepository.save(analysis);
+                // Update fields
+                analysis.setCompanyName(tickerData.optString("company_name", ""));
+                analysis.setSector(tickerData.optString("sector", ""));
+                analysis.setIndustry(tickerData.optString("industry", ""));
+                analysis.setCurrency(tickerData.optString("currency", "BRL"));
+                analysis.setPeriodType(periodType);
+                analysis.setDataJson(tickerData.toString()); // Store full JSON
+                analysis.setLastUpdate(LocalDateTime.now());
 
-            logger.info("Successfully saved analysis for {}", symbol);
-            return analysis;
+                analysis = fundamentalAnalysisRepository.save(analysis);
 
-        } catch (Exception e) {
-            logger.error("Error fetching analysis for {}: {}", ticker.getSymbol(), e.getMessage());
-            throw new MoinexException("Failed to fetch fundamental analysis: " + e.getMessage());
+                logger.info("Successfully saved analysis for {} on attempt {}", symbol, attempt);
+                return analysis;
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Retry interrupted for {}", symbol);
+                throw new MoinexException("Fetch interrupted: " + e.getMessage());
+            } catch (MoinexException e) {
+                throw e;
+            } catch (Exception e) {
+                logger.error("Error fetching analysis for {} on attempt {}: {}", 
+                           symbol, attempt, e.getMessage());
+                
+                // If this is not the last attempt, retry
+                if (attempt < maxRetries) {
+                    try {
+                        logger.info("Retrying in {} ms...", retryDelayMs);
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2; // Exponential backoff
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new MoinexException("Retry interrupted: " + ie.getMessage());
+                    }
+                } else {
+                    throw new MoinexException("Failed to fetch fundamental analysis after " + 
+                                            maxRetries + " attempts: " + e.getMessage());
+                }
+            }
         }
+        
+        // Should never reach here
+        throw new MoinexException("Failed to fetch fundamental analysis for " + symbol);
     }
 
     /**
@@ -201,49 +244,43 @@ public class FundamentalAnalysisService {
     }
 
     /**
-     * Check if analysis exists for ticker
+     * Check if cache is expired (older than 24 hours)
      *
-     * @param tickerId Ticker ID
-     * @return true if exists
+     * @param analysis FundamentalAnalysis entity
+     * @return true if cache is expired
      */
-    public boolean hasAnalysis(Integer tickerId) {
-        return tickerRepository
-                .findById(tickerId)
-                .map(fundamentalAnalysisRepository::existsByTicker)
-                .orElse(false);
-    }
-
-    /**
-     * Get analysis by ticker ID (from cache only)
-     *
-     * @param tickerId Ticker ID
-     * @return FundamentalAnalysis entity
-     * @throws EntityNotFoundException if not found
-     */
-    public FundamentalAnalysis getAnalysisFromCache(Integer tickerId) {
-        return fundamentalAnalysisRepository
-                .findByTickerId(tickerId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "No cached analysis found for ticker ID: " + tickerId));
-    }
-
-    /**
-     * Check if cached analysis is expired
-     *
-     * @param tickerId Ticker ID
-     * @return true if expired or not found
-     */
-    public boolean isCacheExpired(Integer tickerId) {
-        Optional<FundamentalAnalysis> cached =
-                fundamentalAnalysisRepository.findByTickerId(tickerId);
-
-        if (cached.isEmpty()) {
+    public boolean isCacheExpired(FundamentalAnalysis analysis) {
+        if (analysis == null) {
             return true;
         }
 
-        LocalDateTime lastUpdate = cached.get().getLastUpdate();
-        Duration age = Duration.between(lastUpdate, LocalDateTime.now());
+        LocalDateTime lastUpdate = analysis.getLastUpdate();
+        LocalDateTime now = LocalDateTime.now();
 
-        return age.compareTo(CACHE_VALIDITY) >= 0;
+        return lastUpdate.plusHours(CACHE_VALIDITY_HOURS).isBefore(now);
+    }
+
+    /**
+     * Check if cache is expired for a specific ticker and period type
+     *
+     * @param tickerId Ticker ID
+     * @param periodType Period type
+     * @return true if cache is expired or doesn't exist
+     */
+    public boolean isCacheExpired(Integer tickerId, PeriodType periodType) {
+        Optional<FundamentalAnalysis> analysis =
+                fundamentalAnalysisRepository.findByTickerIdAndPeriodType(tickerId, periodType);
+
+        return analysis.map(this::isCacheExpired).orElse(true);
+    }
+
+    /**
+     * Get all cached analyses for a ticker (all period types)
+     *
+     * @param tickerId Ticker ID
+     * @return List of all analyses for the ticker
+     */
+    public List<FundamentalAnalysis> getAllAnalysesForTicker(Integer tickerId) {
+        return fundamentalAnalysisRepository.findByTickerId(tickerId);
     }
 }

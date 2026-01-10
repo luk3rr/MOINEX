@@ -6,16 +6,8 @@
 
 package org.moinex.model.investment;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,6 +22,7 @@ import org.moinex.util.Constants;
  * Entity that stores fundamental analysis data for a ticker
  * This data is fetched from the Python script and cached in the database
  * Linked to Ticker entity - analysis is only available for active (non-archived) tickers
+ * Multiple analyses can exist per ticker (one for each period type: annual, quarterly, etc.)
  */
 @Entity
 @Table(name = "fundamental_analysis")
@@ -43,10 +36,10 @@ public class FundamentalAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Long id;
+    private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticker_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticker_id", nullable = false)
     private Ticker ticker;
 
     @Column(name = "company_name")
@@ -61,6 +54,7 @@ public class FundamentalAnalysis {
     @Column(name = "currency", nullable = false)
     private String currency;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "period_type", nullable = false)
     private PeriodType periodType;
 

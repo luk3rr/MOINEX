@@ -100,6 +100,8 @@ public final class Constants {
             UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml";
     public static final String EDIT_INVESTMENT_TARGET_FXML =
             UI_DIALOG_INVESTMENT_PATH + "edit_investment_target.fxml";
+    public static final String FUNDAMENTAL_ANALYSIS_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "fundamental_analysis.fxml";
     public static final String UI_DIALOG_WALLETTRANSACTION_PATH =
             UI_DIALOG_PATH + "wallettransaction/";
     // UI wallettransaction package
@@ -174,6 +176,7 @@ public final class Constants {
 
     public static final String RESUME_PANE_FXML = UI_COMMON_PATH + "resume_pane.fxml";
     public static final String CRC_PANE_FXML = UI_COMMON_PATH + ("credit_card_pane." + "fxml");
+    public static final String FUNDAMENTAL_METRIC_PANE_FXML = UI_COMMON_PATH + "fundamental_metric_pane.fxml";
 
     public static final String CALCULATOR_FXML = UI_COMMON_PATH + "calculator.fxml";
     public static final String CALENDAR_FXML = UI_COMMON_PATH + "calendar.fxml";
@@ -934,6 +937,8 @@ public final class Constants {
                 "savings.stocksFunds.dialog.noSelection.edit.message";
         public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_DELETE_MESSAGE =
                 "savings.stocksFunds.dialog.noSelection.delete.message";
+        public static final String SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE =
+                "savings.stocksFunds.dialog.noSelection.message";
         public static final String SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_TITLE =
                 "savings.stocksFunds.dialog.hasTransactions.title";
         public static final String SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_MESSAGE =

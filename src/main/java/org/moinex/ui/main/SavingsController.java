@@ -560,6 +560,32 @@ public class SavingsController {
     }
 
     @FXML
+    private void handleViewFundamentalAnalysis() {
+        Ticker selectedTicker = stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTicker == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.FUNDAMENTAL_ANALYSIS_FXML,
+                i18nService.tr("Análise Fundamentalista - " + selectedTicker.getSymbol()),
+                springContext,
+                (FundamentalAnalysisController controller) -> {
+                    controller.setTicker(selectedTicker);
+                    controller.loadAnalysis();
+                },
+                List.of());
+    }
+
+    @FXML
     private void handleDeleteTicker() {
         Ticker selectedTicker = stocksFundsTabTickerTable.getSelectionModel().getSelectedItem();
 
