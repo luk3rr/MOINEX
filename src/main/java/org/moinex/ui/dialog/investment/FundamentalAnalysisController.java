@@ -56,6 +56,7 @@ public class FundamentalAnalysisController {
     @FXML private TabPane metricsTabPane;
     @FXML private VBox loadingContainer;
     @FXML private ProgressIndicator loadingIndicator;
+    @FXML private Button refreshButton;
 
     private FundamentalAnalysisService fundamentalAnalysisService;
     private I18nService i18nService;
@@ -206,6 +207,8 @@ public class FundamentalAnalysisController {
         }
 
         showLoading(true);
+        refreshButton.setDisable(true);
+        periodComboBox.setDisable(true);
 
         // Create background task
         Task<FundamentalAnalysis> task =
@@ -224,11 +227,15 @@ public class FundamentalAnalysisController {
                     displayAnalysis();
                     updateCacheStatusIndicators();
                     showLoading(false);
+                    refreshButton.setDisable(false);
+                    periodComboBox.setDisable(false);
                 });
 
         task.setOnFailed(
                 event -> {
                     showLoading(false);
+                    refreshButton.setDisable(false);
+                    periodComboBox.setDisable(false);
                     Throwable exception = task.getException();
                     logger.error("Error loading fundamental analysis", exception);
 

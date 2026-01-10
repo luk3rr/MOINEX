@@ -34,10 +34,12 @@ import org.springframework.stereotype.Controller;
 public class FundamentalMetricPaneController {
     @FXML private VBox rootVBox;
     @FXML private Text metricNameText;
-    @FXML private Text metricValueText;
+    @FXML private Label metricValueLabel;
     @FXML private HBox metadataBox;
 
     private I18nService i18nService;
+    private static final BigDecimal THRESHOLD_DECREASE_FONT_SIZE =
+            new BigDecimal("1E12"); // 1 Trillion
 
     @Autowired
     public FundamentalMetricPaneController(I18nService i18nService) {
@@ -54,12 +56,14 @@ public class FundamentalMetricPaneController {
     public void updateMetricPane(String metricName, Object metricData, String lastUpdateDate) {
         metricNameText.setText(metricName);
 
+        String valueStr;
+
         if (metricData instanceof JSONObject) {
             JSONObject metric = (JSONObject) metricData;
 
             // Set main value
-            String valueStr = formatMetricValue(metric);
-            metricValueText.setText(valueStr);
+            valueStr = formatMetricValue(metric);
+            metricValueLabel.setText(valueStr);
 
             // Clear and populate metadata
             metadataBox.getChildren().clear();
@@ -87,8 +91,18 @@ public class FundamentalMetricPaneController {
             }
         } else {
             // Simple value
-            metricValueText.setText(UIUtils.getOrDefault(metricData, Constants.NA_DATA).toString());
+            valueStr = UIUtils.getOrDefault(metricData, Constants.NA_DATA).toString();
+            metricValueLabel.setText(valueStr);
             metadataBox.getChildren().clear();
+        }
+
+        // Define metric font size based on value
+        BigDecimal value = extractNumericValue(metricData);
+
+        if (value.abs().compareTo(THRESHOLD_DECREASE_FONT_SIZE) > 0) {
+            metricValueLabel.setStyle("-fx-font-size: 20px;");
+        } else {
+            metricValueLabel.setStyle("-fx-font-size: 22px;");
         }
     }
 
@@ -126,5 +140,31 @@ public class FundamentalMetricPaneController {
         } catch (Exception e) {
             return dateStr;
         }
+    }
+
+    private static BigDecimal extractNumericValue(Object metricData) {
+        if (metricData == null) {
+            return BigDecimal.ZERO;
+        }
+
+        if (metricData instanceof JSONObject metric) {
+            Object value = metric.opt("value");
+
+            if (value == null || value == JSONObject.NULL) {
+                return BigDecimal.ZERO;
+            }
+
+            try {
+                return new BigDecimal(value.toString());
+            } catch (NumberFormatException e) {
+                return BigDecimal.ZERO;
+            }
+        }
+
+        if (metricData instanceof Number) {
+            return new BigDecimal(metricData.toString());
+        }
+
+        return BigDecimal.ZERO;
     }
 }

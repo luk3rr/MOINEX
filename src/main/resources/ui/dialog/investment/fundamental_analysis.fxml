@@ -18,7 +18,7 @@
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <!-- Header Section -->
-            <AnchorPane maxHeight="220.0" prefHeight="300.0" prefWidth="900.0" styleClass="anchor-pane" VBox.vgrow="NEVER">
+            <AnchorPane maxHeight="220.0" prefHeight="300.0" prefWidth="1000.0" styleClass="anchor-pane" VBox.vgrow="NEVER">
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -27,7 +27,7 @@
                               <VBox alignment="CENTER_LEFT" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <!-- Company Name -->
-                                    <Label fx:id="companyNameValueLabel" text="Nome da Empresa">
+                                    <Label fx:id="companyNameValueLabel" text="-">
                                        <font>
                                           <Font name="System Bold" size="20.0" />
                                        </font>
@@ -111,7 +111,7 @@
                                     <!-- Action Buttons -->
                         <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
                            <children>
-                              <JFXButton onAction="#handleRefresh" stylesheets="@../../../css/component/buttons.css" text="%fundamentalAnalysis.button.refresh">
+                              <JFXButton fx:id="refreshButton" onAction="#handleRefresh" stylesheets="@../../../css/component/buttons.css" text="%fundamentalAnalysis.button.refresh">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
