@@ -684,7 +684,7 @@
                                                                         </ImageView>
                                                                      </graphic>
                                                                   </JFXButton>
-                                                                  <JFXButton onAction="#handleViewFundamentalAnalysis" stylesheets="@../../css/component/buttons.css" text="Análise Fundamentalista">
+                                                                  <JFXButton onAction="#handleViewFundamentalAnalysis" stylesheets="@../../css/component/buttons.css" text="%savings.stocksFunds.button.fundamentalAnalysis">
                                                                      <graphic>
                                                                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                            <image>

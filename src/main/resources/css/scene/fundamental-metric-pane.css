@@ -1,0 +1,6 @@
+/* Fundamental Metric Pane Styles */
+
+.metric-metadata-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666;
+}

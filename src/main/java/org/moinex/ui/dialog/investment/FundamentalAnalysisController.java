@@ -63,8 +63,6 @@ public class FundamentalAnalysisController {
     private Ticker ticker;
     private FundamentalAnalysis currentAnalysis;
 
-    private static final String NA = "N/A";
-
     @Autowired
     public FundamentalAnalysisController(
             FundamentalAnalysisService fundamentalAnalysisService,
@@ -157,9 +155,7 @@ public class FundamentalAnalysisController {
                     // Create status label for each period type
                     for (PeriodType periodType : PeriodType.values()) {
                         Label statusLabel = new Label();
-                        statusLabel.setStyle(
-                                "-fx-font-size: 11px; -fx-padding: 2 8 2 8; -fx-background-radius:"
-                                        + " 3;");
+                        statusLabel.getStyleClass().add("cache-status-label");
 
                         // Find analysis for this period type
                         Optional<FundamentalAnalysis> analysis =
@@ -174,24 +170,19 @@ public class FundamentalAnalysisController {
                             boolean expired =
                                     fundamentalAnalysisService.isCacheExpired(analysis.get());
 
-                            statusLabel.setText(periodType.name() + ": " + lastUpdate);
+                            statusLabel.setText(
+                                    UIUtils.translatePeriodType(periodType, i18nService)
+                                            + ": "
+                                            + lastUpdate);
                             if (expired) {
-                                statusLabel.setStyle(
-                                        statusLabel.getStyle()
-                                                + "-fx-background-color: #fff3cd; -fx-text-fill:"
-                                                + " #856404;");
+                                statusLabel.getStyleClass().add("cache-status-label-expired");
                             } else {
-                                statusLabel.setStyle(
-                                        statusLabel.getStyle()
-                                                + "-fx-background-color: #d4edda; -fx-text-fill:"
-                                                + " #155724;");
+                                statusLabel.getStyleClass().add("cache-status-label-valid");
                             }
                         } else {
-                            statusLabel.setText(periodType.name() + ": --");
-                            statusLabel.setStyle(
-                                    statusLabel.getStyle()
-                                            + "-fx-background-color: #e2e3e5; -fx-text-fill:"
-                                            + " #383d41;");
+                            statusLabel.setText(
+                                    UIUtils.translatePeriodType(periodType, i18nService) + ": --");
+                            statusLabel.getStyleClass().add("cache-status-label-unavailable");
                         }
 
                         cacheStatusContainer.getChildren().add(statusLabel);
@@ -288,12 +279,14 @@ public class FundamentalAnalysisController {
 
         // Update company info (use N/A for null values)
         companyNameValueLabel.setText(
-                UIUtils.getOrDefault(currentAnalysis.getCompanyName(), NA).toString());
-        sectorValueLabel.setText(UIUtils.getOrDefault(currentAnalysis.getSector(), NA).toString());
+                UIUtils.getOrDefault(currentAnalysis.getCompanyName(), Constants.NA_DATA)
+                        .toString());
+        sectorValueLabel.setText(
+                UIUtils.getOrDefault(currentAnalysis.getSector(), Constants.NA_DATA).toString());
         industryValueLabel.setText(
-                UIUtils.getOrDefault(currentAnalysis.getIndustry(), NA).toString());
+                UIUtils.getOrDefault(currentAnalysis.getIndustry(), Constants.NA_DATA).toString());
         currencyValueLabel.setText(
-                UIUtils.getOrDefault(currentAnalysis.getCurrency(), NA).toString());
+                UIUtils.getOrDefault(currentAnalysis.getCurrency(), Constants.NA_DATA).toString());
 
         // Parse JSON and populate tabs
         try {
@@ -387,7 +380,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -479,7 +472,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -532,7 +525,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -572,7 +565,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -605,7 +598,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -651,7 +644,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -746,7 +739,7 @@ public class FundamentalAnalysisController {
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent;");
+        scrollPane.getStyleClass().add("transparent-scroll-pane");
 
         tab.setContent(scrollPane);
         return tab;
@@ -764,7 +757,6 @@ public class FundamentalAnalysisController {
         Object metricObj = data.get(key);
 
         try {
-            // Load the FXML and controller
             FXMLLoader loader =
                     new FXMLLoader(getClass().getResource(Constants.FUNDAMENTAL_METRIC_PANE_FXML));
             loader.setControllerFactory(springContext::getBean);
@@ -806,17 +798,6 @@ public class FundamentalAnalysisController {
     @FXML
     private void handleRefresh() {
         loadAnalysis(true);
-    }
-
-    /**
-     * Handle export CSV button click
-     */
-    @FXML
-    private void handleExportCSV() {
-        // TODO: Implement CSV export
-        WindowUtils.showInformationDialog(
-                "Em Desenvolvimento",
-                "Funcionalidade de exportação CSV será implementada em breve.");
     }
 
     /**

@@ -209,6 +209,12 @@ public final class UIUtils {
         return df.format(percentValue) + " %";
     }
 
+    public static String formatNumWithDecimalPlaces(Number value, int decimalPlaces) {
+        DecimalFormat df = new DecimalFormat("#,##0." + "0".repeat(decimalPlaces));
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(value);
+    }
+
     /**
      * Format the date picker to display the date in a specific format
      *

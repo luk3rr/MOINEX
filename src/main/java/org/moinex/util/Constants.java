@@ -353,10 +353,6 @@ public final class Constants {
     public static final Integer NON_LEAP_YEAR_FEBRUARY_DAYS = 28;
     public static final Integer WEEK_DAYS = 7;
 
-    public static final String[] WEEKDAY_ABBREVIATIONS = {
-        "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-    };
-
     public static final Font CALENDAR_WEEKDAY_FONT_CONFIG = Font.font("Arial", FontWeight.BOLD, 14);
 
     public static final Font CALENDAR_DATE_FONT_CONFIG = Font.font("Arial", FontWeight.BOLD, 14);
@@ -383,6 +379,8 @@ public final class Constants {
 
     public static final LocalTime RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME =
             LocalTime.of(0, 0, 0, 0);
+
+    public static final String NA_DATA = "N/A";
 
     // Date formats
     public static final String DB_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
@@ -1272,6 +1270,12 @@ public final class Constants {
         // Fundamental Analysis - Metadata
         public static final String FUNDAMENTAL_ANALYSIS_REFERENCE_DATE =
                 "fundamentalAnalysis.referenceDate";
+
+        // Fundamental Analysis - Errors
+        public static final String FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_TITLE =
+                "fundamentalAnalysis.error.invalidTickerType.title";
+        public static final String FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_MESSAGE =
+                "fundamentalAnalysis.error.invalidTickerType.message";
 
         public static final String BOND_INTEREST_RATE = "bond.interestRate";
 

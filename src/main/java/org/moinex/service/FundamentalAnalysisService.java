@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
 import org.moinex.model.enums.PeriodType;
+import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.FundamentalAnalysis;
 import org.moinex.model.investment.Ticker;
 import org.moinex.repository.investment.FundamentalAnalysisRepository;
@@ -36,8 +37,11 @@ public class FundamentalAnalysisService {
 
     public static final Integer CACHE_VALIDITY_HOURS = 24;
     public static final Integer MAX_RETRIES = 5;
-    public static final Integer RETRY_DELAY_MS = 2000; // Start with 2 seconds
+    public static final Integer RETRY_DELAY_MS = 2000;
     public static final Double RETRY_MULTIPLIER = 1.5;
+
+    public static final List<TickerType> VALID_TICKER_TYPES =
+            List.of(TickerType.STOCK, TickerType.REIT);
 
     private FundamentalAnalysisRepository fundamentalAnalysisRepository;
     private TickerRepository tickerRepository;
@@ -74,6 +78,10 @@ public class FundamentalAnalysisService {
         if (ticker.isArchived()) {
             throw new MoinexException(
                     "Cannot fetch analysis for archived ticker: " + ticker.getSymbol());
+        }
+
+        if (!tickerIsValidForFundamentalAnalysis(ticker)) {
+            throw new IllegalArgumentException("Ticker type must be STOCK or REIT");
         }
 
         // Check cache first for this specific period type
@@ -158,8 +166,22 @@ public class FundamentalAnalysisService {
                     String errorMsg = tickerData.getString("error");
                     logger.warn("API returned error for {}: {}", symbol, errorMsg);
 
-                    // If this is not the last attempt, retry
-                    if (attempt < MAX_RETRIES) {
+                    // For 'Financial data not available', we still have partial data (e.g.,
+                    // price_performance)
+                    if (errorMsg.contains("Financial data not available")) {
+                        logger.info(
+                                "Financial data not available for {}, but saving partial data"
+                                        + " (e.g., price performance)",
+                                symbol);
+                        // Continue to save partial data below
+                    }
+                    // For other permanent errors, fail immediately
+                    else if (errorMsg.contains("not found")
+                            || errorMsg.contains("invalid symbol")) {
+                        throw new MoinexException("API error: " + errorMsg);
+                    }
+                    // For transient errors, retry
+                    else if (attempt < MAX_RETRIES) {
                         logger.info("Retrying in {} ms...", retryDelayMs);
                         Thread.sleep(retryDelayMs);
                         retryDelayMs *= RETRY_MULTIPLIER; // Exponential backoff
@@ -211,12 +233,11 @@ public class FundamentalAnalysisService {
                         attempt,
                         e.getMessage());
 
-                // If this is not the last attempt, retry
                 if (attempt < MAX_RETRIES) {
                     try {
                         logger.info("Retrying in {} ms...", retryDelayMs);
                         Thread.sleep(retryDelayMs);
-                        retryDelayMs *= 2; // Exponential backoff
+                        retryDelayMs *= RETRY_MULTIPLIER; // Exponential backoff
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         throw new MoinexException("Retry interrupted: " + ie.getMessage());
@@ -288,20 +309,6 @@ public class FundamentalAnalysisService {
     }
 
     /**
-     * Check if cache is expired for a specific ticker and period type
-     *
-     * @param tickerId Ticker ID
-     * @param periodType Period type
-     * @return true if cache is expired or doesn't exist
-     */
-    public boolean isCacheExpired(Integer tickerId, PeriodType periodType) {
-        Optional<FundamentalAnalysis> analysis =
-                fundamentalAnalysisRepository.findByTickerIdAndPeriodType(tickerId, periodType);
-
-        return analysis.map(this::isCacheExpired).orElse(true);
-    }
-
-    /**
      * Get all cached analyses for a ticker (all period types)
      *
      * @param tickerId Ticker ID
@@ -309,5 +316,9 @@ public class FundamentalAnalysisService {
      */
     public List<FundamentalAnalysis> getAllAnalysesForTicker(Integer tickerId) {
         return fundamentalAnalysisRepository.findByTickerId(tickerId);
+    }
+
+    public static boolean tickerIsValidForFundamentalAnalysis(Ticker ticker) {
+        return VALID_TICKER_TYPES.contains(ticker.getType());
     }
 }

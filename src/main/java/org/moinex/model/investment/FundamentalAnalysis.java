@@ -19,9 +19,6 @@ import org.moinex.util.Constants;
 
 /**
  * Entity that stores fundamental analysis data for a ticker
- * This data is fetched from the Python script and cached in the database
- * Linked to Ticker entity - analysis is only available for active (non-archived) tickers
- * Multiple analyses can exist per ticker (one for each period type: annual, quarterly, etc.)
  */
 @Entity
 @Table(name = "fundamental_analysis")

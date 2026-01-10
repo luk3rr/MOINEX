@@ -8,7 +8,6 @@ package org.moinex.ui.common;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -40,8 +39,6 @@ public class FundamentalMetricPaneController {
 
     private I18nService i18nService;
 
-    private static final String NA = "N/A";
-
     @Autowired
     public FundamentalMetricPaneController(I18nService i18nService) {
         this.i18nService = i18nService;
@@ -50,12 +47,11 @@ public class FundamentalMetricPaneController {
     /**
      * Update the metric pane with data
      *
-     * @param metricName Name of the metric
-     * @param metricData JSON object containing metric data
+     * @param metricName     Name of the metric
+     * @param metricData     JSON object containing metric data
      * @param lastUpdateDate Last update date to use for real-time data without reference_date
-     * @return The updated VBox
      */
-    public VBox updateMetricPane(String metricName, Object metricData, String lastUpdateDate) {
+    public void updateMetricPane(String metricName, Object metricData, String lastUpdateDate) {
         metricNameText.setText(metricName);
 
         if (metricData instanceof JSONObject) {
@@ -86,16 +82,14 @@ public class FundamentalMetricPaneController {
                                                         .FUNDAMENTAL_ANALYSIS_REFERENCE_DATE)
                                         + ": "
                                         + formatDate(dateToShow));
-                dateLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666;");
+                dateLabel.getStyleClass().add("metric-metadata-label");
                 metadataBox.getChildren().add(dateLabel);
             }
         } else {
             // Simple value
-            metricValueText.setText(UIUtils.getOrDefault(metricData, NA).toString());
+            metricValueText.setText(UIUtils.getOrDefault(metricData, Constants.NA_DATA).toString());
             metadataBox.getChildren().clear();
         }
-
-        return rootVBox;
     }
 
     /**
@@ -106,39 +100,19 @@ public class FundamentalMetricPaneController {
         String type = metric.optString("type", "number");
 
         if (value == null || value.toString().equals("null")) {
-            return NA;
+            return Constants.NA_DATA;
         }
 
         try {
             BigDecimal numValue = new BigDecimal(value.toString());
 
-            switch (type) {
-                case "percent":
-                    return UIUtils.formatPercentageForFundamentalAnalysis(numValue);
-                case "currency":
-                    return UIUtils.formatCurrency(numValue);
-                case "number", "ratio":
-                default:
-                    return String.format("%.2f", numValue);
-            }
+            return switch (type) {
+                case "percent" -> UIUtils.formatPercentageForFundamentalAnalysis(numValue);
+                case "currency" -> UIUtils.formatCurrency(numValue);
+                default -> UIUtils.formatNumWithDecimalPlaces(numValue, 2);
+            };
         } catch (Exception e) {
-            return UIUtils.getOrDefault(value, NA).toString();
-        }
-    }
-
-    /**
-     * Translate data temporality
-     */
-    private String translateTemporality(String temporality) {
-        switch (temporality) {
-            case "real_time":
-                return "Tempo Real";
-            case "historical":
-                return "Histórico";
-            case "calculated":
-                return "Calculado";
-            default:
-                return temporality;
+            return UIUtils.getOrDefault(value, Constants.NA_DATA).toString();
         }
     }
 
@@ -148,7 +122,7 @@ public class FundamentalMetricPaneController {
     private String formatDate(String dateStr) {
         try {
             LocalDateTime date = LocalDateTime.parse(dateStr);
-            return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            return UIUtils.formatDateForDisplay(date, i18nService);
         } catch (Exception e) {
             return dateStr;
         }
