@@ -14,8 +14,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import lombok.NoArgsConstructor;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
@@ -45,6 +46,10 @@ public class TickerService {
     private DividendRepository dividendRepository;
     private CryptoExchangeRepository cryptoExchangeRepository;
     private WalletTransactionService walletTransactionService;
+
+    public Integer MAX_RETRIES = 5;
+    public static final Integer RETRY_DELAY_MS = 2000;
+    public static final Double RETRY_MULTIPLIER = 1.5;
 
     @Autowired
     public TickerService(
@@ -291,54 +296,91 @@ public class TickerService {
         logger.info("Ticker with id {} was updated", tk.getId());
     }
 
-    /**
-     * Update ticker price from API asynchronously
-     *
-     * @param tickers The list of tickers to update
-     * @return A completable future with a list with tickers that failed to update
-     * @throws IllegalArgumentException If the list of tickers is empty
-     */
     @Transactional
     public CompletableFuture<List<Ticker>> updateTickersPriceFromApiAsync(List<Ticker> tickers) {
         if (tickers.isEmpty()) {
-            CompletableFuture<List<Ticker>> failedFuture = new CompletableFuture<>();
-            failedFuture.completeExceptionally(
+            return CompletableFuture.failedFuture(
                     new IllegalArgumentException("No tickers to update"));
-
-            return failedFuture;
         }
 
+        return updateTickersPriceWithRetry(tickers, 1, RETRY_DELAY_MS);
+    }
+
+    private CompletableFuture<List<Ticker>> updateTickersPriceWithRetry(
+            List<Ticker> tickers, int attempt, int retryDelayMs) {
         String[] symbols = tickers.stream().map(Ticker::getSymbol).toArray(String[]::new);
+
+        logger.info("Updating ticker prices - Attempt {}/{}", attempt, MAX_RETRIES);
 
         return APIUtils.fetchStockPricesAsync(symbols)
                 .thenApply(
                         jsonObject -> {
                             List<Ticker> failed = new ArrayList<>();
-                            tickers.forEach(
-                                    ticker -> {
-                                        try {
-                                            JSONObject tickerData =
-                                                    jsonObject.getJSONObject(ticker.getSymbol());
-                                            BigDecimal price =
-                                                    new BigDecimal(
-                                                            tickerData.get("price").toString());
 
-                                            price = Constants.roundPrice(price, ticker.getType());
+                            for (Ticker ticker : tickers) {
+                                try {
+                                    if (!jsonObject.has(ticker.getSymbol())) {
+                                        failed.add(ticker);
+                                        continue;
+                                    }
 
-                                            ticker.setCurrentUnitValue(price);
-                                            ticker.setLastUpdate(LocalDateTime.now());
-                                            tickerRepository.save(ticker);
-                                        } catch (JSONException e) {
-                                            logger.warn(
-                                                    "Failed to update ticker {}: {}",
-                                                    ticker.getSymbol(),
-                                                    e.getMessage());
-                                            failed.add(ticker);
-                                        }
-                                    });
+                                    JSONObject tickerData =
+                                            jsonObject.getJSONObject(ticker.getSymbol());
+
+                                    if (tickerData.has("error")) {
+                                        throw new RuntimeException(tickerData.getString("error"));
+                                    }
+
+                                    BigDecimal price =
+                                            new BigDecimal(tickerData.get("price").toString());
+
+                                    price = Constants.roundPrice(price, ticker.getType());
+
+                                    ticker.setCurrentUnitValue(price);
+                                    ticker.setLastUpdate(LocalDateTime.now());
+                                    tickerRepository.save(ticker);
+
+                                } catch (Exception e) {
+                                    logger.warn(
+                                            "Failed to update ticker {}: {}",
+                                            ticker.getSymbol(),
+                                            e.getMessage());
+                                    failed.add(ticker);
+                                }
+                            }
 
                             return failed;
-                        });
+                        })
+                .handle(
+                        (failed, throwable) -> {
+                            if (throwable == null) {
+                                return CompletableFuture.completedFuture(failed);
+                            }
+
+                            if (attempt >= MAX_RETRIES) {
+                                CompletableFuture<List<Ticker>> failedFuture =
+                                        new CompletableFuture<>();
+
+                                failedFuture.completeExceptionally(throwable);
+                                return failedFuture;
+                            }
+
+                            logger.info("Retrying in {} ms...", retryDelayMs);
+
+                            return CompletableFuture.runAsync(
+                                            () -> {},
+                                            CompletableFuture.delayedExecutor(
+                                                    retryDelayMs, TimeUnit.MILLISECONDS))
+                                    .thenCompose(
+                                            v ->
+                                                    updateTickersPriceWithRetry(
+                                                            tickers,
+                                                            attempt + 1,
+                                                            (int)
+                                                                    (retryDelayMs
+                                                                            * RETRY_MULTIPLIER)));
+                        })
+                .thenCompose(Function.identity());
     }
 
     /**

@@ -36,7 +36,7 @@ public class FundamentalAnalysisService {
     private static final Logger logger = LoggerFactory.getLogger(FundamentalAnalysisService.class);
 
     public static final Integer CACHE_VALIDITY_HOURS = 24;
-    public static final Integer MAX_RETRIES = 5;
+    public static Integer MAX_RETRIES = 5;
     public static final Integer RETRY_DELAY_MS = 2000;
     public static final Double RETRY_MULTIPLIER = 1.5;
 

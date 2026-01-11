@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,11 @@ class MarketServiceTest {
     @Mock private MarketQuotesAndCommoditiesRepository marketQuotesAndCommoditiesRepository;
 
     @InjectMocks private MarketService marketService;
+
+    @BeforeEach
+    void setup() {
+        marketService.MAX_RETRIES = 1;
+    }
 
     @Nested
     @DisplayName("Get Brazilian Market Indicators Tests")

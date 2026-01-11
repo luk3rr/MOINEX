@@ -165,6 +165,8 @@ class TickerServiceTest {
                         new BigDecimal("1"),
                         LocalDateTime.now(),
                         "");
+
+        tickerService.MAX_RETRIES = 1;
     }
 
     @Test

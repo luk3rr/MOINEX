@@ -129,6 +129,8 @@ class FundamentalAnalysisServiceTest {
         JSONObject errorData = new JSONObject();
         errorData.put("error", "Symbol not found");
         errorResponse.put("INVALID.SA", errorData);
+
+        fundamentalAnalysisService.MAX_RETRIES = 2;
     }
 
     @Nested
