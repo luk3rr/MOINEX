@@ -1263,6 +1263,93 @@ public final class Constants {
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW =
                 "fundamentalAnalysis.metric.distance52wLow";
 
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ROE_TOOLTIP =
+                "fundamentalAnalysis.metric.roe.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ROIC_TOOLTIP =
+                "fundamentalAnalysis.metric.roic.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN_TOOLTIP =
+                "fundamentalAnalysis.metric.netMargin.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN_TOOLTIP =
+                "fundamentalAnalysis.metric.ebitdaMargin.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP =
+                "fundamentalAnalysis.metric.currentPrice.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP_TOOLTIP =
+                "fundamentalAnalysis.metric.marketCap.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE_TOOLTIP =
+                "fundamentalAnalysis.metric.enterpriseValue.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO_TOOLTIP =
+                "fundamentalAnalysis.metric.peRatio.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA_TOOLTIP =
+                "fundamentalAnalysis.metric.evEbitda.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD_TOOLTIP =
+                "fundamentalAnalysis.metric.earningsYield.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD_TOOLTIP =
+                "fundamentalAnalysis.metric.fcfYield.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD_TOOLTIP =
+                "fundamentalAnalysis.metric.dividendYield.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE_TOOLTIP =
+                "fundamentalAnalysis.metric.dividendRate.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO_TOOLTIP =
+                "fundamentalAnalysis.metric.payoutRatio.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER_TOOLTIP =
+                "fundamentalAnalysis.metric.grahamNumber.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE_TOOLTIP =
+                "fundamentalAnalysis.metric.grahamFairValue.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY_TOOLTIP =
+                "fundamentalAnalysis.metric.marginOfSafety.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY_TOOLTIP =
+                "fundamentalAnalysis.metric.revenueGrowthYoy.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR_TOOLTIP =
+                "fundamentalAnalysis.metric.revenueGrowthCagr.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS_TOOLTIP =
+                "fundamentalAnalysis.metric.revenueGrowthYears.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT_TOOLTIP =
+                "fundamentalAnalysis.metric.totalDebt.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_TOOLTIP =
+                "fundamentalAnalysis.metric.netDebt.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA_TOOLTIP =
+                "fundamentalAnalysis.metric.netDebtEbitda.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO_TOOLTIP =
+                "fundamentalAnalysis.metric.currentRatio.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER_TOOLTIP =
+                "fundamentalAnalysis.metric.assetTurnover.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_TOOLTIP =
+                "fundamentalAnalysis.metric.ebitda.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW_TOOLTIP =
+                "fundamentalAnalysis.metric.freeCashFlow.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW_TOOLTIP =
+                "fundamentalAnalysis.metric.operatingCashFlow.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CAPEX_TOOLTIP =
+                "fundamentalAnalysis.metric.capex.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME_TOOLTIP =
+                "fundamentalAnalysis.metric.fcfNetIncome.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH_TOOLTIP =
+                "fundamentalAnalysis.metric.dayHigh.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW_TOOLTIP =
+                "fundamentalAnalysis.metric.dayLow.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D_TOOLTIP =
+                "fundamentalAnalysis.metric.change1d.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D_TOOLTIP =
+                "fundamentalAnalysis.metric.change5d.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M_TOOLTIP =
+                "fundamentalAnalysis.metric.change1m.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M_TOOLTIP =
+                "fundamentalAnalysis.metric.change3m.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M_TOOLTIP =
+                "fundamentalAnalysis.metric.change6m.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD_TOOLTIP =
+                "fundamentalAnalysis.metric.changeYtd.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y_TOOLTIP =
+                "fundamentalAnalysis.metric.change1y.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH_TOOLTIP =
+                "fundamentalAnalysis.metric.52wHigh.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW_TOOLTIP =
+                "fundamentalAnalysis.metric.52wLow.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH_TOOLTIP =
+                "fundamentalAnalysis.metric.distance52wHigh.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW_TOOLTIP =
+                "fundamentalAnalysis.metric.distance52wLow.tooltip";
+
         // Period Types
         public static final String PERIOD_TYPE_ANNUAL = "periodType.annual";
         public static final String PERIOD_TYPE_QUARTERLY = "periodType.quarterly";

@@ -338,32 +338,28 @@ def calculate_graham_number(eps, book_value_per_share):
     return None
 
 
-def calculate_graham_fair_value(eps, growth_rate, bond_yield=0.045):
+def calculate_graham_fair_value(eps, growth_rate, bond_yield=0.10):
     """
-    Calculate Fair Value using Benjamin Graham's revised formula
-    
+    Calculate Fair Value using Benjamin Graham's revised formula,
+    adapted to the Brazilian market.
+
     Formula: (EPS × (8.5 + 2g) × 4.4) / Y
-    
+
     Where:
     - EPS = Earnings per share
-    - g = Expected growth rate (as decimal, e.g., 0.10 for 10%)
-    - 8.5 = P/E base for no-growth company
-    - 4.4 = Average yield of AAA corporate bonds in 1962
-    - Y = Current yield of AAA corporate bonds (default 4.5%)
-    
-    :param eps: Earnings per share
-    :param growth_rate: Expected annual growth rate (as decimal)
-    :param bond_yield: Current AAA corporate bond yield (default 4.5%)
-    :return: Fair value or None
+    - g = Expected growth rate (decimal, e.g. 0.10 for 10%)
+    - Y = Long-term Brazilian interest rate (fixed at 10%)
     """
     try:
         if eps and eps > 0 and growth_rate is not None:
-            # Cap growth rate at 25% as per Graham's recommendation
+            # Cap growth rate at 25% as recommended by Graham
             g = min(growth_rate, 0.25)
+
             fair_value = (eps * (8.5 + 2 * g * 100) * 4.4) / (bond_yield * 100)
             return fair_value
-    except:
+    except Exception:
         pass
+
     return None
 
 

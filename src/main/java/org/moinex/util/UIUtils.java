@@ -81,9 +81,14 @@ public final class UIUtils {
      * @param text The text of the tooltip
      */
     public static void addTooltipToNode(Node node, String text) {
+        if (node == null || text == null) {
+            return;
+        }
+
         Tooltip tooltip = new Tooltip(text);
         tooltip.getStyleClass().add(Constants.TOOLTIP_STYLE);
         tooltip.setShowDelay(Duration.seconds(Constants.TOOLTIP_ANIMATION_DELAY));
+        tooltip.setShowDuration(Duration.hours(1));
         tooltip.setHideDelay(Duration.seconds(Constants.TOOLTIP_ANIMATION_DURATION));
 
         Tooltip.install(node, tooltip);

@@ -15,6 +15,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -364,26 +365,40 @@ public class FundamentalAnalysisController {
         FlowPane content = new FlowPane(15, 15);
         content.setPadding(new Insets(20));
 
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE),
-                profitability,
-                "roe");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC),
-                profitability,
-                "roic");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN),
-                profitability,
-                "net_margin");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN),
-                profitability,
-                "ebitda_margin");
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE),
+                        profitability,
+                        "roe"),
+                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC),
+                        profitability,
+                        "roic"),
+                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN),
+                        profitability,
+                        "net_margin"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN),
+                        profitability,
+                        "ebitda_margin"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -406,76 +421,140 @@ public class FundamentalAnalysisController {
         FlowPane content = new FlowPane(15, 15);
         content.setPadding(new Insets(20));
 
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
-                valuation,
-                "current_price");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP),
-                valuation,
-                "market_cap");
-        addMetricToContainer(
-                content,
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
+                        valuation,
+                        "current_price"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE),
-                valuation,
-                "enterprise_value");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO),
-                valuation,
-                "pe_ratio");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA),
-                valuation,
-                "ev_to_ebitda");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP),
+                        valuation,
+                        "market_cap"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD),
-                valuation,
-                "earnings_yield");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD),
-                valuation,
-                "fcf_yield");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE),
+                        valuation,
+                        "enterprise_value"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD),
-                valuation,
-                "dividend_yield");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE),
-                valuation,
-                "dividend_rate");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO),
-                valuation,
-                "payout_ratio");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER),
-                valuation,
-                "graham_number");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO),
+                        valuation,
+                        "pe_ratio"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE),
-                valuation,
-                "graham_fair_value");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA),
+                        valuation,
+                        "ev_to_ebitda"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY),
-                valuation,
-                "margin_of_safety");
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD),
+                        valuation,
+                        "earnings_yield"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD),
+                        valuation,
+                        "fcf_yield"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD),
+                        valuation,
+                        "dividend_yield"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE),
+                        valuation,
+                        "dividend_rate"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO),
+                        valuation,
+                        "payout_ratio"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER),
+                        valuation,
+                        "graham_number"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE),
+                        valuation,
+                        "graham_fair_value"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY),
+                        valuation,
+                        "margin_of_safety"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -499,20 +578,28 @@ public class FundamentalAnalysisController {
         // Revenue growth is nested
         if (growth.has("revenue_growth")) {
             JSONObject revenueGrowth = growth.getJSONObject("revenue_growth");
-            addMetricToContainer(
-                    content,
+            UIUtils.addTooltipToNode(
+                    addMetricToContainer(
+                            content,
+                            i18nService.tr(
+                                    Constants.TranslationKeys
+                                            .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY),
+                            revenueGrowth,
+                            "yoy_growth"),
                     i18nService.tr(
                             Constants.TranslationKeys
-                                    .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY),
-                    revenueGrowth,
-                    "yoy_growth");
-            addMetricToContainer(
-                    content,
+                                    .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY_TOOLTIP));
+            UIUtils.addTooltipToNode(
+                    addMetricToContainer(
+                            content,
+                            i18nService.tr(
+                                    Constants.TranslationKeys
+                                            .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR),
+                            revenueGrowth,
+                            "cagr"),
                     i18nService.tr(
                             Constants.TranslationKeys
-                                    .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR),
-                    revenueGrowth,
-                    "cagr");
+                                    .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR_TOOLTIP));
 
             if (revenueGrowth.has("years")) {
                 // Create a simple metric object for years
@@ -520,13 +607,17 @@ public class FundamentalAnalysisController {
                 yearsMetric.put("value", revenueGrowth.getInt("years"));
                 yearsMetric.put("type", "number");
                 yearsMetric.put("data_temporality", "calculated");
-                addMetricToContainer(
-                        content,
+                UIUtils.addTooltipToNode(
+                        addMetricToContainer(
+                                content,
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS),
+                                yearsMetric,
+                                "value"),
                         i18nService.tr(
                                 Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS),
-                        yearsMetric,
-                        "value");
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS_TOOLTIP));
             }
         }
 
@@ -548,27 +639,46 @@ public class FundamentalAnalysisController {
         FlowPane content = new FlowPane(15, 15);
         content.setPadding(new Insets(20));
 
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT),
-                debt,
-                "total_debt");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT),
-                debt,
-                "net_debt");
-        addMetricToContainer(
-                content,
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT),
+                        debt,
+                        "total_debt"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA),
-                debt,
-                "net_debt_to_ebitda");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO),
-                debt,
-                "current_ratio");
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT),
+                        debt,
+                        "net_debt"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA),
+                        debt,
+                        "net_debt_to_ebitda"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO),
+                        debt,
+                        "current_ratio"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -591,17 +701,26 @@ public class FundamentalAnalysisController {
         FlowPane content = new FlowPane(15, 15);
         content.setPadding(new Insets(20));
 
-        addMetricToContainer(
-                content,
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER),
+                        efficiency,
+                        "asset_turnover"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER),
-                efficiency,
-                "asset_turnover");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA),
-                efficiency,
-                "ebitda");
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA),
+                        efficiency,
+                        "ebitda"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -625,29 +744,47 @@ public class FundamentalAnalysisController {
         FlowPane content = new FlowPane(15, 15);
         content.setPadding(new Insets(20));
 
-        addMetricToContainer(
-                content,
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW),
+                        cashGeneration,
+                        "free_cash_flow"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW),
-                cashGeneration,
-                "free_cash_flow");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW),
+                        cashGeneration,
+                        "operating_cash_flow"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW),
-                cashGeneration,
-                "operating_cash_flow");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX),
-                cashGeneration,
-                "capex");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX),
+                        cashGeneration,
+                        "capex"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME),
-                cashGeneration,
-                "fcf_to_net_income");
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME),
+                        cashGeneration,
+                        "fcf_to_net_income"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -671,78 +808,138 @@ public class FundamentalAnalysisController {
         FlowPane content = new FlowPane(15, 15);
         content.setPadding(new Insets(20));
 
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
-                pricePerformance,
-                "current_price");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH),
-                pricePerformance,
-                "day_high");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW),
-                pricePerformance,
-                "day_low");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D),
-                pricePerformance,
-                "change_1d");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D),
-                pricePerformance,
-                "change_5d");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M),
-                pricePerformance,
-                "change_1m");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M),
-                pricePerformance,
-                "change_3m");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M),
-                pricePerformance,
-                "change_6m");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y),
-                pricePerformance,
-                "change_52w");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD),
-                pricePerformance,
-                "change_ytd");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH),
-                pricePerformance,
-                "week_52_high");
-        addMetricToContainer(
-                content,
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW),
-                pricePerformance,
-                "week_52_low");
-        addMetricToContainer(
-                content,
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
+                        pricePerformance,
+                        "current_price"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH),
-                pricePerformance,
-                "distance_from_52w_high");
-        addMetricToContainer(
-                content,
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH),
+                        pricePerformance,
+                        "day_high"),
                 i18nService.tr(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW),
-                pricePerformance,
-                "distance_from_52w_low");
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW),
+                        pricePerformance,
+                        "day_low"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D),
+                        pricePerformance,
+                        "change_1d"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D),
+                        pricePerformance,
+                        "change_5d"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M),
+                        pricePerformance,
+                        "change_1m"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M),
+                        pricePerformance,
+                        "change_3m"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M),
+                        pricePerformance,
+                        "change_6m"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y),
+                        pricePerformance,
+                        "change_52w"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD),
+                        pricePerformance,
+                        "change_ytd"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH),
+                        pricePerformance,
+                        "week_52_high"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW),
+                        pricePerformance,
+                        "week_52_low"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH),
+                        pricePerformance,
+                        "distance_from_52w_high"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW),
+                        pricePerformance,
+                        "distance_from_52w_low"),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -755,10 +952,11 @@ public class FundamentalAnalysisController {
     /**
      * Add a metric to a container using FundamentalMetricPaneController
      */
-    private void addMetricToContainer(
+    private Node addMetricToContainer(
             FlowPane container, String label, JSONObject data, String key) {
+
         if (!data.has(key)) {
-            return;
+            return null;
         }
 
         Object metricObj = data.get(key);
@@ -781,8 +979,10 @@ public class FundamentalAnalysisController {
             // Add to container
             container.getChildren().add(metricPane);
 
+            return controller.getRoot();
         } catch (IOException e) {
             logger.error("Error loading metric pane for: " + label, e);
+            return null;
         }
     }
 

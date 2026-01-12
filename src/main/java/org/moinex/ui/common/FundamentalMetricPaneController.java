@@ -9,6 +9,7 @@ package org.moinex.ui.common;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -44,6 +45,10 @@ public class FundamentalMetricPaneController {
     @Autowired
     public FundamentalMetricPaneController(I18nService i18nService) {
         this.i18nService = i18nService;
+    }
+
+    public Node getRoot() {
+        return rootVBox;
     }
 
     /**
