@@ -677,6 +677,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 "current_price": create_currency_object(current_price, "real_time"),
                 "market_cap": create_currency_object(market_cap, "real_time"),
                 "enterprise_value": create_currency_object(enterprise_value, "calculated", balance_date),
+                "eps": create_currency_object(eps, "historical", financials_date),
                 "pe_ratio": create_ratio_object(pe_ratio, "calculated", financials_date),
                 "ev_to_ebitda": create_ratio_object(ev_to_ebitda, "calculated", financials_date),
                 "earnings_yield": create_percent_object(earnings_yield, "calculated", financials_date),
@@ -828,6 +829,7 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Valuation", "Current Price", extract_value(val.get("current_price")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "Market Cap", extract_value(val.get("market_cap")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "Enterprise Value", extract_value(val.get("enterprise_value")), data.get("currency", "BRL")])
+            writer.writerow(["Valuation", "EPS", extract_value(val.get("eps")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "P/E Ratio", extract_value(val.get("pe_ratio")), "x"])
             writer.writerow(["Valuation", "EV to EBITDA", extract_value(val.get("ev_to_ebitda")), "x"])
             writer.writerow(["Valuation", "Earnings Yield", extract_value(val.get("earnings_yield")), "%"])

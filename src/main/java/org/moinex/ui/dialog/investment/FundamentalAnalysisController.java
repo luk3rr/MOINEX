@@ -169,14 +169,15 @@ public class FundamentalAnalysisController {
                             String lastUpdate =
                                     UIUtils.formatDateTimeForDisplay(
                                             analysis.get().getLastUpdate(), i18nService);
-                            boolean expired =
-                                    fundamentalAnalysisService.isCacheExpired(analysis.get());
+
+                            boolean recommendedUpdate =
+                                    fundamentalAnalysisService.isUpdateRecommended(analysis.get());
 
                             statusLabel.setText(
                                     UIUtils.translatePeriodType(periodType, i18nService)
                                             + ": "
                                             + lastUpdate);
-                            if (expired) {
+                            if (recommendedUpdate) {
                                 statusLabel.getStyleClass().add("cache-status-label-expired");
                             } else {
                                 statusLabel.getStyleClass().add("cache-status-label-valid");
@@ -452,6 +453,13 @@ public class FundamentalAnalysisController {
                 i18nService.tr(
                         Constants.TranslationKeys
                                 .FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE_TOOLTIP));
+        UIUtils.addTooltipToNode(
+                addMetricToContainer(
+                        content,
+                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EPS),
+                        valuation,
+                        "eps"),
+                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EPS_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,

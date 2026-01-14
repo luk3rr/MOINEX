@@ -1190,6 +1190,8 @@ public final class Constants {
                 "fundamentalAnalysis.metric.marketCap";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE =
                 "fundamentalAnalysis.metric.enterpriseValue";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EPS =
+                "fundamentalAnalysis.metric.eps";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO =
                 "fundamentalAnalysis.metric.peRatio";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA =
@@ -1277,6 +1279,8 @@ public final class Constants {
                 "fundamentalAnalysis.metric.marketCap.tooltip";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE_TOOLTIP =
                 "fundamentalAnalysis.metric.enterpriseValue.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_EPS_TOOLTIP =
+                "fundamentalAnalysis.metric.eps.tooltip";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO_TOOLTIP =
                 "fundamentalAnalysis.metric.peRatio.tooltip";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA_TOOLTIP =

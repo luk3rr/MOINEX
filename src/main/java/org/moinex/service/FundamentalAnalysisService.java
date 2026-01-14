@@ -35,7 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class FundamentalAnalysisService {
     private static final Logger logger = LoggerFactory.getLogger(FundamentalAnalysisService.class);
 
-    public static final Integer CACHE_VALIDITY_HOURS = 24;
+    public static final Integer CACHE_VALIDITY_HOURS = 24 * 7;
+    public static final Integer RECOMMENDED_UPDATE_HOURS = 24;
     public static Integer MAX_RETRIES = 5;
     public static final Integer RETRY_DELAY_MS = 2000;
     public static final Double RETRY_MULTIPLIER = 1.5;
@@ -306,6 +307,15 @@ public class FundamentalAnalysisService {
         LocalDateTime now = LocalDateTime.now();
 
         return lastUpdate.plusHours(CACHE_VALIDITY_HOURS).isBefore(now);
+    }
+
+    public boolean isUpdateRecommended(FundamentalAnalysis analysis) {
+        if (analysis == null) return true;
+
+        LocalDateTime lastUpdate = analysis.getLastUpdate();
+        LocalDateTime now = LocalDateTime.now();
+
+        return lastUpdate.plusHours(RECOMMENDED_UPDATE_HOURS).isBefore(now);
     }
 
     /**
