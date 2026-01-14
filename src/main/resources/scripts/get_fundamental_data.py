@@ -149,6 +149,24 @@ def get_unit_from_type(obj_type):
         return ""
     return ""
 
+def calculate_eps_cagr(eps_values):
+    """
+    Calculate CAGR of EPS
+
+    :param eps_values: List of EPS values (most recent first)
+    :return: CAGR percentage or None
+    """
+    try:
+        if len(eps_values) < 2:
+            return None
+
+        if eps_values[-1] <= 0:
+            return None
+
+        n_years = len(eps_values) - 1
+        return (((eps_values[0] / eps_values[-1]) ** (1 / n_years)) - 1) * 100
+    except Exception:
+        return None
 
 def calculate_roe(net_income, shareholders_equity):
     """
@@ -548,7 +566,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 "cashflow_date": cashflow_date,
                 "period_type": period,
             }
-            
+
             # Income statement data
             revenue = safe_get(latest_financials, "Total Revenue", 0)
             net_income = safe_get(latest_financials, "Net Income", 0)
@@ -638,7 +656,21 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             pe_ratio = calculate_pe_ratio(current_price, eps) if current_price and eps else None
             earnings_yield = calculate_earnings_yield(eps, current_price) if current_price and eps else None
             fcf_yield = calculate_fcf_yield(free_cash_flow, market_cap) if free_cash_flow and market_cap else None
-            
+
+            eps_history = None
+            try:
+                if "Diluted EPS" in financials.index:
+                    eps_series = financials.loc["Diluted EPS"].dropna()
+                    eps_history = eps_series.head(5).tolist()
+            except Exception:
+                eps_history = None
+
+            eps_cagr = calculate_eps_cagr(eps_history) if eps_history else None
+
+            peg_ratio = None
+            if pe_ratio and eps_cagr and eps_cagr > 0:
+                peg_ratio = pe_ratio / eps_cagr
+
             # EV/EBITDA
             enterprise_value = safe_get(info, "enterpriseValue")
             ev_to_ebitda = enterprise_value / ebitda if enterprise_value and ebitda and ebitda != 0 else None
@@ -679,6 +711,8 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 "enterprise_value": create_currency_object(enterprise_value, "calculated", balance_date),
                 "eps": create_currency_object(eps, "historical", financials_date),
                 "pe_ratio": create_ratio_object(pe_ratio, "calculated", financials_date),
+                "peg_ratio": create_ratio_object(peg_ratio, "calculated", financials_date),
+                "eps_cagr": create_percent_object(eps_cagr, "calculated", financials_date),
                 "ev_to_ebitda": create_ratio_object(ev_to_ebitda, "calculated", financials_date),
                 "earnings_yield": create_percent_object(earnings_yield, "calculated", financials_date),
                 "fcf_yield": create_percent_object(fcf_yield, "calculated", cashflow_date),
@@ -831,6 +865,8 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Valuation", "Enterprise Value", extract_value(val.get("enterprise_value")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "EPS", extract_value(val.get("eps")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "P/E Ratio", extract_value(val.get("pe_ratio")), "x"])
+            writer.writerow(["Valuation", "PEG Ratio", extract_value(val.get("peg_ratio")), "x"])
+            writer.writerow(["Valuation", "EPS CAGR", extract_value(val.get("eps_cagr")), "%"])
             writer.writerow(["Valuation", "EV to EBITDA", extract_value(val.get("ev_to_ebitda")), "x"])
             writer.writerow(["Valuation", "Earnings Yield", extract_value(val.get("earnings_yield")), "%"])
             writer.writerow(["Valuation", "FCF Yield", extract_value(val.get("fcf_yield")), "%"])

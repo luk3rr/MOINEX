@@ -1194,6 +1194,8 @@ public final class Constants {
                 "fundamentalAnalysis.metric.eps";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO =
                 "fundamentalAnalysis.metric.peRatio";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO =
+                "fundamentalAnalysis.metric.pegRatio";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA =
                 "fundamentalAnalysis.metric.evEbitda";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD =
@@ -1283,6 +1285,8 @@ public final class Constants {
                 "fundamentalAnalysis.metric.eps.tooltip";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO_TOOLTIP =
                 "fundamentalAnalysis.metric.peRatio.tooltip";
+        public static final String FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO_TOOLTIP =
+                "fundamentalAnalysis.metric.pegRatio.tooltip";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA_TOOLTIP =
                 "fundamentalAnalysis.metric.evEbitda.tooltip";
         public static final String FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD_TOOLTIP =
