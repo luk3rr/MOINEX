@@ -165,7 +165,7 @@ class FundamentalAnalysisServiceTest {
                             .periodType(PeriodType.ANNUAL)
                             .lastUpdate(
                                     LocalDateTime.now()
-                                            .minusHours(25)
+                                            .minusHours(24 * 7 + 1)
                                             .format(Constants.DB_DATE_FORMATTER))
                             .dataJson("{}")
                             .createdAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER))
@@ -422,7 +422,7 @@ class FundamentalAnalysisServiceTest {
                     FundamentalAnalysis.builder()
                             .lastUpdate(
                                     LocalDateTime.now()
-                                            .minusHours(25)
+                                            .minusHours(24 * 7 + 1)
                                             .format(Constants.DB_DATE_FORMATTER))
                             .build();
 
@@ -438,6 +438,31 @@ class FundamentalAnalysisServiceTest {
                             .build();
 
             assertFalse(fundamentalAnalysisService.isCacheExpired(validAnalysis));
+        }
+
+        @Test
+        @DisplayName("Should recommend update when cached analysis is expired")
+        void isUpdateRecommended_ReturnsTrue() {
+            FundamentalAnalysis validAnalysis =
+                    FundamentalAnalysis.builder()
+                            .lastUpdate(
+                                    LocalDateTime.now()
+                                            .minusHours(25)
+                                            .format(Constants.DB_DATE_FORMATTER))
+                            .build();
+
+            assertTrue(fundamentalAnalysisService.isUpdateRecommended(validAnalysis));
+        }
+
+        @Test
+        @DisplayName("Should not recommend update when cached analysis is still valid")
+        void isUpdateRecommended_ReturnsFalse() {
+            FundamentalAnalysis validAnalysis =
+                    FundamentalAnalysis.builder()
+                            .lastUpdate(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER))
+                            .build();
+
+            assertFalse(fundamentalAnalysisService.isUpdateRecommended(validAnalysis));
         }
     }
 

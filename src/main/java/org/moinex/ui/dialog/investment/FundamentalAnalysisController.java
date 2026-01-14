@@ -472,12 +472,12 @@ public class FundamentalAnalysisController {
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
-                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO),
+                        i18nService.tr(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO),
                         valuation,
-                        "peg_ratio"
-                ),
-                i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO_TOOLTIP)
-        );
+                        "peg_ratio"),
+                i18nService.tr(
+                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
