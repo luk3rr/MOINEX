@@ -8,6 +8,7 @@ package org.moinex.app;
 
 import java.io.IOException;
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,6 +25,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class JavaFXApp extends Application {
     private ConfigurableApplicationContext springContext;
+    private static volatile HostServices hostServices;
 
     @Override
     public void init() throws Exception {
@@ -33,6 +35,7 @@ public class JavaFXApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        hostServices = getHostServices();
         FXMLLoader splashLoader =
                 new FXMLLoader(getClass().getResource(Constants.SPLASH_SCREEN_FXML));
         Parent splashRoot = splashLoader.load();
@@ -69,6 +72,13 @@ public class JavaFXApp extends Application {
                                 Platform.exit();
                             }
                         });
+    }
+
+    public static HostServices getHostServicesInstance() {
+        if (hostServices == null) {
+            throw new IllegalStateException("HostServices not initialized yet");
+        }
+        return hostServices;
     }
 
     @Override

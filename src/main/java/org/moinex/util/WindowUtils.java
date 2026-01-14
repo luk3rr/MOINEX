@@ -21,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.moinex.app.JavaFXApp;
 import org.moinex.service.I18nService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -336,6 +337,19 @@ public final class WindowUtils {
             popupStage.showAndWait();
         } catch (IOException e) {
             logger.error("Error loading FXML file: '{}'", fxmlFileName, e);
+        }
+    }
+
+    /**
+     * Opens the given URL in the default web browser
+     * @param url The URL to open
+     */
+    public static void openUrl(String url) {
+        try {
+            JavaFXApp.getHostServicesInstance().showDocument(url);
+        } catch (Exception e) {
+            logger.error("Error opening URL: {}", url, e);
+            showErrorDialog("Error", "Could not open URL: " + url);
         }
     }
 }

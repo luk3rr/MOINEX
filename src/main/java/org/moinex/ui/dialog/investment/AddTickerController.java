@@ -6,6 +6,7 @@
 
 package org.moinex.ui.dialog.investment;
 
+import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityExistsException;
 import java.math.BigDecimal;
 import javafx.fxml.FXML;
@@ -15,6 +16,7 @@ import org.moinex.model.enums.TickerType;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
+import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddTickerController extends BaseTickerManagement {
+    @FXML private JFXButton yahooLookupButton;
 
     /**
      * Constructor
@@ -35,6 +38,16 @@ public final class AddTickerController extends BaseTickerManagement {
     @Autowired
     public AddTickerController(TickerService tickerService, I18nService i18nService) {
         super(tickerService, i18nService);
+    }
+
+    @FXML
+    @Override
+    protected void initialize() {
+        super.initialize();
+
+        UIUtils.addTooltipToNode(
+                yahooLookupButton,
+                i18nService.tr(Constants.TranslationKeys.INVESTMENT_BUTTON_YAHOO_LOOKUP_TOOLTIP));
     }
 
     @FXML
@@ -114,5 +127,10 @@ public final class AddTickerController extends BaseTickerManagement {
                             Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_ADDING_TICKER_TITLE),
                     e.getMessage());
         }
+    }
+
+    @FXML
+    private void goToYahooLookup() {
+        WindowUtils.openUrl(Constants.YAHOO_LOOKUP_URL);
     }
 }

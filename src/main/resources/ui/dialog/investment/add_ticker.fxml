@@ -77,6 +77,24 @@
                         <TextField fx:id="symbolField" promptText="%investment.promptText.symbol" />
                      </children>
                   </VBox>
+                  <VBox>
+                     <children>
+                        <Label>
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <JFXButton fx:id="yahooLookupButton" onAction="#goToYahooLookup">
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../icon/common/question.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </JFXButton>
+                     </children>
+                  </VBox>
                </children>
             </HBox>
          </children>

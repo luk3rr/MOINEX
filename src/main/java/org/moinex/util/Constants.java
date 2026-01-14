@@ -33,6 +33,9 @@ public final class Constants {
 
     public static final String GET_FUNDAMENTAL_DATA_SCRIPT = "get_fundamental_data.py";
 
+    public static final String YAHOO_LOOKUP_URL =
+            "https://finance.yahoo.com/research-hub/screener/most_actives";
+
     // Paths
     public static final String WALLET_TYPE_ICONS_PATH = "/icon/wallet_type/";
     public static final String SIDEBAR_ICONS_PATH = "/icon/sidebar/";
@@ -2188,6 +2191,8 @@ public final class Constants {
                 "investment.dialog.tickerHasTransactions.message";
 
         // Investment FXML Labels
+        public static final String INVESTMENT_BUTTON_YAHOO_LOOKUP_TOOLTIP =
+                "investment.button.yahooLookup.tooltip";
         public static final String INVESTMENT_LABEL_NAME = "investment.label.name";
         public static final String INVESTMENT_LABEL_SYMBOL = "investment.label.symbol";
         public static final String INVESTMENT_LABEL_TYPE = "investment.label.type";
