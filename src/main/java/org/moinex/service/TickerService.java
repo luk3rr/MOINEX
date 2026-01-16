@@ -447,15 +447,18 @@ public class TickerService {
         ticker.setCurrentQuantity(ticker.getCurrentQuantity().add(quantity));
 
         // Update average price
-        BigDecimal updatedTotalValue =
-                ticker.getAverageUnitValue().multiply(ticker.getAverageUnitValueCount());
-
-        updatedTotalValue = updatedTotalValue.add(unitPrice.multiply(quantity));
-
-        ticker.setAverageUnitValue(
-                updatedTotalValue.divide(
-                        ticker.getAverageUnitValueCount().add(quantity), 2, RoundingMode.HALF_UP));
-
+        if (ticker.getAverageUnitValueCount().compareTo(BigDecimal.ZERO) == 0) {
+            ticker.setAverageUnitValue(unitPrice);
+        } else {
+            BigDecimal currentTotalValue = ticker.getAverageUnitValue().multiply(ticker.getAverageUnitValueCount());
+            BigDecimal newTotalValue = unitPrice.multiply(quantity);
+            BigDecimal totalQuantity = ticker.getAverageUnitValueCount().add(quantity);
+            
+            ticker.setAverageUnitValue(
+                    currentTotalValue.add(newTotalValue).divide(
+                            totalQuantity, 2, RoundingMode.HALF_UP));
+        }
+        
         ticker.setAverageUnitValueCount(ticker.getAverageUnitValueCount().add(quantity));
 
         logger.info(
