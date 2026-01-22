@@ -334,6 +334,8 @@ public final class Constants {
 
     public static final Integer XYBAR_CHART_MONTHS = 12;
     public static final Integer XYBAR_CHART_FUTURE_MONTHS = 6;
+    public static final Integer PL_CHART_MONTHS = 18;
+    public static final Integer PL_CHART_FUTURE_MONTHS = 3;
     public static final Integer MONTH_RESUME_FUTURE_MONTHS = 6;
 
     public static final Integer CRC_XYBAR_CHART_MAX_MONTHS = 25;
@@ -511,6 +513,10 @@ public final class Constants {
                 "home.creditCard.tooltip.availableCredit";
         public static final String HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER =
                 "home.creditCard.tooltip.creditCardNumber";
+        public static final String HOME_NET_WORTH_TITLE = "home.netWorth.title";
+        public static final String HOME_NET_WORTH_ASSETS = "home.netWorth.assets";
+        public static final String HOME_NET_WORTH_LIABILITIES = "home.netWorth.liabilities";
+        public static final String HOME_NET_WORTH_NET_WORTH = "home.netWorth.netWorth";
 
         // Wallet
         public static final String WALLET_ALL_WALLETS = "wallet.allWallets";

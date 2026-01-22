@@ -24,6 +24,7 @@ import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.BondOperationRepository;
 import org.moinex.repository.investment.BondRepository;
+import org.moinex.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -535,5 +536,17 @@ public class BondService {
                         () ->
                                 new EntityNotFoundException(
                                         "BondOperation not found with id: " + operationId));
+    }
+
+    /**
+     * Get all bond operations up to a specific date
+     *
+     * @param date The date threshold
+     * @return A list with all operations before or on the date
+     */
+    @Transactional(readOnly = true)
+    public List<BondOperation> getOperationsByDateBefore(LocalDateTime date) {
+        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        return bondOperationRepository.findAllByDateBefore(dateStr);
     }
 }

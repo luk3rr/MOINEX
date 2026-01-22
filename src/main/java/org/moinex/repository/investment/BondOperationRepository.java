@@ -32,4 +32,11 @@ public interface BondOperationRepository extends JpaRepository<BondOperation, In
                     + " :bond AND bo.operationType = :operationType ORDER BY wt.date ASC")
     List<BondOperation> findByBondAndOperationTypeOrderByOperationDateAsc(
             @Param("bond") Bond bond, @Param("operationType") OperationType operationType);
+
+    @Query(
+            "SELECT bo FROM BondOperation bo "
+                    + "LEFT JOIN bo.walletTransaction wt "
+                    + "WHERE wt.date <= :date "
+                    + "ORDER BY wt.date ASC")
+    List<BondOperation> findAllByDateBefore(@Param("date") String date);
 }

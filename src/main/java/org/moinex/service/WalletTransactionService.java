@@ -943,4 +943,30 @@ public class WalletTransactionService {
     public List<Transfer> getAllTransfers() {
         return transferRepository.findAll();
     }
+
+    /**
+     * Get all transactions for a specific wallet after a given date
+     *
+     * @param walletId The id of the wallet
+     * @param date The date threshold
+     * @return A list with transactions after the specified date
+     */
+    public List<WalletTransaction> getTransactionsByWalletAfterDate(
+            Integer walletId, LocalDateTime date) {
+        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        return walletTransactionRepository.findTransactionsByWalletAfterDate(walletId, dateStr);
+    }
+
+    /**
+     * Get all transactions for a specific wallet in a given month
+     *
+     * @param walletId The id of the wallet
+     * @param month The month
+     * @param year The year
+     * @return A list with transactions in the specified month
+     */
+    public List<WalletTransaction> getTransactionsByWalletAndMonth(
+            Integer walletId, Integer month, Integer year) {
+        return walletTransactionRepository.findTransactionsByWalletAndMonth(walletId, month, year);
+    }
 }

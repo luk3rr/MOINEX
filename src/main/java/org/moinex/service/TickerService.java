@@ -450,15 +450,17 @@ public class TickerService {
         if (ticker.getAverageUnitValueCount().compareTo(BigDecimal.ZERO) == 0) {
             ticker.setAverageUnitValue(unitPrice);
         } else {
-            BigDecimal currentTotalValue = ticker.getAverageUnitValue().multiply(ticker.getAverageUnitValueCount());
+            BigDecimal currentTotalValue =
+                    ticker.getAverageUnitValue().multiply(ticker.getAverageUnitValueCount());
             BigDecimal newTotalValue = unitPrice.multiply(quantity);
             BigDecimal totalQuantity = ticker.getAverageUnitValueCount().add(quantity);
-            
+
             ticker.setAverageUnitValue(
-                    currentTotalValue.add(newTotalValue).divide(
-                            totalQuantity, 2, RoundingMode.HALF_UP));
+                    currentTotalValue
+                            .add(newTotalValue)
+                            .divide(totalQuantity, 2, RoundingMode.HALF_UP));
         }
-        
+
         ticker.setAverageUnitValueCount(ticker.getAverageUnitValueCount().add(quantity));
 
         logger.info(
@@ -1296,5 +1298,27 @@ public class TickerService {
      */
     public List<CryptoExchange> getAllCryptoExchanges() {
         return cryptoExchangeRepository.findAll();
+    }
+
+    /**
+     * Get all purchases up to a specific date
+     *
+     * @param date The date threshold
+     * @return A list with all purchases before or on the date
+     */
+    public List<TickerPurchase> getPurchasesByDateBefore(LocalDateTime date) {
+        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        return tickerPurchaseRepository.findAllByDateBefore(dateStr);
+    }
+
+    /**
+     * Get all sales up to a specific date
+     *
+     * @param date The date threshold
+     * @return A list with all sales before or on the date
+     */
+    public List<TickerSale> getSalesByDateBefore(LocalDateTime date) {
+        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        return tickerSaleRepository.findAllByDateBefore(dateStr);
     }
 }

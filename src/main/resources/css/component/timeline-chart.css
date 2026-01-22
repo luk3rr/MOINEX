@@ -210,3 +210,76 @@
     -fx-background-radius: 5px;
     -fx-font-size: 11px;
 }
+
+/* Net Worth Chart - Current date vertical line */
+.current-date-line {
+    -fx-stroke: #9ca3af;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+    -fx-opacity: 0.7;
+}
+
+/* Net Worth Chart - Series styling */
+/* Series 0 = Assets (Ativos) - Blue dashed */
+.chart-series-line.series0 {
+    -fx-stroke: #2563eb;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+/* Series 1 = Liabilities (Passivos) - Red dashed */
+.chart-series-line.series1 {
+    -fx-stroke: #ef4444;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+/* Series 2 = Net Worth (PL) - Green solid */
+.chart-series-line.series2 {
+    -fx-stroke: #22c55e;
+    -fx-stroke-width: 3;
+}
+
+/* Net Worth Chart - Override default legend symbols to match line styles */
+/* Series 0 = Assets (Ativos) - Blue dashed */
+.chart-legend-item-symbol.default-color0.series0 {
+    -fx-background-color: transparent;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+/* Series 1 = Liabilities (Passivos) - Red dashed */
+.chart-legend-item-symbol.default-color1.series1 {
+    -fx-background-color: transparent;
+    -fx-border-color: #ef4444;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-style: segments(5, 3);
+}
+
+/* Series 2 = Net Worth (PL) - Green solid */
+.chart-legend-item-symbol.default-color2.series2 {
+    -fx-background-color: #22c55e;
+}
+
+/* Net Worth Chart - Data point symbols */
+.chart-line-symbol.series0 {
+    -fx-background-color: #2563eb, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.chart-line-symbol.series1 {
+    -fx-background-color: #ef4444, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.chart-line-symbol.series2 {
+    -fx-background-color: #22c55e, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}

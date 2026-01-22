@@ -522,4 +522,20 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
             @Param("transactionType") TransactionType transactionType,
             @Param("startDate") String startDate,
             @Param("endDate") String endDate);
+
+    /**
+     * Get all transactions for a specific wallet after a given date
+     *
+     * @param walletId The id of the wallet
+     * @param date The date threshold (format: 'YYYY-MM-DD HH:MM:SS')
+     * @return A list with transactions after the specified date
+     */
+    @Query(
+            "SELECT wt "
+                    + "FROM WalletTransaction wt "
+                    + "WHERE wt.wallet.id = :walletId "
+                    + "AND wt.date >= :date "
+                    + "ORDER BY wt.date ASC")
+    List<WalletTransaction> findTransactionsByWalletAfterDate(
+            @Param("walletId") Integer walletId, @Param("date") String date);
 }
