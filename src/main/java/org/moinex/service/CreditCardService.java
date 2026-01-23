@@ -933,6 +933,26 @@ public class CreditCardService {
     }
 
     /**
+     * Calculate credit card debt balance at a specific date
+     * Debt balance = Total purchases up to date - Total payments up to date
+     *
+     * @param date The date to calculate debt balance
+     * @return The debt balance at the specified date
+     */
+    public BigDecimal getDebtBalanceAtDate(LocalDateTime date) {
+        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+
+        BigDecimal totalPurchases = creditCardDebtRepository.getTotalDebtAmountUpToDate(dateStr);
+        BigDecimal totalPayments =
+                creditCardPaymentRepository.getTotalPaidPaymentsUpToDate(dateStr);
+
+        BigDecimal debtBalance = totalPurchases.subtract(totalPayments);
+
+        // Debt balance cannot be negative
+        return debtBalance.max(BigDecimal.ZERO);
+    }
+
+    /**
      * Get the total of all paid payments of all credit cards from a specified year
      *
      * @param year The year

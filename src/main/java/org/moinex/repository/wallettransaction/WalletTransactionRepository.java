@@ -538,4 +538,16 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "ORDER BY wt.date ASC")
     List<WalletTransaction> findTransactionsByWalletAfterDate(
             @Param("walletId") Integer walletId, @Param("date") String date);
+
+    /**
+     * Get the earliest (first) transaction date for a wallet
+     * @param walletId The wallet id
+     * @return The date of the first transaction, or null if no transactions
+     */
+    @Query(
+            "SELECT MIN(wt.date) "
+                    + "FROM WalletTransaction wt "
+                    + "WHERE wt.wallet.id = :walletId "
+                    + "AND wt.status = 'CONFIRMED'")
+    String findFirstTransactionDate(@Param("walletId") Integer walletId);
 }

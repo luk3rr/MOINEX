@@ -111,4 +111,20 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
             @Param("categoryIds") List<Integer> categoryIds,
             @Param("startDate") String startDate,
             @Param("endDate") String endDate);
+
+    /**
+     * Get transfers involving a wallet after a specific date
+     * @param walletId The id of the wallet
+     * @param date The date threshold (format: 'YYYY-MM-DD HH:MM:SS')
+     * @return A list with transfers after the specified date
+     */
+    @Query(
+            "SELECT t "
+                    + "FROM Transfer t "
+                    + "WHERE (t.senderWallet.id = :walletId "
+                    + "       OR t.receiverWallet.id = :walletId) "
+                    + "AND t.date > :date "
+                    + "ORDER BY t.date ASC")
+    List<Transfer> findTransfersByWalletAfterDate(
+            @Param("walletId") Integer walletId, @Param("date") String date);
 }

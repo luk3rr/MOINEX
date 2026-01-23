@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -31,6 +31,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -41,13 +42,7 @@ import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.NetWorthLineChart;
 import org.moinex.model.creditcard.CreditCard;
-import org.moinex.model.enums.OperationType;
-import org.moinex.model.enums.TransactionStatus;
 import org.moinex.model.enums.TransactionType;
-import org.moinex.model.investment.BondOperation;
-import org.moinex.model.investment.Ticker;
-import org.moinex.model.investment.TickerPurchase;
-import org.moinex.model.investment.TickerSale;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.*;
@@ -101,6 +96,10 @@ public class HomeController {
 
     @FXML private TableView<WalletTransaction> transactionsTableView;
 
+    @FXML private JFXButton recalculateNetWorthButton;
+
+    @FXML private ImageView recalculateNetWorthButtonIcon;
+
     private ConfigurableApplicationContext springContext;
 
     private List<Wallet> wallets;
@@ -119,9 +118,9 @@ public class HomeController {
 
     private CreditCardService creditCardService;
 
-    private TickerService tickerService;
+    private NetWorthSnapshotService netWorthSnapshotService;
 
-    private BondService bondService;
+    private NetWorthCalculationService netWorthCalculationService;
 
     private Integer walletPaneCurrentPage = 0;
 
@@ -144,16 +143,16 @@ public class HomeController {
             WalletTransactionService walletTransactionService,
             RecurringTransactionService recurringTransactionService,
             CreditCardService creditCardService,
-            TickerService tickerService,
-            BondService bondService,
+            NetWorthSnapshotService netWorthSnapshotService,
+            NetWorthCalculationService netWorthCalculationService,
             ConfigurableApplicationContext springContext,
             I18nService i18nService) {
         this.walletService = walletService;
         this.walletTransactionService = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
-        this.tickerService = tickerService;
-        this.bondService = bondService;
+        this.netWorthSnapshotService = netWorthSnapshotService;
+        this.netWorthCalculationService = netWorthCalculationService;
         this.springContext = springContext;
         this.i18nService = i18nService;
     }
@@ -176,6 +175,66 @@ public class HomeController {
         updateDisplayGraphs();
 
         setButtonsActions();
+    }
+
+    /**
+     * Recalculate all net worth snapshots asynchronously
+     * This method triggers a background calculation that won't block the UI
+     */
+    @FXML
+    public void handleRecalculateNetWorth() {
+        logger.info("Starting net worth recalculation...");
+
+        setOffRecalculateButton();
+
+        netWorthCalculationService
+                .recalculateAllSnapshots()
+                .thenRun(
+                        () ->
+                                Platform.runLater(
+                                        () -> {
+                                            logger.info(
+                                                    "Recalculation completed, updating chart...");
+                                            updateNetWorthLineChart();
+                                            setOnRecalculateButton();
+                                        }))
+                .exceptionally(
+                        throwable -> {
+                            logger.error("Error during recalculation", throwable);
+                            Platform.runLater(this::setOnRecalculateButton);
+                            return null;
+                        });
+    }
+
+    /**
+     * Disable recalculate button and show loading state
+     */
+    private void setOffRecalculateButton() {
+        recalculateNetWorthButtonIcon.setImage(
+                new Image(
+                        Objects.requireNonNull(getClass().getResource(Constants.LOADING_GIF))
+                                .toExternalForm()));
+        recalculateNetWorthButton.setDisable(true);
+        recalculateNetWorthButton.setText(
+                i18nService.tr(
+                        Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING));
+    }
+
+    /**
+     * Enable recalculate button and restore default state
+     */
+    private void setOnRecalculateButton() {
+        recalculateNetWorthButton.setDisable(false);
+        recalculateNetWorthButtonIcon.setImage(
+                new Image(
+                        Objects.requireNonNull(
+                                        getClass()
+                                                .getResource(
+                                                        Constants
+                                                                .RECALCULATE_NET_WORTH_BUTTON_DEFAULT_ICON))
+                                .toExternalForm()));
+        recalculateNetWorthButton.setText(
+                i18nService.tr(Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON));
     }
 
     /**
@@ -792,8 +851,18 @@ public class HomeController {
             AnchorPane.setBottomAnchor(moneyFlowBarChart, 0.0);
             AnchorPane.setLeftAnchor(moneyFlowBarChart, 0.0);
             AnchorPane.setRightAnchor(moneyFlowBarChart, 0.0);
+            recalculateNetWorthButton.setVisible(false);
         } else if (graphPaneCurrentPage == 1) {
             graphTitle.setText(i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_TITLE));
+            recalculateNetWorthButton.setVisible(true);
+
+            // Restore button state based on calculation service status
+            if (netWorthCalculationService.isCalculating()) {
+                setOffRecalculateButton();
+            } else {
+                setOnRecalculateButton();
+            }
+
             updateNetWorthLineChart();
         }
 
@@ -823,6 +892,7 @@ public class HomeController {
 
     /**
      * Calculate net worth data for the chart
+     * Uses cached snapshots when available to avoid expensive recalculations
      * @return List of net worth data points
      */
     private List<NetWorthLineChart.NetWorthDataPoint> calculateNetWorthData() {
@@ -834,352 +904,28 @@ public class HomeController {
 
         for (int i = 0; i < totalMonths; i++) {
             LocalDateTime date = maxMonth.minusMonths(totalMonths - i - 1L);
-            Integer month = date.getMonthValue();
-            Integer year = date.getYear();
+            int month = date.getMonthValue();
+            int year = date.getYear();
             YearMonth period = YearMonth.of(year, month);
 
-            BigDecimal assets = calculateAssetsForMonth(month, year);
-            BigDecimal liabilities = calculateLiabilitiesForMonth(month, year);
-            BigDecimal netWorth = assets.subtract(liabilities);
+            // Try to use cached snapshot first
+            var snapshot = netWorthSnapshotService.getSnapshot(month, year);
 
-            dataPoints.add(
-                    new NetWorthLineChart.NetWorthDataPoint(period, assets, liabilities, netWorth));
+            BigDecimal assets;
+            BigDecimal liabilities;
+            BigDecimal netWorth;
+
+            if (snapshot.isPresent()) {
+                assets = snapshot.get().getAssets();
+                liabilities = snapshot.get().getLiabilities();
+                netWorth = snapshot.get().getNetWorth();
+
+                dataPoints.add(
+                        new NetWorthLineChart.NetWorthDataPoint(
+                                period, assets, liabilities, netWorth));
+            }
         }
 
         return dataPoints;
-    }
-
-    /**
-     * Calculate total assets for a given month
-     * @param month The month
-     * @param year The year
-     * @return Total assets
-     */
-    private BigDecimal calculateAssetsForMonth(Integer month, Integer year) {
-        BigDecimal totalAssets = BigDecimal.ZERO;
-
-        BigDecimal walletBalances = calculateWalletBalancesForMonth(month, year);
-        totalAssets = totalAssets.add(walletBalances);
-
-        BigDecimal investmentValue = calculateInvestmentValueForMonth(month, year);
-        totalAssets = totalAssets.add(investmentValue);
-
-        return totalAssets;
-    }
-
-    /**
-     * Calculate wallet balances for a given month
-     * @param month The month
-     * @param year The year
-     * @return Total wallet balances
-     */
-    private BigDecimal calculateWalletBalancesForMonth(Integer month, Integer year) {
-        BigDecimal totalBalance = BigDecimal.ZERO;
-
-        YearMonth targetMonth = YearMonth.of(year, month);
-        YearMonth currentMonth = YearMonth.now();
-
-        if (targetMonth.isAfter(currentMonth)) { // Future projection
-            totalBalance =
-                    wallets.stream()
-                            .map(Wallet::getBalance)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            List<WalletTransaction> futureTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
-                            currentMonth.plusMonths(1), targetMonth);
-
-            BigDecimal futureIncomesTotal =
-                    futureTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
-                            .map(WalletTransaction::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalBalance = totalBalance.add(futureIncomesTotal);
-
-            BigDecimal futureExpensesTotal =
-                    futureTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                            .map(WalletTransaction::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalBalance = totalBalance.subtract(futureExpensesTotal);
-        } else if (targetMonth.equals(
-                currentMonth)) { // Current month - include pending and scheduled
-            totalBalance =
-                    wallets.stream()
-                            .map(Wallet::getBalance)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            // Add scheduled recurring transactions for current month
-            List<WalletTransaction> scheduledTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
-                            currentMonth, currentMonth);
-
-            BigDecimal scheduledIncomes =
-                    scheduledTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
-                            .map(WalletTransaction::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalBalance = totalBalance.add(scheduledIncomes);
-
-            BigDecimal scheduledExpenses =
-                    scheduledTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                            .map(WalletTransaction::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalBalance = totalBalance.subtract(scheduledExpenses);
-
-            // Add pending transactions for current month
-            List<WalletTransaction> currentMonthTransactions =
-                    walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            month, year);
-
-            BigDecimal pendingIncomes =
-                    currentMonthTransactions.stream()
-                            .filter(
-                                    t ->
-                                            t.getType().equals(TransactionType.INCOME)
-                                                    && t.getStatus()
-                                                            .equals(TransactionStatus.PENDING))
-                            .map(WalletTransaction::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalBalance = totalBalance.add(pendingIncomes);
-
-            BigDecimal pendingExpenses =
-                    currentMonthTransactions.stream()
-                            .filter(
-                                    t ->
-                                            t.getType().equals(TransactionType.EXPENSE)
-                                                    && t.getStatus()
-                                                            .equals(TransactionStatus.PENDING))
-                            .map(WalletTransaction::getAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            totalBalance = totalBalance.subtract(pendingExpenses);
-        } else { // Historical data - calculate retroactively from current balance
-            for (Wallet wallet : wallets) {
-                BigDecimal walletBalance = wallet.getBalance();
-
-                // Revert wallet transactions after target month
-                LocalDateTime startOfNextMonth = targetMonth.plusMonths(1).atDay(1).atStartOfDay();
-
-                List<WalletTransaction> transactionsAfter =
-                        walletTransactionService.getTransactionsByWalletAfterDate(
-                                wallet.getId(), startOfNextMonth);
-
-                for (WalletTransaction tx : transactionsAfter) {
-                    if (tx.getStatus().equals(TransactionStatus.CONFIRMED)) {
-                        if (tx.getType().equals(TransactionType.INCOME)) {
-                            walletBalance = walletBalance.subtract(tx.getAmount());
-                        } else if (tx.getType().equals(TransactionType.EXPENSE)) {
-                            walletBalance = walletBalance.add(tx.getAmount());
-                        }
-                    }
-                }
-
-                // Revert credit card payments after target month
-                // These payments decrease wallet balance but are not WalletTransactions
-                for (int futureMonth = targetMonth.getMonthValue() + 1;
-                        futureMonth <= 12;
-                        futureMonth++) {
-                    BigDecimal payments =
-                            creditCardService.getEffectivePaidPaymentsByMonth(
-                                    wallet.getId(), futureMonth, targetMonth.getYear());
-                    walletBalance = walletBalance.add(payments); // Add back payments
-                }
-
-                // For months in next years
-                int nextYear = targetMonth.getYear() + 1;
-                YearMonth now = YearMonth.now();
-                while (nextYear <= now.getYear()) {
-                    int maxMonth = (nextYear == now.getYear()) ? now.getMonthValue() : 12;
-                    for (int futureMonth = 1; futureMonth <= maxMonth; futureMonth++) {
-                        BigDecimal payments =
-                                creditCardService.getEffectivePaidPaymentsByMonth(
-                                        wallet.getId(), futureMonth, nextYear);
-                        walletBalance = walletBalance.add(payments);
-                    }
-                    nextYear++;
-                }
-
-                // Apply wallet transactions in target month
-                List<WalletTransaction> transactionsInMonth =
-                        walletTransactionService.getTransactionsByWalletAndMonth(
-                                wallet.getId(), month, year);
-
-                for (WalletTransaction tx : transactionsInMonth) {
-                    if (tx.getStatus().equals(TransactionStatus.CONFIRMED)) {
-                        if (tx.getType().equals(TransactionType.INCOME)) {
-                            walletBalance = walletBalance.add(tx.getAmount());
-                        } else if (tx.getType().equals(TransactionType.EXPENSE)) {
-                            walletBalance = walletBalance.subtract(tx.getAmount());
-                        }
-                    }
-                }
-
-                // Apply credit card payments in target month
-                BigDecimal paymentsInMonth =
-                        creditCardService.getEffectivePaidPaymentsByMonth(
-                                wallet.getId(), month, year);
-                walletBalance = walletBalance.subtract(paymentsInMonth);
-
-                totalBalance = totalBalance.add(walletBalance);
-            }
-        }
-
-        return totalBalance;
-    }
-
-    /**
-     * Calculate investment value for a given month
-     * @param month The month
-     * @param year The year
-     * @return Total investment value
-     */
-    private BigDecimal calculateInvestmentValueForMonth(Integer month, Integer year) {
-        YearMonth targetMonth = YearMonth.of(year, month);
-
-        LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59);
-
-        BigDecimal tickerValue = calculateTickerValueAtDate(endOfMonth);
-
-        BigDecimal bondValue = calculateBondValueAtDate(endOfMonth);
-
-        return tickerValue.add(bondValue);
-    }
-
-    /**
-     * Calculate total ticker value at a specific date
-     * @param date The date to calculate value for
-     * @return Total ticker value
-     */
-    private BigDecimal calculateTickerValueAtDate(LocalDateTime date) {
-        // Get all purchases and sales AFTER the target date
-        List<TickerPurchase> allPurchases = tickerService.getAllPurchases();
-        List<TickerSale> allSales = tickerService.getAllSales();
-
-        // Calculate quantity changes after target date for each ticker
-        Map<Integer, BigDecimal> quantityChangesAfter = new HashMap<>();
-
-        for (TickerPurchase purchase : allPurchases) {
-            LocalDateTime purchaseDate = purchase.getWalletTransaction().getDate();
-            if (purchaseDate.isAfter(date)) {
-                Integer tickerId = purchase.getTicker().getId();
-                quantityChangesAfter.merge(tickerId, purchase.getQuantity(), BigDecimal::add);
-            }
-        }
-
-        for (TickerSale sale : allSales) {
-            LocalDateTime saleDate = sale.getWalletTransaction().getDate();
-            if (saleDate.isAfter(date)) {
-                Integer tickerId = sale.getTicker().getId();
-                quantityChangesAfter.merge(tickerId, sale.getQuantity(), BigDecimal::add);
-            }
-        }
-
-        // Calculate historical quantity: current quantity - changes after date
-        List<Ticker> allTickers = tickerService.getAllTickers();
-        Map<Integer, BigDecimal> tickerQuantities = new HashMap<>();
-
-        for (Ticker ticker : allTickers) {
-            BigDecimal currentQty = ticker.getCurrentQuantity();
-            BigDecimal changesAfter =
-                    quantityChangesAfter.getOrDefault(ticker.getId(), BigDecimal.ZERO);
-            BigDecimal historicalQty = currentQty.subtract(changesAfter);
-
-            if (historicalQty.compareTo(BigDecimal.ZERO) > 0) {
-                tickerQuantities.put(ticker.getId(), historicalQty);
-            }
-        }
-
-        Map<Integer, Ticker> tickerMap =
-                allTickers.stream().collect(Collectors.toMap(Ticker::getId, ticker -> ticker));
-
-        BigDecimal totalValue = BigDecimal.ZERO;
-        for (Map.Entry<Integer, BigDecimal> entry : tickerQuantities.entrySet()) {
-            Ticker ticker = tickerMap.get(entry.getKey());
-            if (ticker != null) {
-                BigDecimal quantity = entry.getValue();
-                BigDecimal currentPrice = ticker.getCurrentUnitValue();
-                BigDecimal value = quantity.multiply(currentPrice);
-                totalValue = totalValue.add(value);
-            }
-        }
-
-        return totalValue;
-    }
-
-    /**
-     * Calculate total bond value at a specific date
-     * @param date The date to calculate value for
-     * @return Total bond value
-     */
-    private BigDecimal calculateBondValueAtDate(LocalDateTime date) {
-        List<BondOperation> operations = bondService.getOperationsByDateBefore(date);
-
-        // Calculate quantity held for each bond
-        Map<Integer, BigDecimal> bondQuantities = new HashMap<>();
-        Map<Integer, BigDecimal> bondPrices = new HashMap<>();
-
-        for (BondOperation operation : operations) {
-            Integer bondId = operation.getBond().getId();
-
-            if (operation.getOperationType().equals(OperationType.BUY)) {
-                bondQuantities.merge(bondId, operation.getQuantity(), BigDecimal::add);
-                bondPrices.put(bondId, operation.getUnitPrice());
-            } else if (operation.getOperationType().equals(OperationType.SELL)) {
-                bondQuantities.merge(bondId, operation.getQuantity().negate(), BigDecimal::add);
-            }
-        }
-
-        // Calculate total value using the last known price for each bond
-        BigDecimal totalValue = BigDecimal.ZERO;
-        for (java.util.Map.Entry<Integer, BigDecimal> entry : bondQuantities.entrySet()) {
-            BigDecimal quantity = entry.getValue();
-            BigDecimal price = bondPrices.getOrDefault(entry.getKey(), BigDecimal.ZERO);
-            totalValue = totalValue.add(quantity.multiply(price));
-        }
-
-        return totalValue;
-    }
-
-    /**
-     * Calculate total liabilities for a given month
-     * @param month The month
-     * @param year The year
-     * @return Total liabilities
-     */
-    private BigDecimal calculateLiabilitiesForMonth(Integer month, Integer year) {
-        BigDecimal totalLiabilities = BigDecimal.ZERO;
-
-        YearMonth targetMonth = YearMonth.of(year, month);
-        YearMonth currentMonth = YearMonth.now();
-
-        if (targetMonth.isAfter(currentMonth)) {
-            // Future: pending invoices (debts not yet paid)
-            BigDecimal crcPendingPayments =
-                    creditCardService.getPendingPaymentsByMonth(month, year);
-            totalLiabilities = totalLiabilities.add(crcPendingPayments);
-        } else if (targetMonth.equals(currentMonth)) {
-            // Current month: paid invoices + pending invoices
-            BigDecimal crcPaidPayments =
-                    creditCardService.getEffectivePaidPaymentsByMonth(month, year);
-            totalLiabilities = totalLiabilities.add(crcPaidPayments);
-
-            BigDecimal crcPendingPayments =
-                    creditCardService.getPendingPaymentsByMonth(month, year);
-            totalLiabilities = totalLiabilities.add(crcPendingPayments);
-        } else {
-            // Historical: paid invoices (debts that existed at that time)
-            BigDecimal crcPaidPayments =
-                    creditCardService.getEffectivePaidPaymentsByMonth(month, year);
-            totalLiabilities = totalLiabilities.add(crcPaidPayments);
-        }
-
-        return totalLiabilities;
     }
 }

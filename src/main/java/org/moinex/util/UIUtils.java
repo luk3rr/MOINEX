@@ -29,8 +29,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.NonNull;
@@ -92,6 +94,22 @@ public final class UIUtils {
         tooltip.setHideDelay(Duration.seconds(Constants.TOOLTIP_ANIMATION_DURATION));
 
         Tooltip.install(node, tooltip);
+    }
+
+    /**
+     * Add a tooltip to an axis label in a chart
+     *
+     * @param axis The axis containing the label
+     * @param labelText The text of the label to find
+     * @param tooltipText The tooltip text to display
+     */
+    public static void addTooltipToAxisLabel(
+            CategoryAxis axis, String labelText, String tooltipText) {
+        for (Node node : axis.getChildrenUnmodifiable()) {
+            if (node instanceof Text textNode && labelText.equals(textNode.getText())) {
+                UIUtils.addTooltipToNode(node, tooltipText);
+            }
+        }
     }
 
     /**

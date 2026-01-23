@@ -198,6 +198,8 @@ public final class Constants {
     public static final String LOADING_GIF = GIF_PATH + "loading.gif";
     public static final String SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON =
             COMMON_ICONS_PATH + "synchronize.png";
+    public static final String RECALCULATE_NET_WORTH_BUTTON_DEFAULT_ICON =
+            COMMON_ICONS_PATH + "reload.png";
 
     // CSS
     public static final String MAIN_STYLE_SHEET = CSS_SCENE_PATH + "main.css";
@@ -334,7 +336,7 @@ public final class Constants {
 
     public static final Integer XYBAR_CHART_MONTHS = 12;
     public static final Integer XYBAR_CHART_FUTURE_MONTHS = 6;
-    public static final Integer PL_CHART_MONTHS = 18;
+    public static final Integer PL_CHART_MONTHS = 12 * 5;
     public static final Integer PL_CHART_FUTURE_MONTHS = 3;
     public static final Integer MONTH_RESUME_FUTURE_MONTHS = 6;
 
@@ -517,6 +519,10 @@ public final class Constants {
         public static final String HOME_NET_WORTH_ASSETS = "home.netWorth.assets";
         public static final String HOME_NET_WORTH_LIABILITIES = "home.netWorth.liabilities";
         public static final String HOME_NET_WORTH_NET_WORTH = "home.netWorth.netWorth";
+        public static final String HOME_RECALCULATE_NET_WORTH_BUTTON =
+                "home.recalculateNetWorthButton";
+        public static final String HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING =
+                "home.recalculateNetWorthButton.recalculating";
 
         // Wallet
         public static final String WALLET_ALL_WALLETS = "wallet.allWallets";

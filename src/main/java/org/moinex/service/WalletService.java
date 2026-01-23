@@ -411,6 +411,10 @@ public class WalletService {
         return walletRepository.findAllByIsArchivedFalseOrderByNameAsc();
     }
 
+    public List<Wallet> getAllWalletsOrderedByName() {
+        return walletRepository.findAllByOrderByNameAsc();
+    }
+
     /**
      * Get all wallets that are not archived ordered descending by the number of
      * transactions

@@ -334,4 +334,16 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             @Param("categoryIds") List<Integer> categoryIds,
             @Param("startDate") String startDate,
             @Param("endDate") String endDate);
+
+    /**
+     * Get total amount of paid payments up to a specific date
+     * @param endDate The end date (inclusive)
+     * @return Total amount of paid payments up to the date
+     */
+    @Query(
+            "SELECT coalesce(sum(ccp.amount), 0) "
+                    + "FROM CreditCardPayment ccp "
+                    + "WHERE ccp.date <= :endDate "
+                    + "AND ccp.wallet IS NOT NULL")
+    BigDecimal getTotalPaidPaymentsUpToDate(@Param("endDate") String endDate);
 }

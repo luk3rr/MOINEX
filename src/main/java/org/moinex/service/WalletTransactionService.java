@@ -958,9 +958,8 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get all transactions for a specific wallet in a given month
-     *
-     * @param walletId The id of the wallet
+     * Get transactions by wallet and month
+     * @param walletId The wallet id
      * @param month The month
      * @param year The year
      * @return A list with transactions in the specified month
@@ -968,5 +967,18 @@ public class WalletTransactionService {
     public List<WalletTransaction> getTransactionsByWalletAndMonth(
             Integer walletId, Integer month, Integer year) {
         return walletTransactionRepository.findTransactionsByWalletAndMonth(walletId, month, year);
+    }
+
+    /**
+     * Get the date of the first transaction for a wallet
+     * @param walletId The wallet id
+     * @return The date of the first transaction, or null if no transactions
+     */
+    public LocalDateTime getFirstTransactionDate(Integer walletId) {
+        String dateStr = walletTransactionRepository.findFirstTransactionDate(walletId);
+        if (dateStr == null) {
+            return null;
+        }
+        return LocalDateTime.parse(dateStr, Constants.DB_DATE_FORMATTER);
     }
 }

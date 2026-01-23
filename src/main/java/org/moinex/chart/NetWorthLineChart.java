@@ -3,6 +3,7 @@ package org.moinex.chart;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.geometry.Side;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -19,6 +20,7 @@ public class NetWorthLineChart extends LineChart<String, Number> {
     @Setter private I18nService i18nService;
     private Line currentDateLine;
     private YearMonth currentMonth;
+    private List<NetWorthDataPoint> dataPoints;
 
     public NetWorthLineChart() {
         super(new CategoryAxis(), new NumberAxis());
@@ -50,6 +52,8 @@ public class NetWorthLineChart extends LineChart<String, Number> {
             return;
         }
 
+        this.dataPoints = dataPoints;
+
         XYChart.Series<String, Number> assetsSeries = new XYChart.Series<>();
         XYChart.Series<String, Number> liabilitiesSeries = new XYChart.Series<>();
         XYChart.Series<String, Number> netWorthSeries = new XYChart.Series<>();
@@ -79,7 +83,12 @@ public class NetWorthLineChart extends LineChart<String, Number> {
         getData().add(netWorthSeries);
 
         applyStyling();
-        addCurrentDateLine(dataPoints);
+
+        Platform.runLater(
+                () -> {
+                    addTooltipsToAxisLabels(dataPoints);
+                    addCurrentDateLine(dataPoints);
+                });
     }
 
     private void applyStyling() {
@@ -100,15 +109,68 @@ public class NetWorthLineChart extends LineChart<String, Number> {
             if (series.getNode() != null && !styleClass.isEmpty()) {
                 series.getNode().getStyleClass().add(styleClass);
             }
-
-            for (XYChart.Data<String, Number> data : series.getData()) {
-                if (data.getNode() != null) {
-                    String tooltipText =
-                            series.getName() + ": " + UIUtils.formatCurrency(data.getYValue());
-                    UIUtils.addTooltipToNode(data.getNode(), tooltipText);
-                }
-            }
         }
+    }
+
+    private void addTooltipsToAxisLabels(List<NetWorthDataPoint> dataPoints) {
+        CategoryAxis xAxis = (CategoryAxis) getXAxis();
+
+        widthProperty()
+                .addListener(
+                        (obs, oldVal, newVal) -> {
+                            Platform.runLater(
+                                    () -> {
+                                        reapplyTooltips(dataPoints, xAxis);
+                                        addCurrentDateLine(dataPoints);
+                                    });
+                        });
+
+        heightProperty()
+                .addListener(
+                        (obs, oldVal, newVal) -> {
+                            Platform.runLater(
+                                    () -> {
+                                        reapplyTooltips(dataPoints, xAxis);
+                                        addCurrentDateLine(dataPoints);
+                                    });
+                        });
+
+        Platform.runLater(
+                () -> {
+                    reapplyTooltips(dataPoints, xAxis);
+                    addCurrentDateLine(dataPoints);
+                });
+    }
+
+    private void reapplyTooltips(List<NetWorthDataPoint> dataPoints, CategoryAxis xAxis) {
+        for (NetWorthDataPoint dataPoint : dataPoints) {
+            String periodLabel = UIUtils.formatShortMonthYear(dataPoint.period(), i18nService);
+            String tooltipText = createTooltipText(dataPoint);
+            UIUtils.addTooltipToAxisLabel(xAxis, periodLabel, tooltipText);
+        }
+    }
+
+    private String createTooltipText(NetWorthDataPoint dataPoint) {
+        String assetsLabel = i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS);
+        String liabilitiesLabel =
+                i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES);
+        String netWorthLabel = i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH);
+
+        String periodLabel = UIUtils.formatFullMonthYear(dataPoint.period(), i18nService);
+
+        return periodLabel
+                + "\n"
+                + assetsLabel
+                + ": "
+                + UIUtils.formatCurrency(dataPoint.assets())
+                + "\n"
+                + liabilitiesLabel
+                + ": "
+                + UIUtils.formatCurrency(dataPoint.liabilities())
+                + "\n"
+                + netWorthLabel
+                + ": "
+                + UIUtils.formatCurrency(dataPoint.netWorth());
     }
 
     private void addCurrentDateLine(List<NetWorthDataPoint> dataPoints) {
@@ -167,14 +229,6 @@ public class NetWorthLineChart extends LineChart<String, Number> {
         currentDateLine.setEndX(xPosition);
         currentDateLine.setStartY(0);
         currentDateLine.setEndY(yAxis.getHeight());
-    }
-
-    public void setXAxisLabel(String label) {
-        getXAxis().setLabel(label);
-    }
-
-    public void setYAxisLabel(String label) {
-        getYAxis().setLabel(label);
     }
 
     public record NetWorthDataPoint(
