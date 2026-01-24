@@ -1254,6 +1254,11 @@ public class SavingsController {
         loadTickersFromDatabase();
         loadDividendsFromDatabase();
 
+        logger.info(
+                "Overview calculation: tickers={}, dividends={}",
+                tickers != null ? tickers.size() : 0,
+                dividends != null ? dividends.size() : 0);
+
         BigDecimal totalInvested =
                 tickers.stream()
                         .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
@@ -1264,22 +1269,64 @@ public class SavingsController {
                         .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        BigDecimal tickerUnrealizedGains = BigDecimal.ZERO;
+        BigDecimal tickerUnrealizedLosses = BigDecimal.ZERO;
+
+        for (Ticker ticker : tickers) {
+            BigDecimal invested =
+                    ticker.getAverageUnitValue().multiply(ticker.getCurrentQuantity());
+            BigDecimal current = ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
+            BigDecimal profitLoss = current.subtract(invested);
+
+            logger.debug(
+                    "Overview ticker {} ({}): qty={}, avg={}, current={}, invested={}, value={},"
+                            + " pl={}",
+                    ticker.getSymbol(),
+                    ticker.getName(),
+                    ticker.getCurrentQuantity(),
+                    ticker.getAverageUnitValue(),
+                    ticker.getCurrentUnitValue(),
+                    invested,
+                    current,
+                    profitLoss);
+
+            if (profitLoss.compareTo(BigDecimal.ZERO) > 0) {
+                tickerUnrealizedGains = tickerUnrealizedGains.add(profitLoss);
+            } else {
+                tickerUnrealizedLosses = tickerUnrealizedLosses.add(profitLoss.abs());
+            }
+        }
+
+        logger.info(
+                "Overview tickers unrealized: gains={}, losses={} (gross)",
+                tickerUnrealizedGains,
+                tickerUnrealizedLosses);
+
         BigDecimal bondsTotalInvested = bondService.getTotalInvestedValue();
-        BigDecimal bondsProfitLoss =
+        BigDecimal bondsRealizedProfitLoss =
                 bondService.getAllNonArchivedBonds().stream()
                         .map(bondService::calculateProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal bondsCurrentValue = bondsTotalInvested;
 
+        logger.info(
+                "Overview bonds: investedValue={}, currentValueAssumed={}, realizedProfitLoss={}"
+                        + " (SELL netProfit sum)",
+                bondsTotalInvested,
+                bondsCurrentValue,
+                bondsRealizedProfitLoss);
+
         totalInvested = totalInvested.add(bondsTotalInvested);
-        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue).add(bondsProfitLoss);
+        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue);
 
         BigDecimal totalDividends =
                 dividends.stream()
                         .map(d -> d.getWalletTransaction().getAmount())
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<TickerSale> tickerSales = tickerService.getAllSales();
+        logger.info("Overview dividends: count={}, total={}", dividends.size(), totalDividends);
+
+        List<TickerSale> tickerSales = tickerService.getAllNonArchivedSales();
         BigDecimal tickerRealizedProfit =
                 tickerSales.stream()
                         .map(
@@ -1292,23 +1339,23 @@ public class SavingsController {
                                 })
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal unrealizedProfitLoss = portfolioCurrentValue.subtract(totalInvested);
+        logger.info(
+                "Overview ticker sales: count={}, realizedProfitLoss={}",
+                tickerSales.size(),
+                tickerRealizedProfit);
 
         BigDecimal totalGains = BigDecimal.ZERO;
         BigDecimal totalLosses = BigDecimal.ZERO;
 
-        if (unrealizedProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
-            totalGains = totalGains.add(unrealizedProfitLoss);
-        } else {
-            totalLosses = totalLosses.add(unrealizedProfitLoss.abs());
-        }
+        totalGains = totalGains.add(tickerUnrealizedGains);
+        totalLosses = totalLosses.add(tickerUnrealizedLosses);
 
         totalGains = totalGains.add(totalDividends);
 
-        if (bondsProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
-            totalGains = totalGains.add(bondsProfitLoss);
+        if (bondsRealizedProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
+            totalGains = totalGains.add(bondsRealizedProfitLoss);
         } else {
-            totalLosses = totalLosses.add(bondsProfitLoss.abs());
+            totalLosses = totalLosses.add(bondsRealizedProfitLoss.abs());
         }
 
         if (tickerRealizedProfit.compareTo(BigDecimal.ZERO) > 0) {
@@ -1316,6 +1363,13 @@ public class SavingsController {
         } else {
             totalLosses = totalLosses.add(tickerRealizedProfit.abs());
         }
+
+        logger.info(
+                "Overview result: totalInvested={}, totalValue={}, gains={}, losses={} (gross)",
+                totalInvested,
+                portfolioCurrentValue,
+                totalGains,
+                totalLosses);
 
         overviewTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
         overviewTabGainsField.setText(UIUtils.formatCurrency(totalGains));

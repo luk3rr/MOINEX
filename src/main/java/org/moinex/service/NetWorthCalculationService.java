@@ -262,7 +262,9 @@ public class NetWorthCalculationService {
                 log.debug("  Wallet '{}': current balance = {}", wallet.getName(), walletBalance);
 
                 walletBalance = revertWalletTransactionsAfterMonth(wallet, targetMonth);
-                walletBalance = revertCreditCardPaymentsAfterMonth(wallet, walletBalance, targetMonth, month, year);
+                walletBalance =
+                        revertCreditCardPaymentsAfterMonth(
+                                wallet, walletBalance, targetMonth, month, year);
 
                 log.debug("    Final balance for '{}': {}", wallet.getName(), walletBalance);
 
@@ -326,7 +328,9 @@ public class NetWorthCalculationService {
                 log.debug("  Wallet '{}': current balance = {}", wallet.getName(), walletBalance);
 
                 walletBalance = revertWalletTransactionsAfterMonth(wallet, targetMonth);
-                walletBalance = revertCreditCardPaymentsAfterMonth(wallet, walletBalance, targetMonth, month, year);
+                walletBalance =
+                        revertCreditCardPaymentsAfterMonth(
+                                wallet, walletBalance, targetMonth, month, year);
 
                 log.debug("    Final balance for '{}': {}", wallet.getName(), walletBalance);
 
@@ -533,7 +537,11 @@ public class NetWorthCalculationService {
      * @return The adjusted wallet balance
      */
     private BigDecimal revertCreditCardPaymentsAfterMonth(
-            Wallet wallet, BigDecimal walletBalance, YearMonth targetMonth, Integer month, Integer year) {
+            Wallet wallet,
+            BigDecimal walletBalance,
+            YearMonth targetMonth,
+            Integer month,
+            Integer year) {
 
         // Revert credit card payments after target month
         for (int futureMonth = targetMonth.getMonthValue() + 1; futureMonth <= 12; futureMonth++) {

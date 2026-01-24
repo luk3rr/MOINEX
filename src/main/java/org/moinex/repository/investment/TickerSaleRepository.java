@@ -21,4 +21,7 @@ public interface TickerSaleRepository extends JpaRepository<TickerSale, Integer>
                     + "WHERE wt.date <= :date "
                     + "ORDER BY wt.date ASC")
     List<TickerSale> findAllByDateBefore(@Param("date") String date);
+
+    @Query("SELECT ts FROM TickerSale ts WHERE ts.ticker.isArchived = false")
+    List<TickerSale> findAllNonArchived();
 }

@@ -1282,6 +1282,10 @@ public class TickerService {
         return tickerSaleRepository.findAll();
     }
 
+    public List<TickerSale> getAllNonArchivedSales() {
+        return tickerSaleRepository.findAllNonArchived();
+    }
+
     /**
      * Get all dividends
      *
