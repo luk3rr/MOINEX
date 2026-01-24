@@ -8,7 +8,6 @@ package org.moinex.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.moinex.model.NetWorthSnapshot;
@@ -31,14 +30,6 @@ public class NetWorthSnapshotService {
      */
     public Optional<NetWorthSnapshot> getSnapshot(Integer month, Integer year) {
         return netWorthSnapshotRepository.findByMonthAndYear(month, year);
-    }
-
-    /**
-     * Get all snapshots ordered by date
-     * @return List of snapshots
-     */
-    public List<NetWorthSnapshot> getAllSnapshots() {
-        return netWorthSnapshotRepository.findAllOrderedByDate();
     }
 
     /**
@@ -105,15 +96,5 @@ public class NetWorthSnapshotService {
     @Transactional
     public void deleteAllSnapshots() {
         netWorthSnapshotRepository.deleteAll();
-    }
-
-    /**
-     * Check if snapshot exists
-     * @param month The month
-     * @param year The year
-     * @return True if exists
-     */
-    public boolean snapshotExists(Integer month, Integer year) {
-        return netWorthSnapshotRepository.existsByMonthAndYear(month, year);
     }
 }

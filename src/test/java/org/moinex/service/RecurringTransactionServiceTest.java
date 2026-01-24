@@ -94,7 +94,8 @@ class RecurringTransactionServiceTest {
                     LocalDate.now().plusMonths(3),
                     "New recurring expense",
                     RecurringTransactionFrequency.MONTHLY,
-                    true);
+                    true,
+                    false);
 
             ArgumentCaptor<RecurringTransaction> captor =
                     ArgumentCaptor.forClass(RecurringTransaction.class);
@@ -120,7 +121,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now().plusMonths(1),
                                     "Past transaction",
                                     RecurringTransactionFrequency.MONTHLY,
-                                    true));
+                                    true,
+                                    false));
         }
 
         @DisplayName("Throws EntityNotFoundException when wallet does not exist")
@@ -140,7 +142,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now().plusMonths(1),
                                     "Non-existent wallet transaction",
                                     RecurringTransactionFrequency.MONTHLY,
-                                    true));
+                                    true,
+                                    false));
         }
 
         @DisplayName("Throws IllegalArgumentException when start or end date is null")
@@ -160,7 +163,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now().plusMonths(1),
                                     "Null start date transaction",
                                     RecurringTransactionFrequency.MONTHLY,
-                                    true));
+                                    true,
+                                    false));
 
             assertThrows(
                     IllegalArgumentException.class,
@@ -174,7 +178,8 @@ class RecurringTransactionServiceTest {
                                     null,
                                     "Null end date transaction",
                                     RecurringTransactionFrequency.MONTHLY,
-                                    true));
+                                    true,
+                                    false));
         }
 
         @DisplayName("Throws IllegalArgumentException when amount is less than or equal to zero")
@@ -194,7 +199,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now().plusMonths(1),
                                     "Zero amount transaction",
                                     RecurringTransactionFrequency.MONTHLY,
-                                    true));
+                                    true,
+                                    false));
 
             assertThrows(
                     IllegalArgumentException.class,
@@ -208,7 +214,8 @@ class RecurringTransactionServiceTest {
                                     LocalDate.now().plusMonths(1),
                                     "Negative amount transaction",
                                     RecurringTransactionFrequency.MONTHLY,
-                                    true));
+                                    true,
+                                    false));
         }
     }
 

@@ -151,7 +151,8 @@ public class RecurringTransactionService {
             LocalDate startDate,
             String description,
             RecurringTransactionFrequency frequency,
-            Boolean includeInAnalysis) {
+            Boolean includeInAnalysis,
+            Boolean includeInNetWorth) {
         LocalDate defaultEndDate = Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE;
 
         return addRecurringTransaction(
@@ -163,7 +164,8 @@ public class RecurringTransactionService {
                 defaultEndDate,
                 description,
                 frequency,
-                includeInAnalysis);
+                includeInAnalysis,
+                includeInNetWorth);
     }
 
     /**
@@ -196,7 +198,8 @@ public class RecurringTransactionService {
             LocalDate endDate,
             String description,
             RecurringTransactionFrequency frequency,
-            Boolean includeInAnalysis) {
+            Boolean includeInAnalysis,
+            Boolean includeInNetWorth) {
         Wallet wt =
                 walletRepository
                         .findById(walletId)
@@ -236,6 +239,7 @@ public class RecurringTransactionService {
                         .frequency(frequency)
                         .description(description)
                         .includeInAnalysis(includeInAnalysis)
+                        .includeInNetWorth(includeInNetWorth)
                         .build();
 
         recurringTransactionRepository.save(recurringTransaction);
@@ -348,6 +352,7 @@ public class RecurringTransactionService {
         rtToUpdate.setFrequency(rt.getFrequency());
         rtToUpdate.setStatus(rt.getStatus());
         rtToUpdate.setIncludeInAnalysis(rt.getIncludeInAnalysis());
+        rtToUpdate.setIncludeInNetWorth(rt.getIncludeInNetWorth());
 
         recurringTransactionRepository.save(rtToUpdate);
         m_logger.info("Recurring transaction {} successfully updated", rt.getId());
@@ -511,6 +516,10 @@ public class RecurringTransactionService {
      */
     public List<RecurringTransaction> getAllRecurringTransactions() {
         return recurringTransactionRepository.findAll();
+    }
+
+    public List<RecurringTransaction> getAllByType(TransactionType type) {
+        return recurringTransactionRepository.findByType(type);
     }
 
     /**

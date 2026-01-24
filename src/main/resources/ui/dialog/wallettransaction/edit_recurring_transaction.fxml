@@ -127,6 +127,11 @@
             <Font size="14.0" />
          </font>
       </CheckBox>
+      <CheckBox fx:id="includeInNetWorthCheckBox" mnemonicParsing="false" text="%recurringtransaction.include_in_net_worth">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </CheckBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
             <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />

@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -12,6 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.Tooltip?>
 <VBox alignment="CENTER" prefWidth="510.0" spacing="10.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wallettransaction.AddRecurringTransactionController">
    <children>
       <VBox alignment="CENTER" spacing="10.0">
@@ -121,6 +123,8 @@
             <javafx.scene.control.Tooltip text="%wallettransaction.tooltip.include_in_analysis" />
          </tooltip>
       </javafx.scene.control.CheckBox>
+      <CheckBox fx:id="includeInNetWorthCheckBox" text="%recurringtransaction.include_in_net_worth">
+      </CheckBox>
       <HBox alignment="CENTER" spacing="10.0">
          <children>
             <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />

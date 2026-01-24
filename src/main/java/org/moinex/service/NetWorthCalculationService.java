@@ -24,6 +24,7 @@ import org.moinex.model.investment.BondOperation;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.investment.TickerSale;
+import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.util.Constants;
@@ -107,25 +108,32 @@ public class NetWorthCalculationService {
 
                 BigDecimal walletBalances = calculateWalletBalancesForMonth(month, year);
                 BigDecimal investments = calculateInvestmentValueForMonth(month, year);
-                BigDecimal assets = walletBalances.add(investments);
+                BigDecimal recurringIncome = calculateRecurringTransactionsIncome(month, year);
+                BigDecimal assets = walletBalances.add(investments).add(recurringIncome);
 
                 BigDecimal negativeWalletBalances = calculateNegativeWalletBalances(month, year);
                 BigDecimal creditCardDebt = calculateCreditCardDebt(month, year);
-                BigDecimal liabilities = creditCardDebt.add(negativeWalletBalances);
+                BigDecimal recurringTransactionsDebt =
+                        calculateRecurringTransactionsDebt(month, year);
+                BigDecimal liabilities =
+                        creditCardDebt.add(negativeWalletBalances).add(recurringTransactionsDebt);
 
                 BigDecimal netWorth = assets.subtract(liabilities);
 
                 log.info("--- SUMMARY FOR {}/{} ---", month, year);
                 log.info(
-                        "Assets: {} (Wallets: {} + Investments: {})",
+                        "Assets: {} (Wallets: {} + Investments: {} + Recurring Income: {})",
                         assets,
                         walletBalances,
-                        investments);
+                        investments,
+                        recurringIncome);
                 log.info(
-                        "Liabilities: {} (Credit Card: {} + Negative Wallets: {})",
+                        "Liabilities: {} (Credit Card: {} + Negative Wallets: {} + Recurring"
+                                + " Expenses: {})",
                         liabilities,
                         creditCardDebt,
-                        negativeWalletBalances);
+                        negativeWalletBalances,
+                        recurringTransactionsDebt);
                 log.info("Net Worth: {}", netWorth);
                 log.info("========================================\n");
 
@@ -380,6 +388,132 @@ public class NetWorthCalculationService {
         log.debug("Total credit card debt: {}", creditCardDebt);
         log.debug("=== End CREDIT CARD DEBT calculation ===\n");
         return creditCardDebt;
+    }
+
+    /**
+     * Calculate recurring transactions for a given month
+     * Generic method to calculate remaining balance for recurring transactions with end dates
+     * @param month The month
+     * @param year The year
+     * @param transactionType The type of transaction (EXPENSE or INCOME)
+     * @param debugLabel The label for debug logging
+     * @return Total remaining amount from recurring transactions
+     */
+    private BigDecimal calculateRecurringTransactionsAmount(
+            Integer month, Integer year, TransactionType transactionType, String debugLabel) {
+        log.debug("=== Calculating {} for {}/{} ===", debugLabel, month, year);
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        YearMonth targetMonth = YearMonth.of(year, month);
+        LocalDateTime startOfMonth = targetMonth.atDay(1).atTime(0, 0, 0);
+        LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        List<RecurringTransaction> allRecurringTransactions =
+                recurringTransactionService.getAllByType(transactionType);
+
+        for (RecurringTransaction recurring : allRecurringTransactions) {
+            if (!Boolean.TRUE.equals(recurring.getIncludeInNetWorth())) {
+                log.debug(
+                        "  Recurring transaction {} is not included in net worth calculation",
+                        recurring.getId());
+                continue;
+            }
+
+            LocalDateTime startDate = recurring.getStartDate();
+            LocalDateTime endDate = recurring.getEndDate();
+
+            if (endDate.getYear() == Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.getYear()
+                    && endDate.getMonthValue()
+                            == Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.getMonthValue()
+                    && endDate.getDayOfMonth()
+                            == Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.getDayOfMonth()) {
+                continue;
+            }
+
+            if (endOfMonth.isBefore(startDate)) {
+                log.debug(
+                        "  Recurring transaction {} has not started yet (start date: {})",
+                        recurring.getId(),
+                        startDate);
+                continue;
+            }
+
+            BigDecimal recurringAmount = BigDecimal.ZERO;
+
+            // Calculate what the nextDueDate would be at the start of the target month
+            // We need to project backwards if the target month is in the past
+            LocalDateTime projectedNextDueDate = recurring.getStartDate();
+
+            // Advance from start date to find what the next due date would be at the target month
+            while (projectedNextDueDate.isBefore(startOfMonth)) {
+                projectedNextDueDate =
+                        switch (recurring.getFrequency()) {
+                            case DAILY -> projectedNextDueDate.plusDays(1);
+                            case WEEKLY -> projectedNextDueDate.plusWeeks(1);
+                            case MONTHLY -> projectedNextDueDate.plusMonths(1);
+                            case YEARLY -> projectedNextDueDate.plusYears(1);
+                        };
+            }
+
+            // Count all installments from the target month onwards until end date
+            LocalDateTime currentInstallmentDate = projectedNextDueDate;
+            while ((currentInstallmentDate.isBefore(endDate)
+                    || currentInstallmentDate.equals(endDate))) {
+                recurringAmount = recurringAmount.add(recurring.getAmount());
+                log.debug(
+                        "  Recurring transaction {} - installment due: {} (amount: {})",
+                        recurring.getId(),
+                        currentInstallmentDate,
+                        recurring.getAmount());
+
+                currentInstallmentDate =
+                        switch (recurring.getFrequency()) {
+                            case DAILY -> currentInstallmentDate.plusDays(1);
+                            case WEEKLY -> currentInstallmentDate.plusWeeks(1);
+                            case MONTHLY -> currentInstallmentDate.plusMonths(1);
+                            case YEARLY -> currentInstallmentDate.plusYears(1);
+                        };
+            }
+
+            if (recurringAmount.compareTo(BigDecimal.ZERO) > 0) {
+                totalAmount = totalAmount.add(recurringAmount);
+                log.debug(
+                        "  Total remaining amount for recurring transaction {}: {} (start: {}, end:"
+                                + " {})",
+                        recurring.getId(),
+                        recurringAmount,
+                        startDate,
+                        endDate);
+            }
+        }
+
+        log.debug("Total {}: {}", debugLabel, totalAmount);
+        log.debug("=== End {} calculation ===\n", debugLabel);
+        return totalAmount;
+    }
+
+    /**
+     * Calculate recurring transactions debt for a given month
+     * Calculates the remaining balance (unpaid installments) for recurring transactions with end dates
+     * @param month The month
+     * @param year The year
+     * @return Total remaining debt from recurring transactions
+     */
+    private BigDecimal calculateRecurringTransactionsDebt(Integer month, Integer year) {
+        return calculateRecurringTransactionsAmount(
+                month, year, TransactionType.EXPENSE, "RECURRING TRANSACTIONS DEBT");
+    }
+
+    /**
+     * Calculate recurring income for a given month
+     * Calculates the remaining balance (unpaid installments) for recurring income transactions with end dates
+     * @param month The month
+     * @param year The year
+     * @return Total remaining income from recurring transactions
+     */
+    private BigDecimal calculateRecurringTransactionsIncome(Integer month, Integer year) {
+        return calculateRecurringTransactionsAmount(
+                month, year, TransactionType.INCOME, "RECURRING TRANSACTIONS INCOME");
     }
 
     /**

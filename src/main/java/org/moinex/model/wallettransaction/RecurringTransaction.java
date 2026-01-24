@@ -61,6 +61,10 @@ public class RecurringTransaction extends BaseTransaction {
     @Column(name = "status", nullable = false, columnDefinition = "varchar default 'ACTIVE'")
     private RecurringTransactionStatus status = RecurringTransactionStatus.ACTIVE;
 
+    @Builder.Default
+    @Column(name = "include_in_net_worth", nullable = false)
+    private Boolean includeInNetWorth = false;
+
     public abstract static class RecurringTransactionBuilder<
                     C extends RecurringTransaction, B extends RecurringTransactionBuilder<C, B>>
             extends BaseTransactionBuilder<C, B> {

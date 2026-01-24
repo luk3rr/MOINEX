@@ -52,6 +52,8 @@ public abstract class BaseRecurringTransactionManagement {
 
     @FXML protected CheckBox includeInAnalysisCheckBox;
 
+    @FXML protected CheckBox includeInNetWorthCheckBox;
+
     protected WalletService walletService;
 
     protected RecurringTransactionService recurringTransactionService;
