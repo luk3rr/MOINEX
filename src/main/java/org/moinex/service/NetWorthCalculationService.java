@@ -363,27 +363,11 @@ public class NetWorthCalculationService {
      */
     private BigDecimal calculateCreditCardDebt(Integer month, Integer year) {
         log.debug("=== Calculating CREDIT CARD DEBT for {}/{} ===", month, year);
-        BigDecimal creditCardDebt = BigDecimal.ZERO;
 
-        YearMonth targetMonth = YearMonth.of(year, month);
-        YearMonth currentMonth = YearMonth.now();
-
-        if (targetMonth.isAfter(currentMonth)) {
-            // Future: pending invoices (debts not yet paid)
-            creditCardDebt = creditCardService.getPendingPaymentsByMonth(month, year);
-        } else if (targetMonth.equals(currentMonth)) {
-            // Current month: paid invoices + pending invoices
-            BigDecimal crcPaidPayments =
-                    creditCardService.getEffectivePaidPaymentsByMonth(month, year);
-            creditCardDebt = creditCardDebt.add(crcPaidPayments);
-
-            BigDecimal crcPendingPayments =
-                    creditCardService.getPendingPaymentsByMonth(month, year);
-            creditCardDebt = creditCardDebt.add(crcPendingPayments);
-        } else {
-            // Historical: paid invoices (debts that existed at that time)
-            creditCardDebt = creditCardService.getEffectivePaidPaymentsByMonth(month, year);
-        }
+        BigDecimal creditCardDebt =
+                creditCardService
+                        .getPendingPaymentsByMonth(month, year)
+                        .add(creditCardService.getEffectivePaidPaymentsByMonth(month, year));
 
         log.debug("Total credit card debt: {}", creditCardDebt);
         log.debug("=== End CREDIT CARD DEBT calculation ===\n");
