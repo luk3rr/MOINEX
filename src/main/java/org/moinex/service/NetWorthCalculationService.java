@@ -111,7 +111,7 @@ public class NetWorthCalculationService {
                 BigDecimal recurringIncome = calculateRecurringTransactionsIncome(month, year);
                 BigDecimal assets = walletBalances.add(investments).add(recurringIncome);
 
-                BigDecimal negativeWalletBalances = calculateNegativeWalletBalances(month, year);
+                BigDecimal negativeWalletBalances = BigDecimal.ZERO;
                 BigDecimal creditCardDebt = calculateCreditCardDebt(month, year);
                 BigDecimal recurringTransactionsDebt =
                         calculateRecurringTransactionsDebt(month, year);
@@ -292,82 +292,21 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Calculate negative wallet balances (overdrafts) for a given month
-     * @param month The month
-     * @param year The year
-     * @return Total negative wallet balances
-     */
-    private BigDecimal calculateNegativeWalletBalances(Integer month, Integer year) {
-        BigDecimal totalNegative = BigDecimal.ZERO;
-
-        YearMonth targetMonth = YearMonth.of(year, month);
-        YearMonth currentMonth = YearMonth.now();
-
-        log.debug("=== Calculating NEGATIVE WALLET BALANCES for {}/{} ===", month, year);
-        log.debug("Target month: {} | Current month: {}", targetMonth, currentMonth);
-
-        if (targetMonth.isAfter(currentMonth)) { // Future projection
-            log.debug("Future month - projecting negative balances");
-
-            totalNegative =
-                    wallets.stream()
-                            .map(Wallet::getBalance)
-                            .filter(b -> b.compareTo(BigDecimal.ZERO) < 0)
-                            .map(BigDecimal::abs)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            log.debug("Total future negative balances: {}", totalNegative);
-        } else if (targetMonth.equals(currentMonth)) { // Current month
-            log.debug("Current month - using current negative balances");
-
-            totalNegative =
-                    wallets.stream()
-                            .map(Wallet::getBalance)
-                            .filter(b -> b.compareTo(BigDecimal.ZERO) < 0)
-                            .map(BigDecimal::abs)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            log.debug("Total current negative balances: {}", totalNegative);
-        } else { // Historical data
-            log.debug("Historical month - calculating negative balances retroactively");
-
-            for (Wallet wallet : wallets) {
-                BigDecimal walletBalance = wallet.getBalance();
-                log.debug("  Wallet '{}': current balance = {}", wallet.getName(), walletBalance);
-
-                walletBalance = revertWalletTransactionsAfterMonth(wallet, targetMonth);
-                walletBalance =
-                        revertCreditCardPaymentsAfterMonth(
-                                wallet, walletBalance, targetMonth, month, year);
-
-                log.debug("    Final balance for '{}': {}", wallet.getName(), walletBalance);
-
-                // Only add negative balances as liabilities
-                if (walletBalance.compareTo(BigDecimal.ZERO) < 0) {
-                    totalNegative = totalNegative.add(walletBalance.abs());
-                    log.debug("      -> Added to liabilities: {}", walletBalance.abs());
-                }
-            }
-        }
-
-        log.debug("Total negative wallet balances: {}", totalNegative);
-        log.debug("=== End NEGATIVE WALLET BALANCES calculation ===\n");
-        return totalNegative;
-    }
-
-    /**
      * Calculate credit card debt for a given month
+     * This calculates the debt that existed at the end of the specified month
+     * by considering all debts created up to that date minus all payments made up to that date
+     *
      * @param month The month
      * @param year The year
-     * @return Total credit card debt
+     * @return Total credit card debt at the end of the specified month
      */
     private BigDecimal calculateCreditCardDebt(Integer month, Integer year) {
         log.debug("=== Calculating CREDIT CARD DEBT for {}/{} ===", month, year);
 
-        BigDecimal creditCardDebt =
-                creditCardService
-                        .getPendingPaymentsByMonth(month, year)
-                        .add(creditCardService.getEffectivePaidPaymentsByMonth(month, year));
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDateTime dateAtEndOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        BigDecimal creditCardDebt = creditCardService.getDebtAtDate(dateAtEndOfMonth);
 
         log.debug("Total credit card debt: {}", creditCardDebt);
         log.debug("=== End CREDIT CARD DEBT calculation ===\n");

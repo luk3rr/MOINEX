@@ -1451,4 +1451,45 @@ public class CreditCardService {
         oldDebt.setAmount(newAmount);
         creditCardDebtRepository.save(oldDebt);
     }
+
+    /**
+     * Get the credit card debt at a specific date (snapshot)
+     * This calculates the debt that existed at a given point in time by considering:
+     * - All debts created up to that date
+     * - All payments made up to that date
+     * - For future dates: assumes all pending payments will be paid (no debt accumulation)
+     *
+     * @param date The date to calculate the debt for
+     * @return The total credit card debt at the specified date
+     */
+    public BigDecimal getDebtAtDate(LocalDateTime date) {
+        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        LocalDateTime now = LocalDateTime.now();
+
+        BigDecimal totalDebts =
+                creditCardDebtRepository.findAllCreatedUpToDate(dateStr).stream()
+                        .map(CreditCardDebt::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalPayments =
+                creditCardPaymentRepository.findAllPaidUpToDate(dateStr).stream()
+                        .map(CreditCardPayment::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // For future dates, project the debt considering monthly payments
+        if (date.isAfter(now)) {
+            YearMonth targetMonth = YearMonth.from(date);
+
+            YearMonth month = YearMonth.now();
+            while (!month.isAfter(targetMonth)) {
+                BigDecimal monthlyPayment =
+                        creditCardPaymentRepository.getPendingPaymentsByMonth(
+                                month.getMonthValue(), month.getYear());
+                totalPayments = totalPayments.add(monthlyPayment);
+                month = month.plusMonths(1);
+            }
+        }
+
+        return totalDebts.subtract(totalPayments);
+    }
 }

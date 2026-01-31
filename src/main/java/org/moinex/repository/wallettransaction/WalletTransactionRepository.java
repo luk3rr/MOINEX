@@ -550,4 +550,20 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
                     + "WHERE wt.wallet.id = :walletId "
                     + "AND wt.status = 'CONFIRMED'")
     String findFirstTransactionDate(@Param("walletId") Integer walletId);
+
+    /**
+     * Get all confirmed transactions for a wallet up to a specific date
+     * @param walletId The wallet id
+     * @param endDate The end date (inclusive)
+     * @return List of all confirmed transactions up to the date
+     */
+    @Query(
+            "SELECT wt "
+                    + "FROM WalletTransaction wt "
+                    + "WHERE wt.wallet.id = :walletId "
+                    + "AND wt.date <= :endDate "
+                    + "AND wt.status = 'CONFIRMED' "
+                    + "ORDER BY wt.date ASC")
+    List<WalletTransaction> findAllConfirmedTransactionsUpToDate(
+            @Param("walletId") Integer walletId, @Param("endDate") String endDate);
 }

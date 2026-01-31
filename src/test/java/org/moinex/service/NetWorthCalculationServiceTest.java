@@ -25,7 +25,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.moinex.model.enums.OperationType;
-import org.moinex.model.enums.TransactionStatus;
 import org.moinex.model.enums.TransactionType;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BondOperation;
@@ -63,7 +62,7 @@ class NetWorthCalculationServiceTest {
     class RecalculateAllSnapshotsTests {
         @Test
         @DisplayName("Should recalculate all snapshots successfully")
-        void recalculateAllSnapshots_Success() {
+        void recalculateAllSnapshots_Success() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(1))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
@@ -74,10 +73,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -92,7 +88,7 @@ class NetWorthCalculationServiceTest {
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
 
             assertNotNull(result);
-            assertTrue(result.isDone());
+            result.get();
             assertFalse(result.isCompletedExceptionally());
             verify(netWorthSnapshotService).deleteAllSnapshots();
             verify(netWorthSnapshotService, atLeastOnce())
@@ -137,7 +133,7 @@ class NetWorthCalculationServiceTest {
 
         @Test
         @DisplayName("Should return true when calculation is in progress")
-        void isCalculating_True() {
+        void isCalculating_True() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -146,10 +142,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -161,7 +154,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             assertFalse(netWorthCalculationService.isCalculating());
         }
@@ -172,7 +166,7 @@ class NetWorthCalculationServiceTest {
     class WalletBalancesCalculationTests {
         @Test
         @DisplayName("Should calculate wallet balances for current month")
-        void calculateWalletBalancesForMonth_CurrentMonth() {
+        void calculateWalletBalancesForMonth_CurrentMonth() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -181,10 +175,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -196,7 +187,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(netWorthSnapshotService, atLeastOnce())
                     .saveSnapshot(
@@ -205,7 +197,7 @@ class NetWorthCalculationServiceTest {
 
         @Test
         @DisplayName("Should calculate wallet balances for future month")
-        void calculateWalletBalancesForMonth_FutureMonth() {
+        void calculateWalletBalancesForMonth_FutureMonth() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -214,10 +206,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -229,7 +218,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(netWorthSnapshotService, atLeastOnce())
                     .saveSnapshot(
@@ -242,7 +232,7 @@ class NetWorthCalculationServiceTest {
     class InvestmentValueCalculationTests {
         @Test
         @DisplayName("Should calculate investment value with tickers and bonds")
-        void calculateInvestmentValueForMonth_WithTickers() {
+        void calculateInvestmentValueForMonth_WithTickers() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -251,10 +241,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -266,7 +253,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(tickerService, atLeastOnce()).getAllPurchases();
             verify(tickerService, atLeastOnce()).getAllSales();
@@ -275,7 +263,7 @@ class NetWorthCalculationServiceTest {
 
         @Test
         @DisplayName("Should calculate investment value without tickers")
-        void calculateInvestmentValueForMonth_NoTickers() {
+        void calculateInvestmentValueForMonth_NoTickers() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -284,10 +272,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -299,7 +284,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(netWorthSnapshotService, atLeastOnce())
                     .saveSnapshot(
@@ -312,7 +298,7 @@ class NetWorthCalculationServiceTest {
     class CreditCardDebtCalculationTests {
         @Test
         @DisplayName("Should calculate credit card debt for current month")
-        void calculateCreditCardDebt_CurrentMonth() {
+        void calculateCreditCardDebt_CurrentMonth() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -321,10 +307,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(new BigDecimal("500.00"));
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(new BigDecimal("300.00"));
+            when(creditCardService.getDebtAtDate(any())).thenReturn(new BigDecimal("500.00"));
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -336,16 +319,15 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
-            verify(creditCardService, atLeastOnce()).getPendingPaymentsByMonth(anyInt(), anyInt());
-            verify(creditCardService, atLeastOnce())
-                    .getEffectivePaidPaymentsByMonth(anyInt(), anyInt());
+            verify(creditCardService, atLeastOnce()).getDebtAtDate(any());
         }
 
         @Test
         @DisplayName("Should calculate credit card debt for future month")
-        void calculateCreditCardDebt_FutureMonth() {
+        void calculateCreditCardDebt_FutureMonth() throws Exception {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
@@ -354,10 +336,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(new BigDecimal("500.00"));
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(new BigDecimal("500.00"));
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -369,9 +348,10 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
-            verify(creditCardService, atLeastOnce()).getPendingPaymentsByMonth(anyInt(), anyInt());
+            verify(creditCardService, atLeastOnce()).getDebtAtDate(any());
         }
     }
 
@@ -381,7 +361,7 @@ class NetWorthCalculationServiceTest {
         @Test
         @DisplayName(
                 "Should calculate recurring transactions income with valid recurring transaction")
-        void calculateRecurringTransactionsIncome_WithValidTransaction() {
+        void calculateRecurringTransactionsIncome_WithValidTransaction() throws Exception {
             RecurringTransaction incomeTransaction =
                     RecurringTransaction.builder()
                             .id(1)
@@ -400,10 +380,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -417,7 +394,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(TransactionType.EXPENSE))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(recurringTransactionService, atLeastOnce()).getAllByType(TransactionType.INCOME);
             verify(netWorthSnapshotService, atLeastOnce())
@@ -428,7 +406,7 @@ class NetWorthCalculationServiceTest {
         @Test
         @DisplayName(
                 "Should calculate recurring transactions debt with valid recurring transaction")
-        void calculateRecurringTransactionsDebt_WithValidTransaction() {
+        void calculateRecurringTransactionsDebt_WithValidTransaction() throws Exception {
             RecurringTransaction expenseTransaction =
                     RecurringTransaction.builder()
                             .id(1)
@@ -447,10 +425,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -464,7 +439,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(TransactionType.EXPENSE))
                     .thenReturn(List.of(expenseTransaction));
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(recurringTransactionService, atLeastOnce())
                     .getAllByType(TransactionType.EXPENSE);
@@ -475,7 +451,7 @@ class NetWorthCalculationServiceTest {
 
         @Test
         @DisplayName("Should skip recurring transaction not included in net worth")
-        void calculateRecurringTransactions_NotIncludedInNetWorth() {
+        void calculateRecurringTransactions_NotIncludedInNetWorth() throws Exception {
             RecurringTransaction excludedTransaction =
                     RecurringTransaction.builder()
                             .id(1)
@@ -494,10 +470,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -511,46 +484,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(TransactionType.EXPENSE))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
-
-            verify(netWorthSnapshotService, atLeastOnce())
-                    .saveSnapshot(
-                            anyInt(), anyInt(), any(), any(), any(), any(), any(), any(), any());
-        }
-    }
-
-    @Nested
-    @DisplayName("Negative Wallet Balances Calculation Tests")
-    class NegativeWalletBalancesCalculationTests {
-        @Test
-        @DisplayName("Should calculate negative wallet balances for current month")
-        void calculateNegativeWalletBalances_CurrentMonth() {
-            Wallet negativeWallet = new Wallet(3, "Negative Wallet", new BigDecimal("-500.00"));
-            when(walletService.getAllWalletsOrderedByName())
-                    .thenReturn(List.of(wallet1, negativeWallet));
-            when(walletTransactionService.getFirstTransactionDate(anyInt()))
-                    .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
-
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(netWorthSnapshotService, atLeastOnce())
                     .saveSnapshot(
@@ -563,7 +498,7 @@ class NetWorthCalculationServiceTest {
     class TickerValueCalculationTests {
         @Test
         @DisplayName("Should calculate ticker value with purchases and sales")
-        void calculateTickerValueAtDate_WithPurchasesAndSales() {
+        void calculateTickerValueAtDate_WithPurchasesAndSales() throws Exception {
             Ticker ticker =
                     Ticker.builder()
                             .id(1)
@@ -611,10 +546,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(List.of(purchase));
@@ -626,7 +558,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(tickerService, atLeastOnce()).getAllPurchases();
             verify(tickerService, atLeastOnce()).getAllSales();
@@ -638,7 +571,7 @@ class NetWorthCalculationServiceTest {
 
         @Test
         @DisplayName("Should calculate ticker value with only purchases")
-        void calculateTickerValueAtDate_OnlyPurchases() {
+        void calculateTickerValueAtDate_OnlyPurchases() throws Exception {
             Ticker ticker =
                     Ticker.builder()
                             .id(1)
@@ -670,10 +603,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(List.of(purchase));
@@ -685,7 +615,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(netWorthSnapshotService, atLeastOnce())
                     .saveSnapshot(
@@ -698,7 +629,7 @@ class NetWorthCalculationServiceTest {
     class BondValueCalculationTests {
         @Test
         @DisplayName("Should calculate bond value with buy and sell operations")
-        void calculateBondValueAtDate_WithBuyAndSell() {
+        void calculateBondValueAtDate_WithBuyAndSell() throws Exception {
             Bond bond = Bond.builder().id(1).name("Test Bond").build();
 
             WalletTransaction buyTx =
@@ -745,10 +676,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -761,7 +689,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(bondService, atLeastOnce()).getOperationsByDateBefore(any());
             verify(netWorthSnapshotService, atLeastOnce())
@@ -771,7 +700,7 @@ class NetWorthCalculationServiceTest {
 
         @Test
         @DisplayName("Should calculate bond value with only buy operations")
-        void calculateBondValueAtDate_OnlyBuy() {
+        void calculateBondValueAtDate_OnlyBuy() throws Exception {
             Bond bond = Bond.builder().id(1).name("Test Bond").build();
 
             WalletTransaction buyTx =
@@ -800,10 +729,7 @@ class NetWorthCalculationServiceTest {
             when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
                             anyInt(), anyInt()))
                     .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
+            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
             when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
                     .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
@@ -815,106 +741,8 @@ class NetWorthCalculationServiceTest {
             when(recurringTransactionService.getAllByType(any()))
                     .thenReturn(Collections.emptyList());
 
-            netWorthCalculationService.recalculateAllSnapshots();
-
-            verify(netWorthSnapshotService, atLeastOnce())
-                    .saveSnapshot(
-                            anyInt(), anyInt(), any(), any(), any(), any(), any(), any(), any());
-        }
-    }
-
-    @Nested
-    @DisplayName("Wallet Transaction Reversion Tests")
-    class WalletTransactionReversionTests {
-        @Test
-        @DisplayName("Should revert wallet transactions after target month")
-        void revertWalletTransactionsAfterMonth_WithConfirmedTransactions() {
-            WalletTransaction incomeTransaction =
-                    WalletTransaction.builder()
-                            .id(1)
-                            .date(LocalDateTime.now().plusMonths(1))
-                            .type(TransactionType.INCOME)
-                            .amount(new BigDecimal("500.00"))
-                            .status(TransactionStatus.CONFIRMED)
-                            .build();
-
-            WalletTransaction expenseTransaction =
-                    WalletTransaction.builder()
-                            .id(2)
-                            .date(LocalDateTime.now().plusMonths(1))
-                            .type(TransactionType.EXPENSE)
-                            .amount(new BigDecimal("200.00"))
-                            .status(TransactionStatus.CONFIRMED)
-                            .build();
-
-            when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
-            when(walletTransactionService.getFirstTransactionDate(anyInt()))
-                    .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(List.of(incomeTransaction, expenseTransaction));
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
-
-            netWorthCalculationService.recalculateAllSnapshots();
-
-            verify(walletTransactionService, atLeastOnce())
-                    .getTransactionsByWalletAfterDate(anyInt(), any());
-            verify(netWorthSnapshotService, atLeastOnce())
-                    .saveSnapshot(
-                            anyInt(), anyInt(), any(), any(), any(), any(), any(), any(), any());
-        }
-
-        @Test
-        @DisplayName("Should skip pending transactions when reverting")
-        void revertWalletTransactionsAfterMonth_SkipPendingTransactions() {
-            WalletTransaction pendingTransaction =
-                    WalletTransaction.builder()
-                            .id(1)
-                            .date(LocalDateTime.now().plusMonths(1))
-                            .type(TransactionType.INCOME)
-                            .amount(new BigDecimal("500.00"))
-                            .status(TransactionStatus.PENDING)
-                            .build();
-
-            when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
-            when(walletTransactionService.getFirstTransactionDate(anyInt()))
-                    .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getPendingPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(List.of(pendingTransaction));
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
-
-            netWorthCalculationService.recalculateAllSnapshots();
+            CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
+            result.get();
 
             verify(netWorthSnapshotService, atLeastOnce())
                     .saveSnapshot(

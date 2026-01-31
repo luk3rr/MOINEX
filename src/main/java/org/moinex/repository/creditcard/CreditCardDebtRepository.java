@@ -83,4 +83,16 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
                     + "FROM CreditCardDebt ccd "
                     + "WHERE ccd.date <= :endDate")
     BigDecimal getTotalDebtAmountUpToDate(@Param("endDate") String endDate);
+
+    /**
+     * Get all debts created up to a specific date
+     * @param endDate The end date (inclusive)
+     * @return List of all debts created up to the date
+     */
+    @Query(
+            "SELECT ccd "
+                    + "FROM CreditCardDebt ccd "
+                    + "WHERE ccd.date <= :endDate "
+                    + "ORDER BY ccd.date ASC")
+    List<CreditCardDebt> findAllCreatedUpToDate(@Param("endDate") String endDate);
 }
