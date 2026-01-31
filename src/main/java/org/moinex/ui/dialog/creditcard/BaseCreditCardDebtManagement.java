@@ -9,6 +9,7 @@ package org.moinex.ui.dialog.creditcard;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
+import java.time.Month;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.function.Consumer;
@@ -45,7 +46,9 @@ public abstract class BaseCreditCardDebtManagement {
 
     @FXML protected ComboBox<Category> categoryComboBox;
 
-    @FXML protected ComboBox<YearMonth> invoiceComboBox;
+    @FXML protected ComboBox<Integer> invoiceMonthComboBox;
+
+    @FXML protected ComboBox<Integer> invoiceYearComboBox;
 
     @FXML protected Label crcLimitLabel;
 
@@ -78,6 +81,9 @@ public abstract class BaseCreditCardDebtManagement {
     protected I18nService i18nService;
 
     protected CreditCard creditCard = null;
+
+    protected static final Integer INVOICE_YEAR_RANGE = 2;
+    protected static final Integer MONTHS_IN_YEAR = 12;
 
     protected static final Logger logger =
             LoggerFactory.getLogger(BaseCreditCardDebtManagement.class);
@@ -288,31 +294,37 @@ public abstract class BaseCreditCardDebtManagement {
     }
 
     protected void populateComboBoxes() {
-        YearMonth currentYearMonth = YearMonth.now();
-        YearMonth startYearMonth = currentYearMonth.minusMonths(12);
-        YearMonth endYearMonth = currentYearMonth.plusMonths(13);
-
-        // Show the last 12 months and the next 12 months as options to invoice
-        // date
-        for (YearMonth yearMonth = startYearMonth;
-                yearMonth.isBefore(endYearMonth);
-                yearMonth = yearMonth.plusMonths(1)) {
-            invoiceComboBox.getItems().add(yearMonth);
+        for (int month = 1; month <= MONTHS_IN_YEAR; month++) {
+            invoiceMonthComboBox.getItems().add(month);
         }
 
-        // Set default as next month
-        invoiceComboBox.setValue(currentYearMonth.plusMonths(1));
+        int currentYear = YearMonth.now().getYear();
+        for (int year = currentYear - INVOICE_YEAR_RANGE;
+                year <= currentYear + INVOICE_YEAR_RANGE;
+                year++) {
+            invoiceYearComboBox.getItems().add(year);
+        }
+
+        setDefaultInvoiceMonthAndYear();
 
         categoryComboBox.getItems().addAll(categories);
 
         crcComboBox.getItems().addAll(creditCards);
     }
 
+    protected void setDefaultInvoiceMonthAndYear() {
+        YearMonth currentYearMonth = YearMonth.now();
+        invoiceMonthComboBox.setValue(currentYearMonth.getMonthValue());
+        invoiceYearComboBox.setValue(currentYearMonth.getYear());
+    }
+
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
         UIUtils.configureComboBox(
-                invoiceComboBox, yearMonth -> UIUtils.formatFullMonthYear(yearMonth, i18nService));
+                invoiceMonthComboBox,
+                month -> UIUtils.getMonthDisplayName(Month.of(month), i18nService));
+        UIUtils.configureComboBox(invoiceYearComboBox, Object::toString);
     }
 
     protected void configureSuggestions() {

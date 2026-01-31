@@ -51,7 +51,8 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
     protected void handleSave() {
         CreditCard crc = crcComboBox.getValue();
         Category category = categoryComboBox.getValue();
-        YearMonth invoiceMonth = invoiceComboBox.getValue();
+        Integer invoiceMonth = invoiceMonthComboBox.getValue();
+        Integer invoiceYear = invoiceYearComboBox.getValue();
         String description = descriptionField.getText().strip();
         String valueStr = valueField.getText();
         String installmentsStr = installmentsField.getText();
@@ -60,7 +61,8 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                 || category == null
                 || description.isEmpty()
                 || valueStr.isEmpty()
-                || invoiceMonth == null) {
+                || invoiceMonth == null
+                || invoiceYear == null) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
                     i18nService.tr(
@@ -74,11 +76,13 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
             Integer installments =
                     installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
+            YearMonth invoiceDateYearMonth = YearMonth.of(invoiceYear, invoiceMonth);
+
             creditCardService.addDebt(
                     crc.getId(),
                     category,
                     LocalDateTime.now(), // register date
-                    invoiceMonth,
+                    invoiceDateYearMonth,
                     debtValue,
                     installments,
                     description);

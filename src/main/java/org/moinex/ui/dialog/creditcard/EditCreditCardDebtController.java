@@ -81,8 +81,8 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         CreditCardPayment firstPayment =
                 creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
 
-        invoiceComboBox.setValue(
-                YearMonth.of(firstPayment.getDate().getYear(), firstPayment.getDate().getMonth()));
+        invoiceMonthComboBox.setValue(firstPayment.getDate().getMonthValue());
+        invoiceYearComboBox.setValue(firstPayment.getDate().getYear());
     }
 
     @Override
@@ -90,7 +90,8 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
     protected void handleSave() {
         CreditCard crc = crcComboBox.getValue();
         Category category = categoryComboBox.getValue();
-        YearMonth invoiceMonth = invoiceComboBox.getValue();
+        Integer invoiceMonth = invoiceMonthComboBox.getValue();
+        Integer invoiceYear = invoiceYearComboBox.getValue();
         String description = descriptionField.getText().strip();
         String valueStr = valueField.getText();
         String installmentsStr = installmentsField.getText();
@@ -99,7 +100,8 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 || category == null
                 || description.isEmpty()
                 || valueStr.isEmpty()
-                || invoiceMonth == null) {
+                || invoiceMonth == null
+                || invoiceYear == null) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
                     i18nService.tr(
@@ -120,7 +122,10 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
 
             YearMonth invoice =
                     YearMonth.of(
-                            firstPayment.getDate().getYear(), firstPayment.getDate().getMonth());
+                            firstPayment.getDate().getYear(),
+                            firstPayment.getDate().getMonthValue());
+
+            YearMonth invoiceDateYearMonth = YearMonth.of(invoiceYear, invoiceMonth);
 
             // Check if it has any modification
             if (crcDebt.getCreditCard().getId().equals(crc.getId())
@@ -128,7 +133,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                     && debtValue.compareTo(crcDebt.getAmount()) == 0
                     && crcDebt.getInstallments().equals(installments)
                     && crcDebt.getDescription().equals(description)
-                    && invoice.equals(invoiceMonth)) {
+                    && invoice.equals(invoiceDateYearMonth)) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_DEBT_TITLE),
@@ -143,7 +148,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 crcDebt.setAmount(debtValue);
                 crcDebt.setInstallments(installments);
 
-                creditCardService.updateCreditCardDebt(crcDebt, invoiceMonth);
+                creditCardService.updateCreditCardDebt(crcDebt, invoiceDateYearMonth);
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(
