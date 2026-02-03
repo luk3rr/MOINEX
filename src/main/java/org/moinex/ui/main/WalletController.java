@@ -667,20 +667,20 @@ public class WalletController {
             BigDecimal totalIncomes = BigDecimal.ZERO;
 
             if (selectedIndex == 0) {
-                // Calculate total expenses for the month
                 totalExpenses =
                         transactionsList.stream()
                                 .filter(t -> t.getType().equals(TransactionType.EXPENSE))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                totalExpenses =
-                        totalExpenses.add(
-                                crcPayments.stream()
-                                        .map(CreditCardPayment::getAmount)
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+                BigDecimal crcPaidPayments =
+                        creditCardService.getEffectivePaidPaymentsByMonth(month, year);
 
-                // Calculate total incomes for the month
+                BigDecimal crcPendingPayments =
+                        creditCardService.getPendingPaymentsByMonth(month, year);
+
+                totalExpenses = totalExpenses.add(crcPaidPayments).add(crcPendingPayments);
+
                 totalIncomes =
                         transactionsList.stream()
                                 .filter(t -> t.getType().equals(TransactionType.INCOME))
@@ -709,15 +709,16 @@ public class WalletController {
                                 crcPayments.stream()
                                         .filter(
                                                 p -> {
-                                                    if (p.getWallet() != null) {
+                                                    if (p.isPaid()) {
                                                         return p.getWallet()
                                                                 .getType()
                                                                 .getId()
                                                                 .equals(selectedWalletType.getId());
                                                     } else if (p.getCreditCardDebt()
-                                                                    .getCreditCard()
-                                                                    .getDefaultBillingWallet()
-                                                            != null) {
+                                                                            .getCreditCard()
+                                                                            .getDefaultBillingWallet()
+                                                                    != null
+                                                            && !p.getRefunded()) {
                                                         return p.getCreditCardDebt()
                                                                 .getCreditCard()
                                                                 .getDefaultBillingWallet()

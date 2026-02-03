@@ -430,6 +430,61 @@ public class CreditCardService {
     }
 
     /**
+     * Refund a debt with installments
+     * Consolidates all pending payments to the current month and creates a refund credit
+     *
+     * @param debtId The id of the debt to refund
+     * @throws EntityNotFoundException If the debt does not exist
+     */
+    @Transactional
+    public void refundDebt(Integer debtId) {
+        CreditCardDebt debt =
+                creditCardDebtRepository
+                        .findById(debtId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                String.format(
+                                                        "Debt with id %d not found", debtId)));
+
+        List<CreditCardPayment> payments = getPaymentsByDebtId(debtId);
+
+        if (payments.stream().anyMatch(CreditCardPayment::isRefunded)) {
+            throw new IllegalArgumentException("Debt already refunded");
+        }
+
+        CreditCard creditCard = debt.getCreditCard();
+
+        BigDecimal totalRefund = BigDecimal.ZERO;
+        LocalDateTime nextInvoiceDate = getNextInvoiceDate(creditCard.getId());
+
+        for (CreditCardPayment payment : payments) {
+            if (!payment.isPaid()) {
+                payment.setDate(nextInvoiceDate);
+            } else {
+                totalRefund = totalRefund.add(payment.getAmount());
+            }
+
+            payment.setRefunded(true);
+            creditCardPaymentRepository.save(payment);
+        }
+
+        addCredit(
+                creditCard.getId(),
+                nextInvoiceDate,
+                totalRefund,
+                CreditCardCreditType.REFUND,
+                debt.getDescription());
+
+        creditCardRepository.save(creditCard);
+
+        logger.info(
+                "Debt with id {} refunded with total amount {} and marked as refunded",
+                debtId,
+                totalRefund);
+    }
+
+    /**
      * Delete a debt
      *
      * @param debtId The id of the debt
@@ -589,6 +644,12 @@ public class CreditCardService {
                                                 String.format(
                                                         "Debt with id %d does not exist",
                                                         debt.getId())));
+
+        List<CreditCardPayment> payments = getPaymentsByDebtId(debt.getId());
+
+        if (payments.stream().anyMatch(CreditCardPayment::isRefunded)) {
+            throw new IllegalArgumentException("Debt already refunded and cannot be updated");
+        }
 
         if (!creditCardRepository.existsById(debt.getCreditCard().getId())) {
             throw new EntityNotFoundException(
@@ -1217,7 +1278,7 @@ public class CreditCardService {
 
         // If payment was made with a wallet, add the amount back to the
         // wallet balance
-        if (payment.getWallet() != null) {
+        if (payment.isPaid()) {
             payment.getWallet()
                     .setBalance(payment.getWallet().getBalance().add(payment.getAmount()));
 
@@ -1420,7 +1481,7 @@ public class CreditCardService {
 
             // If the payment was made with a wallet, add the amount difference back to
             // the wallet balance
-            if (payment.getWallet() != null) {
+            if (payment.isPaid()) {
                 BigDecimal diff = currentInstallmentValue.subtract(payment.getAmount());
 
                 payment.getWallet().setBalance(payment.getWallet().getBalance().add(diff));

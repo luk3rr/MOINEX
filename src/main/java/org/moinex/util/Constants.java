@@ -558,6 +558,8 @@ public final class Constants {
         public static final String CREDIT_CARD_DEBTS_LIST_TITLE = "creditCard.debtsList.title";
         public static final String CREDIT_CARD_DEBTS_LIST_BUTTON_EDIT =
                 "creditCard.debtsList.button.edit";
+        public static final String CREDIT_CARD_DEBTS_LIST_BUTTON_REFUND =
+                "creditCard.debtsList.button.refund";
         public static final String CREDIT_CARD_DEBTS_LIST_BUTTON_DELETE =
                 "creditCard.debtsList.button.delete";
         public static final String CREDIT_CARD_DEBTS_LIST_SEARCH_PLACEHOLDER =
@@ -575,6 +577,8 @@ public final class Constants {
                 "creditCard.dialog.noSelection.title";
         public static final String CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE =
                 "creditCard.dialog.noSelection.edit.message";
+        public static final String CREDIT_CARD_DIALOG_NO_SELECTION_REFUND_MESSAGE =
+                "creditCard.dialog.noSelection.refund.message";
         public static final String CREDIT_CARD_DIALOG_NO_SELECTION_DELETE_MESSAGE =
                 "creditCard.dialog.noSelection.delete.message";
         public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE =
@@ -589,14 +593,36 @@ public final class Constants {
                 "creditCard.dialog.confirmationDelete.installments";
         public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID =
                 "creditCard.dialog.confirmationDelete.installmentsPaid";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PENDING =
+                "creditCard.dialog.confirmationDelete.installmentsPending";
         public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY =
                 "creditCard.dialog.confirmationDelete.category";
         public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD =
                 "creditCard.dialog.confirmationDelete.creditCard";
         public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT =
                 "creditCard.dialog.confirmationDelete.refundAmount";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_WALLET =
+                "creditCard.dialog.confirmationDelete.refundWallet";
         public static final String CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_NO_REFUND_AMOUNT =
                 "creditCard.dialog.confirmationDelete.noRefundAmount";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE =
+                "creditCard.dialog.confirmationRefund.title";
+        public static final String CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_MESSAGE =
+                "creditCard.dialog.confirmationRefund.message";
+        public static final String CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE =
+                "creditCard.dialog.refundSuccess.title";
+        public static final String CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE =
+                "creditCard.dialog.refundSuccess.message";
+        public static final String CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE =
+                "creditCard.dialog.deleteSuccess.title";
+        public static final String CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE =
+                "creditCard.dialog.deleteSuccess.message";
+        public static final String CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE =
+                "creditCard.dialog.alreadyRefunded.title";
+        public static final String CREDIT_CARD_DIALOG_ALREADY_REFUNDED_EDIT_MESSAGE =
+                "creditCard.dialog.alreadyRefunded.edit.message";
+        public static final String CREDIT_CARD_DIALOG_ALREADY_REFUNDED_REFUND_MESSAGE =
+                "creditCard.dialog.alreadyRefunded.refund.message";
         public static final String CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID =
                 "creditCard.debtsList.header.debtId";
         public static final String CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION =
@@ -617,6 +643,10 @@ public final class Constants {
                 "creditCard.debtsList.status.pending";
         public static final String CREDIT_CARD_DEBTS_LIST_STATUS_PAID =
                 "creditCard.debtsList.status.paid";
+        public static final String CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED =
+                "creditCard.debtsList.status.onlyRefunded";
+        public static final String CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED =
+                "creditCard.debtsList.status.paidButRefunded";
 
         // Transactions
         public static final String TRANSACTION_MONTHLY_RESUME_TITLE =

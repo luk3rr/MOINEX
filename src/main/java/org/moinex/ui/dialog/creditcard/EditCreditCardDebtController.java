@@ -230,7 +230,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
 
                 BigDecimal paidAmount =
                         payments.stream()
-                                .filter(p -> p.getWallet() != null)
+                                .filter(CreditCardPayment::isPaid)
                                 .map(CreditCardPayment::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

@@ -78,7 +78,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
                     + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
                     + "AND ccp.creditCardDebt.creditCard.id = :crcId "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     List<CreditCardPayment> getPendingCreditCardPayments(
             @Param("crcId") Integer crcId,
             @Param("month") Integer month,
@@ -93,7 +94,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             "SELECT ccp "
                     + "FROM CreditCardPayment ccp "
                     + "WHERE ccp.creditCardDebt.creditCard.id = :crcId "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     List<CreditCardPayment> getAllPendingCreditCardPayments(@Param("crcId") Integer crcId);
 
     /**
@@ -126,7 +128,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             "SELECT coalesce(sum(ccp.amount), 0) "
                     + "FROM CreditCardPayment ccp "
                     + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
-                    + "AND strftime('%Y', ccp.date) = printf('%04d', :year)")
+                    + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
+                    + "AND ccp.refunded = false")
     BigDecimal getTotalDebtAmount(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
@@ -137,7 +140,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
                     + "FROM CreditCardPayment ccp "
-                    + "WHERE strftime('%Y', ccp.date) = printf('%04d', :year)")
+                    + "WHERE strftime('%Y', ccp.date) = printf('%04d', :year) "
+                    + "AND ccp.refunded = false")
     BigDecimal getTotalDebtAmount(@Param("year") Integer year);
 
     /**
@@ -153,7 +157,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "WHERE strftime('%m', ccp.date) >= printf('%02d', :month) "
                     + "AND strftime('%Y', ccp.date) >= printf('%04d', :year) "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getTotalPendingPayments(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
@@ -205,7 +210,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "WHERE strftime('%m', ccp.date) = printf('%02d', :month) "
                     + "AND strftime('%Y', ccp.date) = printf('%04d', :year) "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getPendingPaymentsByMonth(
             @Param("month") Integer month, @Param("year") Integer year);
 
@@ -220,7 +226,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             "SELECT coalesce(sum(ccp.amount), 0) "
                     + "FROM CreditCardPayment ccp "
                     + "WHERE strftime('%Y', ccp.date) >= printf('%04d', :year) "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getTotalPendingPaymentsByYear(@Param("year") Integer year);
 
     /**
@@ -246,7 +253,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             "SELECT coalesce(sum(ccp.amount), 0) "
                     + "FROM CreditCardPayment ccp "
                     + "WHERE strftime('%Y', ccp.date) = printf('%04d', :year) "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getPendingPaymentsByYear(@Param("year") Integer year);
 
     /**
@@ -259,7 +267,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "JOIN ccp.creditCardDebt ccd "
                     + "WHERE ccd.creditCard.id = :creditCardId "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getTotalPendingPaymentsByCreditCard(@Param("creditCardId") Integer creditCardId);
 
     /**
@@ -269,7 +278,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
                     + "FROM CreditCardPayment ccp "
-                    + "WHERE ccp.wallet IS NULL")
+                    + "WHERE ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getTotalPendingPayments();
 
     /**
@@ -281,7 +291,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             "SELECT coalesce(sum(ccp.amount), 0) "
                     + "FROM CreditCardPayment ccp "
                     + "WHERE ccp.creditCardDebt.id = :debtId "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false")
     BigDecimal getRemainingDebt(@Param("debtId") Integer debtId);
 
     /**
@@ -292,12 +303,10 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
      * @return The invoice amount of the credit card in the specified month and year
      */
     @Query(
-            "SELECT coalesce(sum(ccp.amount), 0) "
-                    + "FROM CreditCardPayment ccp "
-                    + "JOIN ccp.creditCardDebt ccd "
-                    + "WHERE ccd.creditCard.id = :creditCardId "
-                    + "AND strftime('%m', ccp.date) = printf('%02d', :month) "
-                    + "AND strftime('%Y', ccp.date) = printf('%04d', :year)")
+            "SELECT coalesce(sum(ccp.amount), 0) FROM CreditCardPayment ccp JOIN ccp.creditCardDebt"
+                + " ccd WHERE ccd.creditCard.id = :creditCardId AND strftime('%m', ccp.date) ="
+                + " printf('%02d', :month) AND strftime('%Y', ccp.date) = printf('%04d', :year) AND"
+                + " (ccp.refunded = false OR (ccp.refunded = true AND ccp.wallet IS NOT NULL))")
     BigDecimal getInvoiceAmount(
             @Param("creditCardId") Integer creditCardId,
             @Param("month") Integer month,
@@ -313,7 +322,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "JOIN ccp.creditCardDebt ccd "
                     + "WHERE ccd.creditCard.id = :creditCardId "
-                    + "AND ccp.wallet IS NULL")
+                    + "AND ccp.wallet IS NULL "
+                    + "AND ccp.refunded = false ")
     String getNextInvoiceDate(@Param("creditCardId") Integer creditCardId);
 
     /**
@@ -329,7 +339,8 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
                     + "FROM CreditCardPayment ccp "
                     + "JOIN ccp.creditCardDebt ccd "
                     + "WHERE ccd.category.id IN :categoryIds "
-                    + "AND ccp.date BETWEEN :startDate AND :endDate")
+                    + "AND ccp.date BETWEEN :startDate AND :endDate "
+                    + "AND ccp.refunded = false")
     BigDecimal getSumAmountByCategoriesAndDateBetween(
             @Param("categoryIds") List<Integer> categoryIds,
             @Param("startDate") String startDate,

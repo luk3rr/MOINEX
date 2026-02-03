@@ -113,6 +113,15 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
+                                                            <JFXButton onAction="#handleRefundDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.refund">
+                                                               <graphic>
+                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                     <image>
+                                                                        <Image url="@../../icon/common/refund.png" />
+                                                                     </image>
+                                                                  </ImageView>
+                                                               </graphic>
+                                                            </JFXButton>
                                                             <JFXButton onAction="#handleDeleteDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.delete">
                                                                <graphic>
                                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

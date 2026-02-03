@@ -64,6 +64,10 @@ public class CreditCardPayment {
     @Column(name = "installment", nullable = false)
     private Integer installment;
 
+    @Builder.Default
+    @Column(name = "refunded", nullable = false)
+    private Boolean refunded = false;
+
     public static class CreditCardPaymentBuilder {
         public CreditCardPaymentBuilder date(LocalDateTime date) {
             this.date = date.format(Constants.DB_DATE_FORMATTER);
@@ -77,5 +81,13 @@ public class CreditCardPayment {
 
     public void setDate(LocalDateTime date) {
         this.date = date.format(Constants.DB_DATE_FORMATTER);
+    }
+
+    public boolean isRefunded() {
+        return refunded;
+    }
+
+    public boolean isPaid() {
+        return wallet != null;
     }
 }

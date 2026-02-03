@@ -852,6 +852,33 @@ class CreditCardServiceTest {
                     IllegalArgumentException.class,
                     () -> creditCardService.updateCreditCardDebt(newDebtData, YearMonth.now()));
         }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException when trying to update a refunded debt")
+        void updateCreditCardDebt_RefundedDebt_ThrowsException() {
+            CreditCardDebt newDebtData =
+                    CreditCardDebt.builder()
+                            .id(oldDebt.getId())
+                            .amount(new BigDecimal("500.00"))
+                            .installments(2)
+                            .creditCard(creditCard)
+                            .category(category)
+                            .description("Updated Description")
+                            .build();
+
+            oldPayments.getFirst().setRefunded(true);
+
+            when(creditCardDebtRepository.findById(oldDebt.getId()))
+                    .thenReturn(Optional.of(oldDebt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(oldDebt.getId()))
+                    .thenReturn(oldPayments);
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> creditCardService.updateCreditCardDebt(newDebtData, YearMonth.now()));
+
+            verify(creditCardDebtRepository, never()).save(any(CreditCardDebt.class));
+        }
     }
 
     @Nested
@@ -1540,6 +1567,216 @@ class CreditCardServiceTest {
             LocalDateTime result = creditCardService.getLatestPaymentDate();
 
             assertEquals(LocalDateTime.of(2027, 3, 20, 18, 45, 30), result);
+        }
+    }
+
+    @Nested
+    @DisplayName("Debt Refund (refundDebt)")
+    class RefundDebtTests {
+
+        private CreditCardDebt debt;
+        private List<CreditCardPayment> payments;
+        private LocalDateTime invoiceDate;
+
+        @BeforeEach
+        void setup() {
+            invoiceDate = LocalDateTime.now().plusMonths(1);
+
+            debt =
+                    CreditCardDebt.builder()
+                            .id(1)
+                            .amount(new BigDecimal("300.00"))
+                            .installments(3)
+                            .creditCard(creditCard)
+                            .category(category)
+                            .description("Test Debt for Refund")
+                            .build();
+
+            payments = new ArrayList<>();
+            IntStream.range(1, 4)
+                    .forEach(
+                            i -> {
+                                CreditCardPayment payment =
+                                        CreditCardPayment.builder()
+                                                .id(i)
+                                                .creditCardDebt(debt)
+                                                .amount(new BigDecimal("100.00"))
+                                                .installment(i)
+                                                .date(LocalDateTime.now().plusMonths(i))
+                                                .refunded(false)
+                                                .build();
+                                payments.add(payment);
+                            });
+        }
+
+        @Test
+        @DisplayName("Should refund debt successfully and create credit")
+        void refundDebt_Success_CreatesCredit() {
+            payments.getFirst().setWallet(wallet);
+            payments.get(1).setWallet(wallet);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+            when(creditCardRepository.findById(creditCard.getId()))
+                    .thenReturn(Optional.of(creditCard));
+
+            creditCardService.refundDebt(debt.getId());
+
+            ArgumentCaptor<CreditCardPayment> paymentCaptor =
+                    ArgumentCaptor.forClass(CreditCardPayment.class);
+            verify(creditCardPaymentRepository, times(3)).save(paymentCaptor.capture());
+
+            List<CreditCardPayment> savedPayments = paymentCaptor.getAllValues();
+            for (CreditCardPayment payment : savedPayments) {
+                assertTrue(payment.getRefunded());
+            }
+
+            verify(creditCardCreditRepository).save(any(CreditCardCredit.class));
+            verify(creditCardRepository, times(2)).save(creditCard);
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException when debt already refunded")
+        void refundDebt_AlreadyRefunded_ThrowsException() {
+            payments.getFirst().setRefunded(true);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> creditCardService.refundDebt(debt.getId()));
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when debt does not exist")
+        void refundDebt_DebtNotFound_ThrowsException() {
+            when(creditCardDebtRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+            assertThrows(
+                    EntityNotFoundException.class,
+                    () -> creditCardService.refundDebt(debt.getId()));
+        }
+
+        @Test
+        @DisplayName("Should consolidate all payments to next invoice date")
+        void refundDebt_ConsolidatesPaymentsToNextInvoiceDate() {
+            payments.getFirst().setWallet(wallet);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+            when(creditCardRepository.findById(creditCard.getId()))
+                    .thenReturn(Optional.of(creditCard));
+
+            creditCardService.refundDebt(debt.getId());
+
+            ArgumentCaptor<CreditCardPayment> paymentCaptor =
+                    ArgumentCaptor.forClass(CreditCardPayment.class);
+            verify(creditCardPaymentRepository, times(3)).save(paymentCaptor.capture());
+
+            List<CreditCardPayment> savedPayments = paymentCaptor.getAllValues();
+            for (CreditCardPayment payment : savedPayments) {
+                if (payment.getWallet() == null) {
+                    assertNotNull(payment.getDate());
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("Should calculate correct total refund amount")
+        void refundDebt_CalculatesCorrectTotalRefund() {
+            payments.getFirst().setWallet(wallet);
+            payments.get(1).setWallet(wallet);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+            when(creditCardRepository.findById(creditCard.getId()))
+                    .thenReturn(Optional.of(creditCard));
+
+            creditCardService.refundDebt(debt.getId());
+
+            ArgumentCaptor<CreditCardCredit> creditCaptor =
+                    ArgumentCaptor.forClass(CreditCardCredit.class);
+            verify(creditCardCreditRepository).save(creditCaptor.capture());
+
+            CreditCardCredit savedCredit = creditCaptor.getValue();
+            assertEquals(new BigDecimal("200.00"), savedCredit.getAmount());
+            assertEquals(CreditCardCreditType.REFUND, savedCredit.getType());
+        }
+
+        @Test
+        @DisplayName("Should mark all payments as refunded")
+        void refundDebt_MarksAllPaymentsAsRefunded() {
+            payments.getFirst().setWallet(wallet);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+            when(creditCardRepository.findById(creditCard.getId()))
+                    .thenReturn(Optional.of(creditCard));
+
+            creditCardService.refundDebt(debt.getId());
+
+            ArgumentCaptor<CreditCardPayment> paymentCaptor =
+                    ArgumentCaptor.forClass(CreditCardPayment.class);
+            verify(creditCardPaymentRepository, times(3)).save(paymentCaptor.capture());
+
+            List<CreditCardPayment> savedPayments = paymentCaptor.getAllValues();
+            assertEquals(3, savedPayments.size());
+            for (CreditCardPayment payment : savedPayments) {
+                assertTrue(payment.getRefunded());
+            }
+        }
+
+        @Test
+        @DisplayName("Should handle refund with partially paid payments")
+        void refundDebt_WithPartiallyPaidPayments() {
+            payments.getFirst().setWallet(wallet);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+            when(creditCardRepository.findById(creditCard.getId()))
+                    .thenReturn(Optional.of(creditCard));
+
+            creditCardService.refundDebt(debt.getId());
+
+            ArgumentCaptor<CreditCardPayment> paymentCaptor =
+                    ArgumentCaptor.forClass(CreditCardPayment.class);
+            verify(creditCardPaymentRepository, times(3)).save(paymentCaptor.capture());
+
+            List<CreditCardPayment> savedPayments = paymentCaptor.getAllValues();
+            for (CreditCardPayment payment : savedPayments) {
+                assertTrue(payment.getRefunded());
+            }
+
+            ArgumentCaptor<CreditCardCredit> creditCaptor =
+                    ArgumentCaptor.forClass(CreditCardCredit.class);
+            verify(creditCardCreditRepository).save(creditCaptor.capture());
+
+            CreditCardCredit savedCredit = creditCaptor.getValue();
+            assertEquals(new BigDecimal("100.00"), savedCredit.getAmount());
+        }
+
+        @Test
+        @DisplayName("Should throw IllegalArgumentException when any payment is already refunded")
+        void refundDebt_AnyPaymentRefunded_ThrowsException() {
+            payments.get(1).setRefunded(true);
+
+            when(creditCardDebtRepository.findById(debt.getId())).thenReturn(Optional.of(debt));
+            when(creditCardPaymentRepository.getPaymentsByDebtId(debt.getId()))
+                    .thenReturn(payments);
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> creditCardService.refundDebt(debt.getId()));
+
+            verify(creditCardPaymentRepository, never()).save(any(CreditCardPayment.class));
+            verify(creditCardCreditRepository, never()).save(any(CreditCardCredit.class));
         }
     }
 }

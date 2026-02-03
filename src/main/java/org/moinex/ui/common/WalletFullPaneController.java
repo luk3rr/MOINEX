@@ -176,7 +176,7 @@ public class WalletFullPaneController {
                                                 .getDefaultBillingWallet()
                                                 .getId()
                                                 .equals(wallet.getId()))
-                        .filter(p -> p.getWallet() == null)
+                        .filter(p -> !p.isPaid() && !p.isRefunded())
                         .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

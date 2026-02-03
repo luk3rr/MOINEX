@@ -13,6 +13,7 @@ import java.text.MessageFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -182,14 +183,140 @@ public class CreditCardController {
             return;
         }
 
+        CreditCardDebt debt = selectedPayment.getCreditCardDebt();
+        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtId(debt.getId());
+
+        if (payments.stream().anyMatch(p -> p.getRefunded().equals(Boolean.TRUE))) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDIT_CARD_DIALOG_ALREADY_REFUNDED_EDIT_MESSAGE));
+            return;
+        }
+
         WindowUtils.openModalWindow(
                 Constants.EDIT_CREDIT_CARD_DEBT_FXML,
                 i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE),
                 springContext,
-                (EditCreditCardDebtController controller) ->
-                        controller.setCreditCardDebt(selectedPayment.getCreditCardDebt()),
+                (EditCreditCardDebtController controller) -> controller.setCreditCardDebt(debt),
                 List.of(this::updateDisplay),
                 i18nService.getBundle());
+    }
+
+    @FXML
+    private void handleRefundDebt() {
+        CreditCardPayment selectedPayment = debtsTableView.getSelectionModel().getSelectedItem();
+
+        if (selectedPayment == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDIT_CARD_DIALOG_NO_SELECTION_REFUND_MESSAGE));
+
+            return;
+        }
+
+        CreditCardDebt debt = selectedPayment.getCreditCardDebt();
+
+        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtId(debt.getId());
+
+        if (payments.stream().anyMatch(p -> p.getRefunded().equals(Boolean.TRUE))) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .CREDIT_CARD_DIALOG_ALREADY_REFUNDED_REFUND_MESSAGE));
+            return;
+        }
+
+        Integer installmentsPaid =
+                Math.toIntExact(payments.stream().filter(CreditCardPayment::isPaid).count());
+
+        Integer installmentsPending =
+                Math.toIntExact(payments.stream().filter(p -> !p.isPaid()).count());
+
+        // Create a message to show the user
+        StringBuilder message = new StringBuilder();
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION),
+                                debt.getDescription()))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT),
+                                UIUtils.formatCurrency(debt.getAmount())))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS),
+                                debt.getInstallments()))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID),
+                                installmentsPaid))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PENDING),
+                                installmentsPending))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY),
+                                debt.getCategory().getName()))
+                .append("\n");
+
+        message.append(
+                        MessageFormat.format(
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD),
+                                debt.getCreditCard().getName()))
+                .append("\n\n");
+
+        message.append(
+                i18nService.tr(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_MESSAGE));
+
+        // Confirm refund
+        if (WindowUtils.showConfirmationDialog(
+                i18nService.tr(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE),
+                message.toString(),
+                i18nService.getBundle())) {
+            creditCardService.refundDebt(debt.getId());
+            updateDisplay();
+
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE));
+        }
     }
 
     @FXML
@@ -213,12 +340,12 @@ public class CreditCardController {
         // Get the amount paid for the debt
         BigDecimal refundAmount =
                 payments.stream()
-                        .filter(p -> p.getWallet() != null)
+                        .filter(CreditCardPayment::isPaid)
                         .map(CreditCardPayment::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Integer installmentsPaid =
-                Math.toIntExact(payments.stream().filter(p -> p.getWallet() != null).count());
+                Math.toIntExact(payments.stream().filter(CreditCardPayment::isPaid).count());
 
         // Create a message to show the user
         StringBuilder message = new StringBuilder();
@@ -287,6 +414,21 @@ public class CreditCardController {
                                                     .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT),
                                     UIUtils.formatCurrency(refundAmount)))
                     .append("\n");
+
+            String walletNames =
+                    payments.stream()
+                            .filter(CreditCardPayment::isPaid)
+                            .map(p -> p.getWallet().getName())
+                            .distinct()
+                            .collect(Collectors.joining(", "));
+
+            message.append("\n")
+                    .append(
+                            MessageFormat.format(
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_WALLET),
+                                    walletNames));
         } else {
             message.append(
                     i18nService.tr(
@@ -302,6 +444,12 @@ public class CreditCardController {
                 i18nService.getBundle())) {
             creditCardService.deleteDebt(debt.getId());
             updateDisplay();
+
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE));
         }
     }
 
@@ -569,9 +717,10 @@ public class CreditCardController {
                                 .filter(
                                         t ->
                                                 t.getCreditCardDebt()
-                                                        .getCategory()
-                                                        .getId()
-                                                        .equals(category.getId()))
+                                                                .getCategory()
+                                                                .getId()
+                                                                .equals(category.getId())
+                                                        && (!t.isRefunded() || t.isPaid()))
                                 .map(CreditCardPayment::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -900,15 +1049,34 @@ public class CreditCardController {
                         i18nService.tr(
                                 Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS));
         statusColumn.setCellValueFactory(
-                param ->
-                        new SimpleStringProperty(
-                                param.getValue().getWallet() == null
-                                        ? i18nService.tr(
-                                                Constants.TranslationKeys
-                                                        .CREDIT_CARD_DEBTS_LIST_STATUS_PENDING)
-                                        : i18nService.tr(
-                                                Constants.TranslationKeys
-                                                        .CREDIT_CARD_DEBTS_LIST_STATUS_PAID)));
+                param -> {
+                    CreditCardPayment payment = param.getValue();
+                    String status;
+                    if (payment.isRefunded()) {
+                        if (!payment.isPaid()) {
+                            status =
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED);
+                        } else {
+                            status =
+                                    i18nService.tr(
+                                            Constants.TranslationKeys
+                                                    .CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED);
+                        }
+                    } else if (!payment.isPaid()) {
+                        status =
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DEBTS_LIST_STATUS_PENDING);
+                    } else {
+                        status =
+                                i18nService.tr(
+                                        Constants.TranslationKeys
+                                                .CREDIT_CARD_DEBTS_LIST_STATUS_PAID);
+                    }
+                    return new SimpleStringProperty(status);
+                });
 
         debtsTableView
                 .getColumns()
