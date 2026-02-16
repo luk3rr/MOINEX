@@ -209,6 +209,10 @@ public final class UIUtils {
      * @param value The value to be formatted
      */
     public static String formatPercentage(Number value, I18nService i18nService) {
+        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+            return "****";
+        }
+
         if (value.doubleValue() < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
             return i18nService.tr(
                     Constants.TranslationKeys.UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE);
@@ -223,6 +227,10 @@ public final class UIUtils {
      * @param value The value to be formatted
      */
     public static String formatPercentageForFundamentalAnalysis(Number value) {
+        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+            return "****";
+        }
+
         double percentValue = value.doubleValue();
 
         // Limit to 2 decimal places
