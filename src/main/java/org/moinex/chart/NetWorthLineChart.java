@@ -10,6 +10,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.shape.Line;
+import javafx.util.StringConverter;
 import lombok.Setter;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
@@ -39,6 +40,18 @@ public class NetWorthLineChart extends LineChart<String, Number> {
         NumberAxis yAxis = (NumberAxis) getYAxis();
         yAxis.setAutoRanging(true);
         yAxis.setForceZeroInRange(false);
+        yAxis.setTickLabelFormatter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(Number value) {
+                        return UIUtils.formatCurrency(value);
+                    }
+
+                    @Override
+                    public Number fromString(String string) {
+                        return 0;
+                    }
+                });
 
         CategoryAxis xAxis = (CategoryAxis) getXAxis();
         xAxis.setAutoRanging(true);
