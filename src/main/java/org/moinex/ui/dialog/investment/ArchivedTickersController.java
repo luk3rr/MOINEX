@@ -18,6 +18,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.investment.Ticker;
@@ -244,6 +245,18 @@ public class ArchivedTickersController {
     private void configureTableView() {
         TableColumn<Ticker, Integer> idColumn = getTickerLongTableColumn();
 
+        TableColumn<Ticker, ImageView> logoColumn = new TableColumn<>("");
+        logoColumn.setCellValueFactory(
+                param -> {
+                    ImageView logo = UIUtils.loadTickerLogo(param.getValue(), 32.0);
+                    return new SimpleObjectProperty<>(logo);
+                });
+        logoColumn.setPrefWidth(50);
+        logoColumn.setMaxWidth(50);
+        logoColumn.setMinWidth(50);
+        logoColumn.setResizable(false);
+        logoColumn.setStyle("-fx-alignment: CENTER;");
+
         TableColumn<Ticker, String> nameColumn =
                 new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_NAME));
         nameColumn.setCellValueFactory(
@@ -302,6 +315,7 @@ public class ArchivedTickersController {
 
         // Add the columns to the table view
         tickerTableView.getColumns().add(idColumn);
+        tickerTableView.getColumns().add(logoColumn);
         tickerTableView.getColumns().add(nameColumn);
         tickerTableView.getColumns().add(symbolColumn);
         tickerTableView.getColumns().add(typeColumn);

@@ -179,6 +179,17 @@ public class APIUtils {
     }
 
     /**
+     * Fetch stock logos asynchronously and cache them locally
+     *
+     * @param websites Array of company websites
+     * @return A CompletableFuture containing the JSON response with logo paths
+     */
+    public static CompletableFuture<JSONObject> fetchStockLogosAsync(String[] websites) {
+        return CompletableFuture.supplyAsync(
+                () -> runPythonScript(Constants.GET_STOCK_LOGO_SCRIPT, websites), executorService);
+    }
+
+    /**
      * Execute a Python script with arguments
      *
      * @param script The script to run

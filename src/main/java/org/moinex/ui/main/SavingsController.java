@@ -898,12 +898,25 @@ public class SavingsController {
     private void configureTableView() {
         TableColumn<Ticker, Integer> idColumn = getTickerLongTableColumn();
 
+        TableColumn<Ticker, ImageView> logoColumn = new TableColumn<>("");
+        logoColumn.setCellValueFactory(
+                param -> {
+                    ImageView logo = UIUtils.loadTickerLogo(param.getValue(), 40.0);
+                    return new SimpleObjectProperty<>(logo);
+                });
+        logoColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
+        logoColumn.setPrefWidth(45);
+        logoColumn.setMaxWidth(45);
+        logoColumn.setMinWidth(45);
+        logoColumn.setResizable(false);
+
         TableColumn<Ticker, String> nameColumn =
                 new TableColumn<>(
                         i18nService.tr(
                                 Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_NAME));
         nameColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
+        nameColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, String> symbolColumn =
                 new TableColumn<>(
@@ -912,6 +925,7 @@ public class SavingsController {
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_SYMBOL));
         symbolColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getSymbol()));
+        symbolColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, String> typeColumn =
                 new TableColumn<>(
@@ -922,6 +936,7 @@ public class SavingsController {
                         new SimpleStringProperty(
                                 UIUtils.translateTickerType(
                                         param.getValue().getType(), i18nService)));
+        typeColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, BigDecimal> quantityColumn =
                 new TableColumn<>(
@@ -930,6 +945,7 @@ public class SavingsController {
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED));
         quantityColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getCurrentQuantity()));
+        quantityColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, String> unitColumn =
                 new TableColumn<>(
@@ -941,6 +957,7 @@ public class SavingsController {
                         new SimpleObjectProperty<>(
                                 UIUtils.formatCurrencyDynamic(
                                         param.getValue().getCurrentUnitValue())));
+        unitColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, String> totalColumn =
                 new TableColumn<>(
@@ -955,6 +972,7 @@ public class SavingsController {
                                                 .getCurrentQuantity()
                                                 .multiply(
                                                         param.getValue().getCurrentUnitValue()))));
+        totalColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, String> avgUnitColumn =
                 new TableColumn<>(
@@ -966,9 +984,11 @@ public class SavingsController {
                         new SimpleObjectProperty<>(
                                 UIUtils.formatCurrencyDynamic(
                                         param.getValue().getAverageUnitValue())));
+        avgUnitColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         // Add the columns to the table view
         stocksFundsTabTickerTable.getColumns().add(idColumn);
+        stocksFundsTabTickerTable.getColumns().add(logoColumn);
         stocksFundsTabTickerTable.getColumns().add(nameColumn);
         stocksFundsTabTickerTable.getColumns().add(symbolColumn);
         stocksFundsTabTickerTable.getColumns().add(typeColumn);
@@ -976,6 +996,42 @@ public class SavingsController {
         stocksFundsTabTickerTable.getColumns().add(unitColumn);
         stocksFundsTabTickerTable.getColumns().add(totalColumn);
         stocksFundsTabTickerTable.getColumns().add(avgUnitColumn);
+
+        // Apply specific styling for this table with icons
+        stocksFundsTabTickerTable.setStyle(
+                stocksFundsTabTickerTable.getStyle() + "-fx-fixed-cell-size: 45px;");
+    }
+
+    /**
+     * Create a centered cell factory for text content
+     */
+    private <T>
+            javafx.util.Callback<TableColumn<Ticker, T>, TableCell<Ticker, T>>
+                    createCenteredCellFactory(Pos alignment) {
+        return column ->
+                new TableCell<>() {
+                    @Override
+                    protected void updateItem(T item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                            setGraphic(null);
+                        } else {
+                            if (item instanceof ImageView) {
+                                setGraphic((ImageView) item);
+                                setStyle("-fx-padding: 0; -fx-alignment: CENTER;");
+                            } else {
+                                setText(item.toString());
+                                String cssAlignment =
+                                        alignment == Pos.CENTER ? "CENTER" : "CENTER-LEFT";
+                                setStyle(
+                                        "-fx-padding: 0 10px; -fx-alignment: "
+                                                + cssAlignment
+                                                + ";");
+                            }
+                        }
+                    }
+                };
     }
 
     private TableColumn<Ticker, Integer> getTickerLongTableColumn() {
@@ -984,24 +1040,7 @@ public class SavingsController {
                         i18nService.tr(
                                 Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
-
-        // Align the ID column to the center
-        idColumn.setCellFactory(
-                column ->
-                        new TableCell<>() {
-                            @Override
-                            protected void updateItem(Integer item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (item == null || empty) {
-                                    setText(null);
-                                } else {
-                                    setText(item.toString());
-                                    setAlignment(Pos.CENTER);
-                                    setStyle("-fx-padding: 0;"); // set padding to zero to
-                                    // ensure the text is centered
-                                }
-                            }
-                        });
+        idColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
         return idColumn;
     }
 

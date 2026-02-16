@@ -17,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -58,6 +59,7 @@ public class FundamentalAnalysisController {
     @FXML private VBox loadingContainer;
     @FXML private ProgressIndicator loadingIndicator;
     @FXML private Button refreshButton;
+    @FXML private ImageView companyLogoImageView;
 
     private FundamentalAnalysisService fundamentalAnalysisService;
     private I18nService i18nService;
@@ -296,6 +298,14 @@ public class FundamentalAnalysisController {
                 UIUtils.getOrDefault(currentAnalysis.getIndustry(), Constants.NA_DATA).toString());
         currencyValueLabel.setText(
                 UIUtils.getOrDefault(currentAnalysis.getCurrency(), Constants.NA_DATA).toString());
+
+        // Load company logo
+        if (ticker != null) {
+            ImageView logo = UIUtils.loadTickerLogo(ticker, 80.0);
+            if (logo != null) {
+                companyLogoImageView.setImage(logo.getImage());
+            }
+        }
 
         // Parse JSON and populate tabs
         try {

@@ -9,6 +9,9 @@ package org.moinex.util;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
@@ -32,11 +35,14 @@ import javafx.scene.Parent;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.NonNull;
 import org.moinex.model.enums.*;
+import org.moinex.model.investment.Ticker;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.I18nService;
@@ -932,5 +938,48 @@ public final class UIUtils {
             return d;
         }
         return value;
+    }
+
+    /**
+     * Load ticker logo from filesystem
+     *
+     * @param ticker The ticker to load logo for
+     * @param size Size of the logo (width and height)
+     * @return ImageView with the logo or null if not found
+     */
+    public static ImageView loadTickerLogo(Ticker ticker, double size) {
+        if (ticker == null || ticker.getDomain() == null || ticker.getDomain().isEmpty()) {
+            return null;
+        }
+
+        try {
+            String domain =
+                    ticker.getDomain()
+                            .replace("https://", "")
+                            .replace("http://", "")
+                            .replace("www.", "")
+                            .split("/")[0];
+
+            String filename = domain + ".png";
+            Path logoPath = Paths.get(Constants.LOGOS_DIR, filename);
+
+            if (Files.exists(logoPath)) {
+                // Use file:// protocol for local files
+                String imageUrl = "file://" + logoPath.toAbsolutePath();
+                Image image = new Image(imageUrl, size, size, true, true);
+
+                if (!image.isError()) {
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitWidth(size);
+                    imageView.setFitHeight(size);
+                    imageView.setPreserveRatio(true);
+                    return imageView;
+                }
+            }
+        } catch (Exception e) {
+            // Logo not found or error loading, return null
+        }
+
+        return null;
     }
 }

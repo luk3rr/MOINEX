@@ -10,6 +10,9 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -296,6 +299,92 @@ public class TickerService {
         logger.info("Ticker with id {} was updated", tk.getId());
     }
 
+    /**
+     * Check if logo file exists for a given domain
+     *
+     * @param domain Company domain (e.g., "apple.com")
+     * @return true if logo file exists, false otherwise
+     */
+    private boolean logoExists(String domain) {
+        if (domain == null || domain.isEmpty()) {
+            return false;
+        }
+
+        try {
+            String filename =
+                    domain.replace("https://", "")
+                                    .replace("http://", "")
+                                    .replace("www.", "")
+                                    .split("/")[0]
+                            + ".png";
+            Path logoPath = Paths.get(Constants.LOGOS_DIR, filename);
+            return Files.exists(logoPath);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Download logos for tickers that don't have them yet
+     *
+     * @param tickers List of tickers to check and download logos for
+     */
+    private void downloadMissingLogos(List<Ticker> tickers) {
+        List<String> websitesToDownload =
+                tickers.stream()
+                        .filter(
+                                ticker ->
+                                        ticker.getDomain() != null && !ticker.getDomain().isEmpty())
+                        .map(Ticker::getDomain)
+                        .filter(domain -> !logoExists(domain))
+                        .distinct()
+                        .toList();
+
+        if (websitesToDownload.isEmpty()) {
+            logger.info("All logos already cached, skipping download");
+            return;
+        }
+
+        logger.info("Downloading {} missing logos", websitesToDownload.size());
+
+        try {
+            APIUtils.fetchStockLogosAsync(websitesToDownload.toArray(new String[0]))
+                    .thenAccept(
+                            jsonObject -> {
+                                int successCount = 0;
+                                int failCount = 0;
+
+                                for (String website : websitesToDownload) {
+                                    if (jsonObject.has(website)) {
+                                        JSONObject logoData = jsonObject.getJSONObject(website);
+                                        if (logoData.has("logo_path")) {
+                                            successCount++;
+                                            logger.debug("Logo downloaded for {}", website);
+                                        } else if (logoData.has("error")) {
+                                            failCount++;
+                                            logger.debug(
+                                                    "Failed to download logo for {}: {}",
+                                                    website,
+                                                    logoData.getString("error"));
+                                        }
+                                    }
+                                }
+
+                                logger.info(
+                                        "Logo download complete: {} successful, {} failed",
+                                        successCount,
+                                        failCount);
+                            })
+                    .exceptionally(
+                            e -> {
+                                logger.warn("Error downloading logos: {}", e.getMessage());
+                                return null;
+                            });
+        } catch (Exception e) {
+            logger.warn("Failed to initiate logo download: {}", e.getMessage());
+        }
+    }
+
     @Transactional
     public CompletableFuture<List<Ticker>> updateTickersPriceFromApiAsync(List<Ticker> tickers) {
         if (tickers.isEmpty()) {
@@ -353,6 +442,9 @@ public class TickerService {
                                     failed.add(ticker);
                                 }
                             }
+
+                            // Download missing logos after updating prices
+                            downloadMissingLogos(tickers);
 
                             return failed;
                         })

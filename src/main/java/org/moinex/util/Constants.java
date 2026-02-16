@@ -33,8 +33,14 @@ public final class Constants {
 
     public static final String GET_FUNDAMENTAL_DATA_SCRIPT = "get_fundamental_data.py";
 
+    public static final String GET_STOCK_LOGO_SCRIPT = "get_stock_logo.py";
+
     public static final String YAHOO_LOOKUP_URL =
             "https://finance.yahoo.com/research-hub/screener/most_actives";
+
+    // Data directories
+    public static final String MOINEX_DATA_DIR = System.getProperty("user.home") + "/.moinex";
+    public static final String LOGOS_DIR = MOINEX_DATA_DIR + "/logos";
 
     // Paths
     public static final String WALLET_TYPE_ICONS_PATH = "/icon/wallet_type/";
