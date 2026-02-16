@@ -338,6 +338,11 @@ public class TickerService {
 
                                     ticker.setCurrentUnitValue(price);
                                     ticker.setLastUpdate(LocalDateTime.now());
+
+                                    if (tickerData.has("website")) {
+                                        ticker.setDomain(tickerData.getString("website"));
+                                    }
+
                                     tickerRepository.save(ticker);
 
                                 } catch (Exception e) {

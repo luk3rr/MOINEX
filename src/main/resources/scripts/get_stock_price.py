@@ -8,6 +8,7 @@ import sys
 import json
 import yfinance as yf
 import requests
+from urllib.parse import urlparse
 
 DEFAULT_CURRENCY = "BRL"
 
@@ -66,6 +67,9 @@ def main():
     currencies = {
         symbol: ticker.info["currency"] for symbol, ticker in tickers.tickers.items()
     }
+    websites = {
+        symbol: ticker.info.get("website") for symbol, ticker in tickers.tickers.items()
+    }
 
     conversion_rates = {DEFAULT_CURRENCY: 1.0}
 
@@ -84,6 +88,11 @@ def main():
                     conversion_rates[currency] = get_conversion_rate(currency)
 
             result[symbol] = {"price": price * conversion_rates[currency]}
+            
+            # Add website if available
+            website = websites.get(symbol)
+            if website:
+                result[symbol]["website"] = website
 
         except Exception as e:
             result[symbol] = {"error": str(e)}

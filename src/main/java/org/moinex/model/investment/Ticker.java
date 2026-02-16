@@ -52,6 +52,9 @@ public class Ticker extends Asset {
     @Column(name = "archived", nullable = false)
     private boolean isArchived = false; // Default value is false
 
+    @Column(name = "domain")
+    private String domain;
+
     public abstract static class TickerBuilder<C extends Ticker, B extends TickerBuilder<C, B>>
             extends AssetBuilder<C, B> {
         public B lastUpdate(LocalDateTime lastUpdate) {
