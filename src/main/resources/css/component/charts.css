@@ -2,11 +2,16 @@
    BARS (BarChart / StackedBarChart)
    ============================================================ */
 
+/* Remove gray background from charts */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
 /* GRUPO 1 – Azul → Verde (frio, base) */
-.chart-bar.series0  { -fx-bar-fill: #2563eb; }
-.chart-bar.series1  { -fx-bar-fill: #3b82f6; }
-.chart-bar.series2  { -fx-bar-fill: #22c55e; }
-.chart-bar.series3  { -fx-bar-fill: #16a34a; }
+.chart-bar.series0  { -fx-bar-fill: #16a34a; }
+.chart-bar.series1  { -fx-bar-fill: #22c55e; }
+.chart-bar.series2  { -fx-bar-fill: #3b82f6; }
+.chart-bar.series3  { -fx-bar-fill: #2563eb; }
 .chart-bar.series4  { -fx-bar-fill: #14532d; }
 
 /* GRUPO 2 – Verde → Amarelo */

@@ -11,11 +11,14 @@ import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +31,11 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -51,10 +58,12 @@ import org.moinex.model.dto.ProfitabilityMetricsDTO;
 import org.moinex.model.dto.TickerPerformanceDTO;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.enums.BondType;
+import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.*;
 import org.moinex.service.*;
 import org.moinex.ui.dialog.investment.*;
+import org.moinex.util.Animation;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -138,6 +147,12 @@ public class SavingsController {
 
     @FXML private AnchorPane pieChartAnchorPane;
 
+    @FXML private JFXButton graphPrevButton;
+
+    @FXML private JFXButton graphNextButton;
+
+    @FXML private Label overviewTabBottonPaneTitle;
+
     @FXML private Text overviewTotalInvestedField;
 
     @FXML private Text overviewTabGainsField;
@@ -204,6 +219,8 @@ public class SavingsController {
     private static final double ALLOCATION_FILLED_BAR_HEIGHT = 20.0;
     private static final double PERCENTAGE_DIVISOR = 100.0;
 
+    private Integer graphPaneCurrentPage = 0;
+
     private static final Logger logger = LoggerFactory.getLogger(SavingsController.class);
 
     /**
@@ -245,11 +262,11 @@ public class SavingsController {
         updateBondTabFields();
         updateBrazilianMarketIndicators();
         updateMarketQuotesAndCommodities();
-        updateInvestmentDistributionChart();
         updateOverviewTabFields();
         updateTopPerformersPanel();
         updateAllocationVsTargetPanel();
         updateProfitabilityMetricsPanel();
+        updateDisplayGraphs();
 
         if (isUpdatingPortfolioPrices) {
             setOffUpdatePortfolioPricesButton();
@@ -257,6 +274,7 @@ public class SavingsController {
             setOnUpdatePortfolioPricesButton();
         }
 
+        setGraphButtonsActions();
         configureListeners();
         configureBondListeners();
     }
@@ -1284,6 +1302,256 @@ public class SavingsController {
         }
 
         return investmentByType;
+    }
+
+    /**
+     * Set the actions for the graph navigation buttons
+     */
+    private void setGraphButtonsActions() {
+        graphPrevButton.setOnAction(
+                event -> {
+                    if (graphPaneCurrentPage > 0) {
+                        graphPaneCurrentPage--;
+                        updateDisplayGraphs();
+                    }
+                });
+
+        graphNextButton.setOnAction(
+                event -> {
+                    if (graphPaneCurrentPage < 1) {
+                        graphPaneCurrentPage++;
+                        updateDisplayGraphs();
+                    }
+                });
+    }
+
+    /**
+     * Update the display of graphs based on the current page
+     */
+    private void updateDisplayGraphs() {
+        pieChartAnchorPane.getChildren().clear();
+
+        if (graphPaneCurrentPage == 0) {
+            overviewTabBottonPaneTitle.setText(
+                    i18nService.tr(Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO));
+            updateInvestmentDistributionChart();
+        } else if (graphPaneCurrentPage == 1) {
+            overviewTabBottonPaneTitle.setText(
+                    i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTMENT_PERFORMANCE));
+            updateInvestmentPerformanceChart();
+        }
+
+        graphPrevButton.setDisable(graphPaneCurrentPage == 0);
+        graphNextButton.setDisable(graphPaneCurrentPage >= 1);
+    }
+
+    /**
+     * Update the investment performance chart with stacked bars showing invested value and capital gains by month
+     */
+    private void updateInvestmentPerformanceChart() {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+
+        StackedBarChart<String, Number> stackedBarChart = new StackedBarChart<>(xAxis, yAxis);
+        stackedBarChart.setLegendVisible(true);
+        stackedBarChart.setVerticalGridLinesVisible(false);
+
+        pieChartAnchorPane.getChildren().clear();
+        pieChartAnchorPane.getChildren().add(stackedBarChart);
+
+        AnchorPane.setTopAnchor(stackedBarChart, 0.0);
+        AnchorPane.setBottomAnchor(stackedBarChart, 0.0);
+        AnchorPane.setLeftAnchor(stackedBarChart, 0.0);
+        AnchorPane.setRightAnchor(stackedBarChart, 0.0);
+
+        stackedBarChart.getData().clear();
+
+        XYChart.Series<String, Number> investedSeries = new XYChart.Series<>();
+        investedSeries.setName(i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE));
+
+        XYChart.Series<String, Number> capitalGainsSeries = new XYChart.Series<>();
+        capitalGainsSeries.setName(i18nService.tr(Constants.TranslationKeys.SAVINGS_CAPITAL_GAINS));
+
+        Map<YearMonth, BigDecimal> monthlyInvested = calculateMonthlyInvestedValue();
+        Map<YearMonth, BigDecimal> monthlyGains = calculateMonthlyCapitalGains();
+
+        YearMonth currentMonth = YearMonth.now();
+        List<YearMonth> allMonths = new ArrayList<>();
+        for (int i = Constants.XYBAR_CHART_MONTHS; i >= 0; i--) {
+            allMonths.add(currentMonth.minusMonths(i));
+        }
+
+        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
+
+        Map<YearMonth, BigDecimal> monthlyTotals = new HashMap<>();
+
+        BigDecimal lastInvested = BigDecimal.ZERO;
+        BigDecimal lastGains = BigDecimal.ZERO;
+
+        for (YearMonth month : allMonths) {
+            String monthLabel = month.format(formatter);
+
+            // Get accumulated value for this month, or use last known value
+            BigDecimal invested = monthlyInvested.getOrDefault(month, lastInvested);
+            BigDecimal gains = monthlyGains.getOrDefault(month, lastGains);
+
+            if (monthlyInvested.containsKey(month)) {
+                lastInvested = invested;
+            }
+            if (monthlyGains.containsKey(month)) {
+                lastGains = gains;
+            }
+
+            BigDecimal total = invested.add(gains);
+            monthlyTotals.put(month, total);
+
+            investedSeries.getData().add(new XYChart.Data<>(monthLabel, invested.doubleValue()));
+            capitalGainsSeries.getData().add(new XYChart.Data<>(monthLabel, gains.doubleValue()));
+        }
+
+        stackedBarChart.getData().addAll(investedSeries, capitalGainsSeries);
+
+        // Calculate maximum total for Y-axis bounds
+        Double maxTotal =
+                monthlyTotals.values().stream()
+                        .map(BigDecimal::doubleValue)
+                        .max(Double::compare)
+                        .orElse(0.0);
+
+        Animation.setDynamicYAxisBounds(yAxis, maxTotal);
+
+        // Format Y-axis labels as currency
+        yAxis.setTickLabelFormatter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(Number value) {
+                        return UIUtils.formatCurrency(value);
+                    }
+
+                    @Override
+                    public Number fromString(String string) {
+                        return 0;
+                    }
+                });
+
+        UIUtils.applyDefaultChartStyle(stackedBarChart);
+
+        stackedBarChart.layout();
+
+        BigDecimal previousTotal = BigDecimal.ZERO;
+
+        for (int i = 0; i < investedSeries.getData().size(); i++) {
+            XYChart.Data<String, Number> investedData = investedSeries.getData().get(i);
+            XYChart.Data<String, Number> gainsData = capitalGainsSeries.getData().get(i);
+
+            YearMonth yearMonth = allMonths.get(i);
+            BigDecimal invested = BigDecimal.valueOf((Double) investedData.getYValue());
+            BigDecimal gains = BigDecimal.valueOf((Double) gainsData.getYValue());
+            BigDecimal total = monthlyTotals.getOrDefault(yearMonth, BigDecimal.ZERO);
+
+            String tooltipText =
+                    i18nService.tr(Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO)
+                            + ": "
+                            + UIUtils.formatCurrency(total)
+                            + "\n"
+                            + i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE)
+                            + ": "
+                            + UIUtils.formatCurrency(invested)
+                            + "\n"
+                            + i18nService.tr(Constants.TranslationKeys.SAVINGS_CAPITAL_GAINS)
+                            + ": "
+                            + UIUtils.formatCurrency(gains);
+
+            if (i > 0 && previousTotal.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal change = total.subtract(previousTotal);
+                BigDecimal percentageChange =
+                        change.divide(previousTotal, 4, RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal("100"));
+
+                String sign = percentageChange.compareTo(BigDecimal.ZERO) >= 0 ? "+" : "";
+                tooltipText +=
+                        "\n"
+                                + i18nService.tr(Constants.TranslationKeys.SAVINGS_VARIATION)
+                                + ": "
+                                + sign
+                                + UIUtils.formatPercentage(percentageChange, i18nService);
+            }
+
+            if (investedData.getNode() != null) {
+                UIUtils.addTooltipToNode(investedData.getNode(), tooltipText);
+            }
+            if (gainsData.getNode() != null) {
+                UIUtils.addTooltipToNode(gainsData.getNode(), tooltipText);
+            }
+
+            previousTotal = total;
+        }
+    }
+
+    /**
+     * Calculate cumulative invested value over time (accumulated capital invested)
+     */
+    private Map<YearMonth, BigDecimal> calculateMonthlyInvestedValue() {
+        Map<YearMonth, BigDecimal> monthlyInvested = new TreeMap<>();
+
+        List<TickerPurchase> allPurchases = tickerService.getAllPurchases();
+        for (TickerPurchase purchase : allPurchases) {
+            YearMonth month = YearMonth.from(purchase.getWalletTransaction().getDate());
+            BigDecimal purchaseValue = purchase.getUnitPrice().multiply(purchase.getQuantity());
+            monthlyInvested.merge(month, purchaseValue, BigDecimal::add);
+        }
+
+        List<BondOperation> allOperations = bondService.getAllOperations();
+        for (BondOperation operation : allOperations) {
+            if (operation.getOperationType() == OperationType.BUY) {
+                YearMonth month = YearMonth.from(operation.getWalletTransaction().getDate());
+                BigDecimal operationValue =
+                        operation.getUnitPrice().multiply(operation.getQuantity());
+                monthlyInvested.merge(month, operationValue, BigDecimal::add);
+            }
+        }
+
+        Map<YearMonth, BigDecimal> cumulativeInvested = new TreeMap<>();
+        BigDecimal accumulated = BigDecimal.ZERO;
+        for (Map.Entry<YearMonth, BigDecimal> entry : monthlyInvested.entrySet()) {
+            accumulated = accumulated.add(entry.getValue());
+            cumulativeInvested.put(entry.getKey(), accumulated);
+        }
+
+        return cumulativeInvested;
+    }
+
+    /**
+     * Calculate cumulative capital gains over time (accumulated dividends and bond profits)
+     */
+    private Map<YearMonth, BigDecimal> calculateMonthlyCapitalGains() {
+        Map<YearMonth, BigDecimal> monthlyGains = new TreeMap<>();
+
+        List<Dividend> allDividends = tickerService.getAllDividends();
+        for (Dividend dividend : allDividends) {
+            YearMonth month = YearMonth.from(dividend.getWalletTransaction().getDate());
+            BigDecimal dividendValue = dividend.getWalletTransaction().getAmount();
+            monthlyGains.merge(month, dividendValue, BigDecimal::add);
+        }
+
+        List<BondOperation> allOperations = bondService.getAllOperations();
+        for (BondOperation operation : allOperations) {
+            if (operation.getOperationType() == OperationType.SELL
+                    && operation.getNetProfit() != null
+                    && operation.getNetProfit().compareTo(BigDecimal.ZERO) > 0) {
+                YearMonth month = YearMonth.from(operation.getWalletTransaction().getDate());
+                monthlyGains.merge(month, operation.getNetProfit(), BigDecimal::add);
+            }
+        }
+
+        Map<YearMonth, BigDecimal> cumulativeGains = new TreeMap<>();
+        BigDecimal accumulated = BigDecimal.ZERO;
+        for (Map.Entry<YearMonth, BigDecimal> entry : monthlyGains.entrySet()) {
+            accumulated = accumulated.add(entry.getValue());
+            cumulativeGains.put(entry.getKey(), accumulated);
+        }
+
+        return cumulativeGains;
     }
 
     /**

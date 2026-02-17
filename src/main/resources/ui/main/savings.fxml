@@ -104,11 +104,29 @@
                                                             <Insets left="10.0" top="10.0" />
                                                          </padding>
                                                       </Label>
-                                                      <HBox fx:id="portfolioP1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+                                                      <HBox fx:id="portfolioP1" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
                                                          <children>
-                                                            <AnchorPane fx:id="pieChartAnchorPane" minWidth="400.0" prefHeight="300.0" prefWidth="300.0" HBox.hgrow="ALWAYS" />
+                                                            <AnchorPane fx:id="pieChartAnchorPane" minWidth="400.0" prefHeight="240.0" prefWidth="300.0" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
+                                                      <JFXButton fx:id="graphPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
+                                                         <graphic>
+                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../icon/common/arrow_left.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                         </graphic>
+                                                      </JFXButton>
+                                                      <JFXButton fx:id="graphNextButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                                         <graphic>
+                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../icon/common/arrow_right.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                         </graphic>
+                                                      </JFXButton>
                                                    </children>
                                                 </AnchorPane>
                                                 <AnchorPane minHeight="220.0" prefHeight="220.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="NEVER">
