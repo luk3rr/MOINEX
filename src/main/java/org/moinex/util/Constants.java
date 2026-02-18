@@ -166,6 +166,10 @@ public final class Constants {
     public static final String PLANS_FXML = UI_MAIN_PATH + "plans.fxml";
     public static final String GOALS_AND_PLANS_FXML = UI_MAIN_PATH + "goals_and_plans.fxml";
     public static final String SAVINGS_FXML = UI_MAIN_PATH + "savings.fxml";
+    public static final String SAVINGS_OVERVIEW_FXML = UI_MAIN_PATH + "savings_overview.fxml";
+    public static final String SAVINGS_STOCKS_FUNDS_FXML =
+            UI_MAIN_PATH + "savings_stocks_funds.fxml";
+    public static final String SAVINGS_BONDS_FXML = UI_MAIN_PATH + "savings_bonds.fxml";
     public static final String CSV_IMPORT_FXML = UI_MAIN_PATH + "csv_import.fxml";
     public static final String SETTINGS_FXML = UI_MAIN_PATH + "settings.fxml";
     public static final String SPLASH_SCREEN_FXML = UI_MAIN_PATH + ("splash_screen." + "fxml");
@@ -216,6 +220,9 @@ public final class Constants {
     public static final String PLANS_STYLE_SHEET = CSS_SCENE_PATH + "plans.css";
     public static final String GOALS_AND_PLANS_STYLE_SHEET = CSS_SCENE_PATH + "goals_and_plans.css";
     public static final String SAVINGS_STYLE_SHEET = CSS_SCENE_PATH + "savings.css";
+    public static final String SAVINGS_OVERVIEW_STYLE_SHEET = CSS_SCENE_PATH + "savings.css";
+    public static final String SAVINGS_STOCKS_FUNDS_STYLE_SHEET = CSS_SCENE_PATH + "savings.css";
+    public static final String SAVINGS_BONDS_STYLE_SHEET = CSS_SCENE_PATH + "savings.css";
     public static final String CSV_IMPORT_STYLE_SHEET = CSS_SCENE_PATH + "csv_import.css";
     public static final String SETTINGS_STYLE_SHEET = CSS_SCENE_PATH + "settings.css";
     public static final String CHARTS_COLORS_STYLE_SHEET = CSS_COMPONENT_PATH + "charts.css";
