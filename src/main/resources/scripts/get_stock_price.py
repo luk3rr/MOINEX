@@ -61,7 +61,7 @@ def main():
     # Get the stock price
     tickers = yf.Tickers(" ".join(symbols))
     prices = {
-        symbol: ticker.history().iloc[-1]["Close"]
+        symbol: ticker.history(period="5d").iloc[-1]["Close"]
         for symbol, ticker in tickers.tickers.items()
     }
     currencies = {

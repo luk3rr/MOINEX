@@ -190,6 +190,45 @@ public class APIUtils {
     }
 
     /**
+     * Fetch historical stock prices asynchronously
+     *
+     * @param symbol The stock symbol
+     * @param startDate Start date in YYYY-MM-DD format
+     * @param endDate End date in YYYY-MM-DD format
+     * @return CompletableFuture with JSONObject containing historical prices
+     */
+    public static CompletableFuture<JSONObject> fetchStockPriceHistoryAsync(
+            String symbol, String startDate, String endDate) {
+        return fetchStockPriceHistoryAsync(symbol, startDate, endDate, null);
+    }
+
+    /**
+     * Fetch historical stock prices asynchronously with specific dates
+     *
+     * @param symbol The stock symbol
+     * @param startDate Start date in YYYY-MM-DD format
+     * @param endDate End date in YYYY-MM-DD format
+     * @param specificDates List of specific dates to fetch (optional, can be null)
+     * @return CompletableFuture with JSONObject containing historical prices
+     */
+    public static CompletableFuture<JSONObject> fetchStockPriceHistoryAsync(
+            String symbol, String startDate, String endDate, java.util.List<String> specificDates) {
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    String[] args;
+                    if (specificDates != null && !specificDates.isEmpty()) {
+                        // Convert list to JSON array string
+                        org.json.JSONArray jsonArray = new org.json.JSONArray(specificDates);
+                        args = new String[] {symbol, startDate, endDate, jsonArray.toString()};
+                    } else {
+                        args = new String[] {symbol, startDate, endDate};
+                    }
+                    return runPythonScript("get_stock_price_history.py", args);
+                },
+                executorService);
+    }
+
+    /**
      * Execute a Python script with arguments
      *
      * @param script The script to run
@@ -240,14 +279,14 @@ public class APIUtils {
                 int exitCode = process.waitFor();
 
                 if (exitCode != 0) {
-                    logger.error("Python script failed with exit code: {}", exitCode);
+                    logger.error("Python script '{}' failed with exit code: {}", script, exitCode);
 
                     if (!errorOutput.isEmpty()) {
                         logger.debug("Error output: {}", errorOutput);
                     }
 
                     throw new MoinexException.APIFetchException(
-                            "Error executing Python script. Exit code: " + exitCode);
+                            "Error executing '" + script + "'. Exit code: " + exitCode);
                 }
 
                 JSONObject jsonObject = new JSONObject(output);

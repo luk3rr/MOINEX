@@ -922,7 +922,9 @@ public final class Constants {
                 "savings.overview.ipca12Months";
         public static final String SAVINGS_INVESTMENT_PERFORMANCE = "savings.investmentPerformance";
         public static final String SAVINGS_INVESTED_VALUE = "savings.investedValue";
-        public static final String SAVINGS_CAPITAL_GAINS = "savings.capitalGains";
+        public static final String SAVINGS_ACCUMULATED_CAPITAL_GAINS =
+                "savings.accumulatedCapitalGains";
+        public static final String SAVINGS_MONTHLY_CAPITAL_GAINS = "savings.monthlyCapitalGains";
         public static final String SAVINGS_VARIATION = "savings.variation";
 
         // Savings Stocks & Funds

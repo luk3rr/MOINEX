@@ -124,6 +124,7 @@ public class TickerService {
         price = Constants.roundPrice(price, type);
         avgUnitPrice = Constants.roundPrice(avgUnitPrice, type);
 
+        LocalDateTime now = LocalDateTime.now();
         Ticker ticker =
                 Ticker.builder()
                         .name(name)
@@ -133,7 +134,8 @@ public class TickerService {
                         .averageUnitValue(avgUnitPrice)
                         .averageUnitValueCount(BigDecimal.ONE)
                         .currentQuantity(quantity)
-                        .lastUpdate(LocalDateTime.now())
+                        .lastUpdate(now)
+                        .createdAt(now)
                         .build();
 
         tickerRepository.save(ticker);
@@ -1381,6 +1383,30 @@ public class TickerService {
 
     public List<TickerSale> getAllNonArchivedSales() {
         return tickerSaleRepository.findAllNonArchived();
+    }
+
+    /**
+     * Get all purchases for a specific ticker
+     *
+     * @param tickerId The ticker ID
+     * @return A list with all purchases for the ticker
+     */
+    public List<TickerPurchase> getAllPurchasesByTicker(Integer tickerId) {
+        return tickerPurchaseRepository.findAll().stream()
+                .filter(p -> p.getTicker().getId().equals(tickerId))
+                .toList();
+    }
+
+    /**
+     * Get all sales for a specific ticker
+     *
+     * @param tickerId The ticker ID
+     * @return A list with all sales for the ticker
+     */
+    public List<TickerSale> getAllSalesByTicker(Integer tickerId) {
+        return tickerSaleRepository.findAll().stream()
+                .filter(s -> s.getTicker().getId().equals(tickerId))
+                .toList();
     }
 
     /**

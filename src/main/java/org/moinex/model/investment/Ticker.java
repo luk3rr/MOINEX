@@ -48,9 +48,12 @@ public class Ticker extends Asset {
     @Column(name = "last_update", nullable = false)
     private String lastUpdate;
 
+    @Column(name = "created_at", nullable = false)
+    private String createdAt;
+
     @Builder.Default
     @Column(name = "archived", nullable = false)
-    private boolean isArchived = false; // Default value is false
+    private boolean isArchived = false;
 
     @Column(name = "domain")
     private String domain;
@@ -59,6 +62,11 @@ public class Ticker extends Asset {
             extends AssetBuilder<C, B> {
         public B lastUpdate(LocalDateTime lastUpdate) {
             this.lastUpdate = lastUpdate.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
+
+        public B createdAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
     }

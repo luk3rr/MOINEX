@@ -11,14 +11,11 @@ import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -197,6 +194,8 @@ public class SavingsController {
 
     private BondService bondService;
 
+    private TickerPriceHistoryService tickerPriceHistoryService;
+
     private List<Ticker> tickers;
 
     private List<Dividend> dividends;
@@ -237,7 +236,8 @@ public class SavingsController {
             I18nService i18nService,
             WalletService walletService,
             InvestmentTargetService investmentTargetService,
-            BondService bondService) {
+            BondService bondService,
+            TickerPriceHistoryService tickerPriceHistoryService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
@@ -245,6 +245,7 @@ public class SavingsController {
         this.walletService = walletService;
         this.investmentTargetService = investmentTargetService;
         this.bondService = bondService;
+        this.tickerPriceHistoryService = tickerPriceHistoryService;
     }
 
     @FXML
@@ -1370,10 +1371,13 @@ public class SavingsController {
         investedSeries.setName(i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE));
 
         XYChart.Series<String, Number> capitalGainsSeries = new XYChart.Series<>();
-        capitalGainsSeries.setName(i18nService.tr(Constants.TranslationKeys.SAVINGS_CAPITAL_GAINS));
+        capitalGainsSeries.setName(
+                i18nService.tr(Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS));
 
         Map<YearMonth, BigDecimal> monthlyInvested = calculateMonthlyInvestedValue();
+        Map<YearMonth, BigDecimal> accumulatedGains = calculateAccumulatedCapitalGains();
         Map<YearMonth, BigDecimal> monthlyGains = calculateMonthlyCapitalGains();
+        Map<YearMonth, BigDecimal> portfolioValues = calculateMonthlyPortfolioValue();
 
         YearMonth currentMonth = YearMonth.now();
         List<YearMonth> allMonths = new ArrayList<>();
@@ -1383,27 +1387,21 @@ public class SavingsController {
 
         DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
 
-        Map<YearMonth, BigDecimal> monthlyTotals = new HashMap<>();
-
         BigDecimal lastInvested = BigDecimal.ZERO;
-        BigDecimal lastGains = BigDecimal.ZERO;
+        BigDecimal lastAccumulatedGains = BigDecimal.ZERO;
 
         for (YearMonth month : allMonths) {
             String monthLabel = month.format(formatter);
 
-            // Get accumulated value for this month, or use last known value
             BigDecimal invested = monthlyInvested.getOrDefault(month, lastInvested);
-            BigDecimal gains = monthlyGains.getOrDefault(month, lastGains);
+            BigDecimal gains = accumulatedGains.getOrDefault(month, lastAccumulatedGains);
 
             if (monthlyInvested.containsKey(month)) {
                 lastInvested = invested;
             }
-            if (monthlyGains.containsKey(month)) {
-                lastGains = gains;
+            if (accumulatedGains.containsKey(month)) {
+                lastAccumulatedGains = gains;
             }
-
-            BigDecimal total = invested.add(gains);
-            monthlyTotals.put(month, total);
 
             investedSeries.getData().add(new XYChart.Data<>(monthLabel, invested.doubleValue()));
             capitalGainsSeries.getData().add(new XYChart.Data<>(monthLabel, gains.doubleValue()));
@@ -1411,16 +1409,14 @@ public class SavingsController {
 
         stackedBarChart.getData().addAll(investedSeries, capitalGainsSeries);
 
-        // Calculate maximum total for Y-axis bounds
         Double maxTotal =
-                monthlyTotals.values().stream()
+                portfolioValues.values().stream()
                         .map(BigDecimal::doubleValue)
                         .max(Double::compare)
                         .orElse(0.0);
 
         Animation.setDynamicYAxisBounds(yAxis, maxTotal);
 
-        // Format Y-axis labels as currency
         yAxis.setTickLabelFormatter(
                 new StringConverter<>() {
                     @Override
@@ -1438,34 +1434,41 @@ public class SavingsController {
 
         stackedBarChart.layout();
 
-        BigDecimal previousTotal = BigDecimal.ZERO;
+        BigDecimal previousPortfolio = BigDecimal.ZERO;
 
         for (int i = 0; i < investedSeries.getData().size(); i++) {
             XYChart.Data<String, Number> investedData = investedSeries.getData().get(i);
             XYChart.Data<String, Number> gainsData = capitalGainsSeries.getData().get(i);
 
             YearMonth yearMonth = allMonths.get(i);
+            BigDecimal portfolio = portfolioValues.getOrDefault(yearMonth, BigDecimal.ZERO);
             BigDecimal invested = BigDecimal.valueOf((Double) investedData.getYValue());
-            BigDecimal gains = BigDecimal.valueOf((Double) gainsData.getYValue());
-            BigDecimal total = monthlyTotals.getOrDefault(yearMonth, BigDecimal.ZERO);
+            BigDecimal accumulatedGain = accumulatedGains.getOrDefault(yearMonth, BigDecimal.ZERO);
+            BigDecimal monthlyGain = monthlyGains.getOrDefault(yearMonth, BigDecimal.ZERO);
 
             String tooltipText =
                     i18nService.tr(Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO)
                             + ": "
-                            + UIUtils.formatCurrency(total)
+                            + UIUtils.formatCurrency(portfolio)
                             + "\n"
                             + i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE)
                             + ": "
                             + UIUtils.formatCurrency(invested)
                             + "\n"
-                            + i18nService.tr(Constants.TranslationKeys.SAVINGS_CAPITAL_GAINS)
+                            + i18nService.tr(
+                                    Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS)
                             + ": "
-                            + UIUtils.formatCurrency(gains);
+                            + UIUtils.formatCurrency(accumulatedGain)
+                            + "\n"
+                            + i18nService.tr(
+                                    Constants.TranslationKeys.SAVINGS_MONTHLY_CAPITAL_GAINS)
+                            + ": "
+                            + UIUtils.formatCurrency(monthlyGain);
 
-            if (i > 0 && previousTotal.compareTo(BigDecimal.ZERO) > 0) {
-                BigDecimal change = total.subtract(previousTotal);
+            if (i > 0 && previousPortfolio.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal change = portfolio.subtract(previousPortfolio);
                 BigDecimal percentageChange =
-                        change.divide(previousTotal, 4, RoundingMode.HALF_UP)
+                        change.divide(previousPortfolio, 4, RoundingMode.HALF_UP)
                                 .multiply(new BigDecimal("100"));
 
                 String sign = percentageChange.compareTo(BigDecimal.ZERO) >= 0 ? "+" : "";
@@ -1484,74 +1487,720 @@ public class SavingsController {
                 UIUtils.addTooltipToNode(gainsData.getNode(), tooltipText);
             }
 
-            previousTotal = total;
+            previousPortfolio = portfolio;
         }
     }
 
     /**
-     * Calculate cumulative invested value over time (accumulated capital invested)
+     * Calculate invested value over time based on average cost × quantity held
+     * This matches the overview calculation: average unit value × current quantity
      */
     private Map<YearMonth, BigDecimal> calculateMonthlyInvestedValue() {
-        Map<YearMonth, BigDecimal> monthlyInvested = new TreeMap<>();
+        Map<YearMonth, BigDecimal> investedByMonth = new TreeMap<>();
 
-        List<TickerPurchase> allPurchases = tickerService.getAllPurchases();
-        for (TickerPurchase purchase : allPurchases) {
-            YearMonth month = YearMonth.from(purchase.getWalletTransaction().getDate());
-            BigDecimal purchaseValue = purchase.getUnitPrice().multiply(purchase.getQuantity());
-            monthlyInvested.merge(month, purchaseValue, BigDecimal::add);
-        }
+        List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
 
-        List<BondOperation> allOperations = bondService.getAllOperations();
-        for (BondOperation operation : allOperations) {
-            if (operation.getOperationType() == OperationType.BUY) {
-                YearMonth month = YearMonth.from(operation.getWalletTransaction().getDate());
-                BigDecimal operationValue =
-                        operation.getUnitPrice().multiply(operation.getQuantity());
-                monthlyInvested.merge(month, operationValue, BigDecimal::add);
+        for (Ticker ticker : allTickers) {
+            List<TickerPurchase> purchases = tickerService.getAllPurchasesByTicker(ticker.getId());
+            List<TickerSale> sales = tickerService.getAllSalesByTicker(ticker.getId());
+
+            if (purchases.isEmpty()
+                    && ticker.getCurrentQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            LocalDate referenceDate;
+            if (!purchases.isEmpty()) {
+                referenceDate =
+                        purchases.stream()
+                                .map(p -> p.getWalletTransaction().getDate().toLocalDate())
+                                .min(LocalDate::compareTo)
+                                .orElse(null);
+            } else {
+                referenceDate =
+                        LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER)
+                                .toLocalDate();
+            }
+
+            if (referenceDate == null) {
+                continue;
+            }
+
+            YearMonth firstMonth = YearMonth.from(referenceDate);
+
+            Map<YearMonth, BigDecimal> quantityByMonth =
+                    calculateQuantityAtMonthEnd(ticker, purchases, sales, firstMonth);
+
+            for (Map.Entry<YearMonth, BigDecimal> entry : quantityByMonth.entrySet()) {
+                YearMonth month = entry.getKey();
+                BigDecimal quantity = entry.getValue();
+
+                if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+                    continue;
+                }
+
+                BigDecimal investedValue = ticker.getAverageUnitValue().multiply(quantity);
+                investedByMonth.merge(month, investedValue, BigDecimal::add);
             }
         }
 
-        Map<YearMonth, BigDecimal> cumulativeInvested = new TreeMap<>();
-        BigDecimal accumulated = BigDecimal.ZERO;
-        for (Map.Entry<YearMonth, BigDecimal> entry : monthlyInvested.entrySet()) {
-            accumulated = accumulated.add(entry.getValue());
-            cumulativeInvested.put(entry.getKey(), accumulated);
+        List<Bond> allBonds = bondService.getAllNonArchivedBonds();
+        for (Bond bond : allBonds) {
+            List<BondOperation> operations = bondService.getOperationsByBond(bond);
+
+            if (operations.isEmpty()) {
+                continue;
+            }
+
+            LocalDate firstOperationDate =
+                    operations.stream()
+                            .map(op -> op.getWalletTransaction().getDate().toLocalDate())
+                            .min(LocalDate::compareTo)
+                            .orElse(null);
+
+            if (firstOperationDate == null) {
+                continue;
+            }
+
+            YearMonth firstMonth = YearMonth.from(firstOperationDate);
+            YearMonth currentMonth = YearMonth.now();
+
+            BigDecimal cumulativeValue = BigDecimal.ZERO;
+            YearMonth month = firstMonth;
+
+            while (!month.isAfter(currentMonth)) {
+                for (BondOperation op : operations) {
+                    YearMonth opMonth = YearMonth.from(op.getWalletTransaction().getDate());
+                    if (opMonth.equals(month)) {
+                        BigDecimal opValue = op.getUnitPrice().multiply(op.getQuantity());
+                        if (op.getOperationType() == OperationType.BUY) {
+                            cumulativeValue = cumulativeValue.add(opValue);
+                        } else if (op.getOperationType() == OperationType.SELL) {
+                            cumulativeValue = cumulativeValue.subtract(opValue);
+                        }
+                    }
+                }
+
+                if (cumulativeValue.compareTo(BigDecimal.ZERO) > 0) {
+                    investedByMonth.merge(month, cumulativeValue, BigDecimal::add);
+                }
+
+                month = month.plusMonths(1);
+            }
         }
 
-        return cumulativeInvested;
+        return investedByMonth;
     }
 
     /**
-     * Calculate cumulative capital gains over time (accumulated dividends and bond profits)
+     * Calculate monthly capital gains (non-cumulative)
+     * Includes: dividends, bond profits/losses, and ticker realized gains/losses
+     * This matches the calculation in updateOverviewTabFields()
      */
     private Map<YearMonth, BigDecimal> calculateMonthlyCapitalGains() {
         Map<YearMonth, BigDecimal> monthlyGains = new TreeMap<>();
 
+        // 1. Add dividends
+        Map<YearMonth, BigDecimal> dividendsOnly = new TreeMap<>();
         List<Dividend> allDividends = tickerService.getAllDividends();
         for (Dividend dividend : allDividends) {
             YearMonth month = YearMonth.from(dividend.getWalletTransaction().getDate());
             BigDecimal dividendValue = dividend.getWalletTransaction().getAmount();
             monthlyGains.merge(month, dividendValue, BigDecimal::add);
+            dividendsOnly.merge(month, dividendValue, BigDecimal::add);
         }
 
+        logger.debug("Dividends: {}", dividendsOnly);
+
+        // 2. Add bond realized gains/losses (all SELL operations, not just positive)
+        Map<YearMonth, BigDecimal> bondProfitsOnly = new TreeMap<>();
         List<BondOperation> allOperations = bondService.getAllOperations();
         for (BondOperation operation : allOperations) {
             if (operation.getOperationType() == OperationType.SELL
-                    && operation.getNetProfit() != null
-                    && operation.getNetProfit().compareTo(BigDecimal.ZERO) > 0) {
+                    && operation.getNetProfit() != null) {
                 YearMonth month = YearMonth.from(operation.getWalletTransaction().getDate());
                 monthlyGains.merge(month, operation.getNetProfit(), BigDecimal::add);
+                bondProfitsOnly.merge(month, operation.getNetProfit(), BigDecimal::add);
             }
         }
 
-        Map<YearMonth, BigDecimal> cumulativeGains = new TreeMap<>();
-        BigDecimal accumulated = BigDecimal.ZERO;
-        for (Map.Entry<YearMonth, BigDecimal> entry : monthlyGains.entrySet()) {
-            accumulated = accumulated.add(entry.getValue());
-            cumulativeGains.put(entry.getKey(), accumulated);
+        logger.debug("Bond profits: {}", bondProfitsOnly);
+
+        // 3. Add ticker realized gains/losses (from sales)
+        Map<YearMonth, BigDecimal> tickerSalesOnly = new TreeMap<>();
+        List<TickerSale> tickerSales = tickerService.getAllNonArchivedSales();
+        for (TickerSale sale : tickerSales) {
+            YearMonth month = YearMonth.from(sale.getWalletTransaction().getDate());
+            BigDecimal saleValue = sale.getUnitPrice().multiply(sale.getQuantity());
+            BigDecimal costBasis = sale.getAverageCost().multiply(sale.getQuantity());
+            BigDecimal profitLoss = saleValue.subtract(costBasis);
+            monthlyGains.merge(month, profitLoss, BigDecimal::add);
+            tickerSalesOnly.merge(month, profitLoss, BigDecimal::add);
         }
 
-        return cumulativeGains;
+        logger.debug("Ticker sales: {}", tickerSalesOnly);
+
+        // 4. Add ticker appreciation/depreciation for each month
+        Map<YearMonth, BigDecimal> tickerGainsByMonth = calculateTickerAppreciationByMonth();
+
+        logger.debug("Ticker appreciation by month: {}", tickerGainsByMonth);
+
+        // Add monthly appreciation for all months
+        for (Map.Entry<YearMonth, BigDecimal> entry : tickerGainsByMonth.entrySet()) {
+            monthlyGains.merge(entry.getKey(), entry.getValue(), BigDecimal::add);
+        }
+
+        logger.debug("Monthly capital gains (non-cumulative): {}", monthlyGains);
+
+        return monthlyGains;
+    }
+
+    /**
+     * Calculate accumulated capital gains over time
+     * For each month, calculates: unrealized gains (current price - cost basis) + dividends received up to that month
+     * This represents the total profit/loss at each point in time
+     */
+    private Map<YearMonth, BigDecimal> calculateAccumulatedCapitalGains() {
+        Map<YearMonth, BigDecimal> accumulatedGains = new TreeMap<>();
+
+        List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
+        List<Dividend> allDividends = tickerService.getAllDividends();
+
+        // Get all months from first transaction to now
+        YearMonth firstMonth = YearMonth.of(2021, 2); // Earliest month with data
+        YearMonth currentMonth = YearMonth.now();
+
+        YearMonth month = firstMonth;
+        while (!month.isAfter(currentMonth)) {
+            BigDecimal monthAccumulatedGain = BigDecimal.ZERO;
+
+            // Calculate unrealized gains for each ticker at this month-end
+            for (Ticker ticker : allTickers) {
+                List<TickerPurchase> purchases =
+                        tickerService.getAllPurchasesByTicker(ticker.getId());
+                List<TickerSale> sales = tickerService.getAllSalesByTicker(ticker.getId());
+
+                // Get quantity at end of this month
+                LocalDate monthEnd = month.atEndOfMonth();
+                BigDecimal quantityAtMonthEnd =
+                        calculateQuantityAtDate(ticker, purchases, sales, monthEnd);
+
+                if (quantityAtMonthEnd.compareTo(BigDecimal.ZERO) <= 0) {
+                    continue;
+                }
+
+                // Get cost basis (average unit value × quantity)
+                BigDecimal costBasis = ticker.getAverageUnitValue().multiply(quantityAtMonthEnd);
+
+                // Get price at month-end
+                Optional<BigDecimal> priceAtMonthEnd =
+                        tickerPriceHistoryService.getClosestPriceBeforeDate(
+                                ticker.getId(), monthEnd);
+
+                if (priceAtMonthEnd.isEmpty()) {
+                    continue;
+                }
+
+                BigDecimal currentValue = priceAtMonthEnd.get().multiply(quantityAtMonthEnd);
+                BigDecimal unrealizedGain = currentValue.subtract(costBasis);
+
+                monthAccumulatedGain = monthAccumulatedGain.add(unrealizedGain);
+            }
+
+            // Add dividends received up to this month
+            final YearMonth finalMonth = month;
+            BigDecimal accumulatedDividends =
+                    allDividends.stream()
+                            .filter(
+                                    d ->
+                                            !d.getWalletTransaction()
+                                                    .getDate()
+                                                    .toLocalDate()
+                                                    .isAfter(finalMonth.atEndOfMonth()))
+                            .map(d -> d.getWalletTransaction().getAmount())
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            monthAccumulatedGain = monthAccumulatedGain.add(accumulatedDividends);
+
+            accumulatedGains.put(month, monthAccumulatedGain);
+            month = month.plusMonths(1);
+        }
+
+        return accumulatedGains;
+    }
+
+    /**
+     * Calculate current portfolio value (market value) for each month
+     * This is the actual value of all investments at the end of each month
+     */
+    private Map<YearMonth, BigDecimal> calculateMonthlyPortfolioValue() {
+        Map<YearMonth, BigDecimal> portfolioByMonth = new TreeMap<>();
+
+        List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
+
+        for (Ticker ticker : allTickers) {
+            List<TickerPurchase> purchases = tickerService.getAllPurchasesByTicker(ticker.getId());
+            List<TickerSale> sales = tickerService.getAllSalesByTicker(ticker.getId());
+
+            if (purchases.isEmpty()
+                    && ticker.getCurrentQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            LocalDate referenceDate;
+            if (!purchases.isEmpty()) {
+                referenceDate =
+                        purchases.stream()
+                                .map(p -> p.getWalletTransaction().getDate().toLocalDate())
+                                .min(LocalDate::compareTo)
+                                .orElse(null);
+            } else {
+                referenceDate =
+                        LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER)
+                                .toLocalDate();
+            }
+
+            if (referenceDate == null) {
+                continue;
+            }
+
+            YearMonth firstMonth = YearMonth.from(referenceDate);
+            Map<YearMonth, BigDecimal> quantityAtMonthEnd =
+                    calculateQuantityAtMonthStart(ticker, purchases, sales, firstMonth);
+
+            for (Map.Entry<YearMonth, BigDecimal> entry : quantityAtMonthEnd.entrySet()) {
+                YearMonth month = entry.getKey();
+                BigDecimal quantity = entry.getValue();
+
+                if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+                    continue;
+                }
+
+                LocalDate endDate;
+                YearMonth currentMonth = YearMonth.now();
+                if (month.equals(currentMonth)) {
+                    endDate = LocalDate.now();
+                } else {
+                    endDate = month.atEndOfMonth();
+                }
+
+                Optional<BigDecimal> priceOpt =
+                        tickerPriceHistoryService.getClosestPriceBeforeDate(
+                                ticker.getId(), endDate);
+
+                if (priceOpt.isEmpty()) {
+                    continue;
+                }
+
+                BigDecimal price = priceOpt.get();
+                BigDecimal value = quantity.multiply(price);
+
+                portfolioByMonth.merge(month, value, BigDecimal::add);
+            }
+        }
+
+        List<Bond> allBonds = bondService.getAllNonArchivedBonds();
+        for (Bond bond : allBonds) {
+            List<BondOperation> operations = bondService.getOperationsByBond(bond);
+
+            if (operations.isEmpty()) {
+                continue;
+            }
+
+            LocalDate firstOperationDate =
+                    operations.stream()
+                            .map(op -> op.getWalletTransaction().getDate().toLocalDate())
+                            .min(LocalDate::compareTo)
+                            .orElse(null);
+
+            if (firstOperationDate == null) {
+                continue;
+            }
+
+            YearMonth firstMonth = YearMonth.from(firstOperationDate);
+            YearMonth currentMonth = YearMonth.now();
+
+            BigDecimal cumulativeValue = BigDecimal.ZERO;
+            YearMonth month = firstMonth;
+
+            while (!month.isAfter(currentMonth)) {
+                for (BondOperation op : operations) {
+                    YearMonth opMonth = YearMonth.from(op.getWalletTransaction().getDate());
+                    if (opMonth.equals(month)) {
+                        BigDecimal opValue = op.getUnitPrice().multiply(op.getQuantity());
+                        if (op.getOperationType() == OperationType.BUY) {
+                            cumulativeValue = cumulativeValue.add(opValue);
+                        } else if (op.getOperationType() == OperationType.SELL) {
+                            cumulativeValue = cumulativeValue.subtract(opValue);
+                        }
+                    }
+                }
+
+                if (cumulativeValue.compareTo(BigDecimal.ZERO) > 0) {
+                    portfolioByMonth.merge(month, cumulativeValue, BigDecimal::add);
+                }
+
+                month = month.plusMonths(1);
+            }
+        }
+
+        return portfolioByMonth;
+    }
+
+    /**
+     * Calculate ticker appreciation/depreciation for each month
+     * Handles intra-month transactions by calculating weighted appreciation
+     * for periods before and after purchases/sales within the same month
+     */
+    private Map<YearMonth, BigDecimal> calculateTickerAppreciationByMonth() {
+        Map<YearMonth, BigDecimal> appreciationByMonth = new TreeMap<>();
+
+        List<Ticker> allTickers = tickerService.getAllNonArchivedTickers();
+
+        for (Ticker ticker : allTickers) {
+            List<TickerPurchase> purchases = tickerService.getAllPurchasesByTicker(ticker.getId());
+            List<TickerSale> sales = tickerService.getAllSalesByTicker(ticker.getId());
+
+            LocalDate referenceDate;
+            LocalDate createdDate =
+                    LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER)
+                            .toLocalDate();
+
+            // Determine the earliest date to consider
+            if (!purchases.isEmpty()) {
+                LocalDate firstPurchaseDate =
+                        purchases.stream()
+                                .map(p -> p.getWalletTransaction().getDate().toLocalDate())
+                                .min(LocalDate::compareTo)
+                                .orElse(null);
+
+                // If ticker has initial quantity, start from creation date
+                // Otherwise, start from first purchase date
+                BigDecimal initialQuantity = ticker.getCurrentQuantity();
+                for (TickerPurchase purchase : purchases) {
+                    initialQuantity = initialQuantity.subtract(purchase.getQuantity());
+                }
+                for (TickerSale sale : sales) {
+                    initialQuantity = initialQuantity.add(sale.getQuantity());
+                }
+
+                if (initialQuantity.compareTo(BigDecimal.ZERO) > 0) {
+                    referenceDate = createdDate;
+                } else {
+                    referenceDate = firstPurchaseDate;
+                }
+            } else if (ticker.getCurrentQuantity().compareTo(BigDecimal.ZERO) > 0) {
+                referenceDate = createdDate;
+            } else {
+                continue;
+            }
+
+            if (referenceDate == null) {
+                continue;
+            }
+
+            YearMonth firstMonth = YearMonth.from(referenceDate);
+            YearMonth currentMonth = YearMonth.now();
+            YearMonth month = firstMonth;
+
+            while (!month.isAfter(currentMonth)) {
+                // Calculate appreciation for this month considering intra-month transactions
+                BigDecimal monthAppreciation =
+                        calculateMonthAppreciationWithIntraMonthTransactions(
+                                ticker, purchases, sales, month, referenceDate, firstMonth);
+
+                if (monthAppreciation.compareTo(BigDecimal.ZERO) != 0) {
+                    appreciationByMonth.merge(month, monthAppreciation, BigDecimal::add);
+                }
+
+                month = month.plusMonths(1);
+            }
+        }
+
+        return appreciationByMonth;
+    }
+
+    /**
+     * Calculate appreciation for a specific month, handling intra-month transactions
+     * Splits the month into periods based on transaction dates and calculates weighted appreciation
+     */
+    private BigDecimal calculateMonthAppreciationWithIntraMonthTransactions(
+            Ticker ticker,
+            List<TickerPurchase> purchases,
+            List<TickerSale> sales,
+            YearMonth month,
+            LocalDate referenceDate,
+            YearMonth firstMonth) {
+
+        // Get all transactions for this month, sorted by date
+        List<LocalDate> transactionDatesInMonth = new ArrayList<>();
+        transactionDatesInMonth.add(month.atDay(1)); // Start of month
+
+        for (TickerPurchase purchase : purchases) {
+            LocalDate purchaseDate = purchase.getWalletTransaction().getDate().toLocalDate();
+            if (YearMonth.from(purchaseDate).equals(month)) {
+                transactionDatesInMonth.add(purchaseDate);
+            }
+        }
+
+        for (TickerSale sale : sales) {
+            LocalDate saleDate = sale.getWalletTransaction().getDate().toLocalDate();
+            if (YearMonth.from(saleDate).equals(month)) {
+                transactionDatesInMonth.add(saleDate);
+            }
+        }
+
+        transactionDatesInMonth.add(month.atEndOfMonth()); // End of month
+        transactionDatesInMonth = transactionDatesInMonth.stream().distinct().sorted().toList();
+
+        // Calculate quantity at the start of the month
+        BigDecimal quantityAtMonthStart =
+                calculateQuantityAtDate(ticker, purchases, sales, month.atDay(1));
+
+        if (quantityAtMonthStart.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal totalAppreciation = BigDecimal.ZERO;
+
+        // Process each period between transactions
+        for (int i = 0; i < transactionDatesInMonth.size() - 1; i++) {
+            LocalDate periodStart = transactionDatesInMonth.get(i);
+            LocalDate periodEnd = transactionDatesInMonth.get(i + 1);
+
+            // Get quantity at the start of this period
+            BigDecimal periodQuantity =
+                    calculateQuantityAtDate(ticker, purchases, sales, periodStart);
+
+            if (periodQuantity.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            // Get prices for this period
+            Optional<BigDecimal> startPriceOpt =
+                    tickerPriceHistoryService.getClosestPriceBeforeDate(
+                            ticker.getId(), periodStart);
+            Optional<BigDecimal> endPriceOpt =
+                    tickerPriceHistoryService.getClosestPriceBeforeDate(ticker.getId(), periodEnd);
+
+            if (startPriceOpt.isEmpty() || endPriceOpt.isEmpty()) {
+                continue;
+            }
+
+            BigDecimal startPrice = startPriceOpt.get();
+            BigDecimal endPrice = endPriceOpt.get();
+            BigDecimal periodAppreciation = endPrice.subtract(startPrice).multiply(periodQuantity);
+
+            totalAppreciation = totalAppreciation.add(periodAppreciation);
+
+            logger.debug(
+                    "Appreciation for {} on {} (period {}-{}): quantity={}, startPrice={},"
+                            + " endPrice={}, periodAppreciation={}",
+                    ticker.getSymbol(),
+                    month,
+                    periodStart,
+                    periodEnd,
+                    periodQuantity,
+                    startPrice,
+                    endPrice,
+                    periodAppreciation);
+        }
+
+        return totalAppreciation;
+    }
+
+    /**
+     * Calculate the quantity owned at a specific date
+     * Considers all purchases and sales up to and including that date
+     */
+    private BigDecimal calculateQuantityAtDate(
+            Ticker ticker, List<TickerPurchase> purchases, List<TickerSale> sales, LocalDate date) {
+
+        // Start with initial quantity
+        BigDecimal initialQuantity = ticker.getCurrentQuantity();
+        for (TickerPurchase purchase : purchases) {
+            initialQuantity = initialQuantity.subtract(purchase.getQuantity());
+        }
+        for (TickerSale sale : sales) {
+            initialQuantity = initialQuantity.add(sale.getQuantity());
+        }
+
+        BigDecimal quantity = initialQuantity;
+
+        // Add purchases up to this date
+        for (TickerPurchase purchase : purchases) {
+            LocalDate purchaseDate = purchase.getWalletTransaction().getDate().toLocalDate();
+            if (!purchaseDate.isAfter(date)) {
+                quantity = quantity.add(purchase.getQuantity());
+            }
+        }
+
+        // Subtract sales up to this date
+        for (TickerSale sale : sales) {
+            LocalDate saleDate = sale.getWalletTransaction().getDate().toLocalDate();
+            if (!saleDate.isAfter(date)) {
+                quantity = quantity.subtract(sale.getQuantity());
+            }
+        }
+
+        return quantity;
+    }
+
+    /**
+     * Calculate quantity owned at the START of each month
+     * For first month, uses initial quantity (from ticker or first purchase)
+     * For subsequent months, uses quantity at end of previous month
+     */
+    private Map<YearMonth, BigDecimal> calculateQuantityAtMonthStart(
+            Ticker ticker,
+            List<TickerPurchase> purchases,
+            List<TickerSale> sales,
+            YearMonth firstMonth) {
+        Map<YearMonth, BigDecimal> quantityAtStart = new TreeMap<>();
+
+        // Build a map of quantity at END of each month
+        Map<YearMonth, BigDecimal> quantityAtEnd = new TreeMap<>();
+
+        // Calculate initial quantity: current quantity minus all purchases plus all sales
+        // This gives us the quantity that existed before any purchases were recorded
+        BigDecimal initialQuantity = ticker.getCurrentQuantity();
+        for (TickerPurchase purchase : purchases) {
+            initialQuantity = initialQuantity.subtract(purchase.getQuantity());
+        }
+        for (TickerSale sale : sales) {
+            initialQuantity = initialQuantity.add(sale.getQuantity());
+        }
+
+        // Start with the initial quantity (before any recorded purchases)
+        BigDecimal cumulativeQuantity = initialQuantity;
+
+        // Process purchases
+        for (TickerPurchase purchase : purchases) {
+            YearMonth month = YearMonth.from(purchase.getWalletTransaction().getDate());
+            cumulativeQuantity = cumulativeQuantity.add(purchase.getQuantity());
+            quantityAtEnd.put(month, cumulativeQuantity);
+        }
+
+        // Process sales
+        for (TickerSale sale : sales) {
+            YearMonth month = YearMonth.from(sale.getWalletTransaction().getDate());
+            cumulativeQuantity = cumulativeQuantity.subtract(sale.getQuantity());
+            quantityAtEnd.put(month, cumulativeQuantity);
+        }
+
+        // Fill in all months from first month to current month
+        YearMonth currentMonth = YearMonth.now();
+        YearMonth month = firstMonth;
+        BigDecimal lastQuantity = initialQuantity;
+
+        while (!month.isAfter(currentMonth)) {
+            if (quantityAtEnd.containsKey(month)) {
+                lastQuantity = quantityAtEnd.get(month);
+            } else {
+                quantityAtEnd.put(month, lastQuantity);
+            }
+            month = month.plusMonths(1);
+        }
+
+        // Convert to quantity at START of each month
+        // For the first month: use initial quantity
+        // For subsequent months: use quantity at end of previous month
+        month = firstMonth;
+        BigDecimal previousMonthEnd = initialQuantity;
+        while (!month.isAfter(currentMonth)) {
+            if (month.equals(firstMonth)) {
+                // First month uses initial quantity
+                quantityAtStart.put(month, initialQuantity);
+            } else {
+                // Subsequent months use quantity at end of previous month
+                quantityAtStart.put(month, previousMonthEnd);
+            }
+            // Update previousMonthEnd for next iteration
+            previousMonthEnd = quantityAtEnd.getOrDefault(month, previousMonthEnd);
+            month = month.plusMonths(1);
+        }
+
+        return quantityAtStart;
+    }
+
+    /**
+     * Calculate quantity owned at the END of each month
+     * This is used for calculating invested value, where we want to show the quantity
+     * held at the end of each month (after all transactions in that month)
+     */
+    private Map<YearMonth, BigDecimal> calculateQuantityAtMonthEnd(
+            Ticker ticker,
+            List<TickerPurchase> purchases,
+            List<TickerSale> sales,
+            YearMonth firstMonth) {
+        Map<YearMonth, BigDecimal> quantityAtEnd = new TreeMap<>();
+
+        // Calculate initial quantity: current quantity minus all purchases plus all sales
+        // This gives us the quantity that existed before any purchases were recorded
+        BigDecimal initialQuantity = ticker.getCurrentQuantity();
+        for (TickerPurchase purchase : purchases) {
+            initialQuantity = initialQuantity.subtract(purchase.getQuantity());
+        }
+        for (TickerSale sale : sales) {
+            initialQuantity = initialQuantity.add(sale.getQuantity());
+        }
+
+        // Start with the initial quantity (before any recorded purchases)
+        BigDecimal cumulativeQuantity = initialQuantity;
+
+        // Process purchases and sales in chronological order
+        List<Object> allTransactions = new ArrayList<>();
+        for (TickerPurchase purchase : purchases) {
+            allTransactions.add(purchase);
+        }
+        for (TickerSale sale : sales) {
+            allTransactions.add(sale);
+        }
+
+        // Sort by date
+        allTransactions.sort(
+                (a, b) -> {
+                    LocalDateTime dateA =
+                            a instanceof TickerPurchase
+                                    ? ((TickerPurchase) a).getWalletTransaction().getDate()
+                                    : ((TickerSale) a).getWalletTransaction().getDate();
+                    LocalDateTime dateB =
+                            b instanceof TickerPurchase
+                                    ? ((TickerPurchase) b).getWalletTransaction().getDate()
+                                    : ((TickerSale) b).getWalletTransaction().getDate();
+                    return dateA.compareTo(dateB);
+                });
+
+        // Process transactions in order
+        for (Object transaction : allTransactions) {
+            if (transaction instanceof TickerPurchase) {
+                TickerPurchase purchase = (TickerPurchase) transaction;
+                YearMonth month = YearMonth.from(purchase.getWalletTransaction().getDate());
+                cumulativeQuantity = cumulativeQuantity.add(purchase.getQuantity());
+                quantityAtEnd.put(month, cumulativeQuantity);
+            } else if (transaction instanceof TickerSale) {
+                TickerSale sale = (TickerSale) transaction;
+                YearMonth month = YearMonth.from(sale.getWalletTransaction().getDate());
+                cumulativeQuantity = cumulativeQuantity.subtract(sale.getQuantity());
+                quantityAtEnd.put(month, cumulativeQuantity);
+            }
+        }
+
+        // Fill in all months from first month to current month
+        YearMonth currentMonth = YearMonth.now();
+        YearMonth month = firstMonth;
+        BigDecimal lastQuantity = initialQuantity;
+
+        while (!month.isAfter(currentMonth)) {
+            if (!quantityAtEnd.containsKey(month)) {
+                quantityAtEnd.put(month, lastQuantity);
+            } else {
+                lastQuantity = quantityAtEnd.get(month);
+            }
+            month = month.plusMonths(1);
+        }
+
+        return quantityAtEnd;
     }
 
     /**

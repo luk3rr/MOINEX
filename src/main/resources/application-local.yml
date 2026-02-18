@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:${user.home}/.moinex/data/moinex.db?journal_mode=WAL
+    username:
+    password:
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 1
+      connection-timeout: 1000
+
+  flyway:
+    enabled: true
+    depends-on: entityManagerFactory
+    baseline-on-migrate: true
+    baseline-version: 1
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+        generate_statistics: false
+    defer-datasource-initialization: false
+
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    root: INFO
+    org.moinex: DEBUG
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+    com.zaxxer.hikari: DEBUG
