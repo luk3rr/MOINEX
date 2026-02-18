@@ -44,7 +44,7 @@ public class TickerPriceHistoryService {
     private TickerSaleRepository tickerSaleRepository;
 
     public static final Integer MAX_RETRIES = 7;
-    public static final Integer RETRY_DELAY_MS = 2000;
+    public static final Integer RETRY_DELAY_MS = 1000;
     public static final Double RETRY_MULTIPLIER = 1.5;
 
     @Autowired
@@ -276,16 +276,6 @@ public class TickerPriceHistoryService {
                                             ticker.getSymbol());
                                 }
 
-                                // 3. Store if it's the most recent price (current month's latest)
-                                else if (date.equals(mostRecentDate)
-                                        && YearMonth.from(date).equals(currentMonth)) {
-                                    shouldStore = true;
-                                    logger.debug(
-                                            "Storing {} for {}: most recent price",
-                                            date,
-                                            ticker.getSymbol());
-                                }
-
                                 if (shouldStore) {
                                     storePriceHistory(ticker, date, price, isMonthEnd);
                                     storedCount++;
@@ -357,12 +347,17 @@ public class TickerPriceHistoryService {
     /**
      * Get the closest price before or on a specific date
      * Alias for getPriceOnDate for better readability
-     * @param tickerId The ticker ID
+     * @param ticker The ticker
      * @param date The date
      * @return Optional containing the price if found
      */
-    public Optional<BigDecimal> getClosestPriceBeforeDate(Integer tickerId, LocalDate date) {
-        return getPriceOnDate(tickerId, date);
+    public Optional<BigDecimal> getClosestPriceBeforeDate(Ticker ticker, LocalDate date) {
+        if (date.equals(LocalDate.now())) {
+            return Optional.of(ticker.getCurrentUnitValue());
+        }
+
+        // For past dates, use historical data
+        return getPriceOnDate(ticker.getId(), date);
     }
 
     /**
@@ -386,7 +381,6 @@ public class TickerPriceHistoryService {
         // With the new optimization strategy, we store:
         // 1. Transaction dates
         // 2. Month-end dates
-        // 3. Most recent price
         // So we consider data complete if we have data from the same month or earlier
         YearMonth firstPurchaseMonth = YearMonth.from(firstPurchaseDate);
         YearMonth earliestDataMonth = YearMonth.from(earliestDate.get());
@@ -553,7 +547,7 @@ public class TickerPriceHistoryService {
                                                 tickerPurchaseRepository,
                                                 tickerSaleRepository);
                                 List<LocalDate> missingDates =
-                                        getMissingPriceDates(ticker.getId(), transactionDates);
+                                        getMissingPriceDates(ticker, transactionDates);
 
                                 if (!missingDates.isEmpty()) {
                                     logger.info(
@@ -565,17 +559,7 @@ public class TickerPriceHistoryService {
 
                                     fetchPricesForDates(ticker, missingDates).join();
                                     updateCount++;
-                                }
-
-                                // Check if current month needs update
-                                if (needsCurrentMonthUpdate(ticker.getId())) {
-                                    logger.info(
-                                            "Updating current month price for {}",
-                                            ticker.getSymbol());
-
-                                    updateCurrentMonthPrice(ticker);
-                                    updateCount++;
-                                } else if (missingDates.isEmpty()) {
+                                } else {
                                     logger.debug(
                                             "Price history for {} is up to date",
                                             ticker.getSymbol());
@@ -692,18 +676,17 @@ public class TickerPriceHistoryService {
 
     /**
      * Check if price history exists for all transaction dates
-     * @param tickerId The ticker ID
+     * @param ticker The ticker
      * @param transactionDates List of transaction dates to check
      * @return List of dates missing price history
      */
-    private List<LocalDate> getMissingPriceDates(
-            Integer tickerId, List<LocalDate> transactionDates) {
+    private List<LocalDate> getMissingPriceDates(Ticker ticker, List<LocalDate> transactionDates) {
         List<LocalDate> missingDates = new java.util.ArrayList<>();
 
         for (LocalDate date : transactionDates) {
             String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
-            if (!priceHistoryRepository.existsByTickerIdAndDate(tickerId, dateStr)) {
-                Optional<BigDecimal> priceBeforeDate = getClosestPriceBeforeDate(tickerId, date);
+            if (!priceHistoryRepository.existsByTickerIdAndDate(ticker.getId(), dateStr)) {
+                Optional<BigDecimal> priceBeforeDate = getClosestPriceBeforeDate(ticker, date);
 
                 if (priceBeforeDate.isEmpty()) {
                     missingDates.add(date);
@@ -711,7 +694,7 @@ public class TickerPriceHistoryService {
                     // Check if the price we found is recent enough (within 7 days)
                     Optional<LocalDate> priceDate =
                             priceHistoryRepository
-                                    .findMostRecentPriceBeforeDate(tickerId, dateStr)
+                                    .findMostRecentPriceBeforeDate(ticker.getId(), dateStr)
                                     .map(TickerPriceHistory::getPriceDate);
 
                     if (priceDate.isPresent()) {
@@ -879,16 +862,6 @@ public class TickerPriceHistoryService {
                                             ticker.getSymbol());
                                 }
 
-                                // 3. Store if it's the most recent price (current month's latest)
-                                else if (date.equals(mostRecentDate)
-                                        && YearMonth.from(date).equals(currentMonth)) {
-                                    shouldStore = true;
-                                    logger.debug(
-                                            "Storing {} for {}: most recent price",
-                                            dateStr,
-                                            ticker.getSymbol());
-                                }
-
                                 if (shouldStore) {
                                     storePriceHistory(ticker, date, price, isMonthEnd);
                                     storedCount++;
@@ -945,39 +918,5 @@ public class TickerPriceHistoryService {
                             }
                             return null;
                         });
-    }
-
-    /**
-     * Check if current month price needs to be updated
-     * @param tickerId The ticker ID
-     * @return True if current month needs update
-     */
-    private boolean needsCurrentMonthUpdate(Integer tickerId) {
-        LocalDate today = LocalDate.now();
-        String todayStr = today.format(Constants.DATE_FORMATTER_NO_TIME);
-
-        // Check if we already have a price for today
-        return !priceHistoryRepository.existsByTickerIdAndDate(tickerId, todayStr);
-    }
-
-    /**
-     * Update the current month price for a ticker
-     * Replaces any existing current month price with today's price
-     * @param ticker The ticker
-     */
-    @Transactional
-    public void updateCurrentMonthPrice(Ticker ticker) {
-        LocalDate today = LocalDate.now();
-        LocalDate lastDayOfMonth = YearMonth.now().atEndOfMonth();
-        boolean isMonthEnd = today.equals(lastDayOfMonth);
-
-        storePriceHistory(ticker, today, ticker.getCurrentUnitValue(), isMonthEnd);
-
-        logger.info(
-                "Updated current month price for {} to {} on {} (month-end: {})",
-                ticker.getSymbol(),
-                ticker.getCurrentUnitValue(),
-                today,
-                isMonthEnd);
     }
 }

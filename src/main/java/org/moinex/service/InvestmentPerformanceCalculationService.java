@@ -351,7 +351,9 @@ public class InvestmentPerformanceCalculationService {
                         tickerService.getAllPurchasesByTicker(ticker.getId());
                 List<TickerSale> sales = tickerService.getAllSalesByTicker(ticker.getId());
 
-                LocalDate monthEnd = month.atEndOfMonth();
+                // For current month, use today's date; for past months, use month-end
+                LocalDate monthEnd =
+                        month.equals(currentMonth) ? LocalDate.now() : month.atEndOfMonth();
                 BigDecimal quantityAtMonthEnd =
                         calculateQuantityAtDate(ticker, purchases, sales, monthEnd);
 
@@ -362,8 +364,7 @@ public class InvestmentPerformanceCalculationService {
                 BigDecimal costBasis = ticker.getAverageUnitValue().multiply(quantityAtMonthEnd);
 
                 Optional<BigDecimal> priceAtMonthEnd =
-                        tickerPriceHistoryService.getClosestPriceBeforeDate(
-                                ticker.getId(), monthEnd);
+                        tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, monthEnd);
 
                 if (priceAtMonthEnd.isEmpty()) {
                     continue;
@@ -439,17 +440,11 @@ public class InvestmentPerformanceCalculationService {
                     continue;
                 }
 
-                LocalDate endDate;
                 YearMonth currentMonth = YearMonth.now();
-                if (month.equals(currentMonth)) {
-                    endDate = LocalDate.now();
-                } else {
-                    endDate = month.atEndOfMonth();
-                }
-
+                LocalDate endDate =
+                        month.equals(currentMonth) ? LocalDate.now() : month.atEndOfMonth();
                 Optional<BigDecimal> priceOpt =
-                        tickerPriceHistoryService.getClosestPriceBeforeDate(
-                                ticker.getId(), endDate);
+                        tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, endDate);
 
                 if (priceOpt.isEmpty()) {
                     continue;
@@ -586,15 +581,11 @@ public class InvestmentPerformanceCalculationService {
             }
         }
 
-        transactionDatesInMonth.add(month.atEndOfMonth());
+        // For current month, use today's date; for past months, use month-end
+        LocalDate monthEndDate =
+                month.equals(YearMonth.now()) ? LocalDate.now() : month.atEndOfMonth();
+        transactionDatesInMonth.add(monthEndDate);
         transactionDatesInMonth = transactionDatesInMonth.stream().distinct().sorted().toList();
-
-        BigDecimal quantityAtMonthStart =
-                calculateQuantityAtDate(ticker, purchases, sales, month.atDay(1));
-
-        if (quantityAtMonthStart.compareTo(BigDecimal.ZERO) <= 0) {
-            return BigDecimal.ZERO;
-        }
 
         BigDecimal totalAppreciation = BigDecimal.ZERO;
 
@@ -602,18 +593,19 @@ public class InvestmentPerformanceCalculationService {
             LocalDate periodStart = transactionDatesInMonth.get(i);
             LocalDate periodEnd = transactionDatesInMonth.get(i + 1);
 
+            // Use quantity at end of period (after any transactions on that day)
             BigDecimal periodQuantity =
-                    calculateQuantityAtDate(ticker, purchases, sales, periodStart);
+                    calculateQuantityAtDate(ticker, purchases, sales, periodEnd);
 
+            // Skip periods with no quantity
             if (periodQuantity.compareTo(BigDecimal.ZERO) <= 0) {
                 continue;
             }
 
             Optional<BigDecimal> startPriceOpt =
-                    tickerPriceHistoryService.getClosestPriceBeforeDate(
-                            ticker.getId(), periodStart);
+                    tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, periodStart);
             Optional<BigDecimal> endPriceOpt =
-                    tickerPriceHistoryService.getClosestPriceBeforeDate(ticker.getId(), periodEnd);
+                    tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, periodEnd);
 
             if (startPriceOpt.isEmpty() || endPriceOpt.isEmpty()) {
                 continue;

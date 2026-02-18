@@ -5,6 +5,7 @@ import org.moinex.repository.investment.TickerSaleRepository;
 import org.moinex.service.MarketService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.TickerPriceHistoryService;
+import org.moinex.service.TickerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ public class AppStartupRunner implements ApplicationRunner {
     private final MarketService marketService;
     private final RecurringTransactionService recurringTransactionService;
     private final TickerPriceHistoryService priceHistoryService;
+    private final TickerService tickerService;
     private final TickerPurchaseRepository tickerPurchaseRepository;
     private final TickerSaleRepository tickerSaleRepository;
 
@@ -28,11 +30,13 @@ public class AppStartupRunner implements ApplicationRunner {
             MarketService marketService,
             RecurringTransactionService recurringTransactionService,
             TickerPriceHistoryService priceHistoryService,
+            TickerService tickerService,
             TickerPurchaseRepository tickerPurchaseRepository,
             TickerSaleRepository tickerSaleRepository) {
         this.marketService = marketService;
         this.recurringTransactionService = recurringTransactionService;
         this.priceHistoryService = priceHistoryService;
+        this.tickerService = tickerService;
         this.tickerPurchaseRepository = tickerPurchaseRepository;
         this.tickerSaleRepository = tickerSaleRepository;
     }
@@ -52,6 +56,17 @@ public class AppStartupRunner implements ApplicationRunner {
                                     ex.getMessage());
                             return null;
                         })
+                .thenCompose(
+                        result ->
+                                tickerService
+                                        .updateAllNonArchivedTickersPricesAsync()
+                                        .exceptionally(
+                                                ex -> {
+                                                    logger.error(
+                                                            "Failed to update ticker prices: {}",
+                                                            ex.getMessage());
+                                                    return null;
+                                                }))
                 .thenCompose(
                         result ->
                                 priceHistoryService

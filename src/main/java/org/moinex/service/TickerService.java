@@ -50,8 +50,8 @@ public class TickerService {
     private CryptoExchangeRepository cryptoExchangeRepository;
     private WalletTransactionService walletTransactionService;
 
-    public Integer MAX_RETRIES = 5;
-    public static final Integer RETRY_DELAY_MS = 2000;
+    public Integer MAX_RETRIES = 7;
+    public static final Integer RETRY_DELAY_MS = 1000;
     public static final Double RETRY_MULTIPLIER = 1.5;
 
     @Autowired
@@ -385,6 +385,42 @@ public class TickerService {
         } catch (Exception e) {
             logger.warn("Failed to initiate logo download: {}", e.getMessage());
         }
+    }
+
+    /**
+     * Update prices for all non-archived tickers from API
+     * This method is typically called during application startup
+     *
+     * @return CompletableFuture that completes when all prices are updated
+     */
+    public CompletableFuture<Void> updateAllNonArchivedTickersPricesAsync() {
+        logger.info("Starting update of all non-archived ticker prices");
+
+        List<Ticker> activeTickers = getAllNonArchivedTickers();
+
+        if (activeTickers.isEmpty()) {
+            logger.info("No active tickers found, skipping price update");
+            return CompletableFuture.completedFuture(null);
+        }
+
+        logger.info("Updating prices for {} active tickers", activeTickers.size());
+
+        return updateTickersPriceFromApiAsync(activeTickers)
+                .thenApply(
+                        failed -> {
+                            if (failed.isEmpty()) {
+                                logger.info("All ticker prices updated successfully");
+                            } else {
+                                logger.warn(
+                                        "Failed to update {} ticker prices: {}",
+                                        failed.size(),
+                                        failed.stream()
+                                                .map(Ticker::getSymbol)
+                                                .collect(
+                                                        java.util.stream.Collectors.joining(", ")));
+                            }
+                            return null;
+                        });
     }
 
     @Transactional
