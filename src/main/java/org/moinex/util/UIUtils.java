@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.Chart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -330,6 +332,35 @@ public final class UIUtils {
         return Constants.CREDIT_CARD_NUMBER_FORMAT.replace("####", lastFourDigits);
     }
 
+    public static void formatCurrencyYAxis(NumberAxis yAxis) {
+        yAxis.setTickLabelFormatter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(Number value) {
+                        return UIUtils.formatCurrency(value);
+                    }
+
+                    @Override
+                    public Number fromString(String string) {
+                        if (string == null || string.isBlank()) {
+                            return 0;
+                        }
+
+                        // If monetary values are hidden, parsing is meaningless
+                        if ("****".equals(string)) {
+                            return 0;
+                        }
+
+                        try {
+                            return currencyFormat.parse(string);
+                        } catch (ParseException e) {
+                            throw new IllegalArgumentException(
+                                    "Invalid currency value: " + string, e);
+                        }
+                    }
+                });
+    }
+
     /**
      * Reset the text of a label to "-"
      *
@@ -467,8 +498,9 @@ public final class UIUtils {
     public static void applyDefaultChartStyle(Chart chart) {
         chart.getStylesheets()
                 .add(
-                        UIUtils.class
-                                .getResource(Constants.CHARTS_COLORS_STYLE_SHEET)
+                        Objects.requireNonNull(
+                                        UIUtils.class.getResource(
+                                                Constants.CHARTS_COLORS_STYLE_SHEET))
                                 .toExternalForm());
     }
 

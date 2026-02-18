@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,12 +38,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.DoughnutChart;
@@ -914,17 +910,7 @@ public class SavingsController {
     private void configureTableView() {
         TableColumn<Ticker, Integer> idColumn = getTickerLongTableColumn();
 
-        TableColumn<Ticker, ImageView> logoColumn = new TableColumn<>("");
-        logoColumn.setCellValueFactory(
-                param -> {
-                    ImageView logo = UIUtils.loadTickerLogo(param.getValue(), 40.0);
-                    return new SimpleObjectProperty<>(logo);
-                });
-        logoColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
-        logoColumn.setPrefWidth(45);
-        logoColumn.setMaxWidth(45);
-        logoColumn.setMinWidth(45);
-        logoColumn.setResizable(false);
+        TableColumn<Ticker, ImageView> logoColumn = getTickerImageViewTableColumn();
 
         TableColumn<Ticker, String> nameColumn =
                 new TableColumn<>(
@@ -1018,12 +1004,36 @@ public class SavingsController {
                 stocksFundsTabTickerTable.getStyle() + "-fx-fixed-cell-size: 45px;");
     }
 
+    private TableColumn<Ticker, ImageView> getTickerImageViewTableColumn() {
+        TableColumn<Ticker, ImageView> logoColumn = new TableColumn<>("");
+        logoColumn.setCellValueFactory(
+                param -> {
+                    ImageView logo = UIUtils.loadTickerLogo(param.getValue(), 40.0);
+                    return new SimpleObjectProperty<>(logo);
+                });
+        logoColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
+        logoColumn.setPrefWidth(45);
+        logoColumn.setMaxWidth(45);
+        logoColumn.setMinWidth(45);
+        logoColumn.setResizable(false);
+        return logoColumn;
+    }
+
+    private TableColumn<Ticker, Integer> getTickerLongTableColumn() {
+        TableColumn<Ticker, Integer> idColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID));
+        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
+        idColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
+        return idColumn;
+    }
+
     /**
      * Create a centered cell factory for text content
      */
-    private <T>
-            javafx.util.Callback<TableColumn<Ticker, T>, TableCell<Ticker, T>>
-                    createCenteredCellFactory(Pos alignment) {
+    private <T> Callback<TableColumn<Ticker, T>, TableCell<Ticker, T>> createCenteredCellFactory(
+            Pos alignment) {
         return column ->
                 new TableCell<>() {
                     @Override
@@ -1048,16 +1058,6 @@ public class SavingsController {
                         }
                     }
                 };
-    }
-
-    private TableColumn<Ticker, Integer> getTickerLongTableColumn() {
-        TableColumn<Ticker, Integer> idColumn =
-                new TableColumn<>(
-                        i18nService.tr(
-                                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID));
-        idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
-        idColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
-        return idColumn;
     }
 
     private void setOffUpdatePortfolioPricesButton() {
@@ -1248,7 +1248,7 @@ public class SavingsController {
             BigDecimal value = BigDecimal.valueOf(data.getPieValue());
             BigDecimal percentage =
                     value.divide(totalInvestment, 4, java.math.RoundingMode.HALF_UP)
-                            .multiply(new BigDecimal("100"));
+                            .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR));
 
             String tooltipText =
                     data.getName()
@@ -1477,18 +1477,7 @@ public class SavingsController {
 
         Animation.setDynamicYAxisBounds(yAxis, maxTotal);
 
-        yAxis.setTickLabelFormatter(
-                new StringConverter<>() {
-                    @Override
-                    public String toString(Number value) {
-                        return UIUtils.formatCurrency(value);
-                    }
-
-                    @Override
-                    public Number fromString(String string) {
-                        return 0;
-                    }
-                });
+        UIUtils.formatCurrencyYAxis(yAxis);
 
         UIUtils.applyDefaultChartStyle(stackedBarChart);
 
@@ -1529,7 +1518,7 @@ public class SavingsController {
                 BigDecimal change = portfolio.subtract(previousPortfolio);
                 BigDecimal percentageChange =
                         change.divide(previousPortfolio, 4, RoundingMode.HALF_UP)
-                                .multiply(new BigDecimal("100"));
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR));
 
                 String sign = percentageChange.compareTo(BigDecimal.ZERO) >= 0 ? "+ " : "- ";
                 tooltipText +=
@@ -1611,17 +1600,16 @@ public class SavingsController {
                 bondService.getAllNonArchivedBonds().stream()
                         .map(bondService::calculateProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal bondsCurrentValue = bondsTotalInvested;
 
         logger.info(
                 "Overview bonds: investedValue={}, currentValueAssumed={}, realizedProfitLoss={}"
                         + " (SELL netProfit sum)",
                 bondsTotalInvested,
-                bondsCurrentValue,
+                bondsTotalInvested,
                 bondsRealizedProfitLoss);
 
         totalInvested = totalInvested.add(bondsTotalInvested);
-        portfolioCurrentValue = portfolioCurrentValue.add(bondsCurrentValue);
+        portfolioCurrentValue = portfolioCurrentValue.add(bondsTotalInvested);
 
         BigDecimal totalDividends =
                 dividends.stream()
@@ -1707,8 +1695,8 @@ public class SavingsController {
         BigDecimal returnPercentage =
                 totalInvested.compareTo(BigDecimal.ZERO) > 0
                         ? profitLoss
-                                .divide(totalInvested, 4, java.math.RoundingMode.HALF_UP)
-                                .multiply(new BigDecimal("100"))
+                                .divide(totalInvested, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
                         : BigDecimal.ZERO;
 
         BigDecimal totalDividends =
@@ -1719,8 +1707,8 @@ public class SavingsController {
         BigDecimal dividendYield =
                 totalInvested.compareTo(BigDecimal.ZERO) > 0
                         ? totalDividends
-                                .divide(totalInvested, 4, java.math.RoundingMode.HALF_UP)
-                                .multiply(new BigDecimal("100"))
+                                .divide(totalInvested, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
                         : BigDecimal.ZERO;
 
         return new ProfitabilityMetricsDTO(
@@ -1750,11 +1738,9 @@ public class SavingsController {
                             BigDecimal percentage =
                                     invested.compareTo(BigDecimal.ZERO) > 0
                                             ? profitLoss
-                                                    .divide(
-                                                            invested,
-                                                            4,
-                                                            java.math.RoundingMode.HALF_UP)
-                                                    .multiply(new BigDecimal("100"))
+                                                    .divide(invested, 4, RoundingMode.HALF_UP)
+                                                    .multiply(
+                                                            BigDecimal.valueOf(PERCENTAGE_DIVISOR))
                                             : BigDecimal.ZERO;
 
                             return new TickerPerformanceDTO(
@@ -1762,11 +1748,9 @@ public class SavingsController {
                         })
                 .sorted(
                         best
-                                ? java.util.Comparator.comparing(
-                                                TickerPerformanceDTO::profitLossPercentage)
+                                ? Comparator.comparing(TickerPerformanceDTO::profitLossPercentage)
                                         .reversed()
-                                : java.util.Comparator.comparing(
-                                        TickerPerformanceDTO::profitLossPercentage))
+                                : Comparator.comparing(TickerPerformanceDTO::profitLossPercentage))
                 .limit(limit)
                 .toList();
     }
@@ -1834,7 +1818,7 @@ public class SavingsController {
         metricsContainer.getChildren().addAll(metricsBox);
 
         portfolioP4.getChildren().add(metricsContainer);
-        HBox.setHgrow(metricsContainer, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(metricsContainer, Priority.ALWAYS);
     }
 
     /**
@@ -1851,8 +1835,8 @@ public class SavingsController {
 
         Label labelNode = new Label(label);
 
-        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         String sign = "";
         if (dynamicColor) {
@@ -1936,7 +1920,7 @@ public class SavingsController {
         container.getChildren().addAll(bestBox, worstBox);
 
         portfolioP2.getChildren().add(container);
-        HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(container, Priority.ALWAYS);
     }
 
     /**
@@ -1954,11 +1938,11 @@ public class SavingsController {
         configureColumnWidth(assetHeader, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
         assetHeader.setAlignment(Pos.CENTER_LEFT);
 
-        javafx.scene.layout.Region spacerA = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacerA, javafx.scene.layout.Priority.ALWAYS);
+        Region spacerA = new Region();
+        HBox.setHgrow(spacerA, Priority.ALWAYS);
 
-        javafx.scene.layout.Region spacerB = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacerB, javafx.scene.layout.Priority.ALWAYS);
+        Region spacerB = new Region();
+        HBox.setHgrow(spacerB, Priority.ALWAYS);
 
         Label returnHeader =
                 new Label(
@@ -2001,11 +1985,11 @@ public class SavingsController {
         configureColumnWidth(symbolLabel, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
         symbolLabel.setAlignment(Pos.CENTER_LEFT);
 
-        javafx.scene.layout.Region spacerA = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacerA, javafx.scene.layout.Priority.ALWAYS);
+        Region spacerA = new Region();
+        HBox.setHgrow(spacerA, Priority.ALWAYS);
 
-        javafx.scene.layout.Region spacerB = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacerB, javafx.scene.layout.Priority.ALWAYS);
+        Region spacerB = new Region();
+        HBox.setHgrow(spacerB, Priority.ALWAYS);
 
         Label percentageLabel =
                 new Label(
@@ -2057,12 +2041,12 @@ public class SavingsController {
 
         for (InvestmentTarget target : targets) {
             AssetType assetType = target.getAssetType();
-            BigDecimal currentValue = BigDecimal.ZERO;
+            BigDecimal currentValue;
             String typeName;
 
             if (assetType == AssetType.BOND) {
                 currentValue = bondService.getTotalInvestedValue();
-                typeName = i18nService.tr("Títulos de Renda Fixa");
+                typeName = i18nService.tr(Constants.TranslationKeys.ASSET_TYPE_BOND);
             } else {
                 TickerType tickerType = TickerType.valueOf(assetType.name());
                 currentValue = currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO);
@@ -2073,7 +2057,7 @@ public class SavingsController {
                     totalValue.compareTo(BigDecimal.ZERO) > 0
                             ? currentValue
                                     .divide(totalValue, 4, RoundingMode.HALF_UP)
-                                    .multiply(new BigDecimal("100"))
+                                    .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
                             : BigDecimal.ZERO;
 
             BigDecimal difference = currentPercentage.subtract(target.getTargetPercentage());
@@ -2107,12 +2091,12 @@ public class SavingsController {
         ColumnConstraints col1 = new ColumnConstraints();
         col1.setPercentWidth(50);
         col1.setMinWidth(20);
-        col1.setHgrow(javafx.scene.layout.Priority.ALWAYS);
+        col1.setHgrow(Priority.ALWAYS);
 
         ColumnConstraints col2 = new ColumnConstraints();
         col2.setPercentWidth(50);
         col2.setMinWidth(20);
-        col2.setHgrow(javafx.scene.layout.Priority.ALWAYS);
+        col2.setHgrow(Priority.ALWAYS);
 
         gridPane.getColumnConstraints().addAll(col1, col2);
 
@@ -2136,7 +2120,7 @@ public class SavingsController {
         container.getChildren().add(gridPane);
 
         portfolioP5.getChildren().add(container);
-        HBox.setHgrow(container, javafx.scene.layout.Priority.ALWAYS);
+        HBox.setHgrow(container, Priority.ALWAYS);
     }
 
     private VBox createAllocationBar(AllocationDTO allocation) {
@@ -2188,8 +2172,8 @@ public class SavingsController {
                                         allocation.targetPercentage(), i18nService));
         currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
 
-        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         String statusText = getStatusText(allocation);
         Label statusLabel = new Label(statusText);
@@ -2431,9 +2415,7 @@ public class SavingsController {
                 Constants.SALE_BOND_FXML,
                 i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
                 springContext,
-                (AddBondSaleController controller) -> {
-                    controller.setBond(selectedBond);
-                },
+                (AddBondSaleController controller) -> controller.setBond(selectedBond),
                 List.of(
                         () -> {
                             updateBondTableView();
@@ -2501,8 +2483,8 @@ public class SavingsController {
         quantityColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
-                    BigDecimal quantity = bondService.getCurrentQuantity(bond);
-                    return new SimpleStringProperty(quantity.toString());
+                    return new SimpleStringProperty(
+                            bondService.getCurrentQuantity(bond).toString());
                 });
 
         TableColumn<Bond, String> avgPriceColumn =
@@ -2510,8 +2492,8 @@ public class SavingsController {
         avgPriceColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
-                    BigDecimal avgPrice = bondService.getAverageUnitPrice(bond);
-                    return new SimpleStringProperty(UIUtils.formatCurrency(avgPrice));
+                    return new SimpleStringProperty(
+                            UIUtils.formatCurrency(bondService.getAverageUnitPrice(bond)));
                 });
 
         TableColumn<Bond, String> currentValueColumn =
@@ -2522,8 +2504,8 @@ public class SavingsController {
         currentValueColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
-                    BigDecimal currentValue = bondService.getInvestedValue(bond);
-                    return new SimpleStringProperty(UIUtils.formatCurrency(currentValue));
+                    return new SimpleStringProperty(
+                            UIUtils.formatCurrency(bondService.getInvestedValue(bond)));
                 });
 
         TableColumn<Bond, String> investedValueColumn =
@@ -2534,8 +2516,8 @@ public class SavingsController {
         investedValueColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
-                    BigDecimal invested = bondService.getInvestedValue(bond);
-                    return new SimpleStringProperty(UIUtils.formatCurrency(invested));
+                    return new SimpleStringProperty(
+                            UIUtils.formatCurrency(bondService.getInvestedValue(bond)));
                 });
 
         TableColumn<Bond, String> profitLossColumn =
@@ -2545,8 +2527,8 @@ public class SavingsController {
         profitLossColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
-                    BigDecimal profitLoss = bondService.calculateProfit(bond);
-                    return new SimpleStringProperty(UIUtils.formatCurrencySigned(profitLoss));
+                    return new SimpleStringProperty(
+                            UIUtils.formatCurrencySigned(bondService.calculateProfit(bond)));
                 });
 
         TableColumn<Bond, String> maturityDateColumn =
@@ -2646,7 +2628,7 @@ public class SavingsController {
                                                 || maturityDate.contains(searchText)
                                                 || interestRate.contains(searchText);
                                     })
-                            .collect(Collectors.toList());
+                            .toList();
         }
 
         bondsTabBondTable.getItems().setAll(bonds);
@@ -2662,12 +2644,10 @@ public class SavingsController {
                         .map(bondService::calculateProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal currentValue = totalInvested;
-
         BigDecimal interestReceived = bondService.getTotalInterestReceived();
 
         bondsTabTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
-        bondsTabCurrentValueField.setText(UIUtils.formatCurrency(currentValue));
+        bondsTabCurrentValueField.setText(UIUtils.formatCurrency(totalInvested));
         bondsTabProfitLossField.setText(UIUtils.formatCurrencySigned(profitLoss));
         bondsTabInterestReceivedField.setText(UIUtils.formatCurrency(interestReceived));
     }
