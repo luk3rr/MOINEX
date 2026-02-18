@@ -204,8 +204,7 @@ public final class Constants {
     public static final String LOADING_GIF = GIF_PATH + "loading.gif";
     public static final String SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON =
             COMMON_ICONS_PATH + "synchronize.png";
-    public static final String RECALCULATE_NET_WORTH_BUTTON_DEFAULT_ICON =
-            COMMON_ICONS_PATH + "reload.png";
+    public static final String RELOAD_ICON = COMMON_ICONS_PATH + "reload.png";
 
     // CSS
     public static final String MAIN_STYLE_SHEET = CSS_SCENE_PATH + "main.css";
@@ -926,6 +925,8 @@ public final class Constants {
                 "savings.accumulatedCapitalGains";
         public static final String SAVINGS_MONTHLY_CAPITAL_GAINS = "savings.monthlyCapitalGains";
         public static final String SAVINGS_VARIATION = "savings.variation";
+        public static final String SAVINGS_BUTTON_RECALCULATE = "savings.button.recalculate";
+        public static final String SAVINGS_BUTTON_RECALCULATING = "savings.button.recalculating";
 
         // Savings Stocks & Funds
         public static final String SAVINGS_STOCKS_FUNDS_NET_CAPITAL_INVESTED =

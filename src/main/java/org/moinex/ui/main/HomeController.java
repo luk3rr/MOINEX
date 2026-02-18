@@ -227,11 +227,7 @@ public class HomeController {
         recalculateNetWorthButton.setDisable(false);
         recalculateNetWorthButtonIcon.setImage(
                 new Image(
-                        Objects.requireNonNull(
-                                        getClass()
-                                                .getResource(
-                                                        Constants
-                                                                .RECALCULATE_NET_WORTH_BUTTON_DEFAULT_ICON))
+                        Objects.requireNonNull(getClass().getResource(Constants.RELOAD_ICON))
                                 .toExternalForm()));
         recalculateNetWorthButton.setText(
                 i18nService.tr(Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON));

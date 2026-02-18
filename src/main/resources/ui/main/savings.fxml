@@ -109,6 +109,15 @@
                                                             <AnchorPane fx:id="pieChartAnchorPane" minWidth="400.0" prefHeight="240.0" prefWidth="300.0" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
+                                                      <JFXButton fx:id="recalculateInvestmentPerformanceButton" onAction="#handleRecalculateInvestmentPerformance" styleClass="button-primary" stylesheets="@../../css/component/buttons.css" text="%savings.button.recalculate" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+                                                         <graphic>
+                                                            <ImageView fx:id="recalculateInvestmentPerformanceButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../icon/common/reload.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                         </graphic>
+                                                      </JFXButton>
                                                       <JFXButton fx:id="graphPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                                          <graphic>
                                                             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
