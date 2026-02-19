@@ -7,12 +7,24 @@
         </encoder>
     </appender>
 
-    <!-- File Appender: escreve logs em um arquivo -->
-    <appender name="File" class="ch.qos.logback.core.FileAppender">
+    <!-- Rolling File Appender: rotaciona por tamanho (5MB), máximo 3 arquivos, sem compressão -->
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${user.home}/.local/state/moinex/moinex.log</file>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+        
+        <!-- Política de rotação: por tamanho (5MB), máximo 3 arquivos -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${user.home}/.local/state/moinex/moinex.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
+        </rollingPolicy>
+        
+        <!-- Gatilho de rotação: quando atingir 5MB -->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
     </appender>
 
     <!-- Root logger -->
