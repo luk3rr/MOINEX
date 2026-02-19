@@ -1,11 +1,9 @@
 package org.moinex.app;
 
+import java.util.concurrent.CompletableFuture;
 import org.moinex.repository.investment.TickerPurchaseRepository;
 import org.moinex.repository.investment.TickerSaleRepository;
-import org.moinex.service.MarketService;
-import org.moinex.service.RecurringTransactionService;
-import org.moinex.service.TickerPriceHistoryService;
-import org.moinex.service.TickerService;
+import org.moinex.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,7 @@ public class AppStartupRunner implements ApplicationRunner {
     private final TickerService tickerService;
     private final TickerPurchaseRepository tickerPurchaseRepository;
     private final TickerSaleRepository tickerSaleRepository;
+    private final InvestmentPerformanceCalculationService investmentPerformanceCalculationService;
 
     @Autowired
     public AppStartupRunner(
@@ -32,13 +31,15 @@ public class AppStartupRunner implements ApplicationRunner {
             TickerPriceHistoryService priceHistoryService,
             TickerService tickerService,
             TickerPurchaseRepository tickerPurchaseRepository,
-            TickerSaleRepository tickerSaleRepository) {
+            TickerSaleRepository tickerSaleRepository,
+            InvestmentPerformanceCalculationService investmentPerformanceCalculationService) {
         this.marketService = marketService;
         this.recurringTransactionService = recurringTransactionService;
         this.priceHistoryService = priceHistoryService;
         this.tickerService = tickerService;
         this.tickerPurchaseRepository = tickerPurchaseRepository;
         this.tickerSaleRepository = tickerSaleRepository;
+        this.investmentPerformanceCalculationService = investmentPerformanceCalculationService;
     }
 
     @Override
@@ -51,35 +52,9 @@ public class AppStartupRunner implements ApplicationRunner {
                 .updateBrazilianMarketIndicatorsFromApiAsync()
                 .exceptionally(
                         ex -> {
-                            logger.error(
-                                    "Failed to update Brazilian market indicators: {}",
-                                    ex.getMessage());
+                            logger.error("Failed to update Brazilian market indicators", ex);
                             return null;
                         })
-                .thenCompose(
-                        result ->
-                                tickerService
-                                        .updateAllNonArchivedTickersPricesAsync()
-                                        .exceptionally(
-                                                ex -> {
-                                                    logger.error(
-                                                            "Failed to update ticker prices: {}",
-                                                            ex.getMessage());
-                                                    return null;
-                                                }))
-                .thenCompose(
-                        result ->
-                                priceHistoryService
-                                        .initializePriceHistory(
-                                                tickerPurchaseRepository, tickerSaleRepository)
-                                        .exceptionally(
-                                                ex -> {
-                                                    logger.error(
-                                                            "Failed to initialize price history:"
-                                                                    + " {}",
-                                                            ex.getMessage());
-                                                    return null;
-                                                }))
                 .thenCompose(
                         result ->
                                 marketService
@@ -88,9 +63,52 @@ public class AppStartupRunner implements ApplicationRunner {
                                                 ex -> {
                                                     logger.error(
                                                             "Failed to update market quotes and"
-                                                                    + " commodities: {}",
-                                                            ex.getMessage());
+                                                                    + " commodities",
+                                                            ex);
                                                     return null;
-                                                }));
+                                                }))
+                .thenCompose(
+                        result ->
+                                priceHistoryService
+                                        .initializePriceHistory(
+                                                tickerPurchaseRepository, tickerSaleRepository)
+                                        .handle(
+                                                (res, ex) -> {
+                                                    if (ex != null) {
+                                                        logger.error(
+                                                                "Failed to initialize price"
+                                                                        + " history",
+                                                                ex);
+                                                        return false;
+                                                    }
+                                                    return true;
+                                                }))
+                .thenCompose(
+                        previousStepSuccess ->
+                                tickerService
+                                        .updateAllNonArchivedTickersPricesAsync()
+                                        .handle(
+                                                (res, ex) -> {
+                                                    if (ex != null) {
+                                                        logger.error(
+                                                                "Failed to update ticker prices",
+                                                                ex);
+                                                        return false;
+                                                    }
+                                                    return previousStepSuccess;
+                                                }))
+                .thenCompose(
+                        bothSucceeded -> {
+                            if (Boolean.TRUE.equals(bothSucceeded)) {
+                                return investmentPerformanceCalculationService
+                                        .recalculateAllSnapshots();
+                            }
+                            return CompletableFuture.completedFuture(null);
+                        })
+                .exceptionally(
+                        ex -> {
+                            logger.error("Unexpected error in startup pipeline", ex);
+                            return null;
+                        });
     }
 }
