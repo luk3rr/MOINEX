@@ -88,17 +88,13 @@
                            <children>
                               <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="%savings.overview.portfolio" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <Label fx:id="overviewTabBottonPaneTitle" styleClass="title" text="%savings.overview.portfolio" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <padding>
                                           <Insets left="10.0" top="10.0" />
                                        </padding>
                                     </Label>
-                                    <HBox fx:id="portfolioP1" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
-                                       <children>
-                                          <AnchorPane fx:id="pieChartAnchorPane" minWidth="400.0" prefHeight="240.0" prefWidth="300.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                    </HBox>
-                                    <JFXButton fx:id="recalculateInvestmentPerformanceButton" onAction="#handleRecalculateInvestmentPerformance" styleClass="button-primary" stylesheets="@../../css/component/buttons.css" text="%savings.button.recalculate" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+                                    <AnchorPane fx:id="pieChartAnchorPane" minWidth="400.0" prefHeight="240.0" prefWidth="300.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+                                    <JFXButton fx:id="recalculateInvestmentPerformanceButton" onAction="#handleRecalculateInvestmentPerformance" styleClass="button-primary" stylesheets="@../../css/component/buttons.css" text="%savings.button.recalculate" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <graphic>
                                           <ImageView fx:id="recalculateInvestmentPerformanceButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
