@@ -34,6 +34,7 @@ import org.moinex.model.enums.InterestType;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.TransactionStatus;
 import org.moinex.model.investment.Bond;
+import org.moinex.model.investment.BondInterestCalculation;
 import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -47,6 +48,8 @@ class BondServiceTest {
     @Mock private BondOperationRepository bondOperationRepository;
 
     @Mock private WalletTransactionService walletTransactionService;
+
+    @Mock private BondInterestCalculationService bondInterestCalculationService;
 
     @Mock private WalletService walletService;
 
@@ -725,14 +728,20 @@ class BondServiceTest {
                             .walletTransaction(walletTransaction)
                             .build();
 
+            BondInterestCalculation interestCalculation =
+                    BondInterestCalculation.builder()
+                            .bond(bond1)
+                            .accumulatedInterest(BigDecimal.valueOf(50))
+                            .build();
+
             when(bondRepository.findByArchivedFalseOrderByNameAsc())
                     .thenReturn(Collections.singletonList(bond1));
-            when(bondOperationRepository.findByBondOrderByOperationDateAsc(bond1))
-                    .thenReturn(Collections.singletonList(sellWithProfit));
+            when(bondInterestCalculationService.getLatestCalculation(bond1.getId()))
+                    .thenReturn(Optional.of(interestCalculation));
 
             BigDecimal totalInterest = bondService.getAllBondsTotalAccumulatedInterest();
 
-            assertEquals(0, BigDecimal.valueOf(50).compareTo(totalInterest));
+            assertEquals(BigDecimal.valueOf(50), totalInterest);
             verify(bondRepository).findByArchivedFalseOrderByNameAsc();
         }
 
@@ -741,8 +750,8 @@ class BondServiceTest {
         void shouldReturnZeroWhenNoOperationsWithProfit() {
             when(bondRepository.findByArchivedFalseOrderByNameAsc())
                     .thenReturn(Collections.singletonList(bond1));
-            when(bondOperationRepository.findByBondOrderByOperationDateAsc(bond1))
-                    .thenReturn(Collections.singletonList(buyOperation));
+            when(bondInterestCalculationService.getLatestCalculation(bond1.getId()))
+                    .thenReturn(Optional.empty());
 
             BigDecimal totalInterest = bondService.getAllBondsTotalAccumulatedInterest();
 
