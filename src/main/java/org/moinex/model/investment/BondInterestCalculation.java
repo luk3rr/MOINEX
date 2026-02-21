@@ -18,11 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
@@ -50,6 +46,9 @@ public class BondInterestCalculation {
     @Column(name = "calculation_date", nullable = false)
     private String calculationDate;
 
+    @Column(name = "calculated_until_date")
+    private String calculatedUntilDate;
+
     @Column(name = "quantity", nullable = false)
     private BigDecimal quantity;
 
@@ -71,6 +70,10 @@ public class BondInterestCalculation {
     @Column(name = "created_at", nullable = false)
     private String createdAt;
 
+    @Builder.Default
+    @Column(name = "manually_adjusted", nullable = false)
+    private boolean manuallyAdjusted = false;
+
     public abstract static class BondInterestCalculationBuilder<
             C extends BondInterestCalculation, B extends BondInterestCalculationBuilder<C, B>> {
         public B referenceMonth(YearMonth referenceMonth) {
@@ -85,6 +88,16 @@ public class BondInterestCalculation {
 
         public B createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt.format(Constants.DB_DATE_FORMATTER);
+            return self();
+        }
+
+        public B calculatedUntilDate(LocalDate calculatedUntilDate) {
+            if (calculatedUntilDate == null) {
+                this.calculatedUntilDate = null;
+            } else {
+                this.calculatedUntilDate =
+                        calculatedUntilDate.format(Constants.DATE_FORMATTER_NO_TIME);
+            }
             return self();
         }
     }
@@ -132,5 +145,20 @@ public class BondInterestCalculation {
             return;
         }
         this.createdAt = dateTime.format(Constants.DB_DATE_FORMATTER);
+    }
+
+    public LocalDate getCalculatedUntilDate() {
+        if (calculatedUntilDate == null) {
+            return null;
+        }
+        return LocalDate.parse(calculatedUntilDate, Constants.DATE_FORMATTER_NO_TIME);
+    }
+
+    public void setCalculatedUntilDate(LocalDate date) {
+        if (date == null) {
+            this.calculatedUntilDate = null;
+            return;
+        }
+        this.calculatedUntilDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
     }
 }

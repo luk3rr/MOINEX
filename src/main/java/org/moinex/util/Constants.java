@@ -87,6 +87,8 @@ public final class Constants {
     public static final String SALE_BOND_FXML = UI_DIALOG_INVESTMENT_PATH + "sale_bond.fxml";
     public static final String BOND_TRANSACTIONS_FXML =
             UI_DIALOG_INVESTMENT_PATH + "bond_transactions.fxml";
+    public static final String BOND_INTEREST_HISTORY_FXML =
+            UI_DIALOG_INVESTMENT_PATH + "bond_interest_history.fxml";
     public static final String ADD_DIVIDEND_FXML =
             UI_DIALOG_INVESTMENT_PATH + ("add_dividend." + "fxml");
     public static final String ADD_CRYPTO_EXCHANGE_FXML =
@@ -1125,6 +1127,8 @@ public final class Constants {
                 "savings.bonds.dialog.noSelection.title";
         public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE =
                 "savings.bonds.dialog.noSelection.edit.message";
+        public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_HISTORY_MESSAGE =
+                "savings.bonds.dialog.noSelection.viewHistory.message";
         public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE =
                 "savings.bonds.dialog.noSelection.delete.message";
         public static final String SAVINGS_BONDS_DIALOG_EDIT_IN_DEVELOPMENT_TITLE =
@@ -1181,6 +1185,8 @@ public final class Constants {
                 "savings.bonds.dialog.noSelection.buy.message";
         public static final String SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE =
                 "savings.bonds.dialog.noSelection.sell.message";
+        public static final String SAVINGS_BONDS_BUTTON_INTEREST_HISTORY =
+                "savings.bonds.button.interestHistory";
 
         // Bond Labels
         public static final String BOND_LABEL_BOND = "bond.label.bond";
@@ -1463,6 +1469,80 @@ public final class Constants {
         // Bond Transactions Dialog
         public static final String BOND_DIALOG_TRANSACTIONS_TITLE =
                 "bond.dialog.transactions.title";
+
+        // Bond Interest History Dialog
+        public static final String BOND_DIALOG_INTEREST_HISTORY_TITLE =
+                "bond.dialog.interestHistory.title";
+        public static final String BOND_INTEREST_HISTORY_LABEL_TITLE =
+                "bond.interestHistory.label.title";
+        public static final String BOND_INTEREST_HISTORY_LABEL_TYPE =
+                "bond.interestHistory.label.type";
+        public static final String BOND_INTEREST_HISTORY_LABEL_INDEXATION =
+                "bond.interestHistory.label.indexation";
+        public static final String BOND_INTEREST_HISTORY_TABLE_MONTH =
+                "bond.interestHistory.table.month";
+        public static final String BOND_INTEREST_HISTORY_TABLE_QUANTITY =
+                "bond.interestHistory.table.quantity";
+        public static final String BOND_INTEREST_HISTORY_TABLE_INVESTED_AMOUNT =
+                "bond.interestHistory.table.investedAmount";
+        public static final String BOND_INTEREST_HISTORY_TABLE_MONTHLY_INTEREST =
+                "bond.interestHistory.table.monthlyInterest";
+        public static final String BOND_INTEREST_HISTORY_TABLE_ACCUMULATED_INTEREST =
+                "bond.interestHistory.table.accumulatedInterest";
+        public static final String BOND_INTEREST_HISTORY_TABLE_FINAL_VALUE =
+                "bond.interestHistory.table.finalValue";
+        public static final String BOND_INTEREST_HISTORY_TABLE_STATUS =
+                "bond.interestHistory.table.status";
+        public static final String BOND_INTEREST_HISTORY_BUTTON_EDIT_INTEREST =
+                "bond.interestHistory.button.editInterest";
+        public static final String BOND_INTEREST_HISTORY_BUTTON_RESET_TO_AUTOMATIC =
+                "bond.interestHistory.button.resetToAutomatic";
+        public static final String BOND_INTEREST_HISTORY_BUTTON_CLOSE =
+                "bond.interestHistory.button.close";
+        public static final String BOND_INTEREST_HISTORY_STATUS_ADJUSTED =
+                "bond.interestHistory.status.adjusted";
+        public static final String BOND_INTEREST_HISTORY_STATUS_AUTOMATIC =
+                "bond.interestHistory.status.automatic";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_EDIT_INTEREST_TITLE =
+                "bond.interestHistory.dialog.editInterest.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_EDIT_INTEREST_HEADER =
+                "bond.interestHistory.dialog.editInterest.header";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_EDIT_INTEREST_CONTENT =
+                "bond.interestHistory.dialog.editInterest.content";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_NO_MONTH_SELECTED_TITLE =
+                "bond.interestHistory.dialog.noMonthSelected.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_NO_MONTH_SELECTED_MESSAGE =
+                "bond.interestHistory.dialog.noMonthSelected.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INVALID_VALUE_TITLE =
+                "bond.interestHistory.dialog.invalidValue.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INVALID_VALUE_MESSAGE =
+                "bond.interestHistory.dialog.invalidValue.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INVALID_NUMBER_TITLE =
+                "bond.interestHistory.dialog.invalidNumber.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INVALID_NUMBER_MESSAGE =
+                "bond.interestHistory.dialog.invalidNumber.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_TITLE =
+                "bond.interestHistory.dialog.interestAdjusted.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_MESSAGE =
+                "bond.interestHistory.dialog.interestAdjusted.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_ERROR_ADJUSTING_TITLE =
+                "bond.interestHistory.dialog.errorAdjusting.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_NO_ADJUSTED_MONTH_TITLE =
+                "bond.interestHistory.dialog.noAdjustedMonth.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_NO_ADJUSTED_MONTH_MESSAGE =
+                "bond.interestHistory.dialog.noAdjustedMonth.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RESET_TITLE =
+                "bond.interestHistory.dialog.confirmReset.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RESET_HEADER =
+                "bond.interestHistory.dialog.confirmReset.header";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RESET_MESSAGE =
+                "bond.interestHistory.dialog.confirmReset.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_TITLE =
+                "bond.interestHistory.dialog.interestReset.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_MESSAGE =
+                "bond.interestHistory.dialog.interestReset.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_ERROR_RESETTING_TITLE =
+                "bond.interestHistory.dialog.errorResetting.title";
 
         // Common Components - Budget Group Pane
         public static final String COMMON_BUDGET_GROUP_TARGET = "common.budgetGroup.target";

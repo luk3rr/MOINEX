@@ -453,6 +453,131 @@ public class BondInterestCalculationService {
     }
 
     /**
+     * Calculate interest for a specific period within a month
+     * Used for incremental calculations when a month was manually adjusted
+     *
+     * @param bond The bond
+     * @param month The month
+     * @param periodStart Start date of the period (inclusive)
+     * @param periodEnd End date of the period (inclusive)
+     * @return Interest accumulated during the period
+     */
+    private BigDecimal calculatePeriodInterestForMonth(
+            Bond bond, YearMonth month, LocalDate periodStart, LocalDate periodEnd) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        if (operations.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDate monthStart = month.atDay(1);
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        // Ensure period is within the month
+        if (periodStart.isBefore(monthStart)) {
+            periodStart = monthStart;
+        }
+        if (periodEnd.isAfter(monthEnd)) {
+            periodEnd = monthEnd;
+        }
+
+        // If period is invalid, return zero
+        if (periodStart.isAfter(periodEnd)) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal periodInterestTotal = BigDecimal.ZERO;
+        BigDecimal currentQuantity = BigDecimal.ZERO;
+        LocalDate lastCalculationDate = periodStart;
+        BigDecimal lastOperationSpread = null;
+
+        // First, calculate quantity and spread at the start of the period
+        for (BondOperation operation : operations) {
+            LocalDate operationDate = operation.getWalletTransaction().getDate().toLocalDate();
+
+            if (operationDate.isBefore(periodStart)) {
+                if (operation.getOperationType() == OperationType.BUY) {
+                    currentQuantity = currentQuantity.add(operation.getQuantity());
+                    if (operation.getSpread() != null) {
+                        lastOperationSpread = operation.getSpread();
+                    }
+                } else {
+                    currentQuantity = currentQuantity.subtract(operation.getQuantity());
+                }
+            }
+        }
+
+        // Now calculate interest for operations within the period
+        for (BondOperation operation : operations) {
+            LocalDate operationDate = operation.getWalletTransaction().getDate().toLocalDate();
+
+            // Skip operations before period start
+            if (operationDate.isBefore(periodStart)) {
+                continue;
+            }
+
+            // Stop at operations after period end
+            if (operationDate.isAfter(periodEnd)) {
+                break;
+            }
+
+            // Calculate interest from last calculation date to this operation
+            if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
+                    && operationDate.isAfter(lastCalculationDate)) {
+                BigDecimal spreadToUse =
+                        lastOperationSpread != null ? lastOperationSpread : bond.getInterestRate();
+                BigDecimal periodInterest =
+                        calculatePeriodInterest(
+                                bond,
+                                lastCalculationDate,
+                                operationDate,
+                                currentQuantity,
+                                operation.getUnitPrice(),
+                                spreadToUse);
+                periodInterestTotal = periodInterestTotal.add(periodInterest);
+            }
+
+            // Update quantity and spread based on operation
+            if (operation.getOperationType() == OperationType.BUY) {
+                currentQuantity = currentQuantity.add(operation.getQuantity());
+                if (operation.getSpread() != null) {
+                    lastOperationSpread = operation.getSpread();
+                }
+            } else {
+                currentQuantity = currentQuantity.subtract(operation.getQuantity());
+            }
+
+            lastCalculationDate = operationDate;
+        }
+
+        // Calculate interest from last operation to period end
+        if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
+                && lastCalculationDate.isBefore(periodEnd)) {
+            BigDecimal lastOperationPrice =
+                    operations.stream()
+                            .filter(op -> op.getOperationType() == OperationType.BUY)
+                            .reduce((first, second) -> second)
+                            .map(BondOperation::getUnitPrice)
+                            .orElse(BigDecimal.ZERO);
+
+            BigDecimal spreadToUse =
+                    lastOperationSpread != null ? lastOperationSpread : bond.getInterestRate();
+            BigDecimal periodInterest =
+                    calculatePeriodInterest(
+                            bond,
+                            lastCalculationDate,
+                            periodEnd,
+                            currentQuantity,
+                            lastOperationPrice,
+                            spreadToUse);
+            periodInterestTotal = periodInterestTotal.add(periodInterest);
+        }
+
+        return periodInterestTotal;
+    }
+
+    /**
      * Calculate and store monthly interest for all months from first operation to today
      *
      * @param bond The bond
@@ -525,46 +650,113 @@ public class BondInterestCalculationService {
                     bondInterestCalculationRepository.findByBondAndReferenceMonth(
                             bond, month.toString());
 
-            BigDecimal monthlyInterest = calculateMonthlyInterest(bond, month);
-
             BigDecimal investedAmount = calculateInvestedAmountForMonth(bond, month);
             BigDecimal currentQuantity = calculateQuantityForMonth(bond, month);
 
             if (existingCalculation.isPresent()) {
-                // For existing calculations, only update monthly interest and quantity
-                // Keep the accumulated interest from the previous month
                 BondInterestCalculation existing = existingCalculation.get();
-                BigDecimal previousAccumulated =
-                        existing.getAccumulatedInterest().subtract(existing.getMonthlyInterest());
-                BigDecimal newAccumulated = previousAccumulated.add(monthlyInterest);
-                BigDecimal finalValue = investedAmount.add(newAccumulated);
 
-                existing.setCalculationDate(LocalDate.now());
-                existing.setQuantity(currentQuantity);
-                existing.setInvestedAmount(investedAmount);
-                existing.setMonthlyInterest(monthlyInterest);
-                existing.setAccumulatedInterest(newAccumulated);
-                existing.setFinalValue(finalValue);
-                existing.setCalculationMethod(getCalculationMethod(bond));
+                // Check if month was manually adjusted
+                if (existing.isManuallyAdjusted() && existing.getCalculatedUntilDate() != null) {
+                    // INCREMENTAL CALCULATION: Calculate only new interest since last calculation
+                    LocalDate calculatedUntil = existing.getCalculatedUntilDate();
+                    LocalDate today = LocalDate.now();
+                    LocalDate monthEnd = month.atEndOfMonth();
 
-                bondInterestCalculationRepository.save(existing);
-                accumulatedInterest = newAccumulated;
-                log.debug(
-                        "Updated monthly interest for bond {} month {}: monthly={}, accumulated={}",
-                        bond.getName(),
-                        month,
-                        monthlyInterest,
-                        newAccumulated);
+                    // Only calculate if there's a new period to calculate
+                    if (calculatedUntil.isBefore(today) && calculatedUntil.isBefore(monthEnd)) {
+                        LocalDate periodStart = calculatedUntil.plusDays(1);
+                        LocalDate periodEnd = today.isAfter(monthEnd) ? monthEnd : today;
+
+                        BigDecimal incrementalInterest =
+                                calculatePeriodInterestForMonth(
+                                        bond, month, periodStart, periodEnd);
+
+                        // Add incremental interest to existing monthly interest
+                        BigDecimal newMonthlyInterest =
+                                existing.getMonthlyInterest().add(incrementalInterest);
+                        BigDecimal previousAccumulated =
+                                existing.getAccumulatedInterest()
+                                        .subtract(existing.getMonthlyInterest());
+                        BigDecimal newAccumulated = previousAccumulated.add(newMonthlyInterest);
+                        BigDecimal finalValue = investedAmount.add(newAccumulated);
+
+                        existing.setCalculationDate(LocalDate.now());
+                        existing.setCalculatedUntilDate(periodEnd);
+                        existing.setQuantity(currentQuantity);
+                        existing.setInvestedAmount(investedAmount);
+                        existing.setMonthlyInterest(newMonthlyInterest);
+                        existing.setAccumulatedInterest(newAccumulated);
+                        existing.setFinalValue(finalValue);
+
+                        bondInterestCalculationRepository.save(existing);
+                        accumulatedInterest = newAccumulated;
+
+                        log.debug(
+                                "Incremental update for manually adjusted bond {} month {}:"
+                                        + " added={}, new monthly={}, accumulated={}",
+                                bond.getName(),
+                                month,
+                                incrementalInterest,
+                                newMonthlyInterest,
+                                newAccumulated);
+                    } else {
+                        // No new period to calculate, just update accumulated for propagation
+                        accumulatedInterest = existing.getAccumulatedInterest();
+                        log.debug(
+                                "Skipping recalculation for manually adjusted bond {} month {}"
+                                        + " (already up to date)",
+                                bond.getName(),
+                                month);
+                    }
+                } else {
+                    // NORMAL RECALCULATION: Recalculate entire month
+                    BigDecimal monthlyInterest = calculateMonthlyInterest(bond, month);
+                    BigDecimal previousAccumulated =
+                            existing.getAccumulatedInterest()
+                                    .subtract(existing.getMonthlyInterest());
+                    BigDecimal newAccumulated = previousAccumulated.add(monthlyInterest);
+                    BigDecimal finalValue = investedAmount.add(newAccumulated);
+
+                    LocalDate monthEnd = month.atEndOfMonth();
+                    LocalDate calculatedUntil =
+                            LocalDate.now().isAfter(monthEnd) ? monthEnd : LocalDate.now();
+
+                    existing.setCalculationDate(LocalDate.now());
+                    existing.setCalculatedUntilDate(calculatedUntil);
+                    existing.setQuantity(currentQuantity);
+                    existing.setInvestedAmount(investedAmount);
+                    existing.setMonthlyInterest(monthlyInterest);
+                    existing.setAccumulatedInterest(newAccumulated);
+                    existing.setFinalValue(finalValue);
+                    existing.setCalculationMethod(getCalculationMethod(bond));
+
+                    bondInterestCalculationRepository.save(existing);
+                    accumulatedInterest = newAccumulated;
+                    log.debug(
+                            "Updated monthly interest for bond {} month {}: monthly={},"
+                                    + " accumulated={}",
+                            bond.getName(),
+                            month,
+                            monthlyInterest,
+                            newAccumulated);
+                }
             } else {
                 // Create new calculation for missing months
+                BigDecimal monthlyInterest = calculateMonthlyInterest(bond, month);
                 accumulatedInterest = accumulatedInterest.add(monthlyInterest);
                 BigDecimal finalValue = investedAmount.add(accumulatedInterest);
+
+                LocalDate monthEnd = month.atEndOfMonth();
+                LocalDate calculatedUntil =
+                        LocalDate.now().isAfter(monthEnd) ? monthEnd : LocalDate.now();
 
                 BondInterestCalculation calculation =
                         BondInterestCalculation.builder()
                                 .bond(bond)
                                 .referenceMonth(month)
                                 .calculationDate(LocalDate.now())
+                                .calculatedUntilDate(calculatedUntil)
                                 .quantity(currentQuantity)
                                 .investedAmount(investedAmount)
                                 .monthlyInterest(monthlyInterest)
@@ -685,5 +877,187 @@ public class BondInterestCalculationService {
     @Transactional(readOnly = true)
     public List<BondInterestCalculation> getMonthlyInterestHistory(Bond bond) {
         return bondInterestCalculationRepository.findByBondOrderByReferenceMonthAsc(bond);
+    }
+
+    /**
+     * Adjust monthly interest for a specific month and recalculate subsequent months
+     *
+     * @param bondId The bond ID
+     * @param month The month to adjust
+     * @param newMonthlyInterest The new monthly interest value
+     */
+    @Transactional
+    public void adjustMonthlyInterest(
+            Integer bondId, YearMonth month, BigDecimal newMonthlyInterest) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+
+        Optional<BondInterestCalculation> calculationOpt =
+                bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                        bond, month.toString());
+
+        if (calculationOpt.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "No interest calculation found for bond "
+                            + bond.getName()
+                            + " in month "
+                            + month);
+        }
+
+        BondInterestCalculation calculation = calculationOpt.get();
+
+        BigDecimal oldMonthlyInterest = calculation.getMonthlyInterest();
+        BigDecimal delta = newMonthlyInterest.subtract(oldMonthlyInterest);
+
+        // Update the adjusted month
+        calculation.setMonthlyInterest(newMonthlyInterest);
+        calculation.setManuallyAdjusted(true);
+        calculation.setCalculatedUntilDate(LocalDate.now());
+
+        BigDecimal newAccumulated = calculation.getAccumulatedInterest().add(delta);
+        calculation.setAccumulatedInterest(newAccumulated);
+        calculation.setFinalValue(calculation.getInvestedAmount().add(newAccumulated));
+
+        bondInterestCalculationRepository.save(calculation);
+
+        log.info(
+                "Adjusted monthly interest for bond {} month {}: old={}, new={}, delta={}",
+                bond.getName(),
+                month,
+                oldMonthlyInterest,
+                newMonthlyInterest,
+                delta);
+
+        // Propagate delta to all subsequent months
+        List<BondInterestCalculation> futureCalculations =
+                bondInterestCalculationRepository.findByBondOrderByReferenceMonthAsc(bond);
+
+        boolean foundAdjustedMonth = false;
+        for (BondInterestCalculation future : futureCalculations) {
+            if (future.getReferenceMonth().equals(month)) {
+                foundAdjustedMonth = true;
+                continue;
+            }
+
+            if (foundAdjustedMonth) {
+                BigDecimal updatedAccumulated = future.getAccumulatedInterest().add(delta);
+                future.setAccumulatedInterest(updatedAccumulated);
+                future.setFinalValue(future.getInvestedAmount().add(updatedAccumulated));
+                bondInterestCalculationRepository.save(future);
+
+                log.debug(
+                        "Propagated delta to bond {} month {}: accumulated={}",
+                        bond.getName(),
+                        future.getReferenceMonth(),
+                        updatedAccumulated);
+            }
+        }
+
+        log.info(
+                "Completed adjustment propagation for bond {} starting from month {}",
+                bond.getName(),
+                month);
+    }
+
+    /**
+     * Reset a manually adjusted month back to automatic calculation
+     *
+     * @param bondId The bond ID
+     * @param month The month to reset
+     */
+    @Transactional
+    public void resetToAutomaticCalculation(Integer bondId, YearMonth month) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+
+        Optional<BondInterestCalculation> calculationOpt =
+                bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                        bond, month.toString());
+
+        if (calculationOpt.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "No interest calculation found for bond "
+                            + bond.getName()
+                            + " in month "
+                            + month);
+        }
+
+        BondInterestCalculation calculation = calculationOpt.get();
+
+        if (!calculation.isManuallyAdjusted()) {
+            log.warn(
+                    "Month {} for bond {} was not manually adjusted, skipping reset",
+                    month,
+                    bond.getName());
+            return;
+        }
+
+        // Recalculate the month automatically
+        BigDecimal oldMonthlyInterest = calculation.getMonthlyInterest();
+        BigDecimal recalculatedInterest = calculateMonthlyInterest(bond, month);
+        BigDecimal delta = recalculatedInterest.subtract(oldMonthlyInterest);
+
+        // Update the month
+        calculation.setMonthlyInterest(recalculatedInterest);
+        calculation.setManuallyAdjusted(false);
+
+        LocalDate monthEnd = month.atEndOfMonth();
+        LocalDate calculatedUntil = LocalDate.now().isAfter(monthEnd) ? monthEnd : LocalDate.now();
+        calculation.setCalculatedUntilDate(calculatedUntil);
+
+        BigDecimal newAccumulated = calculation.getAccumulatedInterest().add(delta);
+        calculation.setAccumulatedInterest(newAccumulated);
+        calculation.setFinalValue(calculation.getInvestedAmount().add(newAccumulated));
+
+        bondInterestCalculationRepository.save(calculation);
+
+        log.info(
+                "Reset monthly interest for bond {} month {} to automatic: old={}, recalculated={},"
+                        + " delta={}",
+                bond.getName(),
+                month,
+                oldMonthlyInterest,
+                recalculatedInterest,
+                delta);
+
+        // Propagate delta to all subsequent months
+        List<BondInterestCalculation> futureCalculations =
+                bondInterestCalculationRepository.findByBondOrderByReferenceMonthAsc(bond);
+
+        boolean foundResetMonth = false;
+        for (BondInterestCalculation future : futureCalculations) {
+            if (future.getReferenceMonth().equals(month)) {
+                foundResetMonth = true;
+                continue;
+            }
+
+            if (foundResetMonth) {
+                BigDecimal updatedAccumulated = future.getAccumulatedInterest().add(delta);
+                future.setAccumulatedInterest(updatedAccumulated);
+                future.setFinalValue(future.getInvestedAmount().add(updatedAccumulated));
+                bondInterestCalculationRepository.save(future);
+
+                log.debug(
+                        "Propagated delta to bond {} month {}: accumulated={}",
+                        bond.getName(),
+                        future.getReferenceMonth(),
+                        updatedAccumulated);
+            }
+        }
+
+        log.info(
+                "Completed reset propagation for bond {} starting from month {}",
+                bond.getName(),
+                month);
     }
 }

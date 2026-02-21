@@ -28,6 +28,7 @@ import org.moinex.ui.dialog.investment.AddBondController;
 import org.moinex.ui.dialog.investment.AddBondPurchaseController;
 import org.moinex.ui.dialog.investment.AddBondSaleController;
 import org.moinex.ui.dialog.investment.ArchivedBondsController;
+import org.moinex.ui.dialog.investment.BondInterestHistoryController;
 import org.moinex.ui.dialog.investment.BondTransactionsController;
 import org.moinex.ui.dialog.investment.EditBondController;
 import org.moinex.util.Constants;
@@ -261,6 +262,35 @@ public class SavingsBondsController {
                         }));
     }
 
+    @FXML
+    private void handleShowInterestHistory() {
+        Bond selectedBond = bondsTabBondTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBond == null) {
+            WindowUtils.showInformationDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .SAVINGS_BONDS_DIALOG_NO_SELECTION_HISTORY_MESSAGE));
+            return;
+        }
+
+        WindowUtils.openModalWindow(
+                Constants.BOND_INTEREST_HISTORY_FXML,
+                MessageFormat.format(
+                        i18nService.tr(
+                                Constants.TranslationKeys.BOND_DIALOG_INTEREST_HISTORY_TITLE),
+                        selectedBond.getName()),
+                springContext,
+                (BondInterestHistoryController controller) -> controller.setBond(selectedBond),
+                List.of(
+                        () -> {
+                            updateBondTableView();
+                            updateBondTabFields();
+                        }));
+    }
+
     private void configureBondTableView() {
         TableColumn<Bond, String> nameColumn =
                 new TableColumn<>(
@@ -311,7 +341,12 @@ public class SavingsBondsController {
                 cellData -> {
                     Bond bond = cellData.getValue();
                     return new SimpleStringProperty(
-                            UIUtils.formatCurrency(bondService.getInvestedValue(bond).add(bondService.getTotalAccumulatedInterestByBondId(bond.getId()))));
+                            UIUtils.formatCurrency(
+                                    bondService
+                                            .getInvestedValue(bond)
+                                            .add(
+                                                    bondService.getTotalAccumulatedInterestByBondId(
+                                                            bond.getId()))));
                 });
 
         TableColumn<Bond, String> investedValueColumn =

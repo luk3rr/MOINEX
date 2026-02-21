@@ -93,7 +93,7 @@
                                           <Insets left="10.0" top="10.0" />
                                        </padding>
                                     </Label>
-                                    <AnchorPane fx:id="pieChartAnchorPane" minWidth="400.0" prefHeight="240.0" prefWidth="300.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+                                    <AnchorPane fx:id="pieChartAnchorPane" prefHeight="240.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
                                     <JFXButton fx:id="recalculateInvestmentPerformanceButton" onAction="#handleRecalculateInvestmentPerformance" styleClass="button-primary" stylesheets="@../../css/component/buttons.css" text="%savings.button.recalculate" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <graphic>
                                           <ImageView fx:id="recalculateInvestmentPerformanceButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -139,7 +139,7 @@
                                           </ImageView>
                                        </graphic>
                                     </JFXButton>
-                                    <HBox fx:id="portfolioP5" alignment="CENTER" minWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+                                    <HBox fx:id="portfolioP5" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
                                  </children>
                               </AnchorPane>
                            </children>
@@ -163,7 +163,7 @@
                               </AnchorPane>
                            </children>
                         </VBox>
-                        <VBox maxWidth="350.0" minWidth="230.0" prefWidth="230.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                        <VBox maxWidth="350.0" minWidth="120.0" prefWidth="180.0" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
                               <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
