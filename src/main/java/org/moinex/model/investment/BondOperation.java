@@ -64,6 +64,9 @@ public class BondOperation {
     @Column(name = "net_profit")
     private BigDecimal netProfit;
 
+    @Column(name = "spread")
+    private BigDecimal spread;
+
     @ManyToOne
     @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id")
     private WalletTransaction walletTransaction;

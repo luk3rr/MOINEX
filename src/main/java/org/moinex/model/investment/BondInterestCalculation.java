@@ -73,17 +73,17 @@ public class BondInterestCalculation {
     public abstract static class BondInterestCalculationBuilder<
             C extends BondInterestCalculation, B extends BondInterestCalculationBuilder<C, B>> {
         public B calculationDate(LocalDate calculationDate) {
-            this.calculationDate = calculationDate.format(Constants.DB_DATE_FORMATTER);
+            this.calculationDate = calculationDate.format(Constants.DATE_FORMATTER_NO_TIME);
             return self();
         }
 
         public B startDate(LocalDate startDate) {
-            this.startDate = startDate.format(Constants.DB_DATE_FORMATTER);
+            this.startDate = startDate.format(Constants.DATE_FORMATTER_NO_TIME);
             return self();
         }
 
         public B endDate(LocalDate endDate) {
-            this.endDate = endDate.format(Constants.DB_DATE_FORMATTER);
+            this.endDate = endDate.format(Constants.DATE_FORMATTER_NO_TIME);
             return self();
         }
 
@@ -97,7 +97,7 @@ public class BondInterestCalculation {
         if (calculationDate == null) {
             return null;
         }
-        return LocalDate.parse(calculationDate, Constants.DB_DATE_FORMATTER);
+        return LocalDate.parse(calculationDate, Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public void setCalculationDate(LocalDate date) {
@@ -105,14 +105,14 @@ public class BondInterestCalculation {
             this.calculationDate = null;
             return;
         }
-        this.calculationDate = date.format(Constants.DB_DATE_FORMATTER);
+        this.calculationDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public LocalDate getStartDate() {
         if (startDate == null) {
             return null;
         }
-        return LocalDate.parse(startDate, Constants.DB_DATE_FORMATTER);
+        return LocalDate.parse(startDate, Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public void setStartDate(LocalDate date) {
@@ -120,14 +120,14 @@ public class BondInterestCalculation {
             this.startDate = null;
             return;
         }
-        this.startDate = date.format(Constants.DB_DATE_FORMATTER);
+        this.startDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public LocalDate getEndDate() {
         if (endDate == null) {
             return null;
         }
-        return LocalDate.parse(endDate, Constants.DB_DATE_FORMATTER);
+        return LocalDate.parse(endDate, Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public void setEndDate(LocalDate date) {
@@ -135,7 +135,7 @@ public class BondInterestCalculation {
             this.endDate = null;
             return;
         }
-        this.endDate = date.format(Constants.DB_DATE_FORMATTER);
+        this.endDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public LocalDateTime getCreatedAt() {

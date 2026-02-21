@@ -1,0 +1,1 @@
+ALTER TABLE bond_operation ADD COLUMN spread NUMERIC(38, 8);

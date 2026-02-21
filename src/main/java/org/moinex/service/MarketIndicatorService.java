@@ -75,7 +75,8 @@ public class MarketIndicatorService {
                 String dateStr = entry.getString("data");
                 String valueStr = entry.getString("valor");
 
-                // Parse date from BACEN format (DD/MM/YYYY) to LocalDate
+                // Parse date from BACEN format
+                // BACEN returns dates in DD/MM/YYYY format
                 LocalDate referenceDate = LocalDate.parse(dateStr, Constants.BACEN_DATE_FORMATTER);
                 BigDecimal rateValue = new BigDecimal(valueStr);
 
@@ -125,7 +126,7 @@ public class MarketIndicatorService {
      */
     @Transactional(readOnly = true)
     public BigDecimal getIndicatorRate(InterestIndex indicatorType, LocalDate date) {
-        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
 
         Optional<MarketIndicatorHistory> history =
                 marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDate(
@@ -148,7 +149,7 @@ public class MarketIndicatorService {
      */
     @Transactional(readOnly = true)
     public BigDecimal getIndicatorRateOrPrevious(InterestIndex indicatorType, LocalDate date) {
-        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
 
         Optional<MarketIndicatorHistory> history =
                 marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDate(
@@ -183,8 +184,8 @@ public class MarketIndicatorService {
     @Transactional(readOnly = true)
     public List<MarketIndicatorHistory> getIndicatorHistoryBetween(
             InterestIndex indicatorType, LocalDate startDate, LocalDate endDate) {
-        String startDateStr = startDate.format(Constants.DB_DATE_FORMATTER);
-        String endDateStr = endDate.format(Constants.DB_DATE_FORMATTER);
+        String startDateStr = startDate.format(Constants.DATE_FORMATTER_NO_TIME);
+        String endDateStr = endDate.format(Constants.DATE_FORMATTER_NO_TIME);
 
         return marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDateBetween(
                 indicatorType, startDateStr, endDateStr);
@@ -264,7 +265,8 @@ public class MarketIndicatorService {
                 }
 
                 LocalDate earliestPurchaseDate =
-                        LocalDate.parse(earliestDateStr, Constants.DB_DATE_FORMATTER);
+                        LocalDateTime.parse(earliestDateStr, Constants.DB_DATE_FORMATTER)
+                                .toLocalDate();
                 log.info(
                         "Indicator {} earliest purchase date: {}", indicator, earliestPurchaseDate);
 
@@ -357,7 +359,7 @@ public class MarketIndicatorService {
      */
     @Transactional(readOnly = true)
     public boolean hasIndicatorData(InterestIndex indicatorType, LocalDate date) {
-        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
+        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
         return marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(
                 indicatorType, dateStr);
     }

@@ -20,6 +20,7 @@ import org.moinex.model.enums.InterestType;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.TransactionStatus;
 import org.moinex.model.investment.Bond;
+import org.moinex.model.investment.BondInterestCalculation;
 import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.BondOperationRepository;
@@ -37,17 +38,20 @@ public class BondService {
     private final BondOperationRepository bondOperationRepository;
     private final WalletTransactionService walletTransactionService;
     private final WalletService walletService;
+    private final BondInterestCalculationService bondInterestCalculationService;
 
     @Autowired
     public BondService(
             BondRepository bondRepository,
             BondOperationRepository bondOperationRepository,
             WalletTransactionService walletTransactionService,
-            WalletService walletService) {
+            WalletService walletService,
+            BondInterestCalculationService bondInterestCalculationService) {
         this.bondRepository = bondRepository;
         this.bondOperationRepository = bondOperationRepository;
         this.walletTransactionService = walletTransactionService;
         this.walletService = walletService;
+        this.bondInterestCalculationService = bondInterestCalculationService;
     }
 
     @Transactional
@@ -325,6 +329,7 @@ public class BondService {
                         .fees(fees)
                         .taxes(taxes)
                         .netProfit(netProfit)
+                        .spread(bond.getInterestRate())
                         .walletTransaction(walletTransaction)
                         .build();
 
@@ -548,5 +553,80 @@ public class BondService {
     public List<BondOperation> getOperationsByDateBefore(LocalDateTime date) {
         String dateStr = date.format(Constants.DB_DATE_FORMATTER);
         return bondOperationRepository.findAllByDateBefore(dateStr);
+    }
+
+    /**
+     * Calculate accumulated interest for a bond up to today
+     *
+     * @param bondId The bond ID
+     * @return BondInterestCalculation with accumulated interest
+     */
+    @Transactional
+    public BondInterestCalculation calculateBondInterestToday(Integer bondId) {
+        return bondInterestCalculationService.calculateBondInterest(bondId, LocalDate.now());
+    }
+
+    /**
+     * Calculate accumulated interest for a bond up to a specific date
+     *
+     * @param bondId The bond ID
+     * @param calculationDate The date to calculate interest until
+     * @return BondInterestCalculation with accumulated interest
+     */
+    @Transactional
+    public BondInterestCalculation calculateBondInterest(
+            Integer bondId, LocalDate calculationDate) {
+        return bondInterestCalculationService.calculateBondInterest(bondId, calculationDate);
+    }
+
+    /**
+     * Get the latest interest calculation for a bond
+     *
+     * @param bondId The bond ID
+     * @return Latest BondInterestCalculation if exists
+     */
+    @Transactional(readOnly = true)
+    public java.util.Optional<BondInterestCalculation> getLatestInterestCalculation(
+            Integer bondId) {
+        return bondInterestCalculationService.getLatestCalculation(bondId);
+    }
+
+    /**
+     * Get all interest calculations for a bond
+     *
+     * @param bondId The bond ID
+     * @return List of BondInterestCalculation ordered by date descending
+     */
+    @Transactional(readOnly = true)
+    public List<BondInterestCalculation> getInterestCalculationHistory(Integer bondId) {
+        return bondInterestCalculationService.getCalculationsByBondId(bondId);
+    }
+
+    /**
+     * Get accumulated interest for a bond up to today
+     *
+     * @param bondId The bond ID
+     * @return Accumulated interest amount
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal getAccumulatedInterestToday(Integer bondId) {
+        return bondInterestCalculationService
+                .getLatestCalculation(bondId)
+                .map(BondInterestCalculation::getAccumulatedInterest)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    /**
+     * Get final value (invested + interest) for a bond up to today
+     *
+     * @param bondId The bond ID
+     * @return Final value (invested amount + accumulated interest)
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal getFinalValueToday(Integer bondId) {
+        return bondInterestCalculationService
+                .getLatestCalculation(bondId)
+                .map(BondInterestCalculation::getFinalValue)
+                .orElse(BigDecimal.ZERO);
     }
 }

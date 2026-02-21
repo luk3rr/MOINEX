@@ -42,4 +42,18 @@ public interface BondInterestCalculationRepository
             "SELECT b FROM BondInterestCalculation b WHERE b.bond = :bond"
                     + " ORDER BY b.calculationDate DESC LIMIT 1")
     Optional<BondInterestCalculation> findLatestByBond(@Param("bond") Bond bond);
+
+    @Query(
+            "SELECT b FROM BondInterestCalculation b WHERE b.bond.id = :bondId"
+                    + " ORDER BY b.calculationDate DESC LIMIT 1")
+    Optional<BondInterestCalculation> findLatestByBondId(@Param("bondId") Integer bondId);
+
+    @Query(
+            "SELECT b FROM BondInterestCalculation b WHERE b.bond.id = :bondId"
+                    + " ORDER BY b.calculationDate DESC")
+    List<BondInterestCalculation> findByBondIdOrderByCalculationDateDesc(
+            @Param("bondId") Integer bondId);
+
+    void deleteByBondIdAndCalculationDate(
+            @Param("bondId") Integer bondId, @Param("calculationDate") String calculationDate);
 }
