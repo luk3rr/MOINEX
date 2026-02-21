@@ -56,7 +56,7 @@ public class MarketIndicatorHistory {
     public abstract static class MarketIndicatorHistoryBuilder<
             C extends MarketIndicatorHistory, B extends MarketIndicatorHistoryBuilder<C, B>> {
         public B referenceDate(LocalDate referenceDate) {
-            this.referenceDate = referenceDate.format(Constants.DB_DATE_FORMATTER);
+            this.referenceDate = referenceDate.format(Constants.DATE_FORMATTER_NO_TIME);
             return self();
         }
 
@@ -70,7 +70,7 @@ public class MarketIndicatorHistory {
         if (referenceDate == null) {
             return null;
         }
-        return LocalDate.parse(referenceDate, Constants.DB_DATE_FORMATTER);
+        return LocalDate.parse(referenceDate, Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public void setReferenceDate(LocalDate date) {
@@ -78,7 +78,7 @@ public class MarketIndicatorHistory {
             this.referenceDate = null;
             return;
         }
-        this.referenceDate = date.format(Constants.DB_DATE_FORMATTER);
+        this.referenceDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public LocalDateTime getCreatedAt() {

@@ -23,6 +23,7 @@ public class AppStartupRunner implements ApplicationRunner {
     private final TickerPurchaseRepository tickerPurchaseRepository;
     private final TickerSaleRepository tickerSaleRepository;
     private final InvestmentPerformanceCalculationService investmentPerformanceCalculationService;
+    private final MarketIndicatorService marketIndicatorService;
 
     @Autowired
     public AppStartupRunner(
@@ -32,7 +33,8 @@ public class AppStartupRunner implements ApplicationRunner {
             TickerService tickerService,
             TickerPurchaseRepository tickerPurchaseRepository,
             TickerSaleRepository tickerSaleRepository,
-            InvestmentPerformanceCalculationService investmentPerformanceCalculationService) {
+            InvestmentPerformanceCalculationService investmentPerformanceCalculationService,
+            MarketIndicatorService marketIndicatorService) {
         this.marketService = marketService;
         this.recurringTransactionService = recurringTransactionService;
         this.priceHistoryService = priceHistoryService;
@@ -40,11 +42,21 @@ public class AppStartupRunner implements ApplicationRunner {
         this.tickerPurchaseRepository = tickerPurchaseRepository;
         this.tickerSaleRepository = tickerSaleRepository;
         this.investmentPerformanceCalculationService = investmentPerformanceCalculationService;
+        this.marketIndicatorService = marketIndicatorService;
     }
 
     @Override
     public void run(ApplicationArguments args) {
         recurringTransactionService.processRecurringTransactions();
+
+        // Update market indicators synchronously before other operations
+        try {
+            logger.info("Updating market indicator history...");
+            marketIndicatorService.updateAllIndicators();
+            logger.info("Market indicator history updated successfully");
+        } catch (Exception ex) {
+            logger.warn("Failed to update market indicator history: {}", ex.getMessage());
+        }
 
         // Execute API operations sequentially to avoid rate limiting
         // Each operation waits for the previous one to complete before starting

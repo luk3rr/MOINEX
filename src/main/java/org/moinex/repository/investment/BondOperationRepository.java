@@ -39,4 +39,18 @@ public interface BondOperationRepository extends JpaRepository<BondOperation, In
                     + "WHERE wt.date <= :date "
                     + "ORDER BY wt.date ASC")
     List<BondOperation> findAllByDateBefore(@Param("date") String date);
+
+    @Query(
+            "SELECT MIN(wt.date) FROM BondOperation bo "
+                    + "LEFT JOIN bo.walletTransaction wt "
+                    + "WHERE bo.bond.interestIndex = :interestIndex "
+                    + "AND bo.operationType = 'BUY'")
+    String findEarliestBuyDateByInterestIndex(
+            @Param("interestIndex") org.moinex.model.enums.InterestIndex interestIndex);
+
+    @Query(
+            "SELECT DISTINCT bo.bond.interestIndex FROM BondOperation bo "
+                    + "WHERE bo.bond.interestIndex IS NOT NULL "
+                    + "AND bo.operationType = 'BUY'")
+    List<org.moinex.model.enums.InterestIndex> findAllUsedInterestIndices();
 }

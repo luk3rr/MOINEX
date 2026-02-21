@@ -35,6 +35,9 @@ public final class Constants {
 
     public static final String GET_STOCK_LOGO_SCRIPT = "get_stock_logo.py";
 
+    public static final String GET_MARKET_INDICATOR_HISTORY_SCRIPT =
+            "get_market_indicator_history.py";
+
     public static final String YAHOO_LOOKUP_URL =
             "https://finance.yahoo.com/research-hub/screener/most_actives";
 
@@ -407,6 +410,7 @@ public final class Constants {
     public static final String SHORT_DATE_FORMAT_NO_TIME = "yy-MM-dd";
     public static final String DATE_FORMAT_WITH_TIME = "yyyy-MM-dd HH:mm:ss";
     public static final String DB_MONTH_YEAR_FORMAT = "yyyy-MM";
+    public static final String BACEN_DATE_FORMAT = "dd/MM/yyyy";
 
     public static final DateTimeFormatter DB_DATE_FORMATTER =
             DateTimeFormatter.ofPattern(DB_DATE_FORMAT);
@@ -422,6 +426,9 @@ public final class Constants {
 
     public static final DateTimeFormatter DB_MONTH_YEAR_FORMATTER =
             DateTimeFormatter.ofPattern(DB_MONTH_YEAR_FORMAT);
+
+    public static final DateTimeFormatter BACEN_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern(BACEN_DATE_FORMAT);
 
     // Define the pattern for positive and negative currency values
     public static final String CURRENCY_FORMAT = "R$ #,##0.00;- R$ #,##0.00";
