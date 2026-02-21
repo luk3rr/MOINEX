@@ -59,6 +59,7 @@
             <children>
                 <JFXButton fx:id="editButton" minWidth="110.0" onAction="#handleEditInterest" stylesheets="@../../../css/component/buttons.css" text="%bond.interestHistory.button.editInterest" />
                 <JFXButton fx:id="resetButton" minWidth="110.0" onAction="#handleResetToAutomatic" stylesheets="@../../../css/component/buttons.css" text="%bond.interestHistory.button.resetToAutomatic" />
+                <JFXButton fx:id="recalculateButton" minWidth="110.0" onAction="#handleRecalculateHistory" stylesheets="@../../../css/component/buttons.css" text="%bond.interestHistory.button.recalculateHistory" />
                 <JFXButton fx:id="closeButton" minWidth="110.0" onAction="#handleClose" stylesheets="@../../../css/component/buttons.css" text="%bond.interestHistory.button.close" />
             </children>
         </HBox>

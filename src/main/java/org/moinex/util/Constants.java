@@ -1543,6 +1543,18 @@ public final class Constants {
                 "bond.interestHistory.dialog.interestReset.message";
         public static final String BOND_INTEREST_HISTORY_DIALOG_ERROR_RESETTING_TITLE =
                 "bond.interestHistory.dialog.errorResetting.title";
+        public static final String BOND_INTEREST_HISTORY_BUTTON_RECALCULATE_HISTORY =
+                "bond.interestHistory.button.recalculateHistory";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_HEADER =
+                "bond.interestHistory.dialog.confirmRecalculate.header";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_MESSAGE =
+                "bond.interestHistory.dialog.confirmRecalculate.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_TITLE =
+                "bond.interestHistory.dialog.historyRecalculated.title";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_MESSAGE =
+                "bond.interestHistory.dialog.historyRecalculated.message";
+        public static final String BOND_INTEREST_HISTORY_DIALOG_ERROR_RECALCULATING_TITLE =
+                "bond.interestHistory.dialog.errorRecalculating.title";
 
         // Common Components - Budget Group Pane
         public static final String COMMON_BUDGET_GROUP_TARGET = "common.budgetGroup.target";

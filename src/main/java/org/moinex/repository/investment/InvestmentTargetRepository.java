@@ -20,6 +20,4 @@ public interface InvestmentTargetRepository extends JpaRepository<InvestmentTarg
     Optional<InvestmentTarget> findByAssetTypeAndIsActiveTrue(AssetType assetType);
 
     Optional<InvestmentTarget> findByAssetType(AssetType assetType);
-
-    boolean existsByAssetType(AssetType assetType);
 }

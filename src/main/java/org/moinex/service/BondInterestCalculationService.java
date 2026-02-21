@@ -1060,4 +1060,37 @@ public class BondInterestCalculationService {
                 bond.getName(),
                 month);
     }
+
+    /**
+     * Recalculate all monthly interest calculations for a bond from scratch
+     * Deletes all existing calculations and recalculates from the first operation
+     *
+     * @param bondId The bond ID
+     */
+    @Transactional
+    public void recalculateAllMonthlyInterest(Integer bondId) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        if (operations.isEmpty()) {
+            log.warn(
+                    "Bond {} has no operations, cannot recalculate interest history",
+                    bond.getName());
+            return;
+        }
+
+        bondInterestCalculationRepository.deleteByBond(bond);
+        log.info("Deleted all existing interest calculations for bond {}", bond.getName());
+
+        calculateAndStoreMonthlyInterest(bond);
+        log.info("Completed full recalculation of interest history for bond {}", bond.getName());
+    }
 }

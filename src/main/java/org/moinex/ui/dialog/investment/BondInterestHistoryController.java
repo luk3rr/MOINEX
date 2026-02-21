@@ -41,6 +41,7 @@ public class BondInterestHistoryController {
     @FXML private TableView<BondInterestCalculation> historyTable;
     @FXML private Button editButton;
     @FXML private Button resetButton;
+    @FXML private Button recalculateButton;
     @FXML private Button closeButton;
 
     private Bond bond;
@@ -336,6 +337,42 @@ public class BondInterestHistoryController {
                                     .BOND_INTEREST_HISTORY_DIALOG_ERROR_RESETTING_TITLE),
                     e.getMessage());
             logger.error("Error resetting interest to automatic", e);
+        }
+    }
+
+    @FXML
+    private void handleRecalculateHistory() {
+        if (!WindowUtils.showConfirmationDialog(
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_HEADER),
+                i18nService.tr(
+                        Constants.TranslationKeys
+                                .BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_MESSAGE))) {
+            return;
+        }
+
+        try {
+            bondInterestCalculationService.recalculateAllMonthlyInterest(bond.getId());
+
+            WindowUtils.showSuccessDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_TITLE),
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_MESSAGE));
+
+            loadHistoryData();
+            logger.info("Interest history recalculated for bond {}", bond.getName());
+
+        } catch (Exception e) {
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .BOND_INTEREST_HISTORY_DIALOG_ERROR_RECALCULATING_TITLE),
+                    e.getMessage());
+            logger.error("Error recalculating interest history", e);
         }
     }
 

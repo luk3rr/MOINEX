@@ -47,19 +47,6 @@ public interface TickerPriceHistoryRepository extends JpaRepository<TickerPriceH
             @Param("tickerId") Integer tickerId, @Param("priceDate") String priceDate);
 
     /**
-     * Find all month-end prices for a ticker
-     * @param tickerId The ticker ID
-     * @return List of month-end price histories
-     */
-    @Query(
-            "SELECT ph "
-                    + "FROM TickerPriceHistory ph "
-                    + "WHERE ph.ticker.id = :tickerId "
-                    + "AND ph.isMonthEnd = true "
-                    + "ORDER BY ph.priceDate ASC")
-    List<TickerPriceHistory> findMonthEndPricesByTicker(@Param("tickerId") Integer tickerId);
-
-    /**
      * Find all month-end prices for a ticker within a date range
      * @param tickerId The ticker ID
      * @param startDate Start date in string format
