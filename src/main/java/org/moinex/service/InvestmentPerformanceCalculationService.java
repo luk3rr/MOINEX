@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.moinex.model.dto.InvestmentPerformanceDTO;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.investment.Bond;
+import org.moinex.model.investment.BondInterestCalculation;
 import org.moinex.model.investment.BondOperation;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.Ticker;
@@ -40,6 +41,7 @@ public class InvestmentPerformanceCalculationService {
     private final TickerService tickerService;
     private final BondService bondService;
     private final TickerPriceHistoryService tickerPriceHistoryService;
+    private final BondInterestCalculationService bondInterestCalculationService;
 
     @Getter private volatile boolean isCalculating = false;
 
@@ -430,6 +432,14 @@ public class InvestmentPerformanceCalculationService {
                     calculateBondCumulativeValueByMonth(operations);
             for (Map.Entry<YearMonth, BigDecimal> entry : bondPortfolioByMonth.entrySet()) {
                 portfolioByMonth.merge(entry.getKey(), entry.getValue(), BigDecimal::add);
+            }
+
+            // Add bond interest history
+            List<BondInterestCalculation> interestHistory =
+                    bondInterestCalculationService.getMonthlyInterestHistory(bond);
+            for (BondInterestCalculation interest : interestHistory) {
+                YearMonth month = interest.getReferenceMonth();
+                portfolioByMonth.merge(month, interest.getAccumulatedInterest(), BigDecimal::add);
             }
         }
 

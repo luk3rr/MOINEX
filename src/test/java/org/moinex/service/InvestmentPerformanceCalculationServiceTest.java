@@ -6,6 +6,7 @@
 
 package org.moinex.service;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -14,7 +15,6 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -44,6 +44,7 @@ class InvestmentPerformanceCalculationServiceTest {
     @Mock private TickerService tickerService;
     @Mock private BondService bondService;
     @Mock private TickerPriceHistoryService tickerPriceHistoryService;
+    @Mock private BondInterestCalculationService bondInterestCalculationService;
 
     @InjectMocks private InvestmentPerformanceCalculationService calculationService;
 
@@ -102,11 +103,11 @@ class InvestmentPerformanceCalculationServiceTest {
         @DisplayName("Should calculate performance data when cache is empty")
         void getPerformanceData_NoCache_Calculate() {
             when(snapshotService.hasSnapshots()).thenReturn(false);
-            when(tickerService.getAllNonArchivedTickers()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllNonArchivedTickers()).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
 
@@ -133,11 +134,11 @@ class InvestmentPerformanceCalculationServiceTest {
                             currentMonth.minusMonths(1).getYear()))
                     .thenReturn(Optional.of(snapshot));
 
-            when(tickerService.getAllNonArchivedTickers()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllNonArchivedTickers()).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
 
@@ -155,11 +156,11 @@ class InvestmentPerformanceCalculationServiceTest {
         @Test
         @DisplayName("Should recalculate all snapshots successfully")
         void recalculateAllSnapshots_Success() throws Exception {
-            when(tickerService.getAllNonArchivedTickers()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllNonArchivedTickers()).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
             doNothing().when(snapshotService).deleteAllSnapshots();
@@ -211,11 +212,11 @@ class InvestmentPerformanceCalculationServiceTest {
         @Test
         @DisplayName("Should return true when calculation is in progress")
         void isCalculating_True() throws Exception {
-            when(tickerService.getAllNonArchivedTickers()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllNonArchivedTickers()).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             doNothing().when(snapshotService).deleteAllSnapshots();
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
@@ -248,12 +249,12 @@ class InvestmentPerformanceCalculationServiceTest {
             ticker.setAverageUnitValue(new BigDecimal("145.00"));
 
             when(tickerService.getAllNonArchivedTickers()).thenReturn(List.of(ticker));
-            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSalesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllSalesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(tickerPriceHistoryService.getClosestPriceBeforeDate(any(Ticker.class), any()))
                     .thenReturn(Optional.of(new BigDecimal("150.00")));
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
@@ -283,9 +284,11 @@ class InvestmentPerformanceCalculationServiceTest {
                             .walletTransaction(transaction)
                             .build();
 
-            when(tickerService.getAllNonArchivedTickers()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllNonArchivedTickers()).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondInterestCalculationService.getMonthlyInterestHistory(any(Bond.class)))
+                    .thenReturn(emptyList());
             when(bondService.getAllNonArchivedBonds()).thenReturn(List.of(bond));
             when(bondService.getOperationsByBond(bond)).thenReturn(List.of(operation));
             when(bondService.getAllOperations()).thenReturn(List.of(operation));
@@ -309,14 +312,14 @@ class InvestmentPerformanceCalculationServiceTest {
             ticker.setCurrentUnitValue(new BigDecimal("150.00"));
 
             when(tickerService.getAllNonArchivedTickers()).thenReturn(List.of(ticker));
-            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSalesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllSalesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
             when(tickerPriceHistoryService.getClosestPriceBeforeDate(any(Ticker.class), any()))
                     .thenReturn(Optional.of(new BigDecimal("150.00")));
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
 
@@ -333,14 +336,14 @@ class InvestmentPerformanceCalculationServiceTest {
             ticker.setCurrentUnitValue(new BigDecimal("150.00"));
 
             when(tickerService.getAllNonArchivedTickers()).thenReturn(List.of(ticker));
-            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSalesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllSalesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
             when(tickerPriceHistoryService.getClosestPriceBeforeDate(any(Ticker.class), any()))
                     .thenReturn(Optional.of(ticker.getCurrentUnitValue()));
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
 
@@ -367,10 +370,10 @@ class InvestmentPerformanceCalculationServiceTest {
             Dividend dividend = Dividend.builder().walletTransaction(transaction).build();
 
             when(tickerService.getAllDividends()).thenReturn(List.of(dividend));
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedTickers()).thenReturn(emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
 
@@ -388,14 +391,14 @@ class InvestmentPerformanceCalculationServiceTest {
             ticker.setCurrentUnitValue(new BigDecimal("150.00"));
 
             when(tickerService.getAllNonArchivedTickers()).thenReturn(List.of(ticker));
-            when(tickerService.getAllDividends()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllNonArchivedSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSalesByTicker(1)).thenReturn(Collections.emptyList());
+            when(tickerService.getAllDividends()).thenReturn(emptyList());
+            when(tickerService.getAllNonArchivedSales()).thenReturn(emptyList());
+            when(tickerService.getAllPurchasesByTicker(1)).thenReturn(emptyList());
+            when(tickerService.getAllSalesByTicker(1)).thenReturn(emptyList());
             when(tickerPriceHistoryService.getClosestPriceBeforeDate(any(Ticker.class), any()))
                     .thenReturn(Optional.of(new BigDecimal("150.00")));
-            when(bondService.getAllNonArchivedBonds()).thenReturn(Collections.emptyList());
-            when(bondService.getAllOperations()).thenReturn(Collections.emptyList());
+            when(bondService.getAllNonArchivedBonds()).thenReturn(emptyList());
+            when(bondService.getAllOperations()).thenReturn(emptyList());
             when(snapshotService.saveSnapshot(anyInt(), anyInt(), any(), any(), any(), any()))
                     .thenReturn(snapshot);
 

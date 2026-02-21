@@ -102,7 +102,6 @@ public class SavingsOverviewController {
     @FXML private Label overviewTabBottonPaneTitle;
     @FXML private HBox portfolioP2;
     @FXML private HBox portfolioP5;
-    @FXML private javafx.scene.layout.VBox profitabilityMetricsPane;
     @FXML private ProfitabilityMetricsPaneController profitabilityMetricsPaneController;
 
     private ConfigurableApplicationContext springContext;
