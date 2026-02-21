@@ -20,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.TransactionStatus;
 import org.moinex.model.enums.TransactionType;
-import org.moinex.model.investment.BondOperation;
-import org.moinex.model.investment.Ticker;
-import org.moinex.model.investment.TickerPurchase;
-import org.moinex.model.investment.TickerSale;
+import org.moinex.model.investment.*;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -43,6 +40,7 @@ public class NetWorthCalculationService {
     private final CreditCardService creditCardService;
     private final TickerService tickerService;
     private final BondService bondService;
+    private final BondInterestCalculationService bondInterestCalculationService;
 
     private List<Wallet> wallets;
 
@@ -520,11 +518,16 @@ public class NetWorthCalculationService {
 
     /**
      * Calculate total bond value at a specific date
+     * Includes invested amount + accumulated interest for each bond
      * @param date The date to calculate value for
-     * @return Total bond value
+     * @return Total bond value (invested amount + accumulated interest)
      */
     private BigDecimal calculateBondValueAtDate(LocalDateTime date) {
         List<BondOperation> operations = bondService.getOperationsByDateBefore(date);
+
+        if (operations.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
 
         // Calculate quantity held for each bond
         Map<Integer, BigDecimal> bondQuantities = new HashMap<>();
@@ -541,12 +544,42 @@ public class NetWorthCalculationService {
             }
         }
 
-        // Calculate total value using the last known price for each bond
+        // Calculate total value: invested amount + accumulated interest
         BigDecimal totalValue = BigDecimal.ZERO;
-        for (java.util.Map.Entry<Integer, BigDecimal> entry : bondQuantities.entrySet()) {
+        YearMonth targetMonth = YearMonth.from(date);
+
+        for (Map.Entry<Integer, BigDecimal> entry : bondQuantities.entrySet()) {
+            Integer bondId = entry.getKey();
             BigDecimal quantity = entry.getValue();
-            BigDecimal price = bondPrices.getOrDefault(entry.getKey(), BigDecimal.ZERO);
-            totalValue = totalValue.add(quantity.multiply(price));
+
+            // Skip if quantity is zero or negative (bond fully sold)
+            if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            // Get the bond to access its interest calculations
+            Bond bond = bondService.getBondById(bondId);
+            if (bond == null) {
+                continue;
+            }
+
+            // Get the interest calculation for the target month
+            var interestCalculation =
+                    bondInterestCalculationService.getMonthlyInterestHistory(bond).stream()
+                            .filter(calc -> calc.getReferenceMonth().equals(targetMonth))
+                            .findFirst();
+
+            BigDecimal bondValue;
+            if (interestCalculation.isPresent()) {
+                // Use final value which includes invested amount + accumulated interest
+                bondValue = interestCalculation.get().getFinalValue();
+            } else {
+                // Fallback: use invested amount (quantity * unit price)
+                BigDecimal price = bondPrices.getOrDefault(bondId, BigDecimal.ZERO);
+                bondValue = quantity.multiply(price);
+            }
+
+            totalValue = totalValue.add(bondValue);
         }
 
         return totalValue;
