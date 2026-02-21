@@ -55,8 +55,8 @@ public class SavingsBondsController {
     private BondService bondService;
     private I18nService i18nService;
 
-    private Map<Integer, BigDecimal> currentMonthInterestCache = new HashMap<>();
-    private Map<Integer, BigDecimal> totalAccumulatedInterestCache = new HashMap<>();
+    private final Map<Integer, BigDecimal> currentMonthInterestCache = new HashMap<>();
+    private final Map<Integer, BigDecimal> totalAccumulatedInterestCache = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsBondsController.class);
 
@@ -311,7 +311,7 @@ public class SavingsBondsController {
                 cellData -> {
                     Bond bond = cellData.getValue();
                     return new SimpleStringProperty(
-                            UIUtils.formatCurrency(bondService.getInvestedValue(bond)));
+                            UIUtils.formatCurrency(bondService.getInvestedValue(bond).add(bondService.getTotalAccumulatedInterestByBondId(bond.getId()))));
                 });
 
         TableColumn<Bond, String> investedValueColumn =
@@ -324,17 +324,6 @@ public class SavingsBondsController {
                     Bond bond = cellData.getValue();
                     return new SimpleStringProperty(
                             UIUtils.formatCurrency(bondService.getInvestedValue(bond)));
-                });
-
-        TableColumn<Bond, String> profitLossColumn =
-                new TableColumn<>(
-                        i18nService.tr(
-                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS));
-        profitLossColumn.setCellValueFactory(
-                cellData -> {
-                    Bond bond = cellData.getValue();
-                    return new SimpleStringProperty(
-                            UIUtils.formatCurrencySigned(bondService.calculateProfit(bond)));
                 });
 
         TableColumn<Bond, String> maturityDateColumn =
@@ -395,8 +384,8 @@ public class SavingsBondsController {
                         typeColumn,
                         quantityColumn,
                         avgPriceColumn,
+                        investedValueColumn,
                         currentValueColumn,
-                        profitLossColumn,
                         maturityDateColumn,
                         interestRateColumn,
                         currentMonthInterestColumn,
@@ -412,7 +401,7 @@ public class SavingsBondsController {
             currentMonthInterestCache.put(
                     bond.getId(), bondService.getCurrentMonthInterest(bond.getId()));
             totalAccumulatedInterestCache.put(
-                    bond.getId(), bondService.getTotalAccumulatedInterest(bond.getId()));
+                    bond.getId(), bondService.getTotalAccumulatedInterestByBondId(bond.getId()));
         }
 
         BondType selectedType = bondsTabBondTypeComboBox.getValue();
@@ -486,10 +475,12 @@ public class SavingsBondsController {
                         .map(bondService::calculateProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal interestReceived = bondService.getTotalInterestReceived();
+        BigDecimal interestReceived = bondService.getAllBondsTotalAccumulatedInterest();
+
+        BigDecimal currentValue = totalInvested.add(interestReceived);
 
         bondsTabTotalInvestedField.setText(UIUtils.formatCurrency(totalInvested));
-        bondsTabCurrentValueField.setText(UIUtils.formatCurrency(totalInvested));
+        bondsTabCurrentValueField.setText(UIUtils.formatCurrency(currentValue));
         bondsTabProfitLossField.setText(UIUtils.formatCurrencySigned(profitLoss));
         bondsTabInterestReceivedField.setText(UIUtils.formatCurrency(interestReceived));
     }

@@ -404,21 +404,12 @@ public class BondService {
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal getTotalInterestReceived() {
+    public BigDecimal getAllBondsTotalAccumulatedInterest() {
         List<Bond> bonds = bondRepository.findByArchivedFalseOrderByNameAsc();
         BigDecimal total = BigDecimal.ZERO;
 
         for (Bond bond : bonds) {
-            List<BondOperation> operations =
-                    bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
-
-            for (BondOperation op : operations) {
-                if (op.getOperationType() == OperationType.SELL && op.getNetProfit() != null) {
-                    if (op.getNetProfit().compareTo(BigDecimal.ZERO) > 0) {
-                        total = total.add(op.getNetProfit());
-                    }
-                }
-            }
+            total = total.add(getTotalAccumulatedInterestByBondId(bond.getId()));
         }
 
         return total;
@@ -585,7 +576,7 @@ public class BondService {
      * @return Total accumulated interest since first operation from database
      */
     @Transactional(readOnly = true)
-    public BigDecimal getTotalAccumulatedInterest(Integer bondId) {
+    public BigDecimal getTotalAccumulatedInterestByBondId(Integer bondId) {
         return bondInterestCalculationService
                 .getLatestCalculation(bondId)
                 .map(BondInterestCalculation::getAccumulatedInterest)

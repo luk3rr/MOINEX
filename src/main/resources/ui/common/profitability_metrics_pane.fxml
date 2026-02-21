@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="5.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.common.ProfitabilityMetricsPaneController">
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-header" text="%savings.metrics.description" />
+            <Label alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-header" text="%savings.metrics.variable" />
+            <Label alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-header" text="%savings.metrics.fixed" />
+            <Label alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-header" text="%savings.metrics.total" />
+         </children>
+      </HBox>
+      <HBox fx:id="totalInvestedRow" alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-cell" text="%savings.metrics.totalInvested" />
+            <Label fx:id="totalInvestedVariable" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="totalInvestedFixed" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="totalInvestedTotal" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+         </children>
+      </HBox>
+      <HBox fx:id="currentValueRow" alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-cell" text="%savings.metrics.currentValue" />
+            <Label fx:id="currentValueVariable" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="currentValueFixed" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="currentValueTotal" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+         </children>
+      </HBox>
+      <HBox fx:id="profitLossRow" alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-cell" text="%savings.metrics.profitLoss" />
+            <Label fx:id="profitLossVariable" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="profitLossFixed" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="profitLossTotal" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+         </children>
+      </HBox>
+      <HBox fx:id="returnPercentageRow" alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-cell" text="%savings.metrics.totalReturn" />
+            <Label fx:id="returnPercentageVariable" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="returnPercentageFixed" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="returnPercentageTotal" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+         </children>
+      </HBox>
+      <HBox fx:id="totalDividendsRow" alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-cell" text="%savings.metrics.totalDividends" />
+            <Label fx:id="totalDividendsVariable" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="totalDividendsFixed" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="totalDividendsTotal" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+         </children>
+      </HBox>
+      <HBox fx:id="dividendYieldRow" alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label minWidth="90.0" styleClass="custom-table-cell" text="%savings.metrics.dividendYield" />
+            <Label fx:id="dividendYieldVariable" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="dividendYieldFixed" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+            <Label fx:id="dividendYieldTotal" alignment="CENTER_RIGHT" minWidth="100.0" styleClass="custom-table-cell" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

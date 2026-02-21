@@ -57,6 +57,7 @@ import org.moinex.service.InvestmentPerformanceCalculationService;
 import org.moinex.service.InvestmentTargetService;
 import org.moinex.service.MarketService;
 import org.moinex.service.TickerService;
+import org.moinex.ui.common.ProfitabilityMetricsPaneController;
 import org.moinex.ui.dialog.investment.EditInvestmentTargetController;
 import org.moinex.util.Animation;
 import org.moinex.util.Constants;
@@ -101,7 +102,8 @@ public class SavingsOverviewController {
     @FXML private Label overviewTabBottonPaneTitle;
     @FXML private HBox portfolioP2;
     @FXML private HBox portfolioP5;
-    @FXML private HBox portfolioP4;
+    @FXML private javafx.scene.layout.VBox profitabilityMetricsPane;
+    @FXML private ProfitabilityMetricsPaneController profitabilityMetricsPaneController;
 
     private ConfigurableApplicationContext springContext;
     private TickerService tickerService;
@@ -421,9 +423,12 @@ public class SavingsOverviewController {
 
         for (Bond bond : allBonds) {
             BigDecimal bondInvestedValue = bondService.getInvestedValue(bond);
+            BigDecimal bondAccumulatedInterest =
+                    bondService.getTotalAccumulatedInterestByBondId(bond.getId());
+            BigDecimal bondTotalValue = bondInvestedValue.add(bondAccumulatedInterest);
             String typeName = UIUtils.translateBondType(bond.getType(), i18nService);
 
-            investmentByType.merge(typeName, bondInvestedValue, BigDecimal::add);
+            investmentByType.merge(typeName, bondTotalValue, BigDecimal::add);
         }
 
         return investmentByType;
@@ -701,20 +706,17 @@ public class SavingsOverviewController {
                 tickerUnrealizedLosses);
 
         BigDecimal bondsTotalInvested = bondService.getTotalInvestedValue();
-        BigDecimal bondsRealizedProfitLoss =
-                bondService.getAllNonArchivedBonds().stream()
-                        .map(bondService::calculateProfit)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal bondsAccumulatedInterest = bondService.getAllBondsTotalAccumulatedInterest();
 
         logger.info(
-                "Overview bonds: investedValue={}, currentValueAssumed={}, realizedProfitLoss={}"
-                        + " (SELL netProfit sum)",
+                "Overview bonds: investedValue={}, currentValueAssumed={}, accumulatedInterest={}",
                 bondsTotalInvested,
                 bondsTotalInvested,
-                bondsRealizedProfitLoss);
+                bondsAccumulatedInterest);
 
         totalInvested = totalInvested.add(bondsTotalInvested);
-        portfolioCurrentValue = portfolioCurrentValue.add(bondsTotalInvested);
+        portfolioCurrentValue =
+                portfolioCurrentValue.add(bondsTotalInvested).add(bondsAccumulatedInterest);
 
         BigDecimal totalDividends =
                 dividends.stream()
@@ -749,11 +751,7 @@ public class SavingsOverviewController {
 
         totalGains = totalGains.add(totalDividends);
 
-        if (bondsRealizedProfitLoss.compareTo(BigDecimal.ZERO) > 0) {
-            totalGains = totalGains.add(bondsRealizedProfitLoss);
-        } else {
-            totalLosses = totalLosses.add(bondsRealizedProfitLoss.abs());
-        }
+        totalGains = totalGains.add(bondsAccumulatedInterest);
 
         if (tickerRealizedProfit.compareTo(BigDecimal.ZERO) > 0) {
             totalGains = totalGains.add(tickerRealizedProfit);
@@ -822,6 +820,96 @@ public class SavingsOverviewController {
                 totalDividends);
     }
 
+    private Map<String, ProfitabilityMetricsDTO> calculateProfitabilityMetricsByType() {
+        loadTickersFromDatabase();
+        loadDividendsFromDatabase();
+
+        BigDecimal variableInvested =
+                tickers.stream()
+                        .map(t -> t.getAverageUnitValue().multiply(t.getCurrentQuantity()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal variableCurrentValue =
+                tickers.stream()
+                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal variableProfitLoss = variableCurrentValue.subtract(variableInvested);
+
+        BigDecimal variableReturnPercentage =
+                variableInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? variableProfitLoss
+                                .divide(variableInvested, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
+                        : BigDecimal.ZERO;
+
+        BigDecimal totalDividends =
+                dividends.stream()
+                        .map(d -> d.getWalletTransaction().getAmount())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal variableDividendYield =
+                variableInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? totalDividends
+                                .divide(variableInvested, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
+                        : BigDecimal.ZERO;
+
+        BigDecimal fixedInvested = bondService.getTotalInvestedValue();
+        BigDecimal fixedAccumulatedInterest = bondService.getAllBondsTotalAccumulatedInterest();
+        BigDecimal fixedCurrentValue = fixedInvested.add(fixedAccumulatedInterest);
+        BigDecimal fixedProfitLoss = fixedAccumulatedInterest;
+
+        BigDecimal fixedReturnPercentage =
+                fixedInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? fixedProfitLoss
+                                .divide(fixedInvested, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
+                        : BigDecimal.ZERO;
+
+        BigDecimal totalInvested = variableInvested.add(fixedInvested);
+        BigDecimal totalCurrentValue = variableCurrentValue.add(fixedCurrentValue);
+        BigDecimal totalProfitLoss = variableProfitLoss.add(fixedProfitLoss);
+
+        BigDecimal totalReturnPercentage =
+                totalInvested.compareTo(BigDecimal.ZERO) > 0
+                        ? totalProfitLoss
+                                .divide(totalInvested, 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(PERCENTAGE_DIVISOR))
+                        : BigDecimal.ZERO;
+
+        Map<String, ProfitabilityMetricsDTO> metrics = new HashMap<>();
+        metrics.put(
+                "variable",
+                new ProfitabilityMetricsDTO(
+                        variableInvested,
+                        variableCurrentValue,
+                        variableProfitLoss,
+                        variableReturnPercentage,
+                        variableDividendYield,
+                        totalDividends));
+        metrics.put(
+                "fixed",
+                new ProfitabilityMetricsDTO(
+                        fixedInvested,
+                        fixedCurrentValue,
+                        fixedProfitLoss,
+                        fixedReturnPercentage,
+                        BigDecimal.ZERO,
+                        BigDecimal.ZERO));
+        metrics.put(
+                "total",
+                new ProfitabilityMetricsDTO(
+                        totalInvested,
+                        totalCurrentValue,
+                        totalProfitLoss,
+                        totalReturnPercentage,
+                        variableDividendYield,
+                        totalDividends));
+
+        return metrics;
+    }
+
     private List<TickerPerformanceDTO> calculateTopPerformers(int limit, boolean best) {
         loadTickersFromDatabase();
 
@@ -855,115 +943,12 @@ public class SavingsOverviewController {
     }
 
     private void updateProfitabilityMetricsPanel() {
-        portfolioP4.getChildren().clear();
+        Map<String, ProfitabilityMetricsDTO> metrics = calculateProfitabilityMetricsByType();
+        ProfitabilityMetricsDTO variableMetrics = metrics.get("variable");
+        ProfitabilityMetricsDTO fixedMetrics = metrics.get("fixed");
+        ProfitabilityMetricsDTO totalMetrics = metrics.get("total");
 
-        ProfitabilityMetricsDTO metrics = calculateProfitabilityMetrics();
-
-        VBox metricsContainer = new VBox(10);
-        metricsContainer.setAlignment(Pos.CENTER);
-
-        VBox metricsBox = new VBox(8);
-        metricsBox.setAlignment(Pos.CENTER_LEFT);
-
-        metricsBox
-                .getChildren()
-                .addAll(
-                        createMetricRow(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_RETURN),
-                                metrics.returnPercentage(),
-                                true,
-                                true,
-                                true),
-                        createMetricRow(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_METRICS_DIVIDEND_YIELD),
-                                metrics.dividendYield(),
-                                true,
-                                false,
-                                true),
-                        createMetricRow(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_INVESTED),
-                                metrics.totalInvested(),
-                                true,
-                                false,
-                                false),
-                        createMetricRow(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_METRICS_CURRENT_VALUE),
-                                metrics.currentValue(),
-                                true,
-                                false,
-                                false),
-                        createMetricRow(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_METRICS_PROFIT_LOSS),
-                                metrics.profitLoss(),
-                                true,
-                                true,
-                                false),
-                        createMetricRow(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.SAVINGS_METRICS_TOTAL_DIVIDENDS),
-                                metrics.totalDividends(),
-                                true,
-                                false,
-                                false));
-
-        metricsContainer.getChildren().addAll(metricsBox);
-
-        portfolioP4.getChildren().add(metricsContainer);
-        HBox.setHgrow(metricsContainer, Priority.ALWAYS);
-    }
-
-    private HBox createMetricRow(
-            String label,
-            BigDecimal value,
-            boolean alwaysGreen,
-            boolean dynamicColor,
-            boolean isPercentage) {
-        HBox row = new HBox(10);
-        row.setAlignment(Pos.CENTER_LEFT);
-
-        Label labelNode = new Label(label);
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        String sign = "";
-        if (dynamicColor) {
-            if (value.compareTo(BigDecimal.ZERO) > 0) {
-                sign = "+ ";
-            } else if (value.compareTo(BigDecimal.ZERO) < 0) {
-                sign = "- ";
-            }
-        }
-
-        String formattedValue =
-                isPercentage
-                        ? UIUtils.formatPercentage(value.abs(), i18nService)
-                        : UIUtils.formatCurrency(value.abs());
-
-        Label valueNode = new Label(sign + formattedValue);
-
-        if (alwaysGreen && !dynamicColor) {
-            valueNode.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
-        } else if (dynamicColor) {
-            if (value.compareTo(BigDecimal.ZERO) < 0) {
-                valueNode.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
-            } else if (value.compareTo(BigDecimal.ZERO) > 0) {
-                valueNode.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
-            } else {
-                valueNode.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
-            }
-        } else {
-            valueNode.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
-        }
-
-        row.getChildren().addAll(labelNode, spacer, valueNode);
-
-        return row;
+        profitabilityMetricsPaneController.setMetrics(variableMetrics, fixedMetrics, totalMetrics);
     }
 
     private void updateTopPerformersPanel() {
@@ -1101,18 +1086,20 @@ public class SavingsOverviewController {
     private List<AllocationDTO> calculateAllocationVsTarget() {
         Map<TickerType, BigDecimal> currentAllocation = new HashMap<>();
 
-        BigDecimal totalValue =
-                tickers.stream()
-                        .map(t -> t.getCurrentQuantity().multiply(t.getCurrentUnitValue()))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalBondValue =
+                bondService
+                        .getTotalInvestedValue()
+                        .add(bondService.getAllBondsTotalAccumulatedInterest());
 
-        BigDecimal totalBondValue = bondService.getTotalInvestedValue();
-        totalValue = totalValue.add(totalBondValue);
+        BigDecimal totalTickerValue = BigDecimal.ZERO;
 
         for (Ticker ticker : tickers) {
             BigDecimal value = ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
+            totalTickerValue = totalTickerValue.add(value);
             currentAllocation.merge(ticker.getType(), value, BigDecimal::add);
         }
+
+        BigDecimal totalValue = totalTickerValue.add(totalBondValue);
 
         List<InvestmentTarget> targets = investmentTargetService.getAllActiveTargets();
 
@@ -1124,7 +1111,7 @@ public class SavingsOverviewController {
             String typeName;
 
             if (assetType == AssetType.BOND) {
-                currentValue = bondService.getTotalInvestedValue();
+                currentValue = totalBondValue;
                 typeName = i18nService.tr(Constants.TranslationKeys.ASSET_TYPE_BOND);
             } else {
                 TickerType tickerType = TickerType.valueOf(assetType.name());

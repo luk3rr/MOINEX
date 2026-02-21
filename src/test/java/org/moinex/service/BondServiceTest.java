@@ -730,7 +730,7 @@ class BondServiceTest {
             when(bondOperationRepository.findByBondOrderByOperationDateAsc(bond1))
                     .thenReturn(Collections.singletonList(sellWithProfit));
 
-            BigDecimal totalInterest = bondService.getTotalInterestReceived();
+            BigDecimal totalInterest = bondService.getAllBondsTotalAccumulatedInterest();
 
             assertEquals(0, BigDecimal.valueOf(50).compareTo(totalInterest));
             verify(bondRepository).findByArchivedFalseOrderByNameAsc();
@@ -744,7 +744,7 @@ class BondServiceTest {
             when(bondOperationRepository.findByBondOrderByOperationDateAsc(bond1))
                     .thenReturn(Collections.singletonList(buyOperation));
 
-            BigDecimal totalInterest = bondService.getTotalInterestReceived();
+            BigDecimal totalInterest = bondService.getAllBondsTotalAccumulatedInterest();
 
             assertEquals(BigDecimal.ZERO, totalInterest);
         }

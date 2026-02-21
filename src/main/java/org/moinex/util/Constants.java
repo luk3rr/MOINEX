@@ -1072,6 +1072,10 @@ public final class Constants {
         public static final String SAVINGS_METRICS_PROFIT_LOSS = "savings.metrics.profitLoss";
         public static final String SAVINGS_METRICS_TOTAL_DIVIDENDS =
                 "savings.metrics.totalDividends";
+        public static final String SAVINGS_METRICS_VARIABLE = "savings.metrics.variable";
+        public static final String SAVINGS_METRICS_FIXED = "savings.metrics.fixed";
+        public static final String SAVINGS_METRICS_DESCRIPTION = "savings.metrics.description";
+        public static final String SAVINGS_METRICS_TOTAL = "savings.metrics.total";
 
         // Savings - Allocation
         public static final String SAVINGS_ALLOCATION_TARGET = "savings.allocation.target";
