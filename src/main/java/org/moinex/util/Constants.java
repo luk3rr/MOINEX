@@ -1165,6 +1165,10 @@ public final class Constants {
                 "savings.bonds.table.header.investedValue";
         public static final String SAVINGS_BONDS_TABLE_HEADER_PROFIT_LOSS =
                 "savings.bonds.table.header.profitLoss";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_CURRENT_MONTH_INTEREST =
+                "savings.bonds.table.header.currentMonthInterest";
+        public static final String SAVINGS_BONDS_TABLE_HEADER_TOTAL_ACCUMULATED_INTEREST =
+                "savings.bonds.table.header.totalAccumulatedInterest";
         public static final String SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE =
                 "savings.bonds.dialog.buyBond.title";
         public static final String SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE =

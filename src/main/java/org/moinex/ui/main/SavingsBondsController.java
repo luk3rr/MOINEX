@@ -8,7 +8,9 @@ package org.moinex.ui.main;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -52,6 +54,9 @@ public class SavingsBondsController {
     private ConfigurableApplicationContext springContext;
     private BondService bondService;
     private I18nService i18nService;
+
+    private Map<Integer, BigDecimal> currentMonthInterestCache = new HashMap<>();
+    private Map<Integer, BigDecimal> totalAccumulatedInterestCache = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(SavingsBondsController.class);
 
@@ -355,6 +360,33 @@ public class SavingsBondsController {
                     return new SimpleStringProperty("-");
                 });
 
+        TableColumn<Bond, String> currentMonthInterestColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_TABLE_HEADER_CURRENT_MONTH_INTEREST));
+        currentMonthInterestColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal interest =
+                            currentMonthInterestCache.getOrDefault(bond.getId(), BigDecimal.ZERO);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(interest));
+                });
+
+        TableColumn<Bond, String> totalAccumulatedInterestColumn =
+                new TableColumn<>(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .SAVINGS_BONDS_TABLE_HEADER_TOTAL_ACCUMULATED_INTEREST));
+        totalAccumulatedInterestColumn.setCellValueFactory(
+                cellData -> {
+                    Bond bond = cellData.getValue();
+                    BigDecimal interest =
+                            totalAccumulatedInterestCache.getOrDefault(
+                                    bond.getId(), BigDecimal.ZERO);
+                    return new SimpleStringProperty(UIUtils.formatCurrency(interest));
+                });
+
         bondsTabBondTable
                 .getColumns()
                 .addAll(
@@ -366,11 +398,22 @@ public class SavingsBondsController {
                         currentValueColumn,
                         profitLossColumn,
                         maturityDateColumn,
-                        interestRateColumn);
+                        interestRateColumn,
+                        currentMonthInterestColumn,
+                        totalAccumulatedInterestColumn);
     }
 
     private void updateBondTableView() {
         List<Bond> bonds = bondService.getAllNonArchivedBonds();
+
+        currentMonthInterestCache.clear();
+        totalAccumulatedInterestCache.clear();
+        for (Bond bond : bonds) {
+            currentMonthInterestCache.put(
+                    bond.getId(), bondService.getCurrentMonthInterest(bond.getId()));
+            totalAccumulatedInterestCache.put(
+                    bond.getId(), bondService.getTotalAccumulatedInterest(bond.getId()));
+        }
 
         BondType selectedType = bondsTabBondTypeComboBox.getValue();
         if (selectedType != null) {

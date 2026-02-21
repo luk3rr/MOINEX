@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,20 +44,20 @@ public class BondInterestCalculation {
     @JoinColumn(name = "bond_id", referencedColumnName = "id", nullable = false)
     private Bond bond;
 
+    @Column(name = "reference_month", nullable = false)
+    private String referenceMonth;
+
     @Column(name = "calculation_date", nullable = false)
     private String calculationDate;
-
-    @Column(name = "start_date", nullable = false)
-    private String startDate;
-
-    @Column(name = "end_date", nullable = false)
-    private String endDate;
 
     @Column(name = "quantity", nullable = false)
     private BigDecimal quantity;
 
     @Column(name = "invested_amount", nullable = false)
     private BigDecimal investedAmount;
+
+    @Column(name = "monthly_interest", nullable = false)
+    private BigDecimal monthlyInterest;
 
     @Column(name = "accumulated_interest", nullable = false)
     private BigDecimal accumulatedInterest;
@@ -72,18 +73,13 @@ public class BondInterestCalculation {
 
     public abstract static class BondInterestCalculationBuilder<
             C extends BondInterestCalculation, B extends BondInterestCalculationBuilder<C, B>> {
+        public B referenceMonth(YearMonth referenceMonth) {
+            this.referenceMonth = referenceMonth.toString();
+            return self();
+        }
+
         public B calculationDate(LocalDate calculationDate) {
             this.calculationDate = calculationDate.format(Constants.DATE_FORMATTER_NO_TIME);
-            return self();
-        }
-
-        public B startDate(LocalDate startDate) {
-            this.startDate = startDate.format(Constants.DATE_FORMATTER_NO_TIME);
-            return self();
-        }
-
-        public B endDate(LocalDate endDate) {
-            this.endDate = endDate.format(Constants.DATE_FORMATTER_NO_TIME);
             return self();
         }
 
@@ -91,6 +87,21 @@ public class BondInterestCalculation {
             this.createdAt = createdAt.format(Constants.DB_DATE_FORMATTER);
             return self();
         }
+    }
+
+    public YearMonth getReferenceMonth() {
+        if (referenceMonth == null) {
+            return null;
+        }
+        return YearMonth.parse(referenceMonth);
+    }
+
+    public void setReferenceMonth(YearMonth month) {
+        if (month == null) {
+            this.referenceMonth = null;
+            return;
+        }
+        this.referenceMonth = month.toString();
     }
 
     public LocalDate getCalculationDate() {
@@ -106,36 +117,6 @@ public class BondInterestCalculation {
             return;
         }
         this.calculationDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
-    }
-
-    public LocalDate getStartDate() {
-        if (startDate == null) {
-            return null;
-        }
-        return LocalDate.parse(startDate, Constants.DATE_FORMATTER_NO_TIME);
-    }
-
-    public void setStartDate(LocalDate date) {
-        if (date == null) {
-            this.startDate = null;
-            return;
-        }
-        this.startDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
-    }
-
-    public LocalDate getEndDate() {
-        if (endDate == null) {
-            return null;
-        }
-        return LocalDate.parse(endDate, Constants.DATE_FORMATTER_NO_TIME);
-    }
-
-    public void setEndDate(LocalDate date) {
-        if (date == null) {
-            this.endDate = null;
-            return;
-        }
-        this.endDate = date.format(Constants.DATE_FORMATTER_NO_TIME);
     }
 
     public LocalDateTime getCreatedAt() {

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,142 +51,6 @@ public class BondInterestCalculationService {
         this.bondOperationRepository = bondOperationRepository;
         this.bondInterestCalculationRepository = bondInterestCalculationRepository;
         this.marketIndicatorService = marketIndicatorService;
-    }
-
-    /**
-     * Calculate accumulated interest for a bond from purchase date to calculation date
-     *
-     * @param bondId The bond ID
-     * @param calculationDate The date to calculate interest until
-     * @return BondInterestCalculation with accumulated interest
-     */
-    @Transactional
-    public BondInterestCalculation calculateBondInterest(
-            Integer bondId, LocalDate calculationDate) {
-        Bond bond =
-                bondRepository
-                        .findById(bondId)
-                        .orElseThrow(
-                                () ->
-                                        new EntityNotFoundException(
-                                                "Bond not found with id: " + bondId));
-
-        List<BondOperation> operations =
-                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
-
-        if (operations.isEmpty()) {
-            throw new IllegalArgumentException("Bond has no operations to calculate interest");
-        }
-
-        // Get first buy operation
-        Optional<BondOperation> firstBuy =
-                operations.stream()
-                        .filter(op -> op.getOperationType() == OperationType.BUY)
-                        .findFirst();
-
-        if (firstBuy.isEmpty()) {
-            throw new IllegalArgumentException("Bond has no buy operations");
-        }
-
-        LocalDate startDate = firstBuy.get().getWalletTransaction().getDate().toLocalDate();
-
-        log.info(
-                "Calculating interest for bond {} from {} to {}",
-                bond.getName(),
-                startDate,
-                calculationDate);
-
-        BigDecimal accumulatedInterest = BigDecimal.ZERO;
-        BigDecimal investedAmount = BigDecimal.ZERO;
-
-        // Process operations chronologically
-        BigDecimal currentQuantity = BigDecimal.ZERO;
-        LocalDate lastCalculationDate = startDate;
-        BigDecimal lastOperationSpread = null; // Will be set when first BUY operation is found
-
-        for (BondOperation operation : operations) {
-            LocalDate operationDate = operation.getWalletTransaction().getDate().toLocalDate();
-
-            if (operationDate.isAfter(calculationDate)) {
-                break;
-            }
-
-            // Calculate interest for the period before this operation
-            if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
-                    && operationDate.isAfter(lastCalculationDate)) {
-                // Use stored spread from operation, fallback to current bond spread if not
-                // available
-                BigDecimal spreadToUse =
-                        lastOperationSpread != null ? lastOperationSpread : bond.getInterestRate();
-                BigDecimal periodInterest =
-                        calculatePeriodInterest(
-                                bond,
-                                lastCalculationDate,
-                                operationDate,
-                                currentQuantity,
-                                operation.getUnitPrice(),
-                                spreadToUse);
-                accumulatedInterest = accumulatedInterest.add(periodInterest);
-            }
-
-            // Update quantity based on operation type
-            if (operation.getOperationType() == OperationType.BUY) {
-                currentQuantity = currentQuantity.add(operation.getQuantity());
-                investedAmount =
-                        investedAmount.add(
-                                operation.getQuantity().multiply(operation.getUnitPrice()));
-                // Store the spread from this operation for future periods
-                if (operation.getSpread() != null) {
-                    lastOperationSpread = operation.getSpread();
-                }
-            } else {
-                currentQuantity = currentQuantity.subtract(operation.getQuantity());
-            }
-
-            lastCalculationDate = operationDate;
-        }
-
-        // Calculate interest for the remaining period until calculation date
-        if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
-                && lastCalculationDate.isBefore(calculationDate)) {
-            BigDecimal lastOperationPrice =
-                    operations.stream()
-                            .filter(op -> op.getOperationType() == OperationType.BUY)
-                            .reduce((first, second) -> second)
-                            .map(BondOperation::getUnitPrice)
-                            .orElse(BigDecimal.ZERO);
-
-            // Use stored spread from operation, fallback to current bond spread if not available
-            BigDecimal spreadToUse =
-                    lastOperationSpread != null ? lastOperationSpread : bond.getInterestRate();
-            BigDecimal periodInterest =
-                    calculatePeriodInterest(
-                            bond,
-                            lastCalculationDate,
-                            calculationDate,
-                            currentQuantity,
-                            lastOperationPrice,
-                            spreadToUse);
-            accumulatedInterest = accumulatedInterest.add(periodInterest);
-        }
-
-        BigDecimal finalValue = investedAmount.add(accumulatedInterest);
-
-        BondInterestCalculation calculation =
-                BondInterestCalculation.builder()
-                        .bond(bond)
-                        .calculationDate(calculationDate)
-                        .startDate(startDate)
-                        .endDate(calculationDate)
-                        .quantity(currentQuantity)
-                        .investedAmount(investedAmount)
-                        .accumulatedInterest(accumulatedInterest)
-                        .finalValue(finalValue)
-                        .calculationMethod(getCalculationMethod(bond))
-                        .createdAt(LocalDateTime.now())
-                        .build();
-
-        return bondInterestCalculationRepository.save(calculation);
     }
 
     /**
@@ -351,7 +216,6 @@ public class BondInterestCalculationService {
     /**
      * Get accumulated indicator rate between two dates using compound interest
      * Formula: ∏[(1 + Taxa_Anual_Dia/100)^(1/252) × (Percentual/100)]
-     *
      * IMPORTANT: The BACEN API only provides data for business days (dias úteis).
      * We iterate through the historical data provided by the API, which already
      * excludes weekends and holidays according to ANBIMA calendar.
@@ -425,19 +289,6 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Get accumulated indicator rate between two dates (100% of indicator)
-     *
-     * @param indicatorType The indicator type
-     * @param startDate Start date
-     * @param endDate End date
-     * @return Accumulated rate (e.g., 1.05 for 5% accumulated)
-     */
-    private BigDecimal getAccumulatedIndicatorRate(
-            InterestIndex indicatorType, LocalDate startDate, LocalDate endDate) {
-        return getAccumulatedIndicatorRate(indicatorType, startDate, endDate, HUNDRED);
-    }
-
-    /**
      * Get the calculation method description
      *
      * @param bond The bond
@@ -453,82 +304,386 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Recalculate interest for a bond (updates existing calculation)
+     * Get the latest interest calculation for a bond (last calculated month)
      *
      * @param bondId The bond ID
-     * @param calculationDate The date to calculate interest until
-     */
-    @Transactional
-    public void recalculateBondInterest(Integer bondId, LocalDate calculationDate) {
-        // Delete existing calculation for this date
-        bondInterestCalculationRepository.deleteByBondIdAndCalculationDate(
-                bondId, calculationDate.format(org.moinex.util.Constants.DATE_FORMATTER_NO_TIME));
-
-        // Calculate new interest
-        calculateBondInterest(bondId, calculationDate);
-    }
-
-    /**
-     * Get the latest interest calculation for a bond
-     *
-     * @param bondId The bond ID
-     * @return Latest BondInterestCalculation
+     * @return Latest BondInterestCalculation for the last calculated month
      */
     @Transactional(readOnly = true)
     public Optional<BondInterestCalculation> getLatestCalculation(Integer bondId) {
-        return bondInterestCalculationRepository.findLatestByBondId(bondId);
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+        return bondInterestCalculationRepository.findLastCalculatedMonth(bond);
     }
 
     /**
-     * Get all interest calculations for a bond
-     *
-     * @param bondId The bond ID
-     * @return List of BondInterestCalculation
-     */
-    @Transactional(readOnly = true)
-    public List<BondInterestCalculation> getCalculationsByBondId(Integer bondId) {
-        return bondInterestCalculationRepository.findByBondIdOrderByCalculationDateDesc(bondId);
-    }
-
-    /**
-     * Calculate interest for all bonds that haven't been calculated today
+     * Synchronize monthly interest calculations for all bonds
+     * Ensures all bonds have their monthly interest history up to date
      * Called on application startup
      */
     @Transactional
     public void calculateInterestForAllBondsIfNeeded() {
-        log.info("Starting interest calculation for bonds that haven't been calculated today");
+        log.info("Starting monthly interest synchronization for all bonds");
 
         List<Bond> activeBonds = bondRepository.findByArchivedFalseOrderByNameAsc();
-        LocalDate today = LocalDate.now();
-        String todayStr = today.format(org.moinex.util.Constants.DATE_FORMATTER_NO_TIME);
-        int calculatedCount = 0;
+        int syncedCount = 0;
 
         for (Bond bond : activeBonds) {
             // Check if this bond has operations
             List<BondOperation> operations =
                     bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
             if (operations.isEmpty()) {
+                log.debug("Bond {} has no operations, skipping", bond.getName());
                 continue;
             }
 
-            // Check if calculation already exists for today
-            Optional<BondInterestCalculation> existingCalculation =
-                    bondInterestCalculationRepository.findByBondAndCalculationDate(bond, todayStr);
-
-            if (existingCalculation.isEmpty()) {
-                try {
-                    calculateBondInterest(bond.getId(), today);
-                    calculatedCount++;
-                    log.debug("Calculated interest for bond: {}", bond.getName());
-                } catch (Exception e) {
-                    log.warn(
-                            "Failed to calculate interest for bond {}: {}",
-                            bond.getName(),
-                            e.getMessage());
-                }
+            try {
+                // Calculate and store monthly interest history
+                calculateAndStoreMonthlyInterest(bond);
+                syncedCount++;
+                log.debug("Synchronized monthly interest for bond: {}", bond.getName());
+            } catch (Exception e) {
+                log.warn(
+                        "Failed to synchronize monthly interest for bond {}: {}",
+                        bond.getName(),
+                        e.getMessage());
             }
         }
 
-        log.info("Interest calculation completed: {} bonds calculated", calculatedCount);
+        log.info("Monthly interest synchronization completed: {} bonds synced", syncedCount);
+    }
+
+    /**
+     * Calculate interest for a specific month
+     *
+     * @param bond The bond
+     * @param month The month to calculate interest for
+     * @return Monthly interest amount
+     */
+    private BigDecimal calculateMonthlyInterest(Bond bond, YearMonth month) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        if (operations.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDate monthStart = month.atDay(1);
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        BigDecimal monthlyInterest = BigDecimal.ZERO;
+        BigDecimal currentQuantity = BigDecimal.ZERO;
+        LocalDate lastCalculationDate = monthStart;
+        BigDecimal lastOperationSpread = null;
+
+        for (BondOperation operation : operations) {
+            LocalDate operationDate = operation.getWalletTransaction().getDate().toLocalDate();
+
+            if (operationDate.isAfter(monthEnd)) {
+                break;
+            }
+
+            if (operationDate.isBefore(monthStart)) {
+                if (operation.getOperationType() == OperationType.BUY) {
+                    currentQuantity = currentQuantity.add(operation.getQuantity());
+                    if (operation.getSpread() != null) {
+                        lastOperationSpread = operation.getSpread();
+                    }
+                } else {
+                    currentQuantity = currentQuantity.subtract(operation.getQuantity());
+                }
+                continue;
+            }
+
+            if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
+                    && operationDate.isAfter(lastCalculationDate)) {
+                BigDecimal spreadToUse =
+                        lastOperationSpread != null ? lastOperationSpread : bond.getInterestRate();
+                BigDecimal periodInterest =
+                        calculatePeriodInterest(
+                                bond,
+                                lastCalculationDate,
+                                operationDate,
+                                currentQuantity,
+                                operation.getUnitPrice(),
+                                spreadToUse);
+                monthlyInterest = monthlyInterest.add(periodInterest);
+            }
+
+            if (operation.getOperationType() == OperationType.BUY) {
+                currentQuantity = currentQuantity.add(operation.getQuantity());
+                if (operation.getSpread() != null) {
+                    lastOperationSpread = operation.getSpread();
+                }
+            } else {
+                currentQuantity = currentQuantity.subtract(operation.getQuantity());
+            }
+
+            lastCalculationDate = operationDate;
+        }
+
+        if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
+                && lastCalculationDate.isBefore(monthEnd)) {
+            BigDecimal lastOperationPrice =
+                    operations.stream()
+                            .filter(op -> op.getOperationType() == OperationType.BUY)
+                            .reduce((first, second) -> second)
+                            .map(BondOperation::getUnitPrice)
+                            .orElse(BigDecimal.ZERO);
+
+            BigDecimal spreadToUse =
+                    lastOperationSpread != null ? lastOperationSpread : bond.getInterestRate();
+            BigDecimal periodInterest =
+                    calculatePeriodInterest(
+                            bond,
+                            lastCalculationDate,
+                            monthEnd,
+                            currentQuantity,
+                            lastOperationPrice,
+                            spreadToUse);
+            monthlyInterest = monthlyInterest.add(periodInterest);
+        }
+
+        return monthlyInterest;
+    }
+
+    /**
+     * Calculate and store monthly interest for all months from first operation to today
+     *
+     * @param bond The bond
+     */
+    @Transactional
+    public void calculateAndStoreMonthlyInterest(Bond bond) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        if (operations.isEmpty()) {
+            log.warn(
+                    "Bond {} has no operations, skipping monthly interest calculation",
+                    bond.getName());
+            return;
+        }
+
+        Optional<BondOperation> firstBuy =
+                operations.stream()
+                        .filter(op -> op.getOperationType() == OperationType.BUY)
+                        .findFirst();
+
+        if (firstBuy.isEmpty()) {
+            log.warn(
+                    "Bond {} has no buy operations, skipping monthly interest calculation",
+                    bond.getName());
+            return;
+        }
+
+        LocalDate startDate = firstBuy.get().getWalletTransaction().getDate().toLocalDate();
+        YearMonth startMonth = YearMonth.from(startDate);
+        YearMonth currentMonth = YearMonth.now();
+
+        // Find the last calculated month (by referenceMonth, not calculationDate)
+        Optional<BondInterestCalculation> lastCalculation =
+                bondInterestCalculationRepository.findLastCalculatedMonth(bond);
+        YearMonth monthToStart = startMonth;
+        BigDecimal accumulatedInterest = BigDecimal.ZERO;
+
+        if (lastCalculation.isPresent()) {
+            // Start from the month after the last calculation
+            YearMonth lastMonth = lastCalculation.get().getReferenceMonth();
+            accumulatedInterest = lastCalculation.get().getAccumulatedInterest();
+
+            // Only recalculate if there are missing months or if it's the current month
+            if (lastMonth.equals(currentMonth)) {
+                log.debug(
+                        "Bond {} already has calculation for current month, only updating it",
+                        bond.getName());
+                monthToStart = currentMonth;
+            } else {
+                monthToStart = lastMonth.plusMonths(1);
+                log.info(
+                        "Bond {} has missing months from {} to {}, calculating...",
+                        bond.getName(),
+                        monthToStart,
+                        currentMonth);
+            }
+        } else {
+            log.info(
+                    "No previous calculations found for bond {}, calculating from {} to {}",
+                    bond.getName(),
+                    startMonth,
+                    currentMonth);
+        }
+
+        YearMonth month = monthToStart;
+
+        while (month.isBefore(currentMonth) || month.equals(currentMonth)) {
+            Optional<BondInterestCalculation> existingCalculation =
+                    bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                            bond, month.toString());
+
+            BigDecimal monthlyInterest = calculateMonthlyInterest(bond, month);
+
+            BigDecimal investedAmount = calculateInvestedAmountForMonth(bond, month);
+            BigDecimal currentQuantity = calculateQuantityForMonth(bond, month);
+
+            if (existingCalculation.isPresent()) {
+                // For existing calculations, only update monthly interest and quantity
+                // Keep the accumulated interest from the previous month
+                BondInterestCalculation existing = existingCalculation.get();
+                BigDecimal previousAccumulated =
+                        existing.getAccumulatedInterest().subtract(existing.getMonthlyInterest());
+                BigDecimal newAccumulated = previousAccumulated.add(monthlyInterest);
+                BigDecimal finalValue = investedAmount.add(newAccumulated);
+
+                existing.setCalculationDate(LocalDate.now());
+                existing.setQuantity(currentQuantity);
+                existing.setInvestedAmount(investedAmount);
+                existing.setMonthlyInterest(monthlyInterest);
+                existing.setAccumulatedInterest(newAccumulated);
+                existing.setFinalValue(finalValue);
+                existing.setCalculationMethod(getCalculationMethod(bond));
+
+                bondInterestCalculationRepository.save(existing);
+                accumulatedInterest = newAccumulated;
+                log.debug(
+                        "Updated monthly interest for bond {} month {}: monthly={}, accumulated={}",
+                        bond.getName(),
+                        month,
+                        monthlyInterest,
+                        newAccumulated);
+            } else {
+                // Create new calculation for missing months
+                accumulatedInterest = accumulatedInterest.add(monthlyInterest);
+                BigDecimal finalValue = investedAmount.add(accumulatedInterest);
+
+                BondInterestCalculation calculation =
+                        BondInterestCalculation.builder()
+                                .bond(bond)
+                                .referenceMonth(month)
+                                .calculationDate(LocalDate.now())
+                                .quantity(currentQuantity)
+                                .investedAmount(investedAmount)
+                                .monthlyInterest(monthlyInterest)
+                                .accumulatedInterest(accumulatedInterest)
+                                .finalValue(finalValue)
+                                .calculationMethod(getCalculationMethod(bond))
+                                .createdAt(LocalDateTime.now())
+                                .build();
+
+                bondInterestCalculationRepository.save(calculation);
+                log.debug(
+                        "Saved monthly interest for bond {} month {}: monthly={}, accumulated={}",
+                        bond.getName(),
+                        month,
+                        monthlyInterest,
+                        accumulatedInterest);
+            }
+
+            month = month.plusMonths(1);
+        }
+
+        log.info(
+                "Monthly interest calculation completed for bond {} with total accumulated: {}",
+                bond.getName(),
+                accumulatedInterest);
+    }
+
+    /**
+     * Calculate invested amount for a specific month
+     *
+     * @param bond The bond
+     * @param month The month
+     * @return Total invested amount in that month
+     */
+    private BigDecimal calculateInvestedAmountForMonth(Bond bond, YearMonth month) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        BigDecimal investedAmount = BigDecimal.ZERO;
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        for (BondOperation operation : operations) {
+            LocalDate operationDate = operation.getWalletTransaction().getDate().toLocalDate();
+
+            if (operationDate.isAfter(monthEnd)) {
+                break;
+            }
+
+            if (operation.getOperationType() == OperationType.BUY) {
+                investedAmount =
+                        investedAmount.add(
+                                operation.getQuantity().multiply(operation.getUnitPrice()));
+            }
+        }
+
+        return investedAmount;
+    }
+
+    /**
+     * Calculate quantity held at end of a specific month
+     *
+     * @param bond The bond
+     * @param month The month
+     * @return Quantity held at end of month
+     */
+    private BigDecimal calculateQuantityForMonth(Bond bond, YearMonth month) {
+        List<BondOperation> operations =
+                bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
+
+        BigDecimal quantity = BigDecimal.ZERO;
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        for (BondOperation operation : operations) {
+            LocalDate operationDate = operation.getWalletTransaction().getDate().toLocalDate();
+
+            if (operationDate.isAfter(monthEnd)) {
+                break;
+            }
+
+            if (operation.getOperationType() == OperationType.BUY) {
+                quantity = quantity.add(operation.getQuantity());
+            } else {
+                quantity = quantity.subtract(operation.getQuantity());
+            }
+        }
+
+        return quantity;
+    }
+
+    /**
+     * Get current month interest from database (calculated at startup)
+     * Does not recalculate, only retrieves stored value for current month
+     *
+     * @param bondId The bond ID
+     * @return Current month interest from database
+     */
+    @Transactional(readOnly = true)
+    public Optional<BigDecimal> getCurrentMonthInterestFromDatabase(Integer bondId) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+        YearMonth currentMonth = YearMonth.now();
+        return bondInterestCalculationRepository
+                .findByBondAndReferenceMonth(bond, currentMonth.toString())
+                .map(BondInterestCalculation::getMonthlyInterest);
+    }
+
+    /**
+     * Get monthly interest history for a bond
+     *
+     * @param bond The bond
+     * @return List of monthly interest calculations
+     */
+    @Transactional(readOnly = true)
+    public List<BondInterestCalculation> getMonthlyInterestHistory(Bond bond) {
+        return bondInterestCalculationRepository.findByBondOrderByReferenceMonthAsc(bond);
     }
 }

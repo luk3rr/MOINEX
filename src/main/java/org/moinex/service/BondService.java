@@ -533,16 +533,6 @@ public class BondService {
         log.info("BondOperation with id {} deleted successfully", operationId);
     }
 
-    @Transactional(readOnly = true)
-    public BondOperation getOperationById(Integer operationId) {
-        return bondOperationRepository
-                .findById(operationId)
-                .orElseThrow(
-                        () ->
-                                new EntityNotFoundException(
-                                        "BondOperation not found with id: " + operationId));
-    }
-
     /**
      * Get all bond operations up to a specific date
      *
@@ -556,77 +546,49 @@ public class BondService {
     }
 
     /**
-     * Calculate accumulated interest for a bond up to today
+     * Get complete monthly interest history for a bond
      *
      * @param bondId The bond ID
-     * @return BondInterestCalculation with accumulated interest
-     */
-    @Transactional
-    public BondInterestCalculation calculateBondInterestToday(Integer bondId) {
-        return bondInterestCalculationService.calculateBondInterest(bondId, LocalDate.now());
-    }
-
-    /**
-     * Calculate accumulated interest for a bond up to a specific date
-     *
-     * @param bondId The bond ID
-     * @param calculationDate The date to calculate interest until
-     * @return BondInterestCalculation with accumulated interest
-     */
-    @Transactional
-    public BondInterestCalculation calculateBondInterest(
-            Integer bondId, LocalDate calculationDate) {
-        return bondInterestCalculationService.calculateBondInterest(bondId, calculationDate);
-    }
-
-    /**
-     * Get the latest interest calculation for a bond
-     *
-     * @param bondId The bond ID
-     * @return Latest BondInterestCalculation if exists
+     * @return List of monthly interest calculations ordered by month
      */
     @Transactional(readOnly = true)
-    public java.util.Optional<BondInterestCalculation> getLatestInterestCalculation(
-            Integer bondId) {
-        return bondInterestCalculationService.getLatestCalculation(bondId);
+    public List<BondInterestCalculation> getMonthlyInterestHistory(Integer bondId) {
+        Bond bond =
+                bondRepository
+                        .findById(bondId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "Bond not found with id: " + bondId));
+        return bondInterestCalculationService.getMonthlyInterestHistory(bond);
     }
 
     /**
-     * Get all interest calculations for a bond
+     * Get current month interest from database (calculated at startup)
+     * Does not recalculate, only retrieves stored value
      *
      * @param bondId The bond ID
-     * @return List of BondInterestCalculation ordered by date descending
+     * @return Monthly interest for current month from database
      */
     @Transactional(readOnly = true)
-    public List<BondInterestCalculation> getInterestCalculationHistory(Integer bondId) {
-        return bondInterestCalculationService.getCalculationsByBondId(bondId);
-    }
-
-    /**
-     * Get accumulated interest for a bond up to today
-     *
-     * @param bondId The bond ID
-     * @return Accumulated interest amount
-     */
-    @Transactional(readOnly = true)
-    public BigDecimal getAccumulatedInterestToday(Integer bondId) {
+    public BigDecimal getCurrentMonthInterest(Integer bondId) {
         return bondInterestCalculationService
-                .getLatestCalculation(bondId)
-                .map(BondInterestCalculation::getAccumulatedInterest)
+                .getCurrentMonthInterestFromDatabase(bondId)
                 .orElse(BigDecimal.ZERO);
     }
 
     /**
-     * Get final value (invested + interest) for a bond up to today
+     * Get total accumulated interest from database (calculated at startup)
+     * Does not recalculate, only retrieves stored value
      *
      * @param bondId The bond ID
-     * @return Final value (invested amount + accumulated interest)
+     * @return Total accumulated interest since first operation from database
      */
     @Transactional(readOnly = true)
-    public BigDecimal getFinalValueToday(Integer bondId) {
+    public BigDecimal getTotalAccumulatedInterest(Integer bondId) {
         return bondInterestCalculationService
                 .getLatestCalculation(bondId)
-                .map(BondInterestCalculation::getFinalValue)
+                .map(BondInterestCalculation::getAccumulatedInterest)
                 .orElse(BigDecimal.ZERO);
     }
 }
