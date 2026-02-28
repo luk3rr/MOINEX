@@ -147,14 +147,14 @@ fi
 chmod +x "$DOT_LOCAL_DIR/share/applications/moinex.desktop"
 print_success ">> Permissões de execução concedidas ao arquivo .desktop"
 
-if mvn clean package; then
+if ./gradlew clean build -x test; then
     print_success ">> JAR criado com sucesso"
 else
-    print_error "Erro ao criar o JAR. Verifique se o maven e o java 21 estão instalados"
+    print_error "Erro ao criar o JAR. Verifique se o gradle e o java 21 estão instalados"
     exit 1
 fi
 
-if cp target/moinex.jar "$MOINEX_DIR/bin/moinex.jar"; then
+if cp build/libs/moinex.jar "$MOINEX_DIR/bin/moinex.jar"; then
     print_success ">> JAR copiado para $MOINEX_DIR/bin"
 else
     print_error "Erro ao copiar o JAR para $MOINEX_DIR/bin"

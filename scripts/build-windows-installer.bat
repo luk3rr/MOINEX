@@ -51,11 +51,11 @@ if not exist "python-embedded\python.exe" (
 )
 
 REM Build the JAR
-echo [INFO] Compilando o projeto com Maven...
-call mvn clean package -DskipTests
+echo [INFO] Compilando o projeto com Gradle...
+call gradlew clean build -x test
 
-if not exist "target\moinex.jar" (
-    echo [ERROR] JAR nao foi gerado. Verifique a compilacao Maven.
+if not exist "build\libs\moinex.jar" (
+    echo [ERROR] JAR nao foi gerado. Verifique a compilacao Gradle.
     exit /b 1
 )
 
@@ -65,8 +65,8 @@ REM Create output directory
 set OUTPUT_DIR=installer-output
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
-REM Extract version from pom.xml or use git tag
-for /f "tokens=*" %%i in ('powershell -Command "(Select-Xml -Path 'pom.xml' -XPath '/*[local-name()=''project'']/*[local-name()=''version'']/text()').Node.Value"') do set VERSION=%%i
+REM Extract version from build.gradle.kts or use git tag
+for /f "tokens=*" %%i in ('powershell -Command "(Get-Content build.gradle.kts | Select-String 'version = ').ToString() -replace 'version = |"', ''"') do set VERSION=%%i
 
 REM If version is empty or SNAPSHOT, try to get from git tag
 if "%VERSION%"=="" set VERSION=1.0.0
@@ -80,10 +80,10 @@ if "%VERSION%"=="1.0-SNAPSHOT" (
     )
 )
 
-REM Copy Python embedded to target directory so jpackage can include it
-echo [INFO] Copiando Python embarcado para o diretorio target...
-if not exist "target\python-embedded" mkdir "target\python-embedded"
-xcopy /E /I /Y python-embedded\* target\python-embedded\
+REM Copy Python embedded to build directory so jpackage can include it
+echo [INFO] Copiando Python embarcado para o diretorio build...
+if not exist "build\python-embedded" mkdir "build\python-embedded"
+xcopy /E /I /Y python-embedded\* build\python-embedded\
 
 echo [INFO] Gerando instalador Windows com jpackage...
 echo [INFO]   Versao: %VERSION%
@@ -91,7 +91,7 @@ echo [INFO]   Isso pode levar alguns minutos...
 
 REM Run jpackage to create Windows installer
 jpackage ^
-    --input target ^
+    --input build\libs ^
     --name Moinex ^
     --main-jar moinex.jar ^
     --main-class org.springframework.boot.loader.launch.JarLauncher ^
@@ -102,7 +102,7 @@ jpackage ^
     --description "Aplicacao de gestao financeira pessoal" ^
     --copyright "Copyright (c) 2024-2026 Lucas Araujo. Licensed under GPL-3.0" ^
     --icon docs\img\icons\moinex-icon.ico ^
-    --app-content target\python-embedded ^
+    --app-content build\python-embedded ^
     --win-dir-chooser ^
     --win-menu ^
     --win-shortcut ^

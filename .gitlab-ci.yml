@@ -8,7 +8,8 @@ variables:
 
 cache:
   paths:
-    - ~/.m2/repository/
+    - .gradle/wrapper
+    - .gradle/caches
 
 stages:
   - test
@@ -18,20 +19,20 @@ stages:
 
 unit_test:
   stage: test
-  image: maven:3.9.6-eclipse-temurin-21
+  image: eclipse-temurin:21-jdk
   script:
-    - mvn clean install jacoco:prepare-agent install jacoco:report
-    - mvn dependency:copy-dependencies
+    - ./gradlew clean build jacocoTestReport
   artifacts:
     paths:
-      - target/classes
-      - target/dependency
-      - target/site/jacoco/jacoco.xml
+      - build/classes
+      - build/libs
+      - build/reports/jacoco/test/jacocoTestReport.xml
     when: always
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
-      - ~/.m2/repository/
+      - .gradle/wrapper
+      - .gradle/caches
     policy: pull-push
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_MERGE_REQUEST_ID'
