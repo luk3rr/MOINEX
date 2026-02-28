@@ -471,6 +471,10 @@ public class BondInterestCalculationService {
                         bond.getInterestIndex(), startDate, endDate);
 
         if (availableData.isEmpty()) {
+            log.info(
+                    "No market data available from start date {} and end date {}",
+                    startDate,
+                    endDate);
             return startDate;
         }
 
@@ -488,15 +492,20 @@ public class BondInterestCalculationService {
      * @param month The month
      * @param periodStart Start date of the period (inclusive)
      * @param periodEnd End date of the period (inclusive)
+     * @param previousCalculatedUntil The previous calculated until date (to return if no new data)
      * @return Result with interest accumulated and last date with available data
      */
     private PeriodInterestResult calculatePeriodInterestForMonth(
-            Bond bond, YearMonth month, LocalDate periodStart, LocalDate periodEnd) {
+            Bond bond,
+            YearMonth month,
+            LocalDate periodStart,
+            LocalDate periodEnd,
+            LocalDate previousCalculatedUntil) {
         List<BondOperation> operations =
                 bondOperationRepository.findByBondOrderByOperationDateAsc(bond);
 
         if (operations.isEmpty()) {
-            return new PeriodInterestResult(BigDecimal.ZERO, periodStart);
+            return new PeriodInterestResult(BigDecimal.ZERO, previousCalculatedUntil);
         }
 
         LocalDate monthStart = month.atDay(1);
@@ -512,7 +521,7 @@ public class BondInterestCalculationService {
 
         // If period is invalid, return zero
         if (periodStart.isAfter(periodEnd)) {
-            return new PeriodInterestResult(BigDecimal.ZERO, periodStart);
+            return new PeriodInterestResult(BigDecimal.ZERO, previousCalculatedUntil);
         }
 
         BigDecimal periodInterestTotal = BigDecimal.ZERO;
@@ -580,7 +589,8 @@ public class BondInterestCalculationService {
         }
 
         // Calculate interest from last operation to period end
-        LocalDate actualLastDate = lastCalculationDate;
+        // Start with previous calculated date - only update if we actually calculate something
+        LocalDate actualLastDate = previousCalculatedUntil;
         if (currentQuantity.compareTo(BigDecimal.ZERO) > 0
                 && lastCalculationDate.isBefore(periodEnd)) {
             BigDecimal lastOperationPrice =
@@ -604,7 +614,7 @@ public class BondInterestCalculationService {
                         availableData.stream()
                                 .map(MarketIndicatorHistory::getReferenceDate)
                                 .max(LocalDate::compareTo)
-                                .orElse(lastCalculationDate);
+                                .orElse(previousCalculatedUntil);
 
                 BigDecimal periodInterest =
                         calculatePeriodInterest(
@@ -617,6 +627,15 @@ public class BondInterestCalculationService {
                 periodInterestTotal = periodInterestTotal.add(periodInterest);
             }
         }
+
+        log.info(
+                "Period interest calculated for bond {} from {} to {}",
+                bond.getName(),
+                periodStart,
+                periodEnd);
+        log.info("Period interest total: {}", periodInterestTotal);
+        log.info("Actual lastCalculationDate: {}", lastCalculationDate);
+        log.info("Actual last date with data: {}", actualLastDate);
 
         return new PeriodInterestResult(periodInterestTotal, actualLastDate);
     }
@@ -714,38 +733,53 @@ public class BondInterestCalculationService {
 
                         PeriodInterestResult result =
                                 calculatePeriodInterestForMonth(
-                                        bond, month, periodStart, periodEnd);
+                                        bond, month, periodStart, periodEnd, calculatedUntil);
 
-                        // Add incremental interest to existing monthly interest
-                        BigDecimal newMonthlyInterest =
-                                existing.getMonthlyInterest().add(result.interest());
-                        BigDecimal previousAccumulated =
-                                existing.getAccumulatedInterest()
-                                        .subtract(existing.getMonthlyInterest());
-                        BigDecimal newAccumulated = previousAccumulated.add(newMonthlyInterest);
-                        BigDecimal finalValue = investedAmount.add(newAccumulated);
+                        // Only update if we actually calculated something new
+                        // If result.lastDateWithData() equals periodStart and interest is zero,
+                        // it means no data was available, so don't advance the date
+                        if (result.interest().compareTo(BigDecimal.ZERO) > 0
+                                || result.lastDateWithData().isAfter(calculatedUntil)) {
+                            // Add incremental interest to existing monthly interest
+                            BigDecimal newMonthlyInterest =
+                                    existing.getMonthlyInterest().add(result.interest());
+                            BigDecimal previousAccumulated =
+                                    existing.getAccumulatedInterest()
+                                            .subtract(existing.getMonthlyInterest());
+                            BigDecimal newAccumulated = previousAccumulated.add(newMonthlyInterest);
+                            BigDecimal finalValue = investedAmount.add(newAccumulated);
 
-                        existing.setCalculationDate(LocalDate.now());
-                        existing.setCalculatedUntilDate(result.lastDateWithData());
-                        existing.setQuantity(currentQuantity);
-                        existing.setInvestedAmount(investedAmount);
-                        existing.setMonthlyInterest(newMonthlyInterest);
-                        existing.setAccumulatedInterest(newAccumulated);
-                        existing.setFinalValue(finalValue);
+                            existing.setCalculationDate(LocalDate.now());
+                            existing.setCalculatedUntilDate(result.lastDateWithData());
+                            existing.setQuantity(currentQuantity);
+                            existing.setInvestedAmount(investedAmount);
+                            existing.setMonthlyInterest(newMonthlyInterest);
+                            existing.setAccumulatedInterest(newAccumulated);
+                            existing.setFinalValue(finalValue);
 
-                        bondInterestCalculationRepository.save(existing);
-                        accumulatedInterest = newAccumulated;
+                            bondInterestCalculationRepository.save(existing);
+                            accumulatedInterest = newAccumulated;
 
-                        log.debug(
-                                "Incremental update for manually adjusted bond {} month {}:"
+                            log.debug(
+                                    "Incremental update for manually adjusted bond {} month {}:"
                                         + " added={}, new monthly={}, accumulated={}, calculated"
                                         + " until={}",
-                                bond.getName(),
-                                month,
-                                result.interest(),
-                                newMonthlyInterest,
-                                newAccumulated,
-                                result.lastDateWithData());
+                                    bond.getName(),
+                                    month,
+                                    result.interest(),
+                                    newMonthlyInterest,
+                                    newAccumulated,
+                                    result.lastDateWithData());
+                        } else {
+                            // No new data available, keep existing values
+                            accumulatedInterest = existing.getAccumulatedInterest();
+                            log.debug(
+                                    "No new data available for manually adjusted bond {} month {}"
+                                            + " (last calculated: {})",
+                                    bond.getName(),
+                                    month,
+                                    calculatedUntil);
+                        }
                     } else {
                         // No new period to calculate, just update accumulated for propagation
                         accumulatedInterest = existing.getAccumulatedInterest();

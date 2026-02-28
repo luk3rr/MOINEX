@@ -290,8 +290,13 @@ public class MarketIndicatorService {
                                 syncStartDate);
                     } else {
                         // We have data from before or at the purchase date
-                        // Just update from yesterday to today
-                        syncStartDate = endDate.minusDays(1);
+                        Optional<MarketIndicatorHistory> mostRecentAvailableData =
+                                marketIndicatorHistoryRepository.findLatestByIndicatorType(
+                                        indicator);
+                        syncStartDate =
+                                mostRecentAvailableData.isPresent()
+                                        ? mostRecentAvailableData.get().getReferenceDate()
+                                        : endDate.minusDays(1);
                         log.debug(
                                 "Indicator {} has complete data from {}, updating recent data",
                                 indicator,
