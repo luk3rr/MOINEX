@@ -1,7 +1,9 @@
 /*
- * Filename: CreditCardService.kt
+ * Filename: CreditCardService.kt (original filename: CreditCardService.java)
  * Created on: September  4, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * Migrate to Kotlin on 28/02/2026
  */
 
 package org.moinex.service

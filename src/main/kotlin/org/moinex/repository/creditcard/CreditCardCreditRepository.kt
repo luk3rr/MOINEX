@@ -1,7 +1,9 @@
 /*
- * Filename: CreditCardCreditRepository.kt
+ * Filename: CreditCardCreditRepository.kt (original filename: CreditCardCreditRepository.java)
  * Created on: March  5, 2025
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * Migrate to Kotlin on 28/02/2026
  */
 
 package org.moinex.repository.creditcard

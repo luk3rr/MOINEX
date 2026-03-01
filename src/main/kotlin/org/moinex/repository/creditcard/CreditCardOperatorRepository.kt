@@ -1,7 +1,9 @@
 /*
- * Filename: CreditCardOperatorRepository.kt
+ * Filename: CreditCardOperatorRepository.kt (original filename: CreditCardOperatorRepository.java)
  * Created on: September 17, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * Migrate to Kotlin on 28/02/2026
  */
 
 package org.moinex.repository.creditcard

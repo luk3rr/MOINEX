@@ -1,3 +1,11 @@
+/*
+ * Filename: CreditCardOperator.kt (original filename: CreditCardOperator.java)
+ * Created on: September 17, 2024
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * Migrate to Kotlin on 28/02/2026
+ */
+
 package org.moinex.model.creditcard
 
 import jakarta.persistence.Column
