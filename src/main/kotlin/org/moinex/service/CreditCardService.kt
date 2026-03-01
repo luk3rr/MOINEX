@@ -268,15 +268,19 @@ class CreditCardService(
                 if (payment.isPaid()) acc.plus(payment.amount) else acc
             }
 
-        addRebate(
-            CreditCardCredit(
-                creditCard = debtFromDatabase.creditCard,
-                date = nextInvoiceDate,
-                amount = totalToRefund,
-                type = CreditCardCreditType.REFUND,
-                description = description,
-            ),
-        )
+        if (totalToRefund > BigDecimal.ZERO) {
+            addRebate(
+                CreditCardCredit(
+                    creditCard = debtFromDatabase.creditCard,
+                    date = nextInvoiceDate,
+                    amount = totalToRefund,
+                    type = CreditCardCreditType.REFUND,
+                    description = description,
+                ),
+            )
+        } else {
+            logger.info("No payments to refund for $debtFromDatabase")
+        }
     }
 
     @Transactional
@@ -290,11 +294,11 @@ class CreditCardService(
 
         val walletFromDatabase = walletRepository.findByIdOrThrow(billingWalletId)
 
-        check(rebate < BigDecimal.ZERO) {
+        check(rebate >= BigDecimal.ZERO) {
             "Rebate cannot be negative"
         }
 
-        check(creditCardFromDatabase.availableRebate > rebate) {
+        check(creditCardFromDatabase.availableRebate >= rebate) {
             "Insufficient available rebate"
         }
 
@@ -306,10 +310,7 @@ class CreditCardService(
                     invoiceDate.year,
                 ).toList()
 
-        val totalPendingPayments =
-            pendingPayments.fold(BigDecimal.ZERO) { acc, payment ->
-                acc.plus(payment.amount)
-            }
+        val totalPendingPayments = pendingPayments.sumOf { it.amount }
 
         var totalToPay = totalPendingPayments.minus(rebate)
 
@@ -372,6 +373,8 @@ class CreditCardService(
         val creditCardFromDatabase = creditCardRepository.findByIdOrThrow(creditCardCredit.creditCard.id!!)
 
         creditCardFromDatabase.availableRebate += creditCardCredit.amount
+
+        creditCardCreditRepository.save(creditCardCredit)
 
         logger.info("$creditCardCredit added successfully")
     }
@@ -534,9 +537,8 @@ class CreditCardService(
 
     private fun refundPayment(payment: CreditCardPayment) {
         payment.wallet?.let { wallet ->
-            wallet.balance = wallet.balance.plus(payment.amount)
+            wallet.balance += payment.amount
             logger.info("${payment.wallet} balance updated to ${wallet.balance} for payment $payment")
-            walletRepository.save(wallet)
         } ?: run {
             logger.info("$payment is not paid")
         }
