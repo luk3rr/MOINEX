@@ -345,7 +345,7 @@ public final class Constants {
     // Credit card
     public static final Integer MAX_BILLING_DUE_DAY = 28;
     public static final Integer INSTALLMENTS_FIELD_MAX_DIGITS = 3;
-    public static final Short MAX_INSTALLMENTS = 999;
+    public static final Integer MAX_INSTALLMENTS = 999;
 
     // Animation constants
     public static final Double MENU_COLLAPSED_WIDTH = 80.0;

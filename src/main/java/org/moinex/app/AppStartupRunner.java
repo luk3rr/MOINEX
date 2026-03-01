@@ -50,109 +50,109 @@ public class AppStartupRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        //recurringTransactionService.processRecurringTransactions();
+        recurringTransactionService.processRecurringTransactions();
 
-        //CompletableFuture.runAsync(
-        //                () -> {
-        //                    logger.info("Updating market indicator history...");
-        //                    marketIndicatorService.updateAllIndicators();
-        //                    logger.info("Market indicator history updated successfully");
-        //                })
-        //        .exceptionally(
-        //                ex -> {
-        //                    logger.warn(
-        //                            "Failed to update market indicator history: {}",
-        //                            ex.getMessage());
-        //                    return null;
-        //                })
-        //        .thenRun(
-        //                () -> {
-        //                    logger.info("Calculating bond interest...");
-        //                    bondInterestCalculationService.calculateInterestForAllBondsIfNeeded();
-        //                    logger.info("Bond interest calculation completed successfully");
-        //                })
-        //        .exceptionally(
-        //                ex -> {
-        //                    logger.warn("Failed to calculate bond interest: {}", ex.getMessage());
-        //                    return null;
-        //                })
-        //        .thenCompose(
-        //                ignored ->
-        //                        marketService
-        //                                .updateBrazilianMarketIndicatorsFromApiAsync()
-        //                                .exceptionally(
-        //                                        ex -> {
-        //                                            logger.error(
-        //                                                    "Failed to update Brazilian market"
-        //                                                            + " indicators",
-        //                                                    ex);
-        //                                            return null;
-        //                                        })
-        //                                .thenCompose(
-        //                                        ignored2 ->
-        //                                                marketService
-        //                                                        .updateMarketQuotesAndCommoditiesFromApiAsync()
-        //                                                        .exceptionally(
-        //                                                                ex -> {
-        //                                                                    logger.error(
-        //                                                                            "Failed to"
-        //                                                                                + " update"
-        //                                                                                + " market"
-        //                                                                                + " quotes"
-        //                                                                                + " and commodities",
-        //                                                                            ex);
-        //                                                                    return null;
-        //                                                                }))
-        //                                .thenCompose(
-        //                                        ignored3 ->
-        //                                                priceHistoryService
-        //                                                        .initializePriceHistory(
-        //                                                                tickerPurchaseRepository,
-        //                                                                tickerSaleRepository)
-        //                                                        .handle(
-        //                                                                (res, ex) -> {
-        //                                                                    if (ex != null) {
-        //                                                                        logger.error(
-        //                                                                                "Failed to"
-        //                                                                                    + " initialize"
-        //                                                                                    + " price"
-        //                                                                                    + " history",
-        //                                                                                ex);
-        //                                                                        return false;
-        //                                                                    }
-        //                                                                    return true;
-        //                                                                }))
-        //                                .thenCompose(
-        //                                        previousStepSuccess ->
-        //                                                tickerService
-        //                                                        .updateAllNonArchivedTickersPricesAsync()
-        //                                                        .handle(
-        //                                                                (res, ex) -> {
-        //                                                                    if (ex != null) {
-        //                                                                        logger.error(
-        //                                                                                "Failed to"
-        //                                                                                    + " update"
-        //                                                                                    + " ticker"
-        //                                                                                    + " prices",
-        //                                                                                ex);
-        //                                                                        return false;
-        //                                                                    }
-        //                                                                    return previousStepSuccess;
-        //                                                                }))
-        //                                .thenCompose(
-        //                                        bothSucceeded -> {
-        //                                            if (Boolean.TRUE.equals(bothSucceeded)) {
-        //                                                return investmentPerformanceCalculationService
-        //                                                        .recalculateAllSnapshots();
-        //                                            }
-        //                                            return CompletableFuture.completedFuture(null);
-        //                                        })
-        //                                .exceptionally(
-        //                                        ex -> {
-        //                                            logger.error(
-        //                                                    "Unexpected error in startup pipeline",
-        //                                                    ex);
-        //                                            return null;
-        //                                        }));
+        CompletableFuture.runAsync(
+                        () -> {
+                            logger.info("Updating market indicator history...");
+                            marketIndicatorService.updateAllIndicators();
+                            logger.info("Market indicator history updated successfully");
+                        })
+                .exceptionally(
+                        ex -> {
+                            logger.warn(
+                                    "Failed to update market indicator history: {}",
+                                    ex.getMessage());
+                            return null;
+                        })
+                .thenRun(
+                        () -> {
+                            logger.info("Calculating bond interest...");
+                            bondInterestCalculationService.calculateInterestForAllBondsIfNeeded();
+                            logger.info("Bond interest calculation completed successfully");
+                        })
+                .exceptionally(
+                        ex -> {
+                            logger.warn("Failed to calculate bond interest: {}", ex.getMessage());
+                            return null;
+                        })
+                .thenCompose(
+                        ignored ->
+                                marketService
+                                        .updateBrazilianMarketIndicatorsFromApiAsync()
+                                        .exceptionally(
+                                                ex -> {
+                                                    logger.error(
+                                                            "Failed to update Brazilian market"
+                                                                    + " indicators",
+                                                            ex);
+                                                    return null;
+                                                })
+                                        .thenCompose(
+                                                ignored2 ->
+                                                        marketService
+                                                                .updateMarketQuotesAndCommoditiesFromApiAsync()
+                                                                .exceptionally(
+                                                                        ex -> {
+                                                                            logger.error(
+                                                                                    "Failed to"
+                                                                                        + " update"
+                                                                                        + " market"
+                                                                                        + " quotes"
+                                                                                        + " and commodities",
+                                                                                    ex);
+                                                                            return null;
+                                                                        }))
+                                        .thenCompose(
+                                                ignored3 ->
+                                                        priceHistoryService
+                                                                .initializePriceHistory(
+                                                                        tickerPurchaseRepository,
+                                                                        tickerSaleRepository)
+                                                                .handle(
+                                                                        (res, ex) -> {
+                                                                            if (ex != null) {
+                                                                                logger.error(
+                                                                                        "Failed to"
+                                                                                            + " initialize"
+                                                                                            + " price"
+                                                                                            + " history",
+                                                                                        ex);
+                                                                                return false;
+                                                                            }
+                                                                            return true;
+                                                                        }))
+                                        .thenCompose(
+                                                previousStepSuccess ->
+                                                        tickerService
+                                                                .updateAllNonArchivedTickersPricesAsync()
+                                                                .handle(
+                                                                        (res, ex) -> {
+                                                                            if (ex != null) {
+                                                                                logger.error(
+                                                                                        "Failed to"
+                                                                                            + " update"
+                                                                                            + " ticker"
+                                                                                            + " prices",
+                                                                                        ex);
+                                                                                return false;
+                                                                            }
+                                                                            return previousStepSuccess;
+                                                                        }))
+                                        .thenCompose(
+                                                bothSucceeded -> {
+                                                    if (Boolean.TRUE.equals(bothSucceeded)) {
+                                                        return investmentPerformanceCalculationService
+                                                                .recalculateAllSnapshots();
+                                                    }
+                                                    return CompletableFuture.completedFuture(null);
+                                                })
+                                        .exceptionally(
+                                                ex -> {
+                                                    logger.error(
+                                                            "Unexpected error in startup pipeline",
+                                                            ex);
+                                                    return null;
+                                                }));
     }
 }

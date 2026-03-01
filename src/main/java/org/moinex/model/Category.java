@@ -34,14 +34,14 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Integer id;
+    public Integer id;
 
     @Column(name = "name", nullable = false, length = 50)
-    private String name;
+    public String name;
 
     @Builder.Default
     @Column(name = "archived", nullable = false)
-    private boolean isArchived = false; // Default value is false
+    public boolean isArchived = false; // Default value is false
 
     @Override
     public boolean equals(Object o) {

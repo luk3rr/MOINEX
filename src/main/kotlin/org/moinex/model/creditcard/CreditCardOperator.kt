@@ -15,9 +15,14 @@ class CreditCardOperator(
     @Column(name = "id")
     var id: Int? = null,
     @Column(name = "name", nullable = false, length = 50, unique = true)
-    var name: String = "",
+    var name: String,
     @Column(name = "icon", length = 30)
     var icon: String? = null,
 ) {
+    init {
+        name = name.trim()
+        require(name.isNotBlank()) { "Credit card operator name cannot be empty" }
+    }
+
     override fun toString(): String = "Credit Card Operator [id=$id, name='$name']"
 }

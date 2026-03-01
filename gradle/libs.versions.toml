@@ -2,7 +2,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-ch-qos-logback-logback-classic = "1.5.17"
+ch-qos-logback-logback-classic = "1.5.32"
 com-diffplug-spotless-spotless-maven-plugin = "2.44.4"
 com-google-googlejavaformat-google-java-format = "1.26.0"
 com-h2database-h2 = "2.3.232"
@@ -22,10 +22,20 @@ org-openjfx-javafx-fxml = "23.0.1"
 org-projectlombok-lombok = "1.18.36"
 org-reflections-reflections = "0.10.2"
 org-slf4j-slf4j-api = "2.0.16"
-org-springframework-boot-spring-boot-starter = "3.4.5"
-org-springframework-boot-spring-boot-starter-data-jpa = "3.4.5"
-org-springframework-boot-spring-boot-starter-test = "3.4.5"
+org-springframework-boot-spring-boot-starter = "3.5.11"
+org-springframework-boot-spring-boot-starter-data-jpa = "3.5.11"
+org-springframework-boot-spring-boot-starter-test = "3.5.11"
 org-xerial-sqlite-jdbc = "3.49.1.0"
+io-kotest-kotest-runner-junit5 = "6.1.4"
+io-kotest-kotest-assertions-core = "6.1.4"
+io-kotest-kotest-extensions-spring = "6.1.4"
+io-mockk-mockk = "1.13.8"
+org-flywaydb-flyway-core = "11.3.4"
+org-jacoco-jacoco = "0.8.13"
+org-jlleitschuh-gradle-ktlint = "1.4.1"
+org-assertj-assertj-core = "3.27.7"
+org-apache-commons-commons-lang3 = "3.18.0"
+commons-beanutils-commons-beanutils = "1.11.0"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback-logback-classic" }
@@ -52,3 +62,13 @@ org-springframework-boot-spring-boot-starter = { module = "org.springframework.b
 org-springframework-boot-spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "org-springframework-boot-spring-boot-starter-data-jpa" }
 org-springframework-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "org-springframework-boot-spring-boot-starter-test" }
 org-xerial-sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "org-xerial-sqlite-jdbc" }
+io-kotest-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "io-kotest-kotest-runner-junit5" }
+io-kotest-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "io-kotest-kotest-assertions-core" }
+io-kotest-kotest-extensions-spring = { module = "io.kotest:kotest-extensions-spring", version.ref = "io-kotest-kotest-extensions-spring" }
+io-mockk-mockk = { module = "io.mockk:mockk", version.ref = "io-mockk-mockk" }
+org-flywaydb-flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "org-flywaydb-flyway-core" }
+org-jacoco-jacoco = { module = "org.jacoco:jacoco", version.ref = "org-jacoco-jacoco" }
+org-jlleitschuh-gradle-ktlint = { module = "org.jlleitschuh.gradle:ktlint", version.ref = "org-jlleitschuh-gradle-ktlint" }
+org-assertj-assertj-core = { module = "org.assertj:assertj-core", version.ref = "org-assertj-assertj-core" }
+org-apache-commons-commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "org-apache-commons-commons-lang3" }
+commons-beanutils-commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils-commons-beanutils" }

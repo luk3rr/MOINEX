@@ -4,15 +4,15 @@
 
 plugins {
     java
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.spring") version "2.0.0"
-    kotlin("plugin.jpa") version "2.0.0"
-    kotlin("plugin.allopen") version "2.0.0"
-    id("org.springframework.boot") version "3.4.5"
+    kotlin("jvm") version "2.1.0"
+    kotlin("plugin.spring") version "2.1.0"
+    kotlin("plugin.jpa") version "2.1.0"
+    kotlin("plugin.allopen") version "2.1.0"
+    id("org.springframework.boot") version "3.5.11"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openjfx.javafxplugin") version "0.1.0"
     id("org.beryx.jlink") version "3.0.1"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
     jacoco
     `maven-publish`
 }
@@ -42,7 +42,6 @@ dependencies {
     // Database
     implementation(libs.org.xerial.sqlite.jdbc)
     implementation(libs.org.hibernate.orm.hibernate.community.dialects)
-    testImplementation(libs.com.h2database.h2)
 
     // JavaFX
     implementation(libs.org.openjfx.javafx.controls)
@@ -51,6 +50,8 @@ dependencies {
 
     // Utilities
     implementation(libs.com.opencsv.opencsv)
+    implementation(libs.org.apache.commons.commons.lang3)
+    implementation(libs.commons.beanutils.commons.beanutils)
     implementation(libs.org.reflections.reflections)
     implementation(libs.net.objecthunter.exp4j)
     implementation(libs.org.json.json)
@@ -61,7 +62,7 @@ dependencies {
     implementation(libs.ch.qos.logback.logback.classic)
 
     // Flyway
-    implementation("org.flywaydb:flyway-core:11.3.4")
+    implementation(libs.org.flywaydb.flyway.core)
 
     // Code Quality
     implementation(libs.com.google.googlejavaformat.google.java.format)
@@ -71,12 +72,18 @@ dependencies {
     annotationProcessor(libs.org.projectlombok.lombok)
 
     // Testing
+    testImplementation(libs.com.h2database.h2)
     testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
     testImplementation(libs.org.junit.jupiter.junit.jupiter.api)
     testImplementation(libs.org.junit.jupiter.junit.jupiter.engine)
     testImplementation(libs.org.mockito.mockito.core)
     testImplementation(libs.org.mockito.mockito.junit.jupiter)
     testImplementation(kotlin("test"))
+    testImplementation(libs.io.kotest.kotest.runner.junit5)
+    testImplementation(libs.io.kotest.kotest.assertions.core)
+    testImplementation(libs.io.kotest.kotest.extensions.spring)
+    testImplementation(libs.io.mockk.mockk)
+    testImplementation(libs.org.assertj.assertj.core)
 }
 
 group = "org.moinex.app"
@@ -89,7 +96,9 @@ java {
 }
 
 javafx {
-    version = "23.0.1"
+    version =
+        libs.versions.org.openjfx.javafx.controls
+            .get()
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -122,7 +131,9 @@ tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion =
+        libs.versions.org.jacoco.jacoco
+            .get()
 }
 
 tasks.jacocoTestReport {
@@ -133,7 +144,10 @@ tasks.jacocoTestReport {
 }
 
 ktlint {
-    version.set("1.0.1")
+    version.set(
+        libs.versions.org.jlleitschuh.gradle.ktlint
+            .get(),
+    )
     android.set(false)
     outputToConsole.set(true)
     ignoreFailures.set(false)

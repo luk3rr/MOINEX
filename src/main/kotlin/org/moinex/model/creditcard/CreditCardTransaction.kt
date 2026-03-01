@@ -24,6 +24,5 @@ class CreditCardTransaction(
 ) {
     init {
         require(amount > BigDecimal.ZERO) { "Amount must be positive" }
-        require(date.toString().isNotEmpty()) { "Date cannot be null" }
     }
 }

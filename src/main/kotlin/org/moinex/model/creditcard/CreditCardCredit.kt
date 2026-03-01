@@ -32,8 +32,7 @@ class CreditCardCredit(
         amount = amount,
         description = description,
     ) {
-    override fun toString(): String {
-        return "Credit Card Credit [id=$id, type=$type, amount=$amount, date=$date, " +
+    override fun toString(): String =
+        "Credit Card Credit [id=$id, type=$type, amount=$amount, date=$date, " +
             "description=$description, creditCardId=${creditCard.id}]"
-    }
 }

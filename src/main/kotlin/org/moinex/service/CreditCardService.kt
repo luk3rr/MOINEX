@@ -114,7 +114,8 @@ class CreditCardService(
         }
 
         val futurePendingPayments =
-            creditCardPaymentRepository.getAllPendingCreditCardPayments(creditCardFromDatabase.id!!)
+            creditCardPaymentRepository
+                .getAllPendingCreditCardPayments(creditCardFromDatabase.id!!)
                 .filter { it.date.isAfter(LocalDateTime.now()) }
 
         futurePendingPayments.forEach { payment ->
@@ -296,11 +297,12 @@ class CreditCardService(
         }
 
         val pendingPayments =
-            creditCardPaymentRepository.getPendingCreditCardPayments(
-                creditCardId,
-                invoiceDate.monthValue,
-                invoiceDate.year,
-            ).toList()
+            creditCardPaymentRepository
+                .getPendingCreditCardPayments(
+                    creditCardId,
+                    invoiceDate.monthValue,
+                    invoiceDate.year,
+                ).toList()
 
         val totalPendingPayments =
             pendingPayments.fold(BigDecimal.ZERO) { acc, payment ->
@@ -694,11 +696,10 @@ class CreditCardService(
     private fun calculatePaymentAmount(
         installment: Int,
         calculation: InstallmentCalculation,
-    ): BigDecimal {
-        return if (installment == 1) {
+    ): BigDecimal =
+        if (installment == 1) {
             calculation.installmentValue.plus(calculation.remainder)
         } else {
             calculation.installmentValue
         }
-    }
 }

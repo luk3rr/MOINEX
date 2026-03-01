@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.moinex.common.LocalDateTimeStringConverter
 import org.moinex.model.wallettransaction.Wallet
+import org.moinex.util.Constants
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -39,11 +40,16 @@ class CreditCardPayment(
     @Convert(converter = LocalDateTimeStringConverter::class)
     var date: LocalDateTime,
 ) {
+    init {
+        require(amount > BigDecimal.ZERO) { "Amount must be greater than zero" }
+        require(rebateUsed >= BigDecimal.ZERO) { "Rebate used must be greater than or equal to zero" }
+        require(installment in 1..Constants.MAX_INSTALLMENTS) { "Installment must be between 1 and ${Constants.MAX_INSTALLMENTS}" }
+    }
+
     fun isRefunded(): Boolean = refunded
 
     fun isPaid(): Boolean = wallet != null
 
-    override fun toString(): String {
-        return "Credit Card Payment [id=$id, installment=$installment, amount=$amount, date=$date, debtId=${creditCardDebt.id}] "
-    }
+    override fun toString(): String =
+        "Credit Card Payment [id=$id, installment=$installment, amount=$amount, date=$date, debtId=${creditCardDebt.id}] "
 }
