@@ -27,25 +27,25 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Setter(AccessLevel.NONE)
-    private Integer id;
+    public Integer id;
 
     @ManyToOne
     @JoinColumn(name = "type_id", referencedColumnName = "id")
-    private WalletType type;
+    public WalletType type;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)
-    private String name;
+    public String name;
 
     @Column(name = "balance", nullable = false, scale = 2)
-    private BigDecimal balance;
+    public BigDecimal balance;
 
     @Builder.Default
     @Column(name = "archived", nullable = false)
-    private boolean isArchived = false; // Default value is false
+    public boolean isArchived = false; // Default value is false
 
     @ManyToOne
     @JoinColumn(name = "master_wallet_id", referencedColumnName = "id")
-    private Wallet masterWallet;
+    public Wallet masterWallet;
 
     /**
      * Constructor for testing purposes
@@ -85,5 +85,10 @@ public class Wallet {
 
     public boolean isMaster() {
         return masterWallet == null;
+    }
+
+    @Override
+    public String toString() {
+        return "Wallet [id=" + id + ", name='" + name + "']";
     }
 }

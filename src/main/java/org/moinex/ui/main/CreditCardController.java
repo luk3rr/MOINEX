@@ -184,9 +184,9 @@ public class CreditCardController {
         }
 
         CreditCardDebt debt = selectedPayment.getCreditCardDebt();
-        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtId(debt.getId());
+        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
 
-        if (payments.stream().anyMatch(p -> p.getRefunded().equals(Boolean.TRUE))) {
+        if (payments.stream().anyMatch(CreditCardPayment::getRefunded)) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE),
@@ -221,9 +221,9 @@ public class CreditCardController {
 
         CreditCardDebt debt = selectedPayment.getCreditCardDebt();
 
-        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtId(debt.getId());
+        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
 
-        if (payments.stream().anyMatch(p -> p.getRefunded().equals(Boolean.TRUE))) {
+        if (payments.stream().anyMatch(CreditCardPayment::getRefunded)) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE),
@@ -308,7 +308,7 @@ public class CreditCardController {
                         Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE),
                 message.toString(),
                 i18nService.getBundle())) {
-            creditCardService.refundDebt(debt.getId());
+            creditCardService.refundDebt(debt.getId(), null);
             updateDisplay();
 
             WindowUtils.showSuccessDialog(
@@ -335,7 +335,7 @@ public class CreditCardController {
 
         CreditCardDebt debt = selectedPayment.getCreditCardDebt();
 
-        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtId(debt.getId());
+        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
 
         // Get the amount paid for the debt
         BigDecimal refundAmount =
@@ -522,7 +522,7 @@ public class CreditCardController {
      * Load credit cards from the database
      */
     private void loadCreditCardsFromDatabase() {
-        creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByTransactionCountDesc();
+        creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByDebtCountDesc();
     }
 
     /**
@@ -542,11 +542,11 @@ public class CreditCardController {
         // If the transaction type is null, all transactions are fetched
         if (similarTextOrId.isEmpty()) {
             creditCardService
-                    .getCreditCardPayments(selectedMonth.getMonthValue(), selectedMonth.getYear())
+                    .getPaymentsByMonth(selectedMonth)
                     .forEach(debtsTableView.getItems()::add);
         } else {
             creditCardService
-                    .getCreditCardPayments(selectedMonth.getMonthValue(), selectedMonth.getYear())
+                    .getPaymentsByMonth(selectedMonth)
                     .stream()
                     .filter(
                             p -> {
@@ -581,7 +581,7 @@ public class CreditCardController {
         // Get the selected year from the year filter combo box
         Year selectedYear = totalDebtsYearFilterComboBox.getValue();
 
-        BigDecimal totalDebts = creditCardService.getTotalDebtAmount(selectedYear.getValue());
+        BigDecimal totalDebts = creditCardService.getTotalDebtAmountByYear(selectedYear);
 
         BigDecimal totalPendingPayments = creditCardService.getTotalPendingPayments();
 
@@ -618,6 +618,9 @@ public class CreditCardController {
         crcPane1.getChildren().clear();
 
         if (!creditCards.isEmpty()) {
+            if (crcPaneCurrentPage >= creditCards.size()) {
+                crcPaneCurrentPage = creditCards.size() - 1;
+            }
             CreditCard crc = creditCards.get(crcPaneCurrentPage);
 
             try {
@@ -708,7 +711,7 @@ public class CreditCardController {
 
             // Get confirmed transactions for the month
             List<CreditCardPayment> payments =
-                    creditCardService.getCreditCardPayments(date.getMonthValue(), date.getYear());
+                    creditCardService.getPaymentsByMonth(yearMonth);
 
             // Calculate total for each category
             for (Category category : categories) {

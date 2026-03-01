@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -160,11 +161,11 @@ public class WalletFullPaneController {
                         wallet.getId(), now.getMonthValue(), now.getYear());
 
         crcPaidAmount =
-                creditCardService.getEffectivePaidPaymentsByMonth(
-                        wallet.getId(), now.getMonthValue(), now.getYear());
+                creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(
+                        wallet.getId(), YearMonth.of(now.getYear(), now.getMonthValue()));
 
         List<CreditCardPayment> payments =
-                creditCardService.getCreditCardPayments(now.getMonthValue(), now.getYear());
+                creditCardService.getPaymentsByMonth(YearMonth.of(now.getYear(), now.getMonthValue()));
 
         // Filter payments that are related to the wallet and are not paid
         crcPendingAmount =

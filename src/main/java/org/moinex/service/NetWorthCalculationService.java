@@ -636,8 +636,8 @@ public class NetWorthCalculationService {
         // Revert credit card payments after target month
         for (int futureMonth = targetMonth.getMonthValue() + 1; futureMonth <= 12; futureMonth++) {
             BigDecimal payments =
-                    creditCardService.getEffectivePaidPaymentsByMonth(
-                            wallet.getId(), futureMonth, targetMonth.getYear());
+                    creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(
+                            wallet.getId(), YearMonth.of(targetMonth.getYear(), futureMonth));
             walletBalance = walletBalance.add(payments);
         }
 
@@ -648,8 +648,8 @@ public class NetWorthCalculationService {
             int maxMonth = (nextYear == now.getYear()) ? now.getMonthValue() : 12;
             for (int futureMonth = 1; futureMonth <= maxMonth; futureMonth++) {
                 BigDecimal payments =
-                        creditCardService.getEffectivePaidPaymentsByMonth(
-                                wallet.getId(), futureMonth, nextYear);
+                        creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(
+                                wallet.getId(), YearMonth.of(nextYear, futureMonth));
                 walletBalance = walletBalance.add(payments);
             }
             nextYear++;
@@ -657,7 +657,7 @@ public class NetWorthCalculationService {
 
         // Apply credit card payments in target month
         BigDecimal paymentsInMonth =
-                creditCardService.getEffectivePaidPaymentsByMonth(wallet.getId(), month, year);
+                creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(wallet.getId(), YearMonth.of(year, month));
         walletBalance = walletBalance.subtract(paymentsInMonth);
 
         return walletBalance;

@@ -25,7 +25,6 @@ import org.moinex.model.enums.TransactionType;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
-import org.moinex.repository.creditcard.CreditCardPaymentRepository;
 import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
@@ -37,7 +36,7 @@ class FinancialPlanningServiceTest {
     @Mock private FinancialPlanRepository financialPlanRepository;
     @Mock private BudgetGroupRepository budgetGroupRepository;
     @Mock private WalletTransactionRepository walletTransactionRepository;
-    @Mock private CreditCardPaymentRepository creditCardPaymentRepository;
+    @Mock private CreditCardService creditCardService;
     @Mock private TransferRepository transferRepository;
     @Mock private CategoryRepository categoryRepository;
 
@@ -498,8 +497,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(expectedSpentAmount);
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.PlanStatusDTO> statusList =
@@ -576,8 +575,8 @@ class FinancialPlanningServiceTest {
             verify(walletTransactionRepository)
                     .getSumAmountByCategoriesAndDateBetween(
                             anyList(), eq(TransactionType.INCOME), anyString(), anyString());
-            verify(creditCardPaymentRepository, never())
-                    .getSumAmountByCategoriesAndDateBetween(anyList(), anyString(), anyString());
+            verify(creditCardService, never())
+                    .getTotalPaymentsByCategoriesAndDateTimeBetween(anyList(), any(), any());
         }
 
         @Test
@@ -606,8 +605,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), eq(TransactionType.INCOME), anyString(), anyString()))
                     .thenReturn(new BigDecimal("500.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(new BigDecimal("100.00"));
 
             List<FinancialPlanningService.PlanStatusDTO> statusList =
@@ -647,8 +646,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), eq(TransactionType.EXPENSE), anyString(), anyString()))
                     .thenReturn(new BigDecimal("200.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(new BigDecimal("100.00"));
 
             List<FinancialPlanningService.PlanStatusDTO> statusList =
@@ -683,8 +682,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(new BigDecimal("500.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(new BigDecimal("100.00"));
 
             List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
@@ -714,8 +713,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(new BigDecimal("1000.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
@@ -771,8 +770,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(new BigDecimal("1200.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
@@ -796,8 +795,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(new BigDecimal("500.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
@@ -824,8 +823,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(new BigDecimal("800.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(new BigDecimal("200.00"));
 
             List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
@@ -851,8 +850,8 @@ class FinancialPlanningServiceTest {
             when(walletTransactionRepository.getSumAmountByCategoriesAndDateBetween(
                             anyList(), any(TransactionType.class), anyString(), anyString()))
                     .thenReturn(new BigDecimal("500.00"));
-            when(creditCardPaymentRepository.getSumAmountByCategoriesAndDateBetween(
-                            anyList(), anyString(), anyString()))
+            when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                            anyList(), any(), any()))
                     .thenReturn(BigDecimal.ZERO);
 
             List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =

@@ -74,12 +74,12 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         suggestionsHandler.enable();
 
         valueField.setText(crcDebt.getAmount().toString());
-        installmentsField.setText(crcDebt.getInstallments().toString());
+        installmentsField.setText(String.valueOf(crcDebt.getInstallments()));
 
         categoryComboBox.setValue(crcDebt.getCategory());
 
         CreditCardPayment firstPayment =
-                creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
+                creditCardService.getPaymentsByDebtOrderedByInstallment(crcDebt.getId()).getFirst();
 
         invoiceMonthComboBox.setValue(firstPayment.getDate().getMonthValue());
         invoiceYearComboBox.setValue(firstPayment.getDate().getYear());
@@ -118,7 +118,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
             // Get the date of the first payment to check if the invoice month is the
             // same
             CreditCardPayment firstPayment =
-                    creditCardService.getPaymentsByDebtId(crcDebt.getId()).getFirst();
+                    creditCardService.getPaymentsByDebtOrderedByInstallment(crcDebt.getId()).getFirst();
 
             YearMonth invoice =
                     YearMonth.of(
@@ -131,7 +131,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
             if (crcDebt.getCreditCard().getId().equals(crc.getId())
                     && crcDebt.getCategory().getId().equals(category.getId())
                     && debtValue.compareTo(crcDebt.getAmount()) == 0
-                    && crcDebt.getInstallments().equals(installments)
+                    && crcDebt.getInstallments() == installments
                     && crcDebt.getDescription().equals(description)
                     && invoice.equals(invoiceDateYearMonth)) {
                 WindowUtils.showInformationDialog(
@@ -148,7 +148,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 crcDebt.setAmount(debtValue);
                 crcDebt.setInstallments(installments);
 
-                creditCardService.updateCreditCardDebt(crcDebt, invoiceDateYearMonth);
+                creditCardService.updateDebt(crcDebt, invoiceDateYearMonth);
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(
@@ -226,7 +226,7 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 }
             } else {
                 List<CreditCardPayment> payments =
-                        creditCardService.getPaymentsByDebtId(crcDebt.getId());
+                        creditCardService.getPaymentsByDebtOrderedByInstallment(crcDebt.getId());
 
                 BigDecimal paidAmount =
                         payments.stream()

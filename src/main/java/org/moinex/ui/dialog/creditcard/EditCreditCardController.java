@@ -53,8 +53,8 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
         limitField.setText(creditCard.getMaxDebt().toString());
         lastFourDigitsField.setText(creditCard.getLastFourDigits());
         operatorComboBox.setValue(creditCard.getOperator());
-        closingDayComboBox.setValue(creditCard.getClosingDay().toString());
-        dueDayComboBox.setValue(creditCard.getBillingDueDay().toString());
+        closingDayComboBox.setValue(String.valueOf(creditCard.getClosingDay()));
+        dueDayComboBox.setValue(String.valueOf(creditCard.getBillingDueDay()));
         defaultBillingWalletComboBox.setValue(creditCard.getDefaultBillingWallet());
     }
 
@@ -87,8 +87,8 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
 
         try {
             BigDecimal crcLimit = new BigDecimal(crcLimitStr);
-            Integer crcClosingDay = Integer.parseInt(crcClosingDayStr);
-            Integer crcDueDay = Integer.parseInt(crcDueDayStr);
+            int crcClosingDay = Integer.parseInt(crcClosingDayStr);
+            int crcDueDay = Integer.parseInt(crcDueDayStr);
 
             boolean defaultWalletChanged =
                     (crcDefaultBillingWallet != null
@@ -103,8 +103,8 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
             if (creditCard.getName().equals(crcName)
                     && crcLimit.compareTo(creditCard.getMaxDebt()) == 0
                     && creditCard.getLastFourDigits().equals(crcLastFourDigitsStr)
-                    && creditCard.getClosingDay().equals(crcClosingDay)
-                    && creditCard.getBillingDueDay().equals(crcDueDay)
+                    && creditCard.getClosingDay() == crcClosingDay
+                    && creditCard.getBillingDueDay() == crcDueDay
                     && creditCard.getOperator().getId().equals(crcOperator.getId())
                     && defaultWalletChanged) {
                 WindowUtils.showInformationDialog(

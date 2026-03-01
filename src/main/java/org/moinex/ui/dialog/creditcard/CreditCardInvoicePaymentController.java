@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.creditcard.CreditCard;
-import org.moinex.model.creditcard.CreditCardPayment;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CreditCardService;
@@ -102,14 +101,7 @@ public class CreditCardInvoicePaymentController {
         crcNameLabel.setText(creditCard.getName());
 
         BigDecimal invoiceAmount =
-                creditCardService
-                        .getPendingCreditCardPayments(
-                                creditCard.getId(),
-                                invoiceDate.getMonthValue(),
-                                invoiceDate.getYear())
-                        .stream()
-                        .map(CreditCardPayment::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                creditCardService.getTotalPendingPaymentsByCreditCardAndMonth(creditCard.getId(), invoiceDate);
 
         crcInvoiceDueLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
@@ -190,13 +182,9 @@ public class CreditCardInvoicePaymentController {
 
         BigDecimal invoiceAmount =
                 creditCardService
-                        .getPendingCreditCardPayments(
+                        .getTotalPendingPaymentsByCreditCardAndMonth(
                                 creditCard.getId(),
-                                invoiceDate.getMonthValue(),
-                                invoiceDate.getYear())
-                        .stream()
-                        .map(CreditCardPayment::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                invoiceDate);
 
         BigDecimal rebateValue =
                 useRebateValueField.getText().isEmpty()
@@ -215,8 +203,7 @@ public class CreditCardInvoicePaymentController {
                 creditCardService.payInvoice(
                         creditCard.getId(),
                         wallet.getId(),
-                        invoiceDate.getMonthValue(),
-                        invoiceDate.getYear(),
+                        invoiceDate,
                         rebateValue);
 
                 WindowUtils.showSuccessDialog(
@@ -267,13 +254,7 @@ public class CreditCardInvoicePaymentController {
 
         BigDecimal invoiceAmount =
                 creditCardService
-                        .getPendingCreditCardPayments(
-                                creditCard.getId(),
-                                invoiceDate.getMonthValue(),
-                                invoiceDate.getYear())
-                        .stream()
-                        .map(CreditCardPayment::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .getTotalPendingPaymentsByCreditCardAndMonth(creditCard.getId(), invoiceDate)
                         .subtract(rebateValue);
 
         if (invoiceAmount.compareTo(BigDecimal.ZERO) < 0) {

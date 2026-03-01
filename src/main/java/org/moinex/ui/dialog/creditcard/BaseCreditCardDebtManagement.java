@@ -400,7 +400,7 @@ public abstract class BaseCreditCardDebtManagement {
         suggestionsHandler.enable();
 
         valueField.setText(ccd.getAmount().toString());
-        installmentsField.setText(ccd.getInstallments().toString());
+        installmentsField.setText(String.valueOf(ccd.getInstallments()));
         categoryComboBox.setValue(ccd.getCategory());
 
         updateAvailableLimitAfterDebtLabel();

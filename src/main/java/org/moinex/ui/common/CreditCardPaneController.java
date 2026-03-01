@@ -306,13 +306,13 @@ public class CreditCardPaneController {
         limitProgressLabel.setText(
                 UIUtils.formatPercentage(limitProgress.doubleValue() * 100, i18nService));
 
-        dueDateLabel.setText(creditCard.getBillingDueDay().toString());
+        dueDateLabel.setText(String.valueOf(creditCard.getBillingDueDay()));
 
-        closureDayLabel.setText(creditCard.getClosingDay().toString());
+        closureDayLabel.setText(String.valueOf(creditCard.getClosingDay()));
 
         nextInvoiceLabel.setText(
                 UIUtils.formatShortMonthYear(
-                        creditCardService.getNextInvoiceDate(creditCard.getId()), i18nService));
+                        creditCardService.getNextInvoiceDate(creditCard), i18nService));
 
         updateInvoiceInfo();
 
@@ -332,18 +332,20 @@ public class CreditCardPaneController {
 
         BigDecimal totalDebts =
                 creditCardService.getInvoiceAmount(
-                        creditCard.getId(),
-                        currentDisplayedMonth.getMonthValue(),
-                        currentDisplayedMonth.getYear());
+                        creditCard.getId(), YearMonth.of(
+                                currentDisplayedMonth.getYear(),
+                                currentDisplayedMonth.getMonthValue()
+                        ));
 
         invoiceMonthLabel.setText(UIUtils.formatCurrency(totalDebts));
 
         invoiceStatusLabel.setText(
                 UIUtils.translateCreditCardInvoiceStatus(
                         creditCardService.getInvoiceStatus(
-                                creditCard.getId(),
-                                currentDisplayedMonth.getMonthValue(),
-                                currentDisplayedMonth.getYear()),
+                                creditCard.getId(), YearMonth.of(
+                                        currentDisplayedMonth.getYear(),
+                                    currentDisplayedMonth.getMonthValue()
+                                )),
                         i18nService));
     }
 

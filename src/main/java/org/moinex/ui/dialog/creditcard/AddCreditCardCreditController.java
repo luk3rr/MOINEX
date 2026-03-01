@@ -126,8 +126,14 @@ public class AddCreditCardCreditController {
             LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);
 
-            creditCardService.addCredit(
-                    crc.getId(), dateTimeWithCurrentHour, creditValue, creditType, description);
+            creditCardService.addRebate(new CreditCardCredit(
+                    null, // id (auto-generated)
+                    creditType, // type
+                    crc, // creditCard
+                    dateTimeWithCurrentHour, // date
+                    creditValue, // amount
+                    description // description
+            ));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

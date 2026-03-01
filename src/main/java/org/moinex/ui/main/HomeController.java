@@ -538,10 +538,10 @@ public class HomeController {
                     year);
 
             BigDecimal crcPaidPayments =
-                    creditCardService.getEffectivePaidPaymentsByMonth(month, year);
+                    creditCardService.getTotalEffectivePaidPaymentsByMonth(YearMonth.of(year, month));
 
             BigDecimal crcPendingPayments =
-                    creditCardService.getPendingPaymentsByMonth(month, year);
+                    creditCardService.getTotalPendingPaymentsByMonth(YearMonth.of(year, month));
 
             // Calculate total expenses for the month
             BigDecimal totalExpenses =

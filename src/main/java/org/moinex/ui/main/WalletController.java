@@ -652,7 +652,8 @@ public class WalletController {
                             YearMonth.of(year, month), YearMonth.of(year, month));
 
             List<CreditCardPayment> crcPayments =
-                    creditCardService.getCreditCardPayments(month, year);
+                    creditCardService.getPaymentsByMonth(
+                            YearMonth.of(year, month));
 
             transactionsList.addAll(futureTransactions);
 
@@ -674,10 +675,12 @@ public class WalletController {
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal crcPaidPayments =
-                        creditCardService.getEffectivePaidPaymentsByMonth(month, year);
+                        creditCardService.getTotalEffectivePaidPaymentsByMonth(
+                                YearMonth.of(year, month));
 
                 BigDecimal crcPendingPayments =
-                        creditCardService.getPendingPaymentsByMonth(month, year);
+                        creditCardService.getTotalPendingPaymentsByMonth(
+                                YearMonth.of(year, month));
 
                 totalExpenses = totalExpenses.add(crcPaidPayments).add(crcPendingPayments);
 

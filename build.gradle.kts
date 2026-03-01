@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "2.0.0"
     kotlin("plugin.spring") version "2.0.0"
     kotlin("plugin.jpa") version "2.0.0"
+    kotlin("plugin.allopen") version "2.0.0"
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openjfx.javafxplugin") version "0.1.0"
@@ -14,6 +15,12 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     jacoco
     `maven-publish`
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
 }
 
 repositories {

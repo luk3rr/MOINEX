@@ -2,6 +2,7 @@ package org.moinex.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class FinancialPlanningService {
     private CreditCardPaymentRepository creditCardPaymentRepository;
     private CategoryRepository categoryRepository;
     private TransferRepository transferRepository;
+    private CreditCardService creditCardService;
 
     @Autowired
     public FinancialPlanningService(
@@ -48,13 +50,14 @@ public class FinancialPlanningService {
             WalletTransactionRepository walletTransactionRepository,
             CreditCardPaymentRepository creditCardPaymentRepository,
             CategoryRepository categoryRepository,
-            TransferRepository transferRepository) {
+            TransferRepository transferRepository, CreditCardService creditCardService) {
         this.financialPlanRepository = financialPlanRepository;
         this.budgetGroupRepository = budgetGroupRepository;
         this.walletTransactionRepository = walletTransactionRepository;
         this.creditCardPaymentRepository = creditCardPaymentRepository;
         this.categoryRepository = categoryRepository;
         this.transferRepository = transferRepository;
+        this.creditCardService = creditCardService;
     }
 
     /**
@@ -218,9 +221,9 @@ public class FinancialPlanningService {
                                                 "Financial plan with ID " + planId + " not found"));
 
         String startDate =
-                period.atDay(1).atStartOfDay().format(Constants.DATE_FORMATTER_WITH_TIME);
+                period.atDay(1).atStartOfDay().format(Constants.DB_DATE_FORMATTER);
         String endDate =
-                period.atEndOfMonth().atTime(23, 59, 59).format(Constants.DATE_FORMATTER_WITH_TIME);
+                period.atEndOfMonth().atTime(23, 59, 59).format(Constants.DB_DATE_FORMATTER);
 
         return plan.getBudgetGroups().stream()
                 .map(
@@ -249,9 +252,9 @@ public class FinancialPlanningService {
                                                         endDate);
 
                                 BigDecimal creditCardTransactionsAmount =
-                                        creditCardPaymentRepository
-                                                .getSumAmountByCategoriesAndDateBetween(
-                                                        categoryIds, startDate, endDate);
+                                        creditCardService
+                                                .getTotalPaymentsByCategoriesAndDateTimeBetween(
+                                                        categoryIds, LocalDateTime.parse(startDate, Constants.DB_DATE_FORMATTER), LocalDateTime.parse(endDate, Constants.DB_DATE_FORMATTER));
 
                                 totalAmount =
                                         totalAmount

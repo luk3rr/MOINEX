@@ -32,7 +32,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
-import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
@@ -370,59 +369,6 @@ public class CSVImportController {
             }
 
             // walletService.addWallet(wt.getName(), wt.getBalance());
-        }
-    }
-
-    /**
-     * Maps and inserts credit card into the database
-     * @param csvData the data from the CSV file
-     * @param columnMapping a map that maps the CSV columns to the database columns
-     */
-    public void mapAndInsertCreditCard(List<String[]> csvData, Map<String, String> columnMapping) {
-        String[] csvHeaders = csvData.getFirst(); // CSV Headers
-        List<String[]> dataRows = csvData.subList(1, csvData.size()); // Data
-
-        for (String[] row : dataRows) {
-            CreditCard crc = CreditCard.builder().build();
-
-            for (Map.Entry<String, String> entry : columnMapping.entrySet()) {
-                String csvColumn = entry.getKey();
-                String dbColumn = entry.getValue();
-
-                try {
-                    switch (dbColumn) {
-                        case "name" -> crc.setName(getValueForColumn(csvHeaders, row, csvColumn));
-                        case "max_debt" ->
-                                crc.setMaxDebt(
-                                        new BigDecimal(
-                                                getValueForColumn(csvHeaders, row, csvColumn)));
-                        case "closing_day" ->
-                                crc.setClosingDay(
-                                        Integer.parseInt(
-                                                getValueForColumn(csvHeaders, row, csvColumn)));
-                        case "billing_due_day" ->
-                                crc.setBillingDueDay(
-                                        Integer.parseInt(
-                                                getValueForColumn(csvHeaders, row, csvColumn)));
-                        case "last_four_digits" ->
-                                crc.setLastFourDigits(
-                                        getValueForColumn(csvHeaders, row, csvColumn));
-                        default -> logger.error("Unknown column: {}", dbColumn);
-                    }
-                } catch (IllegalArgumentException e) {
-                    logger.error(e.getMessage());
-                } catch (RuntimeException e) {
-                    logger.warn(e.getMessage());
-                }
-            }
-
-            creditCardService.addCreditCard(
-                    crc.getName(),
-                    crc.getBillingDueDay(),
-                    crc.getClosingDay(),
-                    crc.getMaxDebt(),
-                    crc.getLastFourDigits(),
-                    0); // default operator id
         }
     }
 

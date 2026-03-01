@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardOperator;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CreditCardService;
@@ -76,20 +77,21 @@ public final class AddCreditCardController extends BaseCreditCardManagement {
         try {
             BigDecimal crcLimit = new BigDecimal(crcLimitStr);
 
-            Integer crcClosingDay = Integer.parseInt(crcClosingDayStr);
-            Integer crcDueDay = Integer.parseInt(crcDueDayStr);
+            int crcClosingDay = Integer.parseInt(crcClosingDayStr);
+            int crcDueDay = Integer.parseInt(crcDueDayStr);
 
-            Integer crcDefaultBillingWalletId =
-                    crcDefaultBillingWallet != null ? crcDefaultBillingWallet.getId() : null;
-
-            creditCardService.addCreditCard(
-                    crcName,
-                    crcDueDay,
-                    crcClosingDay,
-                    crcLimit,
-                    crcLastFourDigitsStr,
-                    crcOperator.getId(),
-                    crcDefaultBillingWalletId);
+            creditCardService.createCreditCard(new CreditCard(
+                    null, // id (auto-generated)
+                    crcOperator, // operator
+                    crcDefaultBillingWallet, // defaultBillingWallet
+                    crcName, // name
+                    crcDueDay, // billingDueDay
+                    crcClosingDay, // closingDay
+                    crcLimit, // maxDebt
+                    BigDecimal.ZERO, // availableRebate
+                    crcLastFourDigitsStr, // lastFourDigits
+                    false // isArchived
+            ));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_CREATED_TITLE),

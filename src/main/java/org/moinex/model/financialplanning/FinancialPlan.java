@@ -32,6 +32,7 @@ public class FinancialPlan {
     @Builder.Default
     private List<BudgetGroup> budgetGroups = new ArrayList<>();
 
+    @Builder.Default
     @Column(name = "archived", nullable = false)
     private boolean archived = false;
 }

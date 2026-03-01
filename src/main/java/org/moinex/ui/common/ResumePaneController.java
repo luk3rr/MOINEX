@@ -124,11 +124,11 @@ public class ResumePaneController {
 
         allYearTransactions.addAll(futureTransactions);
 
-        BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmount(year);
+        BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmountByYear(Year.of(year));
 
-        BigDecimal crcPendingPayments = creditCardService.getPendingPaymentsByYear(year);
+        BigDecimal crcPendingPayments = creditCardService.getTotalPendingPaymentsByYear(Year.of(year));
 
-        BigDecimal crcPaidPayments = creditCardService.getPaidPaymentsByYear(year);
+        BigDecimal crcPaidPayments = creditCardService.getTotalPaidPaymentsByYear(Year.of(year));
 
         updateResumePane(
                 allYearTransactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments);
@@ -148,11 +148,11 @@ public class ResumePaneController {
 
         transactions.addAll(futureTransactions);
 
-        BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmount(month, year);
+        BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmountByMonth(YearMonth.of(year, month));
 
-        BigDecimal crcPendingPayments = creditCardService.getPendingPaymentsByMonth(month, year);
+        BigDecimal crcPendingPayments = creditCardService.getTotalPendingPaymentsByMonth(YearMonth.of(year, month));
 
-        BigDecimal crcPaidPayments = creditCardService.getEffectivePaidPaymentsByMonth(month, year);
+        BigDecimal crcPaidPayments = creditCardService.getTotalEffectivePaidPaymentsByMonth(YearMonth.of(year, month));
 
         updateResumePane(transactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments);
     }

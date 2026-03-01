@@ -52,7 +52,7 @@ public class GoalsPlansController {
                     getClass(),
                     i18nService.getBundle());
         } catch (IOException e) {
-            logger.error("Error loading content: '{}'", e.getMessage());
+            logger.error("Error loading content: '{}'", e.getMessage(), e);
         }
     }
 }

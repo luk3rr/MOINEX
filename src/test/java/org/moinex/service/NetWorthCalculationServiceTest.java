@@ -55,6 +55,20 @@ class NetWorthCalculationServiceTest {
     void setUp() {
         wallet1 = new Wallet(1, "Wallet 1", new BigDecimal("1000.00"));
         wallet2 = new Wallet(2, "Wallet 2", new BigDecimal("2000.00"));
+        
+        // Configure lenient mocks to avoid UnnecessaryStubbingException
+        lenient().when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
+        lenient().when(creditCardService.getTotalEffectivePaidPaymentsByMonth(any())).thenReturn(BigDecimal.ZERO);
+        lenient().when(creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(anyInt(), any())).thenReturn(BigDecimal.ZERO);
+        lenient().when(creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(anyList(), any(), any())).thenReturn(BigDecimal.ZERO);
+        lenient().when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
+        lenient().when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
+        lenient().when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
+        lenient().when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
+        lenient().when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any())).thenReturn(Collections.emptyList());
+        lenient().when(recurringTransactionService.getAllByType(any())).thenReturn(Collections.emptyList());
+        lenient().when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any())).thenReturn(Collections.emptyList());
+        lenient().when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(anyInt(), anyInt())).thenReturn(Collections.emptyList());
     }
 
     @Nested
@@ -68,22 +82,6 @@ class NetWorthCalculationServiceTest {
                     .thenReturn(LocalDateTime.now().minusMonths(3));
             when(walletTransactionService.getFirstTransactionDate(2))
                     .thenReturn(LocalDateTime.now().minusMonths(2));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
 
@@ -137,22 +135,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -170,22 +152,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -201,22 +167,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -236,22 +186,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1, wallet2));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -267,22 +201,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -302,22 +220,7 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
             when(creditCardService.getDebtAtDate(any())).thenReturn(new BigDecimal("500.00"));
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -331,22 +234,7 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(1));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
             when(creditCardService.getDebtAtDate(any())).thenReturn(new BigDecimal("500.00"));
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -375,20 +263,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
             when(recurringTransactionService.getAllByType(TransactionType.INCOME))
                     .thenReturn(List.of(incomeTransaction));
             when(recurringTransactionService.getAllByType(TransactionType.EXPENSE))
@@ -420,20 +294,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
             when(recurringTransactionService.getAllByType(TransactionType.INCOME))
                     .thenReturn(Collections.emptyList());
             when(recurringTransactionService.getAllByType(TransactionType.EXPENSE))
@@ -465,20 +325,6 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
             when(recurringTransactionService.getAllByType(TransactionType.INCOME))
                     .thenReturn(List.of(excludedTransaction));
             when(recurringTransactionService.getAllByType(TransactionType.EXPENSE))
@@ -541,22 +387,9 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(List.of(purchase));
             when(tickerService.getAllSales()).thenReturn(List.of(sale));
             when(tickerService.getAllTickers()).thenReturn(List.of(ticker));
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -598,22 +431,9 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
             when(tickerService.getAllPurchases()).thenReturn(List.of(purchase));
             when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
             when(tickerService.getAllTickers()).thenReturn(List.of(ticker));
-            when(bondService.getOperationsByDateBefore(any())).thenReturn(Collections.emptyList());
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -671,23 +491,8 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
             when(bondService.getOperationsByDateBefore(any()))
                     .thenReturn(List.of(buyOperation, sellOperation));
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();
@@ -724,22 +529,7 @@ class NetWorthCalculationServiceTest {
             when(walletService.getAllWalletsOrderedByName()).thenReturn(List.of(wallet1));
             when(walletTransactionService.getFirstTransactionDate(anyInt()))
                     .thenReturn(LocalDateTime.now().minusMonths(3));
-            when(recurringTransactionService.getFutureTransactionsByMonthForAnalysis(any(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            anyInt(), anyInt()))
-                    .thenReturn(Collections.emptyList());
-            when(creditCardService.getDebtAtDate(any())).thenReturn(BigDecimal.ZERO);
-            when(creditCardService.getEffectivePaidPaymentsByMonth(anyInt(), anyInt(), anyInt()))
-                    .thenReturn(BigDecimal.ZERO);
-            when(tickerService.getAllPurchases()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllSales()).thenReturn(Collections.emptyList());
-            when(tickerService.getAllTickers()).thenReturn(Collections.emptyList());
             when(bondService.getOperationsByDateBefore(any())).thenReturn(List.of(buyOperation));
-            when(walletTransactionService.getTransactionsByWalletAfterDate(anyInt(), any()))
-                    .thenReturn(Collections.emptyList());
-            when(recurringTransactionService.getAllByType(any()))
-                    .thenReturn(Collections.emptyList());
 
             CompletableFuture<Void> result = netWorthCalculationService.recalculateAllSnapshots();
             result.get();

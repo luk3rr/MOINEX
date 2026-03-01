@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
+import org.moinex.model.creditcard.CreditCardDebt;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
@@ -73,19 +74,20 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
         try {
             BigDecimal debtValue = new BigDecimal(valueStr);
 
-            Integer installments =
+            int installments =
                     installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
             YearMonth invoiceDateYearMonth = YearMonth.of(invoiceYear, invoiceMonth);
 
-            creditCardService.addDebt(
-                    crc.getId(),
-                    category,
-                    LocalDateTime.now(), // register date
-                    invoiceDateYearMonth,
-                    debtValue,
-                    installments,
-                    description);
+            creditCardService.createDebt(new CreditCardDebt(
+                    null, // id (auto-generated)
+                    category, // category
+                    installments, // installments
+                    crc, // creditCard
+                    LocalDateTime.now(), // date
+                    debtValue, // amount
+                    description // description
+            ), invoiceDateYearMonth);
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),

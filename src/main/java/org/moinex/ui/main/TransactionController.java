@@ -493,8 +493,7 @@ public class TransactionController {
             // Otherwise, create an empty list
             List<CreditCardPayment> creditCardPayments =
                     selectedTransactionType.equals(TransactionType.EXPENSE)
-                            ? creditCardService.getAllPaidPaymentsByMonth(
-                                    date.getMonthValue(), date.getYear())
+                            ? creditCardService.getAllPaidPaymentsByMonth(yearMonth)
                             : new ArrayList<>();
 
             // Calculate total for each category
