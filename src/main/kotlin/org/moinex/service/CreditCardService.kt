@@ -8,6 +8,7 @@
 
 package org.moinex.service
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.findByIdOrThrow
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardCredit
@@ -38,6 +39,7 @@ class CreditCardService(
     private val creditCardOperatorRepository: CreditCardOperatorRepository,
     private val walletRepository: WalletRepository,
     private val creditCardCreditRepository: CreditCardCreditRepository,
+    private val clockProvider: ClockProvider = ClockProvider(),
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(CreditCardService::class.java)
@@ -118,7 +120,7 @@ class CreditCardService(
         val futurePendingPayments =
             creditCardPaymentRepository
                 .getAllPendingCreditCardPayments(creditCardFromDatabase.id!!)
-                .filter { it.date.isAfter(LocalDateTime.now()) }
+                .filter { it.date.isAfter(clockProvider.now()) }
 
         futurePendingPayments.forEach { payment ->
             payment.date = payment.date.withDayOfMonth(updatedCreditCard.billingDueDay)
@@ -394,7 +396,7 @@ class CreditCardService(
     }
 
     fun getDebtAtDate(date: LocalDateTime): BigDecimal {
-        val now = LocalDateTime.now()
+        val now = clockProvider.now()
 
         val totalDebts =
             creditCardDebtRepository
@@ -511,12 +513,12 @@ class CreditCardService(
         }
     }
 
-    fun getEarliestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findEarliestPaymentDate() ?: LocalDateTime.now()
+    fun getEarliestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findEarliestPaymentDate() ?: clockProvider.now()
 
-    fun getLatestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findLatestPaymentDate() ?: LocalDateTime.now()
+    fun getLatestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findLatestPaymentDate() ?: clockProvider.now()
 
     private fun calculateNextInvoiceDate(creditCard: CreditCard): LocalDateTime {
-        val now = LocalDateTime.now()
+        val now = clockProvider.now()
 
         return if (now.dayOfMonth > creditCard.closingDay) {
             now.plusMonths(1).withDayOfMonth(creditCard.billingDueDay)
