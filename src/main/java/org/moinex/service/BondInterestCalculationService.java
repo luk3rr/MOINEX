@@ -684,12 +684,40 @@ public class BondInterestCalculationService {
             YearMonth lastMonth = lastCalculation.get().getReferenceMonth();
             accumulatedInterest = lastCalculation.get().getAccumulatedInterest();
 
-            // Only recalculate if there are missing months or if it's the current month
+            // Check if we need to recalculate previous month that might be incomplete
+            YearMonth previousMonth = currentMonth.minusMonths(1);
             if (lastMonth.equals(currentMonth)) {
-                log.debug(
-                        "Bond {} already has calculation for current month, only updating it",
-                        bond.getName());
-                monthToStart = currentMonth;
+                // Current month exists, but check if previous month is complete
+                Optional<BondInterestCalculation> previousMonthCalc =
+                        bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                                bond, previousMonth.toString());
+                
+                if (previousMonthCalc.isPresent()) {
+                    LocalDate previousMonthEnd = previousMonth.atEndOfMonth();
+                    LocalDate calculatedUntil = previousMonthCalc.get().getCalculatedUntilDate();
+                    
+                    // If previous month is incomplete, start from there
+                    if (calculatedUntil != null && calculatedUntil.isBefore(previousMonthEnd)) {
+                        log.info(
+                                "Bond {} previous month {} is incomplete (calculated until {}), recalculating from there",
+                                bond.getName(),
+                                previousMonth,
+                                calculatedUntil);
+                        monthToStart = previousMonth;
+                        accumulatedInterest = previousMonthCalc.get().getAccumulatedInterest()
+                                .subtract(previousMonthCalc.get().getMonthlyInterest());
+                    } else {
+                        log.debug(
+                                "Bond {} already has calculation for current month, only updating it",
+                                bond.getName());
+                        monthToStart = currentMonth;
+                    }
+                } else {
+                    log.debug(
+                            "Bond {} already has calculation for current month, only updating it",
+                            bond.getName());
+                    monthToStart = currentMonth;
+                }
             } else {
                 monthToStart = lastMonth.plusMonths(1);
                 log.info(
@@ -792,17 +820,29 @@ public class BondInterestCalculationService {
                 } else {
                     // NORMAL RECALCULATION: Recalculate entire month
                     BigDecimal monthlyInterest = calculateMonthlyInterest(bond, month);
-                    BigDecimal previousAccumulated =
-                            existing.getAccumulatedInterest()
-                                    .subtract(existing.getMonthlyInterest());
+                    
+                    // Get accumulated from previous month (may have been updated in this loop)
+                    YearMonth previousMonth = month.minusMonths(1);
+                    Optional<BondInterestCalculation> previousCalc =
+                            bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                                    bond, previousMonth.toString());
+                    
+                    BigDecimal previousAccumulated = previousCalc
+                            .map(BondInterestCalculation::getAccumulatedInterest)
+                            .orElse(BigDecimal.ZERO);
+                    
                     BigDecimal newAccumulated = previousAccumulated.add(monthlyInterest);
                     BigDecimal finalValue = investedAmount.add(newAccumulated);
 
                     LocalDate monthStart = month.atDay(1);
                     LocalDate monthEnd = month.atEndOfMonth();
                     LocalDate today = LocalDate.now();
-                    LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-                    LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+                    // Always search until today to catch data that became available after month end
+                    LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+                    // But limit the calculated date to the month end
+                    if (calculatedUntil.isAfter(monthEnd)) {
+                        calculatedUntil = monthEnd;
+                    }
 
                     existing.setCalculationDate(LocalDate.now());
                     existing.setCalculatedUntilDate(calculatedUntil);
@@ -832,8 +872,12 @@ public class BondInterestCalculationService {
                 LocalDate monthStart = month.atDay(1);
                 LocalDate monthEnd = month.atEndOfMonth();
                 LocalDate today = LocalDate.now();
-                LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-                LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+                // Always search until today to catch data that became available after month end
+                LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+                // But limit the calculated date to the month end
+                if (calculatedUntil.isAfter(monthEnd)) {
+                    calculatedUntil = monthEnd;
+                }
 
                 BondInterestCalculation calculation =
                         BondInterestCalculation.builder()
@@ -1002,8 +1046,12 @@ public class BondInterestCalculationService {
         LocalDate monthStart = month.atDay(1);
         LocalDate monthEnd = month.atEndOfMonth();
         LocalDate today = LocalDate.now();
-        LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+        // Always search until today to catch data that became available after month end
+        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+        // But limit the calculated date to the month end
+        if (calculatedUntil.isAfter(monthEnd)) {
+            calculatedUntil = monthEnd;
+        }
 
         calculation.setMonthlyInterest(newMonthlyInterest);
         calculation.setManuallyAdjusted(true);
@@ -1101,8 +1149,12 @@ public class BondInterestCalculationService {
         LocalDate monthStart = month.atDay(1);
         LocalDate monthEnd = month.atEndOfMonth();
         LocalDate today = LocalDate.now();
-        LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+        // Always search until today to catch data that became available after month end
+        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+        // But limit the calculated date to the month end
+        if (calculatedUntil.isAfter(monthEnd)) {
+            calculatedUntil = monthEnd;
+        }
 
         calculation.setMonthlyInterest(recalculatedInterest);
         calculation.setManuallyAdjusted(false);
