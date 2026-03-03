@@ -23,7 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Base Budget Group dialog, which is used for both adding and editing budget groups
+ * Controller for the Base Budget Group dialog, which is used for both adding and editing budget
+ * groups
  */
 @Controller
 @NoArgsConstructor
@@ -100,9 +101,7 @@ public class BaseBudgetGroupController {
         setupTransactionTypeFilterComboBox();
     }
 
-    /**
-     * Sets up the event handlers for the add and remove category buttons.
-     */
+    /** Sets up the event handlers for the add and remove category buttons. */
     protected void setupButtonActions() {
         addCategoryButton.setOnAction(
                 event -> moveCategory(availableCategoriesListView, selectedCategoriesListView));
@@ -188,7 +187,7 @@ public class BaseBudgetGroupController {
     /**
      * Moves the selected category from a source list to a destination list
      *
-     * @param source      The source ListView
+     * @param source The source ListView
      * @param destination The destination ListView
      */
     protected void moveCategory(ListView<Category> source, ListView<Category> destination) {
@@ -209,17 +208,13 @@ public class BaseBudgetGroupController {
                 .sort(Comparator.comparing(Category::getName, String.CASE_INSENSITIVE_ORDER));
     }
 
-    /**
-     * Handles the cancel action, closing the dialog window.
-     */
+    /** Handles the cancel action, closing the dialog window. */
     @FXML
     protected void handleCancel() {
         groupNameField.getScene().getWindow().hide();
     }
 
-    /**
-     * Handles the save action, returning the configured budget group data.
-     */
+    /** Handles the save action, returning the configured budget group data. */
     @FXML
     protected void handleSave() {
         String groupName = groupNameField.getText().trim();

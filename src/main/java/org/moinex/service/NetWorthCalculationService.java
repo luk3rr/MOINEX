@@ -47,8 +47,9 @@ public class NetWorthCalculationService {
     @Getter private volatile boolean isCalculating = false;
 
     /**
-     * Recalculate all net worth snapshots asynchronously
-     * This is a long-running operation that should not block the UI
+     * Recalculate all net worth snapshots asynchronously This is a long-running operation that
+     * should not block the UI
+     *
      * @return CompletableFuture that completes when calculation is done
      */
     @Async
@@ -161,6 +162,7 @@ public class NetWorthCalculationService {
 
     /**
      * Calculate wallet balances for a given month
+     *
      * @param month The month
      * @param year The year
      * @return Total wallet balances
@@ -290,9 +292,9 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Calculate credit card debt for a given month
-     * This calculates the debt that existed at the end of the specified month
-     * by considering all debts created up to that date minus all payments made up to that date
+     * Calculate credit card debt for a given month This calculates the debt that existed at the end
+     * of the specified month by considering all debts created up to that date minus all payments
+     * made up to that date
      *
      * @param month The month
      * @param year The year
@@ -312,8 +314,9 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Calculate recurring transactions for a given month
-     * Generic method to calculate remaining balance for recurring transactions with end dates
+     * Calculate recurring transactions for a given month Generic method to calculate remaining
+     * balance for recurring transactions with end dates
+     *
      * @param month The month
      * @param year The year
      * @param transactionType The type of transaction (EXPENSE or INCOME)
@@ -414,8 +417,9 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Calculate recurring transactions debt for a given month
-     * Calculates the remaining balance (unpaid installments) for recurring transactions with end dates
+     * Calculate recurring transactions debt for a given month Calculates the remaining balance
+     * (unpaid installments) for recurring transactions with end dates
+     *
      * @param month The month
      * @param year The year
      * @return Total remaining debt from recurring transactions
@@ -426,8 +430,9 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Calculate recurring income for a given month
-     * Calculates the remaining balance (unpaid installments) for recurring income transactions with end dates
+     * Calculate recurring income for a given month Calculates the remaining balance (unpaid
+     * installments) for recurring income transactions with end dates
+     *
      * @param month The month
      * @param year The year
      * @return Total remaining income from recurring transactions
@@ -439,6 +444,7 @@ public class NetWorthCalculationService {
 
     /**
      * Calculate investment value for a given month
+     *
      * @param month The month
      * @param year The year
      * @return Total investment value
@@ -457,6 +463,7 @@ public class NetWorthCalculationService {
 
     /**
      * Calculate total ticker value at a specific date
+     *
      * @param date The date to calculate value for
      * @return Total ticker value
      */
@@ -517,8 +524,9 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Calculate total bond value at a specific date
-     * Includes invested amount + accumulated interest for each bond
+     * Calculate total bond value at a specific date Includes invested amount + accumulated interest
+     * for each bond
+     *
      * @param date The date to calculate value for
      * @return Total bond value (invested amount + accumulated interest)
      */
@@ -587,6 +595,7 @@ public class NetWorthCalculationService {
 
     /**
      * Revert wallet transactions that occurred after the target month
+     *
      * @param wallet The wallet to process
      * @param targetMonth The target month to revert from
      * @return The adjusted wallet balance
@@ -618,7 +627,9 @@ public class NetWorthCalculationService {
     }
 
     /**
-     * Revert credit card payments that occurred after the target month and apply payments in target month
+     * Revert credit card payments that occurred after the target month and apply payments in target
+     * month
+     *
      * @param wallet The wallet to process
      * @param walletBalance The current wallet balance (after transaction reversions)
      * @param targetMonth The target month to revert from

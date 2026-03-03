@@ -24,9 +24,7 @@ import lombok.experimental.SuperBuilder;
 import org.moinex.model.Category;
 import org.moinex.util.Constants;
 
-/**
- * Represents a transfer between wallets
- */
+/** Represents a transfer between wallets */
 @Entity
 @Table(name = "transfer")
 @Getter
@@ -69,9 +67,7 @@ public class Transfer {
         }
     }
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public Transfer(
             Integer id,
             Wallet senderWallet,

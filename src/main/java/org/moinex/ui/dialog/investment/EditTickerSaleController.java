@@ -30,9 +30,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Ticker Sale dialog
- */
+/** Controller for the Edit Ticker Sale dialog */
 @Controller
 @NoArgsConstructor
 public final class EditTickerSaleController extends BaseTickerTransactionManagement {
@@ -40,6 +38,7 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
 
     /**
      * Constructor
+     *
      * @param walletService Wallet service
      * @param walletTransactionService Wallet transaction service
      * @param categoryService Category service

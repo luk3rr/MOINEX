@@ -7,8 +7,8 @@
 package org.moinex.model.enums;
 
 /**
- * ENUM that represents the type of asset for allocation purposes
- * Includes both ticker types and other investment types like bonds
+ * ENUM that represents the type of asset for allocation purposes Includes both ticker types and
+ * other investment types like bonds
  */
 public enum AssetType {
     STOCK,

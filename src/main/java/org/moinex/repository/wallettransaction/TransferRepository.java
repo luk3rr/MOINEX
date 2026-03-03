@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     /**
      * Get the transfers by wallet
+     *
      * @param walletId The id of the wallet
      * @return A list with the transfers in the wallet
      */
@@ -31,6 +32,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
     /**
      * Get the transfers by month and year
+     *
      * @param month The month
      * @param year The year
      * @return A list with the transfers by month and year
@@ -46,6 +48,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
     /**
      * Get the transfers by wallet and month
+     *
      * @param walletId The id of the wallet
      * @param month The month
      * @param year The year
@@ -66,6 +69,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
     /**
      * Get the count of transfers by wallet
+     *
      * @param walletId The id of the wallet
      * @return The count of transfers in the wallet
      */
@@ -77,8 +81,8 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
     Integer getTransferCountByWallet(@Param("walletId") Integer walletId);
 
     /**
-     * Get suggestions. Suggestions are transfers with distinct descriptions
-     * and most recent date
+     * Get suggestions. Suggestions are transfers with distinct descriptions and most recent date
+     *
      * @return A list with the suggestions
      */
     @Query(
@@ -98,8 +102,9 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
      * Sums the amount of all transfer for a given list of category IDs and a specific date range
      *
      * @param categoryIds The list of category IDs to filter by.
-     * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
-     * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @param startDate The start date of the period (inclusive), formatted as 'YYYY-MM-DD
+     *     HH:MM:SS'.
+     * @param endDate The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
      * @return The total sum of the transfer amounts. Returns 0 if no transfers are found.
      */
     @Query(
@@ -114,6 +119,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Integer> {
 
     /**
      * Get transfers involving a wallet after a specific date
+     *
      * @param walletId The id of the wallet
      * @param date The date threshold (format: 'YYYY-MM-DD HH:MM:SS')
      * @return A list with transfers after the specified date

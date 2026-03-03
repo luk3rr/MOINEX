@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the frequency of payments of a bond
- */
+/** ENUM that represents the frequency of payments of a bond */
 public enum PaymentFrequency {
     DAILY, // Pagamentos diários
     MONTHLY, // Pagamentos mensais

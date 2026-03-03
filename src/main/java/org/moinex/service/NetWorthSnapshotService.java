@@ -24,6 +24,7 @@ public class NetWorthSnapshotService {
 
     /**
      * Get snapshot for a specific month and year
+     *
      * @param month The month
      * @param year The year
      * @return Optional snapshot
@@ -34,6 +35,7 @@ public class NetWorthSnapshotService {
 
     /**
      * Save or update snapshot
+     *
      * @param month The month
      * @param year The year
      * @param assets Total assets
@@ -90,9 +92,7 @@ public class NetWorthSnapshotService {
         return netWorthSnapshotRepository.save(snapshot);
     }
 
-    /**
-     * Delete all snapshots
-     */
+    /** Delete all snapshots */
     @Transactional
     public void deleteAllSnapshots() {
         netWorthSnapshotRepository.deleteAll();

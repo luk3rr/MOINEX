@@ -10,9 +10,7 @@ import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.Map;
 
-/**
- * Data Transfer Object to hold investment performance metrics
- */
+/** Data Transfer Object to hold investment performance metrics */
 public record InvestmentPerformanceDTO(
         Map<YearMonth, BigDecimal> monthlyInvested,
         Map<YearMonth, BigDecimal> portfolioValues,

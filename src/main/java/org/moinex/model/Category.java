@@ -19,9 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Represents a category of expenses and incomes
- */
+/** Represents a category of expenses and incomes */
 @Entity
 @Table(name = "category")
 @Getter

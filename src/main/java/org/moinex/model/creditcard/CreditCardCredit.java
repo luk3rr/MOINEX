@@ -22,10 +22,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.moinex.model.enums.CreditCardCreditType;
 
-/**
- * Represents a credit card credit
- * A credit card credit is a credit made to a credit card
- */
+/** Represents a credit card credit A credit card credit is a credit made to a credit card */
 @Entity
 @Table(name = "credit_card_credit")
 @Getter

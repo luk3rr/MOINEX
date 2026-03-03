@@ -19,9 +19,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
-/**
- * Base class for transactions
- */
+/** Base class for transactions */
 @MappedSuperclass
 @SuperBuilder
 @Getter

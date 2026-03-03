@@ -36,9 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This class is responsible for managing the recurring transactions
- */
+/** This class is responsible for managing the recurring transactions */
 @Service
 @NoArgsConstructor
 public class RecurringTransactionService {
@@ -62,12 +60,12 @@ public class RecurringTransactionService {
      * Validate start and end dates for editing a recurring transaction
      *
      * @param startDate The start date
-     * @param endDate   The end date
+     * @param endDate The end date
      * @param frequency The frequency of the recurring transaction
      * @throws IllegalArgumentException If end date is before start date
      * @throws IllegalArgumentException If the frequency is invalid
-     * @throws IllegalArgumentException If the end date is not at least one interval
-     *                                  after the start date
+     * @throws IllegalArgumentException If the end date is not at least one interval after the start
+     *     date
      */
     private void validateDateAndIntervalForEdit(
             LocalDate startDate, LocalDate endDate, RecurringTransactionFrequency frequency) {
@@ -101,17 +99,17 @@ public class RecurringTransactionService {
     }
 
     /**
-     * Validate start and end dates for creating a recurring transaction.
-     * Ensures the start date is not in the past and reuses edit validation.
+     * Validate start and end dates for creating a recurring transaction. Ensures the start date is
+     * not in the past and reuses edit validation.
      *
      * @param startDate The start date
-     * @param endDate   The end date
+     * @param endDate The end date
      * @param frequency The frequency of the recurring transaction
      * @throws IllegalArgumentException If the start date is before today
      * @throws IllegalArgumentException If end date is before start date
      * @throws IllegalArgumentException If the frequency is invalid
-     * @throws IllegalArgumentException If the end date is not at least one interval
-     *                                  after the start date
+     * @throws IllegalArgumentException If the end date is not at least one interval after the start
+     *     date
      */
     private void validateDateAndIntervalForCreate(
             LocalDate startDate, LocalDate endDate, RecurringTransactionFrequency frequency) {
@@ -125,22 +123,22 @@ public class RecurringTransactionService {
     /**
      * Create a recurring transaction
      *
-     * @param walletId    The id of the wallet
-     * @param category    The category of the transaction
-     * @param type        The type of the transaction
-     * @param amount      The amount of the transaction
-     * @param startDate   The start date of the recurring transaction
+     * @param walletId The id of the wallet
+     * @param category The category of the transaction
+     * @param type The type of the transaction
+     * @param amount The amount of the transaction
+     * @param startDate The start date of the recurring transaction
      * @param description The description of the transaction
-     * @param frequency   The frequency of the recurring transaction
+     * @param frequency The frequency of the recurring transaction
      * @return The id of the recurring transaction
-     * @throws EntityNotFoundException  If the wallet is not found
+     * @throws EntityNotFoundException If the wallet is not found
      * @throws IllegalArgumentException If the start date or end date is null
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      * @throws IllegalArgumentException If the start date is before today
      * @throws IllegalArgumentException If end date is before start date
      * @throws IllegalArgumentException If the frequency is invalid
-     * @throws IllegalArgumentException If the end date is not at least one interval
-     *                                  after the start date
+     * @throws IllegalArgumentException If the end date is not at least one interval after the start
+     *     date
      */
     @Transactional
     public Integer addRecurringTransaction(
@@ -171,23 +169,23 @@ public class RecurringTransactionService {
     /**
      * Create a recurring transaction
      *
-     * @param walletId    The id of the wallet
-     * @param category    The category of the transaction
-     * @param type        The type of the transaction
-     * @param amount      The amount of the transaction
-     * @param startDate   The start date of the recurring transaction
+     * @param walletId The id of the wallet
+     * @param category The category of the transaction
+     * @param type The type of the transaction
+     * @param amount The amount of the transaction
+     * @param startDate The start date of the recurring transaction
      * @param description The description of the transaction
-     * @param frequency   The frequency of the recurring transaction
+     * @param frequency The frequency of the recurring transaction
      * @return The id of the recurring transaction
-     * @throws EntityNotFoundException  If the wallet is not found
+     * @throws EntityNotFoundException If the wallet is not found
      * @throws IllegalArgumentException If the start date or end date is null
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      * @throws IllegalArgumentException If the start date is before today
      * @throws IllegalArgumentException If end date is before start date
      * @throws IllegalArgumentException If the frequency is invalid
-     * @throws IllegalArgumentException If the end date is not at least one interval
-     *                                  after the start date
-     **/
+     * @throws IllegalArgumentException If the end date is not at least one interval after the start
+     *     date
+     */
     @Transactional
     public Integer addRecurringTransaction(
             Integer walletId,
@@ -253,9 +251,9 @@ public class RecurringTransactionService {
      * Stops a recurring transaction
      *
      * @param recurringTransactionId The id of the recurring transaction
-     * @throws EntityNotFoundException                                     If the recurring transaction is not found
-     * @throws MoinexException.RecurringTransactionAlreadyStoppedException If the recurring transaction
-     *                                                                     has already ended
+     * @throws EntityNotFoundException If the recurring transaction is not found
+     * @throws MoinexException.RecurringTransactionAlreadyStoppedException If the recurring
+     *     transaction has already ended
      */
     @Transactional
     public void stopRecurringTransaction(Integer recurringTransactionId) {
@@ -306,13 +304,13 @@ public class RecurringTransactionService {
      * Update a recurring transaction
      *
      * @param rt The recurring transaction
-     * @throws EntityNotFoundException  If the recurring transaction is not found
+     * @throws EntityNotFoundException If the recurring transaction is not found
      * @throws IllegalArgumentException If the start date or end date is null
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      * @throws IllegalArgumentException If end date is before start date
      * @throws IllegalArgumentException If the frequency is invalid
-     * @throws IllegalArgumentException If the end date is not at least one interval
-     *                                  after the start date
+     * @throws IllegalArgumentException If the end date is not at least one interval after the start
+     *     date
      */
     @Transactional
     public void updateRecurringTransaction(RecurringTransaction rt) {
@@ -359,9 +357,8 @@ public class RecurringTransactionService {
     }
 
     /**
-     * Process the recurring transactions
-     * This method checks if the next due date of the recurring transactions has
-     * already passed and generates the missing transactions
+     * Process the recurring transactions This method checks if the next due date of the recurring
+     * transactions has already passed and generates the missing transactions
      */
     @Transactional
     public void processRecurringTransactions() {
@@ -399,7 +396,7 @@ public class RecurringTransactionService {
      * Create a wallet transaction for a recurring transaction
      *
      * @param recurring The recurring transaction
-     * @param dueDate   The due date of the transaction
+     * @param dueDate The due date of the transaction
      * @throws IllegalStateException If the transaction type is invalid
      */
     private void createTransactionForDate(RecurringTransaction recurring, LocalDateTime dueDate) {
@@ -437,7 +434,7 @@ public class RecurringTransactionService {
      * Calculate the next due date of a recurring transaction
      *
      * @param currentDueDate The current due date
-     * @param frequency      The frequency of the recurring transaction
+     * @param frequency The frequency of the recurring transaction
      * @return The next due date with the time set to 23:59
      * @throws IllegalStateException If the frequency is invalid
      */
@@ -458,15 +455,15 @@ public class RecurringTransactionService {
      * Get the date of the last transaction that will be generated
      *
      * @param startDate The start date
-     * @param endDate   The end date
+     * @param endDate The end date
      * @param frequency The frequency of the recurring transaction
      * @return The date of the last transaction
      * @throws IllegalArgumentException If the start date is before today
      * @throws IllegalArgumentException If end date is before start date
      * @throws IllegalArgumentException If the frequency is invalid
-     * @throws IllegalArgumentException If the end date is not at least one interval
-     *                                  after the start date
-     * @throws IllegalStateException    If the frequency is invalid
+     * @throws IllegalArgumentException If the end date is not at least one interval after the start
+     *     date
+     * @throws IllegalStateException If the frequency is invalid
      */
     public LocalDate getLastTransactionDate(
             LocalDate startDate, LocalDate endDate, RecurringTransactionFrequency frequency) {
@@ -493,8 +490,8 @@ public class RecurringTransactionService {
     /**
      * Add the frequency to a date
      *
-     * @param date      The date
-     * @param interval  The interval
+     * @param date The date
+     * @param interval The interval
      * @param frequency The frequency
      * @return The new date
      * @throws IllegalStateException If the frequency is invalid
@@ -526,7 +523,7 @@ public class RecurringTransactionService {
      * Get future transactions by year
      *
      * @param startYear The start year
-     * @param endYear   The end year
+     * @param endYear The end year
      */
     public List<WalletTransaction> getFutureTransactionsByYear(Year startYear, Year endYear) {
         List<RecurringTransaction> recurringTransactions =
@@ -577,7 +574,7 @@ public class RecurringTransactionService {
      * Get future transactions by month
      *
      * @param startMonth The start month
-     * @param endMonth   The end month
+     * @param endMonth The end month
      */
     public List<WalletTransaction> getFutureTransactionsByMonthForAnalysis(
             YearMonth startMonth, YearMonth endMonth) {

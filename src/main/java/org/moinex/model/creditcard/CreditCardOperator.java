@@ -20,8 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Represents a credit card operator
- * A credit card operator is a company that issues credit cards
+ * Represents a credit card operator A credit card operator is a company that issues credit cards
  */
 @Entity
 @Table(name = "credit_card_operator")
@@ -43,9 +42,7 @@ public class CreditCardOperator {
     @Column(name = "icon", length = 30)
     private String icon;
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public CreditCardOperator(Integer id, String name) {
         this.id = id;
         this.name = name;

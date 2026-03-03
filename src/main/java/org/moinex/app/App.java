@@ -8,9 +8,7 @@ package org.moinex.app;
 
 import javafx.application.Application;
 
-/**
- * Main application class
- */
+/** Main application class */
 public class App {
     public static void main(String[] args) {
         Application.launch(JavaFXApp.class, args);

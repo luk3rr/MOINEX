@@ -27,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Credit Card Credits dialog
- */
+/** Controller for the Credit Card Credits dialog */
 @Controller
 @NoArgsConstructor
 public class CreditCardCreditsController {
@@ -47,6 +45,7 @@ public class CreditCardCreditsController {
 
     /**
      * Constructor
+     *
      * @param creditCardService CreditCardService
      * @param i18nService I18nService
      * @note This constructor is used for dependency injection
@@ -106,16 +105,12 @@ public class CreditCardCreditsController {
         stage.close();
     }
 
-    /**
-     * Loads the credit cards from the database
-     */
+    /** Loads the credit cards from the database */
     private void loadCreditCardCreditsFromDatabase() {
         creditCardCredits = creditCardService.getAllCreditCardCredits();
     }
 
-    /**
-     * Updates the credit card table view
-     */
+    /** Updates the credit card table view */
     private void updateCreditCardCreditsTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -148,9 +143,7 @@ public class CreditCardCreditsController {
         creditCardCreditsTableView.refresh();
     }
 
-    /**
-     * Configures the table view columns
-     */
+    /** Configures the table view columns */
     private void configureTableView() {
         TableColumn<CreditCardCredit, Integer> idColumn =
                 new TableColumn<>(i18nService.tr(Constants.TranslationKeys.CREDITCARD_TABLE_ID));

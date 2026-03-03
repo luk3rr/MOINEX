@@ -7,9 +7,7 @@ import org.moinex.service.I18nService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Budget Group dialog
- */
+/** Controller for the Add Budget Group dialog */
 @Controller
 @NoArgsConstructor
 public class AddBudgetGroupController extends BaseBudgetGroupController {

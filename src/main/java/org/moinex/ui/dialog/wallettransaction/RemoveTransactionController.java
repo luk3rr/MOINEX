@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Remove Transaction dialog
+ *
  * @note Make sure to set the transaction type before calling the initialize method
  */
 @Controller
@@ -52,6 +53,7 @@ public class RemoveTransactionController {
 
     /**
      * Constructor
+     *
      * @param walletTransactionService WalletTransactionService
      * @note This constructor is used for dependency injection
      */
@@ -69,6 +71,7 @@ public class RemoveTransactionController {
 
     /**
      * Initializes the controller with the transaction type
+     *
      * @param transactionType TransactionType
      */
     public void initializeWithTransactionType(TransactionType transactionType) {
@@ -199,9 +202,7 @@ public class RemoveTransactionController {
         transactionsTableView.refresh();
     }
 
-    /**
-     * Configures the TableView to display the incomes.
-     */
+    /** Configures the TableView to display the incomes. */
     private void configureTableView() {
         TableColumn<WalletTransaction, Integer> idColumn = getWalletTransactionLongTableColumn();
 

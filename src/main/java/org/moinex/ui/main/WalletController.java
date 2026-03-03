@@ -57,9 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the wallet view
- */
+/** Controller for the wallet view */
 @Controller
 @NoArgsConstructor
 public class WalletController {
@@ -94,9 +92,9 @@ public class WalletController {
     /**
      * Constructor
      *
-     * @param walletService               WalletService
-     * @param creditCardService           CreditCardService
-     * @param walletTransactionService    WalletTransactionService
+     * @param walletService WalletService
+     * @param creditCardService CreditCardService
+     * @param walletTransactionService WalletTransactionService
      * @param recurringTransactionService RecurringTransactionService
      * @note This constructor is used for dependency injection
      */
@@ -230,8 +228,8 @@ public class WalletController {
     /**
      * Update the display
      *
-     * @note: This method can be called by other controllers to update the screen when
-     * there is a change
+     * @note: This method can be called by other controllers to update the screen when there is a
+     *     change
      */
     public void updateDisplay() {
         loadAllDataFromDatabase();
@@ -242,9 +240,7 @@ public class WalletController {
         updateDoughnutChart();
     }
 
-    /**
-     * Set the actions for the buttons
-     */
+    /** Set the actions for the buttons */
     private void setButtonsActions() {
         totalBalancePaneWalletTypeComboBox.setOnAction(e -> updateTotalBalanceView());
         moneyFlowPaneWalletTypeComboBox.setOnAction(e -> updateMoneyFlowBarChart());
@@ -272,25 +268,19 @@ public class WalletController {
         loadWalletsFromDatabase();
     }
 
-    /**
-     * Load the wallet transactions
-     */
+    /** Load the wallet transactions */
     private void loadWalletTransactionsFromDatabase() {
         transactions =
                 walletTransactionService.getTransactionsByMonth(
                         totalBalanceSelectedMonth, totalBalanceSelectedYear);
     }
 
-    /**
-     * Load the wallets
-     */
+    /** Load the wallets */
     private void loadWalletsFromDatabase() {
         wallets = walletService.getAllNonArchivedWalletsOrderedByTransactionCountDesc();
     }
 
-    /**
-     * Load the wallet types
-     */
+    /** Load the wallet types */
     private void loadWalletTypesFromDatabase() {
         walletTypes = walletService.getAllWalletTypes();
 
@@ -309,9 +299,7 @@ public class WalletController {
         }
     }
 
-    /**
-     * Update the display of the total balance pane
-     */
+    /** Update the display of the total balance pane */
     private void updateTotalBalanceView() {
         BigDecimal pendingExpenses = BigDecimal.ZERO;
         BigDecimal pendingIncomes = BigDecimal.ZERO;
@@ -444,9 +432,7 @@ public class WalletController {
         totalBalancePaneInfoVBox.getChildren().add(totalWalletsLabel);
     }
 
-    /**
-     * Update the display of wallets
-     */
+    /** Update the display of wallets */
     private void updateDisplayWallets() {
         walletPane1.getChildren().clear();
         walletPane2.getChildren().clear();
@@ -522,9 +508,7 @@ public class WalletController {
         walletNextButton.setDisable(end >= wallets.size());
     }
 
-    /**
-     * Update the chart with the selected wallet types
-     */
+    /** Update the chart with the selected wallet types */
     private void updateDoughnutChart() {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
@@ -611,9 +595,7 @@ public class WalletController {
         return node instanceof DoughnutChart;
     }
 
-    /**
-     * Update the chart with incomes and expenses for the last months
-     */
+    /** Update the chart with incomes and expenses for the last months */
     private void updateMoneyFlowBarChart() {
         // Create a new bar chart
         // This is necessary to clear the previous data
@@ -822,9 +804,7 @@ public class WalletController {
         }
     }
 
-    /**
-     * Update the doughnut chart
-     */
+    /** Update the doughnut chart */
     private void createDoughnutChartCheckBoxes() {
         balanceByWalletTypePieChartAnchorPane.getChildren().clear();
         totalBalanceByWalletTypeVBox.getChildren().clear();
@@ -845,9 +825,7 @@ public class WalletController {
         }
     }
 
-    /**
-     * Create a new bar chart
-     */
+    /** Create a new bar chart */
     private void createMoneyFlowBarChart() {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();

@@ -20,6 +20,7 @@ public interface NetWorthSnapshotRepository extends JpaRepository<NetWorthSnapsh
 
     /**
      * Find snapshot by month and year
+     *
      * @param month The month
      * @param year The year
      * @return Optional snapshot
@@ -28,14 +29,13 @@ public interface NetWorthSnapshotRepository extends JpaRepository<NetWorthSnapsh
 
     /**
      * Get all snapshots ordered by year and month
+     *
      * @return List of snapshots
      */
     @Query("SELECT nws FROM NetWorthSnapshot nws ORDER BY nws.year ASC, nws.month ASC")
     List<NetWorthSnapshot> findAllOrderedByDate();
 
-    /**
-     * Delete all snapshots
-     */
+    /** Delete all snapshots */
     @Modifying
     @Transactional
     @Query("DELETE FROM NetWorthSnapshot")
@@ -43,6 +43,7 @@ public interface NetWorthSnapshotRepository extends JpaRepository<NetWorthSnapsh
 
     /**
      * Check if snapshot exists for month and year
+     *
      * @param month The month
      * @param year The year
      * @return True if exists

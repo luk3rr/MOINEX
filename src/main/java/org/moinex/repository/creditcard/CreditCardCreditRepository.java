@@ -19,6 +19,7 @@ public interface CreditCardCreditRepository extends JpaRepository<CreditCardCred
 
     /**
      * Get credits card credits by credit card ID and month
+     *
      * @param crcId The ID of the credit card
      * @param month The month
      * @param year The year
@@ -36,6 +37,7 @@ public interface CreditCardCreditRepository extends JpaRepository<CreditCardCred
 
     /**
      * Get the total credits of a credit card by month
+     *
      * @param crcId The ID of the credit card
      * @param month The month
      * @param year The year
@@ -52,8 +54,8 @@ public interface CreditCardCreditRepository extends JpaRepository<CreditCardCred
             @Param("year") Integer year);
 
     /**
-     * Get suggestions. Suggestions are credits with distinct descriptions
-     * and most recent date
+     * Get suggestions. Suggestions are credits with distinct descriptions and most recent date
+     *
      * @return A list with the suggestions
      */
     @Query(

@@ -20,9 +20,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller class for the Calculator application
- */
+/** Controller class for the Calculator application */
 @Controller
 @NoArgsConstructor
 public class CalculatorController {
@@ -37,6 +35,7 @@ public class CalculatorController {
 
     /**
      * Constructor for CalculatorController
+     *
      * @param calculatorService The service for the calculator
      */
     @Autowired

@@ -23,8 +23,7 @@ import lombok.experimental.SuperBuilder;
 import org.moinex.model.Category;
 
 /**
- * Represents a credit card debt
- * A credit card debt is a debt that is associated with a credit card
+ * Represents a credit card debt A credit card debt is a debt that is associated with a credit card
  */
 @Entity
 @Table(name = "credit_card_debt")

@@ -101,7 +101,7 @@ public class GoalFullPaneController {
     /**
      * Constructor
      *
-     * @param goalService              Goal service
+     * @param goalService Goal service
      * @param walletTransactionService Wallet transaction service
      * @note This constructor is used for dependency injection
      */
@@ -121,9 +121,7 @@ public class GoalFullPaneController {
         this.i18nService = i18nService;
     }
 
-    /**
-     * Load goal information from the database
-     */
+    /** Load goal information from the database */
     public void loadGoalInfo() {
         if (goal == null) {
             return;
@@ -497,7 +495,7 @@ public class GoalFullPaneController {
      * Set the value of a label
      *
      * @param valueLabel Label to set the value
-     * @param value      Value to set
+     * @param value Value to set
      */
     private void setLabelValue(Label valueLabel, BigDecimal value) {
         valueLabel.setText(UIUtils.formatCurrency(value));

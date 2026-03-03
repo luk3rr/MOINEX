@@ -35,9 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Transaction dialog
- */
+/** Controller for the Edit Transaction dialog */
 @Controller
 @NoArgsConstructor
 public final class EditTransactionController extends BaseWalletTransactionManagement {
@@ -48,10 +46,10 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     /**
      * Constructor
      *
-     * @param walletService            WalletService
+     * @param walletService WalletService
      * @param walletTransactionService WalletTransactionService
-     * @param categoryService          CategoryService
-     * @param calculatorService        CalculatorService
+     * @param categoryService CategoryService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired

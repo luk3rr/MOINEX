@@ -25,9 +25,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Goal dialog
- */
+/** Controller for the Edit Goal dialog */
 @Controller
 @NoArgsConstructor
 public final class EditGoalController extends BaseGoalManagement {

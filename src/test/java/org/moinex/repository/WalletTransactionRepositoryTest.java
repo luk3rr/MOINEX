@@ -31,9 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Tests for the WalletTransactionRepository
- */
+/** Tests for the WalletTransactionRepository */
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfig.class})

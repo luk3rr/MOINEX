@@ -26,8 +26,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.util.Constants;
 
 /**
- * Represents a credit card payment
- * A credit card payment is a payment made to a credit card debt
+ * Represents a credit card payment A credit card payment is a payment made to a credit card debt
  */
 @Entity
 @Table(name = "credit_card_payment")

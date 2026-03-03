@@ -19,6 +19,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get the total debt of a credit card
+     *
      * @param creditCardId The name of the credit card
      * @return The total debt of the credit card
      */
@@ -29,6 +30,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get the date of the earliest payment
+     *
      * @return The date of the earliest payment
      */
     @Query("SELECT min(ccp.date) FROM CreditCardPayment ccp")
@@ -36,6 +38,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get the date of the latest payment
+     *
      * @return The date of the latest payment
      */
     @Query("SELECT max(ccp.date) FROM CreditCardPayment ccp")
@@ -43,6 +46,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get count of debts by credit card
+     *
      * @param creditCardId The id of the credit card
      * @return The count of debts by credit card
      */
@@ -51,6 +55,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get the number of associated transactions for a category
+     *
      * @param categoryId Category ID
      * @return Number of transactions
      */
@@ -58,8 +63,8 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
     Integer getCountTransactions(@Param("categoryId") Integer categoryId);
 
     /**
-     * Get suggestions. Suggestions are debts with distinct descriptions
-     * and most recent date
+     * Get suggestions. Suggestions are debts with distinct descriptions and most recent date
+     *
      * @return A list with the suggestions
      */
     @Query(
@@ -75,6 +80,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get total amount of debts (purchases) up to a specific date
+     *
      * @param endDate The end date (inclusive)
      * @return Total amount of debts up to the date
      */
@@ -86,6 +92,7 @@ public interface CreditCardDebtRepository extends JpaRepository<CreditCardDebt, 
 
     /**
      * Get all debts created up to a specific date
+     *
      * @param endDate The end date (inclusive)
      * @return List of all debts created up to the date
      */

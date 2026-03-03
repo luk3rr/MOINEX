@@ -31,9 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This class is responsible for managing goals
- */
+/** This class is responsible for managing goals */
 @Service
 @NoArgsConstructor
 public class GoalService {
@@ -65,13 +63,12 @@ public class GoalService {
      * Validates the date and balances of a goal
      *
      * @param initialBalance The initial balance of the goal
-     * @param targetBalance  The target balance of the goal
+     * @param targetBalance The target balance of the goal
      * @param targetDateTime The target date of the goal
      * @throws IllegalArgumentException If the target date is in the past
      * @throws IllegalArgumentException If the initial balance is negative
      * @throws IllegalArgumentException If the target balance is negative or zero
-     * @throws IllegalArgumentException If the initial balance is greater than the
-     *                                  target balance
+     * @throws IllegalArgumentException If the initial balance is greater than the target balance
      */
     public void validateDateAndBalances(
             BigDecimal initialBalance, BigDecimal targetBalance, LocalDateTime targetDateTime) {
@@ -99,21 +96,20 @@ public class GoalService {
     /**
      * Creates a new goal without a master wallet
      *
-     * @param name           The name of the goal
+     * @param name The name of the goal
      * @param initialBalance The initial balance of the goal
-     * @param targetBalance  The targetBalance balance of the goal
-     * @param targetDate     The targetBalance date of the goal
-     * @param motivation     The motivation for the goal
+     * @param targetBalance The targetBalance balance of the goal
+     * @param targetDate The targetBalance date of the goal
+     * @param motivation The motivation for the goal
      * @return The id of the created goal
      * @throws IllegalArgumentException If the name of the goal is empty
-     * @throws EntityExistsException    If a goal with the same name already exists
-     * @throws EntityExistsException    If a wallet with the same name already exists
+     * @throws EntityExistsException If a goal with the same name already exists
+     * @throws EntityExistsException If a wallet with the same name already exists
      * @throws IllegalArgumentException If the target date is in the past
      * @throws IllegalArgumentException If the initial balance is negative
      * @throws IllegalArgumentException If the target balance is negative or zero
-     * @throws IllegalArgumentException If the initial balance is greater than the
-     *                                  target balance
-     * @throws EntityNotFoundException  If the goal wallet type is not found
+     * @throws IllegalArgumentException If the initial balance is greater than the target balance
+     * @throws EntityNotFoundException If the goal wallet type is not found
      */
     @Transactional
     public Integer addGoal(
@@ -128,22 +124,21 @@ public class GoalService {
     /**
      * Creates a new goal
      *
-     * @param name           The name of the goal
+     * @param name The name of the goal
      * @param initialBalance The initial balance of the goal
-     * @param targetBalance  The targetBalance balance of the goal
-     * @param targetDate     The targetBalance date of the goal
-     * @param motivation     The motivation for the goal
-     * @param masterWallet   The master wallet of the goal, can be null if the goal does not
+     * @param targetBalance The targetBalance balance of the goal
+     * @param targetDate The targetBalance date of the goal
+     * @param motivation The motivation for the goal
+     * @param masterWallet The master wallet of the goal, can be null if the goal does not
      * @return The id of the created goal
      * @throws IllegalArgumentException If the name of the goal is empty
-     * @throws EntityExistsException    If a goal with the same name already exists
-     * @throws EntityExistsException    If a wallet with the same name already exists
+     * @throws EntityExistsException If a goal with the same name already exists
+     * @throws EntityExistsException If a wallet with the same name already exists
      * @throws IllegalArgumentException If the target date is in the past
      * @throws IllegalArgumentException If the initial balance is negative
      * @throws IllegalArgumentException If the target balance is negative or zero
-     * @throws IllegalArgumentException If the initial balance is greater than the
-     *                                  target balance
-     * @throws EntityNotFoundException  If the goal wallet type is not found
+     * @throws IllegalArgumentException If the initial balance is greater than the target balance
+     * @throws EntityNotFoundException If the goal wallet type is not found
      */
     @Transactional
     public Integer addGoal(
@@ -207,12 +202,15 @@ public class GoalService {
     }
 
     /**
-     * Handles the funding strategy for a goal when goal is an virtual wallet and a master wallet is provided.
+     * Handles the funding strategy for a goal when goal is an virtual wallet and a master wallet is
+     * provided.
      *
-     * @param goal     The goal to be funded
+     * @param goal The goal to be funded
      * @param strategy The funding strategy to be applied
-     * @throws IllegalArgumentException                       If the funding strategy is null when a master wallet is provided
-     * @throws MoinexException.InsufficientResourcesException If the master wallet does not have enough unallocated balance
+     * @throws IllegalArgumentException If the funding strategy is null when a master wallet is
+     *     provided
+     * @throws MoinexException.InsufficientResourcesException If the master wallet does not have
+     *     enough unallocated balance
      */
     private void handleFundingStrategy(Goal goal, GoalFundingStrategy strategy, BigDecimal value) {
         if (!goal.isVirtual() || value.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -261,7 +259,7 @@ public class GoalService {
      *
      * @param idGoal The id of the goal to be deleted
      * @throws EntityNotFoundException If the goal does not exist
-     * @throws IllegalStateException   If the goal has transactions
+     * @throws IllegalStateException If the goal has transactions
      */
     @Transactional
     public void deleteGoal(Integer idGoal) {
@@ -296,15 +294,14 @@ public class GoalService {
      * Updates a goal
      *
      * @param goalUpdated The goal to be updated
-     * @throws EntityNotFoundException  If the goal does not exist
+     * @throws EntityNotFoundException If the goal does not exist
      * @throws IllegalArgumentException If the name of the goal is empty
-     * @throws EntityExistsException    If a goal with the same name already exists
-     * @throws EntityExistsException    If a wallet with the same name already exists
+     * @throws EntityExistsException If a goal with the same name already exists
+     * @throws EntityExistsException If a wallet with the same name already exists
      * @throws IllegalArgumentException If the target date is in the past
      * @throws IllegalArgumentException If the initial balance is negative
      * @throws IllegalArgumentException If the target balance is negative or zero
-     * @throws IllegalArgumentException If the initial balance is greater than the
-     *                                  target balance
+     * @throws IllegalArgumentException If the initial balance is greater than the target balance
      */
     @Transactional
     public void updateGoal(Goal goalUpdated) {
@@ -460,9 +457,8 @@ public class GoalService {
      *
      * @param idGoal The id of the goal to be archived
      * @throws EntityNotFoundException If the goal does not exist
-     * @note This method is used to archive a goal, which means that the goal
-     * will not be deleted from the database, but it will not be used in the
-     * application anymore
+     * @note This method is used to archive a goal, which means that the goal will not be deleted
+     *     from the database, but it will not be used in the application anymore
      */
     @Transactional
     public void archiveGoal(Integer idGoal) {
@@ -495,8 +491,8 @@ public class GoalService {
      *
      * @param idGoal The id of the goal to be unarchived
      * @throws EntityNotFoundException If the goal does not exist
-     * @note This method is used to unarchive a goal, which means that the goal
-     * will be used in the application again
+     * @note This method is used to unarchive a goal, which means that the goal will be used in the
+     *     application again
      */
     @Transactional
     public void unarchiveGoal(Integer idGoal) {
@@ -521,7 +517,7 @@ public class GoalService {
      * Complete a goal
      *
      * @param idGoal The id of the goal to be completed
-     * @throws EntityNotFoundException                 If the goal does not exist
+     * @throws EntityNotFoundException If the goal does not exist
      * @throws MoinexException.IncompleteGoalException If the goal has not been completed yet
      */
     @Transactional
@@ -578,9 +574,7 @@ public class GoalService {
         logger.info("Goal with id {} reopened", idGoal);
     }
 
-    /**
-     * Get all goals
-     */
+    /** Get all goals */
     public List<Goal> getGoals() {
         return goalRepository.findAll();
     }

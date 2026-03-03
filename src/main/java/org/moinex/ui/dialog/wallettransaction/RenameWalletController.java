@@ -23,9 +23,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Rename Wallet dialog
- */
+/** Controller for the Rename Wallet dialog */
 @Controller
 @NoArgsConstructor
 public class RenameWalletController {
@@ -41,6 +39,7 @@ public class RenameWalletController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */

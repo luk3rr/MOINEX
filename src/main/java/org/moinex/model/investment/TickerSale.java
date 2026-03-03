@@ -42,9 +42,7 @@ public class TickerSale extends Transaction {
     @Column(name = "average_cost", nullable = false)
     private BigDecimal averageCost;
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public TickerSale(
             Integer id,
             Ticker ticker,

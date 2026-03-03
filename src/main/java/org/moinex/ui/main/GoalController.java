@@ -41,9 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller class for the goal view
- */
+/** Controller class for the goal view */
 @Controller
 @NoArgsConstructor
 public class GoalController {
@@ -72,7 +70,7 @@ public class GoalController {
     /**
      * Constructor
      *
-     * @param goalService              The goal service
+     * @param goalService The goal service
      * @param walletTransactionService The wallet transaction service
      * @note This constructor is used for dependency injection
      */
@@ -420,8 +418,8 @@ public class GoalController {
     /**
      * Update the display
      *
-     * @note: This method can be called by other controllers to update the screen when
-     * there is a change
+     * @note: This method can be called by other controllers to update the screen when there is a
+     *     change
      */
     public void updateDisplay() {
         loadGoalsFromDatabase();
@@ -431,9 +429,7 @@ public class GoalController {
         updateGoalTableView();
     }
 
-    /**
-     * Update the display of in progress goals
-     */
+    /** Update the display of in progress goals */
     private void updateDisplayInProgressGoals() {
         inProgressPane1.getChildren().clear();
         inProgressPane2.getChildren().clear();
@@ -506,9 +502,7 @@ public class GoalController {
         inProgressNextButton.setDisable(end >= inProgressGoals.size());
     }
 
-    /**
-     * Update the display of accomplished goals
-     */
+    /** Update the display of accomplished goals */
     private void updateDisplayAccomplishedGoals() {
         accomplishedPane1.getChildren().clear();
         accomplishedPane2.getChildren().clear();
@@ -678,9 +672,7 @@ public class GoalController {
         goalTableView.refresh();
     }
 
-    /**
-     * Set the actions for the buttons
-     */
+    /** Set the actions for the buttons */
     private void setButtonsActions() {
         Integer inProgressGoalsSize =
                 goals.stream().filter(g -> !g.isCompleted() && !g.isArchived()).toList().size();

@@ -19,10 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Represents a wallet type
- * A wallet type is a category of wallets
- */
+/** Represents a wallet type A wallet type is a category of wallets */
 @Entity
 @Table(name = "wallet_type")
 @Getter
@@ -43,9 +40,7 @@ public class WalletType {
     @Column(name = "icon", length = 30)
     private String icon;
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public WalletType(Integer id, String name) {
         this.id = id;
         this.name = name;

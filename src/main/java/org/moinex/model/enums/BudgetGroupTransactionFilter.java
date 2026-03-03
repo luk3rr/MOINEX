@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the transaction type filter for budget groups
- */
+/** ENUM that represents the transaction type filter for budget groups */
 public enum BudgetGroupTransactionFilter {
     INCOME,
     EXPENSE,

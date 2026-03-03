@@ -22,9 +22,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Credit Card dialog
- */
+/** Controller for the Add Credit Card dialog */
 @Controller
 @NoArgsConstructor
 public final class AddCreditCardController extends BaseCreditCardManagement {
@@ -32,6 +30,7 @@ public final class AddCreditCardController extends BaseCreditCardManagement {
 
     /**
      * Constructor
+     *
      * @param creditCardService The credit card service
      * @param walletService The wallet service
      * @param i18nService The internationalization service

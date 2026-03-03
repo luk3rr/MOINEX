@@ -23,9 +23,7 @@ import lombok.experimental.SuperBuilder;
 import org.moinex.model.enums.TransactionStatus;
 import org.moinex.util.Constants;
 
-/**
- * Represents a transaction in a wallet
- */
+/** Represents a transaction in a wallet */
 @Entity
 @Table(name = "wallet_transaction")
 @Getter

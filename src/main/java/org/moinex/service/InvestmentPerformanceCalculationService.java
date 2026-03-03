@@ -46,8 +46,8 @@ public class InvestmentPerformanceCalculationService {
     @Getter private volatile boolean isCalculating = false;
 
     /**
-     * Get investment performance data for display
-     * Uses cache when available, calculates and saves missing months automatically
+     * Get investment performance data for display Uses cache when available, calculates and saves
+     * missing months automatically
      *
      * @return InvestmentPerformanceDTO with all metrics for the last N months
      */

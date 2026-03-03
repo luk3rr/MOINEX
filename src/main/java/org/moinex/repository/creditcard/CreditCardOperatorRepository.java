@@ -16,6 +16,7 @@ public interface CreditCardOperatorRepository extends JpaRepository<CreditCardOp
 
     /**
      * Get all credit card operators ordered by name
+     *
      * @return List of credit card operators
      */
     List<CreditCardOperator> findAllByOrderByNameAsc();

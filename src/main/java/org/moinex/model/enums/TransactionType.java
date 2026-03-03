@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the type of transaction
- */
+/** ENUM that represents the type of transaction */
 public enum TransactionType {
     INCOME,
     EXPENSE

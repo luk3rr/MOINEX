@@ -20,9 +20,7 @@ import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * JavaFX application entry point
- */
+/** JavaFX application entry point */
 public class JavaFXApp extends Application {
     private ConfigurableApplicationContext springContext;
     private static volatile HostServices hostServices;

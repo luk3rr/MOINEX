@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the index of interest of a bond
- */
+/** ENUM that represents the index of interest of a bond */
 public enum InterestIndex {
     // Brazilian Indices
     CDI, // Certificado de Depósito Interbancário

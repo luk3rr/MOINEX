@@ -18,12 +18,14 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     /**
      * Get all non archived categories ordered by name
+     *
      * @return List of categories
      */
     List<Category> findAllByIsArchivedFalseOrderByNameAsc();
 
     /**
      * Check if a category with a given name exists
+     *
      * @param name Category name
      * @return True if the category exists, false otherwise
      */
@@ -31,6 +33,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     /**
      * Get a category by name
+     *
      * @param name Category name
      * @return Category
      */
@@ -38,6 +41,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     /**
      * Get the number of associated transactions for a category
+     *
      * @param categoryId Category ID
      * @return Number of transactions
      */

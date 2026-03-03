@@ -24,8 +24,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Fundamental Metric Pane
- * Displays a single fundamental analysis metric in a card format
+ * Controller for the Fundamental Metric Pane Displays a single fundamental analysis metric in a
+ * card format
  *
  * @note prototype is necessary so that each pane instance is unique
  */
@@ -54,8 +54,8 @@ public class FundamentalMetricPaneController {
     /**
      * Update the metric pane with data
      *
-     * @param metricName     Name of the metric
-     * @param metricData     JSON object containing metric data
+     * @param metricName Name of the metric
+     * @param metricData JSON object containing metric data
      * @param lastUpdateDate Last update date to use for real-time data without reference_date
      */
     public void updateMetricPane(String metricName, Object metricData, String lastUpdateDate) {
@@ -111,9 +111,7 @@ public class FundamentalMetricPaneController {
         }
     }
 
-    /**
-     * Format metric value based on its type
-     */
+    /** Format metric value based on its type */
     private String formatMetricValue(JSONObject metric) {
         Object value = metric.opt("value");
         String type = metric.optString("type", "number");
@@ -135,9 +133,7 @@ public class FundamentalMetricPaneController {
         }
     }
 
-    /**
-     * Format date string
-     */
+    /** Format date string */
     private String formatDate(String dateStr) {
         try {
             LocalDateTime date = LocalDateTime.parse(dateStr);

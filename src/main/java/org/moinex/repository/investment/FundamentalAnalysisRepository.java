@@ -15,14 +15,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository for FundamentalAnalysis entity
- */
+/** Repository for FundamentalAnalysis entity */
 @Repository
 public interface FundamentalAnalysisRepository extends JpaRepository<FundamentalAnalysis, Integer> {
 
     /**
      * Find fundamental analysis by ticker and period type
+     *
      * @param ticker The ticker entity
      * @param periodType The period type (ANNUAL, QUARTERLY, etc.)
      * @return Optional containing the analysis if found
@@ -31,6 +30,7 @@ public interface FundamentalAnalysisRepository extends JpaRepository<Fundamental
 
     /**
      * Find fundamental analysis by ticker id and period type
+     *
      * @param tickerId The ticker id
      * @param periodType The period type (ANNUAL, QUARTERLY, etc.)
      * @return Optional containing the analysis if found
@@ -40,6 +40,7 @@ public interface FundamentalAnalysisRepository extends JpaRepository<Fundamental
 
     /**
      * Find all fundamental analyses for a ticker (all period types)
+     *
      * @param ticker The ticker entity
      * @return List of all analyses for the ticker
      */
@@ -47,6 +48,7 @@ public interface FundamentalAnalysisRepository extends JpaRepository<Fundamental
 
     /**
      * Find all fundamental analyses for a ticker by id (all period types)
+     *
      * @param tickerId The ticker id
      * @return List of all analyses for the ticker
      */
@@ -54,6 +56,7 @@ public interface FundamentalAnalysisRepository extends JpaRepository<Fundamental
 
     /**
      * Check if fundamental analysis exists for a ticker and period type
+     *
      * @param ticker The ticker entity
      * @param periodType The period type
      * @return true if exists, false otherwise
@@ -62,12 +65,14 @@ public interface FundamentalAnalysisRepository extends JpaRepository<Fundamental
 
     /**
      * Delete all fundamental analyses for a ticker
+     *
      * @param ticker The ticker entity
      */
     void deleteByTicker(Ticker ticker);
 
     /**
      * Delete fundamental analysis by ticker and period type
+     *
      * @param ticker The ticker entity
      * @param periodType The period type
      */
@@ -75,6 +80,7 @@ public interface FundamentalAnalysisRepository extends JpaRepository<Fundamental
 
     /**
      * Find all analyses for active (non-archived) tickers
+     *
      * @return List of analyses for active tickers
      */
     @Query("SELECT fa FROM FundamentalAnalysis fa WHERE fa.ticker.isArchived = false")

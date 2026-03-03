@@ -19,6 +19,7 @@ public interface TickerPriceHistoryRepository extends JpaRepository<TickerPriceH
 
     /**
      * Find price history for a ticker on a specific date
+     *
      * @param tickerId The ticker ID
      * @param priceDate The date in string format
      * @return Optional containing the price history if found
@@ -33,6 +34,7 @@ public interface TickerPriceHistoryRepository extends JpaRepository<TickerPriceH
 
     /**
      * Find the most recent price for a ticker on or before a specific date
+     *
      * @param tickerId The ticker ID
      * @param priceDate The date in string format
      * @return Optional containing the most recent price history
@@ -48,6 +50,7 @@ public interface TickerPriceHistoryRepository extends JpaRepository<TickerPriceH
 
     /**
      * Find all month-end prices for a ticker within a date range
+     *
      * @param tickerId The ticker ID
      * @param startDate Start date in string format
      * @param endDate End date in string format
@@ -68,6 +71,7 @@ public interface TickerPriceHistoryRepository extends JpaRepository<TickerPriceH
 
     /**
      * Get the earliest price date for a ticker
+     *
      * @param tickerId The ticker ID
      * @return Optional containing the earliest price history
      */
@@ -80,6 +84,7 @@ public interface TickerPriceHistoryRepository extends JpaRepository<TickerPriceH
 
     /**
      * Check if price history exists for a ticker on a specific date
+     *
      * @param tickerId The ticker ID
      * @param priceDate The date in string format
      * @return True if exists, false otherwise

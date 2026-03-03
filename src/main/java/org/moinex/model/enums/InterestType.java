@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the type of interest of a bond
- */
+/** ENUM that represents the type of interest of a bond */
 public enum InterestType {
     FIXED, // Juros prefixados
     FLOATING, // Juros pós-fixados

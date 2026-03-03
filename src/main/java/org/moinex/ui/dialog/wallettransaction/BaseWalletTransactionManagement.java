@@ -37,9 +37,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Base class for the wallet transaction dialog controllers
- */
+/** Base class for the wallet transaction dialog controllers */
 @NoArgsConstructor
 public abstract class BaseWalletTransactionManagement {
     @FXML protected Label walletAfterBalanceValueLabel;
@@ -87,10 +85,10 @@ public abstract class BaseWalletTransactionManagement {
     /**
      * Constructor
      *
-     * @param walletService            WalletService
+     * @param walletService WalletService
      * @param walletTransactionService WalletTransactionService
-     * @param categoryService          CategoryService
-     * @param calculatorService        CalculatorService
+     * @param categoryService CategoryService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired

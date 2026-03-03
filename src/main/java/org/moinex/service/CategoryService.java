@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This class is responsible for managing the categories
- */
+/** This class is responsible for managing the categories */
 @Service
 @NoArgsConstructor
 public class CategoryService {
@@ -41,6 +39,7 @@ public class CategoryService {
 
     /**
      * Add a new category
+     *
      * @param name Category name
      * @return Category ID
      * @throws EntityExistsException If the category already exists
@@ -70,6 +69,7 @@ public class CategoryService {
 
     /**
      * Delete a category
+     *
      * @param id Category ID
      * @throws EntityNotFoundException If the category not found
      * @throws IllegalStateException If the category has associated transactions
@@ -99,6 +99,7 @@ public class CategoryService {
 
     /**
      * Rename a category
+     *
      * @param id Category ID
      * @param newName New category name
      * @throws EntityNotFoundException If the category not found
@@ -136,6 +137,7 @@ public class CategoryService {
 
     /**
      * Archive a category
+     *
      * @param id Category ID to be archived
      * @throws EntityNotFoundException If the category not found
      */
@@ -160,6 +162,7 @@ public class CategoryService {
 
     /**
      * Unarchive a category
+     *
      * @param id Category ID to be unarchived
      * @throws EntityNotFoundException If the category not found
      */
@@ -184,6 +187,7 @@ public class CategoryService {
 
     /**
      * Get all categories
+     *
      * @return List of categories
      */
     public List<Category> getCategories() {
@@ -192,6 +196,7 @@ public class CategoryService {
 
     /**
      * Get all non-archived categories ordered by name
+     *
      * @return List of categories
      */
     public List<Category> getNonArchivedCategoriesOrderedByName() {
@@ -200,6 +205,7 @@ public class CategoryService {
 
     /**
      * Get the number of transactions associated with a category
+     *
      * @param categoryId Category ID
      * @return Number of transactions
      */

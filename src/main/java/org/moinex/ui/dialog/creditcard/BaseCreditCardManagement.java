@@ -20,9 +20,7 @@ import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Base class to implement the common behavior of the Add and Edit Credit Card
- */
+/** Base class to implement the common behavior of the Add and Edit Credit Card */
 @NoArgsConstructor
 public abstract class BaseCreditCardManagement {
     @FXML protected TextField nameField;
@@ -49,6 +47,7 @@ public abstract class BaseCreditCardManagement {
 
     /**
      * Constructor
+     *
      * @param creditCardService The credit card service
      * @param walletService The wallet service
      * @note This constructor is used for dependency injection

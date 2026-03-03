@@ -21,9 +21,8 @@ import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.util.Constants;
 
 /**
- * Represents a goal
- * A goal is a wallet with a target balance and a target date, good for saving money
- * for a specific purpose, e.g., a trip, a new computer, a new bike, etc.
+ * Represents a goal A goal is a wallet with a target balance and a target date, good for saving
+ * money for a specific purpose, e.g., a trip, a new computer, a new bike, etc.
  */
 @Entity
 @Table(name = "goal")
@@ -66,9 +65,7 @@ public class Goal extends Wallet {
         }
     }
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public Goal(
             Integer id,
             String name,

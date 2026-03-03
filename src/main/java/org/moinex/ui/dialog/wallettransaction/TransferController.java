@@ -27,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Manage Transfers dialog
- */
+/** Controller for the Manage Transfers dialog */
 @Controller
 @NoArgsConstructor
 public class TransferController {
@@ -67,9 +65,7 @@ public class TransferController {
         updateTableView();
     }
 
-    /**
-     * Configures the TableView columns to display Transfer data.
-     */
+    /** Configures the TableView columns to display Transfer data. */
     private void configureTableView() {
         TableColumn<Transfer, Integer> idColumn =
                 new TableColumn<>(
@@ -142,9 +138,7 @@ public class TransferController {
         transfersTableView.getColumns().add(categoryColumn);
     }
 
-    /**
-     * Configures the date pickers with appropriate formatters and default values.
-     */
+    /** Configures the date pickers with appropriate formatters and default values. */
     private void configureDatePickers() {
         UIUtils.setDatePickerFormat(transfersStartDatePicker, i18nService);
         UIUtils.setDatePickerFormat(transfersEndDatePicker, i18nService);
@@ -153,25 +147,19 @@ public class TransferController {
         transfersEndDatePicker.setValue(LocalDate.now().plusMonths(1).withDayOfMonth(1));
     }
 
-    /**
-     * Loads all transfers from the database into the master list and sets up the filtered list.
-     */
+    /** Loads all transfers from the database into the master list and sets up the filtered list. */
     private void loadTransfersFromDatabase() {
         masterData.setAll(walletTransactionService.getAllTransfers());
     }
 
-    /**
-     * Sets up listeners on the search field and date pickers to filter the table view.
-     */
+    /** Sets up listeners on the search field and date pickers to filter the table view. */
     private void setupFilterListeners() {
         searchField.textProperty().addListener((obs, old, val) -> updateTableView());
         transfersStartDatePicker.valueProperty().addListener((obs, old, val) -> updateTableView());
         transfersEndDatePicker.valueProperty().addListener((obs, old, val) -> updateTableView());
     }
 
-    /**
-     * Applies the current filters from the UI to the table view data.
-     */
+    /** Applies the current filters from the UI to the table view data. */
     private void updateTableView() {
         String searchText = searchField.getText().toLowerCase();
         LocalDate startDate = transfersStartDatePicker.getValue();

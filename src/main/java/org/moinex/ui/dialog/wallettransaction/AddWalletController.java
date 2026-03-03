@@ -23,9 +23,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Wallet dialog
- */
+/** Controller for the Add Wallet dialog */
 @Controller
 @NoArgsConstructor
 public class AddWalletController {
@@ -43,6 +41,7 @@ public class AddWalletController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
@@ -127,16 +126,12 @@ public class AddWalletController {
         }
     }
 
-    /**
-     * Load the wallet types
-     */
+    /** Load the wallet types */
     private void loadWalletTypes() {
         walletTypes = walletService.getAllWalletTypes();
     }
 
-    /**
-     * Populate the wallet type combo box
-     */
+    /** Populate the wallet type combo box */
     private void populateWalletTypeComboBox() {
         String nameToMove = "Others";
 

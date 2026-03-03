@@ -19,9 +19,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Category dialog
- */
+/** Controller for the Add Category dialog */
 @Controller
 @NoArgsConstructor
 public class AddCategoryController {

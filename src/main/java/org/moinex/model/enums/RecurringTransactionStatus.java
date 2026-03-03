@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the status of a recurring transaction
- */
+/** ENUM that represents the status of a recurring transaction */
 public enum RecurringTransactionStatus {
     ACTIVE,
     INACTIVE

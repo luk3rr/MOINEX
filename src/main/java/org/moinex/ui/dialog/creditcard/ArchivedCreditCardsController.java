@@ -27,9 +27,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Archived Credit Cards dialog
- */
+/** Controller for the Archived Credit Cards dialog */
 @Controller
 @NoArgsConstructor
 public class ArchivedCreditCardsController {
@@ -45,6 +43,7 @@ public class ArchivedCreditCardsController {
 
     /**
      * Constructor
+     *
      * @param creditCardService CreditCardService
      * @param i18nService I18nService
      * @note This constructor is used for dependency injection
@@ -166,16 +165,12 @@ public class ArchivedCreditCardsController {
         stage.close();
     }
 
-    /**
-     * Loads the credit cards from the database
-     */
+    /** Loads the credit cards from the database */
     private void loadArchivedCreditCardsFromDatabase() {
         archivedCreditCards = creditCardService.getAllArchivedCreditCards();
     }
 
-    /**
-     * Updates the credit card table view
-     */
+    /** Updates the credit card table view */
     private void updateCreditCardTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -202,9 +197,7 @@ public class ArchivedCreditCardsController {
         creditCardTableView.refresh();
     }
 
-    /**
-     * Configures the table view columns
-     */
+    /** Configures the table view columns */
     private void configureTableView() {
         TableColumn<CreditCard, Integer> idColumn =
                 new TableColumn<>(i18nService.tr(Constants.TranslationKeys.CREDITCARD_TABLE_ID));

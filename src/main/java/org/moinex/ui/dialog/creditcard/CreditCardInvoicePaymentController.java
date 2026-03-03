@@ -32,9 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Credit card invoice payment dialog
- */
+/** Controller for the Credit card invoice payment dialog */
 @Controller
 @NoArgsConstructor
 public class CreditCardInvoicePaymentController {
@@ -74,6 +72,7 @@ public class CreditCardInvoicePaymentController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param creditCardService CreditCardService
      * @param calculatorService CalculatorService

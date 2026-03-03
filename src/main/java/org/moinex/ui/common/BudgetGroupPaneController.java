@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the reusable budget group pane component.
- * This controller manages the display of a single budget group's status.
+ * Controller for the reusable budget group pane component. This controller manages the display of a
+ * single budget group's status.
  */
 @Controller
 @Scope("prototype") // Each instance of this controller is unique
@@ -37,9 +37,9 @@ public class BudgetGroupPaneController {
     /**
      * Populates the pane with data from a budget group and its current status.
      *
-     * @param group       The BudgetGroup to display.
+     * @param group The BudgetGroup to display.
      * @param spentAmount The total amount spent in this group for the period.
-     * @param baseIncome  The total base income of the financial plan.
+     * @param baseIncome The total base income of the financial plan.
      */
     public void setData(BudgetGroup group, BigDecimal spentAmount, BigDecimal baseIncome) {
         BigDecimal targetAmount =
@@ -68,9 +68,7 @@ public class BudgetGroupPaneController {
         updateStatus(spentAmount, targetAmount, progress);
     }
 
-    /**
-     * Updates the status labels and progress bar color based on the budget progress.
-     */
+    /** Updates the status labels and progress bar color based on the budget progress. */
     private void updateStatus(
             BigDecimal spentAmount, BigDecimal targetAmount, BigDecimal progress) {
         statusPrefixLabel

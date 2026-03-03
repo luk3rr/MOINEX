@@ -32,9 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This class is responsible for the business logic of the wallet transactions
- * <p>
- * Each method to get transactions has a version that returns only transactions
- * that have a category that is not archived
+ *
+ * <p>Each method to get transactions has a version that returns only transactions that have a
+ * category that is not archived
  */
 @Service
 @NoArgsConstructor
@@ -60,17 +60,17 @@ public class WalletTransactionService {
     /**
      * Transfer money between two wallets
      *
-     * @param senderId    The id of the wallet that sends the money
-     * @param receiverId  The id of the wallet that receives the money
-     * @param amount      The amount of money to be transferred
+     * @param senderId The id of the wallet that sends the money
+     * @param receiverId The id of the wallet that receives the money
+     * @param amount The amount of money to be transferred
      * @param description A description of the transfer
      * @return The id of the created transfer
      * @throws MoinexException.SameSourceDestinationException If the sender and receiver wallets are
-     *                                                        the
-     *                                                        same
-     * @throws IllegalArgumentException                       If the amount is less than or equal to zero
-     * @throws EntityNotFoundException                        If the sender or receiver wallet does not exist
-     * @throws MoinexException.InsufficientResourcesException If the sender wallet does not have enough
+     *     the same
+     * @throws IllegalArgumentException If the amount is less than or equal to zero
+     * @throws EntityNotFoundException If the sender or receiver wallet does not exist
+     * @throws MoinexException.InsufficientResourcesException If the sender wallet does not have
+     *     enough
      */
     @Transactional
     public Integer transferMoney(
@@ -148,15 +148,15 @@ public class WalletTransactionService {
     /**
      * Add an income to a wallet
      *
-     * @param walletId    The id of the wallet that receives the income
-     * @param category    The category of the income
-     * @param date        The date of the income
-     * @param amount      The amount of the income
+     * @param walletId The id of the wallet that receives the income
+     * @param category The category of the income
+     * @param date The date of the income
+     * @param amount The amount of the income
      * @param description A description of the income
-     * @param status      The status of the transaction
+     * @param status The status of the transaction
      * @param includeInAnalysis Whether to include this transaction in analysis totals
      * @return The id of the created transaction
-     * @throws EntityNotFoundException  If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
@@ -211,15 +211,15 @@ public class WalletTransactionService {
     /**
      * Add an expense to a wallet
      *
-     * @param walletId    The id of the wallet that receives the expense
-     * @param category    The category of the expense
-     * @param date        The date of the expense
-     * @param amount      The amount of the expense
+     * @param walletId The id of the wallet that receives the expense
+     * @param category The category of the expense
+     * @param date The date of the expense
+     * @param amount The amount of the expense
      * @param description A description of the expense
-     * @param status      The status of the transaction
+     * @param status The status of the transaction
      * @param includeInAnalysis Whether to include this transaction in analysis totals
      * @return The id of the created transaction
-     * @throws EntityNotFoundException  If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
@@ -278,11 +278,11 @@ public class WalletTransactionService {
      * Update a transaction
      *
      * @param transaction The transaction to be updated
-     * @throws EntityNotFoundException  If the transaction does not exist
-     * @throws EntityNotFoundException  If the wallet does not exist
+     * @throws EntityNotFoundException If the transaction does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
-     * @throws IllegalStateException    If the transaction type does not exist
-     * @throws IllegalStateException    If the transaction status does not exist
+     * @throws IllegalStateException If the transaction type does not exist
+     * @throws IllegalStateException If the transaction status does not exist
      */
     @Transactional
     public void updateTransaction(WalletTransaction transaction) {
@@ -333,9 +333,11 @@ public class WalletTransactionService {
      *
      * @param updatedTransfer The Transfer object with the updated information.
      * @throws EntityNotFoundException if the transfer or any involved wallet is not found.
-     * @throws MoinexException.SameSourceDestinationException if the new sender and receiver are the same.
+     * @throws MoinexException.SameSourceDestinationException if the new sender and receiver are the
+     *     same.
      * @throws IllegalArgumentException if the new amount is zero or negative.
-     * @throws MoinexException.InsufficientResourcesException if the new sender wallet has insufficient funds.
+     * @throws MoinexException.InsufficientResourcesException if the new sender wallet has
+     *     insufficient funds.
      */
     @Transactional
     public void updateTransfer(Transfer updatedTransfer) {
@@ -483,10 +485,10 @@ public class WalletTransactionService {
      * Change the type of transaction
      *
      * @param oldTransaction The transaction to be updated
-     * @param newType        The new type of the transaction
+     * @param newType The new type of the transaction
      * @throws IllegalStateException If the transaction type does not exist
-     * @note This method persists the changes in the wallet balances
-     * and the transaction in the database
+     * @note This method persists the changes in the wallet balances and the transaction in the
+     *     database
      */
     private void changeTransactionType(WalletTransaction oldTransaction, TransactionType newType) {
         if (oldTransaction.getType().equals(newType)) {
@@ -537,10 +539,10 @@ public class WalletTransactionService {
      * Change the wallet of a transaction
      *
      * @param oldTransaction The transaction to be updated
-     * @param newWallet      The new wallet of the transaction
+     * @param newWallet The new wallet of the transaction
      * @throws IllegalStateException If the transaction type does not exist
-     * @note This method persists the changes in the wallet balances
-     * and the transaction in the database
+     * @note This method persists the changes in the wallet balances and the transaction in the
+     *     database
      */
     private void changeTransactionWallet(WalletTransaction oldTransaction, Wallet newWallet) {
         if (oldTransaction.getWallet().getId().equals(newWallet.getId())) {
@@ -586,10 +588,10 @@ public class WalletTransactionService {
      * Change the amount of a transaction
      *
      * @param oldTransaction The transaction to be updated
-     * @param newAmount      The new amount of the transaction
+     * @param newAmount The new amount of the transaction
      * @throws IllegalStateException If the transaction type does not exist
-     * @note This method persists the changes in the wallet balances
-     * and the transaction in the database
+     * @note This method persists the changes in the wallet balances and the transaction in the
+     *     database
      */
     private void changeTransactionAmount(WalletTransaction oldTransaction, BigDecimal newAmount) {
         BigDecimal oldAmount = oldTransaction.getAmount();
@@ -641,11 +643,11 @@ public class WalletTransactionService {
      * Change the status of a transaction
      *
      * @param transaction The transaction to be updated
-     * @param newStatus   The new status of the transaction
+     * @param newStatus The new status of the transaction
      * @throws IllegalStateException If the transaction status does not exist
      * @throws IllegalStateException If the transaction type does not exist
-     * @note This method persists the changes in the wallet balances
-     * and the transaction in the database
+     * @note This method persists the changes in the wallet balances and the transaction in the
+     *     database
      */
     private void changeTransactionStatus(
             WalletTransaction transaction, TransactionStatus newStatus) {
@@ -777,7 +779,7 @@ public class WalletTransactionService {
      * Get all transactions by month
      *
      * @param month The month of the transactions
-     * @param year  The year of the transactions
+     * @param year The year of the transactions
      */
     public List<WalletTransaction> getTransactionsByMonth(Integer month, Integer year) {
         return walletTransactionRepository.findTransactionsByMonth(month, year);
@@ -787,18 +789,18 @@ public class WalletTransactionService {
      * Get all transactions by month when both wallet and category are not archived
      *
      * @param month The month of the transactions
-     * @param year  The year of the transactions
+     * @param year The year of the transactions
      */
     public List<WalletTransaction> getNonArchivedTransactionsByMonth(Integer month, Integer year) {
         return walletTransactionRepository.findNonArchivedTransactionsByMonth(month, year);
     }
 
     /**
-     * Get all transactions by month that should be included in analysis
-     * when both wallet and category are not archived
+     * Get all transactions by month that should be included in analysis when both wallet and
+     * category are not archived
      *
      * @param month The month of the transactions
-     * @param year  The year of the transactions
+     * @param year The year of the transactions
      * @return A list with all transactions of the month for analysis
      */
     public List<WalletTransaction> getNonArchivedTransactionsByMonthForAnalysis(
@@ -821,8 +823,8 @@ public class WalletTransactionService {
      * Get all transactions by wallet where both wallet and category are not archived
      *
      * @param walletId The id of the wallet
-     * @param month    The month of the transactions
-     * @param year     The year of the transactions
+     * @param month The month of the transactions
+     * @param year The year of the transactions
      */
     public List<WalletTransaction> getNonArchivedTransactionsByWalletAndMonth(
             Integer walletId, Integer month, Integer year) {
@@ -831,11 +833,10 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get all transactions between two dates where both wallet and category are not
-     * archived
+     * Get all transactions between two dates where both wallet and category are not archived
      *
      * @param startDate The start date
-     * @param endDate   The end date
+     * @param endDate The end date
      * @return A list with all transactions between the two dates
      */
     public List<WalletTransaction> getNonArchivedTransactionsBetweenDates(
@@ -848,11 +849,10 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get all confirmed transactions by month when both wallet and category are not
-     * archived
+     * Get all confirmed transactions by month when both wallet and category are not archived
      *
      * @param month The month of the transactions
-     * @param year  The year of the transactions
+     * @param year The year of the transactions
      */
     public List<WalletTransaction> getNonArchivedConfirmedTransactionsByMonth(
             Integer month, Integer year) {
@@ -860,8 +860,7 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get the last n transactions of all wallets both wallet and category are not
-     * archived
+     * Get the last n transactions of all wallets both wallet and category are not archived
      *
      * @param n The number of transactions to get
      * @return A list with the last n transactions of all wallets
@@ -873,8 +872,7 @@ public class WalletTransactionService {
     /**
      * Get the date of the oldest transaction
      *
-     * @return The date of the oldest transaction or the current date if there are no
-     * transactions
+     * @return The date of the oldest transaction or the current date if there are no transactions
      */
     public LocalDateTime getOldestTransactionDate() {
         String date = walletTransactionRepository.findOldestTransactionDate();
@@ -901,8 +899,8 @@ public class WalletTransactionService {
      * Get the transfers by wallet and month
      *
      * @param walletId The id of the wallet
-     * @param month    The month
-     * @param year     The year
+     * @param month The month
+     * @param year The year
      * @return A list with the transfers in the wallet by month
      */
     public List<Transfer> getTransfersByWalletAndMonth(
@@ -911,8 +909,8 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get income suggestions. Suggestions are transactions with distinct descriptions
-     * and the most recent date
+     * Get income suggestions. Suggestions are transactions with distinct descriptions and the most
+     * recent date
      *
      * @return A list with the suggestions
      */
@@ -921,8 +919,8 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get expense suggestions. Suggestions are transactions with distinct descriptions
-     * and the most recent date
+     * Get expense suggestions. Suggestions are transactions with distinct descriptions and the most
+     * recent date
      *
      * @return A list with the suggestions
      */
@@ -931,8 +929,8 @@ public class WalletTransactionService {
     }
 
     /**
-     * Get transfer suggestions. Suggestions are transactions with distinct descriptions
-     * and the most recent date
+     * Get transfer suggestions. Suggestions are transactions with distinct descriptions and the
+     * most recent date
      *
      * @return A list with the suggestions
      */
@@ -959,6 +957,7 @@ public class WalletTransactionService {
 
     /**
      * Get transactions by wallet and month
+     *
      * @param walletId The wallet id
      * @param month The month
      * @param year The year
@@ -971,6 +970,7 @@ public class WalletTransactionService {
 
     /**
      * Get the date of the first transaction for a wallet
+     *
      * @param walletId The wallet id
      * @return The date of the first transaction, or null if no transactions
      */

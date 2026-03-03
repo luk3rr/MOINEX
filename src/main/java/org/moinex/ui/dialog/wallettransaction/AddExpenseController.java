@@ -29,14 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Expense dialog
- */
+/** Controller for the Add Expense dialog */
 @Controller
 @NoArgsConstructor
 public final class AddExpenseController extends BaseWalletTransactionManagement {
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param walletTransactionService WalletTransactionService
      * @param categoryService CategoryService

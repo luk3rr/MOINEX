@@ -36,9 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This class is responsible for managing tickers
- */
+/** This class is responsible for managing tickers */
 @Service
 @NoArgsConstructor
 public class TickerService {
@@ -73,15 +71,15 @@ public class TickerService {
     /**
      * Registers a new ticker
      *
-     * @param name         The name of the ticker
-     * @param symbol       The symbol of the ticker
-     * @param type         The type of the ticker
-     * @param price        The price of the ticker
+     * @param name The name of the ticker
+     * @param symbol The symbol of the ticker
+     * @param type The type of the ticker
+     * @param price The price of the ticker
      * @param avgUnitPrice The average unit price of the ticker
-     * @param quantity     The quantity of the ticker
+     * @param quantity The quantity of the ticker
      * @return The id of the registered ticker
      * @throws IllegalArgumentException If the name or symbol is empty
-     * @throws EntityExistsException    If the ticker already exists
+     * @throws EntityExistsException If the ticker already exists
      * @throws IllegalArgumentException If the price is less than or equal to zero
      * @throws IllegalArgumentException If the quantity is less than zero
      * @throws IllegalArgumentException If the average unit price is lower than zero
@@ -150,7 +148,7 @@ public class TickerService {
      *
      * @param id The id of the ticker
      * @throws EntityNotFoundException If the ticker does not exist
-     * @throws IllegalStateException   If the ticker has transactions associated with it
+     * @throws IllegalStateException If the ticker has transactions associated with it
      */
     @Transactional
     public void deleteTicker(Integer id) {
@@ -170,7 +168,7 @@ public class TickerService {
             throw new IllegalStateException(
                     String.format(
                             "Ticker with id %d has transactions associated with it and cannot be"
-                                + " deleted. Remove the transactions first or archive the ticker",
+                                    + " deleted. Remove the transactions first or archive the ticker",
                             id));
         }
 
@@ -184,9 +182,8 @@ public class TickerService {
      *
      * @param id The id of the ticker
      * @throws EntityNotFoundException If the ticker does not exist
-     * @note This method is used to archive a ticker, which means that the ticker
-     * will not be deleted from the database, but it will not use in the application
-     * anymore
+     * @note This method is used to archive a ticker, which means that the ticker will not be
+     *     deleted from the database, but it will not use in the application anymore
      */
     @Transactional
     public void archiveTicker(Integer id) {
@@ -211,8 +208,8 @@ public class TickerService {
      *
      * @param id The id of the ticker
      * @throws EntityNotFoundException If the ticker does not exist
-     * @note This method is used to unarchive a ticker, which means that the ticker
-     * will be used in the application again
+     * @note This method is used to unarchive a ticker, which means that the ticker will be used in
+     *     the application again
      */
     @Transactional
     public void unarchiveTicker(Integer id) {
@@ -237,7 +234,7 @@ public class TickerService {
      * Update a ticker
      *
      * @param tk The ticker to be updated
-     * @throws EntityNotFoundException  If the ticker does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the name or symbol is empty
      * @throws IllegalArgumentException If the price is less than or equal to zero
      * @throws IllegalArgumentException If the quantity is less than zero
@@ -388,8 +385,8 @@ public class TickerService {
     }
 
     /**
-     * Update prices for all non-archived tickers from API
-     * This method is typically called during application startup
+     * Update prices for all non-archived tickers from API This method is typically called during
+     * application startup
      *
      * @return CompletableFuture that completes when all prices are updated
      */
@@ -521,11 +518,11 @@ public class TickerService {
     /**
      * Add a purchase to a ticker
      *
-     * @param tickerId  The id of the ticker
-     * @param quantity  The quantity of the purchase
+     * @param tickerId The id of the ticker
+     * @param quantity The quantity of the purchase
      * @param unitPrice The unit price of the purchase
-     * @param date      The purchase date
-     * @throws EntityNotFoundException  If the ticker does not exist
+     * @param date The purchase date
+     * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the quantity is less than or equal to zero
      * @throws IllegalArgumentException If the unit price is less than or equal to zero
      */
@@ -610,16 +607,15 @@ public class TickerService {
     /**
      * Add a sale to a ticker
      *
-     * @param tickerId  The id of the ticker
-     * @param quantity  The quantity of the sale
+     * @param tickerId The id of the ticker
+     * @param quantity The quantity of the sale
      * @param unitPrice The unit price of the sale
-     * @param date      The sale date
-     * @throws EntityNotFoundException                        If the ticker does not exist
-     * @throws IllegalArgumentException                       If the quantity is less than or equal to zero
-     * @throws IllegalArgumentException                       If the unit price is less than or equal to zero
+     * @param date The sale date
+     * @throws EntityNotFoundException If the ticker does not exist
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
+     * @throws IllegalArgumentException If the unit price is less than or equal to zero
      * @throws MoinexException.InsufficientResourcesException If the quantity is greater than the
-     *                                                        current
-     *                                                        quantity
+     *     current quantity
      */
     @Transactional
     public void addSale(
@@ -699,14 +695,14 @@ public class TickerService {
     /**
      * Add a dividend to a ticker
      *
-     * @param tickerId    The id of the ticker
-     * @param walletId    The id of the deposit wallet
-     * @param category    The category of the dividend
-     * @param amount      The amount of the dividend
-     * @param date        The date of the dividend
+     * @param tickerId The id of the ticker
+     * @param walletId The id of the deposit wallet
+     * @param category The category of the dividend
+     * @param amount The amount of the dividend
+     * @param date The date of the dividend
      * @param description The description of the dividend
-     * @param status      The status of the dividend
-     * @throws EntityNotFoundException  If the ticker does not exist
+     * @param status The status of the dividend
+     * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
@@ -759,21 +755,20 @@ public class TickerService {
     /**
      * Exchange crypto between two tickers
      *
-     * @param sourceTickerId   The id of the sold ticker
-     * @param targetTickerId   The id of the target ticker
-     * @param soldQuantity     The quantity of the sold ticker
+     * @param sourceTickerId The id of the sold ticker
+     * @param targetTickerId The id of the target ticker
+     * @param soldQuantity The quantity of the sold ticker
      * @param receivedQuantity The quantity of the target ticker
-     * @param date             The date of the exchange
-     * @param description      The description of the exchange
-     * @throws MoinexException.SameSourceDestinationException If the source and target tickers are the
-     *                                                        same
-     * @throws EntityNotFoundException                        If the source ticker does not exist
-     * @throws EntityNotFoundException                        If the target ticker does not exist
-     * @throws MoinexException.InvalidTickerTypeException     If the tickers are not of type CRYPTO
-     * @throws IllegalArgumentException                       If the quantity is less than or equal to zero
+     * @param date The date of the exchange
+     * @param description The description of the exchange
+     * @throws MoinexException.SameSourceDestinationException If the source and target tickers are
+     *     the same
+     * @throws EntityNotFoundException If the source ticker does not exist
+     * @throws EntityNotFoundException If the target ticker does not exist
+     * @throws MoinexException.InvalidTickerTypeException If the tickers are not of type CRYPTO
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
      * @throws MoinexException.InsufficientResourcesException If the quantity is greater than the
-     *                                                        current
-     *                                                        quantity
+     *     current quantity
      */
     @Transactional
     public void addCryptoExchange(
@@ -987,8 +982,8 @@ public class TickerService {
      * Update a purchase
      *
      * @param purchase The purchase to be updated
-     * @throws EntityNotFoundException  If the purchase does not exist
-     * @throws EntityNotFoundException  If the ticker does not exist
+     * @throws EntityNotFoundException If the purchase does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the quantity is less than or equal to zero
      * @throws IllegalArgumentException If the unit price is less than or equal to zero
      */
@@ -1037,8 +1032,8 @@ public class TickerService {
      * Update a sale
      *
      * @param sale The sale to be updated
-     * @throws EntityNotFoundException  If the sale does not exist
-     * @throws EntityNotFoundException  If the ticker does not exist
+     * @throws EntityNotFoundException If the sale does not exist
+     * @throws EntityNotFoundException If the ticker does not exist
      * @throws IllegalArgumentException If the quantity is less than or equal to zero
      * @throws IllegalArgumentException If the unit price is less than or equal to zero
      */
@@ -1119,12 +1114,12 @@ public class TickerService {
      * Update a crypto exchange
      *
      * @param exchange The crypto exchange to be updated
-     * @throws EntityNotFoundException        If the crypto exchange does not exist
-     * @throws EntityNotFoundException        If the source ticker does not exist
-     * @throws EntityNotFoundException        If the target ticker does not exist
-     * @throws MoinexException.SameSourceDestinationException If the source and target tickers are the
-     *                                        same
-     * @throws IllegalArgumentException       If the quantity is less than or equal to zero
+     * @throws EntityNotFoundException If the crypto exchange does not exist
+     * @throws EntityNotFoundException If the source ticker does not exist
+     * @throws EntityNotFoundException If the target ticker does not exist
+     * @throws MoinexException.SameSourceDestinationException If the source and target tickers are
+     *     the same
+     * @throws IllegalArgumentException If the quantity is less than or equal to zero
      */
     @Transactional
     public void updateCryptoExchange(CryptoExchange exchange) {
@@ -1184,7 +1179,7 @@ public class TickerService {
     /**
      * Change the quantity of sold ticker of a crypto exchange
      *
-     * @param oldExchange  The crypto exchange to be updated
+     * @param oldExchange The crypto exchange to be updated
      * @param soldQuantity The new sold quantity
      */
     public void changeSoldQuantity(CryptoExchange oldExchange, BigDecimal soldQuantity) {
@@ -1205,7 +1200,7 @@ public class TickerService {
     /**
      * Change the quantity of received crypto of a crypto exchange
      *
-     * @param oldExchange      The crypto exchange to be updated
+     * @param oldExchange The crypto exchange to be updated
      * @param receivedQuantity The new target quantity
      */
     public void changeReceivedQuantity(CryptoExchange oldExchange, BigDecimal receivedQuantity) {
@@ -1230,7 +1225,7 @@ public class TickerService {
      * Change the sold ticker of a crypto exchange
      *
      * @param oldExchange The crypto exchange
-     * @param soldCrypto  The new sold ticker
+     * @param soldCrypto The new sold ticker
      */
     private void changeSoldCrypto(CryptoExchange oldExchange, Ticker soldCrypto) {
         if (oldExchange.getSoldCrypto().getId().equals(soldCrypto.getId())) {
@@ -1258,7 +1253,7 @@ public class TickerService {
     /**
      * Change the received ticker of a crypto exchange
      *
-     * @param oldExchange    The crypto exchange
+     * @param oldExchange The crypto exchange
      * @param receivedCrypto The new target ticker
      */
     private void changeReceivedCrypto(CryptoExchange oldExchange, Ticker receivedCrypto) {

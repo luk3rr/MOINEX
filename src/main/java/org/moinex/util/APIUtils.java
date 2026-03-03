@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class for managing API-related operations, like fetching stock prices and
- * market indicators
+ * Utility class for managing API-related operations, like fetching stock prices and market
+ * indicators
  */
 public class APIUtils {
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -43,9 +43,7 @@ public class APIUtils {
     // Prevent instantiation
     private APIUtils() {}
 
-    /**
-     * Shutdown the executor service
-     */
+    /** Shutdown the executor service */
     public static synchronized void shutdownExecutor() {
         if (shuttingDown) {
             return;
@@ -71,9 +69,7 @@ public class APIUtils {
         }
     }
 
-    /**
-     * Shutdown all running processes
-     */
+    /** Shutdown all running processes */
     private static synchronized void shutdownProcesses() {
         logger.info("Shutting down running processes");
 
@@ -232,7 +228,7 @@ public class APIUtils {
      * Execute a Python script with arguments
      *
      * @param script The script to run
-     * @param args   The arguments to pass to the script
+     * @param args The arguments to pass to the script
      */
     public static JSONObject runPythonScript(String script, String[] args) {
         try (InputStream scriptInputStream =

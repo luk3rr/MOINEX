@@ -28,9 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Tests for the CreditCardDebtRepository
- */
+/** Tests for the CreditCardDebtRepository */
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfig.class})

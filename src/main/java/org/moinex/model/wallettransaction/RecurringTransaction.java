@@ -87,9 +87,7 @@ public class RecurringTransaction extends BaseTransaction {
         }
     }
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public RecurringTransaction(
             Integer id,
             Wallet wallet,

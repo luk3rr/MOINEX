@@ -29,9 +29,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Archived Wallets dialog
- */
+/** Controller for the Archived Wallets dialog */
 @Controller
 @NoArgsConstructor
 public class ArchivedWalletsController {
@@ -49,6 +47,7 @@ public class ArchivedWalletsController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
@@ -195,16 +194,12 @@ public class ArchivedWalletsController {
         stage.close();
     }
 
-    /**
-     * Loads the categories from the database
-     */
+    /** Loads the categories from the database */
     private void loadArchivedWalletsFromDatabase() {
         archivedWallets = walletService.getAllArchivedWallets();
     }
 
-    /**
-     * Updates the category table view
-     */
+    /** Updates the category table view */
     private void updateWalletTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -231,9 +226,7 @@ public class ArchivedWalletsController {
         walletTableView.refresh();
     }
 
-    /**
-     * Configures the table view columns
-     */
+    /** Configures the table view columns */
     private void configureTableView() {
         TableColumn<Wallet, Integer> idColumn = getWalletLongTableColumn();
 

@@ -21,9 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for the Calendar interface
- * <p>
- * Stores the events of the calendar and allows them to be accessed by other
- * classes
+ *
+ * <p>Stores the events of the calendar and allows them to be accessed by other classes
  */
 @Service
 @NoArgsConstructor
@@ -39,6 +38,7 @@ public class CalendarService {
 
     /**
      * Adds an event to the calendar
+     *
      * @param title The title of the event
      * @param description The description of the event
      * @param date The date of the event
@@ -70,6 +70,7 @@ public class CalendarService {
 
     /**
      * Deletes an event from the calendar
+     *
      * @param eventId The id of the event to be removed
      * @throws EntityNotFoundException If the event is not found
      */
@@ -90,6 +91,7 @@ public class CalendarService {
 
     /**
      * Updates an event in the calendar
+     *
      * @param event The event to be updated
      */
     @Transactional
@@ -101,6 +103,7 @@ public class CalendarService {
 
     /**
      * Gets all events in the calendar
+     *
      * @return A list with all events in the calendar
      */
     public List<CalendarEvent> getAllEvents() {

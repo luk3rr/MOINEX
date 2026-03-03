@@ -88,9 +88,9 @@ public class ResumePaneController {
     /**
      * Constructor
      *
-     * @param walletTransactionService    WalletTransactionService
+     * @param walletTransactionService WalletTransactionService
      * @param recurringTransactionService RecurringTransactionService
-     * @param creditCardService           CreditCardService
+     * @param creditCardService CreditCardService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -111,9 +111,7 @@ public class ResumePaneController {
         updateResumePane(now.getMonthValue(), now.getYear());
     }
 
-    /**
-     * Update the display of the resume
-     */
+    /** Update the display of the resume */
     public void updateResumePane(Integer year) {
         List<WalletTransaction> allYearTransactions =
                 walletTransactionService.getNonArchivedTransactionsByYear(year);
@@ -134,9 +132,7 @@ public class ResumePaneController {
                 allYearTransactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments);
     }
 
-    /**
-     * Update the display of the month resume
-     */
+    /** Update the display of the month resume */
     public void updateResumePane(Integer month, Integer year) {
         // Get all transactions of the month that should be included in analysis
         List<WalletTransaction> transactions =

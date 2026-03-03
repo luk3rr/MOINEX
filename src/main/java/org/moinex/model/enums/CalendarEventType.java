@@ -8,9 +8,7 @@ package org.moinex.model.enums;
 
 import lombok.Getter;
 
-/**
- * Represents different types of events in the calendar
- */
+/** Represents different types of events in the calendar */
 @Getter
 public enum CalendarEventType {
     CREDIT_CARD_STATEMENT_CLOSING("Credit Card Statement Closing", "#FF9800"),

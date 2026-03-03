@@ -18,6 +18,7 @@ public class MappingRow {
 
     /**
      * Constructor
+     *
      * @param csvColumn CSV column name
      * @param dbColumns List of DB column names
      */
@@ -29,6 +30,7 @@ public class MappingRow {
 
     /**
      * Get the CSV column name
+     *
      * @return CSV column name
      */
     public String getCSVColumn() {
@@ -41,6 +43,7 @@ public class MappingRow {
 
     /**
      * Get the selected DB column
+     *
      * @return selected DB column
      */
     public String getSelectedDBColumn() {
@@ -57,6 +60,7 @@ public class MappingRow {
 
     /**
      * Get the DB column options for the ComboBox
+     *
      * @return List of DB column options
      */
     public List<String> getDBColumnOptions() {

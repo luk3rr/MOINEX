@@ -53,9 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
-/**
- * Utility class for UI-related functionalities
- */
+/** Utility class for UI-related functionalities */
 @Component
 public final class UIUtils {
     private static final DecimalFormat currencyFormat =
@@ -278,8 +276,8 @@ public final class UIUtils {
     }
 
     /**
-     * Format the date picker to display the date according to the locale
-     * This also configures the internal DatePicker popup calendar to use the locale
+     * Format the date picker to display the date according to the locale This also configures the
+     * internal DatePicker popup calendar to use the locale
      *
      * @param datePicker The date picker to format
      * @param i18nService The I18nService instance for locale
@@ -390,9 +388,9 @@ public final class UIUtils {
     /**
      * Configure a ComboBox with a display function
      *
-     * @param comboBox        The ComboBox to configure
+     * @param comboBox The ComboBox to configure
      * @param displayFunction The function to display the items
-     * @param <T>             The type of the ComboBox items
+     * @param <T> The type of the ComboBox items
      */
     public static <T> void configureComboBox(
             ComboBox<T> comboBox, Function<T, String> displayFunction) {
@@ -912,8 +910,8 @@ public final class UIUtils {
     }
 
     /**
-     * Format a LocalDate for display according to the locale
-     * Uses SHORT format style (e.g., dd/MM/yyyy for pt-BR, M/d/yy for en)
+     * Format a LocalDate for display according to the locale Uses SHORT format style (e.g.,
+     * dd/MM/yyyy for pt-BR, M/d/yy for en)
      *
      * @param date The LocalDate to format
      * @param i18nService The I18nService instance for locale
@@ -930,8 +928,8 @@ public final class UIUtils {
     }
 
     /**
-     * Format a LocalDateTime for display according to the locale
-     * Uses SHORT format style for date (e.g., dd/MM/yyyy for pt-BR, M/d/yy for en)
+     * Format a LocalDateTime for display according to the locale Uses SHORT format style for date
+     * (e.g., dd/MM/yyyy for pt-BR, M/d/yy for en)
      *
      * @param dateTime The LocalDateTime to format
      * @param i18nService The I18nService instance for locale
@@ -948,8 +946,8 @@ public final class UIUtils {
     }
 
     /**
-     * Format a LocalDateTime with time for display according to the locale
-     * Uses SHORT format style (e.g., dd/MM/yyyy HH:mm for pt-BR)
+     * Format a LocalDateTime with time for display according to the locale Uses SHORT format style
+     * (e.g., dd/MM/yyyy HH:mm for pt-BR)
      *
      * @param dateTime The LocalDateTime to format
      * @param i18nService The I18nService instance for locale

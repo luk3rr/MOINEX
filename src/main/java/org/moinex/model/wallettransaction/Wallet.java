@@ -11,10 +11,7 @@ import java.math.BigDecimal;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-/**
- * Represents a wallet
- * A wallet is a container for money
- */
+/** Represents a wallet A wallet is a container for money */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "wallet")
@@ -47,18 +44,14 @@ public class Wallet {
     @JoinColumn(name = "master_wallet_id", referencedColumnName = "id")
     private Wallet masterWallet;
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public Wallet(Integer id, String name, BigDecimal balance) {
         this.id = id;
         this.name = name;
         this.balance = balance;
     }
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public Wallet(Integer id, String name, BigDecimal balance, WalletType type) {
         this.id = id;
         this.name = name;

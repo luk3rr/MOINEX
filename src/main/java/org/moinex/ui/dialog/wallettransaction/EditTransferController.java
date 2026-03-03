@@ -33,9 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Transfer dialog
- */
+/** Controller for the Add Transfer dialog */
 @Controller
 @NoArgsConstructor
 public class EditTransferController extends BaseTransferManagement {
@@ -44,9 +42,9 @@ public class EditTransferController extends BaseTransferManagement {
     /**
      * Constructor
      *
-     * @param walletService            WalletService
+     * @param walletService WalletService
      * @param walletTransactionService WalletTransactionService
-     * @param calculatorService        CalculatorService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired

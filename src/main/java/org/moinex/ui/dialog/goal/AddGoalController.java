@@ -26,9 +26,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Goal dialog
- */
+/** Controller for the Add Goal dialog */
 @Controller
 @NoArgsConstructor
 public final class AddGoalController extends BaseGoalManagement {
@@ -132,9 +130,7 @@ public final class AddGoalController extends BaseGoalManagement {
         }
     }
 
-    /**
-     * Configures the listeners to dynamically show/hide the initial balance strategy options
-     */
+    /** Configures the listeners to dynamically show/hide the initial balance strategy options */
     private void setupDynamicVisibilityListeners() {
         strategyToggleGroup = new ToggleGroup();
         newDepositRadioButton.setToggleGroup(strategyToggleGroup);

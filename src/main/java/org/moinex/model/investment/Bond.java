@@ -28,9 +28,7 @@ import org.moinex.model.enums.InterestIndex;
 import org.moinex.model.enums.InterestType;
 import org.moinex.util.Constants;
 
-/**
- * Class that represents a bond
- */
+/** Class that represents a bond */
 @Entity
 @Table(name = "bond")
 @Getter

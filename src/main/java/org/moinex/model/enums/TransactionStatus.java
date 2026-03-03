@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the status of a transaction
- */
+/** ENUM that represents the status of a transaction */
 public enum TransactionStatus {
     PENDING,
     CONFIRMED

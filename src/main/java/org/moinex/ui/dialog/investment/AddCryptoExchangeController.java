@@ -24,9 +24,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Crypto Exchange dialog
- */
+/** Controller for the Add Crypto Exchange dialog */
 @Controller
 @NoArgsConstructor
 public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
@@ -34,6 +32,7 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
 
     /**
      * Constructor
+     *
      * @param tickerService TickerService
      * @param calculatorService CalculatorService
      * @param i18nService I18n service

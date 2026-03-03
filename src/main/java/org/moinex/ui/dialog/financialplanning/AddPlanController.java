@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Financial Plan dialog
- */
+/** Controller for the Add Financial Plan dialog */
 @Controller
 @NoArgsConstructor
 public class AddPlanController extends BasePlanManagement {

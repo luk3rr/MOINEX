@@ -26,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service class for managing financial plans and budget groups
- */
+/** Service class for managing financial plans and budget groups */
 @Service
 @NoArgsConstructor
 public class FinancialPlanningService {
@@ -60,7 +58,7 @@ public class FinancialPlanningService {
     /**
      * Creates a new financial plan along with its budget groups
      *
-     * @param name   The name of the plan
+     * @param name The name of the plan
      * @param income The base monthly income for the plan
      * @param groups The list of budget groups to create for this plan
      * @return The ID of the newly created financial plan
@@ -199,9 +197,9 @@ public class FinancialPlanningService {
     }
 
     /**
-     * Calculates the current status of a financial plan for a given period.
-     * It determines the amount spent in each budget group by summing up the
-     * transactions of the associated categories within the specified month and year.
+     * Calculates the current status of a financial plan for a given period. It determines the
+     * amount spent in each budget group by summing up the transactions of the associated categories
+     * within the specified month and year.
      *
      * @param planId The ID of the financial plan.
      * @param period The month and year for which to calculate the status.

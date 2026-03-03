@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for the RecurringTransaction entity
- * This repository provides methods to query the database for RecurringTransaction
+ * Repository for the RecurringTransaction entity This repository provides methods to query the
+ * database for RecurringTransaction
  */
 @Repository
 public interface RecurringTransactionRepository
@@ -23,6 +23,7 @@ public interface RecurringTransactionRepository
 
     /**
      * Get the recurring transaction by its status
+     *
      * @param status The status of the recurring transaction
      * @return A list of recurring transactions with the given status
      */
@@ -30,6 +31,7 @@ public interface RecurringTransactionRepository
 
     /**
      * Get the recurring transaction by its type
+     *
      * @param type The type of the recurring transaction
      * @return A list of recurring transactions with the given type
      */

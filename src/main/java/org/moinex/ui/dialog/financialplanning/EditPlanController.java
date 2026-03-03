@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Financial Plan dialog
- */
+/** Controller for the Edit Financial Plan dialog */
 @Controller
 @NoArgsConstructor
 public class EditPlanController extends BasePlanManagement {
@@ -115,9 +113,9 @@ public class EditPlanController extends BasePlanManagement {
     }
 
     /**
-     * Checks if the budget groups in the current editing session are equal to those in the
-     * original financial plan
-     **/
+     * Checks if the budget groups in the current editing session are equal to those in the original
+     * financial plan
+     */
     private boolean areBudgetGroupsEqual() {
         List<BudgetGroup> list1 = new ArrayList<>(budgetGroups);
         List<BudgetGroup> list2 = new ArrayList<>(financialPlan.getBudgetGroups());

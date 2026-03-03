@@ -27,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service for managing fundamental analysis data
- */
+/** Service for managing fundamental analysis data */
 @Service
 @NoArgsConstructor
 public class FundamentalAnalysisService {
@@ -56,9 +54,8 @@ public class FundamentalAnalysisService {
     }
 
     /**
-     * Get fundamental analysis for a ticker and period type
-     * Checks cache first, fetches new data if cache is invalid or forceRefresh is true
-     * Only works for non-archived tickers
+     * Get fundamental analysis for a ticker and period type Checks cache first, fetches new data if
+     * cache is invalid or forceRefresh is true Only works for non-archived tickers
      *
      * @param tickerId Ticker ID
      * @param periodType Period type (ANNUAL, QUARTERLY, etc.)
@@ -134,8 +131,8 @@ public class FundamentalAnalysisService {
     }
 
     /**
-     * Fetch fundamental analysis from Python script and save to database
-     * Implements retry mechanism with exponential backoff
+     * Fetch fundamental analysis from Python script and save to database Implements retry mechanism
+     * with exponential backoff
      *
      * @param ticker Ticker entity
      * @param periodType Period type ("annual" or "quarterly")

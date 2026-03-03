@@ -25,14 +25,13 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Recurring Transaction dialog
- */
+/** Controller for the Add Recurring Transaction dialog */
 @Controller
 @NoArgsConstructor
 public final class AddRecurringTransactionController extends BaseRecurringTransactionManagement {
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param recurringTransactionService RecurringTransactionService
      * @param categoryService CategoryService

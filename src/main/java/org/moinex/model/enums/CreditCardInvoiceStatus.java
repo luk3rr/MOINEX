@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the status of a credit card invoice
- */
+/** ENUM that represents the status of a credit card invoice */
 public enum CreditCardInvoiceStatus {
     OPEN,
     CLOSED

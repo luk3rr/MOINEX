@@ -19,6 +19,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get all credit card payments in a month and year
+     *
      * @param month The month
      * @param year The year
      * @return A list with all credit card payments in a month and year
@@ -34,6 +35,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get credit card payments in a month and year
+     *
      * @param month The month
      * @param year The year
      * @return A list with all credit card payments in a month and year
@@ -48,6 +50,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get credit card payments in a month and year by credit card
+     *
      * @param crcId The credit card id
      * @param month The month
      * @param year The year
@@ -66,11 +69,11 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get credit card pending payments in a month and year by credit card
+     *
      * @param crcId The credit card id
      * @param month The month
      * @param year The year
-     * @return A list with all credit card pending payments in a month and year by
-     *     credit card
+     * @return A list with all credit card pending payments in a month and year by credit card
      */
     @Query(
             "SELECT ccp "
@@ -87,6 +90,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get all pending credit card payments
+     *
      * @param crcId The credit card id
      * @return A list with all pending credit card payments
      */
@@ -100,6 +104,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get payments by debt id
+     *
      * @param debtId The debt id
      * @return A list with all credit card payments by debt id
      */
@@ -108,6 +113,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total paid amount of a credit card
+     *
      * @param creditCardId The credit card id
      * @return The total paid amount of the credit card
      */
@@ -120,6 +126,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total debt amount of all credit cards in a month and year
+     *
      * @param month The month
      * @param year The year
      * @return The total debt amount of all credit cards in a month and year
@@ -134,6 +141,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total debt amount of all credit cards in a year
+     *
      * @param year The year
      * @return The total debt amount of all credit cards in a year
      */
@@ -145,12 +153,13 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
     BigDecimal getTotalDebtAmount(@Param("year") Integer year);
 
     /**
-     * Get the total of all pending payments of all credit cards from a specified month
-     * and year onward, including future months and the current month
+     * Get the total of all pending payments of all credit cards from a specified month and year
+     * onward, including future months and the current month
+     *
      * @param month The starting month (inclusive)
      * @param year The starting year (inclusive)
-     * @return The total of all pending payments of all credit cards from the specified
-     *     month and year onward
+     * @return The total of all pending payments of all credit cards from the specified month and
+     *     year onward
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
@@ -162,12 +171,11 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
     BigDecimal getTotalPendingPayments(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Get the total of all paid payments of all credit cards from a specified month
-     * and year
+     * Get the total of all paid payments of all credit cards from a specified month and year
+     *
      * @param month The month
      * @param year The year
-     * @return The total of all paid payments of all credit cards from the specified
-     *   month and year
+     * @return The total of all paid payments of all credit cards from the specified month and year
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount - ccp.rebateUsed), 0) "
@@ -179,12 +187,13 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             @Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Get the total of all paid payments of all credit cards from a specified month
-     * and year by wallet id
+     * Get the total of all paid payments of all credit cards from a specified month and year by
+     * wallet id
+     *
      * @param month The month
      * @param year The year
-     * @return The total of all paid payments of all credit cards from the specified
-     *   month and year by wallet id
+     * @return The total of all paid payments of all credit cards from the specified month and year
+     *     by wallet id
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount - ccp.rebateUsed), 0) "
@@ -198,12 +207,12 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             @Param("year") Integer year);
 
     /**
-     * Get the total of all pending payments of all credit cards from a specified month
-     * and year
+     * Get the total of all pending payments of all credit cards from a specified month and year
+     *
      * @param month The month
      * @param year The year
-     * @return The total of all pending payments of all credit cards from the specified
-     *   month and year
+     * @return The total of all pending payments of all credit cards from the specified month and
+     *     year
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
@@ -216,11 +225,11 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
             @Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Get the total of all pending payments of all credit cards from a specified year
-     * onward, including future years and the current year
+     * Get the total of all pending payments of all credit cards from a specified year onward,
+     * including future years and the current year
+     *
      * @param year The starting year (inclusive)
-     * @return The total of all pending payments of all credit cards from the specified
-     *    year onward
+     * @return The total of all pending payments of all credit cards from the specified year onward
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
@@ -232,9 +241,9 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total of all paid payments of all credit cards from a specified year
+     *
      * @param year The year
-     * @return The total of all paid payments of all credit cards from the specified
-     *     year
+     * @return The total of all paid payments of all credit cards from the specified year
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
@@ -245,9 +254,9 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total of all pending payments of all credit cards from a specified year
+     *
      * @param year The year
-     * @return The total of all pending payments of all credit cards from the specified
-     *     year
+     * @return The total of all pending payments of all credit cards from the specified year
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) "
@@ -259,6 +268,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total of all pending payments of a credit card
+     *
      * @param creditCardId The credit card id
      * @return The total of all pending payments of a credit card
      */
@@ -273,6 +283,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the total of all pending payments of all credit cards
+     *
      * @return The total of all pending payments of all credit cards
      */
     @Query(
@@ -284,6 +295,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the remaining debt of a purchase
+     *
      * @param debtId The id of the debt
      * @return The remaining debt of the purchase
      */
@@ -297,6 +309,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get the invoice amount of a credit card in a specified month and year
+     *
      * @param creditCardId The credit card id
      * @param month The month
      * @param year The year
@@ -304,9 +317,9 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
      */
     @Query(
             "SELECT coalesce(sum(ccp.amount), 0) FROM CreditCardPayment ccp JOIN ccp.creditCardDebt"
-                + " ccd WHERE ccd.creditCard.id = :creditCardId AND strftime('%m', ccp.date) ="
-                + " printf('%02d', :month) AND strftime('%Y', ccp.date) = printf('%04d', :year) AND"
-                + " (ccp.refunded = false OR (ccp.refunded = true AND ccp.wallet IS NOT NULL))")
+                    + " ccd WHERE ccd.creditCard.id = :creditCardId AND strftime('%m', ccp.date) ="
+                    + " printf('%02d', :month) AND strftime('%Y', ccp.date) = printf('%04d', :year) AND"
+                    + " (ccp.refunded = false OR (ccp.refunded = true AND ccp.wallet IS NOT NULL))")
     BigDecimal getInvoiceAmount(
             @Param("creditCardId") Integer creditCardId,
             @Param("month") Integer month,
@@ -314,6 +327,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get next invoice date of a credit card
+     *
      * @param creditCardId The credit card id
      * @return The next invoice date of the credit card
      */
@@ -327,11 +341,13 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
     String getNextInvoiceDate(@Param("creditCardId") Integer creditCardId);
 
     /**
-     * Sums the amount of all transactions for a given list of category IDs and a specific date range
+     * Sums the amount of all transactions for a given list of category IDs and a specific date
+     * range
      *
      * @param categoryIds The list of category IDs to filter by.
-     * @param startDate   The start date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
-     * @param endDate     The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
+     * @param startDate The start date of the period (inclusive), formatted as 'YYYY-MM-DD
+     *     HH:MM:SS'.
+     * @param endDate The end date of the period (inclusive), formatted as 'YYYY-MM-DD HH:MM:SS'.
      * @return The total sum of the transaction amounts. Returns 0 if no transactions are found.
      */
     @Query(
@@ -348,6 +364,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get total amount of paid payments up to a specific date
+     *
      * @param endDate The end date (inclusive)
      * @return Total amount of paid payments up to the date
      */
@@ -360,6 +377,7 @@ public interface CreditCardPaymentRepository extends JpaRepository<CreditCardPay
 
     /**
      * Get all paid payments up to a specific date
+     *
      * @param endDate The end date (inclusive)
      * @return List of all paid payments up to the date
      */

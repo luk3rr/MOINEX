@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the type of a ticker
- */
+/** ENUM that represents the type of a ticker */
 public enum TickerType {
     STOCK,
     FUND,

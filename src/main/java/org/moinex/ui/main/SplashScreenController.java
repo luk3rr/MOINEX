@@ -10,9 +10,7 @@ import javafx.fxml.FXML;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the splash screen
- */
+/** Controller for the splash screen */
 @Controller
 public class SplashScreenController {
 

@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This class is responsible for the business logic of the Wallet entity
- */
+/** This class is responsible for the business logic of the Wallet entity */
 @Service
 @NoArgsConstructor
 public class WalletService {
@@ -58,12 +56,12 @@ public class WalletService {
     /**
      * Creates a new wallet
      *
-     * @param name       The name of the wallet
-     * @param balance    The initial balance of the wallet
+     * @param name The name of the wallet
+     * @param balance The initial balance of the wallet
      * @param walletType The type of the wallet
      * @return The id of the created wallet
      * @throws IllegalArgumentException If the wallet name is empty
-     * @throws EntityExistsException    If the wallet name is already in use
+     * @throws EntityExistsException If the wallet name is already in use
      */
     @Transactional
     public Integer addWallet(String name, BigDecimal balance, WalletType walletType) {
@@ -92,7 +90,7 @@ public class WalletService {
      *
      * @param id The id of the wallet to be deleted
      * @throws EntityNotFoundException If the wallet does not exist
-     * @throws IllegalStateException   If the wallet has transactions
+     * @throws IllegalStateException If the wallet has transactions
      */
     @Transactional
     public void deleteWallet(Integer id) {
@@ -150,9 +148,8 @@ public class WalletService {
      *
      * @param id The id of the wallet to be archived
      * @throws EntityNotFoundException If the wallet does not exist
-     * @note This method is used to archive a wallet, which means that the wallet
-     * will not be deleted from the database, but it will not be used in the
-     * application anymore
+     * @note This method is used to archive a wallet, which means that the wallet will not be
+     *     deleted from the database, but it will not be used in the application anymore
      */
     @Transactional
     public void archiveWallet(Integer id) {
@@ -185,8 +182,8 @@ public class WalletService {
      *
      * @param id The id of the wallet to be unarchived
      * @throws EntityNotFoundException If the wallet does not exist
-     * @note This method is used to unarchive a wallet, which means that the wallet
-     * will be used in the application again
+     * @note This method is used to unarchive a wallet, which means that the wallet will be used in
+     *     the application again
      */
     @Transactional
     public void unarchiveWallet(Integer id) {
@@ -210,11 +207,11 @@ public class WalletService {
     /**
      * Rename a wallet
      *
-     * @param id      The id of the wallet to be renamed
+     * @param id The id of the wallet to be renamed
      * @param newName The new name of the wallet
      * @throws IllegalArgumentException If the wallet name is empty
-     * @throws EntityNotFoundException  If the wallet does not exist
-     * @throws EntityExistsException    If the wallet name is already in use
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws EntityExistsException If the wallet name is already in use
      */
     @Transactional
     public void renameWallet(Integer id, String newName) {
@@ -246,10 +243,10 @@ public class WalletService {
     /**
      * Change the wallet type
      *
-     * @param id      The id of the wallet to change the type
+     * @param id The id of the wallet to change the type
      * @param newType The new type of the wallet
-     * @throws EntityNotFoundException                      If the wallet does not exist
-     * @throws EntityNotFoundException                      If the wallet type does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws EntityNotFoundException If the wallet type does not exist
      * @throws MoinexException.AttributeAlreadySetException If the wallet already has the new type
      */
     @Transactional
@@ -283,7 +280,7 @@ public class WalletService {
     /**
      * Update the balance of a wallet
      *
-     * @param id         The id of the wallet
+     * @param id The id of the wallet
      * @param newBalance The new balance of the wallet
      * @throws EntityNotFoundException If the wallet does not exist
      */
@@ -416,8 +413,7 @@ public class WalletService {
     }
 
     /**
-     * Get all wallets that are not archived ordered descending by the number of
-     * transactions
+     * Get all wallets that are not archived ordered descending by the number of transactions
      *
      * @return A list with all wallets that are not archived
      */
@@ -437,8 +433,8 @@ public class WalletService {
     }
 
     /**
-     * Get the unallocated balance of a master wallet.
-     * This is the balance that is not allocated to any goals
+     * Get the unallocated balance of a master wallet. This is the balance that is not allocated to
+     * any goals
      *
      * @param masterWallet The master wallet to check
      * @return The unallocated balance of the master wallet

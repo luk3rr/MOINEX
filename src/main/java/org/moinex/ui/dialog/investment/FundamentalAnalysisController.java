@@ -40,8 +40,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for the Fundamental Analysis dialog
- * Displays comprehensive fundamental analysis data for a ticker
+ * Controller for the Fundamental Analysis dialog Displays comprehensive fundamental analysis data
+ * for a ticker
  */
 @Controller
 @NoArgsConstructor
@@ -121,16 +121,12 @@ public class FundamentalAnalysisController {
                         });
     }
 
-    /**
-     * Set the ticker to analyze
-     */
+    /** Set the ticker to analyze */
     public void setTicker(Ticker ticker) {
         this.ticker = ticker;
     }
 
-    /**
-     * Update cache status indicators for all period types
-     */
+    /** Update cache status indicators for all period types */
     private void updateCacheStatusIndicators() {
         if (ticker == null || cacheStatusContainer == null) {
             return;
@@ -195,16 +191,12 @@ public class FundamentalAnalysisController {
                 });
     }
 
-    /**
-     * Load analysis data
-     */
+    /** Load analysis data */
     public void loadAnalysis() {
         loadAnalysis(false);
     }
 
-    /**
-     * Load analysis data with optional force refresh
-     */
+    /** Load analysis data with optional force refresh */
     private void loadAnalysis(boolean forceRefresh) {
         if (ticker == null) {
             return;
@@ -280,9 +272,7 @@ public class FundamentalAnalysisController {
         new Thread(task).start();
     }
 
-    /**
-     * Display analysis data in the UI
-     */
+    /** Display analysis data in the UI */
     private void displayAnalysis() {
         if (currentAnalysis == null) {
             return;
@@ -321,9 +311,7 @@ public class FundamentalAnalysisController {
         }
     }
 
-    /**
-     * Populate all metrics tabs with data
-     */
+    /** Populate all metrics tabs with data */
     private void populateMetricsTabs(JSONObject data) {
         metricsTabPane.getTabs().clear();
 
@@ -363,9 +351,7 @@ public class FundamentalAnalysisController {
         }
     }
 
-    /**
-     * Create Profitability tab
-     */
+    /** Create Profitability tab */
     private Tab createProfitabilityTab(JSONObject profitability) {
         Tab tab =
                 new Tab(
@@ -419,9 +405,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Create Valuation tab
-     */
+    /** Create Valuation tab */
     private Tab createValuationTab(JSONObject valuation) {
         Tab tab =
                 new Tab(
@@ -591,9 +575,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Create Growth tab
-     */
+    /** Create Growth tab */
     private Tab createGrowthTab(JSONObject growth) {
         Tab tab =
                 new Tab(i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_GROWTH));
@@ -656,9 +638,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Create Debt tab
-     */
+    /** Create Debt tab */
     private Tab createDebtTab(JSONObject debt) {
         Tab tab = new Tab(i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_DEBT));
         tab.setClosable(false);
@@ -715,9 +695,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Create Efficiency tab
-     */
+    /** Create Efficiency tab */
     private Tab createEfficiencyTab(JSONObject efficiency) {
         Tab tab =
                 new Tab(
@@ -757,9 +735,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Create Cash Generation tab
-     */
+    /** Create Cash Generation tab */
     private Tab createCashGenerationTab(JSONObject cashGeneration) {
         Tab tab =
                 new Tab(
@@ -821,9 +797,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Create Price Performance tab
-     */
+    /** Create Price Performance tab */
     private Tab createPricePerformanceTab(JSONObject pricePerformance) {
         Tab tab =
                 new Tab(
@@ -976,9 +950,7 @@ public class FundamentalAnalysisController {
         return tab;
     }
 
-    /**
-     * Add a metric to a container using FundamentalMetricPaneController
-     */
+    /** Add a metric to a container using FundamentalMetricPaneController */
     private Node addMetricToContainer(
             FlowPane container, String label, JSONObject data, String key) {
 
@@ -1013,9 +985,7 @@ public class FundamentalAnalysisController {
         }
     }
 
-    /**
-     * Show/hide loading indicator
-     */
+    /** Show/hide loading indicator */
     private void showLoading(boolean show) {
         Platform.runLater(
                 () -> {
@@ -1026,17 +996,13 @@ public class FundamentalAnalysisController {
                 });
     }
 
-    /**
-     * Handle refresh button click
-     */
+    /** Handle refresh button click */
     @FXML
     private void handleRefresh() {
         loadAnalysis(true);
     }
 
-    /**
-     * Handle close button click
-     */
+    /** Handle close button click */
     @FXML
     private void handleClose() {
         Stage stage = (Stage) companyNameValueLabel.getScene().getWindow();

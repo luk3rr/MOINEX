@@ -96,10 +96,10 @@ public class AppStartupRunner implements ApplicationRunner {
                                                                         ex -> {
                                                                             logger.error(
                                                                                     "Failed to"
-                                                                                        + " update"
-                                                                                        + " market"
-                                                                                        + " quotes"
-                                                                                        + " and commodities",
+                                                                                            + " update"
+                                                                                            + " market"
+                                                                                            + " quotes"
+                                                                                            + " and commodities",
                                                                                     ex);
                                                                             return null;
                                                                         }))
@@ -114,9 +114,9 @@ public class AppStartupRunner implements ApplicationRunner {
                                                                             if (ex != null) {
                                                                                 logger.error(
                                                                                         "Failed to"
-                                                                                            + " initialize"
-                                                                                            + " price"
-                                                                                            + " history",
+                                                                                                + " initialize"
+                                                                                                + " price"
+                                                                                                + " history",
                                                                                         ex);
                                                                                 return false;
                                                                             }
@@ -131,9 +131,9 @@ public class AppStartupRunner implements ApplicationRunner {
                                                                             if (ex != null) {
                                                                                 logger.error(
                                                                                         "Failed to"
-                                                                                            + " update"
-                                                                                            + " ticker"
-                                                                                            + " prices",
+                                                                                                + " update"
+                                                                                                + " ticker"
+                                                                                                + " prices",
                                                                                         ex);
                                                                                 return false;
                                                                             }

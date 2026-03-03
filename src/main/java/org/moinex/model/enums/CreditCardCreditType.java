@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the type of credit card credit
- */
+/** ENUM that represents the type of credit card credit */
 public enum CreditCardCreditType {
     CASHBACK, // Cashback credit
     REFUND, // Refund credit

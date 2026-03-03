@@ -39,9 +39,7 @@ public class TickerPurchase extends Transaction {
     @JoinColumn(name = "ticker_id", referencedColumnName = "id")
     private Ticker ticker;
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public TickerPurchase(
             Integer id,
             Ticker ticker,

@@ -8,9 +8,7 @@ package org.moinex.model.dto;
 
 import java.math.BigDecimal;
 
-/**
- * DTO for profitability metrics
- */
+/** DTO for profitability metrics */
 public record ProfitabilityMetricsDTO(
         BigDecimal totalInvested,
         BigDecimal currentValue,

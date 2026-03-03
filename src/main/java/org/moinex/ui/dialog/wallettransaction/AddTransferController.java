@@ -30,9 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Transfer dialog
- */
+/** Controller for the Add Transfer dialog */
 @Controller
 @NoArgsConstructor
 public class AddTransferController extends BaseTransferManagement {
@@ -151,13 +149,13 @@ public class AddTransferController extends BaseTransferManagement {
     }
 
     /**
-     * Updates the projected balance of a wallet (sender or receiver) after a transfer,
-     * considering the rules for virtual and master wallets.
+     * Updates the projected balance of a wallet (sender or receiver) after a transfer, considering
+     * the rules for virtual and master wallets.
      *
      * @param currentWallet The wallet whose balance is being calculated (sender or receiver)
-     * @param otherWallet   The other wallet involved in the transaction
-     * @param label         The UI Label to be updated
-     * @param isSender      True if the currentWallet is the sender, false if it is the receiver
+     * @param otherWallet The other wallet involved in the transaction
+     * @param label The UI Label to be updated
+     * @param isSender True if the currentWallet is the sender, false if it is the receiver
      */
     @Override
     protected void updateAfterBalance(

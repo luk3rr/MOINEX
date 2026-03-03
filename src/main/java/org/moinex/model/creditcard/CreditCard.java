@@ -25,9 +25,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.moinex.model.wallettransaction.Wallet;
 
-/**
- * Represents a credit card
- */
+/** Represents a credit card */
 @Entity
 @Table(name = "credit_card")
 @NoArgsConstructor

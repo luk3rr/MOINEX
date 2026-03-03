@@ -31,9 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This class is responsible for the business logic Credit Card entities
- */
+/** This class is responsible for the business logic Credit Card entities */
 @Service
 @NoArgsConstructor
 public class CreditCardService {
@@ -67,23 +65,23 @@ public class CreditCardService {
     /**
      * Creates a new credit card
      *
-     * @param name           The name of the credit card
-     * @param dueDate        The day of the month the credit card bill is due
-     * @param closingDay     The day of the month the credit card bill is closed
-     * @param maxDebt        The maximum debt of the credit card
+     * @param name The name of the credit card
+     * @param dueDate The day of the month the credit card bill is due
+     * @param closingDay The day of the month the credit card bill is closed
+     * @param maxDebt The maximum debt of the credit card
      * @param lastFourDigits The last four digits of the credit card
-     * @param operatorId     The id of the credit card operator
+     * @param operatorId The id of the credit card operator
      * @return The id of the created credit card
-     * @throws EntityExistsException    If the credit card name is already in use
-     * @throws EntityNotFoundException  If the credit card operator does not exist
-     * @throws EntityNotFoundException  If the default billing wallet does not exist
+     * @throws EntityExistsException If the credit card name is already in use
+     * @throws EntityNotFoundException If the credit card operator does not exist
+     * @throws EntityNotFoundException If the default billing wallet does not exist
      * @throws IllegalArgumentException If the credit card name is empty
      * @throws IllegalArgumentException If the credit card name is already in use
      * @throws IllegalArgumentException If the billingDueDay is not in the range [1,
-     *                                  Constants.MAX_BILLING_DUE_DAY]
+     *     Constants.MAX_BILLING_DUE_DAY]
      * @throws IllegalArgumentException If the maxDebt is negative
-     * @throws IllegalArgumentException If the lastFourDigits is empty or has length
-     *                                  different from 4
+     * @throws IllegalArgumentException If the lastFourDigits is empty or has length different from
+     *     4
      */
     @Transactional
     public Integer addCreditCard(
@@ -99,24 +97,24 @@ public class CreditCardService {
     /**
      * Creates a new credit card
      *
-     * @param name                   The name of the credit card
-     * @param dueDate                The day of the month the credit card bill is due
-     * @param closingDay             The day of the month the credit card bill is closed
-     * @param maxDebt                The maximum debt of the credit card
-     * @param lastFourDigits         The last four digits of the credit card
-     * @param operatorId             The id of the credit card operator
+     * @param name The name of the credit card
+     * @param dueDate The day of the month the credit card bill is due
+     * @param closingDay The day of the month the credit card bill is closed
+     * @param maxDebt The maximum debt of the credit card
+     * @param lastFourDigits The last four digits of the credit card
+     * @param operatorId The id of the credit card operator
      * @param defaultBillingWalletId The id of the default billing wallet
      * @return The id of the created credit card
-     * @throws EntityExistsException    If the credit card name is already in use
-     * @throws EntityNotFoundException  If the credit card operator does not exist
-     * @throws EntityNotFoundException  If the default billing wallet does not exist
+     * @throws EntityExistsException If the credit card name is already in use
+     * @throws EntityNotFoundException If the credit card operator does not exist
+     * @throws EntityNotFoundException If the default billing wallet does not exist
      * @throws IllegalArgumentException If the credit card name is empty
      * @throws IllegalArgumentException If the credit card name is already in use
      * @throws IllegalArgumentException If the billingDueDay is not in the range [1,
-     *                                  Constants.MAX_BILLING_DUE_DAY]
+     *     Constants.MAX_BILLING_DUE_DAY]
      * @throws IllegalArgumentException If the maxDebt is negative
-     * @throws IllegalArgumentException If the lastFourDigits is empty or has length
-     *                                  different from 4
+     * @throws IllegalArgumentException If the lastFourDigits is empty or has length different from
+     *     4
      */
     @Transactional
     public Integer addCreditCard(
@@ -181,7 +179,7 @@ public class CreditCardService {
      *
      * @param id The id of the credit card
      * @throws EntityNotFoundException If the credit card does not exist
-     * @throws IllegalStateException   If the credit card has debts
+     * @throws IllegalStateException If the credit card has debts
      */
     @Transactional
     public void deleteCreditCard(Integer id) {
@@ -210,16 +208,16 @@ public class CreditCardService {
      * Update a credit card
      *
      * @param crc The credit card to be updated
-     * @throws EntityNotFoundException  If the credit card does not exist
-     * @throws EntityNotFoundException  If the credit card operator does not exist
-     * @throws IllegalStateException    If the credit card name is already in use
+     * @throws EntityNotFoundException If the credit card does not exist
+     * @throws EntityNotFoundException If the credit card operator does not exist
+     * @throws IllegalStateException If the credit card name is already in use
      * @throws IllegalArgumentException If the credit card name is empty
      * @throws IllegalArgumentException If the credit card name is already in use
      * @throws IllegalArgumentException If the billingDueDay is not in the range [1,
-     *                                  Constants.MAX_BILLING_DUE_DAY]
+     *     Constants.MAX_BILLING_DUE_DAY]
      * @throws IllegalArgumentException If the maxDebt is negative
-     * @throws IllegalArgumentException If the lastFourDigits is empty or has length
-     *                                  different from 4
+     * @throws IllegalArgumentException If the lastFourDigits is empty or has length different from
+     *     4
      */
     @Transactional
     public void updateCreditCard(CreditCard crc) {
@@ -296,22 +294,23 @@ public class CreditCardService {
     /**
      * Register a debt on the credit card and its respective future payment
      *
-     * @param crcId        The name of the credit card
-     * @param category     The category of the debt
+     * @param crcId The name of the credit card
+     * @param category The category of the debt
      * @param registerDate The date the debt was registered
      * @param invoiceMonth The month of the invoice
-     * @param value        The value of the debt
+     * @param value The value of the debt
      * @param installments The number of installments of the debt
-     * @param description  The description of the debt
-     * @throws EntityNotFoundException                        the credit card does not exist
-     * @throws EntityNotFoundException                        If the category does not exist
-     * @throws IllegalArgumentException                       If the value is null
-     * @throws IllegalArgumentException                       If the value is negative
-     * @throws IllegalArgumentException                       If the installments is not in range [1,
-     *                                                        Constants.MAX_INSTALLMENTS]
-     * @throws IllegalArgumentException                       If the register date is null
-     * @throws IllegalArgumentException                       If the invoice month is null
-     * @throws MoinexException.InsufficientResourcesException If the credit card does not have enough
+     * @param description The description of the debt
+     * @throws EntityNotFoundException the credit card does not exist
+     * @throws EntityNotFoundException If the category does not exist
+     * @throws IllegalArgumentException If the value is null
+     * @throws IllegalArgumentException If the value is negative
+     * @throws IllegalArgumentException If the installments is not in range [1,
+     *     Constants.MAX_INSTALLMENTS]
+     * @throws IllegalArgumentException If the register date is null
+     * @throws IllegalArgumentException If the invoice month is null
+     * @throws MoinexException.InsufficientResourcesException If the credit card does not have
+     *     enough
      */
     @Transactional
     public void addDebt(
@@ -430,8 +429,8 @@ public class CreditCardService {
     }
 
     /**
-     * Refund a debt with installments
-     * Consolidates all pending payments to the current month and creates a refund credit
+     * Refund a debt with installments Consolidates all pending payments to the current month and
+     * creates a refund credit
      *
      * @param debtId The id of the debt to refund
      * @throws EntityNotFoundException If the debt does not exist
@@ -516,12 +515,12 @@ public class CreditCardService {
     /**
      * Register a credit on the credit card
      *
-     * @param crcId       The id of the credit card
-     * @param date        The date of the credit
-     * @param amount      The amount of the credit
-     * @param type        The type of the credit
+     * @param crcId The id of the credit card
+     * @param date The date of the credit
+     * @param amount The amount of the credit
+     * @param type The type of the credit
      * @param description The description of the credit
-     * @throws EntityNotFoundException  If the credit card does not exist
+     * @throws EntityNotFoundException If the credit card does not exist
      * @throws IllegalArgumentException If the amount is less than or equal to zero
      */
     @Transactional
@@ -569,7 +568,7 @@ public class CreditCardService {
      *
      * @param id The id of the credit card
      * @throws EntityNotFoundException If the credit card does not exist
-     * @throws IllegalStateException   If the credit card has pending payments
+     * @throws IllegalStateException If the credit card has pending payments
      */
     @Transactional
     public void archiveCreditCard(Integer id) {
@@ -626,12 +625,12 @@ public class CreditCardService {
     /**
      * Update the debt of a credit card
      *
-     * @param debt         The debt to be updated
+     * @param debt The debt to be updated
      * @param invoiceMonth The month of the invoice
-     * @throws EntityNotFoundException  If the debt does not exist
-     * @throws EntityNotFoundException  If the credit card does not exist
-     * @throws IllegalArgumentException If the total amount of the debt is less than or
-     *                                  equal to zero
+     * @throws EntityNotFoundException If the debt does not exist
+     * @throws EntityNotFoundException If the credit card does not exist
+     * @throws IllegalArgumentException If the total amount of the debt is less than or equal to
+     *     zero
      */
     @Transactional
     public void updateCreditCardDebt(CreditCardDebt debt, YearMonth invoiceMonth) {
@@ -679,15 +678,16 @@ public class CreditCardService {
     /**
      * Pay a credit card invoice
      *
-     * @param crcId    The id of the credit card to pay the invoice
+     * @param crcId The id of the credit card to pay the invoice
      * @param walletId The id of the wallet to register the payment
-     * @param month    The month of the invoice
-     * @param year     The year of the invoice
-     * @param rebate   The rebate amount
-     * @throws EntityNotFoundException                        If the credit card does not exist
-     * @throws EntityNotFoundException                        If the wallet does not exist
-     * @throws IllegalArgumentException                       If the rebate is negative
-     * @throws MoinexException.InsufficientResourcesException If the credit card does not have enough
+     * @param month The month of the invoice
+     * @param year The year of the invoice
+     * @param rebate The rebate amount
+     * @throws EntityNotFoundException If the credit card does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws IllegalArgumentException If the rebate is negative
+     * @throws MoinexException.InsufficientResourcesException If the credit card does not have
+     *     enough
      */
     @Transactional
     public void payInvoice(
@@ -781,13 +781,14 @@ public class CreditCardService {
     /**
      * Pay a credit card invoice
      *
-     * @param crcId    The id of the credit card to pay the invoice
+     * @param crcId The id of the credit card to pay the invoice
      * @param walletId The id of the wallet to register the payment
-     * @param month    The month of the invoice
-     * @param year     The year of the invoice
-     * @throws EntityNotFoundException                        If the credit card does not exist
-     * @throws EntityNotFoundException                        If the wallet does not exist
-     * @throws MoinexException.InsufficientResourcesException If the credit card does not have enough
+     * @param month The month of the invoice
+     * @param year The year of the invoice
+     * @throws EntityNotFoundException If the credit card does not exist
+     * @throws EntityNotFoundException If the wallet does not exist
+     * @throws MoinexException.InsufficientResourcesException If the credit card does not have
+     *     enough
      */
     @Transactional
     public void payInvoice(Integer crcId, Integer walletId, Integer month, Integer year) {
@@ -813,11 +814,9 @@ public class CreditCardService {
     }
 
     /**
-     * Get all credit cards are not archived ordered descending by the number of
-     * transactions
+     * Get all credit cards are not archived ordered descending by the number of transactions
      *
-     * @return A list with all credit cards that are not archived ordered by transaction
-     * count
+     * @return A list with all credit cards that are not archived ordered by transaction count
      */
     public List<CreditCard> getAllNonArchivedCreditCardsOrderedByTransactionCountDesc() {
         return creditCardRepository.findAllByIsArchivedFalse().stream()
@@ -865,7 +864,7 @@ public class CreditCardService {
      * Get credit card payments in a month and year
      *
      * @param month The month
-     * @param year  The year
+     * @param year The year
      * @return A list with all credit card payments in a month and year
      */
     public List<CreditCardPayment> getCreditCardPayments(Integer month, Integer year) {
@@ -877,9 +876,8 @@ public class CreditCardService {
      *
      * @param crcId The id of the credit card
      * @param month The month
-     * @param year  The year
-     * @return A list with all credit card payments in a month and year by credit card
-     * id
+     * @param year The year
+     * @return A list with all credit card payments in a month and year by credit card id
      */
     public List<CreditCardPayment> getCreditCardPayments(
             Integer crcId, Integer month, Integer year) {
@@ -891,9 +889,8 @@ public class CreditCardService {
      *
      * @param crcId The id of the credit card
      * @param month The month
-     * @param year  The year
-     * @return A list with all credit card pending payments in a month and year by
-     * credit card id
+     * @param year The year
+     * @return A list with all credit card pending payments in a month and year by credit card id
      */
     public List<CreditCardPayment> getPendingCreditCardPayments(
             Integer crcId, Integer month, Integer year) {
@@ -924,7 +921,7 @@ public class CreditCardService {
      * Get all paid payments of all credit cards in a month and year
      *
      * @param month The month
-     * @param year  The year
+     * @param year The year
      * @return A list with all paid payments of all credit cards in a month and year
      */
     public List<CreditCardPayment> getAllPaidPaymentsByMonth(Integer month, Integer year) {
@@ -935,7 +932,7 @@ public class CreditCardService {
      * Get the total debt amount of all credit cards in a month and year
      *
      * @param month The month
-     * @param year  The year
+     * @param year The year
      * @return The total debt amount of all credit cards in a month and year
      */
     public BigDecimal getTotalDebtAmount(Integer month, Integer year) {
@@ -953,27 +950,26 @@ public class CreditCardService {
     }
 
     /**
-     * Get the effective amount paid for all credit card payments for a given month, and
-     * year This value considers discounts (such as rebates used).
+     * Get the effective amount paid for all credit card payments for a given month, and year This
+     * value considers discounts (such as rebates used).
      *
      * @param month The month
-     * @param year  The year
-     * @return The total of all paid payments of all credit cards from the specified
-     * month and year
+     * @param year The year
+     * @return The total of all paid payments of all credit cards from the specified month and year
      */
     public BigDecimal getEffectivePaidPaymentsByMonth(Integer month, Integer year) {
         return creditCardPaymentRepository.getEffectivePaidPaymentsByMonth(month, year);
     }
 
     /**
-     * Get the effective amount paid for all credit card payments for a given wallet,
-     * month, and year. This value considers discounts (such as rebates used)
+     * Get the effective amount paid for all credit card payments for a given wallet, month, and
+     * year. This value considers discounts (such as rebates used)
      *
      * @param walletId The wallet id
-     * @param month    The month
-     * @param year     The year
-     * @return The total of all paid payments of all credit cards from the specified
-     * month and year by a wallet
+     * @param month The month
+     * @param year The year
+     * @return The total of all paid payments of all credit cards from the specified month and year
+     *     by a wallet
      */
     public BigDecimal getEffectivePaidPaymentsByMonth(
             Integer walletId, Integer month, Integer year) {
@@ -981,21 +977,20 @@ public class CreditCardService {
     }
 
     /**
-     * Get the total of all pending payments of all credit cards from a specified month
-     * and year
+     * Get the total of all pending payments of all credit cards from a specified month and year
      *
      * @param month The month
-     * @param year  The year
-     * @return The total of all pending payments of all credit cards from the specified
-     * month and year
+     * @param year The year
+     * @return The total of all pending payments of all credit cards from the specified month and
+     *     year
      */
     public BigDecimal getPendingPaymentsByMonth(Integer month, Integer year) {
         return creditCardPaymentRepository.getPendingPaymentsByMonth(month, year);
     }
 
     /**
-     * Calculate credit card debt balance at a specific date
-     * Debt balance = Total purchases up to date - Total payments up to date
+     * Calculate credit card debt balance at a specific date Debt balance = Total purchases up to
+     * date - Total payments up to date
      *
      * @param date The date to calculate debt balance
      * @return The debt balance at the specified date
@@ -1017,8 +1012,7 @@ public class CreditCardService {
      * Get the total of all paid payments of all credit cards from a specified year
      *
      * @param year The year
-     * @return The total of all paid payments of all credit cards from the specified
-     * year
+     * @return The total of all paid payments of all credit cards from the specified year
      */
     public BigDecimal getPaidPaymentsByYear(Integer year) {
         return creditCardPaymentRepository.getPaidPaymentsByYear(year);
@@ -1028,8 +1022,7 @@ public class CreditCardService {
      * Get the total of all pending payments of all credit cards from a specified year
      *
      * @param year The year
-     * @return The total of all pending payments of all credit cards from the specified
-     * year
+     * @return The total of all pending payments of all credit cards from the specified year
      */
     public BigDecimal getPendingPaymentsByYear(Integer year) {
         return creditCardPaymentRepository.getPendingPaymentsByYear(year);
@@ -1058,7 +1051,7 @@ public class CreditCardService {
      *
      * @param crcId The credit card id
      * @param month The month
-     * @param year  The year
+     * @param year The year
      * @return The invoice amount of the credit card in the specified month and year
      */
     public BigDecimal getInvoiceAmount(Integer crcId, Integer month, Integer year) {
@@ -1070,7 +1063,7 @@ public class CreditCardService {
      *
      * @param crcId The id of the credit card
      * @param month The month
-     * @param year  The year
+     * @param year The year
      */
     public List<CreditCardCredit> getCreditCardCreditsByMonth(
             Integer crcId, Integer month, Integer year) {
@@ -1087,12 +1080,12 @@ public class CreditCardService {
     }
 
     /**
-     * Get the invoice status of a credit card in a specified month and year
-     * The invoice status can be either 'Open' or 'Closed'
+     * Get the invoice status of a credit card in a specified month and year The invoice status can
+     * be either 'Open' or 'Closed'
      *
      * @param crcId The credit card id
      * @param month The month
-     * @param year  The year
+     * @param year The year
      * @return The invoice status of the credit card in the specified month and year
      * @throws EntityNotFoundException If the credit card does not exist
      */
@@ -1212,17 +1205,17 @@ public class CreditCardService {
     /**
      * Basic checks for credit card creation or update
      *
-     * @param name           The name of the credit card
-     * @param dueDate        The day of the month the credit card bill is due
-     * @param closingDay     The day of the month the credit card bill is closed
-     * @param maxDebt        The maximum debt of the credit card
+     * @param name The name of the credit card
+     * @param dueDate The day of the month the credit card bill is due
+     * @param closingDay The day of the month the credit card bill is closed
+     * @param maxDebt The maximum debt of the credit card
      * @param lastFourDigits The last four digits of the credit card
      * @throws IllegalArgumentException If the credit card name is empty
      * @throws IllegalArgumentException If the billingDueDay is not in the range [1,
-     *                                  Constants.MAX_BILLING_DUE_DAY]
+     *     Constants.MAX_BILLING_DUE_DAY]
      * @throws IllegalArgumentException If the maxDebt is negative
-     * @throws IllegalArgumentException If the lastFourDigits is empty or has length
-     *                                  different from 4
+     * @throws IllegalArgumentException If the lastFourDigits is empty or has length different from
+     *     4
      */
     private void creditCardBasicChecks(
             String name,
@@ -1264,8 +1257,7 @@ public class CreditCardService {
      *
      * @param id The id of the payment
      * @throws EntityNotFoundException If the payment does not exist
-     * @note WARNING: The data in CreditCardDebt is not updated when a payment is
-     * deleted
+     * @note WARNING: The data in CreditCardDebt is not updated when a payment is deleted
      */
     private void deletePayment(Integer id) {
         CreditCardPayment payment =
@@ -1344,7 +1336,7 @@ public class CreditCardService {
     /**
      * Change the number of installments of a debt
      *
-     * @param oldDebt         The debt to be updated
+     * @param oldDebt The debt to be updated
      * @param newInstallments The new number of installments
      */
     private void changeDebtInstallments(CreditCardDebt oldDebt, Integer newInstallments) {
@@ -1449,7 +1441,7 @@ public class CreditCardService {
     /**
      * Change the total amount of a debt
      *
-     * @param oldDebt   The debt to be updated
+     * @param oldDebt The debt to be updated
      * @param newAmount The new total amount
      */
     private void changeDebtTotalAmount(CreditCardDebt oldDebt, BigDecimal newAmount) {
@@ -1514,11 +1506,10 @@ public class CreditCardService {
     }
 
     /**
-     * Get the credit card debt at a specific date (snapshot)
-     * This calculates the debt that existed at a given point in time by considering:
-     * - All debts created up to that date
-     * - All payments made up to that date
-     * - For future dates: assumes all pending payments will be paid (no debt accumulation)
+     * Get the credit card debt at a specific date (snapshot) This calculates the debt that existed
+     * at a given point in time by considering: - All debts created up to that date - All payments
+     * made up to that date - For future dates: assumes all pending payments will be paid (no debt
+     * accumulation)
      *
      * @param date The date to calculate the debt for
      * @return The total credit card debt at the specified date

@@ -6,9 +6,7 @@
 
 package org.moinex.model.enums;
 
-/**
- * ENUM that represents the type of bond
- */
+/** ENUM that represents the type of bond */
 public enum BondType {
     // Brazilian Bonds
     CDB, // Certificado de Depósito Bancário

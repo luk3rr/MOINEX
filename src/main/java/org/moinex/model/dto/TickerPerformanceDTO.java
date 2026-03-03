@@ -8,9 +8,7 @@ package org.moinex.model.dto;
 
 import java.math.BigDecimal;
 
-/**
- * DTO for ticker performance information
- */
+/** DTO for ticker performance information */
 public record TickerPerformanceDTO(
         String name,
         String symbol,

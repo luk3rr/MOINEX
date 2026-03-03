@@ -29,9 +29,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Dividend dialog
- */
+/** Controller for the Edit Dividend dialog */
 @Controller
 @NoArgsConstructor
 public final class EditDividendController extends BaseDividendManagement {
@@ -39,6 +37,7 @@ public final class EditDividendController extends BaseDividendManagement {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param walletTransactionService WalletTransactionService
      * @param categoryService CategoryService

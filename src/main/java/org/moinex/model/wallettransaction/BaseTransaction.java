@@ -21,9 +21,7 @@ import lombok.experimental.SuperBuilder;
 import org.moinex.model.Category;
 import org.moinex.model.enums.TransactionType;
 
-/**
- * Base class for transactions
- */
+/** Base class for transactions */
 @MappedSuperclass
 @SuperBuilder
 @Getter

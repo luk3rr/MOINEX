@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Credit Card Debt dialog
- */
+/** Controller for the Edit Credit Card Debt dialog */
 @Controller
 @NoArgsConstructor
 public final class EditCreditCardDebtController extends BaseCreditCardDebtManagement {
