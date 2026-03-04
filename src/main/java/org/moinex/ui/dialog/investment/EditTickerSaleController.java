@@ -15,15 +15,14 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.TickerSale;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -41,7 +40,6 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
     /**
      * Constructor
      * @param walletService Wallet service
-     * @param walletTransactionService Wallet transaction service
      * @param categoryService Category service
      * @param tickerService Ticker service
      * @param i18nService I18n service
@@ -50,13 +48,12 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
     @Autowired
     public EditTickerSaleController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             TickerService tickerService,
             I18nService i18nService) {
-        super(walletService, walletTransactionService, categoryService, tickerService, i18nService);
+        super(walletService, categoryService, tickerService, i18nService);
         this.i18nService = i18nService;
-        transactionType = TransactionType.INCOME;
+        walletTransactionType = WalletTransactionType.INCOME;
     }
 
     public void setSale(TickerSale s) {
@@ -83,7 +80,7 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
     protected void handleSave() {
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
-        TransactionStatus status = statusComboBox.getValue();
+        WalletTransactionStatus status = statusComboBox.getValue();
         Category category = categoryComboBox.getValue();
         String unitPriceStr = unitPriceField.getText();
         String quantityStr = quantityField.getText();
@@ -121,8 +118,7 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                     && sale.getQuantity().compareTo(quantity) == 0
                     && sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate)
                     && sale.getWalletTransaction()
-                            .getIncludeInAnalysis()
-                            .equals(includeInAnalysisCheckBox.isSelected())) {
+                            .getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),

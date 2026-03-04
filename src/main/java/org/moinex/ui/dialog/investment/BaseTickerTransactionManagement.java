@@ -16,8 +16,8 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -25,7 +25,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;
@@ -54,7 +53,7 @@ public abstract class BaseTickerTransactionManagement {
 
     @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML protected ComboBox<TransactionStatus> statusComboBox;
+    @FXML protected ComboBox<WalletTransactionStatus> statusComboBox;
 
     @FXML protected ComboBox<Category> categoryComboBox;
 
@@ -65,8 +64,6 @@ public abstract class BaseTickerTransactionManagement {
     protected SuggestionsHandlerHelper<WalletTransaction> suggestionsHandler;
 
     protected WalletService walletService;
-
-    protected WalletTransactionService walletTransactionService;
 
     protected CategoryService categoryService;
 
@@ -82,13 +79,12 @@ public abstract class BaseTickerTransactionManagement {
 
     protected Wallet wallet = null;
 
-    protected TransactionType transactionType;
+    protected WalletTransactionType walletTransactionType;
 
     /**
      * Constructor
      *
      * @param walletService            Wallet service
-     * @param walletTransactionService Wallet transaction service
      * @param categoryService          Category service
      * @param tickerService            Ticker service
      * @param i18nService              I18n service
@@ -97,12 +93,10 @@ public abstract class BaseTickerTransactionManagement {
     @Autowired
     protected BaseTickerTransactionManagement(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             TickerService tickerService,
             I18nService i18nService) {
         this.walletService = walletService;
-        this.walletTransactionService = walletTransactionService;
         this.categoryService = categoryService;
         this.tickerService = tickerService;
         this.i18nService = i18nService;
@@ -240,9 +234,9 @@ public abstract class BaseTickerTransactionManagement {
     }
 
     private BigDecimal getBigDecimal(Wallet wallet, BigDecimal transactionValue) {
-        if (transactionType == TransactionType.EXPENSE) {
+        if (walletTransactionType == WalletTransactionType.EXPENSE) {
             return wallet.getBalance().subtract(transactionValue);
-        } else if (transactionType == TransactionType.INCOME) {
+        } else if (walletTransactionType == WalletTransactionType.INCOME) {
             return wallet.getBalance().add(transactionValue);
         }
 
@@ -258,12 +252,12 @@ public abstract class BaseTickerTransactionManagement {
     }
 
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletTransactionService.getExpenseSuggestions());
+        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
     }
 
     protected void populateComboBoxes() {
         walletComboBox.getItems().setAll(wallets);
-        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        statusComboBox.getItems().addAll(Arrays.asList(WalletTransactionStatus.values()));
         categoryComboBox.getItems().setAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox

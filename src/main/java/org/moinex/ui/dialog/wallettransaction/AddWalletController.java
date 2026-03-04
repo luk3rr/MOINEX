@@ -14,6 +14,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
@@ -98,7 +99,7 @@ public class AddWalletController {
             BigDecimal walletBalance =
                     new BigDecimal(walletBalanceStr.isEmpty() ? "0" : walletBalanceStr);
 
-            walletService.addWallet(walletName, walletBalance, walletType);
+            walletService.createWallet(new Wallet(null, walletType, walletName, walletBalance, false, null));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

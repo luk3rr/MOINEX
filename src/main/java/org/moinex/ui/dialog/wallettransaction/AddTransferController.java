@@ -17,12 +17,12 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
+import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -39,14 +39,12 @@ public class AddTransferController extends BaseTransferManagement {
     @Autowired
     public AddTransferController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CalculatorService calculatorService,
             CategoryService categoryService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
-                walletTransactionService,
                 calculatorService,
                 categoryService,
                 i18nService,
@@ -110,13 +108,14 @@ public class AddTransferController extends BaseTransferManagement {
             LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = transferDate.atTime(currentTime);
 
-            walletTransactionService.transferMoney(
-                    senderWt.getId(),
-                    receiverWt.getId(),
-                    category,
+            walletService.createTransfer( new Transfer(
+                    null,
+                    senderWt,
+                    receiverWt,
                     dateTimeWithCurrentHour,
                     transferValue,
-                    description);
+                    description,
+                    category));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

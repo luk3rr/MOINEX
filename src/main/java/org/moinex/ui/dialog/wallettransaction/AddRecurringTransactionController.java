@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
@@ -53,7 +53,7 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
         String valueString = valueField.getText();
-        TransactionType type = typeComboBox.getValue();
+        WalletTransactionType type = typeComboBox.getValue();
         Category category = categoryComboBox.getValue();
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();

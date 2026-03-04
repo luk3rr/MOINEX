@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.MappedSuperclass
 import org.moinex.common.LocalDateTimeStringConverter
+import org.moinex.common.toRounded
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -21,16 +22,17 @@ import java.time.LocalDateTime
 class CreditCardTransaction(
     @ManyToOne
     @JoinColumn(name = "crc_id", referencedColumnName = "id", nullable = false)
-    open var creditCard: CreditCard,
+    var creditCard: CreditCard,
     @Column(name = "date", nullable = false)
     @Convert(converter = LocalDateTimeStringConverter::class)
-    open var date: LocalDateTime,
+    var date: LocalDateTime,
     @Column(name = "amount", nullable = false, scale = 2)
-    open var amount: BigDecimal,
+    var amount: BigDecimal,
     @Column(name = "description")
-    open var description: String?,
+    var description: String?,
 ) {
     init {
+        amount = amount.toRounded()
         require(amount > BigDecimal.ZERO) { "Amount must be positive" }
     }
 }

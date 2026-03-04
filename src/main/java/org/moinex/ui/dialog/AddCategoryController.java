@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.Category;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.util.Constants;
@@ -47,7 +48,7 @@ public class AddCategoryController {
         String name = categoryNameField.getText();
 
         try {
-            categoryService.addCategory(name);
+            categoryService.createCategory(new Category(null,name,false));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),

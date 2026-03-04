@@ -47,7 +47,7 @@ interface CreditCardDebtRepository : JpaRepository<CreditCardDebt, Int> {
      * @return Number of transactions
      */
     @Query("SELECT count(ccd) FROM CreditCardDebt ccd WHERE ccd.category.id = :categoryId")
-    fun getCountTransactions(
+    fun getDebtCountByCategory(
         @Param("categoryId") categoryId: Int,
     ): Int
 

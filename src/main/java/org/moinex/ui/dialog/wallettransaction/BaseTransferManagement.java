@@ -25,7 +25,6 @@ import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -63,8 +62,6 @@ public abstract class BaseTransferManagement {
 
     protected WalletService walletService;
 
-    protected WalletTransactionService walletTransactionService;
-
     protected CalculatorService calculatorService;
 
     protected CategoryService categoryService;
@@ -82,13 +79,11 @@ public abstract class BaseTransferManagement {
     @Autowired
     protected BaseTransferManagement(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CalculatorService calculatorService,
             CategoryService categoryService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
-        this.walletTransactionService = walletTransactionService;
         this.calculatorService = calculatorService;
         this.categoryService = categoryService;
         this.i18nService = i18nService;
@@ -250,7 +245,7 @@ public abstract class BaseTransferManagement {
     }
 
     private void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletTransactionService.getTransferSuggestions());
+        suggestionsHandler.setSuggestions(walletService.getTransferSuggestions());
     }
 
     private void configureSuggestions() {

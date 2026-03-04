@@ -9,17 +9,15 @@ package org.moinex.ui.main;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import jakarta.persistence.Column;
-import jakarta.persistence.EntityExistsException;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -32,7 +30,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
-import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
 import org.moinex.service.WalletService;
@@ -311,82 +308,6 @@ public class CSVImportController {
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
             return reader.readAll();
         }
-    }
-
-    /**
-     * Maps and inserts categories into the database
-     * @param csvData the data from the CSV file
-     * @param columnMapping a map that maps the CSV columns to the database columns
-     */
-    public void mapAndInsertCategory(List<String[]> csvData, Map<String, String> columnMapping) {
-        String[] csvHeaders = csvData.getFirst(); // CSV Headers
-        List<String[]> dataRows = csvData.subList(1, csvData.size()); // Data
-
-        for (String[] row : dataRows) {
-            for (Map.Entry<String, String> entry : columnMapping.entrySet()) {
-                String csvColumn = entry.getKey();
-                String dbColumn = entry.getValue();
-
-                if (dbColumn.equals("name")) {
-                    try {
-                        categoryService.addCategory(getValueForColumn(csvHeaders, row, csvColumn));
-                    } catch (IllegalArgumentException | EntityExistsException e) {
-                        logger.error(e.getMessage());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Maps and inserts wallet into the database
-     * @param csvData the data from the CSV file
-     * @param columnMapping a map that maps the CSV columns to the database columns
-     */
-    public void mapAndInsertWallet(List<String[]> csvData, Map<String, String> columnMapping) {
-        String[] csvHeaders = csvData.getFirst(); // CSV Headers
-        List<String[]> dataRows = csvData.subList(1, csvData.size()); // Data
-
-        for (String[] row : dataRows) {
-            Wallet wt = Wallet.builder().build();
-
-            for (Map.Entry<String, String> entry : columnMapping.entrySet()) {
-                String csvColumn = entry.getKey();
-                String dbColumn = entry.getValue();
-
-                try {
-                    if (dbColumn.equals("name")) {
-                        wt.setName(getValueForColumn(csvHeaders, row, csvColumn));
-                    } else if (dbColumn.equals("balance")) {
-                        wt.setBalance(
-                                new BigDecimal(getValueForColumn(csvHeaders, row, csvColumn)));
-                    }
-                } catch (IllegalArgumentException e) {
-                    logger.error(e.getMessage());
-                } catch (RuntimeException e) {
-                    logger.warn(e.getMessage());
-                }
-            }
-
-            // walletService.addWallet(wt.getName(), wt.getBalance());
-        }
-    }
-
-    /**
-     * Gets the value for a given column
-     * @param csvHeaders the CSV headers
-     * @param row the row from the CSV file
-     * @param csvColumn the column to get the value from
-     * @return the value for the given column
-     */
-    private String getValueForColumn(String[] csvHeaders, String[] row, String csvColumn) {
-        for (int i = 0; i < csvHeaders.length; i++) {
-            if (csvHeaders[i].equals(csvColumn)) {
-                return row[i];
-            }
-        }
-
-        throw new IllegalArgumentException("Column " + csvColumn + " not found");
     }
 
     private void configureMappingTable() {

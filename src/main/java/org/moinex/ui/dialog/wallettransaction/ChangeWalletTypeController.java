@@ -97,7 +97,8 @@ public class ChangeWalletTypeController {
         }
 
         try {
-            walletService.changeWalletType(wt.getId(), walletNewType);
+            wt.setType(walletNewType);
+            walletService.changeWalletType(wt);
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

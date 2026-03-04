@@ -3,6 +3,7 @@ package org.moinex.model.creditcard
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import org.moinex.common.isZero
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.CreditCardFactory
 import org.moinex.factory.CreditCardOperatorFactory
@@ -38,7 +39,7 @@ class CreditCardPaymentValidationTest :
 
                 Then("should create successfully") {
                     payment.amount shouldBe BigDecimal("100.00")
-                    payment.rebateUsed shouldBe BigDecimal.ZERO
+                    payment.rebateUsed.isZero() shouldBe true
                     payment.installment shouldBe 1
                 }
             }
@@ -105,7 +106,7 @@ class CreditCardPaymentValidationTest :
                     )
 
                 Then("should create successfully") {
-                    payment.rebateUsed shouldBe BigDecimal.ZERO
+                    payment.rebateUsed.isZero() shouldBe true
                 }
             }
         }

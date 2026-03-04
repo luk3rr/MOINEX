@@ -32,8 +32,8 @@ import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.DoughnutChart;
 import org.moinex.model.creditcard.CreditCardPayment;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.model.wallettransaction.WalletType;
@@ -41,7 +41,6 @@ import org.moinex.service.CreditCardService;
 import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.WalletFullPaneController;
 import org.moinex.ui.dialog.wallettransaction.AddTransferController;
 import org.moinex.ui.dialog.wallettransaction.AddWalletController;
@@ -80,7 +79,6 @@ public class WalletController {
     private BarChart<String, Number> moneyFlowBarChart;
     private WalletService walletService;
     private CreditCardService creditCardService;
-    private WalletTransactionService walletTransactionService;
     private RecurringTransactionService recurringTransactionService;
     private I18nService i18nService;
     private List<CheckBox> doughnutChartCheckBoxes;
@@ -96,7 +94,6 @@ public class WalletController {
      *
      * @param walletService               WalletService
      * @param creditCardService           CreditCardService
-     * @param walletTransactionService    WalletTransactionService
      * @param recurringTransactionService RecurringTransactionService
      * @note This constructor is used for dependency injection
      */
@@ -104,13 +101,11 @@ public class WalletController {
     public WalletController(
             WalletService walletService,
             CreditCardService creditCardService,
-            WalletTransactionService walletTransactionService,
             RecurringTransactionService recurringTransactionService,
             ConfigurableApplicationContext springContext,
             I18nService i18nService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
-        this.walletTransactionService = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
         this.springContext = springContext;
         this.i18nService = i18nService;
@@ -277,8 +272,7 @@ public class WalletController {
      */
     private void loadWalletTransactionsFromDatabase() {
         transactions =
-                walletTransactionService.getTransactionsByMonth(
-                        totalBalanceSelectedMonth, totalBalanceSelectedYear);
+                walletService.getAllWalletTransactionsByMonth(YearMonth.of(totalBalanceSelectedYear, totalBalanceSelectedMonth));
     }
 
     /**
@@ -336,15 +330,15 @@ public class WalletController {
 
             pendingExpenses =
                     transactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                            .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                            .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
+                            .filter(t -> t.getStatus().equals(WalletTransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             pendingIncomes =
                     transactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
-                            .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                            .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
+                            .filter(t -> t.getStatus().equals(WalletTransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -377,8 +371,8 @@ public class WalletController {
                                                             .getType()
                                                             .getId()
                                                             .equals(selectedWalletType.getId()))
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                            .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                            .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
+                            .filter(t -> t.getStatus().equals(WalletTransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -392,8 +386,8 @@ public class WalletController {
                                                             .getType()
                                                             .getId()
                                                             .equals(selectedWalletType.getId()))
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
-                            .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                            .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
+                            .filter(t -> t.getStatus().equals(WalletTransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -643,8 +637,7 @@ public class WalletController {
 
             // Get transactions
             List<WalletTransaction> transactionsList =
-                    walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            month, year);
+                    walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(year, month));
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
@@ -670,7 +663,7 @@ public class WalletController {
             if (selectedIndex == 0) {
                 totalExpenses =
                         transactionsList.stream()
-                                .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                                .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -686,7 +679,7 @@ public class WalletController {
 
                 totalIncomes =
                         transactionsList.stream()
-                                .filter(t -> t.getType().equals(TransactionType.INCOME))
+                                .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
             } else if (selectedIndex > 0 && selectedIndex - 1 < walletTypes.size()) {
@@ -703,7 +696,7 @@ public class WalletController {
                                                                 .getType()
                                                                 .getId()
                                                                 .equals(selectedWalletType.getId()))
-                                .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                                .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -746,7 +739,7 @@ public class WalletController {
                                                                 .getType()
                                                                 .getId()
                                                                 .equals(selectedWalletType.getId()))
-                                .filter(t -> t.getType().equals(TransactionType.INCOME))
+                                .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
             } else {

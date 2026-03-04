@@ -129,7 +129,7 @@ public class ManageCategoryController {
         }
 
         // Prevent the removal of categories with associated transactions
-        if (categoryService.getCountTransactions(selectedCategory.getId()) > 0) {
+        if (categoryService.getTransactionCountByCategory(selectedCategory.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys
@@ -264,7 +264,7 @@ public class ManageCategoryController {
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
-                                categoryService.getCountTransactions(param.getValue().getId())));
+                                categoryService.getTransactionCountByCategory(param.getValue().getId())));
 
         numOfTransactionsColumn.setCellFactory(
                 column ->

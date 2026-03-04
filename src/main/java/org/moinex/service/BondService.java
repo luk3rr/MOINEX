@@ -14,11 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.moinex.model.Category;
-import org.moinex.model.enums.BondType;
-import org.moinex.model.enums.InterestIndex;
-import org.moinex.model.enums.InterestType;
-import org.moinex.model.enums.OperationType;
-import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.*;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BondInterestCalculation;
 import org.moinex.model.investment.BondOperation;
@@ -36,7 +32,6 @@ public class BondService {
 
     private final BondRepository bondRepository;
     private final BondOperationRepository bondOperationRepository;
-    private final WalletTransactionService walletTransactionService;
     private final WalletService walletService;
     private final BondInterestCalculationService bondInterestCalculationService;
 
@@ -44,12 +39,10 @@ public class BondService {
     public BondService(
             BondRepository bondRepository,
             BondOperationRepository bondOperationRepository,
-            WalletTransactionService walletTransactionService,
             WalletService walletService,
             BondInterestCalculationService bondInterestCalculationService) {
         this.bondRepository = bondRepository;
         this.bondOperationRepository = bondOperationRepository;
-        this.walletTransactionService = walletTransactionService;
         this.walletService = walletService;
         this.bondInterestCalculationService = bondInterestCalculationService;
     }
@@ -250,7 +243,7 @@ public class BondService {
             BigDecimal netProfit,
             Category category,
             String description,
-            TransactionStatus status,
+            WalletTransactionStatus status,
             Boolean includeInAnalysis) {
         Bond bond =
                 bondRepository
@@ -297,28 +290,32 @@ public class BondService {
 
         if (operationType == OperationType.BUY) {
             transactionId =
-                    walletTransactionService.addExpense(
-                            walletId,
-                            category,
+                    walletService.createWalletTransaction( new WalletTransaction(
+                            null,
                             dateTime,
-                            amount,
-                            description,
                             status,
-                            includeInAnalysis);
+                            description,
+                            includeInAnalysis,
+                            walletService.getWalletById(walletId),
+                            category,
+                            WalletTransactionType.EXPENSE,
+                            amount));
         } else {
             transactionId =
-                    walletTransactionService.addIncome(
-                            walletId,
-                            category,
+                    walletService.createWalletTransaction( new WalletTransaction(
+                            null,
                             dateTime,
-                            amount,
-                            description,
                             status,
-                            includeInAnalysis);
+                            description,
+                            includeInAnalysis,
+                            walletService.getWalletById(walletId),
+                            category,
+                            WalletTransactionType.INCOME,
+                            amount));
         }
 
         WalletTransaction walletTransaction =
-                walletTransactionService.getTransactionById(transactionId);
+                walletService.getWalletTransactionById(transactionId);
 
         BondOperation operation =
                 BondOperation.builder()
@@ -436,7 +433,7 @@ public class BondService {
             BigDecimal netProfit,
             Category category,
             String description,
-            TransactionStatus status,
+            WalletTransactionStatus status,
             Boolean includeInAnalysis) {
         BondOperation operation =
                 bondOperationRepository
@@ -490,7 +487,7 @@ public class BondService {
         walletTransaction.setStatus(status);
         walletTransaction.setIncludeInAnalysis(includeInAnalysis);
 
-        walletTransactionService.updateTransaction(walletTransaction);
+        walletService.updateWalletTransaction(walletTransaction);
 
         operation.setQuantity(quantity);
         operation.setUnitPrice(unitPrice);
@@ -518,7 +515,7 @@ public class BondService {
         bondOperationRepository.delete(operation);
 
         if (walletTransaction != null) {
-            walletTransactionService.deleteTransaction(walletTransaction.getId());
+            walletService.deleteWalletTransaction(walletTransaction.getId());
         }
 
         log.info("BondOperation with id {} deleted successfully", operationId);

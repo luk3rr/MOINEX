@@ -27,7 +27,6 @@ import org.moinex.model.goal.Goal;
 import org.moinex.service.GoalService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.dialog.goal.EditGoalController;
 import org.moinex.ui.dialog.wallettransaction.AddExpenseController;
 import org.moinex.ui.dialog.wallettransaction.AddIncomeController;
@@ -92,8 +91,6 @@ public class GoalFullPaneController {
 
     private WalletService walletService;
 
-    private WalletTransactionService walletTransactionService;
-
     private I18nService i18nService;
 
     private Goal goal;
@@ -102,19 +99,16 @@ public class GoalFullPaneController {
      * Constructor
      *
      * @param goalService              Goal service
-     * @param walletTransactionService Wallet transaction service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public GoalFullPaneController(
             GoalService goalService,
-            WalletTransactionService walletTransactionService,
             ConfigurableApplicationContext springContext,
             GoalController goalController,
             WalletService walletService,
             I18nService i18nService) {
         this.goalService = goalService;
-        this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
         this.goalController = goalController;
         this.walletService = walletService;
@@ -407,7 +401,7 @@ public class GoalFullPaneController {
     @FXML
     private void handleDeleteGoal() {
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0) {
+        if (walletService.getWalletTransactionAndTransferCountByWallet(goal.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys

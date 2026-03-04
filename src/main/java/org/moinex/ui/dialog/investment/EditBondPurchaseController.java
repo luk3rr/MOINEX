@@ -13,15 +13,14 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +34,12 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
     @Autowired
     public EditBondPurchaseController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             BondService bondService,
             I18nService i18nService) {
-        super(walletService, walletTransactionService, categoryService, bondService, i18nService);
+        super(walletService, categoryService, bondService, i18nService);
         this.i18nService = i18nService;
-        transactionType = TransactionType.EXPENSE;
+        walletTransactionType = WalletTransactionType.EXPENSE;
     }
 
     public void setOperation(BondOperation op) {
@@ -80,7 +78,7 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
     protected void handleSave() {
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
-        TransactionStatus status = statusComboBox.getValue();
+        WalletTransactionStatus status = statusComboBox.getValue();
         Category category = categoryComboBox.getValue();
         String unitPriceStr = unitPriceField.getText();
         String quantityStr = quantityField.getText();
@@ -134,8 +132,7 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                             .equals(category.getId())
                     && operation
                             .getWalletTransaction()
-                            .getIncludeInAnalysis()
-                            .equals(includeInAnalysisCheckBox.isSelected())
+                            .getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()
                     && operation.getUnitPrice().compareTo(unitPrice) == 0
                     && operation.getQuantity().compareTo(quantity) == 0
                     && feesEqual

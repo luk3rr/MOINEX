@@ -15,14 +15,14 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,6 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
     /**
      * Constructor
      * @param walletService WalletService
-     * @param walletTransactionService WalletTransactionService
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
@@ -46,20 +45,18 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
     @Autowired
     public AddIncomeController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
-                walletTransactionService,
                 categoryService,
                 calculatorService,
                 i18nService,
                 springContext);
 
-        transactionType = TransactionType.INCOME;
+        walletTransactionType = WalletTransactionType.INCOME;
     }
 
     @FXML
@@ -68,7 +65,7 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
         String incomeValueString = transactionValueField.getText();
-        TransactionStatus status = statusComboBox.getValue();
+        WalletTransactionStatus status = statusComboBox.getValue();
         Category category = categoryComboBox.getValue();
         LocalDate incomeDate = transactionDatePicker.getValue();
 
@@ -95,14 +92,7 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
             LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = incomeDate.atTime(currentTime);
 
-            walletTransactionService.addIncome(
-                    wallet.getId(),
-                    category,
-                    dateTimeWithCurrentHour,
-                    incomeValue,
-                    description,
-                    status,
-                    includeInAnalysisCheckBox.isSelected());
+            walletService.createWalletTransaction(new WalletTransaction(null, dateTimeWithCurrentHour, status, description, includeInAnalysisCheckBox.isSelected(), wallet, category, walletTransactionType, incomeValue));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(
@@ -133,6 +123,6 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
 
     @Override
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletTransactionService.getIncomeSuggestions());
+        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
     }
 }

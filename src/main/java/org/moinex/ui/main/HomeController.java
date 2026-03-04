@@ -42,7 +42,7 @@ import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.NetWorthLineChart;
 import org.moinex.model.creditcard.CreditCard;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.*;
@@ -110,8 +110,6 @@ public class HomeController {
 
     private WalletService walletService;
 
-    private WalletTransactionService walletTransactionService;
-
     private I18nService i18nService;
 
     private RecurringTransactionService recurringTransactionService;
@@ -131,7 +129,6 @@ public class HomeController {
     /**
      * Constructor for injecting the wallet and credit card services
      * @param walletService The wallet service
-     * @param walletTransactionService The wallet transaction service
      * @param recurringTransactionService The recurring transaction service
      * @param creditCardService The credit card service
      * @param springContext The spring context
@@ -140,7 +137,6 @@ public class HomeController {
     @Autowired
     public HomeController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             RecurringTransactionService recurringTransactionService,
             CreditCardService creditCardService,
             NetWorthSnapshotService netWorthSnapshotService,
@@ -148,7 +144,6 @@ public class HomeController {
             ConfigurableApplicationContext springContext,
             I18nService i18nService) {
         this.walletService = walletService;
-        this.walletTransactionService = walletTransactionService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
         this.netWorthSnapshotService = netWorthSnapshotService;
@@ -307,7 +302,7 @@ public class HomeController {
      * @param n The number of transactions to be loaded
      */
     private void loadLastTransactionsFromDatabase(Integer n) {
-        transactions = walletTransactionService.getNonArchivedLastTransactions(n);
+        transactions = walletService.getAllNonArchivedLastWalletTransactions(n);
     }
 
     /**
@@ -402,7 +397,7 @@ public class HomeController {
                                     setGraphic(null);
                                 } else {
                                     ImageView icon =
-                                            transaction.getType() == TransactionType.INCOME
+                                            transaction.getType() == WalletTransactionType.INCOME
                                                     ? new ImageView(Constants.HOME_INCOME_ICON)
                                                     : new ImageView(Constants.HOME_EXPENSE_ICON);
 
@@ -473,7 +468,7 @@ public class HomeController {
                                     hbox.setAlignment(Pos.CENTER_LEFT);
 
                                     // Set style class based on the transaction type
-                                    if (transaction.getType() == TransactionType.INCOME) {
+                                    if (transaction.getType() == WalletTransactionType.INCOME) {
                                         hbox.getStyleClass()
                                                 .add(
                                                         Constants
@@ -520,8 +515,7 @@ public class HomeController {
 
             // Get transactions
             List<WalletTransaction> nonArchivedTransactions =
-                    walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            month, year);
+                    walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(year, month));
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
@@ -546,7 +540,7 @@ public class HomeController {
             // Calculate total expenses for the month
             BigDecimal totalExpenses =
                     nonArchivedTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                            .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -556,7 +550,7 @@ public class HomeController {
             // Calculate total incomes for the month
             BigDecimal totalIncomes =
                     nonArchivedTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
+                            .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 

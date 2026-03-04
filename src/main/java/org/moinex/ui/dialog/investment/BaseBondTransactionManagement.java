@@ -16,8 +16,8 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -25,7 +25,6 @@ import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;
@@ -54,7 +53,7 @@ public abstract class BaseBondTransactionManagement {
 
     @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML protected ComboBox<TransactionStatus> statusComboBox;
+    @FXML protected ComboBox<WalletTransactionStatus> statusComboBox;
 
     @FXML protected ComboBox<Category> categoryComboBox;
 
@@ -65,8 +64,6 @@ public abstract class BaseBondTransactionManagement {
     protected SuggestionsHandlerHelper<WalletTransaction> suggestionsHandler;
 
     protected WalletService walletService;
-
-    protected WalletTransactionService walletTransactionService;
 
     protected CategoryService categoryService;
 
@@ -82,17 +79,15 @@ public abstract class BaseBondTransactionManagement {
 
     protected Wallet wallet = null;
 
-    protected TransactionType transactionType;
+    protected WalletTransactionType walletTransactionType;
 
     @Autowired
     protected BaseBondTransactionManagement(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             BondService bondService,
             I18nService i18nService) {
         this.walletService = walletService;
-        this.walletTransactionService = walletTransactionService;
         this.categoryService = categoryService;
         this.bondService = bondService;
         this.i18nService = i18nService;
@@ -179,7 +174,7 @@ public abstract class BaseBondTransactionManagement {
 
             BigDecimal baseAmount = unitPrice.multiply(quantity);
 
-            if (transactionType == TransactionType.EXPENSE) {
+            if (walletTransactionType == WalletTransactionType.EXPENSE) {
                 totalPrice = baseAmount.add(fees).add(taxes);
             } else {
                 totalPrice = baseAmount.subtract(fees).subtract(taxes);
@@ -232,7 +227,7 @@ public abstract class BaseBondTransactionManagement {
             BigDecimal baseAmount = unitPrice.multiply(quantity);
             BigDecimal transactionValue;
 
-            if (transactionType == TransactionType.EXPENSE) {
+            if (walletTransactionType == WalletTransactionType.EXPENSE) {
                 transactionValue = baseAmount.add(fees).add(taxes);
             } else {
                 transactionValue = baseAmount.subtract(fees).subtract(taxes);
@@ -260,9 +255,9 @@ public abstract class BaseBondTransactionManagement {
     }
 
     private BigDecimal getBigDecimal(Wallet wallet, BigDecimal transactionValue) {
-        if (transactionType == TransactionType.EXPENSE) {
+        if (walletTransactionType == WalletTransactionType.EXPENSE) {
             return wallet.getBalance().subtract(transactionValue);
-        } else if (transactionType == TransactionType.INCOME) {
+        } else if (walletTransactionType == WalletTransactionType.INCOME) {
             return wallet.getBalance().add(transactionValue);
         }
 
@@ -278,12 +273,12 @@ public abstract class BaseBondTransactionManagement {
     }
 
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletTransactionService.getExpenseSuggestions());
+        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
     }
 
     protected void populateComboBoxes() {
         walletComboBox.getItems().setAll(wallets);
-        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        statusComboBox.getItems().addAll(Arrays.asList(WalletTransactionStatus.values()));
         categoryComboBox.getItems().setAll(categories);
 
         if (categories.isEmpty()) {

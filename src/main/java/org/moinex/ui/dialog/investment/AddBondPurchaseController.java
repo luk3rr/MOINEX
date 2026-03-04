@@ -14,14 +14,13 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.enums.OperationType;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +32,12 @@ public final class AddBondPurchaseController extends BaseBondTransactionManageme
     @Autowired
     public AddBondPurchaseController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             BondService bondService,
             I18nService i18nService) {
-        super(walletService, walletTransactionService, categoryService, bondService, i18nService);
+        super(walletService, categoryService, bondService, i18nService);
         this.i18nService = i18nService;
-        transactionType = TransactionType.EXPENSE;
+        walletTransactionType = WalletTransactionType.EXPENSE;
     }
 
     @FXML
@@ -47,7 +45,7 @@ public final class AddBondPurchaseController extends BaseBondTransactionManageme
     protected void handleSave() {
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
-        TransactionStatus status = statusComboBox.getValue();
+        WalletTransactionStatus status = statusComboBox.getValue();
         Category category = categoryComboBox.getValue();
         String unitPriceStr = unitPriceField.getText();
         String quantityStr = quantityField.getText();

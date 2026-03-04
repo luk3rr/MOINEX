@@ -6,6 +6,7 @@ gradle-app.setting
 !gradle-wrapper.properties
 !gradlew
 !gradlew.bat
+.kotlin/*
 
 # Maven (legacy)
 target/
@@ -43,6 +44,7 @@ buildNumber.properties
 *.log*
 *.idea
 .factorypath
+*.txt
 
 # Python embedded for Windows installer
 python-embedded/

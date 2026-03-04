@@ -25,7 +25,6 @@ import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -45,21 +44,18 @@ public class EditTransferController extends BaseTransferManagement {
      * Constructor
      *
      * @param walletService            WalletService
-     * @param walletTransactionService WalletTransactionService
      * @param calculatorService        CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public EditTransferController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CalculatorService calculatorService,
             CategoryService categoryService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
-                walletTransactionService,
                 calculatorService,
                 categoryService,
                 i18nService,
@@ -168,7 +164,7 @@ public class EditTransferController extends BaseTransferManagement {
                 oldTransfer.setDescription(description);
                 oldTransfer.setCategory(category);
                 oldTransfer.setDate(dateTimeWithCurrentHour);
-                walletTransactionService.updateTransfer(oldTransfer);
+                walletService.updateTransfer(oldTransfer);
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(

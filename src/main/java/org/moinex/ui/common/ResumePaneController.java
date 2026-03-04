@@ -14,13 +14,13 @@ import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
 import org.moinex.service.I18nService;
 import org.moinex.service.RecurringTransactionService;
-import org.moinex.service.WalletTransactionService;
+import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class ResumePaneController {
 
     @FXML private Label creditCardsForeseenValue;
 
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
 
     private RecurringTransactionService recurringTransactionService;
 
@@ -88,18 +88,18 @@ public class ResumePaneController {
     /**
      * Constructor
      *
-     * @param walletTransactionService    WalletTransactionService
+     * @param walletService    WalletService
      * @param recurringTransactionService RecurringTransactionService
      * @param creditCardService           CreditCardService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public ResumePaneController(
-            WalletTransactionService walletTransactionService,
+            WalletService walletService,
             RecurringTransactionService recurringTransactionService,
             CreditCardService creditCardService,
             I18nService i18nService) {
-        this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
         this.i18nService = i18nService;
@@ -116,7 +116,7 @@ public class ResumePaneController {
      */
     public void updateResumePane(Integer year) {
         List<WalletTransaction> allYearTransactions =
-                walletTransactionService.getNonArchivedTransactionsByYear(year);
+                walletService.getAllNonArchivedWalletTransactionsByYear(Year.of(year));
 
         List<WalletTransaction> futureTransactions =
                 recurringTransactionService.getFutureTransactionsByYear(
@@ -140,7 +140,7 @@ public class ResumePaneController {
     public void updateResumePane(Integer month, Integer year) {
         // Get all transactions of the month that should be included in analysis
         List<WalletTransaction> transactions =
-                walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(month, year);
+                walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(year, month));
 
         List<WalletTransaction> futureTransactions =
                 recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
@@ -164,15 +164,15 @@ public class ResumePaneController {
             BigDecimal crcTotalPaidPayments) {
         BigDecimal totalConfirmedIncome =
                 transactions.stream()
-                        .filter(t -> t.getType().equals(TransactionType.INCOME))
-                        .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                        .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
+                        .filter(t -> t.getStatus().equals(WalletTransactionStatus.CONFIRMED))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalConfirmedExpenses =
                 transactions.stream()
-                        .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                        .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                        .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
+                        .filter(t -> t.getStatus().equals(WalletTransactionStatus.CONFIRMED))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -181,13 +181,13 @@ public class ResumePaneController {
 
         BigDecimal totalForeseenIncome =
                 transactions.stream()
-                        .filter(t -> t.getType() == TransactionType.INCOME)
+                        .filter(t -> t.getType() == WalletTransactionType.INCOME)
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalForeseenExpenses =
                 transactions.stream()
-                        .filter(t -> t.getType() == TransactionType.EXPENSE)
+                        .filter(t -> t.getType() == WalletTransactionType.EXPENSE)
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 

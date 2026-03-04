@@ -21,15 +21,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.model.creditcard.CreditCardPayment;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.dialog.wallettransaction.*;
 import org.moinex.ui.main.WalletController;
 import org.moinex.util.Constants;
@@ -101,8 +100,6 @@ public class WalletFullPaneController {
 
     private CreditCardService creditCardService;
 
-    private WalletTransactionService walletTransactionService;
-
     private Wallet wallet;
 
     private BigDecimal crcPaidAmount;
@@ -118,20 +115,18 @@ public class WalletFullPaneController {
      *
      * @param walletService            WalletService
      * @param creditCardService        CreditCardService
-     * @param walletTransactionService WalletTransactionService
+     * @param walletService WalletTransactionService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public WalletFullPaneController(
             WalletService walletService,
             CreditCardService creditCardService,
-            WalletTransactionService walletTransactionService,
             ConfigurableApplicationContext springContext,
             WalletController walletController,
             I18nService i18nService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
-        this.walletTransactionService = walletTransactionService;
         this.springContext = springContext;
         this.walletController = walletController;
         this.i18nService = i18nService;
@@ -153,12 +148,12 @@ public class WalletFullPaneController {
         LocalDate now = LocalDate.now();
 
         transactions =
-                walletTransactionService.getNonArchivedTransactionsByWalletAndMonth(
-                        wallet.getId(), now.getMonthValue(), now.getYear());
+                walletService.getAllNonArchivedWalletTransactionsByWalletAndMonth(
+                        wallet.getId(), YearMonth.of(now.getYear(), now.getMonthValue()));
 
         transfers =
-                walletTransactionService.getTransfersByWalletAndMonth(
-                        wallet.getId(), now.getMonthValue(), now.getYear());
+                walletService.getTransfersByWalletAndMonth(
+                        wallet.getId(), YearMonth.of(now.getYear(), now.getMonthValue()));
 
         crcPaidAmount =
                 creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(
@@ -207,22 +202,22 @@ public class WalletFullPaneController {
 
         BigDecimal confirmedIncomesSum =
                 transactions.stream()
-                        .filter(t -> t.getType().equals(TransactionType.INCOME))
-                        .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                        .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
+                        .filter(t -> t.getStatus().equals(WalletTransactionStatus.CONFIRMED))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal pendingIncomesSum =
                 transactions.stream()
-                        .filter(t -> t.getType().equals(TransactionType.INCOME))
-                        .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                        .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
+                        .filter(t -> t.getStatus().equals(WalletTransactionStatus.PENDING))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal confirmedExpensesSum =
                 transactions.stream()
-                        .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                        .filter(t -> t.getStatus().equals(TransactionStatus.CONFIRMED))
+                        .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
+                        .filter(t -> t.getStatus().equals(WalletTransactionStatus.CONFIRMED))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -231,8 +226,8 @@ public class WalletFullPaneController {
 
         BigDecimal pendingExpensesSum =
                 transactions.stream()
-                        .filter(t -> t.getType().equals(TransactionType.EXPENSE))
-                        .filter(t -> t.getStatus().equals(TransactionStatus.PENDING))
+                        .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
+                        .filter(t -> t.getStatus().equals(WalletTransactionStatus.PENDING))
                         .map(WalletTransaction::getAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -362,7 +357,7 @@ public class WalletFullPaneController {
     @FXML
     private void handleDeleteWallet() {
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.getTransactionCountByWallet(wallet.getId()) > 0) {
+        if (walletService.getWalletTransactionAndTransferCountByWallet(wallet.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys

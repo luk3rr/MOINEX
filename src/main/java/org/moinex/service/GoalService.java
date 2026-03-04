@@ -185,17 +185,7 @@ public class GoalService {
                         .orElseThrow(
                                 () -> new EntityNotFoundException("Goal wallet type not found"));
 
-        Goal goal =
-                Goal.builder()
-                        .name(name)
-                        .initialBalance(initialBalance)
-                        .balance(initialBalance)
-                        .targetBalance(targetBalance)
-                        .targetDate(targetDateTime)
-                        .motivation(motivation)
-                        .type(walletType)
-                        .masterWallet(masterWallet)
-                        .build();
+        Goal goal = new Goal(initialBalance, targetBalance, targetDateTime, null, motivation, null, name, walletType, false, masterWallet);
 
         handleFundingStrategy(goal, strategy, goal.getBalance());
 

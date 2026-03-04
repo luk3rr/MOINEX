@@ -24,7 +24,8 @@ import org.json.JSONObject;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.enums.TickerType;
-import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.*;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.*;
@@ -48,7 +49,7 @@ public class TickerService {
     private TickerSaleRepository tickerSaleRepository;
     private DividendRepository dividendRepository;
     private CryptoExchangeRepository cryptoExchangeRepository;
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
 
     public Integer MAX_RETRIES = 7;
     public static final Integer RETRY_DELAY_MS = 1000;
@@ -61,13 +62,13 @@ public class TickerService {
             TickerSaleRepository tickerSaleRepository,
             DividendRepository dividendRepository,
             CryptoExchangeRepository cryptoExchangeRepository,
-            WalletTransactionService walletTransactionService) {
+            WalletService walletService) {
         this.tickerRepository = tickerRepository;
         this.tickerPurchaseRepository = tickerPurchaseRepository;
         this.tickerSaleRepository = tickerSaleRepository;
         this.dividendRepository = dividendRepository;
         this.cryptoExchangeRepository = cryptoExchangeRepository;
-        this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
     }
 
     /**
@@ -538,7 +539,7 @@ public class TickerService {
             Category category,
             LocalDateTime date,
             String description,
-            TransactionStatus status,
+            WalletTransactionStatus status,
             Boolean includeInAnalysis) {
         Ticker ticker =
                 tickerRepository
@@ -562,11 +563,18 @@ public class TickerService {
         BigDecimal amount = unitPrice.multiply(quantity);
 
         // Create a wallet transaction for the purchase
-        Integer id =
-                walletTransactionService.addExpense(
-                        walletId, category, date, amount, description, status, includeInAnalysis);
+        int id = walletService.createWalletTransaction( new WalletTransaction(
+                        null,
+                        date,
+                        status,
+                        description,
+                        includeInAnalysis,
+                        walletService.getWalletById(walletId),
+                        category,
+                        WalletTransactionType.EXPENSE,
+                        amount));
 
-        WalletTransaction walletTransaction = walletTransactionService.getTransactionById(id);
+        WalletTransaction walletTransaction = walletService.getWalletTransactionById(id);
 
         TickerPurchase purchase =
                 TickerPurchase.builder()
@@ -630,7 +638,7 @@ public class TickerService {
             Category category,
             LocalDateTime date,
             String description,
-            TransactionStatus status,
+            WalletTransactionStatus status,
             Boolean includeInAnalysis) {
         Ticker ticker =
                 tickerRepository
@@ -660,11 +668,18 @@ public class TickerService {
         BigDecimal amount = unitPrice.multiply(quantity);
 
         // Create a wallet transaction for the sale
-        Integer id =
-                walletTransactionService.addIncome(
-                        walletId, category, date, amount, description, status, includeInAnalysis);
+        int id = walletService.createWalletTransaction( new WalletTransaction(
+                null,
+                date,
+                status,
+                description,
+                includeInAnalysis,
+                walletService.getWalletById(walletId),
+                category,
+                WalletTransactionType.INCOME,
+                amount));
 
-        WalletTransaction walletTransaction = walletTransactionService.getTransactionById(id);
+        WalletTransaction walletTransaction = walletService.getWalletTransactionById(id);
 
         TickerSale sale =
                 TickerSale.builder()
@@ -717,7 +732,7 @@ public class TickerService {
             BigDecimal amount,
             LocalDateTime date,
             String description,
-            TransactionStatus status,
+            WalletTransactionStatus status,
             Boolean includeInAnalysis) {
         Ticker ticker =
                 tickerRepository
@@ -735,11 +750,18 @@ public class TickerService {
         }
 
         // Create a wallet transaction for the dividend
-        Integer id =
-                walletTransactionService.addIncome(
-                        walletId, category, date, amount, description, status, includeInAnalysis);
+        Integer id = walletService.createWalletTransaction( new WalletTransaction(
+                null,
+                date,
+                status,
+                description,
+                includeInAnalysis,
+                walletService.getWalletById(walletId),
+                category,
+                WalletTransactionType.INCOME,
+                amount));
 
-        WalletTransaction walletTransaction = walletTransactionService.getTransactionById(id);
+        WalletTransaction walletTransaction = walletService.getWalletTransactionById(id);
 
         // Create a dividend
         Dividend dividend =
@@ -882,7 +904,7 @@ public class TickerService {
         // foreign key constraint violation
         tickerPurchaseRepository.delete(purchase);
 
-        walletTransactionService.deleteTransaction(purchase.getWalletTransaction().getId());
+        walletService.deleteWalletTransaction(purchase.getWalletTransaction().getId());
 
         logger.info("TickerPurchase with id {} was deleted", purchaseId);
     }
@@ -910,7 +932,7 @@ public class TickerService {
         // foreign key constraint violation
         tickerSaleRepository.delete(sale);
 
-        walletTransactionService.deleteTransaction(sale.getWalletTransaction().getId());
+        walletService.deleteWalletTransaction(sale.getWalletTransaction().getId());
 
         logger.info("TickerSale with id {} was deleted", saleId);
     }
@@ -938,7 +960,7 @@ public class TickerService {
         // foreign key constraint violation
         dividendRepository.delete(dividend);
 
-        walletTransactionService.deleteTransaction(dividend.getWalletTransaction().getId());
+        walletService.deleteWalletTransaction(dividend.getWalletTransaction().getId());
 
         logger.info("Dividend with id {} was deleted", dividendId);
     }
@@ -1026,7 +1048,7 @@ public class TickerService {
         purchase.getWalletTransaction()
                 .setAmount(purchase.getUnitPrice().multiply(purchase.getQuantity()));
 
-        walletTransactionService.updateTransaction(purchase.getWalletTransaction());
+        walletService.updateWalletTransaction(purchase.getWalletTransaction());
 
         tickerPurchaseRepository.save(oldPurchase);
 
@@ -1075,7 +1097,7 @@ public class TickerService {
 
         sale.getWalletTransaction().setAmount(sale.getUnitPrice().multiply(sale.getQuantity()));
 
-        walletTransactionService.updateTransaction(sale.getWalletTransaction());
+        walletService.updateWalletTransaction(sale.getWalletTransaction());
 
         tickerSaleRepository.save(oldSale);
 
@@ -1108,7 +1130,7 @@ public class TickerService {
                             + " not found and cannot update dividend");
         }
 
-        walletTransactionService.updateTransaction(dividend.getWalletTransaction());
+        walletService.updateWalletTransaction(dividend.getWalletTransaction());
 
         dividendRepository.save(oldDividend);
 

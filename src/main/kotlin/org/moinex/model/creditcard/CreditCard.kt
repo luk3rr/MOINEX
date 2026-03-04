@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import org.moinex.common.toRounded
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.util.Constants
 import java.math.BigDecimal
@@ -54,6 +55,8 @@ class CreditCard(
 ) {
     init {
         name = name.trim()
+        maxDebt = maxDebt.toRounded()
+        availableRebate = availableRebate.toRounded()
         require(name.isNotBlank()) { "Credit card name cannot be empty" }
         require(billingDueDay in 1..Constants.MAX_BILLING_DUE_DAY) {
             "Billing due day must be in the range [1, ${Constants.MAX_BILLING_DUE_DAY}]"

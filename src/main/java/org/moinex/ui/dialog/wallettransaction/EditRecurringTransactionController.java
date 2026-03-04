@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
 import org.moinex.model.enums.RecurringTransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
@@ -95,7 +95,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
         String valueString = valueField.getText();
-        TransactionType type = typeComboBox.getValue();
+        WalletTransactionType type = typeComboBox.getValue();
         Category category = categoryComboBox.getValue();
         LocalDate nextDueDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -145,8 +145,8 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                                     activeCheckBox.isSelected()
                                             ? RecurringTransactionStatus.ACTIVE
                                             : RecurringTransactionStatus.INACTIVE)
-                    && rt.getIncludeInAnalysis().equals(includeInAnalysisCheckBox.isSelected())
-                    && rt.getIncludeInNetWorth().equals(includeInNetWorthCheckBox.isSelected())) {
+                    && rt.getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()
+                    && rt.getIncludeInNetWorth() == includeInNetWorthCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys

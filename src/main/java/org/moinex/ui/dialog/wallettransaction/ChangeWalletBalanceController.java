@@ -107,7 +107,8 @@ public class ChangeWalletBalanceController {
                 return;
             } else // Update balance
             {
-                walletService.updateWalletBalance(wt.getId(), newBalance);
+                wt.setBalance(newBalance);
+                walletService.updateWalletBalance(wt);
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(

@@ -21,8 +21,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.CryptoExchange;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.TickerPurchase;
@@ -1035,8 +1035,8 @@ public class InvestmentTransactionsController {
 
     private String deleteMessage(WalletTransaction wt) {
         BigDecimal balanceAfterDeletion;
-        if (wt.getStatus().equals(TransactionStatus.CONFIRMED)) {
-            if (wt.getType().equals(TransactionType.EXPENSE)) {
+        if (wt.getStatus().equals(WalletTransactionStatus.CONFIRMED)) {
+            if (wt.getType().equals(WalletTransactionType.EXPENSE)) {
                 balanceAfterDeletion = wt.getWallet().getBalance().add(wt.getAmount());
             } else {
                 balanceAfterDeletion = wt.getWallet().getBalance().subtract(wt.getAmount());

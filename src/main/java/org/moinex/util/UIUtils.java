@@ -539,38 +539,38 @@ public final class UIUtils {
     /**
      * Translate transaction status to localized string
      *
-     * @param transactionStatus The transaction status to translate
+     * @param walletTransactionStatus The transaction status to translate
      * @param i18nService The I18nService instance for translation
      * @return Translated transaction status name
      */
     public static String translateTransactionStatus(
-            TransactionStatus transactionStatus, I18nService i18nService) {
+            WalletTransactionStatus walletTransactionStatus, I18nService i18nService) {
         Map<String, String> statusKeyMap =
                 Map.of(
                         "pending", Constants.TranslationKeys.TRANSACTION_STATUS_PENDING,
                         "confirmed", Constants.TranslationKeys.TRANSACTION_STATUS_CONFIRMED);
 
-        String key = statusKeyMap.getOrDefault(transactionStatus.name().toLowerCase(), null);
+        String key = statusKeyMap.getOrDefault(walletTransactionStatus.name().toLowerCase(), null);
         if (key != null) {
             return i18nService.tr(key);
         }
 
-        return transactionStatus.name();
+        return walletTransactionStatus.name();
     }
 
     public static String translateTransactionType(
-            TransactionType transactionType, I18nService i18nService) {
+            WalletTransactionType walletTransactionType, I18nService i18nService) {
         Map<String, String> typeKeyMap =
                 Map.of(
                         "income", Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
                         "expense", Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES);
 
-        String key = typeKeyMap.getOrDefault(transactionType.name().toLowerCase(), null);
+        String key = typeKeyMap.getOrDefault(walletTransactionType.name().toLowerCase(), null);
         if (key != null) {
             return i18nService.tr(key);
         }
 
-        return transactionType.name();
+        return walletTransactionType.name();
     }
 
     public static String translateRecurringTransactionStatus(

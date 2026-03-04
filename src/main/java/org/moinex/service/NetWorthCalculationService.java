@@ -18,8 +18,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.moinex.model.enums.OperationType;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.*;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
@@ -35,7 +35,6 @@ public class NetWorthCalculationService {
 
     private final NetWorthSnapshotService netWorthSnapshotService;
     private final WalletService walletService;
-    private final WalletTransactionService walletTransactionService;
     private final RecurringTransactionService recurringTransactionService;
     private final CreditCardService creditCardService;
     private final TickerService tickerService;
@@ -72,7 +71,7 @@ public class NetWorthCalculationService {
 
             for (Wallet wallet : wallets) {
                 LocalDateTime firstTxDate =
-                        walletTransactionService.getFirstTransactionDate(wallet.getId());
+                        walletService.getFirstWalletTransactionDate(wallet.getId());
                 if (firstTxDate != null
                         && (earliestDate == null || firstTxDate.isBefore(earliestDate))) {
                     earliestDate = firstTxDate;
@@ -187,7 +186,7 @@ public class NetWorthCalculationService {
 
             BigDecimal futureIncomesTotal =
                     futureTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
+                            .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -195,7 +194,7 @@ public class NetWorthCalculationService {
 
             BigDecimal futureExpensesTotal =
                     futureTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                            .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -217,7 +216,7 @@ public class NetWorthCalculationService {
 
             BigDecimal scheduledIncomes =
                     scheduledTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.INCOME))
+                            .filter(t -> t.getType().equals(WalletTransactionType.INCOME))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -225,7 +224,7 @@ public class NetWorthCalculationService {
 
             BigDecimal scheduledExpenses =
                     scheduledTransactions.stream()
-                            .filter(t -> t.getType().equals(TransactionType.EXPENSE))
+                            .filter(t -> t.getType().equals(WalletTransactionType.EXPENSE))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -233,16 +232,15 @@ public class NetWorthCalculationService {
 
             // Add pending transactions for current month
             List<WalletTransaction> currentMonthTransactions =
-                    walletTransactionService.getNonArchivedTransactionsByMonthForAnalysis(
-                            month, year);
+                    walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(year, month));
 
             BigDecimal pendingIncomes =
                     currentMonthTransactions.stream()
                             .filter(
                                     t ->
-                                            t.getType().equals(TransactionType.INCOME)
+                                            t.getType().equals(WalletTransactionType.INCOME)
                                                     && t.getStatus()
-                                                            .equals(TransactionStatus.PENDING))
+                                                            .equals(WalletTransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -252,9 +250,9 @@ public class NetWorthCalculationService {
                     currentMonthTransactions.stream()
                             .filter(
                                     t ->
-                                            t.getType().equals(TransactionType.EXPENSE)
+                                            t.getType().equals(WalletTransactionType.EXPENSE)
                                                     && t.getStatus()
-                                                            .equals(TransactionStatus.PENDING))
+                                                            .equals(WalletTransactionStatus.PENDING))
                             .map(WalletTransaction::getAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -316,12 +314,12 @@ public class NetWorthCalculationService {
      * Generic method to calculate remaining balance for recurring transactions with end dates
      * @param month The month
      * @param year The year
-     * @param transactionType The type of transaction (EXPENSE or INCOME)
+     * @param walletTransactionType The type of transaction (EXPENSE or INCOME)
      * @param debugLabel The label for debug logging
      * @return Total remaining amount from recurring transactions
      */
     private BigDecimal calculateRecurringTransactionsAmount(
-            Integer month, Integer year, TransactionType transactionType, String debugLabel) {
+            Integer month, Integer year, WalletTransactionType walletTransactionType, String debugLabel) {
         log.debug("=== Calculating {} for {}/{} ===", debugLabel, month, year);
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -330,7 +328,7 @@ public class NetWorthCalculationService {
         LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59);
 
         List<RecurringTransaction> allRecurringTransactions =
-                recurringTransactionService.getAllByType(transactionType);
+                recurringTransactionService.getAllByType(walletTransactionType);
 
         for (RecurringTransaction recurring : allRecurringTransactions) {
             if (!Boolean.TRUE.equals(recurring.getIncludeInNetWorth())) {
@@ -422,7 +420,7 @@ public class NetWorthCalculationService {
      */
     private BigDecimal calculateRecurringTransactionsDebt(Integer month, Integer year) {
         return calculateRecurringTransactionsAmount(
-                month, year, TransactionType.EXPENSE, "RECURRING TRANSACTIONS DEBT");
+                month, year, WalletTransactionType.EXPENSE, "RECURRING TRANSACTIONS DEBT");
     }
 
     /**
@@ -434,7 +432,7 @@ public class NetWorthCalculationService {
      */
     private BigDecimal calculateRecurringTransactionsIncome(Integer month, Integer year) {
         return calculateRecurringTransactionsAmount(
-                month, year, TransactionType.INCOME, "RECURRING TRANSACTIONS INCOME");
+                month, year, WalletTransactionType.INCOME, "RECURRING TRANSACTIONS INCOME");
     }
 
     /**
@@ -596,7 +594,7 @@ public class NetWorthCalculationService {
         LocalDateTime startOfNextMonth = targetMonth.plusMonths(1).atDay(1).atStartOfDay();
 
         List<WalletTransaction> transactionsAfter =
-                walletTransactionService.getTransactionsByWalletAfterDate(
+                walletService.getAllWalletTransactionsByWalletAfterDate(
                         wallet.getId(), startOfNextMonth);
 
         log.debug(
@@ -605,10 +603,10 @@ public class NetWorthCalculationService {
                 startOfNextMonth);
 
         for (WalletTransaction tx : transactionsAfter) {
-            if (tx.getStatus().equals(TransactionStatus.CONFIRMED)) {
-                if (tx.getType().equals(TransactionType.INCOME)) {
+            if (tx.getStatus().equals(WalletTransactionStatus.CONFIRMED)) {
+                if (tx.getType().equals(WalletTransactionType.INCOME)) {
                     walletBalance = walletBalance.subtract(tx.getAmount());
-                } else if (tx.getType().equals(TransactionType.EXPENSE)) {
+                } else if (tx.getType().equals(WalletTransactionType.EXPENSE)) {
                     walletBalance = walletBalance.add(tx.getAmount());
                 }
             }

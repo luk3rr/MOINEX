@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
@@ -38,7 +38,7 @@ public abstract class BaseRecurringTransactionManagement {
 
     @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML protected ComboBox<TransactionType> typeComboBox;
+    @FXML protected ComboBox<WalletTransactionType> typeComboBox;
 
     @FXML protected ComboBox<Category> categoryComboBox;
 
@@ -200,7 +200,7 @@ public abstract class BaseRecurringTransactionManagement {
 
     protected void populateComboBoxes() {
         walletComboBox.getItems().setAll(wallets);
-        typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
+        typeComboBox.getItems().setAll(Arrays.asList(WalletTransactionType.values()));
         frequencyComboBox.getItems().setAll(Arrays.asList(RecurringTransactionFrequency.values()));
         categoryComboBox.getItems().setAll(categories);
 

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.moinex.model.Category;
 import org.moinex.model.enums.BudgetGroupTransactionFilter;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.repository.CategoryRepository;
@@ -19,7 +19,6 @@ import org.moinex.repository.financialplanning.BudgetGroupRepository;
 import org.moinex.repository.financialplanning.FinancialPlanRepository;
 import org.moinex.repository.wallettransaction.TransferRepository;
 import org.moinex.repository.wallettransaction.WalletTransactionRepository;
-import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,10 +219,10 @@ public class FinancialPlanningService {
                                         new EntityNotFoundException(
                                                 "Financial plan with ID " + planId + " not found"));
 
-        String startDate =
-                period.atDay(1).atStartOfDay().format(Constants.DB_DATE_FORMATTER);
-        String endDate =
-                period.atEndOfMonth().atTime(23, 59, 59).format(Constants.DB_DATE_FORMATTER);
+        LocalDateTime startDate =
+                period.atDay(1).atStartOfDay();
+        LocalDateTime endDate =
+                period.atEndOfMonth().atTime(23, 59, 59);
 
         return plan.getBudgetGroups().stream()
                 .map(
@@ -247,14 +246,14 @@ public class FinancialPlanningService {
                                         walletTransactionRepository
                                                 .getSumAmountByCategoriesAndDateBetween(
                                                         categoryIds,
-                                                        TransactionType.EXPENSE,
+                                                        WalletTransactionType.EXPENSE,
                                                         startDate,
                                                         endDate);
 
                                 BigDecimal creditCardTransactionsAmount =
                                         creditCardService
                                                 .getTotalPaymentsByCategoriesAndDateTimeBetween(
-                                                        categoryIds, LocalDateTime.parse(startDate, Constants.DB_DATE_FORMATTER), LocalDateTime.parse(endDate, Constants.DB_DATE_FORMATTER));
+                                                        categoryIds, startDate, endDate);
 
                                 totalAmount =
                                         totalAmount
@@ -268,7 +267,7 @@ public class FinancialPlanningService {
                                         walletTransactionRepository
                                                 .getSumAmountByCategoriesAndDateBetween(
                                                         categoryIds,
-                                                        TransactionType.INCOME,
+                                                        WalletTransactionType.INCOME,
                                                         startDate,
                                                         endDate);
 

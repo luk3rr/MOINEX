@@ -35,13 +35,13 @@ import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCardPayment;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
 import org.moinex.service.I18nService;
-import org.moinex.service.WalletTransactionService;
+import org.moinex.service.WalletService;
 import org.moinex.ui.common.ResumePaneController;
 import org.moinex.ui.dialog.ManageCategoryController;
 import org.moinex.ui.dialog.wallettransaction.AddExpenseController;
@@ -74,9 +74,9 @@ public class TransactionController {
 
     @FXML private ComboBox<Year> yearResumeComboBox;
 
-    @FXML private ComboBox<TransactionType> moneyFlowComboBox;
+    @FXML private ComboBox<WalletTransactionType> moneyFlowComboBox;
 
-    @FXML private ComboBox<TransactionType> transactionsTypeComboBox;
+    @FXML private ComboBox<WalletTransactionType> transactionsTypeComboBox;
 
     @FXML private DatePicker transactionsEndDatePicker;
 
@@ -90,7 +90,7 @@ public class TransactionController {
 
     private ConfigurableApplicationContext springContext;
 
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
 
     private CreditCardService creditCardService;
 
@@ -104,19 +104,19 @@ public class TransactionController {
 
     /**
      * Constructor
-     * @param walletTransactionService WalletTransactionService
+     * @param walletService WalletService
      * @param creditCardService CreditCardService
      * @param categoryService CategoryService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public TransactionController(
-            WalletTransactionService walletTransactionService,
+            WalletService walletService,
             CreditCardService creditCardService,
             CategoryService categoryService,
             ConfigurableApplicationContext springContext,
             I18nService i18nService) {
-        this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.categoryService = categoryService;
         this.springContext = springContext;
@@ -143,7 +143,7 @@ public class TransactionController {
 
         yearResumeComboBox.setValue(Year.of(currentDate.getYear()));
 
-        moneyFlowComboBox.setValue(TransactionType.EXPENSE);
+        moneyFlowComboBox.setValue(WalletTransactionType.EXPENSE);
 
         transactionsTypeComboBox.setValue(null); // All transactions
 
@@ -318,8 +318,8 @@ public class TransactionController {
                                         .TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE_AFTER_TRANSACTION)
                         + " ");
 
-        if (selectedTransaction.getStatus().equals(TransactionStatus.CONFIRMED)) {
-            if (selectedTransaction.getType().equals(TransactionType.EXPENSE)) {
+        if (selectedTransaction.getStatus().equals(WalletTransactionStatus.CONFIRMED)) {
+            if (selectedTransaction.getType().equals(WalletTransactionType.EXPENSE)) {
                 message.append(
                                 UIUtils.formatCurrency(
                                         selectedTransaction
@@ -347,7 +347,7 @@ public class TransactionController {
                         Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_TITLE),
                 message.toString(),
                 i18nService.getBundle())) {
-            walletTransactionService.deleteTransaction(selectedTransaction.getId());
+            walletService.deleteWalletTransaction(selectedTransaction.getId());
 
             updateMonthYearResume();
             updateYearResume();
@@ -396,7 +396,7 @@ public class TransactionController {
         String similarTextOrId = transactionsSearchField.getText().toLowerCase();
 
         // Get selected values from the combo boxes
-        TransactionType selectedTransactionType = transactionsTypeComboBox.getValue();
+        WalletTransactionType selectedWalletTransactionType = transactionsTypeComboBox.getValue();
 
         LocalDateTime startDate = transactionsStartDatePicker.getValue().atStartOfDay();
         LocalDateTime endDate = transactionsEndDatePicker.getValue().atTime(23, 59, 59);
@@ -408,22 +408,22 @@ public class TransactionController {
         // type.
         // If the transaction type is null, all transactions are fetched
         if (similarTextOrId.isEmpty()) {
-            walletTransactionService
-                    .getNonArchivedTransactionsBetweenDates(startDate, endDate)
+            walletService
+                    .getAllNonArchivedWalletTransactionsBetweenDates(startDate, endDate)
                     .stream()
                     .filter(
                             t ->
-                                    selectedTransactionType == null
-                                            || t.getType().equals(selectedTransactionType))
+                                    selectedWalletTransactionType == null
+                                            || t.getType().equals(selectedWalletTransactionType))
                     .forEach(transactionsTableView.getItems()::add);
         } else {
-            walletTransactionService
-                    .getNonArchivedTransactionsBetweenDates(startDate, endDate)
+            walletService
+                    .getAllNonArchivedWalletTransactionsBetweenDates(startDate, endDate)
                     .stream()
                     .filter(
                             t ->
-                                    selectedTransactionType == null
-                                            || t.getType().equals(selectedTransactionType))
+                                    selectedWalletTransactionType == null
+                                            || t.getType().equals(selectedWalletTransactionType))
                     .filter(
                             t -> {
                                 String description = t.getDescription().toLowerCase();
@@ -453,7 +453,7 @@ public class TransactionController {
      */
     private void updateMoneyFlow() {
         // Get the selected transaction type
-        TransactionType selectedTransactionType = moneyFlowComboBox.getValue();
+        WalletTransactionType selectedWalletTransactionType = moneyFlowComboBox.getValue();
 
         CategoryAxis categoryAxis = new CategoryAxis();
         NumberAxis numberAxis = new NumberAxis();
@@ -485,14 +485,13 @@ public class TransactionController {
 
             // Get confirmed transactions for the month
             List<WalletTransaction> transactions =
-                    walletTransactionService.getNonArchivedConfirmedTransactionsByMonth(
-                            date.getMonthValue(), date.getYear());
+                    walletService.getAllNonArchivedConfirmedWalletTransactionsByMonth(YearMonth.of(date.getYear(), date.getMonthValue()));
 
             // Get paid credit card payments for the month
             // Only get paid payments if the selected transaction type is expense
             // Otherwise, create an empty list
             List<CreditCardPayment> creditCardPayments =
-                    selectedTransactionType.equals(TransactionType.EXPENSE)
+                    selectedWalletTransactionType.equals(WalletTransactionType.EXPENSE)
                             ? creditCardService.getAllPaidPaymentsByMonth(yearMonth)
                             : new ArrayList<>();
 
@@ -500,7 +499,7 @@ public class TransactionController {
             for (Category category : categories) {
                 BigDecimal totalWalletTransaction =
                         transactions.stream()
-                                .filter(t -> t.getType().equals(selectedTransactionType))
+                                .filter(t -> t.getType().equals(selectedWalletTransactionType))
                                 .filter(t -> t.getCategory().getId().equals(category.getId()))
                                 .map(WalletTransaction::getAmount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -725,7 +724,7 @@ public class TransactionController {
      * date and the current date
      */
     private void populateYearComboBox() {
-        LocalDateTime oldestWalletTransaction = walletTransactionService.getOldestTransactionDate();
+        LocalDateTime oldestWalletTransaction = walletService.getOldestWalletTransactionDate();
         LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
 
         LocalDateTime oldest =
@@ -773,30 +772,30 @@ public class TransactionController {
      * Populate the transaction type combo box with the available transaction types
      */
     private void populateTransactionTypeComboBox() {
-        ObservableList<TransactionType> transactionTypes =
-                FXCollections.observableArrayList(TransactionType.values());
+        ObservableList<WalletTransactionType> walletTransactionTypes =
+                FXCollections.observableArrayList(WalletTransactionType.values());
 
-        moneyFlowComboBox.setItems(transactionTypes);
+        moneyFlowComboBox.setItems(walletTransactionTypes);
 
         // Make a copy of the list to add the 'All' option
         // Add 'All' option to the transaction type combo box
         // All is the first element in the list and is represented by a null value
-        ObservableList<TransactionType> transactionTypesWithNull =
-                FXCollections.observableArrayList(TransactionType.values());
-        transactionTypesWithNull.addFirst(null);
+        ObservableList<WalletTransactionType> walletTransactionTypesWithNull =
+                FXCollections.observableArrayList(WalletTransactionType.values());
+        walletTransactionTypesWithNull.addFirst(null);
 
-        transactionsTypeComboBox.setItems(transactionTypesWithNull);
+        transactionsTypeComboBox.setItems(walletTransactionTypesWithNull);
 
-        // Custom string converter to format the TransactionType as
-        // "TransactionType"
+        // Custom string converter to format the WalletTransactionType as
+        // "WalletTransactionType"
         moneyFlowComboBox.setConverter(
                 new StringConverter<>() {
                     @Override
-                    public String toString(TransactionType transactionType) {
-                        if (transactionType == null) {
+                    public String toString(WalletTransactionType walletTransactionType) {
+                        if (walletTransactionType == null) {
                             return "";
                         }
-                        return transactionType == TransactionType.EXPENSE
+                        return walletTransactionType == WalletTransactionType.EXPENSE
                                 ? i18nService.tr(
                                         Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
                                 : i18nService.tr(
@@ -804,7 +803,7 @@ public class TransactionController {
                     }
 
                     @Override
-                    public TransactionType fromString(String string) {
+                    public WalletTransactionType fromString(String string) {
                         return null;
                     }
                 });
@@ -812,11 +811,11 @@ public class TransactionController {
         transactionsTypeComboBox.setConverter(
                 new StringConverter<>() {
                     @Override
-                    public String toString(TransactionType transactionType) {
-                        if (transactionType == null) {
+                    public String toString(WalletTransactionType walletTransactionType) {
+                        if (walletTransactionType == null) {
                             return i18nService.tr(Constants.TranslationKeys.TRANSACTION_FILTER_ALL);
                         }
-                        return transactionType == TransactionType.EXPENSE
+                        return walletTransactionType == WalletTransactionType.EXPENSE
                                 ? i18nService.tr(
                                         Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
                                 : i18nService.tr(
@@ -824,7 +823,7 @@ public class TransactionController {
                     }
 
                     @Override
-                    public TransactionType fromString(String string) {
+                    public WalletTransactionType fromString(String string) {
                         return null;
                     }
                 });
@@ -835,7 +834,7 @@ public class TransactionController {
      * transaction date and the current date
      */
     private void populateMonthYearResumeComboBoxes() {
-        LocalDateTime oldestWalletTransaction = walletTransactionService.getOldestTransactionDate();
+        LocalDateTime oldestWalletTransaction = walletService.getOldestWalletTransactionDate();
 
         LocalDateTime oldestCreditCard = creditCardService.getEarliestPaymentDate();
 
@@ -921,9 +920,9 @@ public class TransactionController {
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_TYPE));
         typeColumn.setCellValueFactory(
                 param -> {
-                    TransactionType type = param.getValue().getType();
+                    WalletTransactionType type = param.getValue().getType();
                     String translatedType =
-                            type == TransactionType.EXPENSE
+                            type == WalletTransactionType.EXPENSE
                                     ? i18nService.tr(
                                             Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
                                     : i18nService.tr(
@@ -938,9 +937,9 @@ public class TransactionController {
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_STATUS));
         statusColumn.setCellValueFactory(
                 param -> {
-                    TransactionStatus status = param.getValue().getStatus();
+                    WalletTransactionStatus status = param.getValue().getStatus();
                     String translatedStatus =
-                            status == TransactionStatus.PENDING
+                            status == WalletTransactionStatus.PENDING
                                     ? i18nService.tr(
                                             Constants.TranslationKeys.TRANSACTION_STATUS_PENDING)
                                     : i18nService.tr(

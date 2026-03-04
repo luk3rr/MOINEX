@@ -18,11 +18,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.I18nService;
-import org.moinex.service.WalletTransactionService;
+import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -44,21 +44,21 @@ public class RemoveTransactionController {
 
     private List<WalletTransaction> incomes;
 
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
 
     private I18nService i18nService;
 
-    private TransactionType transactionType;
+    private WalletTransactionType walletTransactionType;
 
     /**
      * Constructor
-     * @param walletTransactionService WalletTransactionService
+     * @param walletService WalletTransactionService
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public RemoveTransactionController(
-            WalletTransactionService walletTransactionService, I18nService i18nService) {
-        this.walletTransactionService = walletTransactionService;
+            WalletService walletService, I18nService i18nService) {
+        this.walletService = walletService;
         this.i18nService = i18nService;
     }
 
@@ -69,12 +69,12 @@ public class RemoveTransactionController {
 
     /**
      * Initializes the controller with the transaction type
-     * @param transactionType TransactionType
+     * @param walletTransactionType WalletTransactionType
      */
-    public void initializeWithTransactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
+    public void initializeWithTransactionType(WalletTransactionType walletTransactionType) {
+        this.walletTransactionType = walletTransactionType;
 
-        if (transactionType == null) {
+        if (walletTransactionType == null) {
             throw new IllegalStateException("Transaction type not set");
         }
 
@@ -147,7 +147,7 @@ public class RemoveTransactionController {
                                         .add(
                                                 selectedTransaction
                                                                 .getStatus()
-                                                                .equals(TransactionStatus.CONFIRMED)
+                                                                .equals(WalletTransactionStatus.CONFIRMED)
                                                         ? selectedTransaction.getAmount()
                                                         : BigDecimal.ZERO)))
                 .append("\n");
@@ -156,10 +156,10 @@ public class RemoveTransactionController {
         if (WindowUtils.showConfirmationDialog(
                 i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_CONFIRM_DELETE)
                         + " "
-                        + transactionType.toString().toLowerCase()
+                        + walletTransactionType.toString().toLowerCase()
                         + "?",
                 message.toString())) {
-            walletTransactionService.deleteTransaction(selectedTransaction.getId());
+            walletService.deleteWalletTransaction(selectedTransaction.getId());
             transactionsTableView.getItems().remove(selectedTransaction);
         }
     }
@@ -171,11 +171,7 @@ public class RemoveTransactionController {
     }
 
     private void loadTransactionFromDatabase() {
-        if (transactionType == TransactionType.EXPENSE) {
-            incomes = walletTransactionService.getNonArchivedExpenses();
-        } else {
-            incomes = walletTransactionService.getNonArchivedIncomes();
-        }
+        incomes = walletService.getAllNonArchivedWalletTransactionsByType(walletTransactionType);
     }
 
     private void updateTransactionTableView() {

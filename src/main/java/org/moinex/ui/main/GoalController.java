@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.GoalService;
 import org.moinex.service.I18nService;
-import org.moinex.service.WalletTransactionService;
+import org.moinex.service.WalletService;
 import org.moinex.ui.common.GoalFullPaneController;
 import org.moinex.ui.dialog.goal.AddGoalController;
 import org.moinex.ui.dialog.goal.EditGoalController;
@@ -63,7 +63,7 @@ public class GoalController {
     @FXML private TextField goalSearchField;
     private ConfigurableApplicationContext springContext;
     private GoalService goalService;
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
     private I18nService i18nService;
     private List<Goal> goals;
     private Integer inProgressCurrentPage = 0;
@@ -73,17 +73,17 @@ public class GoalController {
      * Constructor
      *
      * @param goalService              The goal service
-     * @param walletTransactionService The wallet transaction service
+     * @param walletService The wallet transaction service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public GoalController(
             GoalService goalService,
-            WalletTransactionService walletTransactionService,
+            WalletService walletService,
             ConfigurableApplicationContext springContext,
             I18nService i18nService) {
         this.goalService = goalService;
-        this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
         this.springContext = springContext;
         this.i18nService = i18nService;
     }
@@ -344,7 +344,7 @@ public class GoalController {
         }
 
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.getTransactionCountByWallet(goal.getId()) > 0) {
+        if (walletService.getWalletTransactionAndTransferCountByWallet(goal.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_TITLE),
                     i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_MESSAGE));

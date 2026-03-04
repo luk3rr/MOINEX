@@ -22,7 +22,6 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -43,8 +42,6 @@ public class ArchivedWalletsController {
 
     private WalletService walletService;
 
-    private WalletTransactionService walletTransactionService;
-
     private I18nService i18nService;
 
     /**
@@ -55,10 +52,8 @@ public class ArchivedWalletsController {
     @Autowired
     public ArchivedWalletsController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             I18nService i18nService) {
         this.walletService = walletService;
-        this.walletTransactionService = walletTransactionService;
         this.i18nService = i18nService;
     }
 
@@ -143,7 +138,7 @@ public class ArchivedWalletsController {
         }
 
         // Prevent the removal of a wallet with associated transactions
-        if (walletTransactionService.getTransactionCountByWallet(selectedWallet.getId()) > 0) {
+        if (walletService.getWalletTransactionAndTransferCountByWallet(selectedWallet.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys
@@ -269,7 +264,7 @@ public class ArchivedWalletsController {
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
-                                walletTransactionService.getTransactionCountByWallet(
+                                walletService.getWalletTransactionAndTransferCountByWallet(
                                         param.getValue().getId())));
 
         numOfTransactionsColumn.setCellFactory(

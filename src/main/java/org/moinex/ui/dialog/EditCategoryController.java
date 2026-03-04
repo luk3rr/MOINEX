@@ -69,7 +69,8 @@ public class EditCategoryController {
 
         if (newName == null || !newName.isBlank() && !newName.equals(selectedCategory.getName())) {
             try {
-                categoryService.renameCategory(selectedCategory.getId(), newName);
+                selectedCategory.setName(newName);
+                categoryService.renameCategory(selectedCategory);
 
                 nameChanged = true;
             } catch (IllegalArgumentException | EntityExistsException | EntityNotFoundException e) {

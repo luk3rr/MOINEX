@@ -20,15 +20,14 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -48,7 +47,7 @@ public abstract class BaseWalletTransactionManagement {
 
     @FXML protected ComboBox<Wallet> walletComboBox;
 
-    @FXML protected ComboBox<TransactionStatus> statusComboBox;
+    @FXML protected ComboBox<WalletTransactionStatus> statusComboBox;
 
     @FXML protected ComboBox<Category> categoryComboBox;
 
@@ -66,8 +65,6 @@ public abstract class BaseWalletTransactionManagement {
 
     protected WalletService walletService;
 
-    protected WalletTransactionService walletTransactionService;
-
     protected CategoryService categoryService;
 
     protected CalculatorService calculatorService;
@@ -80,7 +77,7 @@ public abstract class BaseWalletTransactionManagement {
 
     protected Wallet wallet = null;
 
-    protected TransactionType transactionType;
+    protected WalletTransactionType walletTransactionType;
 
     private ChangeListener<String> transactionValueListener;
 
@@ -88,7 +85,6 @@ public abstract class BaseWalletTransactionManagement {
      * Constructor
      *
      * @param walletService            WalletService
-     * @param walletTransactionService WalletTransactionService
      * @param categoryService          CategoryService
      * @param calculatorService        CalculatorService
      * @note This constructor is used for dependency injection
@@ -96,13 +92,11 @@ public abstract class BaseWalletTransactionManagement {
     @Autowired
     protected BaseWalletTransactionManagement(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
-        this.walletTransactionService = walletTransactionService;
         this.categoryService = categoryService;
         this.calculatorService = calculatorService;
         this.i18nService = i18nService;
@@ -210,9 +204,9 @@ public abstract class BaseWalletTransactionManagement {
     }
 
     private BigDecimal getBigDecimal(Wallet wallet, BigDecimal transactionValue) {
-        if (transactionType == TransactionType.EXPENSE) {
+        if (walletTransactionType == WalletTransactionType.EXPENSE) {
             return wallet.getBalance().subtract(transactionValue);
-        } else if (transactionType == TransactionType.INCOME) {
+        } else if (walletTransactionType == WalletTransactionType.INCOME) {
             return wallet.getBalance().add(transactionValue);
         }
         throw new IllegalStateException("Invalid transaction type");
@@ -228,7 +222,7 @@ public abstract class BaseWalletTransactionManagement {
 
     protected void populateComboBoxes() {
         walletComboBox.getItems().setAll(wallets);
-        statusComboBox.getItems().addAll(Arrays.asList(TransactionStatus.values()));
+        statusComboBox.getItems().addAll(Arrays.asList(WalletTransactionStatus.values()));
         categoryComboBox.getItems().setAll(categories);
 
         // If there are no categories, add a tooltip to the categoryComboBox

@@ -15,7 +15,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
+import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
@@ -23,7 +23,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,6 @@ public final class EditDividendController extends BaseDividendManagement {
     /**
      * Constructor
      * @param walletService WalletService
-     * @param walletTransactionService WalletTransactionService
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
      * @param tickerService TickerService
@@ -50,14 +48,12 @@ public final class EditDividendController extends BaseDividendManagement {
     @Autowired
     public EditDividendController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
             TickerService tickerService,
             I18nService i18nService) {
         super(
                 walletService,
-                walletTransactionService,
                 categoryService,
                 calculatorService,
                 tickerService,
@@ -86,7 +82,7 @@ public final class EditDividendController extends BaseDividendManagement {
         Wallet wallet = walletComboBox.getValue();
         String description = descriptionField.getText();
         String dividendValueString = dividendValueField.getText();
-        TransactionStatus status = statusComboBox.getValue();
+        WalletTransactionStatus status = statusComboBox.getValue();
         Category category = categoryComboBox.getValue();
         LocalDate dividendDate = dividendDatePicker.getValue();
 
@@ -119,8 +115,7 @@ public final class EditDividendController extends BaseDividendManagement {
                     && dividend.getWalletTransaction().getDescription().equals(description)
                     && dividend.getWalletTransaction().getWallet().getId().equals(wallet.getId())
                     && dividend.getWalletTransaction()
-                            .getIncludeInAnalysis()
-                            .equals(includeInAnalysisCheckBox.isSelected())) {
+                            .getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),

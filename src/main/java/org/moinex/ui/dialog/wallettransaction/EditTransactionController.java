@@ -17,15 +17,14 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TransactionStatus;
-import org.moinex.model.enums.TransactionType;
+import org.moinex.model.enums.WalletTransactionStatus;
+import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
-import org.moinex.service.WalletTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -42,14 +41,13 @@ import org.springframework.stereotype.Controller;
 @NoArgsConstructor
 public final class EditTransactionController extends BaseWalletTransactionManagement {
     private static final Logger logger = LoggerFactory.getLogger(EditTransactionController.class);
-    @FXML private ComboBox<TransactionType> typeComboBox;
+    @FXML private ComboBox<WalletTransactionType> typeComboBox;
     private WalletTransaction walletTransaction = null;
 
     /**
      * Constructor
      *
      * @param walletService            WalletService
-     * @param walletTransactionService WalletTransactionService
      * @param categoryService          CategoryService
      * @param calculatorService        CalculatorService
      * @note This constructor is used for dependency injection
@@ -57,14 +55,12 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     @Autowired
     public EditTransactionController(
             WalletService walletService,
-            WalletTransactionService walletTransactionService,
             CategoryService categoryService,
             CalculatorService calculatorService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
         super(
                 walletService,
-                walletTransactionService,
                 categoryService,
                 calculatorService,
                 i18nService,
@@ -79,7 +75,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
 
         try {
             typeComboBox.setValue(walletTransaction.getType());
-            transactionType = walletTransaction.getType();
+            walletTransactionType = walletTransaction.getType();
             walletComboBox.setValue(walletTransaction.getWallet());
             statusComboBox.setValue(walletTransaction.getStatus());
             categoryComboBox.setValue(walletTransaction.getCategory());
@@ -105,12 +101,12 @@ public final class EditTransactionController extends BaseWalletTransactionManage
 
         typeComboBox.setOnAction(
                 e -> {
-                    transactionType = typeComboBox.getValue();
+                    walletTransactionType = typeComboBox.getValue();
                     walletAfterBalance();
                     loadSuggestionsFromDatabase();
                 });
 
-        typeComboBox.getItems().setAll(Arrays.asList(TransactionType.values()));
+        typeComboBox.getItems().setAll(Arrays.asList(WalletTransactionType.values()));
         UIUtils.configureComboBox(
                 typeComboBox, t -> UIUtils.translateTransactionType(t, i18nService));
     }
@@ -119,10 +115,10 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     @Override
     protected void handleSave() {
         Wallet wallet = walletComboBox.getValue();
-        TransactionType type = typeComboBox.getValue();
+        WalletTransactionType type = typeComboBox.getValue();
         String description = descriptionField.getText().trim();
         String transactionValueString = transactionValueField.getText();
-        TransactionStatus status = statusComboBox.getValue();
+        WalletTransactionStatus status = statusComboBox.getValue();
         Category category = categoryComboBox.getValue();
         LocalDate transactionDate = transactionDatePicker.getValue();
 
@@ -183,7 +179,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                     walletTransaction.setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
                 }
 
-                walletTransactionService.updateTransaction(walletTransaction);
+                walletService.updateWalletTransaction(walletTransaction);
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(
@@ -216,7 +212,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     @Override
     protected void walletAfterBalance() {
         String transactionValueString = transactionValueField.getText();
-        TransactionType currentType = typeComboBox.getValue();
+        WalletTransactionType currentType = typeComboBox.getValue();
         Wallet wallet = walletComboBox.getValue();
 
         if (transactionValueString == null
@@ -247,30 +243,30 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             BigDecimal oldAmount = walletTransaction.getAmount();
             BigDecimal diff = newAmount.subtract(oldAmount).abs();
             BigDecimal balance = wallet.getBalance();
-            TransactionType oldType = walletTransaction.getType();
-            TransactionStatus oldStatus = walletTransaction.getStatus();
+            WalletTransactionType oldType = walletTransaction.getType();
+            WalletTransactionStatus oldStatus = walletTransaction.getStatus();
             Wallet oldWallet = walletTransaction.getWallet();
 
             if (wallet.equals(oldWallet)) {
-                if (oldStatus.equals(TransactionStatus.CONFIRMED)) {
-                    if (oldType.equals(TransactionType.EXPENSE)) {
-                        if (currentType.equals(TransactionType.EXPENSE)) {
+                if (oldStatus.equals(WalletTransactionStatus.CONFIRMED)) {
+                    if (oldType.equals(WalletTransactionType.EXPENSE)) {
+                        if (currentType.equals(WalletTransactionType.EXPENSE)) {
                             if (oldAmount.compareTo(newAmount) > 0) {
                                 walletAfterBalanceValue = balance.add(diff);
                             } else {
                                 walletAfterBalanceValue = balance.subtract(diff);
                             }
-                        } else if (currentType.equals(TransactionType.INCOME)) {
+                        } else if (currentType.equals(WalletTransactionType.INCOME)) {
                             walletAfterBalanceValue = balance.add(oldAmount).add(newAmount);
                         }
-                    } else if (oldType.equals(TransactionType.INCOME)) {
-                        if (currentType.equals(TransactionType.INCOME)) {
+                    } else if (oldType.equals(WalletTransactionType.INCOME)) {
+                        if (currentType.equals(WalletTransactionType.INCOME)) {
                             if (oldAmount.compareTo(newAmount) > 0) {
                                 walletAfterBalanceValue = balance.subtract(diff);
                             } else {
                                 walletAfterBalanceValue = balance.add(diff);
                             }
-                        } else if (currentType.equals(TransactionType.EXPENSE)) {
+                        } else if (currentType.equals(WalletTransactionType.EXPENSE)) {
                             walletAfterBalanceValue =
                                     balance.subtract(oldAmount).subtract(newAmount);
                         }
@@ -280,9 +276,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                         return;
                     }
                 } else {
-                    if (currentType.equals(TransactionType.EXPENSE)) {
+                    if (currentType.equals(WalletTransactionType.EXPENSE)) {
                         walletAfterBalanceValue = balance.subtract(newAmount);
-                    } else if (currentType.equals(TransactionType.INCOME)) {
+                    } else if (currentType.equals(WalletTransactionType.INCOME)) {
                         walletAfterBalanceValue = balance.add(newAmount);
                     } else {
                         // Type isn't mapped. Never should reach here
@@ -292,9 +288,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 }
             } else // Wallet changed
             {
-                if (currentType.equals(TransactionType.EXPENSE)) {
+                if (currentType.equals(WalletTransactionType.EXPENSE)) {
                     walletAfterBalanceValue = balance.subtract(newAmount);
-                } else if (currentType.equals(TransactionType.INCOME)) {
+                } else if (currentType.equals(WalletTransactionType.INCOME)) {
                     walletAfterBalanceValue = balance.add(newAmount);
                 } else {
                     // Type isn't mapped. Never should reach here
@@ -323,18 +319,12 @@ public final class EditTransactionController extends BaseWalletTransactionManage
 
     @Override
     protected void loadSuggestionsFromDatabase() {
-        if (typeComboBox.getValue() == TransactionType.EXPENSE) {
-            suggestionsHandler.setSuggestions(walletTransactionService.getExpenseSuggestions());
-        } else if (typeComboBox.getValue() == TransactionType.INCOME) {
-            suggestionsHandler.setSuggestions(walletTransactionService.getIncomeSuggestions());
-        } else if (typeComboBox.getValue() == null) {
+        if (typeComboBox.getValue() == null) {
             logger.warn("Type not selected. Suggestions will not be loaded.");
             suggestionsHandler.setSuggestions(null);
-        } else {
-            logger.warn(
-                    "Type not mapped. Suggestions will not be loaded. Consider "
-                            + "mapping the type");
-            suggestionsHandler.setSuggestions(null);
+            return;
         }
+
+        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(typeComboBox.getValue()));
     }
 }

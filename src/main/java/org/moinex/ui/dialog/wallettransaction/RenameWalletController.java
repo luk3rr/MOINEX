@@ -81,7 +81,8 @@ public class RenameWalletController {
         }
 
         try {
-            walletService.renameWallet(wt.getId(), walletNewName);
+            wt.setName(walletNewName);
+            walletService.renameWallet(wt);
         } catch (IllegalArgumentException | EntityNotFoundException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
                     i18nService.tr(

@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.service.I18nService;
-import org.moinex.service.WalletTransactionService;
+import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -39,7 +39,7 @@ public class TransferController {
     @FXML private DatePicker transfersStartDatePicker;
 
     private ConfigurableApplicationContext springContext;
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletService;
     private I18nService i18nService;
 
     private final ObservableList<Transfer> masterData = FXCollections.observableArrayList();
@@ -47,10 +47,10 @@ public class TransferController {
 
     @Autowired
     public TransferController(
-            WalletTransactionService walletTransactionService,
+            WalletService walletService,
             ConfigurableApplicationContext springContext,
             I18nService i18nService) {
-        this.walletTransactionService = walletTransactionService;
+        this.walletService = walletService;
         this.springContext = springContext;
         this.i18nService = i18nService;
     }
@@ -157,7 +157,7 @@ public class TransferController {
      * Loads all transfers from the database into the master list and sets up the filtered list.
      */
     private void loadTransfersFromDatabase() {
-        masterData.setAll(walletTransactionService.getAllTransfers());
+        masterData.setAll(walletService.getAllTransfers());
     }
 
     /**
@@ -269,7 +269,7 @@ public class TransferController {
                         selectedTransfer.getId()),
                 i18nService.getBundle())) {
             try {
-                walletTransactionService.deleteTransfer(selectedTransfer.getId());
+                walletService.deleteTransfer(selectedTransfer.getId());
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_SUCCESS_TITLE),

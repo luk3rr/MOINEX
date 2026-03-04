@@ -67,7 +67,7 @@ class CreditCardService(
         }
 
         creditCard.defaultBillingWallet?.let { wallet ->
-            check(walletRepository.existsById(wallet.id)) {
+            check(walletRepository.existsById(wallet.id!!)) {
                 "Wallet $wallet does not exist"
             }
         }
@@ -85,7 +85,7 @@ class CreditCardService(
                 ),
             )
 
-        logger.info("Credit card {} has created successfully", creditCard)
+        logger.info("Credit card {} has created successfully", newCreditCard)
 
         return newCreditCard.id!!
     }
@@ -490,6 +490,8 @@ class CreditCardService(
         startDateTime: LocalDateTime,
         endDateTime: LocalDateTime,
     ) = creditCardPaymentRepository.getTotalPaymentsByCategoriesAndDateTimeBetween(categoryIds, startDateTime, endDateTime)
+
+    fun getDebtCountByCategory(categoryId: Int) = creditCardDebtRepository.getDebtCountByCategory(categoryId)
 
     fun getInvoiceAmount(
         creditCardId: Int,
