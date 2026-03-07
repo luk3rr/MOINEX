@@ -21,6 +21,7 @@ unit_test:
   stage: test
   image: eclipse-temurin:21-jdk
   script:
+    - chmod +x ./gradlew
     - ./gradlew clean build jacocoTestReport
   artifacts:
     paths:
