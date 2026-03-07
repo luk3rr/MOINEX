@@ -23,9 +23,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Calendar Event dialog
- */
+/** Controller for the Add Calendar Event dialog */
 @Controller
 @NoArgsConstructor
 public class AddCalendarEventController {
@@ -43,6 +41,7 @@ public class AddCalendarEventController {
 
     /**
      * Constructor
+     *
      * @param calendarService The CalendarService instance
      * @note This constructor is used for dependency injection
      */

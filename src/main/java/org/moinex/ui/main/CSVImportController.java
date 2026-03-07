@@ -9,7 +9,6 @@ package org.moinex.ui.main;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import jakarta.persistence.Column;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,9 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the CSV Import screen
- */
+/** Controller for the CSV Import screen */
 @Controller
 @NoArgsConstructor
 public class CSVImportController {
@@ -67,6 +64,7 @@ public class CSVImportController {
 
     /**
      * Constructor
+     *
      * @param categoryService CategoryService
      * @param creditCardService CreditCardService
      * @param walletService WalletService
@@ -94,9 +92,7 @@ public class CSVImportController {
                 .addListener((observable, oldValue, newValue) -> populateMappingTable());
     }
 
-    /**
-     * Open file explorer to select a CSV file
-     */
+    /** Open file explorer to select a CSV file */
     @FXML
     private void handleSelectCsv() {
         FileChooser fileChooser = new FileChooser();
@@ -146,6 +142,7 @@ public class CSVImportController {
 
     /**
      * Get a list of column names from a JPA entity
+     *
      * @param tableName The name of the table
      * @return A list of column names
      */
@@ -157,6 +154,7 @@ public class CSVImportController {
 
     /**
      * Get a list of column names from a JPA entity
+     *
      * @param entityClass The entity class
      * @return A list of column names
      */
@@ -241,9 +239,7 @@ public class CSVImportController {
         return column;
     }
 
-    /**
-     * Maps the CSV columns to the database columns
-     */
+    /** Maps the CSV columns to the database columns */
     public void populateMappingTable() {
         mappingTableView.getItems().clear();
 
@@ -298,9 +294,9 @@ public class CSVImportController {
 
     /**
      * reads a CSV file
+     *
      * @param csvFilePath path to the CSV file
-     * @return a list of string arrays, where each array represents a row in the CSV
-     *     file
+     * @return a list of string arrays, where each array represents a row in the CSV file
      * @throws IOException if the file is not found or cannot be read
      * @throws CsvException if the CSV file is not well formatted
      */

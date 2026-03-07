@@ -37,9 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Financial Planning view
- */
+/** Controller for the Financial Planning view */
 @Controller
 @NoArgsConstructor
 public class PlanController {
@@ -118,9 +116,7 @@ public class PlanController {
                 List.of(this::updateView));
     }
 
-    /**
-     * Populates the period ComboBox with the last 12 months.
-     */
+    /** Populates the period ComboBox with the last 12 months. */
     private void populatePeriodComboBox() {
         ObservableList<YearMonth> periods = FXCollections.observableArrayList();
         YearMonth current = YearMonth.now();
@@ -148,9 +144,7 @@ public class PlanController {
                 });
     }
 
-    /**
-     * Sets up listeners for UI components.
-     */
+    /** Sets up listeners for UI components. */
     private void setupListeners() {
         periodComboBox
                 .valueProperty()
@@ -180,9 +174,7 @@ public class PlanController {
                 });
     }
 
-    /**
-     * Main method to refresh the entire view based on the selected period.
-     */
+    /** Main method to refresh the entire view based on the selected period. */
     private void updateView() {
         YearMonth selectedPeriod = periodComboBox.getValue();
         if (selectedPeriod == null) return;
@@ -210,9 +202,7 @@ public class PlanController {
         }
     }
 
-    /**
-     * Updates the doughnut chart with the plan's target distribution.
-     */
+    /** Updates the doughnut chart with the plan's target distribution. */
     private void updateDoughnutChart() {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
@@ -260,9 +250,7 @@ public class PlanController {
         AnchorPane.setRightAnchor(doughnutChart, 0.0);
     }
 
-    /**
-     * Updates the three AnchorPanes with the budget group cards for the current page.
-     */
+    /** Updates the three AnchorPanes with the budget group cards for the current page. */
     private void updateBudgetGroupPanes() {
         List<AnchorPane> panes = List.of(budgetGroupPane1, budgetGroupPane2, budgetGroupPane3);
         panes.forEach(p -> p.getChildren().clear());

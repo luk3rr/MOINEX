@@ -290,32 +290,33 @@ public class BondService {
 
         if (operationType == OperationType.BUY) {
             transactionId =
-                    walletService.createWalletTransaction( new WalletTransaction(
-                            null,
-                            dateTime,
-                            status,
-                            description,
-                            includeInAnalysis,
-                            walletService.getWalletById(walletId),
-                            category,
-                            WalletTransactionType.EXPENSE,
-                            amount));
+                    walletService.createWalletTransaction(
+                            new WalletTransaction(
+                                    null,
+                                    dateTime,
+                                    status,
+                                    description,
+                                    includeInAnalysis,
+                                    walletService.getWalletById(walletId),
+                                    category,
+                                    WalletTransactionType.EXPENSE,
+                                    amount));
         } else {
             transactionId =
-                    walletService.createWalletTransaction( new WalletTransaction(
-                            null,
-                            dateTime,
-                            status,
-                            description,
-                            includeInAnalysis,
-                            walletService.getWalletById(walletId),
-                            category,
-                            WalletTransactionType.INCOME,
-                            amount));
+                    walletService.createWalletTransaction(
+                            new WalletTransaction(
+                                    null,
+                                    dateTime,
+                                    status,
+                                    description,
+                                    includeInAnalysis,
+                                    walletService.getWalletById(walletId),
+                                    category,
+                                    WalletTransactionType.INCOME,
+                                    amount));
         }
 
-        WalletTransaction walletTransaction =
-                walletService.getWalletTransactionById(transactionId);
+        WalletTransaction walletTransaction = walletService.getWalletTransactionById(transactionId);
 
         BondOperation operation =
                 BondOperation.builder()
@@ -552,8 +553,8 @@ public class BondService {
     }
 
     /**
-     * Get current month interest from database (calculated at startup)
-     * Does not recalculate, only retrieves stored value
+     * Get current month interest from database (calculated at startup) Does not recalculate, only
+     * retrieves stored value
      *
      * @param bondId The bond ID
      * @return Monthly interest for current month from database
@@ -566,8 +567,8 @@ public class BondService {
     }
 
     /**
-     * Get total accumulated interest from database (calculated at startup)
-     * Does not recalculate, only retrieves stored value
+     * Get total accumulated interest from database (calculated at startup) Does not recalculate,
+     * only retrieves stored value
      *
      * @param bondId The bond ID
      * @return Total accumulated interest since first operation from database

@@ -24,9 +24,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Change Wallet Type dialog
- */
+/** Controller for the Change Wallet Type dialog */
 @Controller
 @NoArgsConstructor
 public class ChangeWalletTypeController {
@@ -46,6 +44,7 @@ public class ChangeWalletTypeController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */

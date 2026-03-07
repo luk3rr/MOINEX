@@ -28,7 +28,7 @@ public interface MarketIndicatorHistoryRepository
 
     @Query(
             "SELECT m FROM MarketIndicatorHistory m WHERE m.indicatorType = :indicatorType AND"
-                + " m.referenceDate BETWEEN :startDate AND :endDate ORDER BY m.referenceDate ASC")
+                    + " m.referenceDate BETWEEN :startDate AND :endDate ORDER BY m.referenceDate ASC")
     List<MarketIndicatorHistory> findByIndicatorTypeAndReferenceDateBetween(
             @Param("indicatorType") InterestIndex indicatorType,
             @Param("startDate") String startDate,
@@ -36,7 +36,7 @@ public interface MarketIndicatorHistoryRepository
 
     @Query(
             "SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM MarketIndicatorHistory m"
-                + " WHERE m.indicatorType = :indicatorType AND m.referenceDate = :referenceDate")
+                    + " WHERE m.indicatorType = :indicatorType AND m.referenceDate = :referenceDate")
     boolean existsByIndicatorTypeAndReferenceDate(
             @Param("indicatorType") InterestIndex indicatorType,
             @Param("referenceDate") String referenceDate);

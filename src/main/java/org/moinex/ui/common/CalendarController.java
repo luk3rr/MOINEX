@@ -40,9 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the calendar view
- */
+/** Controller for the calendar view */
 @Controller
 @NoArgsConstructor
 public class CalendarController {
@@ -64,6 +62,7 @@ public class CalendarController {
 
     /**
      * Constructor for CalendarController
+     *
      * @param calendarService The service for the calendar
      */
     @Autowired
@@ -110,16 +109,12 @@ public class CalendarController {
                 List.of(this::drawCalendar));
     }
 
-    /**
-     * Load the calendar events from the database
-     */
+    /** Load the calendar events from the database */
     private void loadCalendarEventsFromDatabase() {
         calendarEvents = calendarService.getAllEvents();
     }
 
-    /**
-     * Draw the calendar grid
-     */
+    /** Draw the calendar grid */
     private void drawCalendar() {
         final DateTimeFormatter formatter =
                 UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
@@ -244,6 +239,7 @@ public class CalendarController {
 
     /**
      * Create a map of calendar events by date
+     *
      * @param calendarEvents The list of calendar events
      * @return A map of calendar events by date
      */
@@ -269,6 +265,7 @@ public class CalendarController {
 
     /**
      * Get the calendar events for the month
+     *
      * @param dateFocus The date to focus on
      * @return A map of calendar events by date
      */

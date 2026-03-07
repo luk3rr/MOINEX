@@ -21,9 +21,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Ticker dialog
- */
+/** Controller for the Edit Ticker dialog */
 @Controller
 @NoArgsConstructor
 public final class EditTickerController extends BaseTickerManagement {
@@ -33,6 +31,7 @@ public final class EditTickerController extends BaseTickerManagement {
 
     /**
      * Constructor
+     *
      * @param tickerService Ticker service
      * @param i18nService I18n service
      * @note This constructor is used for dependency injection

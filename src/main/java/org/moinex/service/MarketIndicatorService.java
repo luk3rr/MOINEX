@@ -228,11 +228,10 @@ public class MarketIndicatorService {
     }
 
     /**
-     * Smart update: Synchronize only necessary market indicator data
-     * - Identifies which indicators are actually used by bonds
-     * - For each indicator, fetches data from earliest bond purchase date
-     * - Only syncs data that is missing from the database
-     * This method is designed to run on application startup
+     * Smart update: Synchronize only necessary market indicator data - Identifies which indicators
+     * are actually used by bonds - For each indicator, fetches data from earliest bond purchase
+     * date - Only syncs data that is missing from the database This method is designed to run on
+     * application startup
      */
     @Transactional
     public void updateAllIndicators() {
@@ -327,8 +326,8 @@ public class MarketIndicatorService {
     }
 
     /**
-     * Force update all indicators with specified date range
-     * Use this for manual updates or backfilling
+     * Force update all indicators with specified date range Use this for manual updates or
+     * backfilling
      *
      * @param startDate The start date for the historical data
      * @param endDate The end date for the historical data

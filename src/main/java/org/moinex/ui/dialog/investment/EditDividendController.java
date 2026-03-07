@@ -28,9 +28,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Dividend dialog
- */
+/** Controller for the Edit Dividend dialog */
 @Controller
 @NoArgsConstructor
 public final class EditDividendController extends BaseDividendManagement {
@@ -38,6 +36,7 @@ public final class EditDividendController extends BaseDividendManagement {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
@@ -52,12 +51,7 @@ public final class EditDividendController extends BaseDividendManagement {
             CalculatorService calculatorService,
             TickerService tickerService,
             I18nService i18nService) {
-        super(
-                walletService,
-                categoryService,
-                calculatorService,
-                tickerService,
-                i18nService);
+        super(walletService, categoryService, calculatorService, tickerService, i18nService);
     }
 
     public void setDividend(Dividend d) {
@@ -114,8 +108,8 @@ public final class EditDividendController extends BaseDividendManagement {
                     && dividend.getWalletTransaction().getDate().toLocalDate().equals(dividendDate)
                     && dividend.getWalletTransaction().getDescription().equals(description)
                     && dividend.getWalletTransaction().getWallet().getId().equals(wallet.getId())
-                    && dividend.getWalletTransaction()
-                            .getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()) {
+                    && dividend.getWalletTransaction().getIncludeInAnalysis()
+                            == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),

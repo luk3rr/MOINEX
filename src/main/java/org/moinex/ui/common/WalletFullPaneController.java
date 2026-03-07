@@ -113,9 +113,10 @@ public class WalletFullPaneController {
     /**
      * Constructor
      *
-     * @param walletService            WalletService
-     * @param creditCardService        CreditCardService
+     * @param walletService WalletService
+     * @param creditCardService CreditCardService
      * @param walletService WalletTransactionService
+     * @param creditCardService CreditCardService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -132,9 +133,7 @@ public class WalletFullPaneController {
         this.i18nService = i18nService;
     }
 
-    /**
-     * Load wallet information from the database
-     */
+    /** Load wallet information from the database */
     public void loadWalletInfo() {
         if (wallet == null) {
             transactions.clear();
@@ -160,7 +159,8 @@ public class WalletFullPaneController {
                         wallet.getId(), YearMonth.of(now.getYear(), now.getMonthValue()));
 
         List<CreditCardPayment> payments =
-                creditCardService.getPaymentsByMonth(YearMonth.of(now.getYear(), now.getMonthValue()));
+                creditCardService.getPaymentsByMonth(
+                        YearMonth.of(now.getYear(), now.getMonthValue()));
 
         // Filter payments that are related to the wallet and are not paid
         crcPendingAmount =
@@ -428,9 +428,9 @@ public class WalletFullPaneController {
     /**
      * Set the value of a label
      *
-     * @param signLabel  Label to set the sign
+     * @param signLabel Label to set the sign
      * @param valueLabel Label to set the value
-     * @param value      Value to set
+     * @param value Value to set
      */
     private void setLabelValue(Label signLabel, Label valueLabel, BigDecimal value) {
         if (value.compareTo(BigDecimal.ZERO) < 0) {

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 
 /**
  * Controller for the Remove Transaction dialog
+ *
  * @note Make sure to set the transaction type before calling the initialize method
  */
 @Controller
@@ -52,12 +53,12 @@ public class RemoveTransactionController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletTransactionService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public RemoveTransactionController(
-            WalletService walletService, I18nService i18nService) {
+    public RemoveTransactionController(WalletService walletService, I18nService i18nService) {
         this.walletService = walletService;
         this.i18nService = i18nService;
     }
@@ -69,6 +70,7 @@ public class RemoveTransactionController {
 
     /**
      * Initializes the controller with the transaction type
+     *
      * @param walletTransactionType WalletTransactionType
      */
     public void initializeWithTransactionType(WalletTransactionType walletTransactionType) {
@@ -147,7 +149,9 @@ public class RemoveTransactionController {
                                         .add(
                                                 selectedTransaction
                                                                 .getStatus()
-                                                                .equals(WalletTransactionStatus.CONFIRMED)
+                                                                .equals(
+                                                                        WalletTransactionStatus
+                                                                                .CONFIRMED)
                                                         ? selectedTransaction.getAmount()
                                                         : BigDecimal.ZERO)))
                 .append("\n");
@@ -195,9 +199,7 @@ public class RemoveTransactionController {
         transactionsTableView.refresh();
     }
 
-    /**
-     * Configures the TableView to display the incomes.
-     */
+    /** Configures the TableView to display the incomes. */
     private void configureTableView() {
         TableColumn<WalletTransaction, Integer> idColumn = getWalletTransactionLongTableColumn();
 

@@ -39,8 +39,7 @@ import org.springframework.stereotype.Controller;
 /**
  * Controller for the Credit Card Pane
  *
- * @note prototype is necessary so that each scene knows to which credit card it is
- * associated
+ * @note prototype is necessary so that each scene knows to which credit card it is associated
  */
 @Controller
 @Scope("prototype") // Each instance of this controller is unique
@@ -91,6 +90,7 @@ public class CreditCardPaneController {
 
     /**
      * Constructor
+     *
      * @param creditCardService CreditCardService
      * @note This constructor is used for dependency injection
      */
@@ -254,6 +254,7 @@ public class CreditCardPaneController {
 
     /**
      * Load the Credit Card Pane
+     *
      * @param crc Credit Card to load
      * @param month year and month to display
      * @return The updated VBox
@@ -319,9 +320,7 @@ public class CreditCardPaneController {
         return rootVBox;
     }
 
-    /**
-     * Update the invoice information
-     */
+    /** Update the invoice information */
     public void updateInvoiceInfo() {
         if (creditCard == null) {
             return;
@@ -332,26 +331,24 @@ public class CreditCardPaneController {
 
         BigDecimal totalDebts =
                 creditCardService.getInvoiceAmount(
-                        creditCard.getId(), YearMonth.of(
+                        creditCard.getId(),
+                        YearMonth.of(
                                 currentDisplayedMonth.getYear(),
-                                currentDisplayedMonth.getMonthValue()
-                        ));
+                                currentDisplayedMonth.getMonthValue()));
 
         invoiceMonthLabel.setText(UIUtils.formatCurrency(totalDebts));
 
         invoiceStatusLabel.setText(
                 UIUtils.translateCreditCardInvoiceStatus(
                         creditCardService.getInvoiceStatus(
-                                creditCard.getId(), YearMonth.of(
+                                creditCard.getId(),
+                                YearMonth.of(
                                         currentDisplayedMonth.getYear(),
-                                    currentDisplayedMonth.getMonthValue()
-                                )),
+                                        currentDisplayedMonth.getMonthValue())),
                         i18nService));
     }
 
-    /**
-     * Set the default values for the credit card pane
-     */
+    /** Set the default values for the credit card pane */
     private void setDefaultValues() {
         crcName.setText("");
         crcOperator.setText("");

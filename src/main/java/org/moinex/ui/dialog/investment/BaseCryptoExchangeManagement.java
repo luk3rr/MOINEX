@@ -27,9 +27,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Base class to implement the common behavior of the Add and Edit Crypto Exchange
- */
+/** Base class to implement the common behavior of the Add and Edit Crypto Exchange */
 @NoArgsConstructor
 public abstract class BaseCryptoExchangeManagement {
     @FXML protected Label cryptoSoldAfterBalanceValueLabel;
@@ -66,6 +64,7 @@ public abstract class BaseCryptoExchangeManagement {
 
     /**
      * Constructor
+     *
      * @param tickerService TickerService
      * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection

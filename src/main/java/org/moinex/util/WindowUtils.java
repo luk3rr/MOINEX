@@ -27,9 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-/**
- * Utility class for managing window-related operations
- */
+/** Utility class for managing window-related operations */
 public final class WindowUtils {
     private static final Logger logger = LoggerFactory.getLogger(WindowUtils.class);
 
@@ -37,6 +35,7 @@ public final class WindowUtils {
 
     /**
      * Sets the attributes of an alert dialog
+     *
      * @param alert The alert dialog
      * @param title The title of the dialog
      * @param header The header of the dialog
@@ -70,6 +69,7 @@ public final class WindowUtils {
 
     /**
      * Shows a confirmation dialog with Yes/No options
+     *
      * @param header The header of the dialog
      * @param message The message to be displayed
      * @return True if the user clicked Yes, false otherwise
@@ -107,6 +107,7 @@ public final class WindowUtils {
 
     /**
      * Shows an information dialog with an OK button
+     *
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
@@ -123,6 +124,7 @@ public final class WindowUtils {
 
     /**
      * Shows an error dialog with an OK button
+     *
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
@@ -138,6 +140,7 @@ public final class WindowUtils {
 
     /**
      * Shows a success dialog with an OK button
+     *
      * @param header The header of the dialog
      * @param message The message to be displayed
      */
@@ -167,6 +170,7 @@ public final class WindowUtils {
 
     /**
      * Centers the window on the screen
+     *
      * @param stage The stage to be centered
      */
     public static void centerWindowOnScreen(Stage stage) {
@@ -175,6 +179,7 @@ public final class WindowUtils {
 
     /**
      * Opens a modal window (blocks interaction with the main window)
+     *
      * @param fxmlFileName The path to the FXML file to be loaded
      * @param title The title of the window
      * @param springContext The Spring application context
@@ -197,6 +202,7 @@ public final class WindowUtils {
 
     /**
      * Opens a modal window (blocks interaction with the main window)
+     *
      * @param fxmlFileName The path to the FXML file to be loaded
      * @param title The title of the window
      * @param springContext The Spring application context
@@ -259,6 +265,7 @@ public final class WindowUtils {
 
     /**
      * Opens a popup window (does not block interaction with the main window)
+     *
      * @param fxmlFileName The FXML file to load
      * @param title The title of the window
      * @param springContext The Spring application context
@@ -281,6 +288,7 @@ public final class WindowUtils {
 
     /**
      * Opens a popup window (does not block interaction with the main window)
+     *
      * @param fxmlFileName The FXML file to load
      * @param title The title of the window
      * @param springContext The Spring application context
@@ -342,6 +350,7 @@ public final class WindowUtils {
 
     /**
      * Opens the given URL in the default web browser
+     *
      * @param url The URL to open
      */
     public static void openUrl(String url) {

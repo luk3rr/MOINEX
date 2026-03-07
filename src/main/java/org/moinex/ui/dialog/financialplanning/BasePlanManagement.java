@@ -29,9 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Base class for Add/Edit Financial Plan dialog controllers.
- */
+/** Base class for Add/Edit Financial Plan dialog controllers. */
 @NoArgsConstructor
 public abstract class BasePlanManagement {
 
@@ -82,8 +80,8 @@ public abstract class BasePlanManagement {
     }
 
     /**
-     * Handles the action of adding a new budget group to the container.
-     * This is typically used when the "Custom" template is selected.
+     * Handles the action of adding a new budget group to the container. This is typically used when
+     * the "Custom" template is selected.
      */
     @FXML
     private void handleAddBudgetGroup() {
@@ -104,9 +102,7 @@ public abstract class BasePlanManagement {
                 List.of());
     }
 
-    /**
-     * Updates the budget groups container with the current list of budget groups
-     */
+    /** Updates the budget groups container with the current list of budget groups */
     protected void updateBudgetGroupsContainer() {
         pane1.getChildren().clear();
         pane2.getChildren().clear();
@@ -170,8 +166,8 @@ public abstract class BasePlanManagement {
     }
 
     /**
-     * Retrieves the set of categories that are already assigned to budget groups.
-     * This is used to prevent duplicate category assignments when adding new budget groups.
+     * Retrieves the set of categories that are already assigned to budget groups. This is used to
+     * prevent duplicate category assignments when adding new budget groups.
      *
      * @return A set of categories that are currently assigned to any budget group
      */
@@ -237,7 +233,7 @@ public abstract class BasePlanManagement {
     /**
      * Adds a context menu (right-click) to a node to allow editing and deleting
      *
-     * @param node  The Node to which the context menu will be added
+     * @param node The Node to which the context menu will be added
      * @param group The BudgetGroup associated with the node
      */
     private void addContextMenu(Node node, BudgetGroup group) {

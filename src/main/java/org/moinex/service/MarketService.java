@@ -29,9 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/**
- * Service that provides market information
- */
+/** Service that provides market information */
 @Service
 public class MarketService {
     private final BrazilianMarketIndicatorsRepository brazilianMarketIndicatorsRepository;
@@ -112,9 +110,9 @@ public class MarketService {
      * Update the Brazilian market indicators from the API asynchronously
      *
      * @return A CompletableFuture with the Brazilian market indicators
-     * @throws MoinexException.ResourceAlreadyUpdatingException If the Brazilian market indicators are
-     *                                                          already being updated
-     * @throws MoinexException.APIFetchException                If the API fetch fails
+     * @throws MoinexException.ResourceAlreadyUpdatingException If the Brazilian market indicators
+     *     are already being updated
+     * @throws MoinexException.APIFetchException If the API fetch fails
      */
     @Transactional
     public CompletableFuture<BrazilianMarketIndicators>
@@ -231,9 +229,9 @@ public class MarketService {
      * Update the market quotes and commodities from the API asynchronously
      *
      * @return A CompletableFuture with the market quotes and commodities
-     * @throws MoinexException.ResourceAlreadyUpdatingException If the market quotes and commodities are
-     *                                                          already being updated
-     * @throws MoinexException.APIFetchException                If the API fetch fails
+     * @throws MoinexException.ResourceAlreadyUpdatingException If the market quotes and commodities
+     *     are already being updated
+     * @throws MoinexException.APIFetchException If the API fetch fails
      */
     public CompletableFuture<MarketQuotesAndCommodities>
             updateMarketQuotesAndCommoditiesFromApiAsync() {

@@ -25,9 +25,7 @@ import lombok.experimental.SuperBuilder;
 import org.moinex.model.enums.TickerType;
 import org.moinex.util.Constants;
 
-/**
- * Class that represents a ticker
- */
+/** Class that represents a ticker */
 @Entity
 @Table(name = "ticker")
 @NoArgsConstructor
@@ -73,6 +71,7 @@ public class Ticker extends Asset {
 
     /**
      * Constructor for testing purposes
+     *
      * @param id The id of the ticker
      * @param name The name of the ticker
      * @param symbol The symbol of the ticker

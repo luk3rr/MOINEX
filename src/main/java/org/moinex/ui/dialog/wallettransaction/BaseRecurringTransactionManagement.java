@@ -26,9 +26,7 @@ import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Base class to manage recurring transactions
- */
+/** Base class to manage recurring transactions */
 @Controller
 @NoArgsConstructor
 public abstract class BaseRecurringTransactionManagement {
@@ -68,6 +66,7 @@ public abstract class BaseRecurringTransactionManagement {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param recurringTransactionService RecurringTransactionService
      * @param categoryService CategoryService

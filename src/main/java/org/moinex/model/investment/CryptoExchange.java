@@ -23,9 +23,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.moinex.util.Constants;
 
-/**
- * Class that represents a crypto exchange
- */
+/** Class that represents a crypto exchange */
 @Entity
 @Table(name = "crypto_exchange")
 @Getter
@@ -67,9 +65,7 @@ public class CryptoExchange {
         }
     }
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public CryptoExchange(
             Integer id,
             Ticker soldCrypto,

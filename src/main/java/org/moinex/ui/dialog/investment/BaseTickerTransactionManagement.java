@@ -31,10 +31,7 @@ import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Base class to implement common methods for BuyTickerController and
- * SaleTickerController
- */
+/** Base class to implement common methods for BuyTickerController and SaleTickerController */
 @NoArgsConstructor
 public abstract class BaseTickerTransactionManagement {
     @FXML protected Label tickerNameLabel;
@@ -84,10 +81,14 @@ public abstract class BaseTickerTransactionManagement {
     /**
      * Constructor
      *
-     * @param walletService            Wallet service
-     * @param categoryService          Category service
-     * @param tickerService            Ticker service
-     * @param i18nService              I18n service
+     * @param walletService Wallet service
+     * @param categoryService Category service
+     * @param tickerService Ticker service
+     * @param i18nService I18n service
+     * @param walletService Wallet service
+     * @param categoryService Category service
+     * @param tickerService Ticker service
+     * @param i18nService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -252,7 +253,8 @@ public abstract class BaseTickerTransactionManagement {
     }
 
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
+        suggestionsHandler.setSuggestions(
+                walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
     }
 
     protected void populateComboBoxes() {

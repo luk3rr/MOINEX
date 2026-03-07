@@ -25,8 +25,8 @@ import lombok.Setter;
 import org.moinex.util.Constants;
 
 /**
- * Entity that stores historical price data for tickers
- * Used to calculate capital appreciation/depreciation over time
+ * Entity that stores historical price data for tickers Used to calculate capital
+ * appreciation/depreciation over time
  */
 @Entity
 @Table(name = "ticker_price_history")

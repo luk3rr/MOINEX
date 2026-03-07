@@ -31,9 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Credit card invoice payment dialog
- */
+/** Controller for the Credit card invoice payment dialog */
 @Controller
 @NoArgsConstructor
 public class CreditCardInvoicePaymentController {
@@ -73,6 +71,7 @@ public class CreditCardInvoicePaymentController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param creditCardService CreditCardService
      * @param calculatorService CalculatorService
@@ -101,7 +100,8 @@ public class CreditCardInvoicePaymentController {
         crcNameLabel.setText(creditCard.getName());
 
         BigDecimal invoiceAmount =
-                creditCardService.getTotalPendingPaymentsByCreditCardAndMonth(creditCard.getId(), invoiceDate);
+                creditCardService.getTotalPendingPaymentsByCreditCardAndMonth(
+                        creditCard.getId(), invoiceDate);
 
         crcInvoiceDueLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
@@ -181,10 +181,8 @@ public class CreditCardInvoicePaymentController {
         }
 
         BigDecimal invoiceAmount =
-                creditCardService
-                        .getTotalPendingPaymentsByCreditCardAndMonth(
-                                creditCard.getId(),
-                                invoiceDate);
+                creditCardService.getTotalPendingPaymentsByCreditCardAndMonth(
+                        creditCard.getId(), invoiceDate);
 
         BigDecimal rebateValue =
                 useRebateValueField.getText().isEmpty()
@@ -201,10 +199,7 @@ public class CreditCardInvoicePaymentController {
         } else {
             try {
                 creditCardService.payInvoice(
-                        creditCard.getId(),
-                        wallet.getId(),
-                        invoiceDate,
-                        rebateValue);
+                        creditCard.getId(), wallet.getId(), invoiceDate, rebateValue);
 
                 WindowUtils.showSuccessDialog(
                         i18nService.tr(
@@ -254,7 +249,8 @@ public class CreditCardInvoicePaymentController {
 
         BigDecimal invoiceAmount =
                 creditCardService
-                        .getTotalPendingPaymentsByCreditCardAndMonth(creditCard.getId(), invoiceDate)
+                        .getTotalPendingPaymentsByCreditCardAndMonth(
+                                creditCard.getId(), invoiceDate)
                         .subtract(rebateValue);
 
         if (invoiceAmount.compareTo(BigDecimal.ZERO) < 0) {

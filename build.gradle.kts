@@ -13,6 +13,7 @@ plugins {
     id("org.openjfx.javafxplugin") version "0.1.0"
     id("org.beryx.jlink") version "3.0.1"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+    id("com.diffplug.spotless") version "6.25.0"
     jacoco
     `maven-publish`
 }
@@ -154,6 +155,17 @@ ktlint {
     filter {
         exclude("**/generated/**")
         exclude("**/build/**")
+    }
+}
+
+spotless {
+    java {
+        target("src/*/java/**/*.java")
+        googleJavaFormat("1.22.0").aosp()
+        formatAnnotations()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }
 

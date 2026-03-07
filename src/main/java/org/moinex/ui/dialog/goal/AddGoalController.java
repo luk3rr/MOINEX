@@ -28,9 +28,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Goal dialog
- */
+/** Controller for the Add Goal dialog */
 @Controller
 @NoArgsConstructor
 public final class AddGoalController extends BaseGoalManagement {
@@ -105,9 +103,23 @@ public final class AddGoalController extends BaseGoalManagement {
                     new BigDecimal(initialBalanceStr.isEmpty() ? "0" : initialBalanceStr);
             BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
-            WalletType goalWalletType = walletService.getAllWalletTypes().stream().filter(walletType -> walletType.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME)).findFirst().orElseThrow(() -> new IllegalArgumentException("Goal wallet type not found"));
+            WalletType goalWalletType =
+                    walletService.getAllWalletTypes().stream()
+                            .filter(
+                                    walletType ->
+                                            walletType
+                                                    .getName()
+                                                    .equals(
+                                                            Constants
+                                                                    .GOAL_DEFAULT_WALLET_TYPE_NAME))
+                            .findFirst()
+                            .orElseThrow(
+                                    () ->
+                                            new IllegalArgumentException(
+                                                    "Goal wallet type not found"));
 
-            goalService.createGoal(new Goal(
+            goalService.createGoal(
+                    new Goal(
                             initialBalance,
                             targetBalance,
                             targetDate,
@@ -116,8 +128,8 @@ public final class AddGoalController extends BaseGoalManagement {
                             null,
                             goalName,
                             goalWalletType,
-                    false,
-                    masterWallet),
+                            false,
+                            masterWallet),
                     strategy);
 
             WindowUtils.showSuccessDialog(
@@ -140,9 +152,7 @@ public final class AddGoalController extends BaseGoalManagement {
         }
     }
 
-    /**
-     * Configures the listeners to dynamically show/hide the initial balance strategy options
-     */
+    /** Configures the listeners to dynamically show/hide the initial balance strategy options */
     private void setupDynamicVisibilityListeners() {
         strategyToggleGroup = new ToggleGroup();
         newDepositRadioButton.setToggleGroup(strategyToggleGroup);

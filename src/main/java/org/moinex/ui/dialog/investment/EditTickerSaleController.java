@@ -29,9 +29,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Ticker Sale dialog
- */
+/** Controller for the Edit Ticker Sale dialog */
 @Controller
 @NoArgsConstructor
 public final class EditTickerSaleController extends BaseTickerTransactionManagement {
@@ -39,6 +37,7 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
 
     /**
      * Constructor
+     *
      * @param walletService Wallet service
      * @param categoryService Category service
      * @param tickerService Ticker service
@@ -117,8 +116,8 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                     && sale.getUnitPrice().compareTo(unitPrice) == 0
                     && sale.getQuantity().compareTo(quantity) == 0
                     && sale.getWalletTransaction().getDate().toLocalDate().equals(saleDate)
-                    && sale.getWalletTransaction()
-                            .getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()) {
+                    && sale.getWalletTransaction().getIncludeInAnalysis()
+                            == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         i18nService.tr(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),

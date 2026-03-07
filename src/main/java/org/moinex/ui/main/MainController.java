@@ -37,9 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the main view
- */
+/** Controller for the main view */
 @Controller
 @NoArgsConstructor
 public class MainController {
@@ -208,8 +206,8 @@ public class MainController {
     }
 
     /**
-     * Load the content of the main window with the content of the FXML file
-     * passed as parameter
+     * Load the content of the main window with the content of the FXML file passed as parameter
+     *
      * @param fxmlFile The path to the FXML file to be loaded
      */
     public void loadContent(String fxmlFile, String styleSheet) {
@@ -268,9 +266,7 @@ public class MainController {
         selectedButton.getStyleClass().add(Constants.SIDEBAR_SELECTED_BUTTON_STYLE);
     }
 
-    /**
-     * Toggle the visibility of the sidebar menu
-     */
+    /** Toggle the visibility of the sidebar menu */
     private void toggleMenu() {
         double targetWidth =
                 isMenuExpanded ? Constants.MENU_COLLAPSED_WIDTH : Constants.MENU_EXPANDED_WIDTH;
@@ -306,6 +302,7 @@ public class MainController {
 
     /**
      * Set the visibility of the text of the sidebarButtons
+     *
      * @param visible True if the text should be visible, false otherwise
      */
     private void setButtonTextVisibility(boolean visible) {
@@ -316,6 +313,7 @@ public class MainController {
 
     /**
      * Set the width of the sidebarButtons
+     *
      * @param width The width to be set
      */
     private void setButtonWidth(double width) {

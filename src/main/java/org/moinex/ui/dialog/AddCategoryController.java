@@ -20,9 +20,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Category dialog
- */
+/** Controller for the Add Category dialog */
 @Controller
 @NoArgsConstructor
 public class AddCategoryController {
@@ -48,7 +46,7 @@ public class AddCategoryController {
         String name = categoryNameField.getText();
 
         try {
-            categoryService.createCategory(new Category(null,name,false));
+            categoryService.createCategory(new Category(null, name, false));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),

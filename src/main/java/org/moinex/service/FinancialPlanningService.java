@@ -26,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service class for managing financial plans and budget groups
- */
+/** Service class for managing financial plans and budget groups */
 @Service
 @NoArgsConstructor
 public class FinancialPlanningService {
@@ -49,7 +47,8 @@ public class FinancialPlanningService {
             WalletTransactionRepository walletTransactionRepository,
             CreditCardPaymentRepository creditCardPaymentRepository,
             CategoryRepository categoryRepository,
-            TransferRepository transferRepository, CreditCardService creditCardService) {
+            TransferRepository transferRepository,
+            CreditCardService creditCardService) {
         this.financialPlanRepository = financialPlanRepository;
         this.budgetGroupRepository = budgetGroupRepository;
         this.walletTransactionRepository = walletTransactionRepository;
@@ -62,7 +61,7 @@ public class FinancialPlanningService {
     /**
      * Creates a new financial plan along with its budget groups
      *
-     * @param name   The name of the plan
+     * @param name The name of the plan
      * @param income The base monthly income for the plan
      * @param groups The list of budget groups to create for this plan
      * @return The ID of the newly created financial plan
@@ -201,9 +200,9 @@ public class FinancialPlanningService {
     }
 
     /**
-     * Calculates the current status of a financial plan for a given period.
-     * It determines the amount spent in each budget group by summing up the
-     * transactions of the associated categories within the specified month and year.
+     * Calculates the current status of a financial plan for a given period. It determines the
+     * amount spent in each budget group by summing up the transactions of the associated categories
+     * within the specified month and year.
      *
      * @param planId The ID of the financial plan.
      * @param period The month and year for which to calculate the status.
@@ -219,10 +218,8 @@ public class FinancialPlanningService {
                                         new EntityNotFoundException(
                                                 "Financial plan with ID " + planId + " not found"));
 
-        LocalDateTime startDate =
-                period.atDay(1).atStartOfDay();
-        LocalDateTime endDate =
-                period.atEndOfMonth().atTime(23, 59, 59);
+        LocalDateTime startDate = period.atDay(1).atStartOfDay();
+        LocalDateTime endDate = period.atEndOfMonth().atTime(23, 59, 59);
 
         return plan.getBudgetGroups().stream()
                 .map(

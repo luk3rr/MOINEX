@@ -28,14 +28,13 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Sale Ticker dialog
- */
+/** Controller for the Sale Ticker dialog */
 @Controller
 @NoArgsConstructor
 public final class AddTickerSaleController extends BaseTickerTransactionManagement {
     /**
      * Constructor
+     *
      * @param walletService Wallet service
      * @param categoryService Category service
      * @param tickerService Ticker service

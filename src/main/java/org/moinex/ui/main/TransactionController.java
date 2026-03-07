@@ -58,9 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller class for the transaction view
- */
+/** Controller class for the transaction view */
 @Controller
 @NoArgsConstructor
 public class TransactionController {
@@ -104,6 +102,7 @@ public class TransactionController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param creditCardService CreditCardService
      * @param categoryService CategoryService
@@ -388,9 +387,7 @@ public class TransactionController {
                         }));
     }
 
-    /**
-     * Update the transaction table view
-     */
+    /** Update the transaction table view */
     private void updateTransactionTableView() {
         // Get the search text
         String similarTextOrId = transactionsSearchField.getText().toLowerCase();
@@ -448,9 +445,7 @@ public class TransactionController {
         transactionsTableView.refresh();
     }
 
-    /**
-     * Update the money flow bar chart
-     */
+    /** Update the money flow bar chart */
     private void updateMoneyFlow() {
         // Get the selected transaction type
         WalletTransactionType selectedWalletTransactionType = moneyFlowComboBox.getValue();
@@ -485,7 +480,8 @@ public class TransactionController {
 
             // Get confirmed transactions for the month
             List<WalletTransaction> transactions =
-                    walletService.getAllNonArchivedConfirmedWalletTransactionsByMonth(YearMonth.of(date.getYear(), date.getMonthValue()));
+                    walletService.getAllNonArchivedConfirmedWalletTransactionsByMonth(
+                            YearMonth.of(date.getYear(), date.getMonthValue()));
 
             // Get paid credit card payments for the month
             // Only get paid payments if the selected transaction type is expense
@@ -615,9 +611,7 @@ public class TransactionController {
         }
     }
 
-    /**
-     * Update the year resume view
-     */
+    /** Update the year resume view */
     private void updateYearResume() {
         Year selectedYear = yearResumeComboBox.getValue();
 
@@ -664,9 +658,7 @@ public class TransactionController {
         }
     }
 
-    /**
-     * Update the month resume view
-     */
+    /** Update the month resume view */
     private void updateMonthYearResume() {
         YearMonth selectedYearMonth =
                 YearMonth.of(
@@ -720,8 +712,8 @@ public class TransactionController {
     }
 
     /**
-     * Populate the year combo box with the years between the oldest transaction
-     * date and the current date
+     * Populate the year combo box with the years between the oldest transaction date and the
+     * current date
      */
     private void populateYearComboBox() {
         LocalDateTime oldestWalletTransaction = walletService.getOldestWalletTransactionDate();
@@ -768,9 +760,7 @@ public class TransactionController {
                 });
     }
 
-    /**
-     * Populate the transaction type combo box with the available transaction types
-     */
+    /** Populate the transaction type combo box with the available transaction types */
     private void populateTransactionTypeComboBox() {
         ObservableList<WalletTransactionType> walletTransactionTypes =
                 FXCollections.observableArrayList(WalletTransactionType.values());
@@ -830,8 +820,8 @@ public class TransactionController {
     }
 
     /**
-     * Populate the month resume combo box with the months between the oldest
-     * transaction date and the current date
+     * Populate the month resume combo box with the months between the oldest transaction date and
+     * the current date
      */
     private void populateMonthYearResumeComboBoxes() {
         LocalDateTime oldestWalletTransaction = walletService.getOldestWalletTransactionDate();
@@ -896,9 +886,7 @@ public class TransactionController {
                 });
     }
 
-    /**
-     * Configure the table view columns
-     */
+    /** Configure the table view columns */
     private void configureTableView() {
         TableColumn<WalletTransaction, Integer> idColumn =
                 getWalletTransactionLongTableColumn(

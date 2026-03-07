@@ -20,6 +20,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Check if a ticker with the given name exists
+     *
      * @param name The name of the ticker
      * @return True if a ticker with the given name exists, false otherwise
      */
@@ -27,6 +28,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Check if a ticker with the given symbol exists
+     *
      * @param symbol The symbol of the ticker
      * @return True if a ticker with the given symbol exists, false otherwise
      */
@@ -34,6 +36,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Get count of purchases associated with the ticker
+     *
      * @param tickerId The id of the ticker
      * @return The count of purchases associated with the ticker
      */
@@ -42,6 +45,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Get count of sales associated with the ticker
+     *
      * @param tickerId The id of the ticker
      * @return The count of sales associated with the ticker
      */
@@ -50,6 +54,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Get count of dividends associated with the ticker
+     *
      * @param tickerId The id of the ticker
      * @return The count of dividends associated with the ticker
      */
@@ -58,6 +63,7 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Get count of crypto exchanges associated with the ticker
+     *
      * @param tickerId The id of the ticker
      * @return The count of crypto exchanges associated with the ticker
      */
@@ -71,27 +77,28 @@ public interface TickerRepository extends JpaRepository<Ticker, Integer> {
 
     /**
      * Findall tickers and order them by symbol in ascending order
+     *
      * @return A list of tickers ordered by symbol in ascending order
      */
     List<Ticker> findAllByOrderBySymbolAsc();
 
     /**
-     * Find all tickers that are not archived and order them by symbol in ascending
-     * order
-     * @return A list of tickers that are not archived and ordered by symbol in
-     *     ascending order
+     * Find all tickers that are not archived and order them by symbol in ascending order
+     *
+     * @return A list of tickers that are not archived and ordered by symbol in ascending order
      */
     List<Ticker> findAllByIsArchivedFalseOrderBySymbolAsc();
 
     /**
      * Find all tickers that are archived and order them by symbol in ascending order
-     * @return A list of tickers that are archived and ordered by symbol in ascending
-     *     order
+     *
+     * @return A list of tickers that are archived and ordered by symbol in ascending order
      */
     List<Ticker> findAllByIsArchivedTrueOrderBySymbolAsc();
 
     /**
      * Get all non-archived tickers of a specific type
+     *
      * @param type The type of the tickers
      */
     List<Ticker> findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(TickerType type);

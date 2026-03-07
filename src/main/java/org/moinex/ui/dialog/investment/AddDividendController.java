@@ -27,15 +27,14 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Dividend dialog
- */
+/** Controller for the Add Dividend dialog */
 @Controller
 @NoArgsConstructor
 public final class AddDividendController extends BaseDividendManagement {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
@@ -50,12 +49,7 @@ public final class AddDividendController extends BaseDividendManagement {
             CalculatorService calculatorService,
             TickerService tickerService,
             I18nService i18nService) {
-        super(
-                walletService,
-                categoryService,
-                calculatorService,
-                tickerService,
-                i18nService);
+        super(walletService, categoryService, calculatorService, tickerService, i18nService);
     }
 
     @FXML

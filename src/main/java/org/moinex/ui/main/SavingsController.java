@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller class for the Savings view - Container for tabs
- */
+/** Controller class for the Savings view - Container for tabs */
 @Controller
 @NoArgsConstructor
 public class SavingsController {

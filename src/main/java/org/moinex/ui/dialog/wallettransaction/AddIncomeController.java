@@ -29,14 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Income dialog
- */
+/** Controller for the Add Income dialog */
 @Controller
 @NoArgsConstructor
 public final class AddIncomeController extends BaseWalletTransactionManagement {
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
@@ -49,12 +48,7 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
             CalculatorService calculatorService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
-        super(
-                walletService,
-                categoryService,
-                calculatorService,
-                i18nService,
-                springContext);
+        super(walletService, categoryService, calculatorService, i18nService, springContext);
 
         walletTransactionType = WalletTransactionType.INCOME;
     }
@@ -92,7 +86,17 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
             LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = incomeDate.atTime(currentTime);
 
-            walletService.createWalletTransaction(new WalletTransaction(null, dateTimeWithCurrentHour, status, description, includeInAnalysisCheckBox.isSelected(), wallet, category, walletTransactionType, incomeValue));
+            walletService.createWalletTransaction(
+                    new WalletTransaction(
+                            null,
+                            dateTimeWithCurrentHour,
+                            status,
+                            description,
+                            includeInAnalysisCheckBox.isSelected(),
+                            wallet,
+                            category,
+                            walletTransactionType,
+                            incomeValue));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(
@@ -123,6 +127,7 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
 
     @Override
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
+        suggestionsHandler.setSuggestions(
+                walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
     }
 }

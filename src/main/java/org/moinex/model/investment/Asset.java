@@ -15,9 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-/**
- * Class that represents an asset
- */
+/** Class that represents an asset */
 @MappedSuperclass
 @Getter
 @Setter

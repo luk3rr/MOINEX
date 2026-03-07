@@ -27,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Credit Card Debt dialog
- */
+/** Controller for the Add Credit Card Debt dialog */
 @Controller
 @NoArgsConstructor
 public final class AddCreditCardDebtController extends BaseCreditCardDebtManagement {
@@ -74,20 +72,21 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
         try {
             BigDecimal debtValue = new BigDecimal(valueStr);
 
-            int installments =
-                    installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
+            int installments = installmentsStr.isEmpty() ? 1 : Integer.parseInt(installmentsStr);
 
             YearMonth invoiceDateYearMonth = YearMonth.of(invoiceYear, invoiceMonth);
 
-            creditCardService.createDebt(new CreditCardDebt(
-                    null, // id (auto-generated)
-                    category, // category
-                    installments, // installments
-                    crc, // creditCard
-                    LocalDateTime.now(), // date
-                    debtValue, // amount
-                    description // description
-            ), invoiceDateYearMonth);
+            creditCardService.createDebt(
+                    new CreditCardDebt(
+                            null, // id (auto-generated)
+                            category, // category
+                            installments, // installments
+                            crc, // creditCard
+                            LocalDateTime.now(), // date
+                            debtValue, // amount
+                            description // description
+                            ),
+                    invoiceDateYearMonth);
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),

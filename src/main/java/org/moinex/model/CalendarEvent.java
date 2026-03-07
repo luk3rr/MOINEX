@@ -23,9 +23,7 @@ import lombok.experimental.SuperBuilder;
 import org.moinex.model.enums.CalendarEventType;
 import org.moinex.util.Constants;
 
-/**
- * Represents an event in the calendar
- */
+/** Represents an event in the calendar */
 @Entity
 @Table(name = "calendar_event")
 @Getter

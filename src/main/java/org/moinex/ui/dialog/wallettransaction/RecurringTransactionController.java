@@ -33,9 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Manage Recurring Transactions dialog
- */
+/** Controller for the Manage Recurring Transactions dialog */
 @Controller
 @NoArgsConstructor
 public class RecurringTransactionController {
@@ -55,6 +53,7 @@ public class RecurringTransactionController {
 
     /**
      * Constructor for the RecurringTransactionController
+     *
      * @param recurringTransactionService The recurring transaction service
      */
     @Autowired
@@ -174,16 +173,12 @@ public class RecurringTransactionController {
         stage.close();
     }
 
-    /**
-     * Loads the categories from the database
-     */
+    /** Loads the categories from the database */
     private void loadRecurringTransactionsFromDatabase() {
         recurringTransactions = recurringTransactionService.getAllRecurringTransactions();
     }
 
-    /**
-     * Updates the category table view
-     */
+    /** Updates the category table view */
     private void updateRecurringTransactionTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -224,9 +219,7 @@ public class RecurringTransactionController {
         recurringTransactionTableView.refresh();
     }
 
-    /**
-     * Configures the table view columns
-     */
+    /** Configures the table view columns */
     private void configureTableView() {
         TableColumn<RecurringTransaction, Integer> idColumn =
                 getRecurringTransactionLongTableColumn();
@@ -444,9 +437,7 @@ public class RecurringTransactionController {
         return idColumn;
     }
 
-    /**
-     * Populate the transaction type combo box with the available transaction types
-     */
+    /** Populate the transaction type combo box with the available transaction types */
     private void populateRecurringTransactionStatusComboBox() {
         // Make a copy of the list to add the 'All' option
         // Add 'All' option to the transaction type combo box

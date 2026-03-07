@@ -273,7 +273,8 @@ public abstract class BaseBondTransactionManagement {
     }
 
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
+        suggestionsHandler.setSuggestions(
+                walletService.getWalletTransactionSuggestionsByType(walletTransactionType));
     }
 
     protected void populateComboBoxes() {

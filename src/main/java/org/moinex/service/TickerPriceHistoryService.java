@@ -30,9 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service for managing ticker price history
- */
+/** Service for managing ticker price history */
 @Service
 @NoArgsConstructor
 public class TickerPriceHistoryService {
@@ -61,6 +59,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Store a price history entry
+     *
      * @param ticker The ticker
      * @param priceDate The price date
      * @param closingPrice The closing price
@@ -103,8 +102,9 @@ public class TickerPriceHistoryService {
     }
 
     /**
-     * Delete any existing price record for the current month
-     * This ensures we only keep the most recent price for the current month
+     * Delete any existing price record for the current month This ensures we only keep the most
+     * recent price for the current month
+     *
      * @param tickerId The ticker ID
      * @param month The month to clean up
      */
@@ -132,6 +132,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Fetch and store historical prices for a ticker from a start date
+     *
      * @param ticker The ticker
      * @param startDate The start date (usually first purchase date)
      * @return CompletableFuture that completes when prices are stored
@@ -144,6 +145,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Fetch and store historical prices for a ticker within a date range
+     *
      * @param ticker The ticker
      * @param startDate The start date
      * @param endDate The end date
@@ -158,6 +160,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Fetch and store historical prices with retry and exponential backoff
+     *
      * @param ticker The ticker
      * @param startDate The start date
      * @param endDate The end date
@@ -333,6 +336,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Get the price of a ticker on a specific date (or the most recent price before that date)
+     *
      * @param tickerId The ticker ID
      * @param date The date
      * @return Optional containing the price if found
@@ -345,8 +349,9 @@ public class TickerPriceHistoryService {
     }
 
     /**
-     * Get the closest price before or on a specific date
-     * Alias for getPriceOnDate for better readability
+     * Get the closest price before or on a specific date Alias for getPriceOnDate for better
+     * readability
+     *
      * @param ticker The ticker
      * @param date The date
      * @return Optional containing the price if found
@@ -361,8 +366,9 @@ public class TickerPriceHistoryService {
     }
 
     /**
-     * Check if historical data is complete for a ticker
-     * Verifies if data exists from first purchase date (or before) until now
+     * Check if historical data is complete for a ticker Verifies if data exists from first purchase
+     * date (or before) until now
+     *
      * @param tickerId The ticker ID
      * @param firstPurchaseDate The date of first purchase or created_at
      * @return True if historical data is complete
@@ -399,6 +405,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Get the earliest price date for a ticker
+     *
      * @param tickerId The ticker ID
      * @return Optional containing the earliest date
      */
@@ -409,10 +416,9 @@ public class TickerPriceHistoryService {
     }
 
     /**
-     * Smart initialization: Update price history for all tickers
-     * - For tickers without history: fetch from first purchase date
-     * - For tickers with history: update only current month if needed
-     * This method is designed to run asynchronously on application startup
+     * Smart initialization: Update price history for all tickers - For tickers without history:
+     * fetch from first purchase date - For tickers with history: update only current month if
+     * needed This method is designed to run asynchronously on application startup
      *
      * @param tickerPurchaseRepository Repository to get first purchase dates
      * @return CompletableFuture that completes when all updates are done
@@ -585,6 +591,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Get the first purchase date for a ticker
+     *
      * @param tickerId The ticker ID
      * @param tickerPurchaseRepository Repository to query purchases
      * @return First purchase date or null if no purchases
@@ -600,8 +607,9 @@ public class TickerPriceHistoryService {
     }
 
     /**
-     * Get all transaction dates (purchases and sales) for a ticker
-     * Also includes createdAt date if ticker has initial quantity before first purchase
+     * Get all transaction dates (purchases and sales) for a ticker Also includes createdAt date if
+     * ticker has initial quantity before first purchase
+     *
      * @param tickerId The ticker ID
      * @param tickerPurchaseRepository Repository to query purchases
      * @param tickerSaleRepository Repository to query sales
@@ -676,6 +684,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Check if price history exists for all transaction dates
+     *
      * @param ticker The ticker
      * @param transactionDates List of transaction dates to check
      * @return List of dates missing price history
@@ -709,6 +718,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Fetch and store prices for specific dates
+     *
      * @param ticker The ticker
      * @param dates List of dates to fetch prices for
      * @return CompletableFuture that completes when prices are stored
@@ -748,6 +758,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Fetch and store historical prices for specific dates within a range
+     *
      * @param ticker The ticker
      * @param startDate The start date
      * @param endDate The end date
@@ -762,6 +773,7 @@ public class TickerPriceHistoryService {
 
     /**
      * Fetch and store historical prices for specific dates within a range with retry logic
+     *
      * @param ticker The ticker
      * @param startDate The start date
      * @param endDate The end date

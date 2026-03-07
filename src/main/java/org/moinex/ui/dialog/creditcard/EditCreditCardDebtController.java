@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Credit Card Debt dialog
- */
+/** Controller for the Edit Credit Card Debt dialog */
 @Controller
 @NoArgsConstructor
 public final class EditCreditCardDebtController extends BaseCreditCardDebtManagement {
@@ -118,7 +116,9 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
             // Get the date of the first payment to check if the invoice month is the
             // same
             CreditCardPayment firstPayment =
-                    creditCardService.getPaymentsByDebtOrderedByInstallment(crcDebt.getId()).getFirst();
+                    creditCardService
+                            .getPaymentsByDebtOrderedByInstallment(crcDebt.getId())
+                            .getFirst();
 
             YearMonth invoice =
                     YearMonth.of(

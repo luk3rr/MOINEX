@@ -30,9 +30,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Base class to implement the common behavior of the Add and Edit Dividend
- */
+/** Base class to implement the common behavior of the Add and Edit Dividend */
 @NoArgsConstructor
 public abstract class BaseDividendManagement {
     @FXML protected Label tickerNameLabel;
@@ -79,6 +77,7 @@ public abstract class BaseDividendManagement {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
@@ -207,7 +206,8 @@ public abstract class BaseDividendManagement {
     }
 
     protected void loadSuggestionsFromDatabase() {
-        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(WalletTransactionType.INCOME));
+        suggestionsHandler.setSuggestions(
+                walletService.getWalletTransactionSuggestionsByType(WalletTransactionType.INCOME));
     }
 
     protected void populateComboBoxes() {

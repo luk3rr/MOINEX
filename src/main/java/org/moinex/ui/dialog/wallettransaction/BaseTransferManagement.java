@@ -33,9 +33,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Controller for the Add Transfer dialog
- */
+/** Controller for the Add Transfer dialog */
 @NoArgsConstructor
 public abstract class BaseTransferManagement {
     @FXML protected Label senderWalletAfterBalanceValueLabel;
@@ -183,9 +181,7 @@ public abstract class BaseTransferManagement {
                 UIUtils.formatCurrency(receiverWt.getBalance()));
     }
 
-    /**
-     * Wrapper to update the projected balance of the sender wallet
-     */
+    /** Wrapper to update the projected balance of the sender wallet */
     protected void updateSenderWalletAfterBalance() {
         updateAfterBalance(
                 senderWalletComboBox.getValue(),
@@ -194,9 +190,7 @@ public abstract class BaseTransferManagement {
                 true);
     }
 
-    /**
-     * Wrapper to update the projected balance of the receiver wallet
-     */
+    /** Wrapper to update the projected balance of the receiver wallet */
     protected void updateReceiverWalletAfterBalance() {
         updateAfterBalance(
                 receiverWalletComboBox.getValue(),

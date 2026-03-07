@@ -35,9 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Credit Card Credit dialog
- */
+/** Controller for the Add Credit Card Credit dialog */
 @Controller
 @NoArgsConstructor
 public class AddCreditCardCreditController {
@@ -126,14 +124,15 @@ public class AddCreditCardCreditController {
             LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = date.atTime(currentTime);
 
-            creditCardService.addRebate(new CreditCardCredit(
-                    null, // id (auto-generated)
-                    creditType, // type
-                    crc, // creditCard
-                    dateTimeWithCurrentHour, // date
-                    creditValue, // amount
-                    description // description
-            ));
+            creditCardService.addRebate(
+                    new CreditCardCredit(
+                            null, // id (auto-generated)
+                            creditType, // type
+                            crc, // creditCard
+                            dateTimeWithCurrentHour, // date
+                            creditValue, // amount
+                            description // description
+                            ));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

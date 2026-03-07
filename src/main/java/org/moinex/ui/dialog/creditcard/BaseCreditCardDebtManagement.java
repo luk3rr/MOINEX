@@ -37,9 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/**
- * Base class for the Add Credit Card Debt and Edit Credit Card Debt dialogs
- */
+/** Base class for the Add Credit Card Debt and Edit Credit Card Debt dialogs */
 @NoArgsConstructor
 public abstract class BaseCreditCardDebtManagement {
     @FXML protected ComboBox<CreditCard> crcComboBox;

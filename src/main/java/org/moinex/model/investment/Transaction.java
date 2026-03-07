@@ -18,9 +18,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.moinex.model.wallettransaction.WalletTransaction;
 
-/**
- * Base class for transactions in the investment domain
- */
+/** Base class for transactions in the investment domain */
 @MappedSuperclass
 @Getter
 @Setter

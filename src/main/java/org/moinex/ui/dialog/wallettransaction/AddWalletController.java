@@ -24,9 +24,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Add Wallet dialog
- */
+/** Controller for the Add Wallet dialog */
 @Controller
 @NoArgsConstructor
 public class AddWalletController {
@@ -44,6 +42,7 @@ public class AddWalletController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
@@ -99,7 +98,8 @@ public class AddWalletController {
             BigDecimal walletBalance =
                     new BigDecimal(walletBalanceStr.isEmpty() ? "0" : walletBalanceStr);
 
-            walletService.createWallet(new Wallet(null, walletType, walletName, walletBalance, false, null));
+            walletService.createWallet(
+                    new Wallet(null, walletType, walletName, walletBalance, false, null));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(
@@ -128,16 +128,12 @@ public class AddWalletController {
         }
     }
 
-    /**
-     * Load the wallet types
-     */
+    /** Load the wallet types */
     private void loadWalletTypes() {
         walletTypes = walletService.getAllWalletTypes();
     }
 
-    /**
-     * Populate the wallet type combo box
-     */
+    /** Populate the wallet type combo box */
     private void populateWalletTypeComboBox() {
         String nameToMove = "Others";
 

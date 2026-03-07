@@ -28,9 +28,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Archived Wallets dialog
- */
+/** Controller for the Archived Wallets dialog */
 @Controller
 @NoArgsConstructor
 public class ArchivedWalletsController {
@@ -46,13 +44,12 @@ public class ArchivedWalletsController {
 
     /**
      * Constructor
+     *
      * @param walletService WalletService
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ArchivedWalletsController(
-            WalletService walletService,
-            I18nService i18nService) {
+    public ArchivedWalletsController(WalletService walletService, I18nService i18nService) {
         this.walletService = walletService;
         this.i18nService = i18nService;
     }
@@ -138,7 +135,8 @@ public class ArchivedWalletsController {
         }
 
         // Prevent the removal of a wallet with associated transactions
-        if (walletService.getWalletTransactionAndTransferCountByWallet(selectedWallet.getId()) > 0) {
+        if (walletService.getWalletTransactionAndTransferCountByWallet(selectedWallet.getId())
+                > 0) {
             WindowUtils.showInformationDialog(
                     i18nService.tr(
                             Constants.TranslationKeys
@@ -190,16 +188,12 @@ public class ArchivedWalletsController {
         stage.close();
     }
 
-    /**
-     * Loads the categories from the database
-     */
+    /** Loads the categories from the database */
     private void loadArchivedWalletsFromDatabase() {
         archivedWallets = walletService.getAllArchivedWallets();
     }
 
-    /**
-     * Updates the category table view
-     */
+    /** Updates the category table view */
     private void updateWalletTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -226,9 +220,7 @@ public class ArchivedWalletsController {
         walletTableView.refresh();
     }
 
-    /**
-     * Configures the table view columns
-     */
+    /** Configures the table view columns */
     private void configureTableView() {
         TableColumn<Wallet, Integer> idColumn = getWalletLongTableColumn();
 

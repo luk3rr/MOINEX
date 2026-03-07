@@ -42,9 +42,7 @@ public class Dividend {
     @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id", nullable = false)
     private WalletTransaction walletTransaction;
 
-    /**
-     * Constructor for testing purposes
-     */
+    /** Constructor for testing purposes */
     public Dividend(Integer id, Ticker ticker, WalletTransaction walletTransaction) {
         this.id = id;
         this.ticker = ticker;

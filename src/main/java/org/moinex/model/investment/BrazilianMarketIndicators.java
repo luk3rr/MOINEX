@@ -66,6 +66,7 @@ public class BrazilianMarketIndicators {
 
     /**
      * Get the reference of the IPCA of the last month
+     *
      * @return The reference of the IPCA of the last month
      */
     public YearMonth getIpcaLastMonthReference() {
@@ -78,6 +79,7 @@ public class BrazilianMarketIndicators {
 
     /**
      * Get the last update of the Brazilian market indicators
+     *
      * @return The last update of the Brazilian market indicators
      */
     public LocalDateTime getLastUpdate() {
@@ -90,6 +92,7 @@ public class BrazilianMarketIndicators {
 
     /**
      * Set the reference of the IPCA of the last month
+     *
      * @param ipcaLastMonthReference The reference of the IPCA of the last month
      */
     public void setIpcaLastMonthReference(YearMonth ipcaLastMonthReference) {
@@ -104,6 +107,7 @@ public class BrazilianMarketIndicators {
 
     /**
      * Set the last update of the Brazilian market indicators
+     *
      * @param lastUpdate The last update of the Brazilian market indicators
      */
     public void setLastUpdate(LocalDateTime lastUpdate) {

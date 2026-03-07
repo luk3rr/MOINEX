@@ -13,27 +13,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Cache Maven packages
+      - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
 
       - name: Build project
-        run: mvn clean compile dependency:copy-dependencies
+        run: ./gradlew clean build -x test
 
       - name: Check code formatting
-        run: mvn spotless:check
+        run: ./gradlew spotlessCheck ktlintCheck
 
       - name: Run tests and generate Jacoco report
-        run: mvn test jacoco:report
+        run: ./gradlew test jacocoTestReport
 
       - name: Run SonarCloud analysis
         uses: SonarSource/sonarqube-scan-action@master

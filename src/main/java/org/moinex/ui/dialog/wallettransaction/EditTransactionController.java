@@ -34,9 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Edit Transaction dialog
- */
+/** Controller for the Edit Transaction dialog */
 @Controller
 @NoArgsConstructor
 public final class EditTransactionController extends BaseWalletTransactionManagement {
@@ -47,9 +45,12 @@ public final class EditTransactionController extends BaseWalletTransactionManage
     /**
      * Constructor
      *
-     * @param walletService            WalletService
-     * @param categoryService          CategoryService
-     * @param calculatorService        CalculatorService
+     * @param walletService WalletService
+     * @param categoryService CategoryService
+     * @param calculatorService CalculatorService
+     * @param walletService WalletService
+     * @param categoryService CategoryService
+     * @param calculatorService CalculatorService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -59,12 +60,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             CalculatorService calculatorService,
             I18nService i18nService,
             ConfigurableApplicationContext springContext) {
-        super(
-                walletService,
-                categoryService,
-                calculatorService,
-                i18nService,
-                springContext);
+        super(walletService, categoryService, calculatorService, i18nService, springContext);
     }
 
     public void setTransaction(WalletTransaction wt) {
@@ -325,6 +321,7 @@ public final class EditTransactionController extends BaseWalletTransactionManage
             return;
         }
 
-        suggestionsHandler.setSuggestions(walletService.getWalletTransactionSuggestionsByType(typeComboBox.getValue()));
+        suggestionsHandler.setSuggestions(
+                walletService.getWalletTransactionSuggestionsByType(typeComboBox.getValue()));
     }
 }

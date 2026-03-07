@@ -88,8 +88,8 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Calculate fixed interest (prefixado) using compound interest
-     * Formula: Valor_Investido × [(1 + Taxa_Anual/100)^(Dias_Úteis/252) - 1]
+     * Calculate fixed interest (prefixado) using compound interest Formula: Valor_Investido × [(1 +
+     * Taxa_Anual/100)^(Dias_Úteis/252) - 1]
      *
      * @param bond The bond
      * @param startDate Period start date
@@ -157,9 +157,9 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Calculate floating interest (pós-fixado) using compound interest
-     * Formula: Valor_Investido × (Taxa_Acumulada - 1)
-     * Where Taxa_Acumulada = ∏[(1 + CDI_Anual_Dia/100)^(1/252) × Percentual_CDI]
+     * Calculate floating interest (pós-fixado) using compound interest Formula: Valor_Investido ×
+     * (Taxa_Acumulada - 1) Where Taxa_Acumulada = ∏[(1 + CDI_Anual_Dia/100)^(1/252) ×
+     * Percentual_CDI]
      *
      * @param bond The bond
      * @param startDate Period start date
@@ -214,11 +214,10 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Get accumulated indicator rate between two dates using compound interest
-     * Formula: ∏[(1 + Taxa_Anual_Dia/100)^(1/252) × (Percentual/100)]
-     * IMPORTANT: The BACEN API only provides data for business days (dias úteis).
-     * We iterate through the historical data provided by the API, which already
-     * excludes weekends and holidays according to ANBIMA calendar.
+     * Get accumulated indicator rate between two dates using compound interest Formula: ∏[(1 +
+     * Taxa_Anual_Dia/100)^(1/252) × (Percentual/100)] IMPORTANT: The BACEN API only provides data
+     * for business days (dias úteis). We iterate through the historical data provided by the API,
+     * which already excludes weekends and holidays according to ANBIMA calendar.
      *
      * @param indicatorType The indicator type
      * @param startDate Start date
@@ -322,9 +321,8 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Synchronize monthly interest calculations for all bonds
-     * Ensures all bonds have their monthly interest history up to date
-     * Called on application startup
+     * Synchronize monthly interest calculations for all bonds Ensures all bonds have their monthly
+     * interest history up to date Called on application startup
      */
     @Transactional
     public void calculateInterestForAllBondsIfNeeded() {
@@ -452,9 +450,7 @@ public class BondInterestCalculationService {
         return monthlyInterest;
     }
 
-    /**
-     * Result of period interest calculation with the actual last date calculated
-     */
+    /** Result of period interest calculation with the actual last date calculated */
     private record PeriodInterestResult(BigDecimal interest, LocalDate lastDateWithData) {}
 
     /**
@@ -485,8 +481,8 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Calculate interest for a specific period within a month
-     * Used for incremental calculations when a month was manually adjusted
+     * Calculate interest for a specific period within a month Used for incremental calculations
+     * when a month was manually adjusted
      *
      * @param bond The bond
      * @param month The month
@@ -684,12 +680,43 @@ public class BondInterestCalculationService {
             YearMonth lastMonth = lastCalculation.get().getReferenceMonth();
             accumulatedInterest = lastCalculation.get().getAccumulatedInterest();
 
-            // Only recalculate if there are missing months or if it's the current month
+            // Check if we need to recalculate previous month that might be incomplete
+            YearMonth previousMonth = currentMonth.minusMonths(1);
             if (lastMonth.equals(currentMonth)) {
-                log.debug(
-                        "Bond {} already has calculation for current month, only updating it",
-                        bond.getName());
-                monthToStart = currentMonth;
+                // Current month exists, but check if previous month is complete
+                Optional<BondInterestCalculation> previousMonthCalc =
+                        bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                                bond, previousMonth.toString());
+
+                if (previousMonthCalc.isPresent()) {
+                    LocalDate previousMonthEnd = previousMonth.atEndOfMonth();
+                    LocalDate calculatedUntil = previousMonthCalc.get().getCalculatedUntilDate();
+
+                    // If previous month is incomplete, start from there
+                    if (calculatedUntil != null && calculatedUntil.isBefore(previousMonthEnd)) {
+                        log.info(
+                                "Bond {} previous month {} is incomplete (calculated until {}), recalculating from there",
+                                bond.getName(),
+                                previousMonth,
+                                calculatedUntil);
+                        monthToStart = previousMonth;
+                        accumulatedInterest =
+                                previousMonthCalc
+                                        .get()
+                                        .getAccumulatedInterest()
+                                        .subtract(previousMonthCalc.get().getMonthlyInterest());
+                    } else {
+                        log.debug(
+                                "Bond {} already has calculation for current month, only updating it",
+                                bond.getName());
+                        monthToStart = currentMonth;
+                    }
+                } else {
+                    log.debug(
+                            "Bond {} already has calculation for current month, only updating it",
+                            bond.getName());
+                    monthToStart = currentMonth;
+                }
             } else {
                 monthToStart = lastMonth.plusMonths(1);
                 log.info(
@@ -762,8 +789,8 @@ public class BondInterestCalculationService {
 
                             log.debug(
                                     "Incremental update for manually adjusted bond {} month {}:"
-                                        + " added={}, new monthly={}, accumulated={}, calculated"
-                                        + " until={}",
+                                            + " added={}, new monthly={}, accumulated={}, calculated"
+                                            + " until={}",
                                     bond.getName(),
                                     month,
                                     result.interest(),
@@ -792,17 +819,30 @@ public class BondInterestCalculationService {
                 } else {
                     // NORMAL RECALCULATION: Recalculate entire month
                     BigDecimal monthlyInterest = calculateMonthlyInterest(bond, month);
+
+                    // Get accumulated from previous month (may have been updated in this loop)
+                    YearMonth previousMonth = month.minusMonths(1);
+                    Optional<BondInterestCalculation> previousCalc =
+                            bondInterestCalculationRepository.findByBondAndReferenceMonth(
+                                    bond, previousMonth.toString());
+
                     BigDecimal previousAccumulated =
-                            existing.getAccumulatedInterest()
-                                    .subtract(existing.getMonthlyInterest());
+                            previousCalc
+                                    .map(BondInterestCalculation::getAccumulatedInterest)
+                                    .orElse(BigDecimal.ZERO);
+
                     BigDecimal newAccumulated = previousAccumulated.add(monthlyInterest);
                     BigDecimal finalValue = investedAmount.add(newAccumulated);
 
                     LocalDate monthStart = month.atDay(1);
                     LocalDate monthEnd = month.atEndOfMonth();
                     LocalDate today = LocalDate.now();
-                    LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-                    LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+                    // Always search until today to catch data that became available after month end
+                    LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+                    // But limit the calculated date to the month end
+                    if (calculatedUntil.isAfter(monthEnd)) {
+                        calculatedUntil = monthEnd;
+                    }
 
                     existing.setCalculationDate(LocalDate.now());
                     existing.setCalculatedUntilDate(calculatedUntil);
@@ -832,8 +872,12 @@ public class BondInterestCalculationService {
                 LocalDate monthStart = month.atDay(1);
                 LocalDate monthEnd = month.atEndOfMonth();
                 LocalDate today = LocalDate.now();
-                LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-                LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+                // Always search until today to catch data that became available after month end
+                LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+                // But limit the calculated date to the month end
+                if (calculatedUntil.isAfter(monthEnd)) {
+                    calculatedUntil = monthEnd;
+                }
 
                 BondInterestCalculation calculation =
                         BondInterestCalculation.builder()
@@ -931,8 +975,8 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Get current month interest from database (calculated at startup)
-     * Does not recalculate, only retrieves stored value for current month
+     * Get current month interest from database (calculated at startup) Does not recalculate, only
+     * retrieves stored value for current month
      *
      * @param bondId The bond ID
      * @return Current month interest from database
@@ -1002,8 +1046,12 @@ public class BondInterestCalculationService {
         LocalDate monthStart = month.atDay(1);
         LocalDate monthEnd = month.atEndOfMonth();
         LocalDate today = LocalDate.now();
-        LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+        // Always search until today to catch data that became available after month end
+        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+        // But limit the calculated date to the month end
+        if (calculatedUntil.isAfter(monthEnd)) {
+            calculatedUntil = monthEnd;
+        }
 
         calculation.setMonthlyInterest(newMonthlyInterest);
         calculation.setManuallyAdjusted(true);
@@ -1101,8 +1149,12 @@ public class BondInterestCalculationService {
         LocalDate monthStart = month.atDay(1);
         LocalDate monthEnd = month.atEndOfMonth();
         LocalDate today = LocalDate.now();
-        LocalDate searchEnd = today.isAfter(monthEnd) ? monthEnd : today;
-        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, searchEnd);
+        // Always search until today to catch data that became available after month end
+        LocalDate calculatedUntil = getLastDateWithData(bond, monthStart, today);
+        // But limit the calculated date to the month end
+        if (calculatedUntil.isAfter(monthEnd)) {
+            calculatedUntil = monthEnd;
+        }
 
         calculation.setMonthlyInterest(recalculatedInterest);
         calculation.setManuallyAdjusted(false);
@@ -1155,8 +1207,8 @@ public class BondInterestCalculationService {
     }
 
     /**
-     * Recalculate all monthly interest calculations for a bond from scratch
-     * Deletes all existing calculations and recalculates from the first operation
+     * Recalculate all monthly interest calculations for a bond from scratch Deletes all existing
+     * calculations and recalculates from the first operation
      *
      * @param bondId The bond ID
      */

@@ -17,9 +17,7 @@ import lombok.Setter;
 import org.moinex.model.enums.PeriodType;
 import org.moinex.util.Constants;
 
-/**
- * Entity that stores fundamental analysis data for a ticker
- */
+/** Entity that stores fundamental analysis data for a ticker */
 @Entity
 @Table(name = "fundamental_analysis")
 @NoArgsConstructor

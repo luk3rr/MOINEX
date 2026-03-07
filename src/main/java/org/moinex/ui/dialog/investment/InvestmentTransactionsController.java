@@ -37,9 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Investment Transactions dialog
- */
+/** Controller for the Investment Transactions dialog */
 @Controller
 @NoArgsConstructor
 public class InvestmentTransactionsController {
@@ -70,6 +68,7 @@ public class InvestmentTransactionsController {
 
     /**
      * Constructor
+     *
      * @param tickerService tickerService
      * @param i18nService I18n service
      * @note This constructor is used for dependency injection
@@ -177,37 +176,27 @@ public class InvestmentTransactionsController {
         stage.close();
     }
 
-    /**
-     * Loads the purchases from the database
-     */
+    /** Loads the purchases from the database */
     private void loadPurchasesFromDatabase() {
         purchases = tickerService.getAllPurchases();
     }
 
-    /**
-     * Loads the sales from the database
-     */
+    /** Loads the sales from the database */
     private void loadSalesFromDatabase() {
         sales = tickerService.getAllSales();
     }
 
-    /**
-     * Loads the dividends from the database
-     */
+    /** Loads the dividends from the database */
     private void loadDividendsFromDatabase() {
         dividends = tickerService.getAllDividends();
     }
 
-    /**
-     * Loads the crypto exchanges from the database
-     */
+    /** Loads the crypto exchanges from the database */
     private void loadCryptoExchangesFromDatabase() {
         cryptoExchanges = tickerService.getAllCryptoExchanges();
     }
 
-    /**
-     * Updates dividend table view
-     */
+    /** Updates dividend table view */
     private void updateDividendTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -249,9 +238,7 @@ public class InvestmentTransactionsController {
         dividendTableView.refresh();
     }
 
-    /**
-     * Updates purchase table view
-     */
+    /** Updates purchase table view */
     private void updatePurchaseTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -297,9 +284,7 @@ public class InvestmentTransactionsController {
         purchaseTableView.refresh();
     }
 
-    /**
-     * Updates sale table view
-     */
+    /** Updates sale table view */
     private void updateSaleTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -345,9 +330,7 @@ public class InvestmentTransactionsController {
         saleTableView.refresh();
     }
 
-    /**
-     * Updates the crypto exchange table view
-     */
+    /** Updates the crypto exchange table view */
     private void updateCryptoExchangeTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -384,9 +367,7 @@ public class InvestmentTransactionsController {
         cryptoExchangeTableView.refresh();
     }
 
-    /**
-     * Configure the purchase table view columns
-     */
+    /** Configure the purchase table view columns */
     private void configurePurchaseTableView() {
         TableColumn<TickerPurchase, Integer> idColumn = getTickerPurchaseLongTableColumn();
 
@@ -496,9 +477,7 @@ public class InvestmentTransactionsController {
         return idColumn;
     }
 
-    /**
-     * Configure the sale table view columns
-     */
+    /** Configure the sale table view columns */
     private void configureSaleTableView() {
         TableColumn<TickerSale, Integer> idColumn = getTickerSaleLongTableColumn();
 
@@ -608,9 +587,7 @@ public class InvestmentTransactionsController {
         return idColumn;
     }
 
-    /**
-     * Configure the table view columns
-     */
+    /** Configure the table view columns */
     private void configureDividendTableView() {
         TableColumn<Dividend, Integer> idColumn = getDividendLongTableColumn();
 
@@ -704,9 +681,7 @@ public class InvestmentTransactionsController {
         return idColumn;
     }
 
-    /**
-     * Configure the table view columns
-     */
+    /** Configure the table view columns */
     private void configureCryptoExchangeTableView() {
         TableColumn<CryptoExchange, Integer> idColumn = getCryptoExchangeLongTableColumn();
 

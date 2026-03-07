@@ -56,9 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the home view
- */
+/** Controller for the home view */
 @Controller
 @NoArgsConstructor
 public class HomeController {
@@ -128,6 +126,7 @@ public class HomeController {
 
     /**
      * Constructor for injecting the wallet and credit card services
+     *
      * @param walletService The wallet service
      * @param recurringTransactionService The recurring transaction service
      * @param creditCardService The credit card service
@@ -173,8 +172,8 @@ public class HomeController {
     }
 
     /**
-     * Recalculate all net worth snapshots asynchronously
-     * This method triggers a background calculation that won't block the UI
+     * Recalculate all net worth snapshots asynchronously This method triggers a background
+     * calculation that won't block the UI
      */
     @FXML
     public void handleRecalculateNetWorth() {
@@ -201,9 +200,7 @@ public class HomeController {
                         });
     }
 
-    /**
-     * Disable recalculate button and show loading state
-     */
+    /** Disable recalculate button and show loading state */
     private void setOffRecalculateButton() {
         recalculateNetWorthButtonIcon.setImage(
                 new Image(
@@ -215,9 +212,7 @@ public class HomeController {
                         Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING));
     }
 
-    /**
-     * Enable recalculate button and restore default state
-     */
+    /** Enable recalculate button and restore default state */
     private void setOnRecalculateButton() {
         recalculateNetWorthButton.setDisable(false);
         recalculateNetWorthButtonIcon.setImage(
@@ -228,9 +223,7 @@ public class HomeController {
                 i18nService.tr(Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON));
     }
 
-    /**
-     * Set the actions for the buttons
-     */
+    /** Set the actions for the buttons */
     private void setButtonsActions() {
         walletPrevButton.setOnAction(
                 event -> {
@@ -283,31 +276,26 @@ public class HomeController {
                 });
     }
 
-    /**
-     * Load wallets from the database
-     */
+    /** Load wallets from the database */
     private void loadWalletsFromDatabase() {
         wallets = walletService.getAllNonArchivedWalletsOrderedByName();
     }
 
-    /**
-     * Load credit cards from the database
-     */
+    /** Load credit cards from the database */
     private void loadCreditCardsFromDatabase() {
         creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByName();
     }
 
     /**
      * Load the last transactions from the database
+     *
      * @param n The number of transactions to be loaded
      */
     private void loadLastTransactionsFromDatabase(Integer n) {
         transactions = walletService.getAllNonArchivedLastWalletTransactions(n);
     }
 
-    /**
-     * Update the display of wallets
-     */
+    /** Update the display of wallets */
     private void updateDisplayWallets() {
         walletView1.getChildren().clear();
         walletView2.getChildren().clear();
@@ -337,9 +325,7 @@ public class HomeController {
         walletNextButton.setDisable(end >= wallets.size());
     }
 
-    /**
-     * Update the display of credit cards
-     */
+    /** Update the display of credit cards */
     private void updateDisplayCreditCards() {
         creditCardView1.getChildren().clear();
         creditCardView2.getChildren().clear();
@@ -369,9 +355,7 @@ public class HomeController {
         creditCardNextButton.setDisable(end >= creditCards.size());
     }
 
-    /**
-     * Update the display of the last transactions using VBox
-     */
+    /** Update the display of the last transactions using VBox */
     private void updateDisplayLastTransactions() {
         transactionsTableView.getColumns().clear();
 
@@ -490,9 +474,7 @@ public class HomeController {
         transactionsTableView.setItems(FXCollections.observableArrayList(transactions));
     }
 
-    /**
-     * Update the chart with incomes and expenses for the last months
-     */
+    /** Update the chart with incomes and expenses for the last months */
     private void updateMoneyFlowBarChart() {
         createMoneyFlowBarChart();
 
@@ -515,7 +497,8 @@ public class HomeController {
 
             // Get transactions
             List<WalletTransaction> nonArchivedTransactions =
-                    walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(year, month));
+                    walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(
+                            YearMonth.of(year, month));
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
@@ -532,7 +515,8 @@ public class HomeController {
                     year);
 
             BigDecimal crcPaidPayments =
-                    creditCardService.getTotalEffectivePaidPaymentsByMonth(YearMonth.of(year, month));
+                    creditCardService.getTotalEffectivePaidPaymentsByMonth(
+                            YearMonth.of(year, month));
 
             BigDecimal crcPendingPayments =
                     creditCardService.getTotalPendingPaymentsByMonth(YearMonth.of(year, month));
@@ -629,9 +613,7 @@ public class HomeController {
         }
     }
 
-    /**
-     * Update the display of the month resume
-     */
+    /** Update the display of the month resume */
     private void updateMonthResume() {
         try {
             FXMLLoader loader =
@@ -681,6 +663,7 @@ public class HomeController {
 
     /**
      * Create a node for a credit card
+     *
      * @param creditCard The credit card to be displayed
      * @return The HBox containing the credit card information
      */
@@ -751,6 +734,7 @@ public class HomeController {
 
     /**
      * Create a node for a wallet
+     *
      * @param wallet The wallet to be displayed
      * @return The HBox containing the wallet information
      */
@@ -817,9 +801,7 @@ public class HomeController {
         return rootHbox;
     }
 
-    /**
-     * Create a new bar chart
-     */
+    /** Create a new bar chart */
     private void createMoneyFlowBarChart() {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -827,9 +809,7 @@ public class HomeController {
         moneyFlowBarChart = new BarChart<>(xAxis, yAxis);
     }
 
-    /**
-     * Update the display of graphs based on the current page
-     */
+    /** Update the display of graphs based on the current page */
     private void updateDisplayGraphs() {
         graphView.getChildren().clear();
 
@@ -860,9 +840,7 @@ public class HomeController {
         graphNextButton.setDisable(graphPaneCurrentPage >= 1);
     }
 
-    /**
-     * Update the net worth line chart with assets, liabilities and net worth
-     */
+    /** Update the net worth line chart with assets, liabilities and net worth */
     private void updateNetWorthLineChart() {
         List<NetWorthLineChart.NetWorthDataPoint> dataPoints = calculateNetWorthData();
 
@@ -881,8 +859,9 @@ public class HomeController {
     }
 
     /**
-     * Calculate net worth data for the chart
-     * Uses cached snapshots when available to avoid expensive recalculations
+     * Calculate net worth data for the chart Uses cached snapshots when available to avoid
+     * expensive recalculations
+     *
      * @return List of net worth data points
      */
     private List<NetWorthLineChart.NetWorthDataPoint> calculateNetWorthData() {

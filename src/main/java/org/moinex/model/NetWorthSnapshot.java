@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Represents a cached snapshot of net worth calculation for a specific month
- * This avoids expensive recalculations on every page load
+ * Represents a cached snapshot of net worth calculation for a specific month This avoids expensive
+ * recalculations on every page load
  */
 @Entity
 @Table(name = "net_worth_snapshot")

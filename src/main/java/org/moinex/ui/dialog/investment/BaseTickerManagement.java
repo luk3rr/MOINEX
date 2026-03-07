@@ -18,9 +18,7 @@ import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Base class to implement common methods for AddTickerController and EditTickerController
- */
+/** Base class to implement common methods for AddTickerController and EditTickerController */
 @NoArgsConstructor
 public abstract class BaseTickerManagement {
     @FXML protected TextField nameField;
@@ -40,6 +38,7 @@ public abstract class BaseTickerManagement {
 
     /**
      * Constructor
+     *
      * @param tickerService Ticker service
      * @note This constructor is used for dependency injection
      */

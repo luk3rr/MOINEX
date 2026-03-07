@@ -27,9 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Remove category dialog
- */
+/** Controller for the Remove category dialog */
 @Controller
 @NoArgsConstructor
 public class ManageCategoryController {
@@ -47,6 +45,7 @@ public class ManageCategoryController {
 
     /**
      * Constructor
+     *
      * @param categoryService The category service
      * @note This constructor is used for dependency injection
      */
@@ -167,16 +166,12 @@ public class ManageCategoryController {
         stage.close();
     }
 
-    /**
-     * Loads the categories from the database
-     */
+    /** Loads the categories from the database */
     private void loadCategoryFromDatabase() {
         categories = categoryService.getCategories();
     }
 
-    /**
-     * Updates the category table view
-     */
+    /** Updates the category table view */
     private void updateCategoryTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -203,9 +198,7 @@ public class ManageCategoryController {
         categoryTableView.refresh();
     }
 
-    /**
-     * Configures the table view columns
-     */
+    /** Configures the table view columns */
     private void configureTableView() {
         TableColumn<Category, Integer> idColumn = getCategoryLongTableColumn();
 
@@ -264,7 +257,8 @@ public class ManageCategoryController {
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
-                                categoryService.getTransactionCountByCategory(param.getValue().getId())));
+                                categoryService.getTransactionCountByCategory(
+                                        param.getValue().getId())));
 
         numOfTransactionsColumn.setCellFactory(
                 column ->

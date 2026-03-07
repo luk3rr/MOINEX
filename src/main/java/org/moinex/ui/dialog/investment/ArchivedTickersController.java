@@ -30,9 +30,7 @@ import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Archived Tickers dialog
- */
+/** Controller for the Archived Tickers dialog */
 @Controller
 @NoArgsConstructor
 public class ArchivedTickersController {
@@ -47,6 +45,7 @@ public class ArchivedTickersController {
 
     /**
      * Constructor
+     *
      * @param tickerService tickerService
      * @param i18nService I18n service
      * @note This constructor is used for dependency injection
@@ -192,16 +191,12 @@ public class ArchivedTickersController {
         stage.close();
     }
 
-    /**
-     * Loads the archived tickers from the database
-     */
+    /** Loads the archived tickers from the database */
     private void loadArchivedTickersFromDatabase() {
         archivedTickers = tickerService.getAllArchivedTickers();
     }
 
-    /**
-     * Updates the archived ticker table view
-     */
+    /** Updates the archived ticker table view */
     private void updateTickerTableView() {
         String similarTextOrId = searchField.getText().toLowerCase();
 
@@ -239,9 +234,7 @@ public class ArchivedTickersController {
         tickerTableView.refresh();
     }
 
-    /**
-     * Configure the table view columns
-     */
+    /** Configure the table view columns */
     private void configureTableView() {
         TableColumn<Ticker, Integer> idColumn = getTickerLongTableColumn();
 

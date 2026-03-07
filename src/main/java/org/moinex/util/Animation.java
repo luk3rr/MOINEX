@@ -15,16 +15,14 @@ import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-/**
- * Static methods to create animations
- */
+/** Static methods to create animations */
 public final class Animation {
     private Animation() {}
 
     /**
      * Animates a bar chart
      *
-     * @param data        The data to be animated
+     * @param data The data to be animated
      * @param targetValue The target value for the bar
      */
     public static void xyChartAnimation(XYChart.Data<String, Number> data, Double targetValue) {
@@ -51,7 +49,7 @@ public final class Animation {
     /**
      * Animates a stacked bar chart
      *
-     * @param data         The data to be animated
+     * @param data The data to be animated
      * @param targetValues The target values for each part of the stacked bar
      */
     public static void stackedXYChartAnimation(
@@ -123,7 +121,7 @@ public final class Animation {
      * Sets the bounds of the Y axis of a bar chart dynamically
      *
      * @param numberAxis The Y axis to be updated
-     * @param maxValue   The maximum value of the data
+     * @param maxValue The maximum value of the data
      */
     public static void setDynamicYAxisBounds(NumberAxis numberAxis, Double maxValue) {
         numberAxis.setAutoRanging(false);

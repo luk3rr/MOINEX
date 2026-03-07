@@ -19,9 +19,7 @@ import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Base class to implement the common behavior of the Add and Edit Goal
- */
+/** Base class to implement the common behavior of the Add and Edit Goal */
 @NoArgsConstructor
 public abstract class BaseGoalManagement {
     @FXML protected ComboBox<Wallet> masterWalletComboBox;

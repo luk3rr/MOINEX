@@ -98,7 +98,8 @@ public class GoalFullPaneController {
     /**
      * Constructor
      *
-     * @param goalService              Goal service
+     * @param goalService Goal service
+     * @param goalService Goal service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -115,9 +116,7 @@ public class GoalFullPaneController {
         this.i18nService = i18nService;
     }
 
-    /**
-     * Load goal information from the database
-     */
+    /** Load goal information from the database */
     public void loadGoalInfo() {
         if (goal == null) {
             return;
@@ -190,8 +189,7 @@ public class GoalFullPaneController {
             missingDays.setText(
                     String.valueOf(
                             Constants.calculateDaysUntilTarget(
-                                    goal.getCompletionDate(),
-                                    goal.getTargetDate())));
+                                    goal.getCompletionDate(), goal.getTargetDate())));
 
             // Remove the fields that are not necessary
             infosVBox.getChildren().remove(currentHBox);
@@ -208,8 +206,7 @@ public class GoalFullPaneController {
 
             // Calculate the number of months until the target date
             Integer monthsUntilTarget =
-                    Constants.calculateMonthsUntilTarget(
-                            LocalDate.now(), goal.getTargetDate());
+                    Constants.calculateMonthsUntilTarget(LocalDate.now(), goal.getTargetDate());
 
             // Calculate the ideal amount per month
             BigDecimal idealAmountPerMonth;
@@ -223,8 +220,7 @@ public class GoalFullPaneController {
                                 .divide(
                                         BigDecimal.valueOf(
                                                 Constants.calculateMonthsUntilTarget(
-                                                        LocalDate.now(),
-                                                        goal.getTargetDate())),
+                                                        LocalDate.now(), goal.getTargetDate())),
                                         2,
                                         RoundingMode.HALF_UP);
             }
@@ -233,8 +229,7 @@ public class GoalFullPaneController {
 
             // Calculate the missing days
             Integer missingDaysValue =
-                    Constants.calculateDaysUntilTarget(
-                            LocalDate.now(), goal.getTargetDate());
+                    Constants.calculateDaysUntilTarget(LocalDate.now(), goal.getTargetDate());
 
             missingDays.setText(missingDaysValue.toString());
 
@@ -491,7 +486,7 @@ public class GoalFullPaneController {
      * Set the value of a label
      *
      * @param valueLabel Label to set the value
-     * @param value      Value to set
+     * @param value Value to set
      */
     private void setLabelValue(Label valueLabel, BigDecimal value) {
         valueLabel.setText(UIUtils.formatCurrency(value));

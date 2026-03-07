@@ -130,9 +130,8 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                             .getCategory()
                             .getId()
                             .equals(category.getId())
-                    && operation
-                            .getWalletTransaction()
-                            .getIncludeInAnalysis() == includeInAnalysisCheckBox.isSelected()
+                    && operation.getWalletTransaction().getIncludeInAnalysis()
+                            == includeInAnalysisCheckBox.isSelected()
                     && operation.getUnitPrice().compareTo(unitPrice) == 0
                     && operation.getQuantity().compareTo(quantity) == 0
                     && feesEqual

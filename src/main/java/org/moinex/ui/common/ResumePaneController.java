@@ -88,9 +88,9 @@ public class ResumePaneController {
     /**
      * Constructor
      *
-     * @param walletService    WalletService
+     * @param walletService WalletService
      * @param recurringTransactionService RecurringTransactionService
-     * @param creditCardService           CreditCardService
+     * @param creditCardService CreditCardService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -111,9 +111,7 @@ public class ResumePaneController {
         updateResumePane(now.getMonthValue(), now.getYear());
     }
 
-    /**
-     * Update the display of the resume
-     */
+    /** Update the display of the resume */
     public void updateResumePane(Integer year) {
         List<WalletTransaction> allYearTransactions =
                 walletService.getAllNonArchivedWalletTransactionsByYear(Year.of(year));
@@ -126,7 +124,8 @@ public class ResumePaneController {
 
         BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmountByYear(Year.of(year));
 
-        BigDecimal crcPendingPayments = creditCardService.getTotalPendingPaymentsByYear(Year.of(year));
+        BigDecimal crcPendingPayments =
+                creditCardService.getTotalPendingPaymentsByYear(Year.of(year));
 
         BigDecimal crcPaidPayments = creditCardService.getTotalPaidPaymentsByYear(Year.of(year));
 
@@ -134,13 +133,12 @@ public class ResumePaneController {
                 allYearTransactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments);
     }
 
-    /**
-     * Update the display of the month resume
-     */
+    /** Update the display of the month resume */
     public void updateResumePane(Integer month, Integer year) {
         // Get all transactions of the month that should be included in analysis
         List<WalletTransaction> transactions =
-                walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(year, month));
+                walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(
+                        YearMonth.of(year, month));
 
         List<WalletTransaction> futureTransactions =
                 recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
@@ -148,11 +146,14 @@ public class ResumePaneController {
 
         transactions.addAll(futureTransactions);
 
-        BigDecimal crcTotalDebtAmount = creditCardService.getTotalDebtAmountByMonth(YearMonth.of(year, month));
+        BigDecimal crcTotalDebtAmount =
+                creditCardService.getTotalDebtAmountByMonth(YearMonth.of(year, month));
 
-        BigDecimal crcPendingPayments = creditCardService.getTotalPendingPaymentsByMonth(YearMonth.of(year, month));
+        BigDecimal crcPendingPayments =
+                creditCardService.getTotalPendingPaymentsByMonth(YearMonth.of(year, month));
 
-        BigDecimal crcPaidPayments = creditCardService.getTotalEffectivePaidPaymentsByMonth(YearMonth.of(year, month));
+        BigDecimal crcPaidPayments =
+                creditCardService.getTotalEffectivePaidPaymentsByMonth(YearMonth.of(year, month));
 
         updateResumePane(transactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments);
     }

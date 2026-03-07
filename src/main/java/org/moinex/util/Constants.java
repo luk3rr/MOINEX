@@ -16,9 +16,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.moinex.model.enums.TickerType;
 
-/**
- * Constants used in the application
- */
+/** Constants used in the application */
 public final class Constants {
     public static final String APP_NAME = "Moinex";
 
@@ -2797,7 +2795,7 @@ public final class Constants {
     /**
      * Calculate the number of months until the target date
      *
-     * @param beginDate  The start date
+     * @param beginDate The start date
      * @param targetDate The target date
      * @return The number of months until the target date
      */
@@ -2808,7 +2806,7 @@ public final class Constants {
     /**
      * Calculate the number of days until the target date
      *
-     * @param beginDate  The begin date
+     * @param beginDate The begin date
      * @param targetDate The target date
      * @return The number of days until the target date
      */
@@ -2819,7 +2817,7 @@ public final class Constants {
     /**
      * Round price according to the ticker type
      *
-     * @param price      The price to be rounded
+     * @param price The price to be rounded
      * @param tickerType The ticker type
      */
     public static BigDecimal roundPrice(BigDecimal price, TickerType tickerType) {
@@ -2833,9 +2831,8 @@ public final class Constants {
     }
 
     /**
-     * Get the Python interpreter path based on the operating system
-     * For Windows with embedded Python, use the bundled interpreter
-     * For Linux/Mac, use the system Python
+     * Get the Python interpreter path based on the operating system For Windows with embedded
+     * Python, use the bundled interpreter For Linux/Mac, use the system Python
      */
     private static String getPythonInterpreter() {
         String os = System.getProperty("os.name").toLowerCase();

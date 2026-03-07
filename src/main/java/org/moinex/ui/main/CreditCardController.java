@@ -58,9 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 
-/**
- * Controller for the Credit Card screen
- */
+/** Controller for the Credit Card screen */
 @Controller
 @NoArgsConstructor
 public class CreditCardController {
@@ -102,6 +100,7 @@ public class CreditCardController {
 
     /**
      * Constructor
+     *
      * @param creditCardService CreditCardService
      * @param categoryService CategoryService
      */
@@ -184,7 +183,8 @@ public class CreditCardController {
         }
 
         CreditCardDebt debt = selectedPayment.getCreditCardDebt();
-        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
+        List<CreditCardPayment> payments =
+                creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
 
         if (payments.stream().anyMatch(CreditCardPayment::getRefunded)) {
             WindowUtils.showInformationDialog(
@@ -221,7 +221,8 @@ public class CreditCardController {
 
         CreditCardDebt debt = selectedPayment.getCreditCardDebt();
 
-        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
+        List<CreditCardPayment> payments =
+                creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
 
         if (payments.stream().anyMatch(CreditCardPayment::getRefunded)) {
             WindowUtils.showInformationDialog(
@@ -335,7 +336,8 @@ public class CreditCardController {
 
         CreditCardDebt debt = selectedPayment.getCreditCardDebt();
 
-        List<CreditCardPayment> payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
+        List<CreditCardPayment> payments =
+                creditCardService.getPaymentsByDebtOrderedByInstallment(debt.getId());
 
         // Get the amount paid for the debt
         BigDecimal refundAmount =
@@ -490,10 +492,11 @@ public class CreditCardController {
 
     /**
      * Update the display
-     * @param yearMonth YearMonth - The year and month to be displayed in credit card
-     * resume and table view
-     * @note: This method can be called by other controllers to update the screen when
-     * there is a change
+     *
+     * @param yearMonth YearMonth - The year and month to be displayed in credit card resume and
+     *     table view
+     * @note: This method can be called by other controllers to update the screen when there is a
+     *     change
      */
     public void updateDisplay(YearMonth yearMonth) {
         loadCreditCardsFromDatabase();
@@ -506,8 +509,9 @@ public class CreditCardController {
 
     /**
      * Update the display
-     * @note: This method can be called by other controllers to update the screen when
-     * there is a change
+     *
+     * @note: This method can be called by other controllers to update the screen when there is a
+     *     change
      */
     public void updateDisplay() {
         loadCreditCardsFromDatabase();
@@ -518,16 +522,12 @@ public class CreditCardController {
         updateDisplayCards();
     }
 
-    /**
-     * Load credit cards from the database
-     */
+    /** Load credit cards from the database */
     private void loadCreditCardsFromDatabase() {
         creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByDebtCountDesc();
     }
 
-    /**
-     * Update the debt table view
-     */
+    /** Update the debt table view */
     private void updateDebtsTableView() {
         YearMonth selectedMonth = getTableCurrentMonthYear();
 
@@ -545,9 +545,7 @@ public class CreditCardController {
                     .getPaymentsByMonth(selectedMonth)
                     .forEach(debtsTableView.getItems()::add);
         } else {
-            creditCardService
-                    .getPaymentsByMonth(selectedMonth)
-                    .stream()
+            creditCardService.getPaymentsByMonth(selectedMonth).stream()
                     .filter(
                             p -> {
                                 String description =
@@ -574,9 +572,7 @@ public class CreditCardController {
         debtsTableView.refresh();
     }
 
-    /**
-     * Update the display of the total debts information
-     */
+    /** Update the display of the total debts information */
     private void updateTotalDebtsInfo() {
         // Get the selected year from the year filter combo box
         Year selectedYear = totalDebtsYearFilterComboBox.getValue();
@@ -604,16 +600,12 @@ public class CreditCardController {
         totalDebtsInfoVBox.getChildren().add(totalPendingPaymentsLabel);
     }
 
-    /**
-     * Update the display of the credit cards
-     */
+    /** Update the display of the credit cards */
     private void updateDisplayCards() {
         updateDisplayCards(YearMonth.now());
     }
 
-    /**
-     * Update the display of the credit cards
-     */
+    /** Update the display of the credit cards */
     private void updateDisplayCards(YearMonth defaultMonth) {
         crcPane1.getChildren().clear();
 
@@ -673,9 +665,7 @@ public class CreditCardController {
                 crcPaneCurrentPage == creditCards.size() - 1 || creditCards.isEmpty());
     }
 
-    /**
-     * Update money flow chart
-     */
+    /** Update money flow chart */
     private void updateMoneyFlow() {
         CategoryAxis categoryAxis = new CategoryAxis();
         NumberAxis numberAxis = new NumberAxis();
@@ -710,8 +700,7 @@ public class CreditCardController {
             YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonthValue());
 
             // Get confirmed transactions for the month
-            List<CreditCardPayment> payments =
-                    creditCardService.getPaymentsByMonth(yearMonth);
+            List<CreditCardPayment> payments = creditCardService.getPaymentsByMonth(yearMonth);
 
             // Calculate total for each category
             for (Category category : categories) {
@@ -816,9 +805,7 @@ public class CreditCardController {
         }
     }
 
-    /**
-     * Populate the debt list month filter combo box
-     */
+    /** Populate the debt list month filter combo box */
     private void populateDebtsListMonthFilterComboBox() {
         debtsListMonthFilterComboBox.getItems().clear();
 
@@ -879,9 +866,7 @@ public class CreditCardController {
                 });
     }
 
-    /**
-     * Populate the year filter combo box
-     */
+    /** Populate the year filter combo box */
     private void populateYearFilterComboBox() {
         LocalDateTime oldestDebtDate = creditCardService.getEarliestPaymentDate();
 
@@ -921,9 +906,7 @@ public class CreditCardController {
                 });
     }
 
-    /**
-     * Set the actions for the buttons
-     */
+    /** Set the actions for the buttons */
     private void setButtonsActions() {
         crcPrevButton.setOnAction(
                 event -> {
@@ -942,9 +925,7 @@ public class CreditCardController {
                 });
     }
 
-    /**
-     * Configure the listeners
-     */
+    /** Configure the listeners */
     private void configureListeners() {
         totalDebtsYearFilterComboBox
                 .valueProperty()
@@ -983,9 +964,7 @@ public class CreditCardController {
                 .addListener((observable, oldValue, newValue) -> updateDebtsTableView());
     }
 
-    /**
-     * Configure the table view columns
-     */
+    /** Configure the table view columns */
     private void configureTableView() {
         TableColumn<CreditCardPayment, Integer> idColumn =
                 getCreditCardPaymentLongTableColumn(
