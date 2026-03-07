@@ -18,7 +18,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Inheritance
 import jakarta.persistence.Table
-import org.moinex.common.LocalDateTimeStringConverter
+import org.moinex.common.converter.LocalDateTimeStringConverter
 import org.moinex.model.Category
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.model.enums.RecurringTransactionStatus

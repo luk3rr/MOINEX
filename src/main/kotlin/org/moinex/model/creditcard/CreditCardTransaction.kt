@@ -13,7 +13,7 @@ import jakarta.persistence.Convert
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.MappedSuperclass
-import org.moinex.common.LocalDateTimeStringConverter
+import org.moinex.common.converter.LocalDateTimeStringConverter
 import org.moinex.common.toRounded
 import java.math.BigDecimal
 import java.time.LocalDateTime

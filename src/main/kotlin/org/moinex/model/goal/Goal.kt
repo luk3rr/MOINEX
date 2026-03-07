@@ -9,9 +9,11 @@
 package org.moinex.model.goal
 
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.persistence.Table
+import org.moinex.common.converter.LocalDateStringConverter
 import org.moinex.common.toRounded
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType
@@ -27,8 +29,10 @@ class Goal(
     @Column(name = "target_balance", nullable = false, scale = 2)
     var targetBalance: BigDecimal,
     @Column(name = "target_date", nullable = false)
+    @Convert(converter = LocalDateStringConverter::class)
     var targetDate: LocalDate,
     @Column(name = "completion_date")
+    @Convert(converter = LocalDateStringConverter::class)
     var completionDate: LocalDate? = null,
     @Column(name = "motivation", length = 500)
     var motivation: String? = null,
