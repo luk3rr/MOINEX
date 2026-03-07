@@ -58,7 +58,7 @@ public final class EditGoalController extends BaseGoalManagement {
         nameField.setText(goal.getName());
         balanceField.setText(goal.getBalance().toString());
         targetBalanceField.setText(goal.getTargetBalance().toString());
-        targetDatePicker.setValue(goal.getTargetDate().toLocalDate());
+        targetDatePicker.setValue(goal.getTargetDate());
         motivationTextArea.setText(goal.getMotivation());
         archivedCheckBox.setSelected(goal.isArchived());
         completedCheckBox.setSelected(goal.isCompleted());
@@ -104,7 +104,7 @@ public final class EditGoalController extends BaseGoalManagement {
                     && goal.getBalance().equals(currentBalance)
                     && (goal.isVirtual() && goal.getMasterWallet().equals(masterWallet))
                     && goal.getTargetBalance().equals(targetBalance)
-                    && goal.getTargetDate().toLocalDate().equals(targetDate)
+                    && goal.getTargetDate().equals(targetDate)
                     && goal.getMotivation().equals(motivation)
                     && goal.isArchived() == archived
                     && goal.isCompleted() == completed) {
@@ -116,7 +116,7 @@ public final class EditGoalController extends BaseGoalManagement {
                 goal.setName(goalName);
                 goal.setBalance(currentBalance);
                 goal.setTargetBalance(targetBalance);
-                goal.setTargetDate(targetDate.atStartOfDay());
+                goal.setTargetDate(targetDate);
                 goal.setMotivation(motivation);
                 goal.setArchived(archived);
                 goal.setMasterWallet(masterWallet);
@@ -126,7 +126,7 @@ public final class EditGoalController extends BaseGoalManagement {
                 // completion date to the current date, This is necessary for UpdateGoal
                 // identify if the completed field was changed
                 if (completed && !goal.isCompleted()) {
-                    goal.setCompletionDate(LocalDate.now().atStartOfDay());
+                    goal.setCompletionDate(LocalDate.now());
                 } else {
                     goal.setCompletionDate(null);
                 }

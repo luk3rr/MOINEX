@@ -15,4 +15,9 @@ import org.springframework.stereotype.Repository
 @Repository
 interface GoalRepository : JpaRepository<Goal, Int> {
     fun existsByName(name: String): Boolean
+
+    fun existsByNameAndIdNot(
+        name: String,
+        id: Int,
+    ): Boolean
 }

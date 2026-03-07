@@ -103,7 +103,7 @@ public class GoalController {
                     long monthsUntilTarget =
                             Constants.calculateMonthsUntilTarget(
                                     LocalDate.now(),
-                                    param.getValue().getTargetDate().toLocalDate());
+                                    param.getValue().getTargetDate());
 
                     // Calculate the recommended monthly deposit
                     double recommendedMonthlyDeposit =
@@ -129,7 +129,7 @@ public class GoalController {
                     Integer monthsUntilTarget =
                             Constants.calculateMonthsUntilTarget(
                                     LocalDate.now(),
-                                    param.getValue().getTargetDate().toLocalDate());
+                                    param.getValue().getTargetDate());
 
                     return new SimpleObjectProperty<>(monthsUntilTarget.toString());
                 });
@@ -414,7 +414,7 @@ public class GoalController {
     }
 
     private void loadGoalsFromDatabase() {
-        goals = goalService.getGoals();
+        goals = goalService.getAllGoals();
     }
 
     /**
@@ -644,7 +644,7 @@ public class GoalController {
                                 String monthsUntilTarget =
                                         Constants.calculateMonthsUntilTarget(
                                                         LocalDate.now(),
-                                                        g.getTargetDate().toLocalDate())
+                                                        g.getTargetDate())
                                                 .toString();
 
                                 String recommendedMonthlyDeposit =
@@ -656,7 +656,7 @@ public class GoalController {
                                                                         .calculateMonthsUntilTarget(
                                                                                 LocalDate.now(),
                                                                                 g.getTargetDate()
-                                                                                        .toLocalDate())),
+                                                                                        )),
                                                         2,
                                                         RoundingMode.HALF_UP)
                                                 .toString();

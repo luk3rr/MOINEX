@@ -17,7 +17,9 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.enums.GoalFundingStrategy;
+import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.Wallet;
+import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.GoalService;
 import org.moinex.service.I18nService;
 import org.moinex.service.WalletService;
@@ -103,13 +105,19 @@ public final class AddGoalController extends BaseGoalManagement {
                     new BigDecimal(initialBalanceStr.isEmpty() ? "0" : initialBalanceStr);
             BigDecimal targetBalance = new BigDecimal(targetBalanceStr);
 
-            goalService.addGoal(
-                    goalName,
-                    initialBalance,
-                    targetBalance,
-                    targetDate,
-                    motivation,
-                    masterWallet,
+            WalletType goalWalletType = walletService.getAllWalletTypes().stream().filter(walletType -> walletType.getName().equals(Constants.GOAL_DEFAULT_WALLET_TYPE_NAME)).findFirst().orElseThrow(() -> new IllegalArgumentException("Goal wallet type not found"));
+
+            goalService.createGoal(new Goal(
+                            initialBalance,
+                            targetBalance,
+                            targetDate,
+                            null,
+                            motivation,
+                            null,
+                            goalName,
+                            goalWalletType,
+                    false,
+                    masterWallet),
                     strategy);
 
             WindowUtils.showSuccessDialog(

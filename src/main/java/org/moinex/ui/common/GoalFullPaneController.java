@@ -190,8 +190,8 @@ public class GoalFullPaneController {
             missingDays.setText(
                     String.valueOf(
                             Constants.calculateDaysUntilTarget(
-                                    goal.getCompletionDate().toLocalDate(),
-                                    goal.getTargetDate().toLocalDate())));
+                                    goal.getCompletionDate(),
+                                    goal.getTargetDate())));
 
             // Remove the fields that are not necessary
             infosVBox.getChildren().remove(currentHBox);
@@ -209,7 +209,7 @@ public class GoalFullPaneController {
             // Calculate the number of months until the target date
             Integer monthsUntilTarget =
                     Constants.calculateMonthsUntilTarget(
-                            LocalDate.now(), goal.getTargetDate().toLocalDate());
+                            LocalDate.now(), goal.getTargetDate());
 
             // Calculate the ideal amount per month
             BigDecimal idealAmountPerMonth;
@@ -224,7 +224,7 @@ public class GoalFullPaneController {
                                         BigDecimal.valueOf(
                                                 Constants.calculateMonthsUntilTarget(
                                                         LocalDate.now(),
-                                                        goal.getTargetDate().toLocalDate())),
+                                                        goal.getTargetDate())),
                                         2,
                                         RoundingMode.HALF_UP);
             }
@@ -234,7 +234,7 @@ public class GoalFullPaneController {
             // Calculate the missing days
             Integer missingDaysValue =
                     Constants.calculateDaysUntilTarget(
-                            LocalDate.now(), goal.getTargetDate().toLocalDate());
+                            LocalDate.now(), goal.getTargetDate());
 
             missingDays.setText(missingDaysValue.toString());
 

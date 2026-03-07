@@ -6,3 +6,5 @@ import java.math.RoundingMode
 fun BigDecimal.toRounded(): BigDecimal = this.setScale(2, RoundingMode.HALF_UP)
 
 fun BigDecimal.isZero() = this.compareTo(BigDecimal.ZERO) == 0
+
+fun BigDecimal.isNotZero() = this.compareTo(BigDecimal.ZERO) != 0

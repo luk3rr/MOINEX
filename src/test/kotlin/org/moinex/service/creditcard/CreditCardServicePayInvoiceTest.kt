@@ -6,6 +6,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import org.moinex.common.isZero
+import org.moinex.common.toRounded
 import org.moinex.factory.CreditCardFactory
 import org.moinex.factory.CreditCardOperatorFactory
 import org.moinex.factory.CreditCardPaymentFactory
@@ -77,11 +79,11 @@ class CreditCardServicePayInvoiceTest :
                 service.payInvoice(1, 1, invoiceDate, BigDecimal.ZERO)
 
                 Then("should deduct total payment amount from wallet balance") {
-                    wallet.balance.compareTo(BigDecimal("4700.00")) shouldBe 0
+                    wallet.balance shouldBe BigDecimal("4700.00")
                 }
 
                 Then("should not change available rebate") {
-                    creditCard.availableRebate.compareTo(BigDecimal("500.00")) shouldBe 0
+                    creditCard.availableRebate shouldBe BigDecimal("500.00")
                 }
 
                 Then("should set wallet for all payments") {
@@ -90,8 +92,8 @@ class CreditCardServicePayInvoiceTest :
                 }
 
                 Then("should set rebateUsed to zero for all payments") {
-                    payment1.rebateUsed.compareTo(BigDecimal.ZERO) shouldBe 0
-                    payment2.rebateUsed.compareTo(BigDecimal.ZERO) shouldBe 0
+                    payment1.rebateUsed.isZero() shouldBe true
+                    payment2.rebateUsed.isZero() shouldBe true
                 }
             }
         }
@@ -131,11 +133,11 @@ class CreditCardServicePayInvoiceTest :
                 service.payInvoice(2, 2, invoiceDate, BigDecimal("50.00"))
 
                 Then("should deduct total payment minus rebate from wallet") {
-                    wallet.balance.compareTo(BigDecimal("2850.00")) shouldBe 0
+                    wallet.balance shouldBe BigDecimal("2850.00")
                 }
 
                 Then("should deduct rebate from available rebate") {
-                    creditCard.availableRebate.compareTo(BigDecimal("50.00")) shouldBe 0
+                    creditCard.availableRebate.toRounded() shouldBe BigDecimal("50.00")
                 }
 
                 Then("should distribute rebate proportionally to payments") {

@@ -105,7 +105,7 @@ class WalletService(
         val walletFromDatabase = walletRepository.findByIdOrThrow(updatedWallet.id!!)
 
         check(!walletRepository.existsByNameAndIdNot(updatedWallet.name, updatedWallet.id!!)) {
-            "Wallet with name '${updatedWallet.name}' already existis"
+            "Wallet with name '${updatedWallet.name}' already exists"
         }
 
         walletFromDatabase.apply {
@@ -279,6 +279,8 @@ class WalletService(
 
     fun getAllWalletTypes(): List<WalletType> = walletTypeRepository.findAllByOrderByNameAsc()
 
+    fun existsWalletTypeByName(name: String): Boolean = walletTypeRepository.existsByName(name)
+
     fun getAllArchivedWallets(): List<Wallet> = walletRepository.findAllByIsArchivedTrue()
 
     fun getAllNonArchivedWalletsOrderedByName(): List<Wallet> = walletRepository.findAllByIsArchivedFalseOrderByNameAsc()
@@ -382,6 +384,13 @@ class WalletService(
     ): List<Transfer> = transfersRepository.findTransfersByWalletAndMonth(walletId, yearMonth.monthValue, yearMonth.year)
 
     fun getTransferSuggestions(): List<Transfer> = transfersRepository.findSuggestions()
+
+    fun existsByName(name: String): Boolean = walletRepository.existsByName(name)
+
+    fun existsByNameAndIdNot(
+        name: String,
+        id: Int,
+    ): Boolean = walletRepository.existsByNameAndIdNot(name, id)
 
     private fun incrementWalletBalance(
         walletFromDatabase: Wallet,
