@@ -150,13 +150,14 @@ class WalletServiceDeleteTransferTest :
         Given("a transfer from virtual wallet to regular wallet") {
             val walletType = WalletTypeFactory.create(1, "Master")
             val masterWallet = WalletFactory.create(id = 7, name = "Master", balance = BigDecimal("1900.00"), type = walletType)
-            val virtualWallet = WalletFactory.create(
-                id = 8,
-                name = "Virtual",
-                balance = BigDecimal("900.00"),
-                type = walletType,
-                masterWallet = masterWallet,
-            )
+            val virtualWallet =
+                WalletFactory.create(
+                    id = 8,
+                    name = "Virtual",
+                    balance = BigDecimal("900.00"),
+                    type = walletType,
+                    masterWallet = masterWallet,
+                )
             val receiverWallet = WalletFactory.create(id = 9, balance = BigDecimal("600.00"))
             val category = CategoryFactory.create(id = 1)
             val transfer =
@@ -197,13 +198,14 @@ class WalletServiceDeleteTransferTest :
         Given("a transfer to virtual wallet from regular wallet") {
             val walletType = WalletTypeFactory.create(2, "Master")
             val masterWallet = WalletFactory.create(id = 10, name = "Master", balance = BigDecimal("1100.00"), type = walletType)
-            val virtualWallet = WalletFactory.create(
-                id = 11,
-                name = "Virtual",
-                balance = BigDecimal("600.00"),
-                type = walletType,
-                masterWallet = masterWallet,
-            )
+            val virtualWallet =
+                WalletFactory.create(
+                    id = 11,
+                    name = "Virtual",
+                    balance = BigDecimal("600.00"),
+                    type = walletType,
+                    masterWallet = masterWallet,
+                )
             val senderWallet = WalletFactory.create(id = 12, balance = BigDecimal("900.00"))
             val category = CategoryFactory.create(id = 1)
             val transfer =
@@ -244,20 +246,22 @@ class WalletServiceDeleteTransferTest :
         Given("a transfer between two virtual wallets with same master") {
             val walletType = WalletTypeFactory.create(3, "Master")
             val masterWallet = WalletFactory.create(id = 13, name = "Master", balance = BigDecimal("2000.00"), type = walletType)
-            val virtualWallet1 = WalletFactory.create(
-                id = 14,
-                name = "Virtual1",
-                balance = BigDecimal("900.00"),
-                type = walletType,
-                masterWallet = masterWallet,
-            )
-            val virtualWallet2 = WalletFactory.create(
-                id = 15,
-                name = "Virtual2",
-                balance = BigDecimal("600.00"),
-                type = walletType,
-                masterWallet = masterWallet,
-            )
+            val virtualWallet1 =
+                WalletFactory.create(
+                    id = 14,
+                    name = "Virtual1",
+                    balance = BigDecimal("900.00"),
+                    type = walletType,
+                    masterWallet = masterWallet,
+                )
+            val virtualWallet2 =
+                WalletFactory.create(
+                    id = 15,
+                    name = "Virtual2",
+                    balance = BigDecimal("600.00"),
+                    type = walletType,
+                    masterWallet = masterWallet,
+                )
             val category = CategoryFactory.create(id = 1)
             val transfer =
                 TransferFactory.create(
@@ -298,21 +302,23 @@ class WalletServiceDeleteTransferTest :
             val walletType1 = WalletTypeFactory.create(4, "Master")
             val walletType2 = WalletTypeFactory.create(5, "Master")
             val masterWallet1 = WalletFactory.create(id = 16, name = "Master1", balance = BigDecimal("900.00"), type = walletType1)
-            val virtualWallet1 = WalletFactory.create(
-                id = 17,
-                name = "Virtual1",
-                balance = BigDecimal("400.00"),
-                type = walletType1,
-                masterWallet = masterWallet1,
-            )
+            val virtualWallet1 =
+                WalletFactory.create(
+                    id = 17,
+                    name = "Virtual1",
+                    balance = BigDecimal("400.00"),
+                    type = walletType1,
+                    masterWallet = masterWallet1,
+                )
             val masterWallet2 = WalletFactory.create(id = 18, name = "Master2", balance = BigDecimal("1100.00"), type = walletType2)
-            val virtualWallet2 = WalletFactory.create(
-                id = 19,
-                name = "Virtual2",
-                balance = BigDecimal("600.00"),
-                type = walletType2,
-                masterWallet = masterWallet2,
-            )
+            val virtualWallet2 =
+                WalletFactory.create(
+                    id = 19,
+                    name = "Virtual2",
+                    balance = BigDecimal("600.00"),
+                    type = walletType2,
+                    masterWallet = masterWallet2,
+                )
             val category = CategoryFactory.create(id = 1)
             val transfer =
                 TransferFactory.create(

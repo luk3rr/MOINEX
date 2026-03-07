@@ -31,7 +31,7 @@ class CategoryService(
 
         val newCategory = categoryRepository.save(category)
 
-        logger.info("Category '{}' added successfully", newCategory)
+        logger.info("$newCategory added successfully")
 
         return newCategory.id!!
     }
@@ -46,7 +46,7 @@ class CategoryService(
 
         categoryRepository.delete(categoryFromDatabase)
 
-        logger.info("Category '{}' deleted successfully", categoryFromDatabase.name)
+        logger.info("$categoryFromDatabase deleted successfully")
     }
 
     @Transactional
@@ -66,7 +66,7 @@ class CategoryService(
             name = updatedCategory.name
         }
 
-        logger.info("Category '{}' renamed successfully", categoryFromDatabase)
+        logger.info("$categoryFromDatabase renamed successfully")
     }
 
     @Transactional
@@ -74,7 +74,7 @@ class CategoryService(
         val categoryFromDatabase = categoryRepository.findByIdOrThrow(id)
 
         if (categoryFromDatabase.isArchived) {
-            logger.info("Category with id {} is already archived", id)
+            logger.info("$categoryFromDatabase is already archived")
             return
         }
 
@@ -82,7 +82,7 @@ class CategoryService(
             isArchived = true
         }
 
-        logger.info("Category with id {} was archived", id)
+        logger.info("$categoryFromDatabase was archived")
     }
 
     @Transactional
@@ -90,7 +90,7 @@ class CategoryService(
         val categoryFromDatabase = categoryRepository.findByIdOrThrow(id)
 
         if (!categoryFromDatabase.isArchived) {
-            logger.info("Category with id {} is already unarchived", id)
+            logger.info("$categoryFromDatabase is already unarchived")
             return
         }
 
@@ -98,7 +98,7 @@ class CategoryService(
             isArchived = false
         }
 
-        logger.info("Category with id {} was unarchived", id)
+        logger.info("$categoryFromDatabase was unarchived")
     }
 
     fun getCategories(): List<Category> = categoryRepository.findAll()

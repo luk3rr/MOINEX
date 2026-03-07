@@ -42,4 +42,6 @@ class Category(
     }
 
     override fun hashCode(): Int = id?.hashCode() ?: javaClass.hashCode()
+
+    override fun toString(): String = "Category [id=$id, name='$name']"
 }

@@ -310,13 +310,14 @@ class WalletServiceDeleteWalletTransactionTest :
         Given("a confirmed expense transaction in virtual wallet") {
             val walletType = WalletTypeFactory.create(1, "Master")
             val masterWallet = WalletFactory.create(id = 10, balance = BigDecimal("1000.00"))
-            val virtualWallet = WalletFactory.create(
-                11,
-                "Virtual Wallet",
-                BigDecimal("900.00"),
-                walletType,
-                masterWallet = masterWallet,
-            )
+            val virtualWallet =
+                WalletFactory.create(
+                    11,
+                    "Virtual Wallet",
+                    BigDecimal("900.00"),
+                    walletType,
+                    masterWallet = masterWallet,
+                )
             val transaction =
                 WalletTransactionFactory.create(
                     id = 11,
@@ -350,13 +351,14 @@ class WalletServiceDeleteWalletTransactionTest :
         Given("a confirmed income transaction in virtual wallet") {
             val walletType = WalletTypeFactory.create(2, "Master")
             val masterWallet = WalletFactory.create(id = 12, balance = BigDecimal("1200.00"))
-            val virtualWallet = WalletFactory.create(
-                13,
-                "Virtual Wallet",
-                BigDecimal("1100.00"),
-                walletType,
-                masterWallet = masterWallet,
-            )
+            val virtualWallet =
+                WalletFactory.create(
+                    13,
+                    "Virtual Wallet",
+                    BigDecimal("1100.00"),
+                    walletType,
+                    masterWallet = masterWallet,
+                )
             val transaction =
                 WalletTransactionFactory.create(
                     id = 12,

@@ -14,7 +14,6 @@ import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository
 import org.moinex.repository.wallettransaction.WalletTypeRepository
 import org.moinex.service.WalletService
-import java.math.BigDecimal
 import java.util.Optional
 
 class WalletServiceGeneralTest :
@@ -221,9 +220,9 @@ class WalletServiceGeneralTest :
 
                 Then("should return wallets ordered by total transaction count descending") {
                     result.size shouldBe 3
-                    result[0].id shouldBe 10  // 8 + 4 = 12
-                    result[1].id shouldBe 9   // 5 + 2 = 7
-                    result[2].id shouldBe 11  // 3 + 1 = 4
+                    result[0].id shouldBe 10 // 8 + 4 = 12
+                    result[1].id shouldBe 9 // 5 + 2 = 7
+                    result[2].id shouldBe 11 // 3 + 1 = 4
                 }
             }
         }

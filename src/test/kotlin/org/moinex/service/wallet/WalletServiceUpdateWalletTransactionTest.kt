@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.WalletFactory
