@@ -248,12 +248,13 @@ public class BaseBudgetGroupController {
         BudgetGroupTransactionFilter filter = transactionTypeFilterComboBox.getValue();
 
         BudgetGroup budgetGroup =
-                BudgetGroup.builder()
-                        .name(groupName)
-                        .targetPercentage(BigDecimal.valueOf(targetPercentage))
-                        .categories(new HashSet<>(selectedCategories))
-                        .transactionTypeFilter(filter)
-                        .build();
+                new BudgetGroup(
+                        null,
+                        groupName,
+                        BigDecimal.valueOf(targetPercentage),
+                        null,
+                        new HashSet<>(selectedCategories),
+                        filter);
 
         if (onSaveCallback != null) {
             onSaveCallback.accept(budgetGroup);

@@ -85,12 +85,12 @@ public class MarketIndicatorService {
                 if (!marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(
                         indicatorType, refDateStr)) {
                     MarketIndicatorHistory history =
-                            MarketIndicatorHistory.builder()
-                                    .indicatorType(indicatorType)
-                                    .referenceDate(referenceDate)
-                                    .rateValue(rateValue)
-                                    .createdAt(LocalDateTime.now())
-                                    .build();
+                            new MarketIndicatorHistory(
+                                    null,
+                                    indicatorType,
+                                    referenceDate,
+                                    rateValue,
+                                    LocalDateTime.now());
 
                     marketIndicatorHistoryRepository.save(history);
                     savedCount++;

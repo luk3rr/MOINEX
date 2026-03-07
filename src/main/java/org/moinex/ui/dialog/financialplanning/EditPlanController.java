@@ -154,13 +154,13 @@ public class EditPlanController extends BasePlanManagement {
         List<BudgetGroup> copy = new ArrayList<>();
         for (BudgetGroup group : groups) {
             BudgetGroup newGroup =
-                    BudgetGroup.builder()
-                            .id(group.getId())
-                            .name(group.getName())
-                            .targetPercentage(group.getTargetPercentage())
-                            .categories(new HashSet<>(group.getCategories()))
-                            .transactionTypeFilter(group.getTransactionTypeFilter())
-                            .build();
+                    new BudgetGroup(
+                            group.getId(),
+                            group.getName(),
+                            group.getTargetPercentage(),
+                            group.getPlan(),
+                            new HashSet<>(group.getCategories()),
+                            group.getTransactionTypeFilter());
             copy.add(newGroup);
         }
         return copy;

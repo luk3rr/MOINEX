@@ -53,15 +53,15 @@ public class InvestmentPerformanceSnapshotService {
             snapshot.setCalculatedAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER));
         } else {
             snapshot =
-                    InvestmentPerformanceSnapshot.builder()
-                            .month(month)
-                            .year(year)
-                            .investedValue(investedValue)
-                            .portfolioValue(portfolioValue)
-                            .accumulatedCapitalGains(accumulatedCapitalGains)
-                            .monthlyCapitalGains(monthlyCapitalGains)
-                            .calculatedAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER))
-                            .build();
+                    new InvestmentPerformanceSnapshot(
+                            null,
+                            month,
+                            year,
+                            investedValue,
+                            portfolioValue,
+                            accumulatedCapitalGains,
+                            monthlyCapitalGains,
+                            LocalDateTime.now().format(Constants.DB_DATE_FORMATTER));
         }
 
         return repository.save(snapshot);

@@ -1,0 +1,82 @@
+/*
+ * Filename: BondOperation.kt (original filename: BondOperation.java)
+ * Created on: January  3, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * Migrate to Kotlin on 07/03/2026
+ */
+
+package org.moinex.model.investment
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
+import org.moinex.common.toRounded
+import org.moinex.model.enums.OperationType
+import org.moinex.model.wallettransaction.WalletTransaction
+import java.math.BigDecimal
+
+@Entity
+@Table(name = "bond_operation")
+class BondOperation(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    var id: Int? = null,
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "bond_id", referencedColumnName = "id", nullable = false)
+    var bond: Bond,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_type", nullable = false)
+    var operationType: OperationType,
+    @Column(name = "quantity", nullable = false)
+    var quantity: BigDecimal,
+    @Column(name = "unit_price", nullable = false)
+    var unitPrice: BigDecimal,
+    @Column(name = "fees")
+    var fees: BigDecimal? = null,
+    @Column(name = "taxes")
+    var taxes: BigDecimal? = null,
+    @Column(name = "net_profit")
+    var netProfit: BigDecimal? = null,
+    @Column(name = "spread")
+    var spread: BigDecimal? = null,
+    @ManyToOne
+    @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id")
+    var walletTransaction: WalletTransaction? = null,
+) {
+    init {
+        quantity = quantity.toRounded()
+        unitPrice = unitPrice.toRounded()
+        fees = fees?.toRounded()
+        taxes = taxes?.toRounded()
+        netProfit = netProfit?.toRounded()
+        spread = spread?.toRounded()
+
+        require(quantity > BigDecimal.ZERO) {
+            "Quantity must be positive"
+        }
+        require(unitPrice >= BigDecimal.ZERO) {
+            "Unit price must be non-negative"
+        }
+        fees?.let {
+            require(it >= BigDecimal.ZERO) {
+                "Fees must be non-negative"
+            }
+        }
+        taxes?.let {
+            require(it >= BigDecimal.ZERO) {
+                "Taxes must be non-negative"
+            }
+        }
+    }
+
+    override fun toString(): String = "BondOperation [id=$id, bond=${bond.name}, type=$operationType]"
+}

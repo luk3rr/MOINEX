@@ -75,18 +75,18 @@ public class NetWorthSnapshotService {
             snapshot.setCalculatedAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER));
         } else {
             snapshot =
-                    NetWorthSnapshot.builder()
-                            .month(month)
-                            .year(year)
-                            .assets(assets)
-                            .liabilities(liabilities)
-                            .netWorth(netWorth)
-                            .walletBalances(walletBalances)
-                            .investments(investments)
-                            .creditCardDebt(creditCardDebt)
-                            .negativeWalletBalances(negativeWalletBalances)
-                            .calculatedAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER))
-                            .build();
+                    new NetWorthSnapshot(
+                            null,
+                            month,
+                            year,
+                            assets,
+                            liabilities,
+                            netWorth,
+                            walletBalances,
+                            investments,
+                            creditCardDebt,
+                            negativeWalletBalances,
+                            LocalDateTime.now().format(Constants.DB_DATE_FORMATTER));
         }
 
         return netWorthSnapshotRepository.save(snapshot);

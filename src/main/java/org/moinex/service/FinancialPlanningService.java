@@ -85,10 +85,9 @@ public class FinancialPlanningService {
 
         validateBudgetGroups(groups);
 
-        FinancialPlan plan = FinancialPlan.builder().name(name).baseIncome(income).build();
+        FinancialPlan plan = new FinancialPlan(null, name, income, groups, false);
 
         groups.forEach(group -> group.setPlan(plan));
-        plan.setBudgetGroups(groups);
 
         try {
             FinancialPlan oldPlan = getActivePlan();

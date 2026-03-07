@@ -148,7 +148,7 @@ public class MarketService {
                             try {
                                 bmi = getBrazilianMarketIndicators();
                             } catch (EntityNotFoundException e) {
-                                bmi = BrazilianMarketIndicators.builder().build();
+                                bmi = new BrazilianMarketIndicators();
                             }
 
                             String valorField = "valor";
@@ -279,7 +279,7 @@ public class MarketService {
                             try {
                                 mqac = getMarketQuotesAndCommodities();
                             } catch (EntityNotFoundException e) {
-                                mqac = MarketQuotesAndCommodities.builder().build();
+                                mqac = new MarketQuotesAndCommodities();
                             }
 
                             String priceField = "price";

@@ -125,17 +125,19 @@ public class TickerService {
 
         LocalDateTime now = LocalDateTime.now();
         Ticker ticker =
-                Ticker.builder()
-                        .name(name)
-                        .symbol(symbol)
-                        .type(type)
-                        .currentUnitValue(price)
-                        .averageUnitValue(avgUnitPrice)
-                        .averageUnitValueCount(BigDecimal.ONE)
-                        .currentQuantity(quantity)
-                        .lastUpdate(now)
-                        .createdAt(now)
-                        .build();
+                new Ticker(
+                        null,
+                        type,
+                        now,
+                        now,
+                        false,
+                        null,
+                        name,
+                        symbol,
+                        quantity,
+                        price,
+                        avgUnitPrice,
+                        BigDecimal.ONE);
 
         tickerRepository.save(ticker);
 
@@ -576,12 +578,7 @@ public class TickerService {
         WalletTransaction walletTransaction = walletService.getWalletTransactionById(id);
 
         TickerPurchase purchase =
-                TickerPurchase.builder()
-                        .ticker(ticker)
-                        .quantity(quantity)
-                        .unitPrice(unitPrice)
-                        .walletTransaction(walletTransaction)
-                        .build();
+                new TickerPurchase(null, ticker, quantity, unitPrice, walletTransaction);
 
         tickerPurchaseRepository.save(purchase);
 
@@ -682,13 +679,13 @@ public class TickerService {
         WalletTransaction walletTransaction = walletService.getWalletTransactionById(id);
 
         TickerSale sale =
-                TickerSale.builder()
-                        .ticker(ticker)
-                        .quantity(quantity)
-                        .unitPrice(unitPrice)
-                        .walletTransaction(walletTransaction)
-                        .averageCost(ticker.getAverageUnitValue())
-                        .build();
+                new TickerSale(
+                        null,
+                        ticker,
+                        ticker.getAverageUnitValue(),
+                        quantity,
+                        unitPrice,
+                        walletTransaction);
 
         tickerSaleRepository.save(sale);
 
@@ -766,8 +763,7 @@ public class TickerService {
         WalletTransaction walletTransaction = walletService.getWalletTransactionById(id);
 
         // Create a dividend
-        Dividend dividend =
-                Dividend.builder().ticker(ticker).walletTransaction(walletTransaction).build();
+        Dividend dividend = new Dividend(null, ticker, walletTransaction);
 
         dividendRepository.save(dividend);
 
@@ -851,14 +847,14 @@ public class TickerService {
         }
 
         CryptoExchange exchange =
-                CryptoExchange.builder()
-                        .soldCrypto(soldCrypto)
-                        .receivedCrypto(receivedCrypto)
-                        .soldQuantity(soldQuantity)
-                        .receivedQuantity(receivedQuantity)
-                        .date(date)
-                        .description(description)
-                        .build();
+                new CryptoExchange(
+                        null,
+                        soldCrypto,
+                        receivedCrypto,
+                        soldQuantity,
+                        receivedQuantity,
+                        date,
+                        description);
 
         cryptoExchangeRepository.save(exchange);
 

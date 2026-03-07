@@ -63,17 +63,17 @@ public class BondService {
         }
 
         Bond bond =
-                Bond.builder()
-                        .name(name)
-                        .symbol(symbol)
-                        .type(bondType)
-                        .issuer(issuer)
-                        .maturityDate(maturityDate)
-                        .interestType(interestType)
-                        .interestIndex(interestIndex)
-                        .interestRate(interestRate)
-                        .archived(false)
-                        .build();
+                new Bond(
+                        null,
+                        name,
+                        symbol,
+                        bondType,
+                        issuer,
+                        maturityDate.toLocalDate(),
+                        interestType,
+                        interestIndex,
+                        interestRate,
+                        false);
 
         bondRepository.save(bond);
         log.info("Bond {} added successfully", name);
@@ -118,7 +118,7 @@ public class BondService {
         bond.setSymbol(symbol);
         bond.setType(bondType);
         bond.setIssuer(issuer);
-        bond.setMaturityDate(maturityDate);
+        bond.setMaturityDate(maturityDate.toLocalDate());
         bond.setInterestType(interestType);
         bond.setInterestIndex(interestIndex);
         bond.setInterestRate(interestRate);
@@ -319,17 +319,17 @@ public class BondService {
         WalletTransaction walletTransaction = walletService.getWalletTransactionById(transactionId);
 
         BondOperation operation =
-                BondOperation.builder()
-                        .bond(bond)
-                        .operationType(operationType)
-                        .quantity(quantity)
-                        .unitPrice(unitPrice)
-                        .fees(fees)
-                        .taxes(taxes)
-                        .netProfit(netProfit)
-                        .spread(bond.getInterestRate())
-                        .walletTransaction(walletTransaction)
-                        .build();
+                new BondOperation(
+                        null,
+                        bond,
+                        operationType,
+                        quantity,
+                        unitPrice,
+                        fees,
+                        taxes,
+                        netProfit,
+                        bond.getInterestRate(),
+                        walletTransaction);
 
         bondOperationRepository.save(operation);
 

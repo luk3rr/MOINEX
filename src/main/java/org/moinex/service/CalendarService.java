@@ -55,13 +55,7 @@ public class CalendarService {
             throw new IllegalArgumentException("Title cannot be empty");
         }
 
-        CalendarEvent event =
-                CalendarEvent.builder()
-                        .title(title)
-                        .description(description)
-                        .date(date)
-                        .eventType(eventType)
-                        .build();
+        CalendarEvent event = new CalendarEvent(null, date, title, description, eventType);
 
         calendarEventRepository.save(event);
 

@@ -52,11 +52,7 @@ public class InvestmentTargetService {
         InvestmentTarget target =
                 investmentTargetRepository
                         .findByAssetType(assetType)
-                        .orElse(
-                                InvestmentTarget.builder()
-                                        .assetType(assetType)
-                                        .isActive(true)
-                                        .build());
+                        .orElse(new InvestmentTarget(null, assetType, BigDecimal.ZERO, true));
 
         target.setTargetPercentage(targetPercentage);
         target.setActive(true);

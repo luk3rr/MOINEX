@@ -72,7 +72,7 @@ public final class EditBondController {
         issuerField.setText(bond.getIssuer());
 
         if (bond.getMaturityDate() != null) {
-            maturityDatePicker.setValue(bond.getMaturityDate().toLocalDate());
+            maturityDatePicker.setValue(bond.getMaturityDate());
         }
 
         interestTypeComboBox.setValue(bond.getInterestType());
@@ -82,7 +82,7 @@ public final class EditBondController {
             interestRateField.setText(bond.getInterestRate().toString());
         }
 
-        archivedCheckBox.setSelected(bond.isArchived());
+        archivedCheckBox.setSelected(bond.getArchived());
     }
 
     @FXML
@@ -123,7 +123,7 @@ public final class EditBondController {
                 !bond.getName().equals(name)
                         || !bondType.equals(bond.getType())
                         || !maturityDate.atStartOfDay().equals(bond.getMaturityDate())
-                        || archived != bond.isArchived();
+                        || archived != bond.getArchived();
 
         if (symbol != null && !symbol.isBlank()) {
             hasChanges = hasChanges || !symbol.equals(bond.getSymbol());
@@ -178,7 +178,7 @@ public final class EditBondController {
                     interestRate);
 
             // Update archived status if changed
-            if (archived != bond.isArchived()) {
+            if (archived != bond.getArchived()) {
                 if (archived) {
                     bondService.archiveBond(bond.getId());
                 } else {

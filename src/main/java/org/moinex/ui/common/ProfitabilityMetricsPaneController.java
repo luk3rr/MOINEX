@@ -57,21 +57,23 @@ public class ProfitabilityMetricsPaneController {
             ProfitabilityMetricsDTO fixedMetrics,
             ProfitabilityMetricsDTO totalMetrics) {
         setTotalInvested(
-                variableMetrics.totalInvested(),
-                fixedMetrics.totalInvested(),
-                totalMetrics.totalInvested());
+                variableMetrics.getTotalInvested(),
+                fixedMetrics.getTotalInvested(),
+                totalMetrics.getTotalInvested());
         setCurrentValue(
-                variableMetrics.currentValue(),
-                fixedMetrics.currentValue(),
-                totalMetrics.currentValue());
+                variableMetrics.getCurrentValue(),
+                fixedMetrics.getCurrentValue(),
+                totalMetrics.getCurrentValue());
         setProfitLoss(
-                variableMetrics.profitLoss(), fixedMetrics.profitLoss(), totalMetrics.profitLoss());
+                variableMetrics.getProfitLoss(),
+                fixedMetrics.getProfitLoss(),
+                totalMetrics.getProfitLoss());
         setReturnPercentage(
-                variableMetrics.returnPercentage(),
-                fixedMetrics.returnPercentage(),
-                totalMetrics.returnPercentage());
-        setTotalDividends(variableMetrics.totalDividends(), totalMetrics.totalDividends());
-        setDividendYield(variableMetrics.dividendYield(), totalMetrics.dividendYield());
+                variableMetrics.getReturnPercentage(),
+                fixedMetrics.getReturnPercentage(),
+                totalMetrics.getReturnPercentage());
+        setTotalDividends(variableMetrics.getTotalDividends(), totalMetrics.getTotalDividends());
+        setDividendYield(variableMetrics.getDividendYield(), totalMetrics.getDividendYield());
     }
 
     private void setTotalInvested(BigDecimal variable, BigDecimal fixed, BigDecimal total) {

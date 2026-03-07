@@ -8,7 +8,6 @@ package org.moinex.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -89,12 +88,7 @@ public class TickerPriceHistoryService {
             }
 
             TickerPriceHistory history =
-                    TickerPriceHistory.builder()
-                            .ticker(ticker)
-                            .priceDate(dateStr)
-                            .closingPrice(closingPrice)
-                            .isMonthEnd(isMonthEnd)
-                            .build();
+                    new TickerPriceHistory(null, ticker, priceDate, closingPrice, isMonthEnd);
 
             priceHistoryRepository.save(history);
             logger.debug("Stored new price for {} on {}", ticker.getSymbol(), priceDate);
@@ -455,10 +449,7 @@ public class TickerPriceHistoryService {
                         try {
                             LocalDate firstPurchaseDate =
                                     getFirstPurchaseDate(ticker.getId(), tickerPurchaseRepository);
-                            LocalDateTime createdAt =
-                                    LocalDateTime.parse(
-                                            ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER);
-                            LocalDate createdDate = createdAt.toLocalDate();
+                            LocalDate createdDate = ticker.getCreatedAt().toLocalDate();
 
                             LocalDate referenceDate;
 
@@ -668,9 +659,7 @@ public class TickerPriceHistoryService {
         // If there was initial quantity (before any purchases), add createdAt as a transaction date
         // This is the reference date for calculating appreciation of the initial quantity
         if (initialQuantity.compareTo(BigDecimal.ZERO) > 0) {
-            LocalDateTime createdAt =
-                    LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER);
-            LocalDate createdDate = createdAt.toLocalDate();
+            LocalDate createdDate = ticker.getCreatedAt().toLocalDate();
             dates.add(createdDate);
             logger.debug(
                     "Ticker {} has initial quantity {}, adding createdAt {} as transaction date",

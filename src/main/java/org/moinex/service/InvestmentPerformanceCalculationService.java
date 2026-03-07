@@ -189,9 +189,7 @@ public class InvestmentPerformanceCalculationService {
                                 .min(LocalDate::compareTo)
                                 .orElse(null);
             } else {
-                referenceDate =
-                        LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER)
-                                .toLocalDate();
+                referenceDate = ticker.getCreatedAt().toLocalDate();
             }
 
             if (referenceDate == null) {
@@ -382,9 +380,7 @@ public class InvestmentPerformanceCalculationService {
                                 .min(LocalDate::compareTo)
                                 .orElse(null);
             } else {
-                referenceDate =
-                        LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER)
-                                .toLocalDate();
+                referenceDate = ticker.getCreatedAt().toLocalDate();
             }
 
             if (referenceDate == null) {
@@ -468,9 +464,7 @@ public class InvestmentPerformanceCalculationService {
                                 .min(LocalDate::compareTo)
                                 .orElse(null);
             } else {
-                referenceDate =
-                        LocalDateTime.parse(ticker.getCreatedAt(), Constants.DB_DATE_FORMATTER)
-                                .toLocalDate();
+                referenceDate = ticker.getCreatedAt().toLocalDate();
             }
 
             if (referenceDate == null) {

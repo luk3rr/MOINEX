@@ -880,19 +880,20 @@ public class BondInterestCalculationService {
                 }
 
                 BondInterestCalculation calculation =
-                        BondInterestCalculation.builder()
-                                .bond(bond)
-                                .referenceMonth(month)
-                                .calculationDate(LocalDate.now())
-                                .calculatedUntilDate(calculatedUntil)
-                                .quantity(currentQuantity)
-                                .investedAmount(investedAmount)
-                                .monthlyInterest(monthlyInterest)
-                                .accumulatedInterest(accumulatedInterest)
-                                .finalValue(finalValue)
-                                .calculationMethod(getCalculationMethod(bond))
-                                .createdAt(LocalDateTime.now())
-                                .build();
+                        new BondInterestCalculation(
+                                null,
+                                bond,
+                                month,
+                                LocalDate.now(),
+                                calculatedUntil,
+                                currentQuantity,
+                                investedAmount,
+                                monthlyInterest,
+                                accumulatedInterest,
+                                finalValue,
+                                getCalculationMethod(bond),
+                                LocalDateTime.now(),
+                                false);
 
                 bondInterestCalculationRepository.save(calculation);
                 log.debug(

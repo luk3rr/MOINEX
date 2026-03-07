@@ -160,56 +160,56 @@ public class AddPlanController extends BasePlanManagement {
 
     private List<BudgetGroup> getTemplate503020() {
         return List.of(
-                BudgetGroup.builder()
-                        .name(
-                                i18nService.tr(
-                                        Constants.TranslationKeys
-                                                .FINANCIALPLANNING_TEMPLATE_ESSENTIALS))
-                        .targetPercentage(BigDecimal.valueOf(50))
-                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
-                        .build(),
-                BudgetGroup.builder()
-                        .name(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS))
-                        .targetPercentage(BigDecimal.valueOf(30))
-                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
-                        .build(),
-                BudgetGroup.builder()
-                        .name(
-                                i18nService.tr(
-                                        Constants.TranslationKeys
-                                                .FINANCIALPLANNING_TEMPLATE_INVESTMENTS))
-                        .targetPercentage(BigDecimal.valueOf(20))
-                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
-                        .build());
+                new BudgetGroup(
+                        null,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_ESSENTIALS),
+                        BigDecimal.valueOf(50),
+                        null,
+                        new HashSet<>(),
+                        BudgetGroupTransactionFilter.EXPENSE),
+                new BudgetGroup(
+                        null,
+                        i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS),
+                        BigDecimal.valueOf(30),
+                        null,
+                        new HashSet<>(),
+                        BudgetGroupTransactionFilter.EXPENSE),
+                new BudgetGroup(
+                        null,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_INVESTMENTS),
+                        BigDecimal.valueOf(20),
+                        null,
+                        new HashSet<>(),
+                        BudgetGroupTransactionFilter.EXPENSE));
     }
 
     private List<BudgetGroup> getTemplate303040() {
         return List.of(
-                BudgetGroup.builder()
-                        .name(
-                                i18nService.tr(
-                                        Constants.TranslationKeys
-                                                .FINANCIALPLANNING_TEMPLATE_ESSENTIALS))
-                        .targetPercentage(BigDecimal.valueOf(30))
-                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
-                        .build(),
-                BudgetGroup.builder()
-                        .name(
-                                i18nService.tr(
-                                        Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS))
-                        .targetPercentage(BigDecimal.valueOf(30))
-                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
-                        .build(),
-                BudgetGroup.builder()
-                        .name(
-                                i18nService.tr(
-                                        Constants.TranslationKeys
-                                                .FINANCIALPLANNING_TEMPLATE_INVESTMENTS))
-                        .targetPercentage(BigDecimal.valueOf(40))
-                        .transactionTypeFilter(BudgetGroupTransactionFilter.EXPENSE)
-                        .build());
+                new BudgetGroup(
+                        null,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_ESSENTIALS),
+                        BigDecimal.valueOf(30),
+                        null,
+                        new HashSet<>(),
+                        BudgetGroupTransactionFilter.EXPENSE),
+                new BudgetGroup(
+                        null,
+                        i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS),
+                        BigDecimal.valueOf(30),
+                        null,
+                        new HashSet<>(),
+                        BudgetGroupTransactionFilter.EXPENSE),
+                new BudgetGroup(
+                        null,
+                        i18nService.tr(
+                                Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_INVESTMENTS),
+                        BigDecimal.valueOf(40),
+                        null,
+                        new HashSet<>(),
+                        BudgetGroupTransactionFilter.EXPENSE));
     }
 
     private void createBudgetGroupFromTemplate(List<BudgetGroup> template) {

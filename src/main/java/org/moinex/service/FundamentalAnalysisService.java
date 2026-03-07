@@ -20,7 +20,6 @@ import org.moinex.model.investment.Ticker;
 import org.moinex.repository.investment.FundamentalAnalysisRepository;
 import org.moinex.repository.investment.TickerRepository;
 import org.moinex.util.APIUtils;
-import org.moinex.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,14 +194,17 @@ public class FundamentalAnalysisService {
                         fundamentalAnalysisRepository
                                 .findByTickerAndPeriodType(ticker, periodType)
                                 .orElse(
-                                        FundamentalAnalysis.builder()
-                                                .ticker(ticker)
-                                                .createdAt(
-                                                        LocalDateTime.now()
-                                                                .format(
-                                                                        Constants
-                                                                                .DB_DATE_FORMATTER))
-                                                .build());
+                                        new FundamentalAnalysis(
+                                                null,
+                                                ticker,
+                                                null,
+                                                null,
+                                                null,
+                                                "BRL",
+                                                periodType,
+                                                "{}",
+                                                LocalDateTime.now(),
+                                                LocalDateTime.now()));
 
                 // Update fields
                 analysis.setCompanyName(tickerData.optString("company_name", ""));
@@ -210,7 +212,7 @@ public class FundamentalAnalysisService {
                 analysis.setIndustry(tickerData.optString("industry", ""));
                 analysis.setCurrency(tickerData.optString("currency", "BRL"));
                 analysis.setPeriodType(periodType);
-                analysis.setDataJson(tickerData.toString()); // Store full JSON
+                analysis.setDataJson(tickerData.toString());
                 analysis.setLastUpdate(LocalDateTime.now());
 
                 analysis = fundamentalAnalysisRepository.save(analysis);

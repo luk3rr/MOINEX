@@ -546,10 +546,10 @@ public class SavingsOverviewController {
 
         var performanceData = investmentPerformanceCalculationService.getPerformanceData();
 
-        Map<YearMonth, BigDecimal> monthlyInvested = performanceData.monthlyInvested();
-        Map<YearMonth, BigDecimal> accumulatedGains = performanceData.accumulatedGains();
-        Map<YearMonth, BigDecimal> monthlyGains = performanceData.monthlyGains();
-        Map<YearMonth, BigDecimal> portfolioValues = performanceData.portfolioValues();
+        Map<YearMonth, BigDecimal> monthlyInvested = performanceData.getMonthlyInvested();
+        Map<YearMonth, BigDecimal> accumulatedGains = performanceData.getAccumulatedGains();
+        Map<YearMonth, BigDecimal> monthlyGains = performanceData.getMonthlyGains();
+        Map<YearMonth, BigDecimal> portfolioValues = performanceData.getPortfolioValues();
 
         YearMonth currentMonth = YearMonth.now();
         List<YearMonth> allMonths = new ArrayList<>();
@@ -934,9 +934,11 @@ public class SavingsOverviewController {
                         })
                 .sorted(
                         best
-                                ? Comparator.comparing(TickerPerformanceDTO::profitLossPercentage)
+                                ? Comparator.comparing(
+                                                TickerPerformanceDTO::getProfitLossPercentage)
                                         .reversed()
-                                : Comparator.comparing(TickerPerformanceDTO::profitLossPercentage))
+                                : Comparator.comparing(
+                                        TickerPerformanceDTO::getProfitLossPercentage))
                 .limit(limit)
                 .toList();
     }
@@ -1043,7 +1045,7 @@ public class SavingsOverviewController {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
 
-        Label symbolLabel = new Label(performer.symbol());
+        Label symbolLabel = new Label(performer.getSymbol());
         symbolLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
         configureColumnWidth(symbolLabel, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
         symbolLabel.setAlignment(Pos.CENTER_LEFT);
@@ -1058,7 +1060,7 @@ public class SavingsOverviewController {
                 new Label(
                         performer.getSign()
                                 + UIUtils.formatPercentage(
-                                        performer.profitLossPercentage(), i18nService));
+                                        performer.getProfitLossPercentage(), i18nService));
         percentageLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
 
         if (performer.isPositive()) {
@@ -1072,7 +1074,7 @@ public class SavingsOverviewController {
         configureColumnWidth(percentageLabel, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
         percentageLabel.setAlignment(Pos.CENTER);
 
-        Label valueLabel = new Label(UIUtils.formatCurrencyDynamic(performer.currentValue()));
+        Label valueLabel = new Label(UIUtils.formatCurrencyDynamic(performer.getCurrentValue()));
         valueLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
         configureColumnWidth(valueLabel, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
         valueLabel.setAlignment(Pos.CENTER_RIGHT);
@@ -1191,7 +1193,7 @@ public class SavingsOverviewController {
     private VBox createAllocationBar(AllocationDTO allocation) {
         VBox barContainer = new VBox(ALLOCATION_BAR_CONTAINER_SPACING);
 
-        Label typeLabel = new Label(allocation.typeName());
+        Label typeLabel = new Label(allocation.getTypeName());
         typeLabel.getStyleClass().add(Constants.ALLOCATION_TYPE_LABEL_STYLE);
 
         HBox progressBar = new HBox();
@@ -1231,10 +1233,10 @@ public class SavingsOverviewController {
 
         Label currentLabel =
                 new Label(
-                        UIUtils.formatPercentage(allocation.currentPercentage(), i18nService)
+                        UIUtils.formatPercentage(allocation.getCurrentPercentage(), i18nService)
                                 + " / "
                                 + UIUtils.formatPercentage(
-                                        allocation.targetPercentage(), i18nService));
+                                        allocation.getTargetPercentage(), i18nService));
         currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
 
         Region spacer = new Region();
@@ -1274,7 +1276,7 @@ public class SavingsOverviewController {
             return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET);
         }
 
-        BigDecimal absDifference = allocation.difference().abs();
+        BigDecimal absDifference = allocation.getDifference().abs();
         String formattedDiff = UIUtils.formatPercentage(absDifference, i18nService);
 
         if (allocation.isCriticalLow()) {
