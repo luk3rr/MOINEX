@@ -4,7 +4,7 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.common
+package org.moinex.common.extension
 
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.jpa.repository.JpaRepository

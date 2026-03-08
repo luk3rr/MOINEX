@@ -8,8 +8,8 @@
 
 package org.moinex.service
 
-import org.moinex.common.findByIdOrThrow
-import org.moinex.common.isZero
+import org.moinex.common.extension.findByIdOrThrow
+import org.moinex.common.extension.isZero
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.Transfer

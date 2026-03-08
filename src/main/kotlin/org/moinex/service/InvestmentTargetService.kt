@@ -9,9 +9,9 @@
 package org.moinex.service
 
 import jakarta.persistence.EntityNotFoundException
-import org.moinex.common.isBetween
-import org.moinex.common.isEqual
-import org.moinex.common.isNotEqual
+import org.moinex.common.extension.isBetween
+import org.moinex.common.extension.isEqual
+import org.moinex.common.extension.isNotEqual
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.InvestmentTarget
 import org.moinex.repository.investment.InvestmentTargetRepository

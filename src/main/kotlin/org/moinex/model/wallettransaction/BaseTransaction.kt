@@ -14,7 +14,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.MappedSuperclass
-import org.moinex.common.toRounded
+import org.moinex.common.extension.toRounded
 import org.moinex.model.Category
 import org.moinex.model.enums.WalletTransactionType
 import java.math.BigDecimal

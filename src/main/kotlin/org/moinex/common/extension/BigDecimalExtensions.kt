@@ -1,4 +1,4 @@
-package org.moinex.common
+package org.moinex.common.extension
 
 import java.math.BigDecimal
 import java.math.RoundingMode

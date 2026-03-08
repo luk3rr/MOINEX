@@ -18,7 +18,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import org.moinex.common.toRounded
+import org.moinex.common.extension.toRounded
 import org.moinex.model.enums.OperationType
 import org.moinex.model.wallettransaction.WalletTransaction
 import java.math.BigDecimal

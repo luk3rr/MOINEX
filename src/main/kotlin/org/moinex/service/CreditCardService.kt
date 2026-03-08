@@ -9,7 +9,7 @@
 package org.moinex.service
 
 import org.moinex.common.ClockProvider
-import org.moinex.common.findByIdOrThrow
+import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardCredit
 import org.moinex.model.creditcard.CreditCardDebt

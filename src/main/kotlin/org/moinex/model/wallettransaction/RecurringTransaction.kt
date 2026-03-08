@@ -19,8 +19,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Inheritance
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateStringConverter
-import org.moinex.common.isAfterOrEqual
-import org.moinex.common.isBeforeOrEqual
+import org.moinex.common.extension.isAfterOrEqual
+import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.model.Category
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.model.enums.RecurringTransactionStatus

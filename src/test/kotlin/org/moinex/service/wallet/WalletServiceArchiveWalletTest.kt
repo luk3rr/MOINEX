@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
-import org.moinex.common.isZero
+import org.moinex.common.extension.isZero
 import org.moinex.factory.WalletFactory
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType

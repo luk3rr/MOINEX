@@ -18,7 +18,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateTimeStringConverter
-import org.moinex.common.toRounded
+import org.moinex.common.extension.toRounded
 import org.moinex.model.Category
 import java.math.BigDecimal
 import java.time.LocalDateTime

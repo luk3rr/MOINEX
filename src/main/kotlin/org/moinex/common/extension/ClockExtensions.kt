@@ -1,4 +1,4 @@
-package org.moinex.common
+package org.moinex.common.extension
 
 import org.moinex.util.Constants
 import java.time.LocalDate

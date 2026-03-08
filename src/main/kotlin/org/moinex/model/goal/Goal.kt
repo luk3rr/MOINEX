@@ -14,7 +14,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateStringConverter
-import org.moinex.common.toRounded
+import org.moinex.common.extension.toRounded
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType
 import java.math.BigDecimal

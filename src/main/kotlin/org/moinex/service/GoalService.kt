@@ -8,9 +8,9 @@
 
 package org.moinex.service
 
-import org.moinex.common.findByIdOrThrow
-import org.moinex.common.isNotZero
-import org.moinex.common.isZero
+import org.moinex.common.extension.findByIdOrThrow
+import org.moinex.common.extension.isNotZero
+import org.moinex.common.extension.isZero
 import org.moinex.model.enums.GoalFundingStrategy
 import org.moinex.model.goal.Goal
 import org.moinex.repository.goal.GoalRepository

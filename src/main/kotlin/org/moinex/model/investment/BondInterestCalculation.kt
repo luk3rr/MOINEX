@@ -20,7 +20,7 @@ import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateStringConverter
 import org.moinex.common.converter.LocalDateTimeStringConverter
 import org.moinex.common.converter.YearMonthStringConverter
-import org.moinex.common.toRounded
+import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime

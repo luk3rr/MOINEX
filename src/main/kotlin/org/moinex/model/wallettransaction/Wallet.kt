@@ -18,7 +18,7 @@ import jakarta.persistence.InheritanceType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import org.moinex.common.toRounded
+import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
 
 @Entity

@@ -8,7 +8,7 @@
 
 package org.moinex.service
 
-import org.moinex.common.findByIdOrThrow
+import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.model.CalendarEvent
 import org.moinex.repository.CalendarEventRepository
 import org.slf4j.LoggerFactory

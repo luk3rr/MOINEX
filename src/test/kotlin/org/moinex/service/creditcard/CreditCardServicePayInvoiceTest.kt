@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import org.moinex.common.isZero
-import org.moinex.common.toRounded
+import org.moinex.common.extension.isZero
+import org.moinex.common.extension.toRounded
 import org.moinex.factory.CreditCardFactory
 import org.moinex.factory.CreditCardOperatorFactory
 import org.moinex.factory.CreditCardPaymentFactory

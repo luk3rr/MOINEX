@@ -8,10 +8,10 @@
 
 package org.moinex.service
 
-import org.moinex.common.findByIdOrThrow
-import org.moinex.common.isAfterOrEqual
-import org.moinex.common.isBeforeOrEqual
-import org.moinex.common.isOpenEnded
+import org.moinex.common.extension.findByIdOrThrow
+import org.moinex.common.extension.isAfterOrEqual
+import org.moinex.common.extension.isBeforeOrEqual
+import org.moinex.common.extension.isOpenEnded
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.enums.WalletTransactionStatus
