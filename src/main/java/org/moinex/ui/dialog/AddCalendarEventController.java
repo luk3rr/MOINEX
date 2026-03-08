@@ -14,6 +14,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.model.CalendarEvent;
 import org.moinex.model.enums.CalendarEventType;
 import org.moinex.service.CalendarService;
 import org.moinex.service.I18nService;
@@ -85,7 +86,8 @@ public class AddCalendarEventController {
         }
 
         try {
-            calendarService.addEvent(eventTitle, description, eventDate.atStartOfDay(), eventType);
+            calendarService.createEvent(
+                    new CalendarEvent(null, eventDate, eventTitle, description, eventType));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),

@@ -17,9 +17,9 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.moinex.common.converter.LocalDateTimeStringConverter
+import org.moinex.common.converter.LocalDateStringConverter
 import org.moinex.model.enums.CalendarEventType
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Entity
 @Table(name = "calendar_event")
@@ -29,8 +29,8 @@ class CalendarEvent(
     @Column(name = "id")
     var id: Int? = null,
     @Column(name = "date", nullable = false)
-    @Convert(converter = LocalDateTimeStringConverter::class)
-    var date: LocalDateTime,
+    @Convert(converter = LocalDateStringConverter::class)
+    var date: LocalDate,
     @Column(name = "title", nullable = false)
     var title: String,
     @Column(name = "description")
