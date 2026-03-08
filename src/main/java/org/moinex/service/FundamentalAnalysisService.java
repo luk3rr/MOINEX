@@ -13,8 +13,8 @@ import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.enums.PeriodType;
-import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.FundamentalAnalysis;
 import org.moinex.model.investment.Ticker;
 import org.moinex.repository.investment.FundamentalAnalysisRepository;
@@ -38,8 +38,8 @@ public class FundamentalAnalysisService {
     public static final Integer RETRY_DELAY_MS = 2000;
     public static final Double RETRY_MULTIPLIER = 1.5;
 
-    public static final List<TickerType> VALID_TICKER_TYPES =
-            List.of(TickerType.STOCK, TickerType.REIT);
+    public static final List<AssetType> VALID_TICKER_TYPES =
+            List.of(AssetType.STOCK, AssetType.REIT);
 
     private FundamentalAnalysisRepository fundamentalAnalysisRepository;
     private TickerRepository tickerRepository;

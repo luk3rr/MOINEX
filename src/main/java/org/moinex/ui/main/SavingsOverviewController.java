@@ -43,7 +43,6 @@ import org.moinex.model.dto.AllocationDTO;
 import org.moinex.model.dto.ProfitabilityMetricsDTO;
 import org.moinex.model.dto.TickerPerformanceDTO;
 import org.moinex.model.enums.AssetType;
-import org.moinex.model.enums.TickerType;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BrazilianMarketIndicators;
 import org.moinex.model.investment.Dividend;
@@ -415,7 +414,7 @@ public class SavingsOverviewController {
             BigDecimal tickerCurrentValue =
                     ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
 
-            String typeName = UIUtils.translateTickerType(ticker.getType(), i18nService);
+            String typeName = UIUtils.translateAssetType(ticker.getType(), i18nService);
 
             investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add);
         }
@@ -1085,7 +1084,7 @@ public class SavingsOverviewController {
     }
 
     private List<AllocationDTO> calculateAllocationVsTarget() {
-        Map<TickerType, BigDecimal> currentAllocation = new HashMap<>();
+        Map<AssetType, BigDecimal> currentAllocation = new HashMap<>();
 
         BigDecimal totalBondValue =
                 bondService
@@ -1115,9 +1114,9 @@ public class SavingsOverviewController {
                 currentValue = totalBondValue;
                 typeName = i18nService.tr(Constants.TranslationKeys.ASSET_TYPE_BOND);
             } else {
-                TickerType tickerType = TickerType.valueOf(assetType.name());
+                AssetType tickerType = AssetType.valueOf(assetType.name());
                 currentValue = currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO);
-                typeName = UIUtils.translateTickerType(tickerType, i18nService);
+                typeName = UIUtils.translateAssetType(tickerType, i18nService);
             }
 
             BigDecimal currentPercentage =

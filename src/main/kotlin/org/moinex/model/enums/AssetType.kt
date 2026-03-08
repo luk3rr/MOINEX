@@ -8,11 +8,18 @@
 
 package org.moinex.model.enums
 
-enum class AssetType {
-    STOCK,
-    FUND,
-    CRYPTOCURRENCY,
-    REIT,
-    ETF,
-    BOND,
+enum class AssetType(
+    val category: AssetCategory,
+) {
+    STOCK(AssetCategory.TICKER),
+    FUND(AssetCategory.TICKER),
+    CRYPTOCURRENCY(AssetCategory.TICKER),
+    REIT(AssetCategory.TICKER),
+    ETF(AssetCategory.TICKER),
+    BOND(AssetCategory.FIXED_INCOME),
+}
+
+enum class AssetCategory {
+    TICKER,
+    FIXED_INCOME,
 }

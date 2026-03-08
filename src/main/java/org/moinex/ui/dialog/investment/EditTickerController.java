@@ -12,7 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
@@ -62,7 +62,7 @@ public final class EditTickerController extends BaseTickerManagement {
         String symbol = symbolField.getText().strip();
 
         String currentPriceStr = currentPriceField.getText();
-        TickerType type = typeComboBox.getValue();
+        AssetType type = typeComboBox.getValue();
         String quantityStr = quantityField.getText();
         String avgUnitPriceStr = avgUnitPriceField.getText();
 

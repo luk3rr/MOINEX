@@ -107,58 +107,51 @@ public class EditInvestmentTargetController {
     }
 
     private void updateTotalPercentage() {
-        BigDecimal total = BigDecimal.ZERO;
+        java.util.Map<AssetType, BigDecimal> targets = new java.util.HashMap<>();
 
         for (TargetRow row : targetRows) {
             try {
                 String text = row.percentageField.getText().trim();
-                if (!text.isEmpty()) {
-                    BigDecimal value = new BigDecimal(text);
-                    total = total.add(value);
-                }
-            } catch (NumberFormatException e) {
+                BigDecimal value = text.isEmpty() ? BigDecimal.ZERO : new BigDecimal(text);
+                targets.put(row.assetType, value);
+            } catch (NumberFormatException ignored) {
             }
         }
 
-        totalPercentageLabel.setText(UIUtils.formatPercentage(total, i18nService));
+        InvestmentTargetService.Companion.ValidationResult validationResult =
+                investmentTargetService.validate(targets);
 
-        if (total.compareTo(new BigDecimal("100")) == 0) {
+        totalPercentageLabel.setText(
+                UIUtils.formatPercentage(validationResult.getTotal(), i18nService));
+
+        if (validationResult.isValid()
+                && validationResult.getTotal().compareTo(new BigDecimal("100")) == 0) {
             totalPercentageLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: green;");
             validationLabel.setVisible(false);
         } else {
             totalPercentageLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
-            validationLabel.setText(
-                    i18nService.tr(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION));
+
+            if (!validationResult.isValid()) {
+                validationLabel.setText(validationResult.getErrors().getFirst());
+            } else if (validationResult.getTotal().compareTo(new BigDecimal("100")) != 0) {
+                validationLabel.setText(
+                        i18nService.tr(
+                                Constants.TranslationKeys
+                                        .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION));
+            }
             validationLabel.setVisible(true);
         }
     }
 
     @FXML
     private void handleSave() {
-        BigDecimal total = BigDecimal.ZERO;
-        List<TargetData> targetDataList = new ArrayList<>();
+        java.util.Map<AssetType, BigDecimal> targets = new java.util.HashMap<>();
 
         for (TargetRow row : targetRows) {
             try {
                 String text = row.percentageField.getText().trim();
                 BigDecimal percentage = text.isEmpty() ? BigDecimal.ZERO : new BigDecimal(text);
-
-                if (percentage.compareTo(BigDecimal.ZERO) < 0
-                        || percentage.compareTo(new BigDecimal("100")) > 0) {
-                    WindowUtils.showErrorDialog(
-                            i18nService.tr(
-                                    Constants.TranslationKeys
-                                            .INVESTMENT_DIALOG_INVALID_PERCENTAGE_TITLE),
-                            i18nService.tr(
-                                    Constants.TranslationKeys
-                                            .INVESTMENT_DIALOG_INVALID_PERCENTAGE_MESSAGE));
-                    return;
-                }
-
-                total = total.add(percentage);
-                targetDataList.add(new TargetData(row.assetType, percentage));
+                targets.put(row.assetType, percentage);
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
                         i18nService.tr(
@@ -171,43 +164,8 @@ public class EditInvestmentTargetController {
             }
         }
 
-        if (total.compareTo(new BigDecimal("100")) != 0) {
-            WindowUtils.showErrorDialog(
-                    i18nService.tr(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE),
-                    i18nService.tr(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION));
-            return;
-        }
-
         try {
-            List<InvestmentTarget> allTargets = investmentTargetService.getAllActiveTargets();
-
-            for (InvestmentTarget existingTarget : allTargets) {
-                boolean found = false;
-                for (TargetData data : targetDataList) {
-                    if (existingTarget.getAssetType() == data.assetType) {
-                        found = true;
-                        if (data.percentage.compareTo(BigDecimal.ZERO) == 0) {
-                            investmentTargetService.deleteTarget(existingTarget.getId());
-                        } else {
-                            investmentTargetService.setTarget(data.assetType, data.percentage);
-                        }
-                        break;
-                    }
-                }
-                if (!found) {
-                    investmentTargetService.deleteTarget(existingTarget.getId());
-                }
-            }
-
-            for (TargetData data : targetDataList) {
-                if (data.percentage.compareTo(BigDecimal.ZERO) > 0) {
-                    investmentTargetService.setTarget(data.assetType, data.percentage);
-                }
-            }
+            investmentTargetService.saveTargets(targets);
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(
@@ -216,6 +174,12 @@ public class EditInvestmentTargetController {
                             Constants.TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE));
 
             targetsContainer.getScene().getWindow().hide();
+        } catch (IllegalStateException e) {
+            WindowUtils.showErrorDialog(
+                    i18nService.tr(
+                            Constants.TranslationKeys
+                                    .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE),
+                    e.getMessage());
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
                     i18nService.tr(
@@ -237,16 +201,6 @@ public class EditInvestmentTargetController {
         TargetRow(AssetType assetType, TextField percentageField) {
             this.assetType = assetType;
             this.percentageField = percentageField;
-        }
-    }
-
-    private static class TargetData {
-        AssetType assetType;
-        BigDecimal percentage;
-
-        TargetData(AssetType assetType, BigDecimal percentage) {
-            this.assetType = assetType;
-            this.percentage = percentage;
         }
     }
 }

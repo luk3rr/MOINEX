@@ -30,7 +30,7 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.FundamentalAnalysisService;
@@ -64,7 +64,7 @@ public class SavingsStocksFundsController {
     @FXML private Text stocksFundsTabDividendsReceivedField;
     @FXML private TableView<Ticker> stocksFundsTabTickerTable;
     @FXML private TextField stocksFundsTabTickerSearchField;
-    @FXML private ComboBox<TickerType> stocksFundsTabTickerTypeComboBox;
+    @FXML private ComboBox<AssetType> stocksFundsTabTickerTypeComboBox;
     @FXML private JFXButton updatePortfolioPricesButton;
     @FXML private ImageView updatePricesButtonIcon;
 
@@ -472,7 +472,7 @@ public class SavingsStocksFundsController {
 
     private void updateTransactionTableView() {
         String similarTextOrId = stocksFundsTabTickerSearchField.getText().toLowerCase();
-        TickerType selectedTickerType = stocksFundsTabTickerTypeComboBox.getValue();
+        AssetType selectedTickerType = stocksFundsTabTickerTypeComboBox.getValue();
 
         stocksFundsTabTickerTable.getItems().clear();
 
@@ -517,8 +517,8 @@ public class SavingsStocksFundsController {
     }
 
     private void populateTickerTypeComboBox() {
-        ObservableList<TickerType> tickerTypesWithNull =
-                FXCollections.observableArrayList(TickerType.values());
+        ObservableList<AssetType> tickerTypesWithNull =
+                FXCollections.observableArrayList(AssetType.values());
 
         tickerTypesWithNull.addFirst(null);
 
@@ -527,21 +527,21 @@ public class SavingsStocksFundsController {
         stocksFundsTabTickerTypeComboBox.setConverter(
                 new StringConverter<>() {
                     @Override
-                    public String toString(TickerType tickerType) {
+                    public String toString(AssetType tickerType) {
                         return tickerType != null
-                                ? UIUtils.translateTickerType(tickerType, i18nService)
+                                ? UIUtils.translateAssetType(tickerType, i18nService)
                                 : i18nService.tr(
                                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL);
                     }
 
                     @Override
-                    public TickerType fromString(String string) {
+                    public AssetType fromString(String string) {
                         return string.equals(
                                         i18nService.tr(
                                                 Constants.TranslationKeys
                                                         .SAVINGS_STOCKS_FUNDS_FILTER_ALL))
                                 ? null
-                                : TickerType.valueOf(string);
+                                : AssetType.valueOf(string);
                     }
                 });
     }
@@ -584,7 +584,7 @@ public class SavingsStocksFundsController {
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateTickerType(
+                                UIUtils.translateAssetType(
                                         param.getValue().getType(), i18nService)));
         typeColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 

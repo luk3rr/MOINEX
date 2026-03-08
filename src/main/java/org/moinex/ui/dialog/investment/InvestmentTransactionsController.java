@@ -387,7 +387,7 @@ public class InvestmentTransactionsController {
         tickerTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateTickerType(
+                                UIUtils.translateAssetType(
                                         param.getValue().getTicker().getType(), i18nService)));
 
         TableColumn<TickerPurchase, String> dateColumn =
@@ -497,7 +497,7 @@ public class InvestmentTransactionsController {
         tickerTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateTickerType(
+                                UIUtils.translateAssetType(
                                         param.getValue().getTicker().getType(), i18nService)));
 
         TableColumn<TickerSale, String> dateColumn =
@@ -607,7 +607,7 @@ public class InvestmentTransactionsController {
         tickerTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateTickerType(
+                                UIUtils.translateAssetType(
                                         param.getValue().getTicker().getType(), i18nService)));
 
         TableColumn<Dividend, String> dateColumn =

@@ -12,13 +12,12 @@ import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.InvestmentTarget
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import java.util.Optional
 
 @Repository
 interface InvestmentTargetRepository : JpaRepository<InvestmentTarget, Int> {
     fun findAllByIsActiveTrueOrderByAssetTypeAsc(): List<InvestmentTarget>
 
-    fun findByAssetTypeAndIsActiveTrue(assetType: AssetType): Optional<InvestmentTarget>
+    fun findByAssetTypeAndIsActiveTrue(assetType: AssetType): InvestmentTarget?
 
-    fun findByAssetType(assetType: AssetType): Optional<InvestmentTarget>
+    fun findByAssetType(assetType: AssetType): InvestmentTarget?
 }

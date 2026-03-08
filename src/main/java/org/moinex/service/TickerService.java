@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
-import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.*;
@@ -89,7 +89,7 @@ public class TickerService {
     public Integer addTicker(
             String name,
             String symbol,
-            TickerType type,
+            AssetType type,
             BigDecimal price,
             BigDecimal avgUnitPrice,
             BigDecimal quantity) {
@@ -829,8 +829,8 @@ public class TickerService {
                                                                 + " exchange crypto",
                                                         targetTickerId)));
 
-        if (soldCrypto.getType() != TickerType.CRYPTOCURRENCY
-                || receivedCrypto.getType() != TickerType.CRYPTOCURRENCY) {
+        if (soldCrypto.getType() != AssetType.CRYPTOCURRENCY
+                || receivedCrypto.getType() != AssetType.CRYPTOCURRENCY) {
             throw new MoinexException.InvalidTickerTypeException(
                     "Both tickers must be of type CRYPTO to exchange crypto");
         }
@@ -1361,7 +1361,7 @@ public class TickerService {
      *
      * @param type The type of the tickers
      */
-    public List<Ticker> getAllNonArchivedTickersByType(TickerType type) {
+    public List<Ticker> getAllNonArchivedTickersByType(AssetType type) {
         return tickerRepository.findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(type);
     }
 

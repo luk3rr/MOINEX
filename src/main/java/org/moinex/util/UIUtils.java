@@ -627,23 +627,6 @@ public final class UIUtils {
         return eventType.getDescription();
     }
 
-    public static String translateTickerType(TickerType tickerType, I18nService i18nService) {
-        Map<String, String> tickerKeyMap =
-                Map.of(
-                        "stock", Constants.TranslationKeys.TICKER_TYPE_STOCK,
-                        "fund", Constants.TranslationKeys.TICKER_TYPE_FUND,
-                        "cryptocurrency", Constants.TranslationKeys.TICKER_TYPE_CRYPTO,
-                        "reit", Constants.TranslationKeys.TICKER_TYPE_REIT,
-                        "etf", Constants.TranslationKeys.TICKER_TYPE_ETF);
-
-        String key = tickerKeyMap.getOrDefault(tickerType.name().toLowerCase(), null);
-        if (key != null) {
-            return i18nService.tr(key);
-        }
-
-        return tickerType.name();
-    }
-
     public static String translateAssetType(AssetType assetType, I18nService i18nService) {
         Map<String, String> assetKeyMap =
                 Map.of(

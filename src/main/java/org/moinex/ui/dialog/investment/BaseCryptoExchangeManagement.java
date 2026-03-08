@@ -15,7 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.I18nService;
@@ -272,7 +272,7 @@ public abstract class BaseCryptoExchangeManagement {
     }
 
     protected void loadCryptosFromDatabase() {
-        cryptos = tickerService.getAllNonArchivedTickersByType(TickerType.CRYPTOCURRENCY);
+        cryptos = tickerService.getAllNonArchivedTickersByType(AssetType.CRYPTOCURRENCY);
     }
 
     protected void populateCryptoComboBoxes() {

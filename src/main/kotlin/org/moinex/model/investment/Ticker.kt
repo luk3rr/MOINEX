@@ -18,7 +18,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateTimeStringConverter
-import org.moinex.model.enums.TickerType
+import org.moinex.model.enums.AssetType
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -31,7 +31,7 @@ class Ticker(
     var id: Int? = null,
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    var type: TickerType,
+    var type: AssetType,
     @Column(name = "last_update", nullable = false)
     @Convert(converter = LocalDateTimeStringConverter::class)
     var lastUpdate: LocalDateTime,

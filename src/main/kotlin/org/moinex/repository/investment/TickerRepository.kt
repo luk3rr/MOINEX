@@ -8,7 +8,7 @@
 
 package org.moinex.repository.investment
 
-import org.moinex.model.enums.TickerType
+import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Ticker
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -112,5 +112,5 @@ interface TickerRepository : JpaRepository<Ticker, Int> {
      * Get all non-archived tickers of a specific type
      * @param type The type of the tickers
      */
-    fun findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(type: TickerType): List<Ticker>
+    fun findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(type: AssetType): List<Ticker>
 }

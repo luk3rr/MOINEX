@@ -11,7 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.AssetType;
 import org.moinex.service.I18nService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
@@ -31,7 +31,7 @@ public abstract class BaseTickerManagement {
 
     @FXML protected TextField avgUnitPriceField;
 
-    @FXML protected ComboBox<TickerType> typeComboBox;
+    @FXML protected ComboBox<AssetType> typeComboBox;
 
     protected TickerService tickerService;
     protected I18nService i18nService;
@@ -65,11 +65,11 @@ public abstract class BaseTickerManagement {
     protected abstract void handleSave();
 
     protected void populateTypeComboBox() {
-        typeComboBox.getItems().setAll(TickerType.values());
+        typeComboBox.getItems().setAll(AssetType.values());
     }
 
     protected void configureComboBoxes() {
-        UIUtils.configureComboBox(typeComboBox, t -> UIUtils.translateTickerType(t, i18nService));
+        UIUtils.configureComboBox(typeComboBox, t -> UIUtils.translateAssetType(t, i18nService));
     }
 
     protected void configureListeners() {

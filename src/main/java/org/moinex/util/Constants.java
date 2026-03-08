@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import org.moinex.model.enums.TickerType;
+import org.moinex.model.enums.AssetType;
 
 /** Constants used in the application */
 public final class Constants {
@@ -2820,10 +2820,10 @@ public final class Constants {
      * @param price The price to be rounded
      * @param tickerType The ticker type
      */
-    public static BigDecimal roundPrice(BigDecimal price, TickerType tickerType) {
+    public static BigDecimal roundPrice(BigDecimal price, AssetType assetType) {
         // Stocks and funds have two decimal places
         // Cryptocurrencies have MAX allowed by settings
-        if (tickerType.equals(TickerType.STOCK) || tickerType.equals(TickerType.FUND)) {
+        if (assetType.equals(AssetType.STOCK) || assetType.equals(AssetType.FUND)) {
             return price.setScale(2, RoundingMode.HALF_UP);
         } else {
             return price.setScale(INVESTMENT_CALCULATION_PRECISION, RoundingMode.HALF_UP);

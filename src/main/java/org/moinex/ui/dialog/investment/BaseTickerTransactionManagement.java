@@ -86,7 +86,6 @@ public abstract class BaseTickerTransactionManagement {
      * @param tickerService Ticker service
      * @param i18nService I18n service
      * @param walletService Wallet service
-     * @param categoryService Category service
      * @param tickerService Ticker service
      * @param i18nService I18n service
      * @note This constructor is used for dependency injection
