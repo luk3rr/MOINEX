@@ -18,13 +18,16 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Inheritance
 import jakarta.persistence.Table
-import org.moinex.common.converter.LocalDateTimeStringConverter
+import org.moinex.common.converter.LocalDateStringConverter
+import org.moinex.common.isAfterOrEqual
+import org.moinex.common.isBeforeOrEqual
 import org.moinex.model.Category
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
+import org.moinex.util.Constants
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Entity
 @Inheritance
@@ -35,14 +38,14 @@ class RecurringTransaction(
     @Column(name = "id")
     var id: Int? = null,
     @Column(name = "start_date", nullable = false)
-    @Convert(converter = LocalDateTimeStringConverter::class)
-    var startDate: LocalDateTime,
+    @Convert(converter = LocalDateStringConverter::class)
+    var startDate: LocalDate,
     @Column(name = "end_date", nullable = false)
-    @Convert(converter = LocalDateTimeStringConverter::class)
-    var endDate: LocalDateTime,
+    @Convert(converter = LocalDateStringConverter::class)
+    var endDate: LocalDate = Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE,
     @Column(name = "next_due_date", nullable = false)
-    @Convert(converter = LocalDateTimeStringConverter::class)
-    var nextDueDate: LocalDateTime,
+    @Convert(converter = LocalDateStringConverter::class)
+    var nextDueDate: LocalDate,
     @Enumerated(EnumType.STRING)
     @Column(name = "frequency", nullable = false)
     var frequency: RecurringTransactionFrequency,
@@ -59,14 +62,21 @@ class RecurringTransaction(
     includeInAnalysis: Boolean = true,
 ) : BaseTransaction(wallet, category, type, amount, description, includeInAnalysis) {
     init {
-        require(startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
-            "Start date must be before or equal to end date"
+        require(startDate.isBefore(endDate)) {
+            "Start date must be before to end date"
         }
 
-        require(nextDueDate.isAfter(startDate) || nextDueDate.isEqual(startDate)) {
+        require(nextDueDate.isAfterOrEqual(startDate)) {
             "Next due date must be after or equal to start date"
+        }
+
+        val minimumEndDate = startDate.plus(1, frequency.chronoUnit)
+        require(minimumEndDate.isBeforeOrEqual(endDate)) {
+            "End date must be at least one ${frequency.name} after the start date"
         }
     }
 
-    override fun toString(): String = "Recurring Transaction [id=$id, type=$type, amount=$amount]"
+    fun isActive(): Boolean = status == RecurringTransactionStatus.ACTIVE
+
+    override fun toString(): String = "Recurring Transaction [id=$id, type=$type, frequency=$frequency, amount=$amount]"
 }

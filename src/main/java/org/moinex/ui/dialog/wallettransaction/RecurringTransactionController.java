@@ -7,6 +7,7 @@
 package org.moinex.ui.dialog.wallettransaction;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -322,14 +323,19 @@ public class RecurringTransactionController {
                 param -> {
                     RecurringTransaction rt = param.getValue();
 
-                    Double expectedRemainingAmount;
+                    BigDecimal expectedRemainingAmount;
 
                     try {
                         expectedRemainingAmount =
-                                recurringTransactionService.calculateExpectedRemainingAmount(
-                                        rt.getId());
+                                recurringTransactionService
+                                        .getExpectedRemainingAmountFromRecurringTransaction(
+                                                rt.getId());
                     } catch (EntityNotFoundException e) {
-                        expectedRemainingAmount = 0.0;
+                        expectedRemainingAmount = BigDecimal.ZERO;
+                    }
+
+                    if (expectedRemainingAmount == null) {
+                        return new SimpleStringProperty("-");
                     }
 
                     return new SimpleStringProperty(
@@ -396,7 +402,6 @@ public class RecurringTransactionController {
                                 } else {
                                     RecurringTransaction rt = getTableRow().getItem();
                                     if (rt.getEndDate()
-                                            .toLocalDate()
                                             .equals(
                                                     Constants
                                                             .RECURRING_TRANSACTION_DEFAULT_END_DATE)) {

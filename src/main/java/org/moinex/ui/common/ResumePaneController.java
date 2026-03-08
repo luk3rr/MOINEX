@@ -117,7 +117,7 @@ public class ResumePaneController {
                 walletService.getAllNonArchivedWalletTransactionsByYear(Year.of(year));
 
         List<WalletTransaction> futureTransactions =
-                recurringTransactionService.getFutureTransactionsByYear(
+                recurringTransactionService.getFutureRecurringTransactionsByYear(
                         Year.of(year), Year.of(year));
 
         allYearTransactions.addAll(futureTransactions);
@@ -141,7 +141,7 @@ public class ResumePaneController {
                         YearMonth.of(year, month));
 
         List<WalletTransaction> futureTransactions =
-                recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
+                recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
                         YearMonth.of(year, month), YearMonth.of(year, month));
 
         transactions.addAll(futureTransactions);

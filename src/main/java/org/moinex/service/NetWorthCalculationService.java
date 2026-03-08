@@ -7,6 +7,7 @@
 package org.moinex.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.HashMap;
@@ -183,7 +184,7 @@ public class NetWorthCalculationService {
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             List<WalletTransaction> futureTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
                             currentMonth.plusMonths(1), targetMonth);
 
             BigDecimal futureIncomesTotal =
@@ -213,7 +214,7 @@ public class NetWorthCalculationService {
 
             // Add scheduled recurring transactions for current month
             List<WalletTransaction> scheduledTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
                             currentMonth, currentMonth);
 
             BigDecimal scheduledIncomes =
@@ -335,11 +336,12 @@ public class NetWorthCalculationService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         YearMonth targetMonth = YearMonth.of(year, month);
-        LocalDateTime startOfMonth = targetMonth.atDay(1).atTime(0, 0, 0);
-        LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59);
+        LocalDate startOfMonth = targetMonth.atDay(1);
+        LocalDate endOfMonth = targetMonth.atEndOfMonth();
 
         List<RecurringTransaction> allRecurringTransactions =
-                recurringTransactionService.getAllByType(walletTransactionType);
+                recurringTransactionService.getAllRecurringTransactionsByType(
+                        walletTransactionType);
 
         for (RecurringTransaction recurring : allRecurringTransactions) {
             if (!Boolean.TRUE.equals(recurring.getIncludeInNetWorth())) {
@@ -349,8 +351,8 @@ public class NetWorthCalculationService {
                 continue;
             }
 
-            LocalDateTime startDate = recurring.getStartDate();
-            LocalDateTime endDate = recurring.getEndDate();
+            LocalDate startDate = recurring.getStartDate();
+            LocalDate endDate = recurring.getEndDate();
 
             if (endDate.getYear() == Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE.getYear()
                     && endDate.getMonthValue()
@@ -372,7 +374,7 @@ public class NetWorthCalculationService {
 
             // Calculate what the nextDueDate would be at the start of the target month
             // We need to project backwards if the target month is in the past
-            LocalDateTime projectedNextDueDate = recurring.getStartDate();
+            LocalDate projectedNextDueDate = recurring.getStartDate();
 
             // Advance from start date to find what the next due date would be at the target month
             while (projectedNextDueDate.isBefore(startOfMonth)) {
@@ -386,7 +388,7 @@ public class NetWorthCalculationService {
             }
 
             // Count all installments from the target month onwards until end date
-            LocalDateTime currentInstallmentDate = projectedNextDueDate;
+            LocalDate currentInstallmentDate = projectedNextDueDate;
             while ((currentInstallmentDate.isBefore(endDate)
                     || currentInstallmentDate.equals(endDate))) {
                 recurringAmount = recurringAmount.add(recurring.getAmount());

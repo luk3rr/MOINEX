@@ -61,14 +61,12 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
         typeComboBox.setValue(rt.getType());
         categoryComboBox.setValue(rt.getCategory());
 
-        startDatePicker.setValue(rt.getNextDueDate().toLocalDate());
+        startDatePicker.setValue(rt.getNextDueDate());
 
-        if (rt.getEndDate()
-                .toLocalDate()
-                .equals(Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE)) {
+        if (rt.getEndDate().equals(Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE)) {
             endDatePicker.setValue(null);
         } else {
-            endDatePicker.setValue(rt.getEndDate().toLocalDate());
+            endDatePicker.setValue(rt.getEndDate());
         }
 
         frequencyComboBox.setValue(rt.getFrequency());
@@ -122,10 +120,9 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
             BigDecimal transactionAmount = new BigDecimal(valueString);
 
             boolean endDateChanged =
-                    (endDate != null && !endDate.equals(rt.getEndDate().toLocalDate()))
+                    (endDate != null && !endDate.equals(rt.getEndDate()))
                             || (endDate == null
                                     && !rt.getEndDate()
-                                            .toLocalDate()
                                             .equals(
                                                     Constants
                                                             .RECURRING_TRANSACTION_DEFAULT_END_DATE));
@@ -136,7 +133,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                     && rt.getAmount().compareTo(transactionAmount) == 0
                     && rt.getType().equals(type)
                     && rt.getCategory().getId().equals(category.getId())
-                    && rt.getNextDueDate().toLocalDate().equals(nextDueDate)
+                    && rt.getNextDueDate().equals(nextDueDate)
                     && !endDateChanged
                     && rt.getFrequency().equals(frequency)
                     && rt.getStatus()
@@ -160,7 +157,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                 rt.setAmount(transactionAmount);
                 rt.setType(type);
                 rt.setCategory(category);
-                rt.setNextDueDate(nextDueDate.atTime(Constants.RECURRING_TRANSACTION_DEFAULT_TIME));
+                rt.setNextDueDate(nextDueDate);
 
                 // If the end date not set, set the default end date
                 endDate =
@@ -168,7 +165,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                                 ? Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE
                                 : endDate;
 
-                rt.setEndDate(endDate.atTime(Constants.RECURRING_TRANSACTION_DEFAULT_TIME));
+                rt.setEndDate(endDate);
                 rt.setFrequency(frequency);
                 rt.setStatus(
                         activeCheckBox.isSelected()

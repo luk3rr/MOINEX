@@ -14,7 +14,9 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
+import org.moinex.model.enums.RecurringTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
+import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.I18nService;
@@ -79,30 +81,23 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
         try {
             BigDecimal transactionAmount = new BigDecimal(valueString);
 
-            if (endDate == null) {
-                recurringTransactionService.addRecurringTransaction(
-                        wallet.getId(),
-                        category,
-                        type,
-                        transactionAmount,
-                        startDate,
-                        description,
-                        frequency,
-                        includeInAnalysisCheckBox.isSelected(),
-                        includeInNetWorthCheckBox.isSelected());
-            } else {
-                recurringTransactionService.addRecurringTransaction(
-                        wallet.getId(),
-                        category,
-                        type,
-                        transactionAmount,
-                        startDate,
-                        endDate,
-                        description,
-                        frequency,
-                        includeInAnalysisCheckBox.isSelected(),
-                        includeInNetWorthCheckBox.isSelected());
-            }
+            endDate = endDate == null ? Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE : endDate;
+
+            recurringTransactionService.createRecurringTransaction(
+                    new RecurringTransaction(
+                            null,
+                            startDate,
+                            endDate,
+                            startDate,
+                            frequency,
+                            RecurringTransactionStatus.ACTIVE,
+                            includeInNetWorthCheckBox.isSelected(),
+                            description,
+                            wallet,
+                            category,
+                            type,
+                            transactionAmount,
+                            includeInAnalysisCheckBox.isSelected()));
 
             WindowUtils.showSuccessDialog(
                     i18nService.tr(

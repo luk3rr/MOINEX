@@ -627,7 +627,7 @@ public class WalletController {
 
             // Get future transactions and merge with the current transactions
             List<WalletTransaction> futureTransactions =
-                    recurringTransactionService.getFutureTransactionsByMonthForAnalysis(
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
                             YearMonth.of(year, month), YearMonth.of(year, month));
 
             List<CreditCardPayment> crcPayments =

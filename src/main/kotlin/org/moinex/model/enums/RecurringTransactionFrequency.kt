@@ -8,9 +8,13 @@
 
 package org.moinex.model.enums
 
-enum class RecurringTransactionFrequency {
-    DAILY,
-    WEEKLY,
-    MONTHLY,
-    YEARLY,
+import java.time.temporal.ChronoUnit
+
+enum class RecurringTransactionFrequency(
+    val chronoUnit: ChronoUnit,
+) {
+    DAILY(ChronoUnit.DAYS),
+    WEEKLY(ChronoUnit.WEEKS),
+    MONTHLY(ChronoUnit.MONTHS),
+    YEARLY(ChronoUnit.YEARS),
 }
