@@ -10,7 +10,6 @@ package org.moinex.service
 
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.common.extension.isBetween
-import org.moinex.common.extension.isEqual
 import org.moinex.common.extension.isNotEqual
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.InvestmentTarget
@@ -42,23 +41,12 @@ class InvestmentTargetService(
             validationResult.errors.joinToString(", ")
         }
 
-        check(validationResult.total.isEqual(100)) {
-            "Total investment target percentage must equal 100"
-        }
-
         val currentTargets = investmentTargetRepository.findAllByIsActiveTrueOrderByAssetTypeAsc()
 
         currentTargets.forEach { existingTarget ->
-            val newPercentage = targets[existingTarget.assetType]
-
-            if (newPercentage != null) {
-                if (newPercentage == BigDecimal.ZERO) {
-                    existingTarget.isActive = false
-                } else {
-                    existingTarget.targetPercentage = newPercentage
-                }
-            } else {
-                existingTarget.isActive = false
+            when (val newPercentage = targets[existingTarget.assetType]) {
+                null, BigDecimal.ZERO -> existingTarget.isActive = false
+                else -> existingTarget.targetPercentage = newPercentage
             }
         }
 
