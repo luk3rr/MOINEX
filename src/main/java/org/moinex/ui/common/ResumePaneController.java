@@ -18,7 +18,7 @@ import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -83,7 +83,7 @@ public class ResumePaneController {
     private RecurringTransactionService recurringTransactionService;
 
     private CreditCardService creditCardService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -98,11 +98,11 @@ public class ResumePaneController {
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
             CreditCardService creditCardService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -277,8 +277,10 @@ public class ResumePaneController {
         UIUtils.removeTooltipFromNode(savingsCurrentValue);
 
         if (savingsPercentage > 0) {
-            savingsLabel.setText(i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_SAVINGS));
-            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage, i18nService));
+            savingsLabel.setText(
+                    preferencesService.translate(Constants.TranslationKeys.COMMON_RESUME_SAVINGS));
+            savingsCurrentValue.setText(
+                    UIUtils.formatPercentage(savingsPercentage, preferencesService));
             savingsCurrentSign.setText("+");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -288,14 +290,16 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().add(Constants.POSITIVE_BALANCE_STYLE);
         } else if (savingsPercentage < 0) {
             savingsLabel.setText(
-                    i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
-            savingsCurrentValue.setText(UIUtils.formatPercentage(savingsPercentage, i18nService));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
+            savingsCurrentValue.setText(
+                    UIUtils.formatPercentage(savingsPercentage, preferencesService));
 
             if (savingsPercentage < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
                 savingsCurrentSign.setText(" ");
                 UIUtils.addTooltipToNode(
                         savingsCurrentValue,
-                        "- " + UIUtils.formatPercentage(-savingsPercentage, i18nService));
+                        "- " + UIUtils.formatPercentage(-savingsPercentage, preferencesService));
             } else {
                 savingsCurrentSign.setText("-");
             }
@@ -307,8 +311,9 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().add(Constants.NEGATIVE_BALANCE_STYLE);
         } else {
             savingsLabel.setText(
-                    i18nService.tr(Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
-            savingsCurrentValue.setText(UIUtils.formatPercentage(0.0, i18nService));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
+            savingsCurrentValue.setText(UIUtils.formatPercentage(0.0, preferencesService));
             savingsCurrentSign.setText(" ");
 
             savingsCurrentValue.getStyleClass().clear();
@@ -329,14 +334,14 @@ public class ResumePaneController {
 
         if (foreseenSavingsPercentage > 0) {
             savingsForeseenValue.setText(
-                    UIUtils.formatPercentage(foreseenSavingsPercentage, i18nService));
+                    UIUtils.formatPercentage(foreseenSavingsPercentage, preferencesService));
             savingsForeseenSign.setText("+");
         } else if (foreseenSavingsPercentage < 0) {
             savingsForeseenValue.setText(
-                    UIUtils.formatPercentage(-foreseenSavingsPercentage, i18nService));
+                    UIUtils.formatPercentage(-foreseenSavingsPercentage, preferencesService));
             savingsForeseenSign.setText("-");
         } else {
-            savingsForeseenValue.setText(UIUtils.formatPercentage(0.0, i18nService));
+            savingsForeseenValue.setText(UIUtils.formatPercentage(0.0, preferencesService));
             savingsForeseenSign.setText(" ");
         }
 

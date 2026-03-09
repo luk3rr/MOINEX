@@ -21,7 +21,7 @@ import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.dialog.creditcard.AddCreditCardCreditController;
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController;
 import org.moinex.ui.dialog.creditcard.CreditCardCreditsController;
@@ -86,7 +86,7 @@ public class CreditCardPaneController {
     private CreditCardService creditCardService;
 
     private CreditCard creditCard;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -99,11 +99,11 @@ public class CreditCardPaneController {
             CreditCardService creditCardService,
             ConfigurableApplicationContext springContext,
             CreditCardController creditCardController,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.creditCardService = creditCardService;
         this.springContext = springContext;
         this.creditCardController = creditCardController;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -115,7 +115,8 @@ public class CreditCardPaneController {
     private void handleAddDebt() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_DEBT_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_DEBT),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_DEBT),
                 springContext,
                 (AddCreditCardDebtController controller) -> controller.setCreditCard(creditCard),
                 List.of(() -> creditCardController.updateDisplay()));
@@ -125,7 +126,8 @@ public class CreditCardPaneController {
     private void handleAddCredit() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_CREDIT_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_CREDIT),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_CREDIT),
                 springContext,
                 (AddCreditCardCreditController controller) -> controller.setCreditCard(creditCard),
                 List.of(() -> creditCardController.updateDisplay()));
@@ -135,7 +137,8 @@ public class CreditCardPaneController {
     private void handleEditCreditCard() {
         WindowUtils.openModalWindow(
                 Constants.EDIT_CREDIT_CARD_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_EDIT),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_EDIT),
                 springContext,
                 (EditCreditCardController controller) -> controller.setCreditCard(creditCard),
                 List.of(() -> creditCardController.updateDisplay()));
@@ -145,20 +148,21 @@ public class CreditCardPaneController {
     private void handleArchiveCreditCard() {
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_TITLE),
                         creditCard.getName()),
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_MESSAGE),
-                i18nService.getBundle())) {
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_MESSAGE),
+                preferencesService.getBundle())) {
             try {
                 creditCardService.archiveCreditCard(creditCard.getId());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .COMMON_CREDIT_CARD_DIALOG_ARCHIVE_SUCCESS_TITLE),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .COMMON_CREDIT_CARD_DIALOG_ARCHIVE_SUCCESS_MESSAGE),
                                 creditCard.getName()));
@@ -167,7 +171,7 @@ public class CreditCardPaneController {
                 creditCardController.updateDisplay();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_ERROR),
                         e.getMessage());
             }
@@ -179,10 +183,10 @@ public class CreditCardPaneController {
         // Prevent the removal of a credit card with associated debts
         if (creditCardService.getDebtCountByCreditCard(creditCard.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .COMMON_CREDIT_CARD_DIALOG_DELETE_HAS_DEBTS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .COMMON_CREDIT_CARD_DIALOG_DELETE_HAS_DEBTS_MESSAGE));
             return;
@@ -190,20 +194,21 @@ public class CreditCardPaneController {
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_TITLE),
                         creditCard.getName()),
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_MESSAGE),
-                i18nService.getBundle())) {
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_MESSAGE),
+                preferencesService.getBundle())) {
             try {
                 creditCardService.deleteCreditCard(creditCard.getId());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .COMMON_CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .COMMON_CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE),
                                 creditCard.getName()));
@@ -212,7 +217,7 @@ public class CreditCardPaneController {
                 creditCardController.updateDisplay();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_ERROR),
                         e.getMessage());
             }
@@ -223,7 +228,8 @@ public class CreditCardPaneController {
     private void handleShowRebates() {
         WindowUtils.openModalWindow(
                 Constants.CREDIT_CARD_CREDITS_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_SHOW_CREDITS),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_SHOW_CREDITS),
                 springContext,
                 (CreditCardCreditsController controller) -> {},
                 List.of(() -> creditCardController.updateDisplay()));
@@ -245,7 +251,8 @@ public class CreditCardPaneController {
     private void handleRegisterPayment() {
         WindowUtils.openModalWindow(
                 Constants.CREDIT_CARD_INVOICE_PAYMENT_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_REGISTER_PAYMENT),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_REGISTER_PAYMENT),
                 springContext,
                 (CreditCardInvoicePaymentController controller) ->
                         controller.setCreditCard(creditCard, currentDisplayedMonth),
@@ -305,7 +312,7 @@ public class CreditCardPaneController {
 
         limitProgressBar.setProgress(limitProgress.doubleValue());
         limitProgressLabel.setText(
-                UIUtils.formatPercentage(limitProgress.doubleValue() * 100, i18nService));
+                UIUtils.formatPercentage(limitProgress.doubleValue() * 100, preferencesService));
 
         dueDateLabel.setText(String.valueOf(creditCard.getBillingDueDay()));
 
@@ -313,7 +320,7 @@ public class CreditCardPaneController {
 
         nextInvoiceLabel.setText(
                 UIUtils.formatShortMonthYear(
-                        creditCardService.getNextInvoiceDate(creditCard), i18nService));
+                        creditCardService.getNextInvoiceDate(creditCard), preferencesService));
 
         updateInvoiceInfo();
 
@@ -327,7 +334,7 @@ public class CreditCardPaneController {
         }
 
         invoiceMonthNavigatorBarLabel.setText(
-                UIUtils.formatShortMonthYear(currentDisplayedMonth, i18nService));
+                UIUtils.formatShortMonthYear(currentDisplayedMonth, preferencesService));
 
         BigDecimal totalDebts =
                 creditCardService.getInvoiceAmount(
@@ -345,7 +352,7 @@ public class CreditCardPaneController {
                                 YearMonth.of(
                                         currentDisplayedMonth.getYear(),
                                         currentDisplayedMonth.getMonthValue())),
-                        i18nService));
+                        preferencesService));
     }
 
     /** Set the default values for the credit card pane */

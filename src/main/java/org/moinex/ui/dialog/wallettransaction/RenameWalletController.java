@@ -15,7 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -35,7 +35,7 @@ public class RenameWalletController {
 
     private WalletService walletService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -44,9 +44,10 @@ public class RenameWalletController {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public RenameWalletController(WalletService walletService, I18nService i18nService) {
+    public RenameWalletController(
+            WalletService walletService, PreferencesService preferencesService) {
         this.walletService = walletService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -71,9 +72,9 @@ public class RenameWalletController {
 
         if (wt == null || walletNewName.isBlank()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -84,7 +85,7 @@ public class RenameWalletController {
             walletService.renameWallet(wt);
         } catch (IllegalArgumentException | EntityNotFoundException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_RENAMING_WALLET_TITLE),
                     e.getMessage());

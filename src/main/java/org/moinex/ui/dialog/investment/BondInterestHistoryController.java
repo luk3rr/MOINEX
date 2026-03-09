@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.investment.Bond;
 import org.moinex.model.investment.BondInterestCalculation;
 import org.moinex.service.BondInterestCalculationService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -46,7 +46,7 @@ public class BondInterestHistoryController {
 
     private Bond bond;
     private BondInterestCalculationService bondInterestCalculationService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private static final Logger logger =
             LoggerFactory.getLogger(BondInterestHistoryController.class);
@@ -54,9 +54,9 @@ public class BondInterestHistoryController {
     @Autowired
     public BondInterestHistoryController(
             BondInterestCalculationService bondInterestCalculationService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.bondInterestCalculationService = bondInterestCalculationService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setBond(Bond bond) {
@@ -87,7 +87,7 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> monthColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_INTEREST_HISTORY_TABLE_MONTH));
         monthColumn.setCellValueFactory(
                 cellData ->
@@ -96,7 +96,7 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> quantityColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_INTEREST_HISTORY_TABLE_QUANTITY));
         quantityColumn.setCellValueFactory(
                 cellData -> {
@@ -106,7 +106,7 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> investedAmountColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_TABLE_INVESTED_AMOUNT));
         investedAmountColumn.setCellValueFactory(
@@ -117,7 +117,7 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> monthlyInterestColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_TABLE_MONTHLY_INTEREST));
         monthlyInterestColumn.setCellValueFactory(
@@ -128,7 +128,7 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> accumulatedInterestColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_TABLE_ACCUMULATED_INTEREST));
         accumulatedInterestColumn.setCellValueFactory(
@@ -139,7 +139,7 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> finalValueColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_INTEREST_HISTORY_TABLE_FINAL_VALUE));
         finalValueColumn.setCellValueFactory(
                 cellData -> {
@@ -149,18 +149,18 @@ public class BondInterestHistoryController {
 
         TableColumn<BondInterestCalculation, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_INTEREST_HISTORY_TABLE_STATUS));
         statusColumn.setCellValueFactory(
                 cellData -> {
                     if (cellData.getValue().isManuallyAdjusted()) {
                         return new SimpleStringProperty(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .BOND_INTEREST_HISTORY_STATUS_ADJUSTED));
                     }
                     return new SimpleStringProperty(
-                            i18nService.tr(
+                            preferencesService.translate(
                                     Constants.TranslationKeys
                                             .BOND_INTEREST_HISTORY_STATUS_AUTOMATIC));
                 });
@@ -205,10 +205,10 @@ public class BondInterestHistoryController {
         BondInterestCalculation selected = historyTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_NO_MONTH_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_NO_MONTH_SELECTED_MESSAGE));
             return;
@@ -216,17 +216,17 @@ public class BondInterestHistoryController {
 
         TextInputDialog dialog = new TextInputDialog(selected.getMonthlyInterest().toString());
         dialog.setTitle(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .BOND_INTEREST_HISTORY_DIALOG_EDIT_INTEREST_TITLE));
         dialog.setHeaderText(
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_DIALOG_EDIT_INTEREST_HEADER),
                         selected.getReferenceMonth().toString()));
         dialog.setContentText(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .BOND_INTEREST_HISTORY_DIALOG_EDIT_INTEREST_CONTENT));
 
@@ -240,10 +240,10 @@ public class BondInterestHistoryController {
 
             if (newValue.compareTo(BigDecimal.ZERO) < 0) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_DIALOG_INVALID_VALUE_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_DIALOG_INVALID_VALUE_MESSAGE));
                 return;
@@ -253,10 +253,10 @@ public class BondInterestHistoryController {
                     bond.getId(), selected.getReferenceMonth(), newValue);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_MESSAGE));
 
@@ -269,16 +269,16 @@ public class BondInterestHistoryController {
 
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_INVALID_NUMBER_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_INVALID_NUMBER_MESSAGE));
             logger.warn("Invalid number format for interest adjustment", e);
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_ERROR_ADJUSTING_TITLE),
                     e.getMessage());
@@ -291,21 +291,21 @@ public class BondInterestHistoryController {
         BondInterestCalculation selected = historyTable.getSelectionModel().getSelectedItem();
         if (selected == null || !selected.isManuallyAdjusted()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_NO_ADJUSTED_MONTH_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_NO_ADJUSTED_MONTH_MESSAGE));
             return;
         }
 
         if (!WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RESET_HEADER),
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RESET_MESSAGE),
                         selected.getReferenceMonth().toString()))) {
@@ -317,10 +317,10 @@ public class BondInterestHistoryController {
                     bond.getId(), selected.getReferenceMonth());
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_MESSAGE));
 
@@ -332,7 +332,7 @@ public class BondInterestHistoryController {
 
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_ERROR_RESETTING_TITLE),
                     e.getMessage());
@@ -343,10 +343,10 @@ public class BondInterestHistoryController {
     @FXML
     private void handleRecalculateHistory() {
         if (!WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_HEADER),
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .BOND_INTEREST_HISTORY_DIALOG_CONFIRM_RECALCULATE_MESSAGE))) {
             return;
@@ -356,10 +356,10 @@ public class BondInterestHistoryController {
             bondInterestCalculationService.recalculateAllMonthlyInterest(bond.getId());
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_MESSAGE));
 
@@ -368,7 +368,7 @@ public class BondInterestHistoryController {
 
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_INTEREST_HISTORY_DIALOG_ERROR_RECALCULATING_TITLE),
                     e.getMessage());

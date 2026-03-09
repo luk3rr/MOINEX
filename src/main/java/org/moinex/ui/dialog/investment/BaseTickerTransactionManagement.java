@@ -22,7 +22,7 @@ import org.moinex.model.investment.Ticker;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -66,7 +66,7 @@ public abstract class BaseTickerTransactionManagement {
 
     protected TickerService tickerService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<Wallet> wallets;
 
@@ -84,10 +84,10 @@ public abstract class BaseTickerTransactionManagement {
      * @param walletService Wallet service
      * @param categoryService Category service
      * @param tickerService Ticker service
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @param walletService Wallet service
      * @param tickerService Ticker service
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -95,11 +95,11 @@ public abstract class BaseTickerTransactionManagement {
             WalletService walletService,
             CategoryService categoryService,
             TickerService tickerService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.categoryService = categoryService;
         this.tickerService = tickerService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -132,7 +132,7 @@ public abstract class BaseTickerTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(transactionDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transactionDatePicker, preferencesService);
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -178,10 +178,10 @@ public abstract class BaseTickerTransactionManagement {
             totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_MESSAGE));
 
@@ -266,14 +266,15 @@ public abstract class BaseTickerTransactionManagement {
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_TOOLTIP_CATEGORY_REQUIRED));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_TOOLTIP_CATEGORY_REQUIRED));
         }
     }
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(
-                statusComboBox, t -> UIUtils.translateTransactionStatus(t, i18nService));
+                statusComboBox, t -> UIUtils.translateTransactionStatus(t, preferencesService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

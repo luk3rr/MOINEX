@@ -15,7 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -35,7 +35,7 @@ public class ChangeWalletBalanceController {
 
     private WalletService walletService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -44,9 +44,10 @@ public class ChangeWalletBalanceController {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ChangeWalletBalanceController(WalletService walletService, I18nService i18nService) {
+    public ChangeWalletBalanceController(
+            WalletService walletService, PreferencesService preferencesService) {
         this.walletService = walletService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -83,9 +84,9 @@ public class ChangeWalletBalanceController {
 
         if (wt == null || newBalanceStr.isBlank()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -97,10 +98,10 @@ public class ChangeWalletBalanceController {
             // Check if it has modification
             if (wt.getBalance().compareTo(newBalance) == 0) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_NO_CHANGES_BALANCE_MESSAGE));
                 return;
@@ -110,10 +111,10 @@ public class ChangeWalletBalanceController {
                 walletService.updateWalletBalance(wt);
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_WALLET_BALANCE_UPDATED_MESSAGE));
             }
@@ -122,15 +123,15 @@ public class ChangeWalletBalanceController {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
             return;
         } catch (EntityNotFoundException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_UPDATING_BALANCE_TITLE),
                     e.getMessage());

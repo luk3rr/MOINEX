@@ -12,7 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ public class SettingsController {
 
     @FXML private ComboBox<Locale> languageComboBox;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private ConfigurableApplicationContext springContext;
 
@@ -31,8 +31,8 @@ public class SettingsController {
 
     @Autowired
     public SettingsController(
-            I18nService i18nService, ConfigurableApplicationContext springContext) {
-        this.i18nService = i18nService;
+            PreferencesService preferencesService, ConfigurableApplicationContext springContext) {
+        this.preferencesService = preferencesService;
         this.springContext = springContext;
 
         localeLabels.put(Locale.forLanguageTag("pt-BR"), "Português");
@@ -41,7 +41,7 @@ public class SettingsController {
 
     @FXML
     private void initialize() {
-        languageComboBox.getItems().setAll(i18nService.getSupportedLocales());
+        languageComboBox.getItems().setAll(preferencesService.getSupportedLocales());
 
         languageComboBox.setConverter(
                 new StringConverter<>() {
@@ -59,7 +59,7 @@ public class SettingsController {
                     }
                 });
 
-        languageComboBox.getSelectionModel().select(i18nService.getLocale());
+        languageComboBox.getSelectionModel().select(preferencesService.getLocale());
 
         languageComboBox
                 .valueProperty()
@@ -69,7 +69,7 @@ public class SettingsController {
                                 return;
                             }
 
-                            i18nService.setLocale(newVal);
+                            preferencesService.setLocale(newVal);
 
                             if (languageComboBox.getScene() == null
                                     || languageComboBox.getScene().getWindow() == null) {
@@ -90,13 +90,14 @@ public class SettingsController {
                                                                             org.moinex.util
                                                                                     .Constants
                                                                                     .MAIN_FXML),
-                                                            i18nService.getBundle());
+                                                            preferencesService.getBundle());
                                             loader.setControllerFactory(springContext::getBean);
 
                                             Parent mainRoot = loader.load();
 
                                             scene.setRoot(mainRoot);
-                                            stage.setTitle(i18nService.tr("app.title"));
+                                            stage.setTitle(
+                                                    preferencesService.translate("app.title"));
                                         } catch (IOException e) {
                                             // If reload fails, keep current UI
                                         }

@@ -24,7 +24,7 @@ import org.moinex.chart.BudgetGroupTimelineChart;
 import org.moinex.chart.DoughnutChart;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.common.BudgetGroupPaneController;
 import org.moinex.ui.dialog.financialplanning.AddPlanController;
 import org.moinex.ui.dialog.financialplanning.EditPlanController;
@@ -58,7 +58,7 @@ public class PlanController {
 
     private ConfigurableApplicationContext springContext;
     private FinancialPlanningService financialPlanningService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private FinancialPlan currentPlan;
     private List<FinancialPlanningService.PlanStatusDTO> currentPlanStatus;
@@ -69,10 +69,10 @@ public class PlanController {
     public PlanController(
             ConfigurableApplicationContext springContext,
             FinancialPlanningService financialPlanningService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.springContext = springContext;
         this.financialPlanningService = financialPlanningService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -93,7 +93,7 @@ public class PlanController {
     private void handleNewPlan() {
         WindowUtils.openModalWindow(
                 Constants.ADD_PLAN_FXML,
-                i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_ADD_PLAN_TITLE),
+                preferencesService.translate(Constants.TranslationKeys.PLAN_DIALOG_ADD_PLAN_TITLE),
                 springContext,
                 (AddPlanController controller) -> {},
                 List.of(this::updateView));
@@ -103,14 +103,16 @@ public class PlanController {
     private void handleEditPlan() {
         if (currentPlan == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_PLAN_FXML,
-                i18nService.tr(Constants.TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
+                preferencesService.translate(Constants.TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
                 springContext,
                 (EditPlanController controller) -> controller.setPlan(currentPlan),
                 List.of(this::updateView));
@@ -130,7 +132,7 @@ public class PlanController {
         periodComboBox.setConverter(
                 new StringConverter<>() {
                     final DateTimeFormatter formatter =
-                            UIUtils.getFullMonthYearFormatter(i18nService.getLocale());
+                            UIUtils.getFullMonthYearFormatter(preferencesService.getLocale());
 
                     @Override
                     public String toString(YearMonth yearMonth) {
@@ -214,7 +216,7 @@ public class PlanController {
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
-        doughnutChart.setI18nService(i18nService);
+        doughnutChart.setI18nService(preferencesService);
         doughnutChart.setShowCenterLabel(false);
         doughnutChart.setLegendVisible(true);
         doughnutChart.setLabelsVisible(false);
@@ -234,7 +236,7 @@ public class PlanController {
                             + "\n"
                             + UIUtils.formatCurrency(value)
                             + " ("
-                            + UIUtils.formatPercentage(percentage, i18nService)
+                            + UIUtils.formatPercentage(percentage, preferencesService)
                             + ")";
 
             UIUtils.addTooltipToNode(node, tooltipText);
@@ -276,7 +278,7 @@ public class PlanController {
             FXMLLoader loader =
                     new FXMLLoader(
                             getClass().getResource(Constants.BUDGET_GROUP_PANE_FXML),
-                            i18nService.getBundle());
+                            preferencesService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent content = loader.load();
 
@@ -329,9 +331,11 @@ public class PlanController {
                         currentPlan.getId(), startPeriod, endPeriod);
 
         BudgetGroupTimelineChart timelineChart = new BudgetGroupTimelineChart();
-        timelineChart.setI18nService(i18nService);
-        timelineChart.setXAxisLabel(i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_X_AXIS));
-        timelineChart.setYAxisLabel(i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_Y_AXIS));
+        timelineChart.setPreferencesService(preferencesService);
+        timelineChart.setXAxisLabel(
+                preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_X_AXIS));
+        timelineChart.setYAxisLabel(
+                preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_Y_AXIS));
         timelineChart.updateData(historicalData);
 
         UIUtils.applyDefaultChartStyle(timelineChart);

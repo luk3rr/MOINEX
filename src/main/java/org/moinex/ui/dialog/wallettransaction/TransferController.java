@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Transfer;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -38,7 +38,7 @@ public class TransferController {
 
     private ConfigurableApplicationContext springContext;
     private WalletService walletService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private final ObservableList<Transfer> masterData = FXCollections.observableArrayList();
     private FilteredList<Transfer> filteredData;
@@ -47,10 +47,10 @@ public class TransferController {
     public TransferController(
             WalletService walletService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -69,28 +69,31 @@ public class TransferController {
     private void configureTableView() {
         TableColumn<Transfer, Integer> idColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         TableColumn<Transfer, String> dateColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DATE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateForDisplay(
-                                        param.getValue().getDate(), i18nService)));
+                                        param.getValue().getDate(), preferencesService)));
 
         TableColumn<Transfer, String> descriptionColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         TableColumn<Transfer, String> amountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_AMOUNT));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -98,19 +101,22 @@ public class TransferController {
 
         TableColumn<Transfer, String> senderColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_SENDER));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_SENDER));
         senderColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getSenderWallet().getName()));
 
         TableColumn<Transfer, String> receiverColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_RECEIVER));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_RECEIVER));
         receiverColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getReceiverWallet().getName()));
 
         TableColumn<Transfer, String> categoryColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_TABLE_CATEGORY));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param -> {
                     if (param.getValue().getCategory() != null) {
@@ -140,8 +146,8 @@ public class TransferController {
 
     /** Configures the date pickers with appropriate formatters and default values. */
     private void configureDatePickers() {
-        UIUtils.setDatePickerFormat(transfersStartDatePicker, i18nService);
-        UIUtils.setDatePickerFormat(transfersEndDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transfersStartDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(transfersEndDatePicker, preferencesService);
 
         transfersStartDatePicker.setValue(LocalDate.now().withDayOfMonth(1));
         transfersEndDatePicker.setValue(LocalDate.now().plusMonths(1).withDayOfMonth(1));
@@ -199,7 +205,7 @@ public class TransferController {
     private void handleAdd() {
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_ADD_NEW_TRANSFER_TITLE),
                 springContext,
                 (AddTransferController controller) -> {},
@@ -215,10 +221,10 @@ public class TransferController {
         Transfer selectedTransfer = transfersTableView.getSelectionModel().getSelectedItem();
         if (selectedTransfer == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_EDIT_MESSAGE));
             return;
@@ -226,7 +232,7 @@ public class TransferController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_TRANSFER_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EDIT_TRANSFER_TITLE),
                 springContext,
                 (EditTransferController controller) -> controller.setTransfer(selectedTransfer),
@@ -238,30 +244,30 @@ public class TransferController {
         Transfer selectedTransfer = transfersTableView.getSelectionModel().getSelectedItem();
         if (selectedTransfer == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_DELETE_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_TITLE),
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_MESSAGE),
                         selectedTransfer.getId()),
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             try {
                 walletService.deleteTransfer(selectedTransfer.getId());
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_SUCCESS_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_TRANSFER_DELETED_MESSAGE));
 
@@ -270,7 +276,7 @@ public class TransferController {
 
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_TITLE),
                         e.getMessage());
             }

@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Ticker;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -33,13 +33,14 @@ public final class EditTickerController extends BaseTickerManagement {
      * Constructor
      *
      * @param tickerService Ticker service
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public EditTickerController(TickerService tickerService, I18nService i18nService) {
-        super(tickerService, i18nService);
-        this.i18nService = i18nService;
+    public EditTickerController(
+            TickerService tickerService, PreferencesService preferencesService) {
+        super(tickerService, preferencesService);
+        this.preferencesService = preferencesService;
     }
 
     public void setTicker(Ticker tk) {
@@ -72,8 +73,9 @@ public final class EditTickerController extends BaseTickerManagement {
                 || symbol.isBlank()
                 || currentPriceStr.isBlank()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
@@ -85,9 +87,9 @@ public final class EditTickerController extends BaseTickerManagement {
                 || (avgUnitPriceStr == null || avgUnitPriceStr.isBlank())
                         && !(quantityStr == null || quantityStr.isBlank())) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_MESSAGE));
 
             return;
@@ -121,9 +123,9 @@ public final class EditTickerController extends BaseTickerManagement {
                     && ticker.getAverageUnitValue().compareTo(avgUnitPrice) == 0
                     && ticker.isArchived() == archived) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_NO_CHANGES_TICKER_MESSAGE));
 
@@ -141,9 +143,9 @@ public final class EditTickerController extends BaseTickerManagement {
                 tickerService.updateTicker(ticker);
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_UPDATED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_TICKER_UPDATED_MESSAGE));
             }
@@ -152,13 +154,13 @@ public final class EditTickerController extends BaseTickerManagement {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_ERROR_UPDATING_TICKER_TITLE),
                     e.getMessage());

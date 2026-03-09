@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +38,13 @@ public class FundamentalMetricPaneController {
     @FXML private Label metricValueLabel;
     @FXML private HBox metadataBox;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
     private static final BigDecimal THRESHOLD_DECREASE_FONT_SIZE =
             new BigDecimal("1E12"); // 1 Trillion
 
     @Autowired
-    public FundamentalMetricPaneController(I18nService i18nService) {
-        this.i18nService = i18nService;
+    public FundamentalMetricPaneController(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     public Node getRoot() {
@@ -86,7 +86,7 @@ public class FundamentalMetricPaneController {
             if (dateToShow != null) {
                 Label dateLabel =
                         new Label(
-                                i18nService.tr(
+                                preferencesService.translate(
                                                 Constants.TranslationKeys
                                                         .FUNDAMENTAL_ANALYSIS_REFERENCE_DATE)
                                         + ": "
@@ -137,7 +137,7 @@ public class FundamentalMetricPaneController {
     private String formatDate(String dateStr) {
         try {
             LocalDateTime date = LocalDateTime.parse(dateStr);
-            return UIUtils.formatDateForDisplay(date, i18nService);
+            return UIUtils.formatDateForDisplay(date, preferencesService);
         } catch (Exception e) {
             return dateStr;
         }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +23,16 @@ import org.springframework.stereotype.Controller;
 public class EditPlanController extends BasePlanManagement {
 
     private FinancialPlan financialPlan;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
     public EditPlanController(
             FinancialPlanningService financialPlanningService,
             ConfigurableApplicationContext applicationContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         super(financialPlanningService, applicationContext);
-        this.i18nService = i18nService;
-        setI18nService(i18nService);
+        this.preferencesService = preferencesService;
+        setPreferencesService(preferencesService);
     }
 
     public void setPlan(FinancialPlan plan) {
@@ -53,9 +53,9 @@ public class EditPlanController extends BasePlanManagement {
 
         if (planName.isEmpty() || baseIncomeText.isEmpty()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -72,10 +72,10 @@ public class EditPlanController extends BasePlanManagement {
                     && baseIncome.compareTo(financialPlan.getBaseIncome()) == 0
                     && areBudgetGroupsEqual()) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .FINANCIALPLANNING_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .FINANCIALPLANNING_DIALOG_NO_CHANGES_MESSAGE));
                 return;
@@ -88,24 +88,24 @@ public class EditPlanController extends BasePlanManagement {
             financialPlanningService.updatePlan(financialPlan);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE));
 
             planNameField.getScene().getWindow().hide();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_ERROR_UPDATING_PLAN_TITLE),
                     e.getMessage());

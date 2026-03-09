@@ -19,7 +19,7 @@ import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -37,7 +37,7 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
      * @param walletService Wallet service
      * @param categoryService Category service
      * @param tickerService Ticker service
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -45,9 +45,9 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
             WalletService walletService,
             CategoryService categoryService,
             TickerService tickerService,
-            I18nService i18nService) {
-        super(walletService, categoryService, tickerService, i18nService);
-        this.i18nService = i18nService;
+            PreferencesService preferencesService) {
+        super(walletService, categoryService, tickerService, preferencesService);
+        this.preferencesService = preferencesService;
         walletTransactionType = WalletTransactionType.EXPENSE;
     }
 
@@ -73,8 +73,9 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
                 || quantityStr.isBlank()
                 || buyDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
@@ -100,22 +101,22 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
                     includeInAnalysisCheckBox.isSelected());
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_PURCHASE_ADDED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_PURCHASE_ADDED_MESSAGE));
 
             Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_BUYING_TICKER_TITLE),
                     e.getMessage());
         }

@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import lombok.NoArgsConstructor;
 import org.moinex.model.financialplanning.BudgetGroup;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Controller;
 @NoArgsConstructor
 public class BudgetGroupPaneController {
 
-    @Autowired private I18nService i18nService;
+    @Autowired private PreferencesService preferencesService;
 
     @FXML private Label groupNameLabel;
     @FXML private Label targetPercentageLabel;
@@ -57,10 +57,10 @@ public class BudgetGroupPaneController {
 
         groupNameLabel.setText(group.getName());
         targetPercentageLabel.setText(
-                UIUtils.formatPercentage(group.getTargetPercentage(), i18nService));
+                UIUtils.formatPercentage(group.getTargetPercentage(), preferencesService));
         targetAmountLabel.setText(UIUtils.formatCurrency(targetAmount));
         spentAmountLabel.setText(UIUtils.formatCurrency(spentAmount));
-        progressPercentageLabel.setText(UIUtils.formatPercentage(progress, i18nService));
+        progressPercentageLabel.setText(UIUtils.formatPercentage(progress, preferencesService));
 
         progressBar.setProgress(
                 progress.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP).doubleValue());
@@ -94,14 +94,16 @@ public class BudgetGroupPaneController {
 
         if (remaining.compareTo(BigDecimal.ZERO) < 0) {
             statusPrefixLabel.setText(
-                    i18nService.tr(Constants.TranslationKeys.COMMON_BUDGET_GROUP_OVERSPENT));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.COMMON_BUDGET_GROUP_OVERSPENT));
             statusAmountLabel.setText(UIUtils.formatCurrency(remaining.abs()));
             statusPrefixLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
             statusAmountLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
             progressBar.getStyleClass().add(Constants.PROGRESS_BAR_RED_COLOR_STYLE);
         } else {
             statusPrefixLabel.setText(
-                    i18nService.tr(Constants.TranslationKeys.COMMON_BUDGET_GROUP_REMAINING));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.COMMON_BUDGET_GROUP_REMAINING));
             statusAmountLabel.setText(UIUtils.formatCurrency(remaining));
 
             if (progress.compareTo(new BigDecimal("75")) > 0) {

@@ -21,7 +21,7 @@ import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -39,9 +39,9 @@ public class AddTransferController extends BaseTransferManagement {
             WalletService walletService,
             CalculatorService calculatorService,
             CategoryService categoryService,
-            I18nService i18nService,
+            PreferencesService preferencesService,
             ConfigurableApplicationContext springContext) {
-        super(walletService, calculatorService, categoryService, i18nService, springContext);
+        super(walletService, calculatorService, categoryService, preferencesService, springContext);
     }
 
     public void setSenderWalletComboBox(Wallet wt) {
@@ -87,9 +87,9 @@ public class AddTransferController extends BaseTransferManagement {
                 || description.isBlank()
                 || transferDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -112,10 +112,10 @@ public class AddTransferController extends BaseTransferManagement {
                             category));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_MESSAGE));
 
@@ -123,10 +123,10 @@ public class AddTransferController extends BaseTransferManagement {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_MESSAGE));
         } catch (MoinexException.SameSourceDestinationException
@@ -136,7 +136,7 @@ public class AddTransferController extends BaseTransferManagement {
                 | MoinexException.InsufficientResourcesException
                 | MoinexException.TransferFromMasterToVirtualWalletException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_CREATING_TRANSFER_TITLE),
                     e.getMessage());
@@ -182,10 +182,10 @@ public class AddTransferController extends BaseTransferManagement {
                     // If the current wallet is the SENDER and is a master wallet of the receiver,
                     // then an error is thrown... BUT be a buddy and show a message to the user :)
                     WindowUtils.showInformationDialog(
-                            i18nService.tr(
+                            preferencesService.translate(
                                     Constants.TranslationKeys
                                             .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_TITLE),
-                            i18nService.tr(
+                            preferencesService.translate(
                                     Constants.TranslationKeys
                                             .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_MESSAGE));
                     return;

@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -40,7 +40,7 @@ public abstract class BaseGoalManagement {
 
     protected GoalService goalService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -55,13 +55,13 @@ public abstract class BaseGoalManagement {
         this.walletService = walletService;
     }
 
-    protected void setI18nService(I18nService i18nService) {
-        this.i18nService = i18nService;
+    protected void setPreferencesService(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @FXML
     protected void initialize() {
-        UIUtils.setDatePickerFormat(targetDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(targetDatePicker, preferencesService);
 
         loadWalletsFromDatabase();
 

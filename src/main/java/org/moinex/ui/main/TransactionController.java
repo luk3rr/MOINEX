@@ -40,7 +40,7 @@ import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.ResumePaneController;
 import org.moinex.ui.dialog.ManageCategoryController;
@@ -94,7 +94,7 @@ public class TransactionController {
 
     private CategoryService categoryService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private static final Integer DAYS_BEFORE_OFFSET = 30;
 
@@ -114,12 +114,12 @@ public class TransactionController {
             CreditCardService creditCardService,
             CategoryService categoryService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.categoryService = categoryService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -131,8 +131,8 @@ public class TransactionController {
         populateTransactionTypeComboBox();
 
         // Format the date pickers
-        UIUtils.setDatePickerFormat(transactionsStartDatePicker, i18nService);
-        UIUtils.setDatePickerFormat(transactionsEndDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transactionsStartDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(transactionsEndDatePicker, preferencesService);
 
         LocalDateTime currentDate = LocalDateTime.now();
 
@@ -184,7 +184,8 @@ public class TransactionController {
     private void handleAddIncome() {
         WindowUtils.openModalWindow(
                 Constants.ADD_INCOME_FXML,
-                i18nService.tr(Constants.TranslationKeys.TRANSACTION_DIALOG_ADD_INCOME_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.TRANSACTION_DIALOG_ADD_INCOME_TITLE),
                 springContext,
                 (AddIncomeController controller) -> {},
                 List.of(
@@ -200,7 +201,8 @@ public class TransactionController {
     private void handleAddExpense() {
         WindowUtils.openModalWindow(
                 Constants.ADD_EXPENSE_FXML,
-                i18nService.tr(Constants.TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE),
                 springContext,
                 (AddExpenseController controller) -> {},
                 List.of(
@@ -219,8 +221,9 @@ public class TransactionController {
 
         if (selectedTransaction == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .TRANSACTION_DIALOG_NO_SELECTION_EDIT_MESSAGE));
 
@@ -229,7 +232,8 @@ public class TransactionController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_TRANSACTION_FXML,
-                i18nService.tr(Constants.TranslationKeys.TRANSACTION_DIALOG_EDIT_TRANSACTION_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.TRANSACTION_DIALOG_EDIT_TRANSACTION_TITLE),
                 springContext,
                 (EditTransactionController controller) ->
                         controller.setTransaction(selectedTransaction),
@@ -249,8 +253,9 @@ public class TransactionController {
 
         if (selectedTransaction == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .TRANSACTION_DIALOG_NO_SELECTION_DELETE_MESSAGE));
 
@@ -262,7 +267,7 @@ public class TransactionController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_DESCRIPTION),
                                 selectedTransaction.getDescription()))
@@ -270,7 +275,7 @@ public class TransactionController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_AMOUNT),
                                 UIUtils.formatCurrency(selectedTransaction.getAmount())))
@@ -278,25 +283,25 @@ public class TransactionController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE),
                                 UIUtils.formatDateTimeForDisplay(
-                                        selectedTransaction.getDate(), i18nService)))
+                                        selectedTransaction.getDate(), preferencesService)))
                 .append("\n");
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_STATUS),
                                 UIUtils.translateTransactionStatus(
-                                        selectedTransaction.getStatus(), i18nService)))
+                                        selectedTransaction.getStatus(), preferencesService)))
                 .append("\n");
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET),
                                 selectedTransaction.getWallet().getName()))
@@ -304,7 +309,7 @@ public class TransactionController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE),
                                 UIUtils.formatCurrency(
@@ -312,7 +317,7 @@ public class TransactionController {
                 .append("\n");
 
         message.append(
-                i18nService.tr(
+                preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE_AFTER_TRANSACTION)
                         + " ");
@@ -342,10 +347,10 @@ public class TransactionController {
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_TITLE),
                 message.toString(),
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             walletService.deleteWalletTransaction(selectedTransaction.getId());
 
             updateMonthYearResume();
@@ -359,7 +364,7 @@ public class TransactionController {
     private void handleRecurringTransactions() {
         WindowUtils.openModalWindow(
                 Constants.RECURRING_TRANSACTIONS_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.TRANSACTION_DIALOG_PERIODIC_TRANSACTION_TITLE),
                 springContext,
                 (RecurringTransactionController controller) -> {},
@@ -376,7 +381,7 @@ public class TransactionController {
     private void handleManageCategories() {
         WindowUtils.openModalWindow(
                 Constants.MANAGE_CATEGORY_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.TRANSACTION_DIALOG_MANAGE_CATEGORIES_TITLE),
                 springContext,
                 (ManageCategoryController controller) -> {},
@@ -467,7 +472,8 @@ public class TransactionController {
         moneyFlowStackedBarChart.getData().clear();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
+        DateTimeFormatter formatter =
+                UIUtils.getShortMonthYearFormatter(preferencesService.getLocale());
 
         List<Category> categories = categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
@@ -600,7 +606,7 @@ public class TransactionController {
                                 + ": "
                                 + UIUtils.formatCurrency(value)
                                 + " ("
-                                + UIUtils.formatPercentage(percentage, i18nService)
+                                + UIUtils.formatPercentage(percentage, preferencesService)
                                 + ")\nTotal: "
                                 + UIUtils.formatCurrency(monthTotal));
 
@@ -619,7 +625,7 @@ public class TransactionController {
             FXMLLoader loader =
                     new FXMLLoader(
                             getClass().getResource(Constants.RESUME_PANE_FXML),
-                            i18nService.getBundle());
+                            preferencesService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
@@ -669,7 +675,7 @@ public class TransactionController {
             FXMLLoader loader =
                     new FXMLLoader(
                             getClass().getResource(Constants.RESUME_PANE_FXML),
-                            i18nService.getBundle());
+                            preferencesService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
@@ -746,7 +752,7 @@ public class TransactionController {
         yearResumeComboBox.setConverter(
                 new StringConverter<>() {
                     private final DateTimeFormatter formatter =
-                            UIUtils.getYearFormatter(i18nService.getLocale());
+                            UIUtils.getYearFormatter(preferencesService.getLocale());
 
                     @Override
                     public String toString(Year year) {
@@ -786,9 +792,9 @@ public class TransactionController {
                             return "";
                         }
                         return walletTransactionType == WalletTransactionType.EXPENSE
-                                ? i18nService.tr(
+                                ? preferencesService.translate(
                                         Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
-                                : i18nService.tr(
+                                : preferencesService.translate(
                                         Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES);
                     }
 
@@ -803,12 +809,13 @@ public class TransactionController {
                     @Override
                     public String toString(WalletTransactionType walletTransactionType) {
                         if (walletTransactionType == null) {
-                            return i18nService.tr(Constants.TranslationKeys.TRANSACTION_FILTER_ALL);
+                            return preferencesService.translate(
+                                    Constants.TranslationKeys.TRANSACTION_FILTER_ALL);
                         }
                         return walletTransactionType == WalletTransactionType.EXPENSE
-                                ? i18nService.tr(
+                                ? preferencesService.translate(
                                         Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
-                                : i18nService.tr(
+                                : preferencesService.translate(
                                         Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES);
                     }
 
@@ -876,7 +883,9 @@ public class TransactionController {
                 new StringConverter<>() {
                     @Override
                     public String toString(Month month) {
-                        return month != null ? UIUtils.getMonthDisplayName(month, i18nService) : "";
+                        return month != null
+                                ? UIUtils.getMonthDisplayName(month, preferencesService)
+                                : "";
                     }
 
                     @Override
@@ -890,12 +899,12 @@ public class TransactionController {
     private void configureTableView() {
         TableColumn<WalletTransaction, Integer> idColumn =
                 getWalletTransactionLongTableColumn(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_ID));
 
         TableColumn<WalletTransaction, String> categoryColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_CATEGORY));
         categoryColumn.setCellValueFactory(
@@ -903,7 +912,7 @@ public class TransactionController {
 
         TableColumn<WalletTransaction, String> typeColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_TYPE));
         typeColumn.setCellValueFactory(
@@ -911,16 +920,16 @@ public class TransactionController {
                     WalletTransactionType type = param.getValue().getType();
                     String translatedType =
                             type == WalletTransactionType.EXPENSE
-                                    ? i18nService.tr(
+                                    ? preferencesService.translate(
                                             Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
-                                    : i18nService.tr(
+                                    : preferencesService.translate(
                                             Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES);
                     return new SimpleStringProperty(translatedType);
                 });
 
         TableColumn<WalletTransaction, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_STATUS));
         statusColumn.setCellValueFactory(
@@ -928,27 +937,27 @@ public class TransactionController {
                     WalletTransactionStatus status = param.getValue().getStatus();
                     String translatedStatus =
                             status == WalletTransactionStatus.PENDING
-                                    ? i18nService.tr(
+                                    ? preferencesService.translate(
                                             Constants.TranslationKeys.TRANSACTION_STATUS_PENDING)
-                                    : i18nService.tr(
+                                    : preferencesService.translate(
                                             Constants.TranslationKeys.TRANSACTION_STATUS_CONFIRMED);
                     return new SimpleStringProperty(translatedStatus);
                 });
 
         TableColumn<WalletTransaction, String> dateColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getDate(), i18nService)));
+                                        param.getValue().getDate(), preferencesService)));
 
         TableColumn<WalletTransaction, String> amountColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_AMOUNT));
         amountColumn.setCellValueFactory(
@@ -958,7 +967,7 @@ public class TransactionController {
 
         TableColumn<WalletTransaction, String> descriptionColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
@@ -966,7 +975,7 @@ public class TransactionController {
 
         TableColumn<WalletTransaction, String> walletNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .TRANSACTION_TRANSACTION_LIST_HEADER_WALLET));
         walletNameColumn.setCellValueFactory(

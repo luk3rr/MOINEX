@@ -22,7 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.investment.Ticker;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -41,19 +41,20 @@ public class ArchivedTickersController {
     private List<Ticker> archivedTickers;
 
     private TickerService tickerService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
      *
      * @param tickerService tickerService
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ArchivedTickersController(TickerService tickerService, I18nService i18nService) {
+    public ArchivedTickersController(
+            TickerService tickerService, PreferencesService preferencesService) {
         this.tickerService = tickerService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -76,9 +77,9 @@ public class ArchivedTickersController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_TICKER_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_TICKER_SELECTED_UNARCHIVE));
             return;
@@ -86,23 +87,23 @@ public class ArchivedTickersController {
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_CONFIRM_UNARCHIVE_TICKER_TITLE),
                         selectedTicker.getName() + " (" + selectedTicker.getSymbol() + ")"),
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .INVESTMENT_DIALOG_CONFIRM_UNARCHIVE_TICKER_MESSAGE),
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             try {
                 tickerService.unarchiveTicker(selectedTicker.getId());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_TICKER_UNARCHIVED_TITLE),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .INVESTMENT_DIALOG_TICKER_UNARCHIVED_MESSAGE),
                                 selectedTicker.getName()
@@ -115,7 +116,7 @@ public class ArchivedTickersController {
                 updateTickerTableView();
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_ERROR_UNARCHIVING_TICKER_TITLE),
                         e.getMessage());
@@ -129,9 +130,9 @@ public class ArchivedTickersController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_TICKER_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_TICKER_SELECTED_DELETE));
             return;
         }
@@ -139,10 +140,10 @@ public class ArchivedTickersController {
         // Prevent the removal of a ticker with associated transactions
         if (tickerService.getTransactionCountByTicker(selectedTicker.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_TICKER_HAS_TRANSACTIONS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_TICKER_HAS_TRANSACTIONS_MESSAGE));
             return;
@@ -150,21 +151,21 @@ public class ArchivedTickersController {
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_CONFIRM_DELETE_TICKER_TITLE),
                         selectedTicker.getName() + " (" + selectedTicker.getSymbol() + ")"),
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_TICKER_MESSAGE),
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             try {
                 tickerService.deleteTicker(selectedTicker.getId());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_DELETED_TITLE),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .INVESTMENT_DIALOG_TICKER_DELETED_MESSAGE),
                                 selectedTicker.getName()
@@ -177,7 +178,7 @@ public class ArchivedTickersController {
                 updateTickerTableView();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_ERROR_DELETING_TICKER_TITLE),
                         e.getMessage());
@@ -251,33 +252,40 @@ public class ArchivedTickersController {
         logoColumn.setStyle("-fx-alignment: CENTER;");
 
         TableColumn<Ticker, String> nameColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_NAME));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_NAME));
         nameColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<Ticker, String> symbolColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_SYMBOL));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_SYMBOL));
         symbolColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getSymbol()));
 
         TableColumn<Ticker, String> typeColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getType(), i18nService)));
+                                        param.getValue().getType(), preferencesService)));
 
         TableColumn<Ticker, BigDecimal> quantityColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY_OWNED));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY_OWNED));
         quantityColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getCurrentQuantity()));
 
         TableColumn<Ticker, String> unitColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_UNIT_PRICE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_UNIT_PRICE));
         unitColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -286,7 +294,8 @@ public class ArchivedTickersController {
 
         TableColumn<Ticker, String> totalColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TOTAL_VALUE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TOTAL_VALUE));
         totalColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -298,7 +307,7 @@ public class ArchivedTickersController {
 
         TableColumn<Ticker, String> avgUnitColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_TABLE_AVERAGE_UNIT_PRICE));
         avgUnitColumn.setCellValueFactory(
                 param ->
@@ -320,7 +329,9 @@ public class ArchivedTickersController {
 
     private TableColumn<Ticker, Integer> getTickerLongTableColumn() {
         TableColumn<Ticker, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_ID));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center

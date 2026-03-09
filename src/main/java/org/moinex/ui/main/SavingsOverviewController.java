@@ -51,10 +51,10 @@ import org.moinex.model.investment.MarketQuotesAndCommodities;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.investment.TickerSale;
 import org.moinex.service.BondService;
-import org.moinex.service.I18nService;
 import org.moinex.service.InvestmentPerformanceCalculationService;
 import org.moinex.service.InvestmentTargetService;
 import org.moinex.service.MarketService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.ui.common.ProfitabilityMetricsPaneController;
 import org.moinex.ui.dialog.investment.EditInvestmentTargetController;
@@ -106,7 +106,7 @@ public class SavingsOverviewController {
     private ConfigurableApplicationContext springContext;
     private TickerService tickerService;
     private MarketService marketService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
     private InvestmentTargetService investmentTargetService;
     private BondService bondService;
     private InvestmentPerformanceCalculationService investmentPerformanceCalculationService;
@@ -142,14 +142,14 @@ public class SavingsOverviewController {
             TickerService tickerService,
             MarketService marketService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService,
+            PreferencesService preferencesService,
             InvestmentTargetService investmentTargetService,
             BondService bondService,
             InvestmentPerformanceCalculationService investmentPerformanceCalculationService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
         this.investmentTargetService = investmentTargetService;
         this.bondService = bondService;
         this.investmentPerformanceCalculationService = investmentPerformanceCalculationService;
@@ -238,21 +238,23 @@ public class SavingsOverviewController {
         }
 
         overviewTabSelicValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getSelicTarget(), i18nService));
+                UIUtils.formatPercentage(
+                        brazilianMarketIndicators.getSelicTarget(), preferencesService));
 
         overviewTabIPCALastMonthValueField.setText(
                 UIUtils.formatPercentage(
-                        brazilianMarketIndicators.getIpcaLastMonth(), i18nService));
+                        brazilianMarketIndicators.getIpcaLastMonth(), preferencesService));
 
         overviewTabIPCALastMonthDescriptionField.setText(
                 "IPCA " + brazilianMarketIndicators.getIpcaLastMonthReference());
 
         overviewTabIPCA12MonthsValueField.setText(
-                UIUtils.formatPercentage(brazilianMarketIndicators.getIpca12Months(), i18nService));
+                UIUtils.formatPercentage(
+                        brazilianMarketIndicators.getIpca12Months(), preferencesService));
 
         brazilianMarketIndicatorsLastUpdateValue.setText(
                 UIUtils.formatDateTimeForDisplay(
-                        brazilianMarketIndicators.getLastUpdate(), i18nService));
+                        brazilianMarketIndicators.getLastUpdate(), preferencesService));
     }
 
     private void updateMarketQuotesAndCommodities() {
@@ -292,11 +294,11 @@ public class SavingsOverviewController {
 
         marketQuotesLastUpdateValue.setText(
                 UIUtils.formatDateTimeForDisplay(
-                        marketQuotesAndCommodities.getLastUpdate(), i18nService));
+                        marketQuotesAndCommodities.getLastUpdate(), preferencesService));
 
         commoditiesLastUpdateValue.setText(
                 UIUtils.formatDateTimeForDisplay(
-                        marketQuotesAndCommodities.getLastUpdate(), i18nService));
+                        marketQuotesAndCommodities.getLastUpdate(), preferencesService));
     }
 
     private synchronized void schedulerEntryForUpdatingMarketQuotes() {
@@ -370,7 +372,7 @@ public class SavingsOverviewController {
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
-        doughnutChart.setI18nService(i18nService);
+        doughnutChart.setI18nService(preferencesService);
         doughnutChart.setLabelsVisible(false);
 
         for (PieChart.Data data : doughnutChart.getData()) {
@@ -386,7 +388,7 @@ public class SavingsOverviewController {
                             + "\n"
                             + UIUtils.formatCurrency(value)
                             + " ("
-                            + UIUtils.formatPercentage(percentage, i18nService)
+                            + UIUtils.formatPercentage(percentage, preferencesService)
                             + ")";
 
             UIUtils.addTooltipToNode(node, tooltipText);
@@ -414,7 +416,7 @@ public class SavingsOverviewController {
             BigDecimal tickerCurrentValue =
                     ticker.getCurrentQuantity().multiply(ticker.getCurrentUnitValue());
 
-            String typeName = UIUtils.translateAssetType(ticker.getType(), i18nService);
+            String typeName = UIUtils.translateAssetType(ticker.getType(), preferencesService);
 
             investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add);
         }
@@ -424,7 +426,7 @@ public class SavingsOverviewController {
             BigDecimal bondAccumulatedInterest =
                     bondService.getTotalAccumulatedInterestByBondId(bond.getId());
             BigDecimal bondTotalValue = bondInvestedValue.add(bondAccumulatedInterest);
-            String typeName = UIUtils.translateBondType(bond.getType(), i18nService);
+            String typeName = UIUtils.translateBondType(bond.getType(), preferencesService);
 
             investmentByType.merge(typeName, bondTotalValue, BigDecimal::add);
         }
@@ -455,13 +457,15 @@ public class SavingsOverviewController {
 
         if (graphPaneCurrentPage == 0) {
             overviewTabBottonPaneTitle.setText(
-                    i18nService.tr(Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO));
             updateInvestmentDistributionChart();
             recalculateInvestmentPerformanceButton.setVisible(false);
             recalculateInvestmentPerformanceButton.setManaged(false);
         } else if (graphPaneCurrentPage == 1) {
             overviewTabBottonPaneTitle.setText(
-                    i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTMENT_PERFORMANCE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.SAVINGS_INVESTMENT_PERFORMANCE));
             updateInvestmentPerformanceChart();
             recalculateInvestmentPerformanceButton.setVisible(true);
             recalculateInvestmentPerformanceButton.setManaged(true);
@@ -505,7 +509,8 @@ public class SavingsOverviewController {
                                 .toExternalForm()));
         recalculateInvestmentPerformanceButton.setDisable(true);
         recalculateInvestmentPerformanceButton.setText(
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BUTTON_RECALCULATING));
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_BUTTON_RECALCULATING));
     }
 
     private void setOnRecalculateInvestmentPerformanceButton() {
@@ -515,7 +520,7 @@ public class SavingsOverviewController {
                         Objects.requireNonNull(getClass().getResource(Constants.RELOAD_ICON))
                                 .toExternalForm()));
         recalculateInvestmentPerformanceButton.setText(
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BUTTON_RECALCULATE));
+                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BUTTON_RECALCULATE));
     }
 
     private void updateInvestmentPerformanceChart() {
@@ -537,11 +542,13 @@ public class SavingsOverviewController {
         stackedBarChart.getData().clear();
 
         XYChart.Series<String, Number> investedSeries = new XYChart.Series<>();
-        investedSeries.setName(i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE));
+        investedSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE));
 
         XYChart.Series<String, Number> capitalGainsSeries = new XYChart.Series<>();
         capitalGainsSeries.setName(
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS));
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS));
 
         var performanceData = investmentPerformanceCalculationService.getPerformanceData();
 
@@ -556,7 +563,8 @@ public class SavingsOverviewController {
             allMonths.add(currentMonth.minusMonths(i));
         }
 
-        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
+        DateTimeFormatter formatter =
+                UIUtils.getShortMonthYearFormatter(preferencesService.getLocale());
 
         BigDecimal lastInvested = BigDecimal.ZERO;
         BigDecimal lastAccumulatedGains = BigDecimal.ZERO;
@@ -607,20 +615,22 @@ public class SavingsOverviewController {
             BigDecimal monthlyGain = monthlyGains.getOrDefault(yearMonth, BigDecimal.ZERO);
 
             String tooltipText =
-                    i18nService.tr(Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO)
+                    preferencesService.translate(
+                                    Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO)
                             + ": "
                             + UIUtils.formatCurrency(portfolio)
                             + "\n"
-                            + i18nService.tr(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE)
+                            + preferencesService.translate(
+                                    Constants.TranslationKeys.SAVINGS_INVESTED_VALUE)
                             + ": "
                             + UIUtils.formatCurrency(invested)
                             + "\n"
-                            + i18nService.tr(
+                            + preferencesService.translate(
                                     Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS)
                             + ": "
                             + UIUtils.formatCurrency(accumulatedGain)
                             + "\n"
-                            + i18nService.tr(
+                            + preferencesService.translate(
                                     Constants.TranslationKeys.SAVINGS_MONTHLY_CAPITAL_GAINS)
                             + ": "
                             + UIUtils.formatCurrency(monthlyGain);
@@ -634,10 +644,11 @@ public class SavingsOverviewController {
                 String sign = percentageChange.compareTo(BigDecimal.ZERO) >= 0 ? "+ " : "- ";
                 tooltipText +=
                         "\n"
-                                + i18nService.tr(Constants.TranslationKeys.SAVINGS_VARIATION)
+                                + preferencesService.translate(
+                                        Constants.TranslationKeys.SAVINGS_VARIATION)
                                 + ": "
                                 + sign
-                                + UIUtils.formatPercentage(percentageChange, i18nService);
+                                + UIUtils.formatPercentage(percentageChange, preferencesService);
             }
 
             if (investedData.getNode() != null) {
@@ -964,7 +975,9 @@ public class SavingsOverviewController {
 
         VBox bestBox = new VBox(5);
         Label bestLabel =
-                new Label(i18nService.tr(Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST));
+                new Label(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST));
         bestLabel.getStyleClass().add(Constants.CUSTOM_TABLE_TITLE_STYLE);
         bestLabel.setAlignment(Pos.CENTER);
         bestBox.getChildren().add(bestLabel);
@@ -978,7 +991,9 @@ public class SavingsOverviewController {
 
         VBox worstBox = new VBox(5);
         Label worstLabel =
-                new Label(i18nService.tr(Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST));
+                new Label(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST));
         worstLabel.getStyleClass().add(Constants.CUSTOM_TABLE_TITLE_STYLE);
         worstLabel.setAlignment(Pos.CENTER);
         worstBox.getChildren().add(worstLabel);
@@ -1002,7 +1017,7 @@ public class SavingsOverviewController {
 
         Label assetHeader =
                 new Label(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_ASSET));
         assetHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
         configureColumnWidth(assetHeader, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH);
@@ -1016,7 +1031,7 @@ public class SavingsOverviewController {
 
         Label returnHeader =
                 new Label(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_RETURN));
         returnHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
         configureColumnWidth(returnHeader, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH);
@@ -1024,7 +1039,7 @@ public class SavingsOverviewController {
 
         Label valueHeader =
                 new Label(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_VALUE));
         valueHeader.getStyleClass().add(Constants.CUSTOM_TABLE_HEADER_STYLE);
         configureColumnWidth(valueHeader, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH);
@@ -1059,7 +1074,7 @@ public class SavingsOverviewController {
                 new Label(
                         performer.getSign()
                                 + UIUtils.formatPercentage(
-                                        performer.getProfitLossPercentage(), i18nService));
+                                        performer.getProfitLossPercentage(), preferencesService));
         percentageLabel.getStyleClass().add(Constants.CUSTOM_TABLE_CELL_STYLE);
 
         if (performer.isPositive()) {
@@ -1112,11 +1127,11 @@ public class SavingsOverviewController {
 
             if (assetType == AssetType.BOND) {
                 currentValue = totalBondValue;
-                typeName = i18nService.tr(Constants.TranslationKeys.ASSET_TYPE_BOND);
+                typeName = preferencesService.translate(Constants.TranslationKeys.ASSET_TYPE_BOND);
             } else {
                 AssetType tickerType = AssetType.valueOf(assetType.name());
                 currentValue = currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO);
-                typeName = UIUtils.translateAssetType(tickerType, i18nService);
+                typeName = UIUtils.translateAssetType(tickerType, preferencesService);
             }
 
             BigDecimal currentPercentage =
@@ -1232,10 +1247,11 @@ public class SavingsOverviewController {
 
         Label currentLabel =
                 new Label(
-                        UIUtils.formatPercentage(allocation.getCurrentPercentage(), i18nService)
+                        UIUtils.formatPercentage(
+                                        allocation.getCurrentPercentage(), preferencesService)
                                 + " / "
                                 + UIUtils.formatPercentage(
-                                        allocation.getTargetPercentage(), i18nService));
+                                        allocation.getTargetPercentage(), preferencesService));
         currentLabel.getStyleClass().add(Constants.ALLOCATION_INFO_LABEL_STYLE);
 
         Region spacer = new Region();
@@ -1272,26 +1288,31 @@ public class SavingsOverviewController {
         }
 
         if (allocation.isOnTargetRange()) {
-            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET);
+            return preferencesService.translate(
+                    Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET);
         }
 
         BigDecimal absDifference = allocation.getDifference().abs();
-        String formattedDiff = UIUtils.formatPercentage(absDifference, i18nService);
+        String formattedDiff = UIUtils.formatPercentage(absDifference, preferencesService);
 
         if (allocation.isCriticalLow()) {
-            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)
+            return preferencesService.translate(
+                            Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)
                     + " "
                     + formattedDiff;
         } else if (allocation.isWarningLow()) {
-            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_LOW)
+            return preferencesService.translate(
+                            Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_LOW)
                     + " "
                     + formattedDiff;
         } else if (allocation.isWarningHigh()) {
-            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)
+            return preferencesService.translate(
+                            Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)
                     + " "
                     + formattedDiff;
         } else if (allocation.isCriticalHigh()) {
-            return i18nService.tr(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)
+            return preferencesService.translate(
+                            Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)
                     + " "
                     + formattedDiff;
         }
@@ -1303,7 +1324,8 @@ public class SavingsOverviewController {
     private void handleEditInvestmentTarget() {
         WindowUtils.openModalWindow(
                 Constants.EDIT_INVESTMENT_TARGET_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE),
                 springContext,
                 (EditInvestmentTargetController controller) -> {},
                 List.of(this::updateAllocationVsTargetPanel));

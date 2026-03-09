@@ -73,7 +73,7 @@ public abstract class BaseDividendManagement {
 
     protected Ticker ticker = null;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -90,12 +90,12 @@ public abstract class BaseDividendManagement {
             CategoryService categoryService,
             CalculatorService calculatorService,
             TickerService tickerService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.categoryService = categoryService;
         this.calculatorService = calculatorService;
         this.tickerService = tickerService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -128,7 +128,7 @@ public abstract class BaseDividendManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(dividendDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(dividendDatePicker, preferencesService);
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -250,7 +250,7 @@ public abstract class BaseDividendManagement {
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(
-                statusComboBox, s -> UIUtils.translateTransactionStatus(s, i18nService));
+                statusComboBox, s -> UIUtils.translateTransactionStatus(s, preferencesService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

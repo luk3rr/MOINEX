@@ -20,7 +20,7 @@ import org.moinex.model.enums.BondType;
 import org.moinex.model.enums.InterestIndex;
 import org.moinex.model.enums.InterestType;
 import org.moinex.service.BondService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -43,12 +43,12 @@ public final class AddBondController {
     @FXML private JFXButton cancelButton;
 
     private BondService bondService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
-    public AddBondController(BondService bondService, I18nService i18nService) {
+    public AddBondController(BondService bondService, PreferencesService preferencesService) {
         this.bondService = bondService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -57,7 +57,7 @@ public final class AddBondController {
         populateComboBoxes();
         configureListeners();
 
-        UIUtils.setDatePickerFormat(maturityDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(maturityDatePicker, preferencesService);
     }
 
     @FXML
@@ -73,8 +73,10 @@ public final class AddBondController {
 
         if (name == null || bondType == null || name.isBlank() || maturityDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -84,8 +86,8 @@ public final class AddBondController {
                 interestRate = new BigDecimal(interestRateStr);
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
                 return;
@@ -104,19 +106,23 @@ public final class AddBondController {
                     interestRate);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ADDED_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ADDED_MESSAGE));
+                    preferencesService.translate(Constants.TranslationKeys.BOND_DIALOG_ADDED_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_ADDED_MESSAGE));
 
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
 
         } catch (EntityExistsException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_MESSAGE));
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE), e.getMessage());
+                    preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                    e.getMessage());
         }
     }
 
@@ -127,9 +133,10 @@ public final class AddBondController {
     }
 
     private void configureComboBoxes() {
-        UIUtils.configureComboBox(bondTypeComboBox, t -> UIUtils.translateBondType(t, i18nService));
         UIUtils.configureComboBox(
-                interestTypeComboBox, t -> UIUtils.translateInterestType(t, i18nService));
+                bondTypeComboBox, t -> UIUtils.translateBondType(t, preferencesService));
+        UIUtils.configureComboBox(
+                interestTypeComboBox, t -> UIUtils.translateInterestType(t, preferencesService));
         UIUtils.configureComboBox(interestIndexComboBox, InterestIndex::name);
     }
 

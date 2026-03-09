@@ -22,7 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.moinex.app.JavaFXApp;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -190,14 +190,14 @@ public final class WindowUtils {
             String title,
             ApplicationContext springContext,
             Consumer<T> controllerSetup) {
-        I18nService i18nService = springContext.getBean(I18nService.class);
+        PreferencesService preferencesService = springContext.getBean(PreferencesService.class);
         openModalWindow(
                 fxmlFileName,
                 title,
                 springContext,
                 controllerSetup,
                 List.of(),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     /**
@@ -215,14 +215,14 @@ public final class WindowUtils {
             ApplicationContext springContext,
             Consumer<T> controllerSetup,
             List<Runnable> onHiddenActions) {
-        I18nService i18nService = springContext.getBean(I18nService.class);
+        PreferencesService preferencesService = springContext.getBean(PreferencesService.class);
         openModalWindow(
                 fxmlFileName,
                 title,
                 springContext,
                 controllerSetup,
                 onHiddenActions,
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     public static <T> void openModalWindow(
@@ -276,14 +276,14 @@ public final class WindowUtils {
             String title,
             ApplicationContext springContext,
             Consumer<T> controllerSetup) {
-        I18nService i18nService = springContext.getBean(I18nService.class);
+        PreferencesService preferencesService = springContext.getBean(PreferencesService.class);
         openPopupWindow(
                 fxmlFileName,
                 title,
                 springContext,
                 controllerSetup,
                 List.of(),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     /**
@@ -301,14 +301,14 @@ public final class WindowUtils {
             ApplicationContext springContext,
             Consumer<T> controllerSetup,
             List<Runnable> onHiddenActions) {
-        I18nService i18nService = springContext.getBean(I18nService.class);
+        PreferencesService preferencesService = springContext.getBean(PreferencesService.class);
         openPopupWindow(
                 fxmlFileName,
                 title,
                 springContext,
                 controllerSetup,
                 onHiddenActions,
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     public static <T> void openPopupWindow(

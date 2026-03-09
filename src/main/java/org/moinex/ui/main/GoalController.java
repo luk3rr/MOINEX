@@ -26,7 +26,7 @@ import javafx.scene.layout.AnchorPane;
 import lombok.NoArgsConstructor;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.GoalService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.GoalFullPaneController;
 import org.moinex.ui.dialog.goal.AddGoalController;
@@ -62,7 +62,7 @@ public class GoalController {
     private ConfigurableApplicationContext springContext;
     private GoalService goalService;
     private WalletService walletService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
     private List<Goal> goals;
     private Integer inProgressCurrentPage = 0;
     private Integer accomplishedCurrentPage = 0;
@@ -79,17 +79,17 @@ public class GoalController {
             GoalService goalService,
             WalletService walletService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.goalService = goalService;
         this.walletService = walletService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     private TableColumn<Goal, String> getColumn() {
         TableColumn<Goal, String> recommendedMonthlyDepositColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .GOAL_TABLE_HEADER_RECOMMENDED_MONTHLY_DEPOSIT));
         recommendedMonthlyDepositColumn.setCellValueFactory(
@@ -115,7 +115,7 @@ public class GoalController {
     private TableColumn<Goal, String> getTableColumn() {
         TableColumn<Goal, String> monthsUntilTargetColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.GOAL_TABLE_HEADER_MONTHS_UNTIL_TARGET));
         monthsUntilTargetColumn.setCellValueFactory(
                 param -> {
@@ -135,7 +135,7 @@ public class GoalController {
     private TableColumn<Goal, String> getStringTableColumn() {
         TableColumn<Goal, String> completionDateColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.GOAL_TABLE_HEADER_COMPLETION_DATE));
         completionDateColumn.setCellValueFactory(
                 param -> {
@@ -145,7 +145,7 @@ public class GoalController {
                             && param.getValue().getCompletionDate() != null) {
                         return new SimpleStringProperty(
                                 UIUtils.formatDateForDisplay(
-                                        param.getValue().getCompletionDate(), i18nService));
+                                        param.getValue().getCompletionDate(), preferencesService));
                     }
 
                     return new SimpleObjectProperty<>("-");
@@ -156,13 +156,14 @@ public class GoalController {
     private TableColumn<Goal, String> getGoalStringTableColumn() {
         TableColumn<Goal, String> progressColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_PROGRESS));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_PROGRESS));
         progressColumn.setCellValueFactory(
                 param -> {
                     // If the goal is archived, return 100 %
                     if (param.getValue().isCompleted())
                         return new SimpleObjectProperty<>(
-                                UIUtils.formatPercentage(100, i18nService));
+                                UIUtils.formatPercentage(100, preferencesService));
 
                     return new SimpleObjectProperty<>(
                             UIUtils.formatPercentage(
@@ -174,14 +175,16 @@ public class GoalController {
                                                             .getTargetBalance()
                                                             .doubleValue()
                                                     * 100,
-                                    i18nService));
+                                    preferencesService));
                 });
         return progressColumn;
     }
 
     private TableColumn<Goal, Integer> getGoalLongTableColumn() {
         TableColumn<Goal, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_ID));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -252,7 +255,7 @@ public class GoalController {
     private void handleAddGoal() {
         WindowUtils.openModalWindow(
                 Constants.ADD_GOAL_FXML,
-                i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ADD_GOAL_TITLE),
+                preferencesService.translate(Constants.TranslationKeys.GOAL_DIALOG_ADD_GOAL_TITLE),
                 springContext,
                 (AddGoalController controller) -> {},
                 List.of(
@@ -271,8 +274,9 @@ public class GoalController {
 
         if (goal == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .GOAL_DIALOG_NO_SELECTION_ADD_DEPOSIT_MESSAGE));
             return;
@@ -280,14 +284,17 @@ public class GoalController {
 
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ARCHIVED_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ARCHIVED_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_ARCHIVED_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_ARCHIVED_MESSAGE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ADD_TRANSFER_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.GOAL_DIALOG_ADD_TRANSFER_TITLE),
                 springContext,
                 (AddTransferController controller) -> controller.setReceiverWalletComboBox(goal),
                 List.of(
@@ -306,15 +313,16 @@ public class GoalController {
 
         if (goal == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_EDIT_MESSAGE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_GOAL_FXML,
-                i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EDIT_GOAL_TITLE),
+                preferencesService.translate(Constants.TranslationKeys.GOAL_DIALOG_EDIT_GOAL_TITLE),
                 springContext,
                 (EditGoalController controller) -> controller.setGoal(goal),
                 List.of(
@@ -333,8 +341,9 @@ public class GoalController {
 
         if (goal == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_DELETE_MESSAGE));
             return;
         }
@@ -342,8 +351,10 @@ public class GoalController {
         // Prevent the removal of a wallet with associated transactions
         if (walletService.getWalletTransactionAndTransferCountByWallet(goal.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
@@ -352,7 +363,7 @@ public class GoalController {
 
         message.append(
                         java.text.MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .GOAL_DIALOG_CONFIRMATION_DELETE_NAME),
                                 goal.getName()))
@@ -360,7 +371,7 @@ public class GoalController {
 
         message.append(
                         java.text.MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .GOAL_DIALOG_CONFIRMATION_DELETE_INITIAL_AMOUNT),
                                 UIUtils.formatCurrency(goal.getInitialBalance())))
@@ -368,7 +379,7 @@ public class GoalController {
 
         message.append(
                         java.text.MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .GOAL_DIALOG_CONFIRMATION_DELETE_CURRENT_AMOUNT),
                                 UIUtils.formatCurrency(goal.getBalance())))
@@ -376,7 +387,7 @@ public class GoalController {
 
         message.append(
                         java.text.MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_AMOUNT),
                                 UIUtils.formatCurrency(goal.getTargetBalance())))
@@ -384,18 +395,20 @@ public class GoalController {
 
         message.append(
                         java.text.MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE),
-                                UIUtils.formatDateForDisplay(goal.getTargetDate(), i18nService)))
+                                UIUtils.formatDateForDisplay(
+                                        goal.getTargetDate(), preferencesService)))
                 .append("\n");
 
         try {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TITLE),
                     message.toString(),
-                    i18nService.getBundle())) {
+                    preferencesService.getBundle())) {
                 goalService.deleteGoal(goal.getId());
                 goals.remove(goal);
 
@@ -405,7 +418,8 @@ public class GoalController {
             }
         } catch (EntityNotFoundException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE), e.getMessage());
+                    preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                    e.getMessage());
         }
     }
 
@@ -445,7 +459,7 @@ public class GoalController {
                 FXMLLoader loader =
                         new FXMLLoader(
                                 getClass().getResource(Constants.GOAL_FULL_PANE_FXML),
-                                i18nService.getBundle());
+                                preferencesService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
 
                 Parent newContent = loader.load();
@@ -517,7 +531,7 @@ public class GoalController {
                 FXMLLoader loader =
                         new FXMLLoader(
                                 getClass().getResource(Constants.GOAL_FULL_PANE_FXML),
-                                i18nService.getBundle());
+                                preferencesService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
 
                 Parent newContent = loader.load();
@@ -578,23 +592,23 @@ public class GoalController {
         return goals.stream()
                 .filter(
                         g -> {
-                            if (i18nService
-                                    .tr(Constants.TranslationKeys.GOAL_FILTER_ALL)
+                            if (preferencesService
+                                    .translate(Constants.TranslationKeys.GOAL_FILTER_ALL)
                                     .equals(selectedGoalStatus)) {
                                 return true;
                             }
-                            if (i18nService
-                                    .tr(Constants.TranslationKeys.GOAL_FILTER_COMPLETED)
+                            if (preferencesService
+                                    .translate(Constants.TranslationKeys.GOAL_FILTER_COMPLETED)
                                     .equals(selectedGoalStatus)) {
                                 return g.isCompleted() && !g.isArchived();
                             }
-                            if (i18nService
-                                    .tr(Constants.TranslationKeys.GOAL_FILTER_ACTIVE)
+                            if (preferencesService
+                                    .translate(Constants.TranslationKeys.GOAL_FILTER_ACTIVE)
                                     .equals(selectedGoalStatus)) {
                                 return !g.isCompleted() && !g.isArchived();
                             }
-                            if (i18nService
-                                    .tr(Constants.TranslationKeys.GOAL_FILTER_ARCHIVED)
+                            if (preferencesService
+                                    .translate(Constants.TranslationKeys.GOAL_FILTER_ARCHIVED)
                                     .equals(selectedGoalStatus)) {
                                 return g.isArchived();
                             }
@@ -623,12 +637,12 @@ public class GoalController {
                                 String targetAmount = g.getTargetBalance().toString();
                                 String targetDate =
                                         UIUtils.formatDateForDisplay(
-                                                g.getTargetDate(), i18nService);
+                                                g.getTargetDate(), preferencesService);
 
                                 String completionDate =
                                         g.getCompletionDate() != null
                                                 ? UIUtils.formatDateForDisplay(
-                                                        g.getCompletionDate(), i18nService)
+                                                        g.getCompletionDate(), preferencesService)
                                                 : "-";
 
                                 String status = g.isCompleted() ? "completed" : "active";
@@ -713,13 +727,16 @@ public class GoalController {
         TableColumn<Goal, Integer> idColumn = getGoalLongTableColumn();
 
         TableColumn<Goal, String> nameColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_NAME));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_NAME));
         nameColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getName()));
 
         TableColumn<Goal, String> initialAmountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_INITIAL_AMOUNT));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_INITIAL_AMOUNT));
         initialAmountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -727,7 +744,8 @@ public class GoalController {
 
         TableColumn<Goal, String> currentAmountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_CURRENT_AMOUNT));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_CURRENT_AMOUNT));
         currentAmountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -735,7 +753,8 @@ public class GoalController {
 
         TableColumn<Goal, String> targetAmountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_TARGET_AMOUNT));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_TARGET_AMOUNT));
         targetAmountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -745,28 +764,31 @@ public class GoalController {
 
         TableColumn<Goal, String> targetDateColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_TARGET_DATE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_TARGET_DATE));
         targetDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateForDisplay(
-                                        param.getValue().getTargetDate(), i18nService)));
+                                        param.getValue().getTargetDate(), preferencesService)));
 
         TableColumn<Goal, String> completionDateColumn = getStringTableColumn();
 
         TableColumn<Goal, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_TABLE_HEADER_STATUS));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_TABLE_HEADER_STATUS));
         statusColumn.setCellValueFactory(
                 param -> {
                     Goal goal = param.getValue();
                     String status =
                             goal.isArchived()
-                                    ? i18nService.tr(Constants.TranslationKeys.GOAL_STATUS_ARCHIVED)
+                                    ? preferencesService.translate(
+                                            Constants.TranslationKeys.GOAL_STATUS_ARCHIVED)
                                     : goal.isCompleted()
-                                            ? i18nService.tr(
+                                            ? preferencesService.translate(
                                                     Constants.TranslationKeys.GOAL_STATUS_COMPLETED)
-                                            : i18nService.tr(
+                                            : preferencesService.translate(
                                                     Constants.TranslationKeys.GOAL_STATUS_ACTIVE);
                     return new SimpleObjectProperty<>(status);
                 });
@@ -798,7 +820,7 @@ public class GoalController {
                                             Tooltip tooltip =
                                                     new Tooltip(
                                                             java.text.MessageFormat.format(
-                                                                    i18nService.tr(
+                                                                    preferencesService.translate(
                                                                             Constants
                                                                                     .TranslationKeys
                                                                                     .GOAL_TABLE_TOOLTIP_MOTIVATION),
@@ -811,14 +833,18 @@ public class GoalController {
     }
 
     private void populateStatusComboBox() {
-        statusComboBox.getItems().add(i18nService.tr(Constants.TranslationKeys.GOAL_FILTER_ALL));
-        statusComboBox.getItems().add(i18nService.tr(Constants.TranslationKeys.GOAL_FILTER_ACTIVE));
         statusComboBox
                 .getItems()
-                .add(i18nService.tr(Constants.TranslationKeys.GOAL_FILTER_COMPLETED));
+                .add(preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ALL));
         statusComboBox
                 .getItems()
-                .add(i18nService.tr(Constants.TranslationKeys.GOAL_FILTER_ARCHIVED));
+                .add(preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ACTIVE));
+        statusComboBox
+                .getItems()
+                .add(preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_COMPLETED));
+        statusComboBox
+                .getItems()
+                .add(preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ARCHIVED));
         statusComboBox.getSelectionModel().selectFirst();
     }
 }

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
@@ -56,7 +56,7 @@ public abstract class BaseCryptoExchangeManagement {
 
     protected CalculatorService calculatorService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<Ticker> cryptos;
 
@@ -76,8 +76,8 @@ public abstract class BaseCryptoExchangeManagement {
         this.calculatorService = calculatorService;
     }
 
-    protected void setI18nService(I18nService i18nService) {
-        this.i18nService = i18nService;
+    protected void setPreferencesService(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     public void setFromCryptoComboBox(Ticker tk) {
@@ -98,7 +98,7 @@ public abstract class BaseCryptoExchangeManagement {
         populateCryptoComboBoxes();
 
         // Configure the date picker
-        UIUtils.setDatePickerFormat(exchangeDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(exchangeDatePicker, preferencesService);
 
         // Reset all labels
         UIUtils.resetLabel(cryptoSoldAfterBalanceValueLabel);
@@ -134,7 +134,7 @@ public abstract class BaseCryptoExchangeManagement {
     protected void handleCryptoSoldOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
+                preferencesService.translate(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(
@@ -147,7 +147,7 @@ public abstract class BaseCryptoExchangeManagement {
     protected void handleCryptoReceivedOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
+                preferencesService.translate(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(

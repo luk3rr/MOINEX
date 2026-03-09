@@ -20,7 +20,7 @@ import org.moinex.model.investment.Dividend;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -41,7 +41,7 @@ public final class EditDividendController extends BaseDividendManagement {
      * @param categoryService CategoryService
      * @param calculatorService CalculatorService
      * @param tickerService TickerService
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -50,8 +50,8 @@ public final class EditDividendController extends BaseDividendManagement {
             CategoryService categoryService,
             CalculatorService calculatorService,
             TickerService tickerService,
-            I18nService i18nService) {
-        super(walletService, categoryService, calculatorService, tickerService, i18nService);
+            PreferencesService preferencesService) {
+        super(walletService, categoryService, calculatorService, tickerService, preferencesService);
     }
 
     public void setDividend(Dividend d) {
@@ -89,8 +89,9 @@ public final class EditDividendController extends BaseDividendManagement {
                 || category == null
                 || dividendDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
@@ -111,9 +112,9 @@ public final class EditDividendController extends BaseDividendManagement {
                     && dividend.getWalletTransaction().getIncludeInAnalysis()
                             == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_NO_CHANGES_DIVIDEND_MESSAGE));
             } else // If there is any modification, update the transaction
@@ -133,9 +134,9 @@ public final class EditDividendController extends BaseDividendManagement {
                 tickerService.updateDividend(dividend);
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE));
             }
@@ -144,15 +145,15 @@ public final class EditDividendController extends BaseDividendManagement {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE));
         } catch (EntityNotFoundException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_ERROR_UPDATING_DIVIDEND_TITLE),
                     e.getMessage());

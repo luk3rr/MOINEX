@@ -25,8 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import lombok.NoArgsConstructor;
-import org.moinex.service.I18nService;
-import org.moinex.service.UserPreferencesService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.ui.common.CalendarController;
 import org.moinex.util.Constants;
@@ -69,9 +68,7 @@ public class MainController {
 
     private ConfigurableApplicationContext springContext;
 
-    private UserPreferencesService userPreferencesService;
-
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private Pair<String, String> currentContent;
 
@@ -82,12 +79,9 @@ public class MainController {
 
     @Autowired
     public MainController(
-            ConfigurableApplicationContext springContext,
-            UserPreferencesService userPreferencesService,
-            I18nService i18nService) {
+            ConfigurableApplicationContext springContext, PreferencesService preferencesService) {
         this.springContext = springContext;
-        this.userPreferencesService = userPreferencesService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -167,22 +161,22 @@ public class MainController {
     private void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                i18nService.tr("main.calculator"),
+                preferencesService.translate("main.calculator"),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> {}),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
     private void handleOpenCalendar() {
         WindowUtils.openPopupWindow(
                 Constants.CALENDAR_FXML,
-                i18nService.tr("main.calendar"),
+                preferencesService.translate("main.calendar"),
                 springContext,
                 (CalendarController controller) -> {},
                 List.of(() -> {}),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
@@ -193,11 +187,11 @@ public class MainController {
 
     @FXML
     private void handleToggleMonetaryValues() {
-        userPreferencesService.toggleHideMonetaryValues();
+        preferencesService.toggleHideMonetaryValues();
 
         toggleMonetaryValuesIcon.setImage(
                 new Image(
-                        userPreferencesService.showMonetaryValues()
+                        preferencesService.showMonetaryValues()
                                 ? Constants.SHOW_ICON
                                 : Constants.HIDE_ICON));
 
@@ -213,7 +207,8 @@ public class MainController {
     public void loadContent(String fxmlFile, String styleSheet) {
         try {
             FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource(fxmlFile), i18nService.getBundle());
+                    new FXMLLoader(
+                            getClass().getResource(fxmlFile), preferencesService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 

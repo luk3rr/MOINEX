@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.FinancialPlanningService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.common.BudgetGroupPreviewController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -47,7 +47,7 @@ public abstract class BasePlanManagement {
 
     protected FinancialPlanningService financialPlanningService;
     protected ConfigurableApplicationContext springContext;
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<BudgetGroup> budgetGroups = new ArrayList<>();
     protected Integer paneCurrentPage = 0;
@@ -60,8 +60,8 @@ public abstract class BasePlanManagement {
         this.springContext = springContext;
     }
 
-    protected void setI18nService(I18nService i18nService) {
-        this.i18nService = i18nService;
+    protected void setPreferencesService(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -87,7 +87,7 @@ public abstract class BasePlanManagement {
     private void handleAddBudgetGroup() {
         WindowUtils.openModalWindow(
                 Constants.ADD_BUDGET_GROUP_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_ADD_BUDGET_GROUP_TITLE),
                 springContext,
                 (AddBudgetGroupController controller) -> {
@@ -196,10 +196,10 @@ public abstract class BasePlanManagement {
     protected boolean isPlanValid() {
         if (budgetGroups.isEmpty() || budgetGroups.size() < 2) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_MESSAGE));
 
@@ -208,10 +208,10 @@ public abstract class BasePlanManagement {
 
         if (calculateTotalPercentage().compareTo(new BigDecimal("100")) != 0) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_MESSAGE));
             return false;
@@ -219,9 +219,9 @@ public abstract class BasePlanManagement {
 
         if (hasEmptyGroups()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_MESSAGE));
             return false;
@@ -240,12 +240,12 @@ public abstract class BasePlanManagement {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem editItem =
                 new MenuItem(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_EDIT));
         editItem.setOnAction(event -> handleEditBudgetGroup(group));
         MenuItem deleteItem =
                 new MenuItem(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_DELETE));
         deleteItem.setOnAction(event -> handleDeleteBudgetGroup(group));
         contextMenu.getItems().addAll(editItem, deleteItem);
@@ -268,7 +268,7 @@ public abstract class BasePlanManagement {
     private void handleEditBudgetGroup(BudgetGroup groupToEdit) {
         WindowUtils.openModalWindow(
                 Constants.EDIT_BUDGET_GROUP_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EDIT_BUDGET_GROUP_TITLE),
                 springContext,
                 (EditBudgetGroupController controller) -> {
@@ -357,28 +357,29 @@ public abstract class BasePlanManagement {
         if (totalPercentage.compareTo(new BigDecimal("100")) > 0) {
             budgetGroupInfo.setText(
                     MessageFormat.format(
-                            i18nService.tr(
+                            preferencesService.translate(
                                     Constants.TranslationKeys
                                             .FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS),
-                            UIUtils.formatPercentage(totalPercentage, i18nService)));
+                            UIUtils.formatPercentage(totalPercentage, preferencesService)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
         } else if (hasEmptyGroups) {
             budgetGroupInfo.setText(
-                    i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_INFO_EMPTY_GROUPS));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.FINANCIALPLANNING_INFO_EMPTY_GROUPS));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else if (totalPercentage.compareTo(new BigDecimal("100")) < 0) {
             BigDecimal remaining = new BigDecimal("100").subtract(totalPercentage);
             budgetGroupInfo.setText(
                     MessageFormat.format(
-                            i18nService.tr(
+                            preferencesService.translate(
                                     Constants.TranslationKeys
                                             .FINANCIALPLANNING_INFO_PERCENTAGE_BELOW),
-                            UIUtils.formatPercentage(totalPercentage, i18nService),
-                            UIUtils.formatPercentage(remaining, i18nService)));
+                            UIUtils.formatPercentage(totalPercentage, preferencesService),
+                            UIUtils.formatPercentage(remaining, preferencesService)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else {
             budgetGroupInfo.setText(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
         }

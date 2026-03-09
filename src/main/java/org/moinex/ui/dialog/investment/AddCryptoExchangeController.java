@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -28,24 +28,24 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
      *
      * @param tickerService TickerService
      * @param calculatorService CalculatorService
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public AddCryptoExchangeController(
             TickerService tickerService,
             CalculatorService calculatorService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         super(tickerService, calculatorService);
-        this.i18nService = i18nService;
-        setI18nService(i18nService);
+        this.preferencesService = preferencesService;
+        setPreferencesService(preferencesService);
     }
 
     @FXML
@@ -68,8 +68,9 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                 || description.isBlank()
                 || exchangeDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
@@ -90,19 +91,19 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                     description);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE));
 
             Stage stage = (Stage) cryptoReceivedQuantityField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
         } catch (MoinexException.SameSourceDestinationException
@@ -111,7 +112,7 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                 | IllegalArgumentException
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_ERROR_CREATING_EXCHANGE_TITLE),
                     e.getMessage());

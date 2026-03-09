@@ -11,7 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import lombok.NoArgsConstructor;
 import org.moinex.model.dto.ProfitabilityMetricsDTO;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,11 @@ public class ProfitabilityMetricsPaneController {
     @FXML private Label dividendYieldFixed;
     @FXML private Label dividendYieldTotal;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
-    public ProfitabilityMetricsPaneController(I18nService i18nService) {
-        this.i18nService = i18nService;
+    public ProfitabilityMetricsPaneController(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     public void setMetrics(
@@ -119,11 +119,11 @@ public class ProfitabilityMetricsPaneController {
     }
 
     private void setDividendYield(BigDecimal variable, BigDecimal total) {
-        dividendYieldVariable.setText(UIUtils.formatPercentage(variable, i18nService));
+        dividendYieldVariable.setText(UIUtils.formatPercentage(variable, preferencesService));
         dividendYieldFixed.setText("-");
         dividendYieldFixed.getStyleClass().clear();
         dividendYieldFixed.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
-        dividendYieldTotal.setText(UIUtils.formatPercentage(total, i18nService));
+        dividendYieldTotal.setText(UIUtils.formatPercentage(total, preferencesService));
     }
 
     private String formatValueWithSign(BigDecimal value, boolean isPercentage) {
@@ -136,7 +136,7 @@ public class ProfitabilityMetricsPaneController {
 
         String formattedValue =
                 isPercentage
-                        ? UIUtils.formatPercentage(value.abs(), i18nService)
+                        ? UIUtils.formatPercentage(value.abs(), preferencesService)
                         : UIUtils.formatCurrency(value.abs());
 
         return sign + formattedValue;

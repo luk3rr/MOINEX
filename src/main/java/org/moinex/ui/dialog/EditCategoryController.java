@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +36,13 @@ public class EditCategoryController {
 
     private CategoryService categoryService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
-    public EditCategoryController(CategoryService categoryService, I18nService i18nService) {
+    public EditCategoryController(
+            CategoryService categoryService, PreferencesService preferencesService) {
         this.categoryService = categoryService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -73,7 +74,7 @@ public class EditCategoryController {
                 nameChanged = true;
             } catch (IllegalArgumentException | EntityExistsException | EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_NAME_TITLE),
                         e.getMessage());
@@ -88,7 +89,7 @@ public class EditCategoryController {
                 archivedChanged = true;
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
                         e.getMessage());
@@ -101,7 +102,7 @@ public class EditCategoryController {
                 archivedChanged = true;
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
                         e.getMessage());
@@ -113,23 +114,23 @@ public class EditCategoryController {
             String msg;
             if (nameChanged && archivedChanged) {
                 msg =
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CATEGORY_DIALOG_CATEGORY_NAME_AND_ARCHIVED_UPDATED_MESSAGE);
             } else if (archivedChanged) {
                 msg =
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE);
             } else {
                 msg =
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE);
             }
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
                     msg);
         }

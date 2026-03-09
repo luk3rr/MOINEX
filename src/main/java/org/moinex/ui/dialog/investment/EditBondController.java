@@ -22,7 +22,7 @@ import org.moinex.model.enums.InterestIndex;
 import org.moinex.model.enums.InterestType;
 import org.moinex.model.investment.Bond;
 import org.moinex.service.BondService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -46,13 +46,13 @@ public final class EditBondController {
     @FXML private JFXButton cancelButton;
 
     private BondService bondService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
     private Bond bond = null;
 
     @Autowired
-    public EditBondController(BondService bondService, I18nService i18nService) {
+    public EditBondController(BondService bondService, PreferencesService preferencesService) {
         this.bondService = bondService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -61,7 +61,7 @@ public final class EditBondController {
         populateComboBoxes();
         configureListeners();
 
-        UIUtils.setDatePickerFormat(maturityDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(maturityDatePicker, preferencesService);
     }
 
     public void setBond(Bond bond) {
@@ -99,8 +99,10 @@ public final class EditBondController {
 
         if (name == null || bondType == null || name.isBlank() || maturityDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -110,8 +112,8 @@ public final class EditBondController {
                 interestRate = new BigDecimal(interestRateStr);
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
                 return;
@@ -160,8 +162,10 @@ public final class EditBondController {
 
         if (!hasChanges) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_MESSAGE));
             return;
         }
 
@@ -187,19 +191,23 @@ public final class EditBondController {
             }
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE));
 
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
 
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_TITLE),
                     e.getMessage());
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE), e.getMessage());
+                    preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                    e.getMessage());
         }
     }
 
@@ -210,9 +218,10 @@ public final class EditBondController {
     }
 
     private void configureComboBoxes() {
-        UIUtils.configureComboBox(bondTypeComboBox, t -> UIUtils.translateBondType(t, i18nService));
         UIUtils.configureComboBox(
-                interestTypeComboBox, t -> UIUtils.translateInterestType(t, i18nService));
+                bondTypeComboBox, t -> UIUtils.translateBondType(t, preferencesService));
+        UIUtils.configureComboBox(
+                interestTypeComboBox, t -> UIUtils.translateInterestType(t, preferencesService));
         UIUtils.configureComboBox(interestIndexComboBox, InterestIndex::name);
     }
 

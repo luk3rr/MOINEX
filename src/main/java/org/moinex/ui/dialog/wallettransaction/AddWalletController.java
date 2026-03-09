@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -36,7 +36,7 @@ public class AddWalletController {
 
     private WalletService walletService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private List<WalletType> walletTypes;
 
@@ -47,9 +47,9 @@ public class AddWalletController {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddWalletController(WalletService walletService, I18nService i18nService) {
+    public AddWalletController(WalletService walletService, PreferencesService preferencesService) {
         this.walletService = walletService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -86,9 +86,9 @@ public class AddWalletController {
 
         if (walletName.isEmpty() || walletType == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -102,10 +102,10 @@ public class AddWalletController {
                     new Wallet(null, walletType, walletName, walletBalance, false, null));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_WALLET_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_WALLET_CREATED_MESSAGE));
 
@@ -113,15 +113,15 @@ public class AddWalletController {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_CREATING_WALLET_TITLE),
                     e.getMessage());
@@ -158,6 +158,6 @@ public class AddWalletController {
 
     private void configureComboBoxes() {
         UIUtils.configureComboBox(
-                walletTypeComboBox, wt -> UIUtils.translateWalletType(wt, i18nService));
+                walletTypeComboBox, wt -> UIUtils.translateWalletType(wt, preferencesService));
     }
 }

@@ -27,7 +27,7 @@ import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.dialog.wallettransaction.*;
 import org.moinex.ui.main.WalletController;
@@ -90,7 +90,7 @@ public class WalletFullPaneController {
 
     @FXML private MenuItem changeWalletTypeMenuItem;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private ConfigurableApplicationContext springContext;
 
@@ -125,12 +125,12 @@ public class WalletFullPaneController {
             CreditCardService creditCardService,
             ConfigurableApplicationContext springContext,
             WalletController walletController,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.springContext = springContext;
         this.walletController = walletController;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     /** Load wallet information from the database */
@@ -196,7 +196,7 @@ public class WalletFullPaneController {
         setupDynamicVisibility();
 
         walletName.setText(wallet.getName());
-        walletType.setText(UIUtils.translateWalletType(wallet.getType(), i18nService));
+        walletType.setText(UIUtils.translateWalletType(wallet.getType(), preferencesService));
         walletIcon.setImage(
                 new Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.getType().getIcon()));
 
@@ -282,7 +282,8 @@ public class WalletFullPaneController {
     private void handleAddIncome() {
         WindowUtils.openModalWindow(
                 Constants.ADD_INCOME_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_INCOME),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_INCOME),
                 springContext,
                 (AddIncomeController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -292,7 +293,8 @@ public class WalletFullPaneController {
     private void handleAddExpense() {
         WindowUtils.openModalWindow(
                 Constants.ADD_EXPENSE_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_EXPENSE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_EXPENSE),
                 springContext,
                 (AddExpenseController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -302,7 +304,8 @@ public class WalletFullPaneController {
     private void handleAddTransfer() {
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_TRANSFER),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_WALLET_MODAL_ADD_TRANSFER),
                 springContext,
                 (AddTransferController controller) -> controller.setSenderWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -312,7 +315,7 @@ public class WalletFullPaneController {
     private void handleRenameWallet() {
         WindowUtils.openModalWindow(
                 Constants.RENAME_WALLET_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_RENAME),
+                preferencesService.translate(Constants.TranslationKeys.COMMON_WALLET_MODAL_RENAME),
                 springContext,
                 (RenameWalletController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -322,7 +325,8 @@ public class WalletFullPaneController {
     private void handleChangeWalletType() {
         WindowUtils.openModalWindow(
                 Constants.CHANGE_WALLET_TYPE_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_CHANGE_TYPE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_WALLET_MODAL_CHANGE_TYPE),
                 springContext,
                 (ChangeWalletTypeController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -332,7 +336,8 @@ public class WalletFullPaneController {
     private void handleChangeWalletBalance() {
         WindowUtils.openModalWindow(
                 Constants.CHANGE_WALLET_BALANCE_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_MODAL_CHANGE_BALANCE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_WALLET_MODAL_CHANGE_BALANCE),
                 springContext,
                 (ChangeWalletBalanceController controller) -> controller.setWalletComboBox(wallet),
                 List.of(() -> walletController.updateDisplay()));
@@ -342,11 +347,12 @@ public class WalletFullPaneController {
     private void handleArchiveWallet() {
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_TITLE),
                         wallet.getName()),
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_MESSAGE),
-                i18nService.getBundle())) {
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_MESSAGE),
+                preferencesService.getBundle())) {
             walletService.archiveWallet(wallet.getId());
 
             // Update wallet display in the main window
@@ -359,10 +365,10 @@ public class WalletFullPaneController {
         // Prevent the removal of a wallet with associated transactions
         if (walletService.getWalletTransactionAndTransferCountByWallet(wallet.getId()) > 0) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE));
             return;
@@ -375,28 +381,30 @@ public class WalletFullPaneController {
                 totalOfAssociatedVirtualWallets.equals(0)
                         ? ""
                         : MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .COMMON_WALLET_DIALOG_DELETE_VIRTUAL_WALLETS),
                                 totalOfAssociatedVirtualWallets);
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_TITLE),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_TITLE),
                         wallet.getName()),
-                i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_MESSAGE)
+                preferencesService.translate(
+                                Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_MESSAGE)
                         + "\n"
                         + virtualWalletsMessage,
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             try {
                 walletService.deleteWallet(wallet.getId());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .COMMON_WALLET_DIALOG_DELETE_SUCCESS_TITLE),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .COMMON_WALLET_DIALOG_DELETE_SUCCESS_MESSAGE),
                                 wallet.getName()));
@@ -405,7 +413,8 @@ public class WalletFullPaneController {
                 walletController.updateDisplay();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_ERROR),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.COMMON_WALLET_DIALOG_DELETE_ERROR),
                         e.getMessage());
             }
         }
@@ -456,6 +465,6 @@ public class WalletFullPaneController {
         virtualWalletInfo.setVisible(true);
         virtualWalletInfo.setManaged(true);
 
-        virtualWalletInfo.setText(UIUtils.getVirtualWalletInfo(wallet, i18nService));
+        virtualWalletInfo.setText(UIUtils.getVirtualWalletInfo(wallet, preferencesService));
     }
 }

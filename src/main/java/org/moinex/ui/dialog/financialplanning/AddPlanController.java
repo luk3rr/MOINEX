@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.enums.BudgetGroupTransactionFilter;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.FinancialPlanningService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +32,16 @@ public class AddPlanController extends BasePlanManagement {
     @FXML private Label option2Description;
     @FXML private Label option3Description;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
     public AddPlanController(
             FinancialPlanningService financialPlanningService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         super(financialPlanningService, springContext);
-        this.i18nService = i18nService;
-        setI18nService(i18nService);
+        this.preferencesService = preferencesService;
+        setPreferencesService(preferencesService);
     }
 
     @Override
@@ -60,9 +60,9 @@ public class AddPlanController extends BasePlanManagement {
 
         if (planName.isEmpty() || baseIncomeText.isEmpty()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -77,24 +77,24 @@ public class AddPlanController extends BasePlanManagement {
             financialPlanningService.createPlan(planName, baseIncome, budgetGroups);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_PLAN_CREATED_MESSAGE));
 
             planNameField.getScene().getWindow().hide();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_ERROR_CREATING_PLAN_TITLE),
                     e.getMessage());
@@ -103,21 +103,24 @@ public class AddPlanController extends BasePlanManagement {
 
     private void configureRadioButtons() {
         option1.setText(
-                i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_50_30_20_NAME));
+                preferencesService.translate(
+                        Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_50_30_20_NAME));
         option1Description.setText(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_50_30_20_DESCRIPTION));
 
         option2.setText(
-                i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_30_30_40_NAME));
+                preferencesService.translate(
+                        Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_30_30_40_NAME));
         option2Description.setText(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_30_30_40_DESCRIPTION));
 
         option3.setText(
-                i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_CUSTOM_NAME));
+                preferencesService.translate(
+                        Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_CUSTOM_NAME));
         option3Description.setText(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_CUSTOM_DESCRIPTION));
     }
 
@@ -162,7 +165,7 @@ public class AddPlanController extends BasePlanManagement {
         return List.of(
                 new BudgetGroup(
                         null,
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_ESSENTIALS),
                         BigDecimal.valueOf(50),
                         null,
@@ -170,14 +173,15 @@ public class AddPlanController extends BasePlanManagement {
                         BudgetGroupTransactionFilter.EXPENSE),
                 new BudgetGroup(
                         null,
-                        i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS),
                         BigDecimal.valueOf(30),
                         null,
                         new HashSet<>(),
                         BudgetGroupTransactionFilter.EXPENSE),
                 new BudgetGroup(
                         null,
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_INVESTMENTS),
                         BigDecimal.valueOf(20),
                         null,
@@ -189,7 +193,7 @@ public class AddPlanController extends BasePlanManagement {
         return List.of(
                 new BudgetGroup(
                         null,
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_ESSENTIALS),
                         BigDecimal.valueOf(30),
                         null,
@@ -197,14 +201,15 @@ public class AddPlanController extends BasePlanManagement {
                         BudgetGroupTransactionFilter.EXPENSE),
                 new BudgetGroup(
                         null,
-                        i18nService.tr(Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_WANTS),
                         BigDecimal.valueOf(30),
                         null,
                         new HashSet<>(),
                         BudgetGroupTransactionFilter.EXPENSE),
                 new BudgetGroup(
                         null,
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.FINANCIALPLANNING_TEMPLATE_INVESTMENTS),
                         BigDecimal.valueOf(40),
                         null,

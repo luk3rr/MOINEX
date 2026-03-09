@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +28,13 @@ public class AddCategoryController {
 
     private CategoryService categoryService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
-    public AddCategoryController(CategoryService categoryService, I18nService i18nService) {
+    public AddCategoryController(
+            CategoryService categoryService, PreferencesService preferencesService) {
         this.categoryService = categoryService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -49,9 +50,10 @@ public class AddCategoryController {
             categoryService.createCategory(new Category(null, name, false));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
                     MessageFormat.format(
-                            i18nService.tr(
+                            preferencesService.translate(
                                     Constants.TranslationKeys
                                             .CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE),
                             name));
@@ -60,7 +62,7 @@ public class AddCategoryController {
             stage.close();
         } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CATEGORY_DIALOG_ERROR_ADDING_CATEGORY_TITLE),
                     e.getMessage());
         }

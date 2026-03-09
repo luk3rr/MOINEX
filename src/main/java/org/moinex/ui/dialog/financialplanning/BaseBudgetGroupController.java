@@ -16,7 +16,7 @@ import org.moinex.model.Category;
 import org.moinex.model.enums.BudgetGroupTransactionFilter;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +46,14 @@ public class BaseBudgetGroupController {
 
     protected Consumer<BudgetGroup> onSaveCallback;
     protected CategoryService categoryService;
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
     protected Set<Category> assignedCategories;
 
     @Autowired
-    public BaseBudgetGroupController(CategoryService categoryService, I18nService i18nService) {
+    public BaseBudgetGroupController(
+            CategoryService categoryService, PreferencesService preferencesService) {
         this.categoryService = categoryService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     /**
@@ -147,15 +148,15 @@ public class BaseBudgetGroupController {
                         if (filter == null) return "";
                         return switch (filter) {
                             case INCOME ->
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .FINANCIALPLANNING_FILTER_INCOME);
                             case EXPENSE ->
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .FINANCIALPLANNING_FILTER_EXPENSE);
                             case BOTH ->
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .FINANCIALPLANNING_FILTER_BOTH);
                         };
@@ -166,13 +167,13 @@ public class BaseBudgetGroupController {
                         if (string == null || string.isEmpty()) return null;
 
                         String income =
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.FINANCIALPLANNING_FILTER_INCOME);
                         String expense =
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.FINANCIALPLANNING_FILTER_EXPENSE);
                         String both =
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.FINANCIALPLANNING_FILTER_BOTH);
 
                         if (string.equals(income)) return BudgetGroupTransactionFilter.INCOME;
@@ -222,10 +223,10 @@ public class BaseBudgetGroupController {
 
         if (groupName.isEmpty() || targetPercentageText.isEmpty()) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_MESSAGE));
             return;
@@ -236,9 +237,9 @@ public class BaseBudgetGroupController {
             targetPercentage = Double.parseDouble(targetPercentageText);
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_INPUT_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FINANCIALPLANNING_DIALOG_INVALID_INPUT_MESSAGE));
             return;

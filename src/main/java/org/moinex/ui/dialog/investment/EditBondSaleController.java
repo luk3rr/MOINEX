@@ -21,7 +21,7 @@ import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -42,9 +42,9 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
             WalletService walletService,
             CategoryService categoryService,
             BondService bondService,
-            I18nService i18nService) {
-        super(walletService, categoryService, bondService, i18nService);
-        this.i18nService = i18nService;
+            PreferencesService preferencesService) {
+        super(walletService, categoryService, bondService, preferencesService);
+        this.preferencesService = preferencesService;
         walletTransactionType = WalletTransactionType.INCOME;
     }
 
@@ -172,8 +172,10 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                 || quantityStr.isBlank()
                 || saleDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -225,8 +227,9 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                     && netProfitEqual
                     && operation.getWalletTransaction().getDate().toLocalDate().equals(saleDate)) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_SALE_MESSAGE));
             } else {
                 bondService.updateOperation(
@@ -244,19 +247,24 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                         includeInAnalysisCheckBox.isSelected());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_TITLE),
-                        i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_MESSAGE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_TITLE),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) bondNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_SALE_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_SALE_TITLE),
                     e.getMessage());
         }
     }

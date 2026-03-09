@@ -3,7 +3,7 @@ package org.moinex.ui.dialog.financialplanning;
 import javafx.fxml.FXML;
 import lombok.NoArgsConstructor;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -13,8 +13,9 @@ import org.springframework.stereotype.Controller;
 public class AddBudgetGroupController extends BaseBudgetGroupController {
 
     @Autowired
-    public AddBudgetGroupController(CategoryService categoryService, I18nService i18nService) {
-        super(categoryService, i18nService);
+    public AddBudgetGroupController(
+            CategoryService categoryService, PreferencesService preferencesService) {
+        super(categoryService, preferencesService);
     }
 
     @Override

@@ -23,7 +23,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -69,7 +69,7 @@ public abstract class BaseBondTransactionManagement {
 
     protected BondService bondService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<Wallet> wallets;
 
@@ -86,11 +86,11 @@ public abstract class BaseBondTransactionManagement {
             WalletService walletService,
             CategoryService categoryService,
             BondService bondService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.categoryService = categoryService;
         this.bondService = bondService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -122,7 +122,7 @@ public abstract class BaseBondTransactionManagement {
 
         populateComboBoxes();
 
-        UIUtils.setDatePickerFormat(transactionDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transactionDatePicker, preferencesService);
 
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
@@ -183,10 +183,10 @@ public abstract class BaseBondTransactionManagement {
             totalPriceLabel.setText(UIUtils.formatCurrency(totalPrice));
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_MESSAGE));
 
@@ -285,14 +285,15 @@ public abstract class BaseBondTransactionManagement {
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_TOOLTIP_CATEGORY_REQUIRED));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_TOOLTIP_CATEGORY_REQUIRED));
         }
     }
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(
-                statusComboBox, t -> UIUtils.translateTransactionStatus(t, i18nService));
+                statusComboBox, t -> UIUtils.translateTransactionStatus(t, preferencesService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

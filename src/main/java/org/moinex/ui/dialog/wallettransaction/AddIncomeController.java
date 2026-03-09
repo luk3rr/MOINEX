@@ -21,7 +21,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -46,9 +46,9 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
             WalletService walletService,
             CategoryService categoryService,
             CalculatorService calculatorService,
-            I18nService i18nService,
+            PreferencesService preferencesService,
             ConfigurableApplicationContext springContext) {
-        super(walletService, categoryService, calculatorService, i18nService, springContext);
+        super(walletService, categoryService, calculatorService, preferencesService, springContext);
 
         walletTransactionType = WalletTransactionType.INCOME;
     }
@@ -72,9 +72,9 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
                 || category == null
                 || incomeDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -99,10 +99,10 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
                             incomeValue));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INCOME_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INCOME_CREATED_MESSAGE));
 
@@ -110,15 +110,15 @@ public final class AddIncomeController extends BaseWalletTransactionManagement {
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_INCOME_VALUE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_INCOME_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_CREATING_INCOME_TITLE),
                     e.getMessage());

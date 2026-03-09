@@ -34,7 +34,7 @@ import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.FundamentalAnalysisService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
 import org.moinex.ui.dialog.investment.AddDividendController;
@@ -70,7 +70,7 @@ public class SavingsStocksFundsController {
 
     private ConfigurableApplicationContext springContext;
     private TickerService tickerService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private List<Ticker> tickers;
     private List<Dividend> dividends;
@@ -83,10 +83,10 @@ public class SavingsStocksFundsController {
     public SavingsStocksFundsController(
             TickerService tickerService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.tickerService = tickerService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -110,7 +110,7 @@ public class SavingsStocksFundsController {
     private void handleRegisterTicker() {
         WindowUtils.openModalWindow(
                 Constants.ADD_TICKER_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_TICKER_TITLE),
                 springContext,
                 (AddTickerController controller) -> {},
@@ -123,10 +123,10 @@ public class SavingsStocksFundsController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_BUY_MESSAGE));
             return;
@@ -134,7 +134,7 @@ public class SavingsStocksFundsController {
 
         WindowUtils.openModalWindow(
                 Constants.BUY_TICKER_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_BUY_TICKER_TITLE),
                 springContext,
                 (AddTickerPurchaseController controller) -> controller.setTicker(selectedTicker),
@@ -147,10 +147,10 @@ public class SavingsStocksFundsController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_SELL_MESSAGE));
             return;
@@ -158,7 +158,7 @@ public class SavingsStocksFundsController {
 
         WindowUtils.openModalWindow(
                 Constants.SALE_TICKER_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_SELL_TICKER_TITLE),
                 springContext,
                 (AddTickerSaleController controller) -> controller.setTicker(selectedTicker),
@@ -171,10 +171,10 @@ public class SavingsStocksFundsController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_ADD_DIVIDEND_MESSAGE));
             return;
@@ -182,7 +182,7 @@ public class SavingsStocksFundsController {
 
         WindowUtils.openModalWindow(
                 Constants.ADD_DIVIDEND_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_DIVIDEND_TITLE),
                 springContext,
                 (AddDividendController controller) -> controller.setTicker(selectedTicker),
@@ -195,7 +195,7 @@ public class SavingsStocksFundsController {
 
         WindowUtils.openModalWindow(
                 Constants.ADD_CRYPTO_EXCHANGE_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .SAVINGS_STOCKS_FUNDS_DIALOG_ADD_CRYPTO_EXCHANGE_TITLE),
                 springContext,
@@ -209,7 +209,7 @@ public class SavingsStocksFundsController {
     private void handleOpenTickerArchive() {
         WindowUtils.openModalWindow(
                 Constants.ARCHIVED_TICKERS_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_TICKER_ARCHIVE_TITLE),
                 springContext,
                 (ArchivedTickersController controller) -> {},
@@ -220,7 +220,7 @@ public class SavingsStocksFundsController {
     private void handleShowTransactions() {
         WindowUtils.openModalWindow(
                 Constants.INVESTMENT_TRANSACTIONS_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys
                                 .SAVINGS_STOCKS_FUNDS_DIALOG_INVESTMENT_TRANSACTIONS_TITLE),
                 springContext,
@@ -240,10 +240,10 @@ public class SavingsStocksFundsController {
                                         () -> {
                                             if (failed.isEmpty()) {
                                                 WindowUtils.showSuccessDialog(
-                                                        i18nService.tr(
+                                                        preferencesService.translate(
                                                                 Constants.TranslationKeys
                                                                         .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE),
-                                                        i18nService.tr(
+                                                        preferencesService.translate(
                                                                 Constants.TranslationKeys
                                                                         .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE));
                                             } else if (failed.size()
@@ -251,18 +251,18 @@ public class SavingsStocksFundsController {
                                                             .getItems()
                                                             .size()) {
                                                 WindowUtils.showInformationDialog(
-                                                        i18nService.tr(
+                                                        preferencesService.translate(
                                                                 Constants.TranslationKeys
                                                                         .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE),
-                                                        i18nService.tr(
+                                                        preferencesService.translate(
                                                                 Constants.TranslationKeys
                                                                         .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED));
                                             } else {
                                                 WindowUtils.showInformationDialog(
-                                                        i18nService.tr(
+                                                        preferencesService.translate(
                                                                 Constants.TranslationKeys
                                                                         .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE),
-                                                        i18nService.tr(
+                                                        preferencesService.translate(
                                                                         Constants.TranslationKeys
                                                                                 .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED)
                                                                 + "\n"
@@ -280,7 +280,7 @@ public class SavingsStocksFundsController {
                             Platform.runLater(
                                     () -> {
                                         WindowUtils.showErrorDialog(
-                                                i18nService.tr(
+                                                preferencesService.translate(
                                                         Constants.TranslationKeys
                                                                 .DIALOG_ERROR_TITLE),
                                                 e.getMessage());
@@ -303,10 +303,10 @@ public class SavingsStocksFundsController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_EDIT_MESSAGE));
             return;
@@ -314,7 +314,7 @@ public class SavingsStocksFundsController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_TICKER_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_EDIT_TICKER_TITLE),
                 springContext,
                 (EditTickerController controller) -> controller.setTicker(selectedTicker),
@@ -327,10 +327,10 @@ public class SavingsStocksFundsController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE));
             return;
@@ -338,10 +338,10 @@ public class SavingsStocksFundsController {
 
         if (!FundamentalAnalysisService.tickerIsValidForFundamentalAnalysis(selectedTicker)) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_MESSAGE));
             return;
@@ -350,7 +350,8 @@ public class SavingsStocksFundsController {
         WindowUtils.openModalWindow(
                 Constants.FUNDAMENTAL_ANALYSIS_FXML,
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_DIALOG_TITLE),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_DIALOG_TITLE),
                         selectedTicker.getSymbol()),
                 springContext,
                 (FundamentalAnalysisController controller) -> {
@@ -366,10 +367,10 @@ public class SavingsStocksFundsController {
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_DELETE_MESSAGE));
             return;
@@ -377,17 +378,17 @@ public class SavingsStocksFundsController {
 
         if (tickerService.getTransactionCountByTicker(selectedTicker.getId()) > 0) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE)
                         + " "
@@ -396,13 +397,13 @@ public class SavingsStocksFundsController {
                         + selectedTicker.getSymbol()
                         + ")",
                 "",
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             try {
                 tickerService.deleteTicker(selectedTicker.getId());
                 updatePortfolioIndicators();
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
                         e.getMessage());
             }
         }
@@ -529,15 +530,15 @@ public class SavingsStocksFundsController {
                     @Override
                     public String toString(AssetType tickerType) {
                         return tickerType != null
-                                ? UIUtils.translateAssetType(tickerType, i18nService)
-                                : i18nService.tr(
+                                ? UIUtils.translateAssetType(tickerType, preferencesService)
+                                : preferencesService.translate(
                                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL);
                     }
 
                     @Override
                     public AssetType fromString(String string) {
                         return string.equals(
-                                        i18nService.tr(
+                                        preferencesService.translate(
                                                 Constants.TranslationKeys
                                                         .SAVINGS_STOCKS_FUNDS_FILTER_ALL))
                                 ? null
@@ -562,7 +563,7 @@ public class SavingsStocksFundsController {
 
         TableColumn<Ticker, String> nameColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_NAME));
         nameColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
@@ -570,7 +571,7 @@ public class SavingsStocksFundsController {
 
         TableColumn<Ticker, String> symbolColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_SYMBOL));
         symbolColumn.setCellValueFactory(
@@ -579,18 +580,18 @@ public class SavingsStocksFundsController {
 
         TableColumn<Ticker, String> typeColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TYPE));
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getType(), i18nService)));
+                                        param.getValue().getType(), preferencesService)));
         typeColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER_LEFT));
 
         TableColumn<Ticker, BigDecimal> quantityColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED));
         quantityColumn.setCellValueFactory(
@@ -599,7 +600,7 @@ public class SavingsStocksFundsController {
 
         TableColumn<Ticker, String> unitColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_UNIT_PRICE));
         unitColumn.setCellValueFactory(
@@ -611,7 +612,7 @@ public class SavingsStocksFundsController {
 
         TableColumn<Ticker, String> totalColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TOTAL_VALUE));
         totalColumn.setCellValueFactory(
@@ -626,7 +627,7 @@ public class SavingsStocksFundsController {
 
         TableColumn<Ticker, String> avgUnitColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE));
         avgUnitColumn.setCellValueFactory(
@@ -668,7 +669,7 @@ public class SavingsStocksFundsController {
     private TableColumn<Ticker, Integer> getTickerLongTableColumn() {
         TableColumn<Ticker, Integer> idColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
         idColumn.setCellFactory(createCenteredCellFactory(Pos.CENTER));
@@ -710,7 +711,8 @@ public class SavingsStocksFundsController {
                                 .toExternalForm()));
         updatePortfolioPricesButton.setDisable(true);
         updatePortfolioPricesButton.setText(
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATING));
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATING));
 
         isUpdatingPortfolioPrices = true;
     }
@@ -726,7 +728,7 @@ public class SavingsStocksFundsController {
                                                                 .SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON))
                                 .toExternalForm()));
         updatePortfolioPricesButton.setText(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES));
 
         isUpdatingPortfolioPrices = false;

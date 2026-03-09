@@ -1,9 +1,10 @@
 /*
- * Filename: I18nService.kt (original filename: I18nService.java)
+ * Filename: PreferencesService.kt (original filename: I18nService.java)
  * Created on: December 29, 2025
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  *
  * Migrate to Kotlin on 03/08/2026
+ * Unified with UserPreferencesService on 03/09/2026
  */
 
 package org.moinex.service
@@ -15,10 +16,11 @@ import java.util.ResourceBundle
 import java.util.prefs.Preferences
 
 @Service
-class I18nService {
+class PreferencesService {
     companion object {
         const val BUNDLE_BASE_NAME = "i18n.messages"
         const val PREF_KEY_LOCALE = "ui.locale"
+        const val PREF_KEY_HIDE_MONETARY_VALUES = "ui.hideMonetaryValues"
         const val BRAZILIAN_PORTUGUESE_TAG = "pt-BR"
         val SUPPORTED_LOCALES = listOf(Locale.forLanguageTag(BRAZILIAN_PORTUGUESE_TAG), Locale.ENGLISH)
         val preferences: Preferences = Preferences.userRoot().node("org.moinex")
@@ -29,6 +31,12 @@ class I18nService {
             field = value
             preferences.put(PREF_KEY_LOCALE, toPreferenceValue(value))
             bundleCache = null
+        }
+
+    var hideMonetaryValues: Boolean = resolveInitialHideMonetaryValues()
+        set(value) {
+            field = value
+            preferences.putBoolean(PREF_KEY_HIDE_MONETARY_VALUES, value)
         }
 
     private var bundleCache: ResourceBundle? = null
@@ -42,7 +50,7 @@ class I18nService {
             ResourceBundle.getBundle(BUNDLE_BASE_NAME, Locale.ENGLISH).also { bundleCache = it }
         }
 
-    fun tr(key: String?): String =
+    fun translate(key: String?): String =
         key?.let {
             try {
                 getBundle().getString(it)
@@ -50,6 +58,12 @@ class I18nService {
                 it
             }
         } ?: ""
+
+    fun showMonetaryValues(): Boolean = !hideMonetaryValues
+
+    fun toggleHideMonetaryValues() {
+        hideMonetaryValues = !hideMonetaryValues
+    }
 
     private fun resolveInitialLocale(): Locale {
         val stored =
@@ -70,6 +84,8 @@ class I18nService {
             }
         } ?: Locale.forLanguageTag(BRAZILIAN_PORTUGUESE_TAG)
     }
+
+    private fun resolveInitialHideMonetaryValues(): Boolean = preferences.getBoolean(PREF_KEY_HIDE_MONETARY_VALUES, false)
 
     private fun toPreferenceValue(locale: Locale): String =
         locale.language +

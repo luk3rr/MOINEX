@@ -47,8 +47,7 @@ import org.moinex.model.enums.*;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
-import org.moinex.service.I18nService;
-import org.moinex.service.UserPreferencesService;
+import org.moinex.service.PreferencesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -62,10 +61,10 @@ public final class UIUtils {
     private static final DecimalFormat percentageFormat =
             new DecimalFormat(Constants.PERCENTAGE_FORMAT);
 
-    private static UserPreferencesService userPreferencesService;
+    private static PreferencesService userPreferencesService;
 
     @Autowired
-    public UIUtils(UserPreferencesService userPreferencesService) {
+    public UIUtils(PreferencesService userPreferencesService) {
         UIUtils.userPreferencesService = userPreferencesService;
     }
 
@@ -134,7 +133,7 @@ public final class UIUtils {
      * @note Automatically formats to 2 fraction digits, rounding half up
      */
     public static String formatCurrency(Number value) {
-        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+        if (userPreferencesService != null && userPreferencesService.getHideMonetaryValues()) {
             return "****";
         }
 
@@ -149,7 +148,7 @@ public final class UIUtils {
      * @note Automatically formats to 2 fraction digits, rounding half up
      */
     public static String formatCurrencySigned(Number value) {
-        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+        if (userPreferencesService != null && userPreferencesService.getHideMonetaryValues()) {
             return "****";
         }
 
@@ -168,7 +167,7 @@ public final class UIUtils {
      * @param value The value to be formatted
      */
     public static String formatCurrencyDynamic(Number value) {
-        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+        if (userPreferencesService != null && userPreferencesService.getHideMonetaryValues()) {
             return "****";
         }
 
@@ -214,13 +213,13 @@ public final class UIUtils {
      *
      * @param value The value to be formatted
      */
-    public static String formatPercentage(Number value, I18nService i18nService) {
-        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+    public static String formatPercentage(Number value, PreferencesService preferencesService) {
+        if (userPreferencesService != null && userPreferencesService.getHideMonetaryValues()) {
             return "****";
         }
 
         if (value.doubleValue() < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
-            return i18nService.tr(
+            return preferencesService.translate(
                     Constants.TranslationKeys.UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE);
         }
 
@@ -233,7 +232,7 @@ public final class UIUtils {
      * @param value The value to be formatted
      */
     public static String formatPercentageForFundamentalAnalysis(Number value) {
-        if (userPreferencesService != null && userPreferencesService.hideMonetaryValues()) {
+        if (userPreferencesService != null && userPreferencesService.getHideMonetaryValues()) {
             return "****";
         }
 
@@ -256,7 +255,7 @@ public final class UIUtils {
      * Format the date picker to display the date in a specific format
      *
      * @param datePicker The date picker to format
-     * @deprecated Use {@link #setDatePickerFormat(DatePicker, I18nService)} instead
+     * @deprecated Use {@link #setDatePickerFormat(DatePicker, PreferencesService)} instead
      */
     @Deprecated
     public static void setDatePickerFormat(DatePicker datePicker) {
@@ -280,10 +279,11 @@ public final class UIUtils {
      * internal DatePicker popup calendar to use the locale
      *
      * @param datePicker The date picker to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      */
-    public static void setDatePickerFormat(DatePicker datePicker, I18nService i18nService) {
-        Locale locale = i18nService.getLocale();
+    public static void setDatePickerFormat(
+            DatePicker datePicker, PreferencesService preferencesService) {
+        Locale locale = preferencesService.getLocale();
 
         Locale.setDefault(locale);
 
@@ -506,10 +506,11 @@ public final class UIUtils {
      * Translate wallet type name to localized string
      *
      * @param walletType The wallet type to translate
-     * @param i18nService The I18nService instance for translation
+     * @param preferencesService The PreferencesService instance for translation
      * @return Translated wallet type name
      */
-    public static String translateWalletType(WalletType walletType, I18nService i18nService) {
+    public static String translateWalletType(
+            WalletType walletType, PreferencesService preferencesService) {
         String name = walletType.getName().toLowerCase().replace(" ", "");
 
         // Map common wallet type names to i18n keys
@@ -527,7 +528,7 @@ public final class UIUtils {
 
         String key = typeKeyMap.getOrDefault(name, null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         // Fallback to original name if no translation found
@@ -538,11 +539,12 @@ public final class UIUtils {
      * Translate transaction status to localized string
      *
      * @param walletTransactionStatus The transaction status to translate
-     * @param i18nService The I18nService instance for translation
+     * @param preferencesService The PreferencesService instance for translation
      * @return Translated transaction status name
      */
     public static String translateTransactionStatus(
-            WalletTransactionStatus walletTransactionStatus, I18nService i18nService) {
+            WalletTransactionStatus walletTransactionStatus,
+            PreferencesService preferencesService) {
         Map<String, String> statusKeyMap =
                 Map.of(
                         "pending", Constants.TranslationKeys.TRANSACTION_STATUS_PENDING,
@@ -550,14 +552,14 @@ public final class UIUtils {
 
         String key = statusKeyMap.getOrDefault(walletTransactionStatus.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return walletTransactionStatus.name();
     }
 
     public static String translateTransactionType(
-            WalletTransactionType walletTransactionType, I18nService i18nService) {
+            WalletTransactionType walletTransactionType, PreferencesService preferencesService) {
         Map<String, String> typeKeyMap =
                 Map.of(
                         "income", Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
@@ -565,14 +567,14 @@ public final class UIUtils {
 
         String key = typeKeyMap.getOrDefault(walletTransactionType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return walletTransactionType.name();
     }
 
     public static String translateRecurringTransactionStatus(
-            RecurringTransactionStatus rtStatus, I18nService i18nService) {
+            RecurringTransactionStatus rtStatus, PreferencesService preferencesService) {
         Map<String, String> statusKeyMap =
                 Map.of(
                         "active", Constants.TranslationKeys.RECURRING_TRANSACTION_STATUS_ACTIVE,
@@ -581,14 +583,14 @@ public final class UIUtils {
 
         String key = statusKeyMap.getOrDefault(rtStatus.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return rtStatus.name();
     }
 
     public static String translateRecurringTransactionFrequency(
-            RecurringTransactionFrequency frequency, I18nService i18nService) {
+            RecurringTransactionFrequency frequency, PreferencesService preferencesService) {
         Map<String, String> frequencyKeyMap =
                 Map.of(
                         "daily", Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_DAILY,
@@ -599,14 +601,14 @@ public final class UIUtils {
 
         String key = frequencyKeyMap.getOrDefault(frequency.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return frequency.name();
     }
 
     public static String translateCalendarEventType(
-            CalendarEventType eventType, I18nService i18nService) {
+            CalendarEventType eventType, PreferencesService preferencesService) {
         Map<String, String> eventTypeKeyMap =
                 Map.of(
                         "credit_card_statement_closing",
@@ -621,13 +623,14 @@ public final class UIUtils {
 
         String key = eventTypeKeyMap.getOrDefault(eventType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return eventType.getDescription();
     }
 
-    public static String translateAssetType(AssetType assetType, I18nService i18nService) {
+    public static String translateAssetType(
+            AssetType assetType, PreferencesService preferencesService) {
         Map<String, String> assetKeyMap =
                 Map.of(
                         "stock", Constants.TranslationKeys.ASSET_TYPE_STOCK,
@@ -639,13 +642,14 @@ public final class UIUtils {
 
         String key = assetKeyMap.getOrDefault(assetType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return assetType.name();
     }
 
-    public static String translatePeriodType(PeriodType periodType, I18nService i18nService) {
+    public static String translatePeriodType(
+            PeriodType periodType, PreferencesService preferencesService) {
         Map<String, String> periodTypeKeyMap =
                 Map.of(
                         "annual", Constants.TranslationKeys.PERIOD_TYPE_ANNUAL,
@@ -653,13 +657,14 @@ public final class UIUtils {
 
         String key = periodTypeKeyMap.getOrDefault(periodType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return periodType.name();
     }
 
-    public static String translateBondType(BondType bondType, I18nService i18nService) {
+    public static String translateBondType(
+            BondType bondType, PreferencesService preferencesService) {
         Map<String, String> bondTypeKeyMap =
                 Map.of(
                         "cdb", Constants.TranslationKeys.BOND_TYPE_CDB,
@@ -673,13 +678,14 @@ public final class UIUtils {
 
         String key = bondTypeKeyMap.getOrDefault(bondType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return bondType.name();
     }
 
-    public static String translateInterestType(InterestType interestType, I18nService i18nService) {
+    public static String translateInterestType(
+            InterestType interestType, PreferencesService preferencesService) {
         Map<String, String> interestTypeKeyMap =
                 Map.of(
                         "fixed", Constants.TranslationKeys.INTEREST_TYPE_FIXED,
@@ -688,14 +694,14 @@ public final class UIUtils {
 
         String key = interestTypeKeyMap.getOrDefault(interestType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return interestType.name();
     }
 
     public static String translateInterestIndex(
-            InterestIndex interestIndex, I18nService i18nService) {
+            InterestIndex interestIndex, PreferencesService preferencesService) {
         Map<String, String> interestIndexKeyMap =
                 Map.of(
                         "cdi", Constants.TranslationKeys.INTEREST_INDEX_CDI,
@@ -707,14 +713,14 @@ public final class UIUtils {
 
         String key = interestIndexKeyMap.getOrDefault(interestIndex.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return interestIndex.name();
     }
 
     public static String translateCreditCardInvoiceStatus(
-            CreditCardInvoiceStatus crcInvoiceStatus, I18nService i18nService) {
+            CreditCardInvoiceStatus crcInvoiceStatus, PreferencesService preferencesService) {
         Map<String, String> crcInvoiceStatusKeyMap =
                 Map.of(
                         "open", Constants.TranslationKeys.COMMON_CREDIT_CARD_OPEN,
@@ -723,14 +729,14 @@ public final class UIUtils {
         String key =
                 crcInvoiceStatusKeyMap.getOrDefault(crcInvoiceStatus.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return crcInvoiceStatus.name();
     }
 
     public static String translateCreditCardCreditType(
-            CreditCardCreditType crcCreditType, I18nService i18nService) {
+            CreditCardCreditType crcCreditType, PreferencesService preferencesService) {
         Map<String, String> crcCreditTypeKeyMap =
                 Map.of(
                         "cashback", Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_CASHBACK,
@@ -739,14 +745,14 @@ public final class UIUtils {
 
         String key = crcCreditTypeKeyMap.getOrDefault(crcCreditType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return crcCreditType.name();
     }
 
     public static String translateOperationType(
-            OperationType operationType, I18nService i18nService) {
+            OperationType operationType, PreferencesService preferencesService) {
         Map<String, String> operationTypeKeyMap =
                 Map.of(
                         "buy", Constants.TranslationKeys.OPERATION_TYPE_BUY,
@@ -754,7 +760,7 @@ public final class UIUtils {
 
         String key = operationTypeKeyMap.getOrDefault(operationType.name().toLowerCase(), null);
         if (key != null) {
-            return i18nService.tr(key);
+            return preferencesService.translate(key);
         }
 
         return operationType.name();
@@ -764,16 +770,19 @@ public final class UIUtils {
      * Get virtual wallet info
      *
      * @param wallet The wallet to get the info
-     * @param i18nService The I18nService instance for translation
+     * @param preferencesService The PreferencesService instance for translation
      * @return The virtual wallet info
      */
-    public static String getVirtualWalletInfo(Wallet wallet, I18nService i18nService) {
+    public static String getVirtualWalletInfo(
+            Wallet wallet, PreferencesService preferencesService) {
         if (wallet.isMaster()) {
-            return i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET);
+            return preferencesService.translate(
+                    Constants.TranslationKeys.HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET);
         }
 
         return MessageFormat.format(
-                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET),
+                preferencesService.translate(
+                        Constants.TranslationKeys.HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET),
                 wallet.getMasterWallet().getName());
     }
 
@@ -811,54 +820,57 @@ public final class UIUtils {
      * Format a LocalDateTime to short month/year format with locale
      *
      * @param dateTime The date to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted date string
      */
-    public static String formatShortMonthYear(LocalDateTime dateTime, I18nService i18nService) {
-        return dateTime.format(getShortMonthYearFormatter(i18nService.getLocale()));
+    public static String formatShortMonthYear(
+            LocalDateTime dateTime, PreferencesService preferencesService) {
+        return dateTime.format(getShortMonthYearFormatter(preferencesService.getLocale()));
     }
 
     /**
      * Format a YearMonth to short month/year format with locale
      *
      * @param yearMonth The YearMonth to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted date string
      */
-    public static String formatShortMonthYear(YearMonth yearMonth, I18nService i18nService) {
-        return yearMonth.format(getShortMonthYearFormatter(i18nService.getLocale()));
+    public static String formatShortMonthYear(
+            YearMonth yearMonth, PreferencesService preferencesService) {
+        return yearMonth.format(getShortMonthYearFormatter(preferencesService.getLocale()));
     }
 
     /**
      * Format a YearMonth to full month and year format with locale
      *
      * @param yearMonth The YearMonth to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted date string
      */
-    public static String formatFullMonthYear(YearMonth yearMonth, I18nService i18nService) {
-        return yearMonth.format(getFullMonthYearFormatter(i18nService.getLocale()));
+    public static String formatFullMonthYear(
+            YearMonth yearMonth, PreferencesService preferencesService) {
+        return yearMonth.format(getFullMonthYearFormatter(preferencesService.getLocale()));
     }
 
     /**
      * Format a Year to year format with locale
      *
      * @param year The Year to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted year string
      */
-    public static String formatYear(Year year, I18nService i18nService) {
-        return year.format(getYearFormatter(i18nService.getLocale()));
+    public static String formatYear(Year year, PreferencesService preferencesService) {
+        return year.format(getYearFormatter(preferencesService.getLocale()));
     }
 
     /**
      * Get weekday abbreviations in the current locale
      *
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Array of weekday abbreviations starting from Sunday
      */
-    public static String[] getWeekdayAbbreviations(I18nService i18nService) {
-        Locale locale = i18nService.getLocale();
+    public static String[] getWeekdayAbbreviations(PreferencesService preferencesService) {
+        Locale locale = preferencesService.getLocale();
         return new String[] {
             DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, locale),
             DayOfWeek.MONDAY.getDisplayName(TextStyle.SHORT, locale),
@@ -874,22 +886,23 @@ public final class UIUtils {
      * Get month display name in the current locale
      *
      * @param month The Month to get display name for
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Display name of the month
      */
-    public static String getMonthDisplayName(Month month, I18nService i18nService) {
-        return month.getDisplayName(TextStyle.FULL, i18nService.getLocale());
+    public static String getMonthDisplayName(Month month, PreferencesService preferencesService) {
+        return month.getDisplayName(TextStyle.FULL, preferencesService.getLocale());
     }
 
     /**
      * Get month short display name in the current locale
      *
      * @param month The Month to get short display name for
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Short display name of the month
      */
-    public static String getMonthShortDisplayName(Month month, I18nService i18nService) {
-        return month.getDisplayName(TextStyle.SHORT, i18nService.getLocale());
+    public static String getMonthShortDisplayName(
+            Month month, PreferencesService preferencesService) {
+        return month.getDisplayName(TextStyle.SHORT, preferencesService.getLocale());
     }
 
     /**
@@ -897,16 +910,17 @@ public final class UIUtils {
      * dd/MM/yyyy for pt-BR, M/d/yy for en)
      *
      * @param date The LocalDate to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted date string for display
      */
-    public static String formatDateForDisplay(LocalDate date, I18nService i18nService) {
+    public static String formatDateForDisplay(
+            LocalDate date, PreferencesService preferencesService) {
         if (date == null) {
             return "";
         }
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.SHORT)
-                        .withLocale(i18nService.getLocale());
+                        .withLocale(preferencesService.getLocale());
         return date.format(formatter);
     }
 
@@ -915,16 +929,17 @@ public final class UIUtils {
      * (e.g., dd/MM/yyyy for pt-BR, M/d/yy for en)
      *
      * @param dateTime The LocalDateTime to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted date string for display
      */
-    public static String formatDateForDisplay(LocalDateTime dateTime, I18nService i18nService) {
+    public static String formatDateForDisplay(
+            LocalDateTime dateTime, PreferencesService preferencesService) {
         if (dateTime == null) {
             return "";
         }
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.SHORT)
-                        .withLocale(i18nService.getLocale());
+                        .withLocale(preferencesService.getLocale());
         return dateTime.format(formatter);
     }
 
@@ -933,16 +948,17 @@ public final class UIUtils {
      * (e.g., dd/MM/yyyy HH:mm for pt-BR)
      *
      * @param dateTime The LocalDateTime to format
-     * @param i18nService The I18nService instance for locale
+     * @param preferencesService The PreferencesService instance for locale
      * @return Formatted date and time string for display
      */
-    public static String formatDateTimeForDisplay(LocalDateTime dateTime, I18nService i18nService) {
+    public static String formatDateTimeForDisplay(
+            LocalDateTime dateTime, PreferencesService preferencesService) {
         if (dateTime == null) {
             return "";
         }
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofLocalizedDateTime(java.time.format.FormatStyle.SHORT)
-                        .withLocale(i18nService.getLocale());
+                        .withLocale(preferencesService.getLocale());
         return dateTime.format(formatter);
     }
 

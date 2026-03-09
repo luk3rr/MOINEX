@@ -26,7 +26,7 @@ import org.moinex.model.creditcard.CreditCardDebt;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -76,7 +76,7 @@ public abstract class BaseCreditCardDebtManagement {
 
     protected CalculatorService calculatorService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected CreditCard creditCard = null;
 
@@ -98,8 +98,8 @@ public abstract class BaseCreditCardDebtManagement {
         this.springContext = springContext;
     }
 
-    protected void setI18nService(I18nService i18nService) {
-        this.i18nService = i18nService;
+    protected void setPreferencesService(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     public void setCreditCard(CreditCard crc) {
@@ -236,7 +236,8 @@ public abstract class BaseCreditCardDebtManagement {
 
         if (installments < 1) {
             msgLabel.setText(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_INSTALLMENTS));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_INSTALLMENTS));
             return;
         }
 
@@ -268,7 +269,7 @@ public abstract class BaseCreditCardDebtManagement {
             if (exactDivision) {
                 msgLabel.setText(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.CREDITCARD_DEBT_REPEAT_MONTHS),
                                 installments,
                                 UIUtils.formatCurrency(exactInstallmentValue)));
@@ -277,7 +278,7 @@ public abstract class BaseCreditCardDebtManagement {
 
                 msgLabel.setText(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDITCARD_DEBT_REPEAT_MONTHS_UNEVEN),
                                 installments,
@@ -287,7 +288,8 @@ public abstract class BaseCreditCardDebtManagement {
             }
         } catch (NumberFormatException e) {
             msgLabel.setText(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_VALUE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_VALUE));
         }
     }
 
@@ -321,7 +323,7 @@ public abstract class BaseCreditCardDebtManagement {
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
         UIUtils.configureComboBox(
                 invoiceMonthComboBox,
-                month -> UIUtils.getMonthDisplayName(Month.of(month), i18nService));
+                month -> UIUtils.getMonthDisplayName(Month.of(month), preferencesService));
         UIUtils.configureComboBox(invoiceYearComboBox, Object::toString);
     }
 

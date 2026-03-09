@@ -19,8 +19,8 @@ import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.InvestmentTarget;
-import org.moinex.service.I18nService;
 import org.moinex.service.InvestmentTargetService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -36,15 +36,16 @@ public class EditInvestmentTargetController {
     @FXML private Label validationLabel;
 
     private InvestmentTargetService investmentTargetService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private List<TargetRow> targetRows = new ArrayList<>();
 
     @Autowired
     public EditInvestmentTargetController(
-            InvestmentTargetService investmentTargetService, I18nService i18nService) {
+            InvestmentTargetService investmentTargetService,
+            PreferencesService preferencesService) {
         this.investmentTargetService = investmentTargetService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -73,7 +74,7 @@ public class EditInvestmentTargetController {
         HBox row = new HBox(10.0);
         row.setAlignment(Pos.CENTER_LEFT);
 
-        Label typeLabel = new Label(UIUtils.translateAssetType(assetType, i18nService));
+        Label typeLabel = new Label(UIUtils.translateAssetType(assetType, preferencesService));
         typeLabel.setMinWidth(200.0);
         typeLabel.setStyle("-fx-font-weight: bold;");
 
@@ -122,7 +123,7 @@ public class EditInvestmentTargetController {
                 investmentTargetService.validate(targets);
 
         totalPercentageLabel.setText(
-                UIUtils.formatPercentage(validationResult.getTotal(), i18nService));
+                UIUtils.formatPercentage(validationResult.getTotal(), preferencesService));
 
         if (validationResult.isValid()
                 && validationResult.getTotal().compareTo(new BigDecimal("100")) == 0) {
@@ -135,7 +136,7 @@ public class EditInvestmentTargetController {
                 validationLabel.setText(validationResult.getErrors().getFirst());
             } else if (validationResult.getTotal().compareTo(new BigDecimal("100")) != 0) {
                 validationLabel.setText(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION));
             }
@@ -154,10 +155,10 @@ public class EditInvestmentTargetController {
                 targets.put(row.assetType, percentage);
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_INVALID_PERCENTAGE_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_INVALID_PERCENTAGE_MESSAGE));
                 return;
@@ -168,21 +169,21 @@ public class EditInvestmentTargetController {
             investmentTargetService.saveTargets(targets);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE));
 
             targetsContainer.getScene().getWindow().hide();
         } catch (IllegalStateException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE),
                     e.getMessage());
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_ERROR_UPDATING_TARGET_TITLE),
                     e.getMessage());

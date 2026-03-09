@@ -25,7 +25,7 @@ import org.moinex.model.creditcard.CreditCardCredit;
 import org.moinex.model.enums.CreditCardCreditType;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
@@ -59,18 +59,18 @@ public class AddCreditCardCreditController {
 
     private CalculatorService calculatorService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
     public AddCreditCardCreditController(
             CreditCardService creditCardService,
             CalculatorService calculatorService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setCreditCard(CreditCard crc) {
@@ -94,7 +94,7 @@ public class AddCreditCardCreditController {
         populateCreditCardCombobox();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(datePicker, i18nService);
+        UIUtils.setDatePickerFormat(datePicker, preferencesService);
     }
 
     @FXML
@@ -112,8 +112,9 @@ public class AddCreditCardCreditController {
                 || valueStr.isEmpty()) {
 
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
@@ -135,23 +136,23 @@ public class AddCreditCardCreditController {
                             ));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE));
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
                     e.getMessage());
         }
@@ -194,7 +195,7 @@ public class AddCreditCardCreditController {
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
         UIUtils.configureComboBox(
                 creditTypeComboBox,
-                type -> UIUtils.translateCreditCardCreditType(type, i18nService));
+                type -> UIUtils.translateCreditCardCreditType(type, preferencesService));
     }
 
     private void configureSuggestions() {

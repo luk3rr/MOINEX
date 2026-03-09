@@ -108,7 +108,7 @@ public class HomeController {
 
     private WalletService walletService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private RecurringTransactionService recurringTransactionService;
 
@@ -131,7 +131,7 @@ public class HomeController {
      * @param recurringTransactionService The recurring transaction service
      * @param creditCardService The credit card service
      * @param springContext The spring context
-     * @param i18nService The i18n service
+     * @param preferencesService The i18n service
      */
     @Autowired
     public HomeController(
@@ -141,14 +141,14 @@ public class HomeController {
             NetWorthSnapshotService netWorthSnapshotService,
             NetWorthCalculationService netWorthCalculationService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
         this.netWorthSnapshotService = netWorthSnapshotService;
         this.netWorthCalculationService = netWorthCalculationService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -208,7 +208,7 @@ public class HomeController {
                                 .toExternalForm()));
         recalculateNetWorthButton.setDisable(true);
         recalculateNetWorthButton.setText(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING));
     }
 
@@ -220,7 +220,8 @@ public class HomeController {
                         Objects.requireNonNull(getClass().getResource(Constants.RELOAD_ICON))
                                 .toExternalForm()));
         recalculateNetWorthButton.setText(
-                i18nService.tr(Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON));
+                preferencesService.translate(
+                        Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON));
     }
 
     /** Set the actions for the buttons */
@@ -362,7 +363,7 @@ public class HomeController {
         TableColumn<WalletTransaction, WalletTransaction> transactionColumn =
                 new TableColumn<>(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.HOME_TRANSACTIONS_TABLE_TITLE),
                                 Constants.HOME_LAST_TRANSACTIONS_SIZE));
 
@@ -412,14 +413,16 @@ public class HomeController {
                                     Label dateLabel =
                                             new Label(
                                                     UIUtils.formatDateForDisplay(
-                                                            transaction.getDate(), i18nService));
+                                                            transaction.getDate(),
+                                                            preferencesService));
                                     dateLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH);
 
                                     Label transactionStatusLabel =
                                             new Label(
                                                     UIUtils.translateTransactionStatus(
-                                                            transaction.getStatus(), i18nService));
+                                                            transaction.getStatus(),
+                                                            preferencesService));
                                     transactionStatusLabel.setMinWidth(
                                             Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH);
 
@@ -484,7 +487,8 @@ public class HomeController {
 
         LocalDateTime maxMonth =
                 LocalDateTime.now().plusMonths(Constants.XYBAR_CHART_FUTURE_MONTHS);
-        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
+        DateTimeFormatter formatter =
+                UIUtils.getShortMonthYearFormatter(preferencesService.getLocale());
 
         int totalMonths = Constants.XYBAR_CHART_MONTHS + Constants.XYBAR_CHART_FUTURE_MONTHS;
 
@@ -544,10 +548,12 @@ public class HomeController {
 
         // Create two series: one for incomes and one for expenses
         XYChart.Series<String, Number> expensesSeries = new XYChart.Series<>();
-        expensesSeries.setName(i18nService.tr(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES));
+        expensesSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES));
 
         XYChart.Series<String, Number> incomesSeries = new XYChart.Series<>();
-        incomesSeries.setName(i18nService.tr(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES));
+        incomesSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES));
 
         double maxValue = 0.0;
 
@@ -619,7 +625,7 @@ public class HomeController {
             FXMLLoader loader =
                     new FXMLLoader(
                             getClass().getResource(Constants.RESUME_PANE_FXML),
-                            i18nService.getBundle());
+                            preferencesService.getBundle());
             loader.setControllerFactory(springContext::getBean);
             Parent newContent = loader.load();
 
@@ -637,8 +643,9 @@ public class HomeController {
 
             monthResumePaneTitle.setText(
                     MessageFormat.format(
-                            i18nService.tr(Constants.TranslationKeys.HOME_RESUME_TITLE),
-                            UIUtils.formatShortMonthYear(currentDate, i18nService)));
+                            preferencesService.translate(
+                                    Constants.TranslationKeys.HOME_RESUME_TITLE),
+                            UIUtils.formatShortMonthYear(currentDate, preferencesService)));
 
             resumePaneController.updateResumePane(
                     currentDate.getMonthValue(), currentDate.getYear());
@@ -680,7 +687,7 @@ public class HomeController {
         nameLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_NAME_STYLE);
         UIUtils.addTooltipToNode(
                 nameLabel,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NAME));
 
         Label crcOperatorLabel = new Label(creditCard.getOperator().getName());
@@ -688,7 +695,7 @@ public class HomeController {
         crcOperatorLabel.setAlignment(Pos.TOP_LEFT);
         UIUtils.addTooltipToNode(
                 crcOperatorLabel,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_OPERATOR));
 
         Label availableCredit =
@@ -700,7 +707,7 @@ public class HomeController {
 
         UIUtils.addTooltipToNode(
                 availableCredit,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_AVAILABLE_CREDIT));
 
         Label digitsLabel =
@@ -708,7 +715,7 @@ public class HomeController {
         digitsLabel.getStyleClass().add(Constants.HOME_CREDIT_CARD_ITEM_DIGITS_STYLE);
         UIUtils.addTooltipToNode(
                 digitsLabel,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER));
 
         infoVbox.getChildren().addAll(nameLabel, crcOperatorLabel, availableCredit, digitsLabel);
@@ -751,31 +758,36 @@ public class HomeController {
         nameLabel.getStyleClass().add(Constants.HOME_WALLET_ITEM_NAME_STYLE);
         UIUtils.addTooltipToNode(
                 nameLabel,
-                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME));
+                preferencesService.translate(
+                        Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME));
 
         Label walletTypeLabel =
-                new Label(UIUtils.translateWalletType(wallet.getType(), i18nService));
+                new Label(UIUtils.translateWalletType(wallet.getType(), preferencesService));
         walletTypeLabel.getStyleClass().add(Constants.HOME_WALLET_TYPE_STYLE);
         walletTypeLabel.setAlignment(Pos.TOP_LEFT);
         UIUtils.addTooltipToNode(
                 walletTypeLabel,
-                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_TYPE));
+                preferencesService.translate(
+                        Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_TYPE));
 
         Label balanceLabel = new Label(UIUtils.formatCurrency(wallet.getBalance()));
         balanceLabel.getStyleClass().add(Constants.HOME_WALLET_ITEM_BALANCE_STYLE);
         UIUtils.addTooltipToNode(
                 balanceLabel,
-                i18nService.tr(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_BALANCE));
+                preferencesService.translate(
+                        Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_BALANCE));
 
         if (wallet.isVirtual()) {
             Label virtualWalletLabel =
-                    new Label(i18nService.tr(Constants.TranslationKeys.HOME_WALLET_VIRTUAL_WALLET));
+                    new Label(
+                            preferencesService.translate(
+                                    Constants.TranslationKeys.HOME_WALLET_VIRTUAL_WALLET));
 
             virtualWalletLabel.setAlignment(Pos.BOTTOM_LEFT);
             virtualWalletLabel.getStyleClass().add(Constants.HOME_VIRTUAL_WALLET_INFO_STYLE);
 
             UIUtils.addTooltipToNode(
-                    virtualWalletLabel, UIUtils.getVirtualWalletInfo(wallet, i18nService));
+                    virtualWalletLabel, UIUtils.getVirtualWalletInfo(wallet, preferencesService));
 
             infoVbox.getChildren()
                     .addAll(nameLabel, walletTypeLabel, balanceLabel, virtualWalletLabel);
@@ -814,7 +826,8 @@ public class HomeController {
         graphView.getChildren().clear();
 
         if (graphPaneCurrentPage == 0) {
-            graphTitle.setText(i18nService.tr(Constants.TranslationKeys.HOME_MONEY_FLOW_TITLE));
+            graphTitle.setText(
+                    preferencesService.translate(Constants.TranslationKeys.HOME_MONEY_FLOW_TITLE));
             updateMoneyFlowBarChart();
             graphView.getChildren().add(moneyFlowBarChart);
             AnchorPane.setTopAnchor(moneyFlowBarChart, 0.0);
@@ -823,7 +836,8 @@ public class HomeController {
             AnchorPane.setRightAnchor(moneyFlowBarChart, 0.0);
             recalculateNetWorthButton.setVisible(false);
         } else if (graphPaneCurrentPage == 1) {
-            graphTitle.setText(i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_TITLE));
+            graphTitle.setText(
+                    preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_TITLE));
             recalculateNetWorthButton.setVisible(true);
 
             // Restore button state based on calculation service status
@@ -845,7 +859,7 @@ public class HomeController {
         List<NetWorthLineChart.NetWorthDataPoint> dataPoints = calculateNetWorthData();
 
         NetWorthLineChart netWorthChart = new NetWorthLineChart();
-        netWorthChart.setI18nService(i18nService);
+        netWorthChart.setPreferencesService(preferencesService);
         netWorthChart.updateData(dataPoints);
 
         UIUtils.applyDefaultChartStyle(netWorthChart);

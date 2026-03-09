@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.CalendarEvent;
 import org.moinex.model.enums.CalendarEventType;
 import org.moinex.service.CalendarService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -38,7 +38,7 @@ public class AddCalendarEventController {
 
     private CalendarService calendarService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -47,15 +47,16 @@ public class AddCalendarEventController {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public AddCalendarEventController(CalendarService calendarService, I18nService i18nService) {
+    public AddCalendarEventController(
+            CalendarService calendarService, PreferencesService preferencesService) {
         this.calendarService = calendarService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
     private void initialize() {
         configureComboBoxes();
-        UIUtils.setDatePickerFormat(datePicker, i18nService);
+        UIUtils.setDatePickerFormat(datePicker, preferencesService);
         populateComboBoxes();
     }
 
@@ -76,9 +77,9 @@ public class AddCalendarEventController {
 
         if (eventTitle.isEmpty() || eventDate == null || eventType == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
 
@@ -90,15 +91,16 @@ public class AddCalendarEventController {
                     new CalendarEvent(null, eventDate, eventTitle, description, eventType));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_MESSAGE));
 
             Stage stage = (Stage) titleField.getScene().getWindow();
             stage.close();
         } catch (IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CALENDAR_DIALOG_ERROR_CREATING_EVENT_TITLE),
                     e.getMessage());
         }
@@ -110,6 +112,6 @@ public class AddCalendarEventController {
 
     private void configureComboBoxes() {
         UIUtils.configureComboBox(
-                typeComboBox, t -> UIUtils.translateCalendarEventType(t, i18nService));
+                typeComboBox, t -> UIUtils.translateCalendarEventType(t, preferencesService));
     }
 }

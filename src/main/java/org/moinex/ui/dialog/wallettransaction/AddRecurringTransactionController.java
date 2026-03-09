@@ -19,7 +19,7 @@ import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -44,8 +44,8 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
             CategoryService categoryService,
-            I18nService i18nService) {
-        super(walletService, recurringTransactionService, categoryService, i18nService);
+            PreferencesService preferencesService) {
+        super(walletService, recurringTransactionService, categoryService, preferencesService);
     }
 
     @FXML
@@ -70,9 +70,9 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
                 || startDate == null
                 || frequency == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -100,10 +100,10 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
                             includeInAnalysisCheckBox.isSelected()));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_MESSAGE));
 
@@ -111,15 +111,15 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_CREATING_RECURRING_TITLE),
                     e.getMessage());

@@ -23,7 +23,7 @@ import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
@@ -64,7 +64,7 @@ public abstract class BaseTransferManagement {
 
     protected CategoryService categoryService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<Wallet> wallets;
 
@@ -79,12 +79,12 @@ public abstract class BaseTransferManagement {
             WalletService walletService,
             CalculatorService calculatorService,
             CategoryService categoryService,
-            I18nService i18nService,
+            PreferencesService preferencesService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
         this.calculatorService = calculatorService;
         this.categoryService = categoryService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
         this.springContext = springContext;
     }
 
@@ -101,7 +101,7 @@ public abstract class BaseTransferManagement {
         populateComboBoxes();
 
         // Configure the date picker
-        UIUtils.setDatePickerFormat(transferDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transferDatePicker, preferencesService);
 
         // Reset all labels
         UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);
@@ -138,7 +138,8 @@ public abstract class BaseTransferManagement {
     protected void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
+                preferencesService.translate(
+                        Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transferValueField)));
@@ -252,11 +253,11 @@ public abstract class BaseTransferManagement {
                 tf ->
                         String.format(
                                 "%s%n%s | "
-                                        + i18nService.tr(
+                                        + preferencesService.translate(
                                                 Constants.TranslationKeys
                                                         .WALLETTRANSACTION_SUGGESTION_FROM)
                                         + " %s | "
-                                        + i18nService.tr(
+                                        + preferencesService.translate(
                                                 Constants.TranslationKeys
                                                         .WALLETTRANSACTION_SUGGESTION_TO)
                                         + " %s | %s ",
@@ -266,7 +267,7 @@ public abstract class BaseTransferManagement {
                                 tf.getReceiverWallet().getName(),
                                 tf.getCategory() != null
                                         ? tf.getCategory().getName()
-                                        : i18nService.tr(
+                                        : preferencesService.translate(
                                                 Constants.TranslationKeys
                                                         .WALLETTRANSACTION_SUGGESTION_NO_CATEGORY));
 

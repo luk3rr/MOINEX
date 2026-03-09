@@ -21,7 +21,7 @@ import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
@@ -61,7 +61,7 @@ public class CreditCardInvoicePaymentController {
 
     private CalculatorService calculatorService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private List<Wallet> wallets;
 
@@ -75,7 +75,7 @@ public class CreditCardInvoicePaymentController {
      * @param walletService WalletService
      * @param creditCardService CreditCardService
      * @param calculatorService CalculatorService
-     * @param i18nService I18nService
+     * @param preferencesService PreferencesService
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -84,12 +84,12 @@ public class CreditCardInvoicePaymentController {
             CreditCardService creditCardService,
             CalculatorService calculatorService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.calculatorService = calculatorService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setCreditCard(CreditCard crc, YearMonth invoiceDate) {
@@ -107,7 +107,7 @@ public class CreditCardInvoicePaymentController {
 
         totalToPayLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
-        crcInvoiceMonthLabel.setText(UIUtils.formatShortMonthYear(invoiceDate, i18nService));
+        crcInvoiceMonthLabel.setText(UIUtils.formatShortMonthYear(invoiceDate, preferencesService));
 
         crcAvailableRebateLabel.setText(UIUtils.formatCurrency(creditCard.getAvailableRebate()));
 
@@ -172,9 +172,9 @@ public class CreditCardInvoicePaymentController {
 
         if (wallet == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_WALLET_NOT_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDITCARD_DIALOG_WALLET_NOT_SELECTED_MESSAGE));
             return;
@@ -191,9 +191,9 @@ public class CreditCardInvoicePaymentController {
 
         if (invoiceAmount.compareTo(BigDecimal.ZERO) == 0) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_MESSAGE));
         } else {
@@ -202,9 +202,9 @@ public class CreditCardInvoicePaymentController {
                         creditCard.getId(), wallet.getId(), invoiceDate, rebateValue);
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE));
 
                 Stage stage = (Stage) crcNameLabel.getScene().getWindow();
@@ -213,7 +213,7 @@ public class CreditCardInvoicePaymentController {
                     | IllegalArgumentException
                     | MoinexException.InsufficientResourcesException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE),
                         e.getMessage());

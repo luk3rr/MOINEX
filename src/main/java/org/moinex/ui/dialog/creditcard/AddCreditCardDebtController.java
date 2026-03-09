@@ -20,7 +20,7 @@ import org.moinex.model.creditcard.CreditCardDebt;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddCreditCardDebtController extends BaseCreditCardDebtManagement {
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
     public AddCreditCardDebtController(
@@ -39,10 +39,10 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
             CreditCardService creditCardService,
             CalculatorService calculatorService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         super(categoryService, creditCardService, calculatorService, springContext);
-        this.i18nService = i18nService;
-        setI18nService(i18nService);
+        this.preferencesService = preferencesService;
+        setPreferencesService(preferencesService);
     }
 
     @Override
@@ -63,8 +63,9 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                 || invoiceMonth == null
                 || invoiceYear == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
@@ -89,22 +90,24 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                     invoiceDateYearMonth);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_MESSAGE));
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
         } catch (EntityNotFoundException
                 | IllegalArgumentException
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
                     e.getMessage());
         }

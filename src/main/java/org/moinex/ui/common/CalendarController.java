@@ -31,7 +31,7 @@ import javafx.scene.text.Text;
 import lombok.NoArgsConstructor;
 import org.moinex.model.CalendarEvent;
 import org.moinex.service.CalendarService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.dialog.AddCalendarEventController;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -58,7 +58,7 @@ public class CalendarController {
 
     private CalendarService calendarService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor for CalendarController
@@ -68,10 +68,10 @@ public class CalendarController {
     @Autowired
     public CalendarController(
             CalendarService calendarService,
-            I18nService i18nService,
+            PreferencesService preferencesService,
             ConfigurableApplicationContext springContext) {
         this.calendarService = calendarService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
         this.springContext = springContext;
     }
 
@@ -103,7 +103,8 @@ public class CalendarController {
     private void handleAddEvent() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CALENDAR_EVENT_FXML,
-                i18nService.tr(Constants.TranslationKeys.COMMON_CALENDAR_MODAL_ADD_EVENT),
+                preferencesService.translate(
+                        Constants.TranslationKeys.COMMON_CALENDAR_MODAL_ADD_EVENT),
                 springContext,
                 (AddCalendarEventController controller) -> {},
                 List.of(this::drawCalendar));
@@ -117,7 +118,7 @@ public class CalendarController {
     /** Draw the calendar grid */
     private void drawCalendar() {
         final DateTimeFormatter formatter =
-                UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
+                UIUtils.getShortMonthYearFormatter(preferencesService.getLocale());
         currentMonth.setText(dateFocus.format(formatter));
 
         Integer monthMaxDate = dateFocus.getMonth().maxLength();
@@ -148,7 +149,7 @@ public class CalendarController {
         double calendarHeight = calendar.getPrefHeight();
 
         // Create the weekday labels
-        String[] weekdayAbbreviations = UIUtils.getWeekdayAbbreviations(i18nService);
+        String[] weekdayAbbreviations = UIUtils.getWeekdayAbbreviations(preferencesService);
         for (int j = 0; j < weekdayAbbreviations.length; j++) {
             Text dayLabel = new Text(weekdayAbbreviations[j]);
             dayLabel.setFont(Constants.CALENDAR_WEEKDAY_FONT_CONFIG);

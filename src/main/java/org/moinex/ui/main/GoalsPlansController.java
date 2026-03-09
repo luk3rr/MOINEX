@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import lombok.NoArgsConstructor;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.slf4j.Logger;
@@ -25,13 +25,13 @@ public class GoalsPlansController {
     @FXML private Tab plansTab;
 
     private ConfigurableApplicationContext springContext;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
     public GoalsPlansController(
-            ConfigurableApplicationContext springContext, I18nService i18nService) {
+            ConfigurableApplicationContext springContext, PreferencesService preferencesService) {
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -43,14 +43,14 @@ public class GoalsPlansController {
                     Constants.GOALS_STYLE_SHEET,
                     springContext,
                     getClass(),
-                    i18nService.getBundle());
+                    preferencesService.getBundle());
             UIUtils.loadContentIntoTab(
                     plansTab,
                     Constants.PLANS_FXML,
                     Constants.PLANS_STYLE_SHEET,
                     springContext,
                     getClass(),
-                    i18nService.getBundle());
+                    preferencesService.getBundle());
         } catch (IOException e) {
             logger.error("Error loading content: '{}'", e.getMessage(), e);
         }

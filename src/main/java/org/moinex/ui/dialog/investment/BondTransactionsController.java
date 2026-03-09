@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.investment.BondOperation;
 import org.moinex.service.BondService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -41,7 +41,7 @@ public class BondTransactionsController {
     private List<BondOperation> operations;
 
     private BondService bondService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private final String NA_ITEM = "N/A";
 
@@ -49,10 +49,10 @@ public class BondTransactionsController {
     public BondTransactionsController(
             BondService bondService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.bondService = bondService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -83,9 +83,9 @@ public class BondTransactionsController {
 
         if (selectedOperation == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.BOND_DIALOG_NO_OPERATION_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_DIALOG_NO_OPERATION_SELECTED_EDIT_MESSAGE));
             return;
@@ -94,7 +94,8 @@ public class BondTransactionsController {
         if (selectedOperation.getOperationType() == OperationType.BUY) {
             WindowUtils.openModalWindow(
                     Constants.EDIT_BOND_PURCHASE_FXML,
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EDIT_PURCHASE_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EDIT_PURCHASE_TITLE),
                     springContext,
                     (EditBondPurchaseController controller) ->
                             controller.setOperation(selectedOperation),
@@ -106,7 +107,8 @@ public class BondTransactionsController {
         } else {
             WindowUtils.openModalWindow(
                     Constants.EDIT_BOND_SALE_FXML,
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EDIT_SALE_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EDIT_SALE_TITLE),
                     springContext,
                     (EditBondSaleController controller) ->
                             controller.setOperation(selectedOperation),
@@ -124,45 +126,48 @@ public class BondTransactionsController {
 
         if (selectedOperation == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.BOND_DIALOG_NO_OPERATION_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .BOND_DIALOG_NO_OPERATION_SELECTED_DELETE_MESSAGE));
             return;
         }
 
         String operationType =
-                UIUtils.translateOperationType(selectedOperation.getOperationType(), i18nService);
+                UIUtils.translateOperationType(
+                        selectedOperation.getOperationType(), preferencesService);
         String bondName = selectedOperation.getBond().getName();
         String symbol = selectedOperation.getBond().getSymbol();
         String bondDisplay =
                 bondName + (symbol != null && !symbol.isBlank() ? " (" + symbol + ")" : "");
 
         String message =
-                i18nService
-                        .tr(Constants.TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_OPERATION_MESSAGE)
+                preferencesService
+                        .translate(
+                                Constants.TranslationKeys
+                                        .BOND_DIALOG_CONFIRM_DELETE_OPERATION_MESSAGE)
                         .replace("{operationType}", operationType)
                         .replace("{bond}", bondDisplay);
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_OPERATION_TITLE),
                 message,
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             try {
                 bondService.deleteOperation(selectedOperation.getId());
                 loadOperationsFromDatabase();
                 updateOperationTableView();
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_OPERATION_DELETED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_OPERATION_DELETED_MESSAGE));
             } catch (Exception e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
                         e.getMessage());
             }
         }
@@ -191,7 +196,8 @@ public class BondTransactionsController {
                                                 : "";
                                 String date =
                                         UIUtils.formatDateForDisplay(
-                                                op.getWalletTransaction().getDate(), i18nService);
+                                                op.getWalletTransaction().getDate(),
+                                                preferencesService);
                                 String quantity = op.getQuantity().toString();
                                 String unitPrice = op.getUnitPrice().toString();
                                 String fees = op.getFees() != null ? op.getFees().toString() : "";
@@ -228,15 +234,17 @@ public class BondTransactionsController {
 
         TableColumn<BondOperation, String> operationTypeColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.BOND_TABLE_OPERATION_TYPE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_TABLE_OPERATION_TYPE));
         operationTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateOperationType(
-                                        param.getValue().getOperationType(), i18nService)));
+                                        param.getValue().getOperationType(), preferencesService)));
 
         TableColumn<BondOperation, String> bondNameColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_BOND));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_BOND));
         bondNameColumn.setCellValueFactory(
                 param -> {
                     String symbol = param.getValue().getBond().getSymbol();
@@ -248,36 +256,43 @@ public class BondTransactionsController {
                 });
 
         TableColumn<BondOperation, String> bondTypeColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_TYPE));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_TYPE));
         bondTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateBondType(
-                                        param.getValue().getBond().getType(), i18nService)));
+                                        param.getValue().getBond().getType(), preferencesService)));
 
         TableColumn<BondOperation, String> dateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_DATE));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateForDisplay(
                                         param.getValue().getWalletTransaction().getDate(),
-                                        i18nService)));
+                                        preferencesService)));
 
         TableColumn<BondOperation, String> quantityColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_QUANTITY));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_TABLE_QUANTITY));
         quantityColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getQuantity().toString()));
 
         TableColumn<BondOperation, String> unitPriceColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
         unitPriceColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
                                 UIUtils.formatCurrency(param.getValue().getUnitPrice())));
 
         TableColumn<BondOperation, String> feesColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_FEES));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_FEES));
         feesColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -286,7 +301,8 @@ public class BondTransactionsController {
                                         : NA_ITEM));
 
         TableColumn<BondOperation, String> taxesColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_TAXES));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_TAXES));
         taxesColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -295,7 +311,9 @@ public class BondTransactionsController {
                                         : NA_ITEM));
 
         TableColumn<BondOperation, String> profitLossColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_PROFIT_LOSS));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_TABLE_PROFIT_LOSS));
         profitLossColumn.setCellValueFactory(
                 param -> {
                     BondOperation op = param.getValue();
@@ -336,7 +354,8 @@ public class BondTransactionsController {
                         });
 
         TableColumn<BondOperation, String> walletNameColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_WALLET));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_WALLET));
         walletNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -362,7 +381,8 @@ public class BondTransactionsController {
 
     private TableColumn<BondOperation, Integer> getOperationIdTableColumn() {
         TableColumn<BondOperation, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_ID));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(

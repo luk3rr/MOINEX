@@ -28,7 +28,7 @@ import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.investment.TickerSale;
 import org.moinex.model.wallettransaction.WalletTransaction;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -64,23 +64,23 @@ public class InvestmentTransactionsController {
     private List<CryptoExchange> cryptoExchanges;
 
     private TickerService tickerService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
      *
      * @param tickerService tickerService
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public InvestmentTransactionsController(
             TickerService tickerService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.tickerService = tickerService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -220,7 +220,8 @@ public class InvestmentTransactionsController {
                                                 .toLowerCase();
                                 String date =
                                         UIUtils.formatDateTimeForDisplay(
-                                                d.getWalletTransaction().getDate(), i18nService);
+                                                d.getWalletTransaction().getDate(),
+                                                preferencesService);
                                 String status =
                                         d.getWalletTransaction().getStatus().name().toLowerCase();
 
@@ -256,7 +257,8 @@ public class InvestmentTransactionsController {
                                 String tickerSymbol = p.getTicker().getSymbol().toLowerCase();
                                 String date =
                                         UIUtils.formatDateTimeForDisplay(
-                                                p.getWalletTransaction().getDate(), i18nService);
+                                                p.getWalletTransaction().getDate(),
+                                                preferencesService);
                                 String quantity = p.getQuantity().toString();
                                 String unitPrice = p.getUnitPrice().toString();
                                 String amount = p.getWalletTransaction().getAmount().toString();
@@ -302,7 +304,8 @@ public class InvestmentTransactionsController {
                                 String tickerSymbol = s.getTicker().getSymbol().toLowerCase();
                                 String date =
                                         UIUtils.formatDateTimeForDisplay(
-                                                s.getWalletTransaction().getDate(), i18nService);
+                                                s.getWalletTransaction().getDate(),
+                                                preferencesService);
                                 String quantity = s.getQuantity().toString();
                                 String unitPrice = s.getUnitPrice().toString();
                                 String amount = s.getWalletTransaction().getAmount().toString();
@@ -348,7 +351,8 @@ public class InvestmentTransactionsController {
                                 String targetCrypto =
                                         ce.getReceivedCrypto().getName().toLowerCase();
                                 String date =
-                                        UIUtils.formatDateTimeForDisplay(ce.getDate(), i18nService);
+                                        UIUtils.formatDateTimeForDisplay(
+                                                ce.getDate(), preferencesService);
                                 String sourceQuantity = ce.getSoldQuantity().toString();
                                 String targetQuantity = ce.getReceivedQuantity().toString();
                                 String description = ce.getDescription().toLowerCase();
@@ -373,7 +377,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerPurchase, String> tickerNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TICKER));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TICKER));
         tickerNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -383,31 +388,38 @@ public class InvestmentTransactionsController {
                                         + ")"));
 
         TableColumn<TickerPurchase, String> tickerTypeColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
         tickerTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getTicker().getType(), i18nService)));
+                                        param.getValue().getTicker().getType(),
+                                        preferencesService)));
 
         TableColumn<TickerPurchase, String> dateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
                                         param.getValue().getWalletTransaction().getDate(),
-                                        i18nService)));
+                                        preferencesService)));
 
         TableColumn<TickerPurchase, String> quantityColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY));
         quantityColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getQuantity().toString()));
 
         TableColumn<TickerPurchase, String> unitPriceColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_UNIT_PRICE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_UNIT_PRICE));
         unitPriceColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -415,7 +427,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerPurchase, String> amountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TOTAL_AMOUNT));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TOTAL_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -424,7 +437,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerPurchase, String> walletNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_WALLET));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_WALLET));
         walletNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -432,13 +446,14 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerPurchase, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_STATUS));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_STATUS));
         statusColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateTransactionStatus(
                                         param.getValue().getWalletTransaction().getStatus(),
-                                        i18nService)));
+                                        preferencesService)));
 
         // Add the columns to the table view
         purchaseTableView.getColumns().add(idColumn);
@@ -454,7 +469,9 @@ public class InvestmentTransactionsController {
 
     private TableColumn<TickerPurchase, Integer> getTickerPurchaseLongTableColumn() {
         TableColumn<TickerPurchase, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_ID));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -483,7 +500,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerSale, String> tickerNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TICKER));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TICKER));
         tickerNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -493,31 +511,38 @@ public class InvestmentTransactionsController {
                                         + ")"));
 
         TableColumn<TickerSale, String> tickerTypeColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
         tickerTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getTicker().getType(), i18nService)));
+                                        param.getValue().getTicker().getType(),
+                                        preferencesService)));
 
         TableColumn<TickerSale, String> dateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
                                         param.getValue().getWalletTransaction().getDate(),
-                                        i18nService)));
+                                        preferencesService)));
 
         TableColumn<TickerSale, String> quantityColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY));
         quantityColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getQuantity().toString()));
 
         TableColumn<TickerSale, String> unitPriceColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_UNIT_PRICE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_UNIT_PRICE));
         unitPriceColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -525,7 +550,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerSale, String> amountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TOTAL_AMOUNT));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TOTAL_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -534,7 +560,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerSale, String> walletNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_WALLET));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_WALLET));
         walletNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -542,13 +569,14 @@ public class InvestmentTransactionsController {
 
         TableColumn<TickerSale, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_STATUS));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_STATUS));
         statusColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateTransactionStatus(
                                         param.getValue().getWalletTransaction().getStatus(),
-                                        i18nService)));
+                                        preferencesService)));
 
         // Add the columns to the table view
         saleTableView.getColumns().add(idColumn);
@@ -564,7 +592,9 @@ public class InvestmentTransactionsController {
 
     private TableColumn<TickerSale, Integer> getTickerSaleLongTableColumn() {
         TableColumn<TickerSale, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_ID));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -593,7 +623,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<Dividend, String> tickerNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TICKER));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TICKER));
         tickerNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -603,25 +634,31 @@ public class InvestmentTransactionsController {
                                         + ")"));
 
         TableColumn<Dividend, String> tickerTypeColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_TYPE));
         tickerTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getTicker().getType(), i18nService)));
+                                        param.getValue().getTicker().getType(),
+                                        preferencesService)));
 
         TableColumn<Dividend, String> dateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
                                         param.getValue().getWalletTransaction().getDate(),
-                                        i18nService)));
+                                        preferencesService)));
 
         TableColumn<Dividend, String> amountColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_DIVIDEND_VALUE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_DIVIDEND_VALUE));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -630,7 +667,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<Dividend, String> walletNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_WALLET));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_WALLET));
         walletNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -638,13 +676,14 @@ public class InvestmentTransactionsController {
 
         TableColumn<Dividend, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_STATUS));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_STATUS));
         statusColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateTransactionStatus(
                                         param.getValue().getWalletTransaction().getStatus(),
-                                        i18nService)));
+                                        preferencesService)));
 
         // Add the columns to the table view
         dividendTableView.getColumns().add(idColumn);
@@ -658,7 +697,9 @@ public class InvestmentTransactionsController {
 
     private TableColumn<Dividend, Integer> getDividendLongTableColumn() {
         TableColumn<Dividend, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_ID));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -687,7 +728,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<CryptoExchange, String> soldCryptoNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_CRYPTO_SOLD));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_CRYPTO_SOLD));
         soldCryptoNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -698,7 +740,8 @@ public class InvestmentTransactionsController {
 
         TableColumn<CryptoExchange, String> receivedCryptoNameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_CRYPTO_RECEIVED));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_CRYPTO_RECEIVED));
         receivedCryptoNameColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -709,28 +752,32 @@ public class InvestmentTransactionsController {
 
         TableColumn<CryptoExchange, BigDecimal> quantitySoldColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY_SOLD));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY_SOLD));
         quantitySoldColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getSoldQuantity()));
 
         TableColumn<CryptoExchange, BigDecimal> quantityReceivedColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_TABLE_QUANTITY_RECEIVED));
         quantityReceivedColumn.setCellValueFactory(
                 param -> new SimpleObjectProperty<>(param.getValue().getReceivedQuantity()));
 
         TableColumn<CryptoExchange, String> dateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getDate(), i18nService)));
+                                        param.getValue().getDate(), preferencesService)));
 
         TableColumn<CryptoExchange, String> descriptionColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_DESCRIPTION));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getDescription()));
 
@@ -746,7 +793,9 @@ public class InvestmentTransactionsController {
 
     private TableColumn<CryptoExchange, Integer> getCryptoExchangeLongTableColumn() {
         TableColumn<CryptoExchange, Integer> idColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.INVESTMENT_TABLE_ID));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center
@@ -772,9 +821,9 @@ public class InvestmentTransactionsController {
     private void editPurchase(TickerPurchase purchase) {
         if (purchase == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_MESSAGE));
 
@@ -783,7 +832,8 @@ public class InvestmentTransactionsController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_TICKER_PURCHASE_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TICKER_PURCHASE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TICKER_PURCHASE),
                 springContext,
                 (EditTickerPurchaseController controller) -> controller.setPurchase(purchase),
                 List.of(
@@ -796,9 +846,9 @@ public class InvestmentTransactionsController {
     private void editSale(TickerSale sale) {
         if (sale == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_SALE_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_SALE_SELECTED_MESSAGE));
 
             return;
@@ -806,7 +856,8 @@ public class InvestmentTransactionsController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_TICKER_SALE_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TICKER_SALE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TICKER_SALE),
                 springContext,
                 (EditTickerSaleController controller) -> controller.setSale(sale),
                 List.of(
@@ -819,9 +870,9 @@ public class InvestmentTransactionsController {
     private void editDividend(Dividend dividend) {
         if (dividend == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_MESSAGE));
 
@@ -830,7 +881,8 @@ public class InvestmentTransactionsController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_DIVIDEND_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_DIVIDEND),
+                preferencesService.translate(
+                        Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_DIVIDEND),
                 springContext,
                 (EditDividendController controller) -> controller.setDividend(dividend),
                 List.of(
@@ -843,9 +895,9 @@ public class InvestmentTransactionsController {
     private void editCryptoExchange(CryptoExchange cryptoExchange) {
         if (cryptoExchange == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_MESSAGE));
 
@@ -854,7 +906,8 @@ public class InvestmentTransactionsController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_CRYPTO_EXCHANGE_FXML,
-                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_CRYPTO_EXCHANGE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_CRYPTO_EXCHANGE),
                 springContext,
                 (EditCryptoExchangeController controller) ->
                         controller.setCryptoExchange(cryptoExchange),
@@ -868,9 +921,9 @@ public class InvestmentTransactionsController {
     private void deletePurchase(TickerPurchase purchase) {
         if (purchase == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_PURCHASE_SELECTED_DELETE_MESSAGE));
             return;
@@ -879,10 +932,10 @@ public class InvestmentTransactionsController {
         String message = deleteMessage(purchase.getWalletTransaction());
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_PURCHASE_TITLE),
                 message,
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             tickerService.deletePurchase(purchase.getId());
             loadPurchasesFromDatabase();
             updatePurchaseTableView();
@@ -892,9 +945,9 @@ public class InvestmentTransactionsController {
     private void deleteSale(TickerSale sale) {
         if (sale == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_SALE_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_SALE_SELECTED_DELETE_MESSAGE));
             return;
@@ -903,10 +956,10 @@ public class InvestmentTransactionsController {
         String message = deleteMessage(sale.getWalletTransaction());
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_SALE_TITLE),
                 message,
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             tickerService.deleteSale(sale.getId());
             loadSalesFromDatabase();
             updateSaleTableView();
@@ -916,9 +969,9 @@ public class InvestmentTransactionsController {
     private void deleteDividend(Dividend dividend) {
         if (dividend == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_DIVIDEND_SELECTED_DELETE_MESSAGE));
             return;
@@ -927,10 +980,10 @@ public class InvestmentTransactionsController {
         String message = deleteMessage(dividend.getWalletTransaction());
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_DIVIDEND_TITLE),
                 message,
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             tickerService.deleteDividend(dividend.getId());
             loadDividendsFromDatabase();
             updateDividendTableView();
@@ -940,9 +993,9 @@ public class InvestmentTransactionsController {
     private void deleteCryptoExchange(CryptoExchange cryptoExchange) {
         if (cryptoExchange == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_NO_EXCHANGE_SELECTED_DELETE_MESSAGE));
             return;
@@ -953,22 +1006,22 @@ public class InvestmentTransactionsController {
                         "ID: {0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n{8}",
                         cryptoExchange.getId(),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.INVESTMENT_DELETE_SOURCE_CRYPTO),
                                 cryptoExchange.getSoldCrypto().getName(),
                                 cryptoExchange.getSoldCrypto().getSymbol()),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.INVESTMENT_DELETE_TARGET_CRYPTO),
                                 cryptoExchange.getReceivedCrypto().getName(),
                                 cryptoExchange.getReceivedCrypto().getSymbol()),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .INVESTMENT_DELETE_SOURCE_QUANTITY),
                                 cryptoExchange.getSoldQuantity()),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .INVESTMENT_DELETE_SOURCE_QUANTITY_AFTER_DELETION),
                                 cryptoExchange
@@ -976,12 +1029,12 @@ public class InvestmentTransactionsController {
                                         .getCurrentQuantity()
                                         .add(cryptoExchange.getSoldQuantity())),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .INVESTMENT_DELETE_TARGET_QUANTITY),
                                 cryptoExchange.getReceivedQuantity()),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .INVESTMENT_DELETE_TARGET_QUANTITY_AFTER_DELETION),
                                 cryptoExchange
@@ -989,19 +1042,20 @@ public class InvestmentTransactionsController {
                                         .getCurrentQuantity()
                                         .subtract(cryptoExchange.getReceivedQuantity())),
                         MessageFormat.format(
-                                i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_DATE),
+                                preferencesService.translate(
+                                        Constants.TranslationKeys.INVESTMENT_DELETE_DATE),
                                 UIUtils.formatDateTimeForDisplay(
-                                        cryptoExchange.getDate(), i18nService)),
+                                        cryptoExchange.getDate(), preferencesService)),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.INVESTMENT_DELETE_DESCRIPTION),
                                 cryptoExchange.getDescription()));
 
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_EXCHANGE_TITLE),
                 message,
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             tickerService.deleteCryptoExchange(cryptoExchange.getId());
             loadCryptoExchangesFromDatabase();
             updateCryptoExchangeTableView();
@@ -1023,25 +1077,31 @@ public class InvestmentTransactionsController {
         return MessageFormat.format(
                 "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}",
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_DESCRIPTION),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_DELETE_DESCRIPTION),
                         wt.getDescription()),
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_AMOUNT),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_DELETE_AMOUNT),
                         UIUtils.formatCurrency(wt.getAmount())),
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_DATE),
-                        UIUtils.formatDateTimeForDisplay(wt.getDate(), i18nService)),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_DELETE_DATE),
+                        UIUtils.formatDateTimeForDisplay(wt.getDate(), preferencesService)),
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_STATUS),
-                        UIUtils.translateTransactionStatus(wt.getStatus(), i18nService)),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_DELETE_STATUS),
+                        UIUtils.translateTransactionStatus(wt.getStatus(), preferencesService)),
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_WALLET),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_DELETE_WALLET),
                         wt.getWallet().getName()),
                 MessageFormat.format(
-                        i18nService.tr(Constants.TranslationKeys.INVESTMENT_DELETE_WALLET_BALANCE),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.INVESTMENT_DELETE_WALLET_BALANCE),
                         UIUtils.formatCurrency(wt.getWallet().getBalance())),
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DELETE_WALLET_BALANCE_AFTER_DELETION),
                         UIUtils.formatCurrency(balanceAfterDeletion)));

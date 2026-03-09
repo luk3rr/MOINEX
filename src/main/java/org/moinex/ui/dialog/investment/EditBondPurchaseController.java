@@ -19,7 +19,7 @@ import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -36,9 +36,9 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
             WalletService walletService,
             CategoryService categoryService,
             BondService bondService,
-            I18nService i18nService) {
-        super(walletService, categoryService, bondService, i18nService);
-        this.i18nService = i18nService;
+            PreferencesService preferencesService) {
+        super(walletService, categoryService, bondService, preferencesService);
+        this.preferencesService = preferencesService;
         walletTransactionType = WalletTransactionType.EXPENSE;
     }
 
@@ -97,8 +97,10 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                 || quantityStr.isBlank()
                 || buyDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -138,8 +140,9 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                     && taxesEqual
                     && operation.getWalletTransaction().getDate().toLocalDate().equals(buyDate)) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_PURCHASE_MESSAGE));
             } else {
                 bondService.updateOperation(
@@ -157,9 +160,9 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                         includeInAnalysisCheckBox.isSelected());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_MESSAGE));
             }
 
@@ -167,11 +170,13 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_PURCHASE_TITLE),
                     e.getMessage());
         }

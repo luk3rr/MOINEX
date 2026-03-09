@@ -18,7 +18,7 @@ import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.GoalService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -35,7 +35,7 @@ public final class EditGoalController extends BaseGoalManagement {
 
     private Goal goal = null;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -44,10 +44,12 @@ public final class EditGoalController extends BaseGoalManagement {
      */
     @Autowired
     public EditGoalController(
-            GoalService goalService, WalletService walletService, I18nService i18nService) {
+            GoalService goalService,
+            WalletService walletService,
+            PreferencesService preferencesService) {
         super(goalService, walletService);
-        this.i18nService = i18nService;
-        setI18nService(i18nService);
+        this.preferencesService = preferencesService;
+        setPreferencesService(preferencesService);
     }
 
     public void setGoal(Goal goal) {
@@ -87,8 +89,10 @@ public final class EditGoalController extends BaseGoalManagement {
 
         if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -107,8 +111,10 @@ public final class EditGoalController extends BaseGoalManagement {
                     && goal.isArchived() == archived
                     && goal.isCompleted() == completed) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_NO_CHANGES_MESSAGE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_DIALOG_NO_CHANGES_TITLE),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_DIALOG_NO_CHANGES_MESSAGE));
             } else // If there is any modification, update the goal
             {
                 goal.setName(goalName);
@@ -132,22 +138,27 @@ public final class EditGoalController extends BaseGoalManagement {
                 goalService.updateGoal(goal);
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_TITLE),
-                        i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_MESSAGE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_TITLE),
+                        preferencesService.translate(
+                                Constants.TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (EntityNotFoundException
                 | IllegalArgumentException
                 | EntityExistsException
                 | MoinexException.IncompleteGoalException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ERROR_UPDATING_GOAL_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_ERROR_UPDATING_GOAL_TITLE),
                     e.getMessage());
         }
     }

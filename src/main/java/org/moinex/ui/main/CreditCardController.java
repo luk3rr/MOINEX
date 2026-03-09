@@ -42,7 +42,7 @@ import org.moinex.model.creditcard.CreditCardDebt;
 import org.moinex.model.creditcard.CreditCardPayment;
 import org.moinex.service.CategoryService;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.common.CreditCardPaneController;
 import org.moinex.ui.dialog.creditcard.AddCreditCardController;
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController;
@@ -90,7 +90,7 @@ public class CreditCardController {
 
     private CategoryService categoryService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private List<CreditCard> creditCards;
 
@@ -109,11 +109,11 @@ public class CreditCardController {
             CreditCardService creditCardService,
             CategoryService categoryService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.creditCardService = creditCardService;
         this.categoryService = categoryService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -134,7 +134,8 @@ public class CreditCardController {
         debtsListMonthFilterComboBox.setValue(now.getMonth());
         debtsListYearFilterComboBox.setValue(Year.of(now.getYear()));
 
-        invoiceMonth.setText(UIUtils.formatShortMonthYear(getTableCurrentMonthYear(), i18nService));
+        invoiceMonth.setText(
+                UIUtils.formatShortMonthYear(getTableCurrentMonthYear(), preferencesService));
 
         debtsListMonthFilterComboBox.setOnAction(event -> updateDebtsTableView());
 
@@ -150,22 +151,24 @@ public class CreditCardController {
     private void handleAddDebt() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_DEBT_FXML,
-                i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE),
                 springContext,
                 (AddCreditCardDebtController controller) -> {},
                 List.of(this::updateDisplay),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
     private void handleAddCreditCard() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_FXML,
-                i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE),
                 springContext,
                 (AddCreditCardController controller) -> {},
                 List.of(this::updateDisplayCards),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
@@ -174,8 +177,9 @@ public class CreditCardController {
 
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE));
 
@@ -188,9 +192,9 @@ public class CreditCardController {
 
         if (payments.stream().anyMatch(CreditCardPayment::getRefunded)) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDIT_CARD_DIALOG_ALREADY_REFUNDED_EDIT_MESSAGE));
             return;
@@ -198,11 +202,12 @@ public class CreditCardController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_CREDIT_CARD_DEBT_FXML,
-                i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE),
                 springContext,
                 (EditCreditCardDebtController controller) -> controller.setCreditCardDebt(debt),
                 List.of(this::updateDisplay),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
@@ -211,8 +216,9 @@ public class CreditCardController {
 
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDIT_CARD_DIALOG_NO_SELECTION_REFUND_MESSAGE));
 
@@ -226,9 +232,9 @@ public class CreditCardController {
 
         if (payments.stream().anyMatch(CreditCardPayment::getRefunded)) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDIT_CARD_DIALOG_ALREADY_REFUNDED_REFUND_MESSAGE));
             return;
@@ -245,7 +251,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION),
                                 debt.getDescription()))
@@ -253,7 +259,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT),
                                 UIUtils.formatCurrency(debt.getAmount())))
@@ -261,7 +267,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS),
                                 debt.getInstallments()))
@@ -269,7 +275,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID),
                                 installmentsPaid))
@@ -277,7 +283,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PENDING),
                                 installmentsPending))
@@ -285,7 +291,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY),
                                 debt.getCategory().getName()))
@@ -293,29 +299,29 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD),
                                 debt.getCreditCard().getName()))
                 .append("\n\n");
 
         message.append(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_MESSAGE));
 
         // Confirm refund
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE),
                 message.toString(),
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             creditCardService.refundDebt(debt.getId(), null);
             updateDisplay();
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE));
         }
     }
@@ -326,8 +332,9 @@ public class CreditCardController {
 
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDIT_CARD_DIALOG_NO_SELECTION_DELETE_MESSAGE));
 
@@ -354,7 +361,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION),
                                 debt.getDescription()))
@@ -362,7 +369,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT),
                                 UIUtils.formatCurrency(debt.getAmount())))
@@ -370,15 +377,15 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE),
-                                UIUtils.formatDateForDisplay(debt.getDate(), i18nService)))
+                                UIUtils.formatDateForDisplay(debt.getDate(), preferencesService)))
                 .append("\n");
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS),
                                 debt.getInstallments()))
@@ -386,7 +393,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID),
                                 installmentsPaid))
@@ -394,7 +401,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY),
                                 debt.getCategory().getName()))
@@ -402,7 +409,7 @@ public class CreditCardController {
 
         message.append(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD),
                                 debt.getCreditCard().getName()))
@@ -411,7 +418,7 @@ public class CreditCardController {
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
             message.append(
                             MessageFormat.format(
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT),
                                     UIUtils.formatCurrency(refundAmount)))
@@ -427,30 +434,30 @@ public class CreditCardController {
             message.append("\n")
                     .append(
                             MessageFormat.format(
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_WALLET),
                                     walletNames));
         } else {
             message.append(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_NO_REFUND_AMOUNT));
         }
 
         // Confirm deletion
         if (WindowUtils.showConfirmationDialog(
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE),
                 message.toString(),
-                i18nService.getBundle())) {
+                preferencesService.getBundle())) {
             creditCardService.deleteDebt(debt.getId());
             updateDisplay();
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE));
         }
     }
@@ -459,12 +466,12 @@ public class CreditCardController {
     private void handleViewArchivedCreditCards() {
         WindowUtils.openModalWindow(
                 Constants.ARCHIVED_CREDIT_CARDS_FXML,
-                i18nService.tr(
+                preferencesService.translate(
                         Constants.TranslationKeys.CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE),
                 springContext,
                 (ArchivedCreditCardsController controller) -> {},
                 List.of(this::updateDisplay),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
@@ -586,7 +593,7 @@ public class CreditCardController {
         Label totalPendingPaymentsLabel =
                 new Label(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_TOTAL_DEBTS_PENDING_PAYMENTS),
                                 UIUtils.formatCurrency(totalPendingPayments)));
@@ -619,7 +626,7 @@ public class CreditCardController {
                 FXMLLoader loader =
                         new FXMLLoader(
                                 getClass().getResource(Constants.CRC_PANE_FXML),
-                                i18nService.getBundle());
+                                preferencesService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
                 Parent newContent = loader.load();
 
@@ -684,7 +691,8 @@ public class CreditCardController {
         debtsFlowStackedBarChart.getData().clear();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        DateTimeFormatter formatter = UIUtils.getShortMonthYearFormatter(i18nService.getLocale());
+        DateTimeFormatter formatter =
+                UIUtils.getShortMonthYearFormatter(preferencesService.getLocale());
 
         List<Category> categories = categoryService.getNonArchivedCategoriesOrderedByName();
         Map<YearMonth, Map<Category, Double>> monthlyTotals = new LinkedHashMap<>();
@@ -794,7 +802,7 @@ public class CreditCardController {
                                 + ": "
                                 + UIUtils.formatCurrency(value)
                                 + " ("
-                                + UIUtils.formatPercentage(percentage, i18nService)
+                                + UIUtils.formatPercentage(percentage, preferencesService)
                                 + ")\nTotal: "
                                 + UIUtils.formatCurrency(monthTotal));
 
@@ -856,7 +864,9 @@ public class CreditCardController {
                 new StringConverter<>() {
                     @Override
                     public String toString(Month month) {
-                        return month != null ? UIUtils.getMonthDisplayName(month, i18nService) : "";
+                        return month != null
+                                ? UIUtils.getMonthDisplayName(month, preferencesService)
+                                : "";
                     }
 
                     @Override
@@ -892,7 +902,7 @@ public class CreditCardController {
         totalDebtsYearFilterComboBox.setConverter(
                 new StringConverter<>() {
                     private final DateTimeFormatter formatter =
-                            UIUtils.getYearFormatter(i18nService.getLocale());
+                            UIUtils.getYearFormatter(preferencesService.getLocale());
 
                     @Override
                     public String toString(Year year) {
@@ -939,7 +949,7 @@ public class CreditCardController {
                                     && debtsListYearFilterComboBox.getValue() != null) {
                                 invoiceMonth.setText(
                                         UIUtils.formatShortMonthYear(
-                                                getTableCurrentMonthYear(), i18nService));
+                                                getTableCurrentMonthYear(), preferencesService));
                             }
 
                             updateDebtsTableView();
@@ -953,7 +963,7 @@ public class CreditCardController {
                                     && debtsListMonthFilterComboBox.getValue() != null) {
                                 invoiceMonth.setText(
                                         UIUtils.formatShortMonthYear(
-                                                getTableCurrentMonthYear(), i18nService));
+                                                getTableCurrentMonthYear(), preferencesService));
                             }
 
                             updateDebtsTableView();
@@ -968,12 +978,12 @@ public class CreditCardController {
     private void configureTableView() {
         TableColumn<CreditCardPayment, Integer> idColumn =
                 getCreditCardPaymentLongTableColumn(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID));
 
         TableColumn<CreditCardPayment, String> descriptionColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
@@ -983,7 +993,7 @@ public class CreditCardController {
 
         TableColumn<CreditCardPayment, String> amountColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
@@ -992,13 +1002,13 @@ public class CreditCardController {
 
         TableColumn<CreditCardPayment, String> installmentColumn =
                 getCreditCardPaymentStringTableColumn(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT));
 
         TableColumn<CreditCardPayment, String> crcColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD));
         crcColumn.setCellValueFactory(
@@ -1008,7 +1018,7 @@ public class CreditCardController {
 
         TableColumn<CreditCardPayment, String> categoryColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param ->
@@ -1017,18 +1027,18 @@ public class CreditCardController {
 
         TableColumn<CreditCardPayment, String> dateColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateForDisplay(
-                                        param.getValue().getDate(), i18nService)));
+                                        param.getValue().getDate(), preferencesService)));
 
         TableColumn<CreditCardPayment, String> statusColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS));
         statusColumn.setCellValueFactory(
                 param -> {
@@ -1037,23 +1047,23 @@ public class CreditCardController {
                     if (payment.isRefunded()) {
                         if (!payment.isPaid()) {
                             status =
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED);
                         } else {
                             status =
-                                    i18nService.tr(
+                                    preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED);
                         }
                     } else if (!payment.isPaid()) {
                         status =
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DEBTS_LIST_STATUS_PENDING);
                     } else {
                         status =
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .CREDIT_CARD_DEBTS_LIST_STATUS_PAID);
                     }

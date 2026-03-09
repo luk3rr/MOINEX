@@ -26,7 +26,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.CalculatorController;
 import org.moinex.util.Constants;
@@ -67,7 +67,7 @@ public abstract class BaseWalletTransactionManagement {
 
     protected CalculatorService calculatorService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<Wallet> wallets;
 
@@ -95,12 +95,12 @@ public abstract class BaseWalletTransactionManagement {
             WalletService walletService,
             CategoryService categoryService,
             CalculatorService calculatorService,
-            I18nService i18nService,
+            PreferencesService preferencesService,
             ConfigurableApplicationContext springContext) {
         this.walletService = walletService;
         this.categoryService = categoryService;
         this.calculatorService = calculatorService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
         this.springContext = springContext;
     }
 
@@ -133,7 +133,7 @@ public abstract class BaseWalletTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(transactionDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(transactionDatePicker, preferencesService);
 
         // Set default value for includeInAnalysis checkbox
         if (includeInAnalysisCheckBox != null) {
@@ -162,7 +162,8 @@ public abstract class BaseWalletTransactionManagement {
     protected void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
+                preferencesService.translate(
+                        Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transactionValueField)));
@@ -231,7 +232,7 @@ public abstract class BaseWalletTransactionManagement {
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY));
         }
     }
@@ -239,7 +240,7 @@ public abstract class BaseWalletTransactionManagement {
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(
-                statusComboBox, w -> UIUtils.translateTransactionStatus(w, i18nService));
+                statusComboBox, w -> UIUtils.translateTransactionStatus(w, preferencesService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

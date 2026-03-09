@@ -9,13 +9,13 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import lombok.Setter;
 import org.moinex.service.FinancialPlanningService.BudgetGroupHistoricalDataDTO;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 
 public class BudgetGroupTimelineChart extends LineChart<String, Number> {
 
-    @Setter private I18nService i18nService;
+    @Setter private PreferencesService preferencesService;
 
     public BudgetGroupTimelineChart() {
         super(new javafx.scene.chart.CategoryAxis(), new NumberAxis());
@@ -59,14 +59,17 @@ public class BudgetGroupTimelineChart extends LineChart<String, Number> {
             XYChart.Series<String, Number> actualSeriesData = new XYChart.Series<>();
             XYChart.Series<String, Number> targetSeriesData = new XYChart.Series<>();
 
-            String actualLabel = i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_ACTUAL);
-            String targetLabel = i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_TARGET);
+            String actualLabel =
+                    preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_ACTUAL);
+            String targetLabel =
+                    preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_TARGET);
 
             actualSeriesData.setName(groupName + " (" + actualLabel + ")");
             targetSeriesData.setName(groupName + " (" + targetLabel + ")");
 
             for (BudgetGroupHistoricalDataDTO data : entry.getValue()) {
-                String periodLabel = UIUtils.formatShortMonthYear(data.period(), i18nService);
+                String periodLabel =
+                        UIUtils.formatShortMonthYear(data.period(), preferencesService);
 
                 BigDecimal actualAmount = data.spentAmount();
                 BigDecimal targetAmount = data.targetAmount();
@@ -93,10 +96,12 @@ public class BudgetGroupTimelineChart extends LineChart<String, Number> {
     }
 
     private void applyStyling() {
-        if (i18nService == null) return;
+        if (preferencesService == null) return;
 
-        String actualLabel = i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_ACTUAL);
-        String targetLabel = i18nService.tr(Constants.TranslationKeys.PLAN_TIMELINE_TARGET);
+        String actualLabel =
+                preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_ACTUAL);
+        String targetLabel =
+                preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_TARGET);
 
         for (int i = 0; i < getData().size(); i++) {
             XYChart.Series<String, Number> series = getData().get(i);

@@ -21,7 +21,7 @@ import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.GoalService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -41,7 +41,7 @@ public final class AddGoalController extends BaseGoalManagement {
 
     private ToggleGroup strategyToggleGroup;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -50,10 +50,12 @@ public final class AddGoalController extends BaseGoalManagement {
      */
     @Autowired
     public AddGoalController(
-            GoalService goalService, WalletService walletService, I18nService i18nService) {
+            GoalService goalService,
+            WalletService walletService,
+            PreferencesService preferencesService) {
         super(goalService, walletService);
-        this.i18nService = i18nService;
-        setI18nService(i18nService);
+        this.preferencesService = preferencesService;
+        setPreferencesService(preferencesService);
     }
 
     @Override
@@ -77,8 +79,10 @@ public final class AddGoalController extends BaseGoalManagement {
 
         if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -89,9 +93,9 @@ public final class AddGoalController extends BaseGoalManagement {
             Toggle selectedToggle = strategyToggleGroup.getSelectedToggle();
             if (selectedToggle == null) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_MESSAGE));
                 return;
             }
@@ -133,21 +137,26 @@ public final class AddGoalController extends BaseGoalManagement {
                     strategy);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE));
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (IllegalArgumentException
                 | EntityExistsException
                 | EntityNotFoundException
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.GOAL_DIALOG_ERROR_CREATING_GOAL_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.GOAL_DIALOG_ERROR_CREATING_GOAL_TITLE),
                     e.getMessage());
         }
     }

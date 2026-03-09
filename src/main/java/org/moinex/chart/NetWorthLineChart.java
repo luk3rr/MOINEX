@@ -12,13 +12,13 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.shape.Line;
 import javafx.util.StringConverter;
 import lombok.Setter;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 
 public class NetWorthLineChart extends LineChart<String, Number> {
 
-    @Setter private I18nService i18nService;
+    @Setter private PreferencesService preferencesService;
     private Line currentDateLine;
     private YearMonth currentMonth;
     private List<NetWorthDataPoint> dataPoints;
@@ -71,13 +71,16 @@ public class NetWorthLineChart extends LineChart<String, Number> {
         XYChart.Series<String, Number> liabilitiesSeries = new XYChart.Series<>();
         XYChart.Series<String, Number> netWorthSeries = new XYChart.Series<>();
 
-        assetsSeries.setName(i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS));
+        assetsSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS));
         liabilitiesSeries.setName(
-                i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES));
-        netWorthSeries.setName(i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH));
+                preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES));
+        netWorthSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH));
 
         for (NetWorthDataPoint dataPoint : dataPoints) {
-            String periodLabel = UIUtils.formatShortMonthYear(dataPoint.period(), i18nService);
+            String periodLabel =
+                    UIUtils.formatShortMonthYear(dataPoint.period(), preferencesService);
 
             XYChart.Data<String, Number> assetsData =
                     new XYChart.Data<>(periodLabel, dataPoint.assets());
@@ -105,7 +108,7 @@ public class NetWorthLineChart extends LineChart<String, Number> {
     }
 
     private void applyStyling() {
-        if (i18nService == null) return;
+        if (preferencesService == null) return;
 
         for (int i = 0; i < getData().size(); i++) {
             XYChart.Series<String, Number> series = getData().get(i);
@@ -157,19 +160,22 @@ public class NetWorthLineChart extends LineChart<String, Number> {
 
     private void reapplyTooltips(List<NetWorthDataPoint> dataPoints, CategoryAxis xAxis) {
         for (NetWorthDataPoint dataPoint : dataPoints) {
-            String periodLabel = UIUtils.formatShortMonthYear(dataPoint.period(), i18nService);
+            String periodLabel =
+                    UIUtils.formatShortMonthYear(dataPoint.period(), preferencesService);
             String tooltipText = createTooltipText(dataPoint);
             UIUtils.addTooltipToAxisLabel(xAxis, periodLabel, tooltipText);
         }
     }
 
     private String createTooltipText(NetWorthDataPoint dataPoint) {
-        String assetsLabel = i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS);
+        String assetsLabel =
+                preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS);
         String liabilitiesLabel =
-                i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES);
-        String netWorthLabel = i18nService.tr(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH);
+                preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES);
+        String netWorthLabel =
+                preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH);
 
-        String periodLabel = UIUtils.formatFullMonthYear(dataPoint.period(), i18nService);
+        String periodLabel = UIUtils.formatFullMonthYear(dataPoint.period(), preferencesService);
 
         return periodLabel
                 + "\n"

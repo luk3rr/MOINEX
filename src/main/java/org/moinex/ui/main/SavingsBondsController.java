@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.enums.BondType;
 import org.moinex.model.investment.Bond;
 import org.moinex.service.BondService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.ui.dialog.investment.AddBondController;
 import org.moinex.ui.dialog.investment.AddBondPurchaseController;
 import org.moinex.ui.dialog.investment.AddBondSaleController;
@@ -54,7 +54,7 @@ public class SavingsBondsController {
 
     private ConfigurableApplicationContext springContext;
     private BondService bondService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     private final Map<Integer, BigDecimal> currentMonthInterestCache = new HashMap<>();
     private final Map<Integer, BigDecimal> totalAccumulatedInterestCache = new HashMap<>();
@@ -65,10 +65,10 @@ public class SavingsBondsController {
     public SavingsBondsController(
             BondService bondService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.bondService = bondService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -83,7 +83,8 @@ public class SavingsBondsController {
     private void handleRegisterBond() {
         WindowUtils.openModalWindow(
                 Constants.ADD_BOND_FXML,
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
                 springContext,
                 (AddBondController controller) -> {},
                 List.of(
@@ -99,9 +100,9 @@ public class SavingsBondsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE));
             return;
@@ -109,7 +110,8 @@ public class SavingsBondsController {
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_BOND_FXML,
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
                 springContext,
                 (EditBondController controller) -> controller.setBond(selectedBond),
                 List.of(
@@ -125,9 +127,9 @@ public class SavingsBondsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE));
             return;
@@ -135,20 +137,20 @@ public class SavingsBondsController {
 
         if (bondService.getOperationCountByBond(selectedBond.getId()) > 0) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_MESSAGE));
             return;
         }
 
         boolean confirmed =
                 WindowUtils.showConfirmationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE),
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE),
                                 selectedBond.getName()));
@@ -158,9 +160,9 @@ public class SavingsBondsController {
                 bondService.deleteBond(selectedBond.getId());
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE));
 
@@ -168,13 +170,13 @@ public class SavingsBondsController {
                 updateBondTabFields();
             } catch (IllegalStateException e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_DIALOG_ERROR_DELETING_BOND_TITLE),
                         e.getMessage());
             } catch (Exception e) {
                 WindowUtils.showErrorDialog(
-                        i18nService.tr(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
                         e.getMessage());
             }
         }
@@ -184,7 +186,8 @@ public class SavingsBondsController {
     private void handleOpenBondArchive() {
         WindowUtils.openModalWindow(
                 Constants.ARCHIVED_BONDS_FXML,
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
                 springContext,
                 (ArchivedBondsController controller) -> {},
                 List.of(
@@ -200,9 +203,9 @@ public class SavingsBondsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_BONDS_DIALOG_NO_SELECTION_BUY_MESSAGE));
             return;
@@ -210,7 +213,8 @@ public class SavingsBondsController {
 
         WindowUtils.openModalWindow(
                 Constants.BUY_BOND_FXML,
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
                 springContext,
                 (AddBondPurchaseController controller) -> {
                     controller.setBond(selectedBond);
@@ -228,9 +232,9 @@ public class SavingsBondsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE));
             return;
@@ -238,7 +242,8 @@ public class SavingsBondsController {
 
         WindowUtils.openModalWindow(
                 Constants.SALE_BOND_FXML,
-                i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
                 springContext,
                 (AddBondSaleController controller) -> controller.setBond(selectedBond),
                 List.of(
@@ -252,7 +257,8 @@ public class SavingsBondsController {
     private void handleShowBondTransactions() {
         WindowUtils.openModalWindow(
                 Constants.BOND_TRANSACTIONS_FXML,
-                i18nService.tr(Constants.TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
                 springContext,
                 (BondTransactionsController controller) -> {},
                 List.of(
@@ -268,9 +274,9 @@ public class SavingsBondsController {
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .SAVINGS_BONDS_DIALOG_NO_SELECTION_HISTORY_MESSAGE));
             return;
@@ -279,7 +285,7 @@ public class SavingsBondsController {
         WindowUtils.openModalWindow(
                 Constants.BOND_INTEREST_HISTORY_FXML,
                 MessageFormat.format(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_INTEREST_HISTORY_TITLE),
                         selectedBond.getName()),
                 springContext,
@@ -294,28 +300,32 @@ public class SavingsBondsController {
     private void configureBondTableView() {
         TableColumn<Bond, String> nameColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME));
         nameColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getName()));
 
         TableColumn<Bond, String> symbolColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL));
         symbolColumn.setCellValueFactory(
                 cellData -> new SimpleStringProperty(cellData.getValue().getSymbol()));
 
         TableColumn<Bond, String> typeColumn =
                 new TableColumn<>(
-                        i18nService.tr(Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE));
+                        preferencesService.translate(
+                                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE));
         typeColumn.setCellValueFactory(
                 cellData ->
                         new SimpleStringProperty(
                                 UIUtils.translateBondType(
-                                        cellData.getValue().getType(), i18nService)));
+                                        cellData.getValue().getType(), preferencesService)));
 
         TableColumn<Bond, String> quantityColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_QUANTITY));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_TABLE_QUANTITY));
         quantityColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
@@ -324,7 +334,9 @@ public class SavingsBondsController {
                 });
 
         TableColumn<Bond, String> avgPriceColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
+                new TableColumn<>(
+                        preferencesService.translate(
+                                Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
         avgPriceColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
@@ -334,7 +346,7 @@ public class SavingsBondsController {
 
         TableColumn<Bond, String> currentValueColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE));
         currentValueColumn.setCellValueFactory(
@@ -351,7 +363,7 @@ public class SavingsBondsController {
 
         TableColumn<Bond, String> investedValueColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE));
         investedValueColumn.setCellValueFactory(
@@ -362,19 +374,22 @@ public class SavingsBondsController {
                 });
 
         TableColumn<Bond, String> maturityDateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_MATURITY_DATE));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_MATURITY_DATE));
         maturityDateColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
                     if (bond.getMaturityDate() != null) {
                         return new SimpleStringProperty(
-                                UIUtils.formatDateForDisplay(bond.getMaturityDate(), i18nService));
+                                UIUtils.formatDateForDisplay(
+                                        bond.getMaturityDate(), preferencesService));
                     }
                     return new SimpleStringProperty("-");
                 });
 
         TableColumn<Bond, String> interestRateColumn =
-                new TableColumn<>(i18nService.tr(Constants.TranslationKeys.BOND_INTEREST_RATE));
+                new TableColumn<>(
+                        preferencesService.translate(Constants.TranslationKeys.BOND_INTEREST_RATE));
         interestRateColumn.setCellValueFactory(
                 cellData -> {
                     Bond bond = cellData.getValue();
@@ -386,7 +401,7 @@ public class SavingsBondsController {
 
         TableColumn<Bond, String> currentMonthInterestColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_TABLE_HEADER_CURRENT_MONTH_INTEREST));
         currentMonthInterestColumn.setCellValueFactory(
@@ -399,7 +414,7 @@ public class SavingsBondsController {
 
         TableColumn<Bond, String> totalAccumulatedInterestColumn =
                 new TableColumn<>(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .SAVINGS_BONDS_TABLE_HEADER_TOTAL_ACCUMULATED_INTEREST));
         totalAccumulatedInterestColumn.setCellValueFactory(
@@ -457,7 +472,7 @@ public class SavingsBondsController {
                                                         : "";
                                         String type =
                                                 UIUtils.translateBondType(
-                                                                bond.getType(), i18nService)
+                                                                bond.getType(), preferencesService)
                                                         .toLowerCase();
                                         String issuer =
                                                 bond.getIssuer() != null
@@ -475,7 +490,7 @@ public class SavingsBondsController {
                                                 bond.getMaturityDate() != null
                                                         ? UIUtils.formatDateForDisplay(
                                                                         bond.getMaturityDate(),
-                                                                        i18nService)
+                                                                        preferencesService)
                                                                 .toLowerCase()
                                                         : "";
                                         String interestRate =
@@ -526,10 +541,10 @@ public class SavingsBondsController {
                     @Override
                     public String toString(BondType bondType) {
                         if (bondType == null) {
-                            return i18nService.tr(
+                            return preferencesService.translate(
                                     Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL);
                         }
-                        return UIUtils.translateBondType(bondType, i18nService);
+                        return UIUtils.translateBondType(bondType, preferencesService);
                     }
 
                     @Override

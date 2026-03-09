@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -40,7 +40,7 @@ public class ChangeWalletTypeController {
 
     private WalletService walletService;
 
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
@@ -49,9 +49,10 @@ public class ChangeWalletTypeController {
      * @note This constructor is used for dependency injection
      */
     @Autowired
-    public ChangeWalletTypeController(WalletService walletService, I18nService i18nService) {
+    public ChangeWalletTypeController(
+            WalletService walletService, PreferencesService preferencesService) {
         this.walletService = walletService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     public void setWalletComboBox(Wallet wt) {
@@ -87,9 +88,9 @@ public class ChangeWalletTypeController {
 
         if (wt == null || walletNewType == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
@@ -100,15 +101,15 @@ public class ChangeWalletTypeController {
             walletService.changeWalletType(wt);
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE));
         } catch (EntityNotFoundException | MoinexException.AttributeAlreadySetException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
                     e.getMessage());
             return;
@@ -166,7 +167,7 @@ public class ChangeWalletTypeController {
     private void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(
-                newTypeComboBox, wt -> UIUtils.translateWalletType(wt, i18nService));
+                newTypeComboBox, wt -> UIUtils.translateWalletType(wt, preferencesService));
     }
 
     private void updateCurrentTypeLabel(Wallet wt) {
@@ -175,6 +176,6 @@ public class ChangeWalletTypeController {
             return;
         }
 
-        currentTypeLabel.setText(UIUtils.translateWalletType(wt.getType(), i18nService));
+        currentTypeLabel.setText(UIUtils.translateWalletType(wt.getType(), preferencesService));
     }
 }

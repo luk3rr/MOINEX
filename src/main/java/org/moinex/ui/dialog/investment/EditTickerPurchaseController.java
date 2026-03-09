@@ -20,7 +20,7 @@ import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -41,7 +41,7 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
      * @param walletService Wallet service
      * @param categoryService Category service
      * @param tickerService Ticker service
-     * @param i18nService I18n service
+     * @param preferencesService I18n service
      * @note This constructor is used for dependency injection
      */
     @Autowired
@@ -49,9 +49,9 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
             WalletService walletService,
             CategoryService categoryService,
             TickerService tickerService,
-            I18nService i18nService) {
-        super(walletService, categoryService, tickerService, i18nService);
-        this.i18nService = i18nService;
+            PreferencesService preferencesService) {
+        super(walletService, categoryService, tickerService, preferencesService);
+        this.preferencesService = preferencesService;
         walletTransactionType = WalletTransactionType.EXPENSE;
     }
 
@@ -98,8 +98,9 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                 || quantityStr.isBlank()
                 || buyDate == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
@@ -124,9 +125,9 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                     && purchase.getWalletTransaction().getIncludeInAnalysis()
                             == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_NO_CHANGES_PURCHASE_MESSAGE));
             } else // If there is any modification, update the transaction
@@ -147,9 +148,9 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                 tickerService.updatePurchase(purchase);
 
                 WindowUtils.showSuccessDialog(
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys.INVESTMENT_DIALOG_PURCHASE_UPDATED_TITLE),
-                        i18nService.tr(
+                        preferencesService.translate(
                                 Constants.TranslationKeys
                                         .INVESTMENT_DIALOG_PURCHASE_UPDATED_MESSAGE));
             }
@@ -158,13 +159,13 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .INVESTMENT_DIALOG_ERROR_UPDATING_PURCHASE_TITLE),
                     e.getMessage());

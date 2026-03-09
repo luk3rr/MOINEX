@@ -16,7 +16,7 @@ import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardOperator;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -27,23 +27,23 @@ import org.springframework.stereotype.Controller;
 @Controller
 @NoArgsConstructor
 public final class AddCreditCardController extends BaseCreditCardManagement {
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     /**
      * Constructor
      *
      * @param creditCardService The credit card service
      * @param walletService The wallet service
-     * @param i18nService The internationalization service
+     * @param preferencesService The internationalization service
      * @note This constructor is used for dependency injection
      */
     @Autowired
     public AddCreditCardController(
             CreditCardService creditCardService,
             WalletService walletService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         super(creditCardService, walletService);
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -66,8 +66,9 @@ public final class AddCreditCardController extends BaseCreditCardManagement {
                 || crcClosingDayStr == null
                 || crcDueDayStr == null) {
             WindowUtils.showInformationDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
@@ -94,19 +95,22 @@ public final class AddCreditCardController extends BaseCreditCardManagement {
                             ));
 
             WindowUtils.showSuccessDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_CREATED_TITLE),
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_CREATED_MESSAGE));
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_CREATED_TITLE),
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_CREATED_MESSAGE));
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_TITLE),
-                    i18nService.tr(
+                    preferencesService.translate(
+                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_TITLE),
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_MESSAGE));
         } catch (EntityExistsException | EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_TITLE),
                     e.getMessage());
         }

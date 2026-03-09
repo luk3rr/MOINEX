@@ -38,7 +38,7 @@ import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.CreditCardService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.ui.common.WalletFullPaneController;
@@ -78,7 +78,7 @@ public class WalletController {
     private WalletService walletService;
     private CreditCardService creditCardService;
     private RecurringTransactionService recurringTransactionService;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
     private List<CheckBox> doughnutChartCheckBoxes;
     private List<WalletTransaction> transactions;
     private List<WalletType> walletTypes;
@@ -103,12 +103,12 @@ public class WalletController {
             CreditCardService creditCardService,
             RecurringTransactionService recurringTransactionService,
             ConfigurableApplicationContext springContext,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.creditCardService = creditCardService;
         this.recurringTransactionService = recurringTransactionService;
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -118,20 +118,21 @@ public class WalletController {
 
         loadAllDataFromDatabase();
 
-        String allWalletsLabel = i18nService.tr(Constants.TranslationKeys.WALLET_ALL_WALLETS);
+        String allWalletsLabel =
+                preferencesService.translate(Constants.TranslationKeys.WALLET_ALL_WALLETS);
 
         totalBalancePaneWalletTypeComboBox
                 .getItems()
                 .addAll(
                         walletTypes.stream()
-                                .map(wt -> UIUtils.translateWalletType(wt, i18nService))
+                                .map(wt -> UIUtils.translateWalletType(wt, preferencesService))
                                 .toList());
 
         moneyFlowPaneWalletTypeComboBox
                 .getItems()
                 .addAll(
                         walletTypes.stream()
-                                .map(wt -> UIUtils.translateWalletType(wt, i18nService))
+                                .map(wt -> UIUtils.translateWalletType(wt, preferencesService))
                                 .toList());
 
         // Add the default wallet type and select it
@@ -155,7 +156,8 @@ public class WalletController {
     private void handleAddTransfer() {
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                i18nService.tr(Constants.TranslationKeys.WALLET_DIALOG_ADD_TRANSFER_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.WALLET_DIALOG_ADD_TRANSFER_TITLE),
                 springContext,
                 (AddTransferController controller) -> {},
                 List.of(
@@ -166,14 +168,15 @@ public class WalletController {
                             updateTotalBalanceView();
                             updateDoughnutChart();
                         }),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
     private void handleAddWallet() {
         WindowUtils.openModalWindow(
                 Constants.ADD_WALLET_FXML,
-                i18nService.tr(Constants.TranslationKeys.WALLET_DIALOG_ADD_WALLET_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.WALLET_DIALOG_ADD_WALLET_TITLE),
                 springContext,
                 (AddWalletController controller) -> {},
                 List.of(
@@ -184,14 +187,15 @@ public class WalletController {
                             updateTotalBalanceView();
                             updateDoughnutChart();
                         }),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
     private void handleViewArchivedWallets() {
         WindowUtils.openModalWindow(
                 Constants.ARCHIVED_WALLETS_FXML,
-                i18nService.tr(Constants.TranslationKeys.WALLET_DIALOG_ARCHIVED_WALLETS_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.WALLET_DIALOG_ARCHIVED_WALLETS_TITLE),
                 springContext,
                 (ArchivedWalletsController controller) -> {},
                 List.of(
@@ -202,14 +206,15 @@ public class WalletController {
                             updateMoneyFlowBarChart();
                             updateDoughnutChart();
                         }),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     @FXML
     private void handleViewTransfers() {
         WindowUtils.openModalWindow(
                 Constants.TRANSFERS_FXML,
-                i18nService.tr(Constants.TranslationKeys.WALLET_DIALOG_VIEW_TRANSFERS_TITLE),
+                preferencesService.translate(
+                        Constants.TranslationKeys.WALLET_DIALOG_VIEW_TRANSFERS_TITLE),
                 springContext,
                 (TransferController controller) -> {},
                 List.of(
@@ -219,7 +224,7 @@ public class WalletController {
                             updateTotalBalanceView();
                             updateDoughnutChart();
                         }),
-                i18nService.getBundle());
+                preferencesService.getBundle());
     }
 
     /**
@@ -408,7 +413,7 @@ public class WalletController {
         Label balanceForeseenLabel =
                 new Label(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys.WALLET_TOTAL_BALANCE_FORESEEN),
                                 UIUtils.formatCurrency(foreseenBalance)));
 
@@ -417,7 +422,7 @@ public class WalletController {
         Label totalWalletsLabel =
                 new Label(
                         MessageFormat.format(
-                                i18nService.tr(
+                                preferencesService.translate(
                                         Constants.TranslationKeys
                                                 .WALLET_TOTAL_BALANCE_CORRESPONDS_TO),
                                 totalAmountInWallets));
@@ -445,7 +450,7 @@ public class WalletController {
                 FXMLLoader loader =
                         new FXMLLoader(
                                 getClass().getResource(Constants.WALLET_FULL_PANE_FXML),
-                                i18nService.getBundle());
+                                preferencesService.getBundle());
                 loader.setControllerFactory(springContext::getBean);
                 Parent newContent = loader.load();
 
@@ -520,7 +525,8 @@ public class WalletController {
                         walletTypes.stream()
                                 .filter(
                                         type ->
-                                                UIUtils.translateWalletType(type, i18nService)
+                                                UIUtils.translateWalletType(
+                                                                type, preferencesService)
                                                         .equals(walletTypeName))
                                 .findFirst()
                                 .orElse(null);
@@ -543,14 +549,14 @@ public class WalletController {
 
                     pieChartData.add(
                             new PieChart.Data(
-                                    UIUtils.translateWalletType(wt, i18nService),
+                                    UIUtils.translateWalletType(wt, preferencesService),
                                     totalBalanceGroup.doubleValue()));
                 }
             }
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
-        doughnutChart.setI18nService(i18nService);
+        doughnutChart.setI18nService(preferencesService);
         doughnutChart.setLabelsVisible(false);
 
         for (PieChart.Data data : doughnutChart.getData()) {
@@ -569,7 +575,7 @@ public class WalletController {
                             + "\n"
                             + UIUtils.formatCurrency(value)
                             + " ("
-                            + UIUtils.formatPercentage(percentage, i18nService)
+                            + UIUtils.formatPercentage(percentage, preferencesService)
                             + ")";
 
             UIUtils.addTooltipToNode(node, tooltipText);
@@ -605,7 +611,7 @@ public class WalletController {
         LocalDateTime maxMonth =
                 LocalDateTime.now().plusMonths(Constants.XYBAR_CHART_FUTURE_MONTHS);
         DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("MMM/yy", i18nService.getLocale());
+                DateTimeFormatter.ofPattern("MMM/yy", preferencesService.getLocale());
 
         int totalMonths = Constants.XYBAR_CHART_MONTHS + Constants.XYBAR_CHART_FUTURE_MONTHS;
 
@@ -736,10 +742,12 @@ public class WalletController {
 
         // Create two series: one for incomes and one for expenses
         XYChart.Series<String, Number> expensesSeries = new XYChart.Series<>();
-        expensesSeries.setName(i18nService.tr(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES));
+        expensesSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES));
 
         XYChart.Series<String, Number> incomesSeries = new XYChart.Series<>();
-        incomesSeries.setName(i18nService.tr(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES));
+        incomesSeries.setName(
+                preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES));
 
         double maxValue = 0.0;
 
@@ -811,7 +819,7 @@ public class WalletController {
         doughnutChartCheckBoxes = new ArrayList<>();
 
         for (WalletType wt : walletTypes) {
-            CheckBox checkBox = new CheckBox(UIUtils.translateWalletType(wt, i18nService));
+            CheckBox checkBox = new CheckBox(UIUtils.translateWalletType(wt, preferencesService));
             checkBox.getStyleClass().add(Constants.WALLET_CHECK_BOX_STYLE);
             checkBox.setSelected(true);
             doughnutChartCheckBoxes.add(checkBox);

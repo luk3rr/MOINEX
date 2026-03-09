@@ -11,7 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import lombok.NoArgsConstructor;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.slf4j.Logger;
@@ -32,13 +32,13 @@ public class SavingsController {
     @FXML private Tab bondsTab;
 
     private ConfigurableApplicationContext springContext;
-    private I18nService i18nService;
+    private PreferencesService preferencesService;
 
     @Autowired
     public SavingsController(
-            ConfigurableApplicationContext springContext, I18nService i18nService) {
+            ConfigurableApplicationContext springContext, PreferencesService preferencesService) {
         this.springContext = springContext;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -50,21 +50,21 @@ public class SavingsController {
                     Constants.SAVINGS_OVERVIEW_STYLE_SHEET,
                     springContext,
                     getClass(),
-                    i18nService.getBundle());
+                    preferencesService.getBundle());
             UIUtils.loadContentIntoTab(
                     stocksFundsTab,
                     Constants.SAVINGS_STOCKS_FUNDS_FXML,
                     Constants.SAVINGS_STOCKS_FUNDS_STYLE_SHEET,
                     springContext,
                     getClass(),
-                    i18nService.getBundle());
+                    preferencesService.getBundle());
             UIUtils.loadContentIntoTab(
                     bondsTab,
                     Constants.SAVINGS_BONDS_FXML,
                     Constants.SAVINGS_BONDS_STYLE_SHEET,
                     springContext,
                     getClass(),
-                    i18nService.getBundle());
+                    preferencesService.getBundle());
         } catch (IOException e) {
             logger.error("Error loading content: '{}'", e.getMessage());
         }

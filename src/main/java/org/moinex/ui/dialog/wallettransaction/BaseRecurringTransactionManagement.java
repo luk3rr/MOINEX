@@ -18,7 +18,7 @@ import org.moinex.model.enums.RecurringTransactionFrequency;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
-import org.moinex.service.I18nService;
+import org.moinex.service.PreferencesService;
 import org.moinex.service.RecurringTransactionService;
 import org.moinex.service.WalletService;
 import org.moinex.util.Constants;
@@ -58,7 +58,7 @@ public abstract class BaseRecurringTransactionManagement {
 
     protected CategoryService categoryService;
 
-    protected I18nService i18nService;
+    protected PreferencesService preferencesService;
 
     protected List<Wallet> wallets;
 
@@ -77,11 +77,11 @@ public abstract class BaseRecurringTransactionManagement {
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
             CategoryService categoryService,
-            I18nService i18nService) {
+            PreferencesService preferencesService) {
         this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
         this.categoryService = categoryService;
-        this.i18nService = i18nService;
+        this.preferencesService = preferencesService;
     }
 
     @FXML
@@ -94,8 +94,8 @@ public abstract class BaseRecurringTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(startDatePicker, i18nService);
-        UIUtils.setDatePickerFormat(endDatePicker, i18nService);
+        UIUtils.setDatePickerFormat(startDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(endDatePicker, preferencesService);
 
         startDatePicker.setOnAction(e -> updateInfoLabel());
 
@@ -144,26 +144,27 @@ public abstract class BaseRecurringTransactionManagement {
         if (startDate != null && frequency != null) {
             if (endDate != null) {
                 msg =
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
+                        preferencesService.translate(
+                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
                                 + " "
                                 + startDate
                                 + ", "
-                                + i18nService.tr(
+                                + preferencesService.translate(
                                         Constants.TranslationKeys.WALLETTRANSACTION_INFO_ENDS_ON)
                                 + " "
                                 + endDate
                                 + ", "
-                                + i18nService.tr(
+                                + preferencesService.translate(
                                         Constants.TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
                                 + " "
                                 + UIUtils.translateRecurringTransactionFrequency(
-                                        frequency, i18nService);
+                                        frequency, preferencesService);
 
                 try {
 
                     msg +=
                             "\n"
-                                    + i18nService.tr(
+                                    + preferencesService.translate(
                                             Constants.TranslationKeys
                                                     .WALLETTRANSACTION_INFO_LAST_TRANSACTION)
                                     + " "
@@ -174,15 +175,16 @@ public abstract class BaseRecurringTransactionManagement {
                 }
             } else {
                 msg =
-                        i18nService.tr(Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
+                        preferencesService.translate(
+                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
                                 + " "
                                 + startDate
                                 + ", "
-                                + i18nService.tr(
+                                + preferencesService.translate(
                                         Constants.TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
                                 + " "
                                 + UIUtils.translateRecurringTransactionFrequency(
-                                        frequency, i18nService);
+                                        frequency, preferencesService);
             }
         }
 
@@ -208,7 +210,7 @@ public abstract class BaseRecurringTransactionManagement {
         if (categories.isEmpty()) {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
-                    i18nService.tr(
+                    preferencesService.translate(
                             Constants.TranslationKeys
                                     .WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY_RECURRING));
         }
@@ -217,10 +219,10 @@ public abstract class BaseRecurringTransactionManagement {
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
         UIUtils.configureComboBox(
-                typeComboBox, t -> UIUtils.translateTransactionType(t, i18nService));
+                typeComboBox, t -> UIUtils.translateTransactionType(t, preferencesService));
         UIUtils.configureComboBox(
                 frequencyComboBox,
-                f -> UIUtils.translateRecurringTransactionFrequency(f, i18nService));
+                f -> UIUtils.translateRecurringTransactionFrequency(f, preferencesService));
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 }
