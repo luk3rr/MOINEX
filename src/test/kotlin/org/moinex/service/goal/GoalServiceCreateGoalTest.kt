@@ -7,8 +7,8 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.moinex.factory.GoalFactory
-import org.moinex.factory.WalletFactory
+import org.moinex.factory.goal.GoalFactory
+import org.moinex.factory.wallet.WalletFactory
 import org.moinex.model.enums.GoalFundingStrategy
 import org.moinex.repository.goal.GoalRepository
 import org.moinex.service.GoalService

@@ -1,14 +1,6 @@
-/*
- * Filename: InvestmentPerformanceSnapshotRepository.kt (original filename: InvestmentPerformanceSnapshotRepository.java)
- * Created on: February 17, 2026
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrate to Kotlin on 07/03/2026
- */
+package org.moinex.repository.investment
 
-package org.moinex.repository
-
-import org.moinex.model.InvestmentPerformanceSnapshot
+import org.moinex.model.investment.InvestmentPerformanceSnapshot
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

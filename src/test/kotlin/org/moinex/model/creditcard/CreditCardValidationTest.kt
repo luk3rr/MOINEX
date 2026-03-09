@@ -3,8 +3,8 @@ package org.moinex.model.creditcard
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import org.moinex.factory.CreditCardFactory
-import org.moinex.factory.CreditCardOperatorFactory
+import org.moinex.factory.creditcard.CreditCardFactory
+import org.moinex.factory.creditcard.CreditCardOperatorFactory
 import org.moinex.util.Constants
 import java.math.BigDecimal
 

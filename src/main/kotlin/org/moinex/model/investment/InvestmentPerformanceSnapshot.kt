@@ -1,12 +1,4 @@
-/*
- * Filename: InvestmentPerformanceSnapshot.kt (original filename: InvestmentPerformanceSnapshot.java)
- * Created on: February 17, 2026
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrate to Kotlin on 07/03/2026
- */
-
-package org.moinex.model
+package org.moinex.model.investment
 
 import jakarta.persistence.Column
 import jakarta.persistence.Convert

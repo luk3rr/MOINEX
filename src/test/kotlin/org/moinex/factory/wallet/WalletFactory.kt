@@ -1,4 +1,4 @@
-package org.moinex.factory
+package org.moinex.factory.wallet
 
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType

@@ -1,4 +1,4 @@
-package org.moinex.factory
+package org.moinex.factory.creditcard
 
 import org.moinex.model.creditcard.CreditCardOperator
 

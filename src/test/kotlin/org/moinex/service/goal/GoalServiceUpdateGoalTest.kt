@@ -9,8 +9,8 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import jakarta.persistence.EntityNotFoundException
-import org.moinex.factory.GoalFactory
-import org.moinex.factory.WalletFactory
+import org.moinex.factory.goal.GoalFactory
+import org.moinex.factory.wallet.WalletFactory
 import org.moinex.repository.goal.GoalRepository
 import org.moinex.service.GoalService
 import org.moinex.service.WalletService

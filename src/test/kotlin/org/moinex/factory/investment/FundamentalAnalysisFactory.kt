@@ -1,4 +1,4 @@
-package org.moinex.factory
+package org.moinex.factory.investment
 
 import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis

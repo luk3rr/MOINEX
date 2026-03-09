@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.moinex.model.InvestmentPerformanceSnapshot;
-import org.moinex.repository.InvestmentPerformanceSnapshotRepository;
+import org.moinex.model.investment.InvestmentPerformanceSnapshot;
+import org.moinex.repository.investment.InvestmentPerformanceSnapshotRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

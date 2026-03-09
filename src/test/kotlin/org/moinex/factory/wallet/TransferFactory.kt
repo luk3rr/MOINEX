@@ -1,5 +1,6 @@
-package org.moinex.factory
+package org.moinex.factory.wallet
 
+import org.moinex.factory.CategoryFactory
 import org.moinex.model.Category
 import org.moinex.model.wallettransaction.Transfer
 import org.moinex.model.wallettransaction.Wallet

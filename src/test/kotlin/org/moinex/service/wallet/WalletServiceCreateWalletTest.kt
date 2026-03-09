@@ -8,7 +8,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.moinex.factory.WalletFactory
+import org.moinex.factory.wallet.WalletFactory
 import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository

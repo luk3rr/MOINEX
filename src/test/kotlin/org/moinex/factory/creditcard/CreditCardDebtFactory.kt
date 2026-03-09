@@ -1,5 +1,6 @@
-package org.moinex.factory
+package org.moinex.factory.creditcard
 
+import org.moinex.factory.CategoryFactory
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardDebt

@@ -8,8 +8,8 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
 import org.json.JSONObject
-import org.moinex.factory.FundamentalAnalysisFactory
-import org.moinex.factory.TickerFactory
+import org.moinex.factory.investment.FundamentalAnalysisFactory
+import org.moinex.factory.investment.TickerFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis

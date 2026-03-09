@@ -8,10 +8,10 @@ import io.mockk.every
 import io.mockk.mockk
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.toRounded
-import org.moinex.factory.CreditCardFactory
-import org.moinex.factory.CreditCardOperatorFactory
-import org.moinex.factory.CreditCardPaymentFactory
-import org.moinex.factory.WalletFactory
+import org.moinex.factory.creditcard.CreditCardFactory
+import org.moinex.factory.creditcard.CreditCardOperatorFactory
+import org.moinex.factory.creditcard.CreditCardPaymentFactory
+import org.moinex.factory.wallet.WalletFactory
 import org.moinex.repository.creditcard.CreditCardCreditRepository
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardOperatorRepository

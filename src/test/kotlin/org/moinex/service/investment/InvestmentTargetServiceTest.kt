@@ -15,7 +15,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.common.extension.isEqual
-import org.moinex.factory.InvestmentTargetFactory
+import org.moinex.factory.investment.InvestmentTargetFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.repository.investment.InvestmentTargetRepository
 import org.moinex.service.InvestmentTargetService

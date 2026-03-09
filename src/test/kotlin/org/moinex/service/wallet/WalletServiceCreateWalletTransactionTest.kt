@@ -8,8 +8,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
-import org.moinex.factory.WalletFactory
-import org.moinex.factory.WalletTransactionFactory
+import org.moinex.factory.wallet.WalletFactory
+import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.wallettransaction.TransferRepository

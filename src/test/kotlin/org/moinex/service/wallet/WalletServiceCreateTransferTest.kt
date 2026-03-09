@@ -10,9 +10,9 @@ import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.common.extension.isZero
 import org.moinex.factory.CategoryFactory
-import org.moinex.factory.TransferFactory
-import org.moinex.factory.WalletFactory
-import org.moinex.factory.WalletTypeFactory
+import org.moinex.factory.wallet.TransferFactory
+import org.moinex.factory.wallet.WalletFactory
+import org.moinex.factory.wallet.WalletTypeFactory
 import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository

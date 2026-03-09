@@ -1,5 +1,6 @@
-package org.moinex.factory
+package org.moinex.factory.goal
 
+import org.moinex.factory.wallet.WalletTypeFactory
 import org.moinex.model.goal.Goal
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType
