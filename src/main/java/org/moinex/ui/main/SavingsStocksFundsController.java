@@ -336,7 +336,7 @@ public class SavingsStocksFundsController {
             return;
         }
 
-        if (!FundamentalAnalysisService.tickerIsValidForFundamentalAnalysis(selectedTicker)) {
+        if (!FundamentalAnalysisService.Companion.isValidForFundamentalAnalysis(selectedTicker)) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
                             Constants.TranslationKeys

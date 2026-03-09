@@ -66,7 +66,8 @@ public class SavingsController {
                     getClass(),
                     preferencesService.getBundle());
         } catch (IOException e) {
-            logger.error("Error loading content: '{}'", e.getMessage());
+            logger.error(
+                    "Error loading content: '{}' - Cause: {}", e.getMessage(), e.getCause(), e);
         }
     }
 }

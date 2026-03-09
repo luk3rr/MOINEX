@@ -13,7 +13,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.moinex.model.InvestmentPerformanceSnapshot;
 import org.moinex.repository.InvestmentPerformanceSnapshotRepository;
-import org.moinex.util.Constants;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +49,7 @@ public class InvestmentPerformanceSnapshotService {
             snapshot.setPortfolioValue(portfolioValue);
             snapshot.setAccumulatedCapitalGains(accumulatedCapitalGains);
             snapshot.setMonthlyCapitalGains(monthlyCapitalGains);
-            snapshot.setCalculatedAt(LocalDateTime.now().format(Constants.DB_DATE_FORMATTER));
+            snapshot.setCalculatedAt(LocalDateTime.now());
         } else {
             snapshot =
                     new InvestmentPerformanceSnapshot(
@@ -61,7 +60,7 @@ public class InvestmentPerformanceSnapshotService {
                             portfolioValue,
                             accumulatedCapitalGains,
                             monthlyCapitalGains,
-                            LocalDateTime.now().format(Constants.DB_DATE_FORMATTER));
+                            LocalDateTime.now());
         }
 
         return repository.save(snapshot);

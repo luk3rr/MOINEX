@@ -35,6 +35,8 @@ dependencies {
     // Kotlin
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
+    implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.core)
+    implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.reactor)
 
     // Spring Boot
     implementation(libs.org.springframework.boot.spring.boot.starter)

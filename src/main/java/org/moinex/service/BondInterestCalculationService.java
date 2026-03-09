@@ -686,7 +686,7 @@ public class BondInterestCalculationService {
                 // Current month exists, but check if previous month is complete
                 Optional<BondInterestCalculation> previousMonthCalc =
                         bondInterestCalculationRepository.findByBondAndReferenceMonth(
-                                bond, previousMonth.toString());
+                                bond, previousMonth);
 
                 if (previousMonthCalc.isPresent()) {
                     LocalDate previousMonthEnd = previousMonth.atEndOfMonth();
@@ -737,8 +737,7 @@ public class BondInterestCalculationService {
 
         while (month.isBefore(currentMonth) || month.equals(currentMonth)) {
             Optional<BondInterestCalculation> existingCalculation =
-                    bondInterestCalculationRepository.findByBondAndReferenceMonth(
-                            bond, month.toString());
+                    bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month);
 
             BigDecimal investedAmount = calculateInvestedAmountForMonth(bond, month);
             BigDecimal currentQuantity = calculateQuantityForMonth(bond, month);
@@ -824,7 +823,7 @@ public class BondInterestCalculationService {
                     YearMonth previousMonth = month.minusMonths(1);
                     Optional<BondInterestCalculation> previousCalc =
                             bondInterestCalculationRepository.findByBondAndReferenceMonth(
-                                    bond, previousMonth.toString());
+                                    bond, previousMonth);
 
                     BigDecimal previousAccumulated =
                             previousCalc
@@ -993,7 +992,7 @@ public class BondInterestCalculationService {
                                                 "Bond not found with id: " + bondId));
         YearMonth currentMonth = YearMonth.now();
         return bondInterestCalculationRepository
-                .findByBondAndReferenceMonth(bond, currentMonth.toString())
+                .findByBondAndReferenceMonth(bond, currentMonth)
                 .map(BondInterestCalculation::getMonthlyInterest);
     }
 
@@ -1027,8 +1026,7 @@ public class BondInterestCalculationService {
                                                 "Bond not found with id: " + bondId));
 
         Optional<BondInterestCalculation> calculationOpt =
-                bondInterestCalculationRepository.findByBondAndReferenceMonth(
-                        bond, month.toString());
+                bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month);
 
         if (calculationOpt.isEmpty()) {
             throw new EntityNotFoundException(
@@ -1120,8 +1118,7 @@ public class BondInterestCalculationService {
                                                 "Bond not found with id: " + bondId));
 
         Optional<BondInterestCalculation> calculationOpt =
-                bondInterestCalculationRepository.findByBondAndReferenceMonth(
-                        bond, month.toString());
+                bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month);
 
         if (calculationOpt.isEmpty()) {
             throw new EntityNotFoundException(

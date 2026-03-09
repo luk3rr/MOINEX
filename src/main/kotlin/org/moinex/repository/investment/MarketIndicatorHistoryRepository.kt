@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 import java.util.Optional
 
 @Repository
@@ -26,7 +27,7 @@ interface MarketIndicatorHistoryRepository : JpaRepository<MarketIndicatorHistor
     )
     fun findByIndicatorTypeAndReferenceDate(
         @Param("indicatorType") indicatorType: InterestIndex,
-        @Param("referenceDate") referenceDate: String,
+        @Param("referenceDate") referenceDate: LocalDate,
     ): Optional<MarketIndicatorHistory>
 
     @Query(
@@ -38,8 +39,8 @@ interface MarketIndicatorHistoryRepository : JpaRepository<MarketIndicatorHistor
     )
     fun findByIndicatorTypeAndReferenceDateBetween(
         @Param("indicatorType") indicatorType: InterestIndex,
-        @Param("startDate") startDate: String,
-        @Param("endDate") endDate: String,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
     ): List<MarketIndicatorHistory>
 
     @Query(
@@ -50,7 +51,7 @@ interface MarketIndicatorHistoryRepository : JpaRepository<MarketIndicatorHistor
     )
     fun existsByIndicatorTypeAndReferenceDate(
         @Param("indicatorType") indicatorType: InterestIndex,
-        @Param("referenceDate") referenceDate: String,
+        @Param("referenceDate") referenceDate: LocalDate,
     ): Boolean
 
     @Query(

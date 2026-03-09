@@ -14,7 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.Optional
 
 @Repository
 interface TickerRepository : JpaRepository<Ticker, Int> {
@@ -88,7 +87,7 @@ interface TickerRepository : JpaRepository<Ticker, Int> {
         @Param("tickerId") tickerId: Int,
     ): Int
 
-    fun findBySymbol(symbol: String): Optional<Ticker>
+    fun findBySymbol(symbol: String): Ticker?
 
     /**
      * Findall tickers and order them by symbol in ascending order

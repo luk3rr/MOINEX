@@ -81,9 +81,8 @@ public class MarketIndicatorService {
                 BigDecimal rateValue = new BigDecimal(valueStr);
 
                 // Check if already exists
-                String refDateStr = referenceDate.format(Constants.DATE_FORMATTER_NO_TIME);
                 if (!marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(
-                        indicatorType, refDateStr)) {
+                        indicatorType, referenceDate)) {
                     MarketIndicatorHistory history =
                             new MarketIndicatorHistory(
                                     null,
@@ -126,11 +125,10 @@ public class MarketIndicatorService {
      */
     @Transactional(readOnly = true)
     public BigDecimal getIndicatorRate(InterestIndex indicatorType, LocalDate date) {
-        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
 
         Optional<MarketIndicatorHistory> history =
                 marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDate(
-                        indicatorType, dateStr);
+                        indicatorType, date);
 
         if (history.isEmpty()) {
             throw new EntityNotFoundException(
@@ -149,20 +147,19 @@ public class MarketIndicatorService {
      */
     @Transactional(readOnly = true)
     public BigDecimal getIndicatorRateOrPrevious(InterestIndex indicatorType, LocalDate date) {
-        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
-
         Optional<MarketIndicatorHistory> history =
                 marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDate(
-                        indicatorType, dateStr);
+                        indicatorType, date);
 
         if (history.isPresent()) {
             return history.get().getRateValue();
         }
 
         // If not found, try to find the closest previous date
+        LocalDate startDate = LocalDate.of(1900, 1, 1);
         List<MarketIndicatorHistory> previousRecords =
                 marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDateBetween(
-                        indicatorType, "1900-01-01", dateStr);
+                        indicatorType, startDate, date);
 
         if (previousRecords.isEmpty()) {
             throw new EntityNotFoundException(
@@ -184,11 +181,8 @@ public class MarketIndicatorService {
     @Transactional(readOnly = true)
     public List<MarketIndicatorHistory> getIndicatorHistoryBetween(
             InterestIndex indicatorType, LocalDate startDate, LocalDate endDate) {
-        String startDateStr = startDate.format(Constants.DATE_FORMATTER_NO_TIME);
-        String endDateStr = endDate.format(Constants.DATE_FORMATTER_NO_TIME);
-
         return marketIndicatorHistoryRepository.findByIndicatorTypeAndReferenceDateBetween(
-                indicatorType, startDateStr, endDateStr);
+                indicatorType, startDate, endDate);
     }
 
     /**
@@ -363,9 +357,8 @@ public class MarketIndicatorService {
      */
     @Transactional(readOnly = true)
     public boolean hasIndicatorData(InterestIndex indicatorType, LocalDate date) {
-        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
         return marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(
-                indicatorType, dateStr);
+                indicatorType, date);
     }
 
     /**

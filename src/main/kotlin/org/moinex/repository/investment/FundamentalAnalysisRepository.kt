@@ -14,7 +14,6 @@ import org.moinex.model.investment.Ticker
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.util.Optional
 
 @Repository
 interface FundamentalAnalysisRepository : JpaRepository<FundamentalAnalysis, Int> {
@@ -27,7 +26,7 @@ interface FundamentalAnalysisRepository : JpaRepository<FundamentalAnalysis, Int
     fun findByTickerAndPeriodType(
         ticker: Ticker,
         periodType: PeriodType,
-    ): Optional<FundamentalAnalysis>
+    ): FundamentalAnalysis?
 
     /**
      * Find fundamental analysis by ticker id and period type
@@ -38,7 +37,7 @@ interface FundamentalAnalysisRepository : JpaRepository<FundamentalAnalysis, Int
     fun findByTickerIdAndPeriodType(
         tickerId: Int,
         periodType: PeriodType,
-    ): Optional<FundamentalAnalysis>
+    ): FundamentalAnalysis?
 
     /**
      * Find all fundamental analyses for a ticker (all period types)

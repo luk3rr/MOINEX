@@ -22,8 +22,11 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import kotlinx.coroutines.BuildersKt;
+import kotlinx.coroutines.Dispatchers;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
+import org.moinex.config.RetryConfig;
 import org.moinex.model.enums.PeriodType;
 import org.moinex.model.investment.FundamentalAnalysis;
 import org.moinex.model.investment.Ticker;
@@ -169,7 +172,8 @@ public class FundamentalAnalysisController {
                                             analysis.get().getLastUpdate(), preferencesService);
 
                             boolean recommendedUpdate =
-                                    fundamentalAnalysisService.isUpdateRecommended(analysis.get());
+                                    FundamentalAnalysisService.Companion.isUpdateRecommended(
+                                            analysis.get());
 
                             statusLabel.setText(
                                     UIUtils.translatePeriodType(periodType, preferencesService)
@@ -213,8 +217,15 @@ public class FundamentalAnalysisController {
                     @Override
                     protected FundamentalAnalysis call() throws Exception {
                         PeriodType period = periodComboBox.getValue();
-                        return fundamentalAnalysisService.getAnalysis(
-                                ticker.getId(), period, forceRefresh);
+                        // Call suspend function using runBlocking
+                        return BuildersKt.runBlocking(
+                                Dispatchers.getIO(),
+                                (scope, continuation) ->
+                                        fundamentalAnalysisService.getAnalysis(
+                                                ticker.getId(),
+                                                period,
+                                                forceRefresh,
+                                                continuation));
                     }
                 };
 
@@ -256,7 +267,8 @@ public class FundamentalAnalysisController {
                                         preferencesService.translate(
                                                 Constants.TranslationKeys
                                                         .FUNDAMENTAL_ANALYSIS_ERROR_CONNECTION_MESSAGE),
-                                        FundamentalAnalysisService.MAX_RETRIES);
+                                        RetryConfig.Companion.getFUNDAMENTAL_ANALYSIS()
+                                                .getMaxRetries());
                     } else {
                         errorMessage =
                                 preferencesService.translate(

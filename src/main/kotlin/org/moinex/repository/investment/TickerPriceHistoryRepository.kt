@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 import java.util.Optional
 
 @Repository
@@ -31,7 +32,7 @@ interface TickerPriceHistoryRepository : JpaRepository<TickerPriceHistory, Int> 
     )
     fun findByTickerIdAndDate(
         @Param("tickerId") tickerId: Int,
-        @Param("priceDate") priceDate: String,
+        @Param("priceDate") priceDate: LocalDate,
     ): Optional<TickerPriceHistory>
 
     /**
@@ -49,7 +50,7 @@ interface TickerPriceHistoryRepository : JpaRepository<TickerPriceHistory, Int> 
     )
     fun findMostRecentPriceBeforeDate(
         @Param("tickerId") tickerId: Int,
-        @Param("priceDate") priceDate: String,
+        @Param("priceDate") priceDate: LocalDate,
     ): Optional<TickerPriceHistory>
 
     /**
@@ -70,8 +71,8 @@ interface TickerPriceHistoryRepository : JpaRepository<TickerPriceHistory, Int> 
     )
     fun findMonthEndPricesByTickerAndDateRange(
         @Param("tickerId") tickerId: Int,
-        @Param("startDate") startDate: String,
-        @Param("endDate") endDate: String,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
     ): List<TickerPriceHistory>
 
     /**
@@ -103,6 +104,6 @@ interface TickerPriceHistoryRepository : JpaRepository<TickerPriceHistory, Int> 
     )
     fun existsByTickerIdAndDate(
         @Param("tickerId") tickerId: Int,
-        @Param("priceDate") priceDate: String,
+        @Param("priceDate") priceDate: LocalDate,
     ): Boolean
 }

@@ -67,12 +67,11 @@ public class TickerPriceHistoryService {
     @Transactional
     public void storePriceHistory(
             Ticker ticker, LocalDate priceDate, BigDecimal closingPrice, boolean isMonthEnd) {
-        String dateStr = priceDate.format(Constants.DATE_FORMATTER_NO_TIME);
         YearMonth priceMonth = YearMonth.from(priceDate);
         YearMonth currentMonth = YearMonth.now();
 
         Optional<TickerPriceHistory> existing =
-                priceHistoryRepository.findByTickerIdAndDate(ticker.getId(), dateStr);
+                priceHistoryRepository.findByTickerIdAndDate(ticker.getId(), priceDate);
 
         if (existing.isPresent()) {
             TickerPriceHistory history = existing.get();
@@ -106,12 +105,9 @@ public class TickerPriceHistoryService {
         LocalDate monthStart = month.atDay(1);
         LocalDate monthEnd = month.atEndOfMonth();
 
-        String startDateStr = monthStart.format(Constants.DATE_FORMATTER_NO_TIME);
-        String endDateStr = monthEnd.format(Constants.DATE_FORMATTER_NO_TIME);
-
         List<TickerPriceHistory> currentMonthPrices =
                 priceHistoryRepository.findMonthEndPricesByTickerAndDateRange(
-                        tickerId, startDateStr, endDateStr);
+                        tickerId, monthStart, monthEnd);
 
         for (TickerPriceHistory price : currentMonthPrices) {
             if (!price.isMonthEnd()) {
@@ -336,9 +332,8 @@ public class TickerPriceHistoryService {
      * @return Optional containing the price if found
      */
     public Optional<BigDecimal> getPriceOnDate(Integer tickerId, LocalDate date) {
-        String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
         return priceHistoryRepository
-                .findMostRecentPriceBeforeDate(tickerId, dateStr)
+                .findMostRecentPriceBeforeDate(tickerId, date)
                 .map(TickerPriceHistory::getClosingPrice);
     }
 
@@ -682,8 +677,7 @@ public class TickerPriceHistoryService {
         List<LocalDate> missingDates = new java.util.ArrayList<>();
 
         for (LocalDate date : transactionDates) {
-            String dateStr = date.format(Constants.DATE_FORMATTER_NO_TIME);
-            if (!priceHistoryRepository.existsByTickerIdAndDate(ticker.getId(), dateStr)) {
+            if (!priceHistoryRepository.existsByTickerIdAndDate(ticker.getId(), date)) {
                 Optional<BigDecimal> priceBeforeDate = getClosestPriceBeforeDate(ticker, date);
 
                 if (priceBeforeDate.isEmpty()) {
@@ -692,7 +686,7 @@ public class TickerPriceHistoryService {
                     // Check if the price we found is recent enough (within 7 days)
                     Optional<LocalDate> priceDate =
                             priceHistoryRepository
-                                    .findMostRecentPriceBeforeDate(ticker.getId(), dateStr)
+                                    .findMostRecentPriceBeforeDate(ticker.getId(), date)
                                     .map(TickerPriceHistory::getPriceDate);
 
                     if (priceDate.isPresent()) {

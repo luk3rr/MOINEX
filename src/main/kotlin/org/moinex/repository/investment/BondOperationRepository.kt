@@ -16,6 +16,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 interface BondOperationRepository : JpaRepository<BondOperation, Int> {
@@ -59,7 +60,7 @@ interface BondOperationRepository : JpaRepository<BondOperation, Int> {
             "ORDER BY wt.date ASC",
     )
     fun findAllByDateBefore(
-        @Param("date") date: String,
+        @Param("date") date: LocalDateTime,
     ): List<BondOperation>
 
     @Query(

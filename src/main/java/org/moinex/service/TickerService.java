@@ -1489,8 +1489,7 @@ public class TickerService {
      * @return A list with all purchases before or on the date
      */
     public List<TickerPurchase> getPurchasesByDateBefore(LocalDateTime date) {
-        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
-        return tickerPurchaseRepository.findAllByDateBefore(dateStr);
+        return tickerPurchaseRepository.findAllByDateBefore(date);
     }
 
     /**
@@ -1500,7 +1499,6 @@ public class TickerService {
      * @return A list with all sales before or on the date
      */
     public List<TickerSale> getSalesByDateBefore(LocalDateTime date) {
-        String dateStr = date.format(Constants.DB_DATE_FORMATTER);
-        return tickerSaleRepository.findAllByDateBefore(dateStr);
+        return tickerSaleRepository.findAllByDateBefore(date);
     }
 }

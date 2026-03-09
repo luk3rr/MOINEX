@@ -36,6 +36,7 @@ org-jlleitschuh-gradle-ktlint = "1.4.1"
 org-assertj-assertj-core = "3.27.7"
 org-apache-commons-commons-lang3 = "3.18.0"
 commons-beanutils-commons-beanutils = "1.11.0"
+org-jetbrains-kotlinx-kotlinx-coroutines-core = "1.9.0"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback-logback-classic" }
@@ -72,3 +73,5 @@ org-jlleitschuh-gradle-ktlint = { module = "org.jlleitschuh.gradle:ktlint", vers
 org-assertj-assertj-core = { module = "org.assertj:assertj-core", version.ref = "org-assertj-assertj-core" }
 org-apache-commons-commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "org-apache-commons-commons-lang3" }
 commons-beanutils-commons-beanutils = { module = "commons-beanutils:commons-beanutils", version.ref = "commons-beanutils-commons-beanutils" }
+org-jetbrains-kotlinx-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "org-jetbrains-kotlinx-kotlinx-coroutines-core" }
+org-jetbrains-kotlinx-kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "org-jetbrains-kotlinx-kotlinx-coroutines-core" }

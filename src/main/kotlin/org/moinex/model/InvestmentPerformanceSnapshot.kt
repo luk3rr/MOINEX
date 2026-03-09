@@ -9,13 +9,16 @@
 package org.moinex.model
 
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.moinex.common.converter.LocalDateTimeStringConverter
 import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "investment_performance_snapshot")
@@ -36,8 +39,9 @@ class InvestmentPerformanceSnapshot(
     var accumulatedCapitalGains: BigDecimal,
     @Column(name = "monthly_capital_gains", nullable = false)
     var monthlyCapitalGains: BigDecimal,
+    @Convert(converter = LocalDateTimeStringConverter::class)
     @Column(name = "calculated_at", nullable = false)
-    var calculatedAt: String,
+    var calculatedAt: LocalDateTime,
 ) {
     init {
         investedValue = investedValue.toRounded()
