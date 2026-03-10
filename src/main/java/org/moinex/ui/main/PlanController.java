@@ -22,6 +22,8 @@ import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.BudgetGroupTimelineChart;
 import org.moinex.chart.DoughnutChart;
+import org.moinex.model.dto.BudgetGroupHistoricalDataDTO;
+import org.moinex.model.dto.PlanStatusDTO;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
 import org.moinex.service.PreferencesService;
@@ -61,7 +63,7 @@ public class PlanController {
     private PreferencesService preferencesService;
 
     private FinancialPlan currentPlan;
-    private List<FinancialPlanningService.PlanStatusDTO> currentPlanStatus;
+    private List<PlanStatusDTO> currentPlanStatus;
     private int currentPage = 0;
     private final int historicalDataMonths = 12;
 
@@ -81,7 +83,7 @@ public class PlanController {
         setupListeners();
 
         try {
-            this.currentPlan = financialPlanningService.getActivePlan();
+            this.currentPlan = financialPlanningService.getNonArchivedPlan();
 
             updateView();
         } catch (EntityNotFoundException e) {
@@ -182,16 +184,16 @@ public class PlanController {
         if (selectedPeriod == null) return;
 
         try {
-            this.currentPlan = financialPlanningService.getActivePlan();
+            this.currentPlan = financialPlanningService.getNonArchivedPlan();
             this.currentPlanStatus =
                     financialPlanningService.getPlanStatus(
                             this.currentPlan.getId(), selectedPeriod);
 
             this.currentPlanStatus.sort(
                     (a, b) ->
-                            b.group()
+                            b.getGroup()
                                     .getTargetPercentage()
-                                    .compareTo(a.group().getTargetPercentage()));
+                                    .compareTo(a.getGroup().getTargetPercentage()));
 
             baseMonthlyIncome.setText(UIUtils.formatCurrency(currentPlan.getBaseIncome()));
             updateDoughnutChart();
@@ -208,11 +210,11 @@ public class PlanController {
     private void updateDoughnutChart() {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
 
-        for (FinancialPlanningService.PlanStatusDTO status : currentPlanStatus) {
+        for (PlanStatusDTO status : currentPlanStatus) {
             pieChartData.add(
                     new PieChart.Data(
-                            status.group().getName(),
-                            status.group().getTargetPercentage().doubleValue()));
+                            status.getGroup().getName(),
+                            status.getGroup().getTargetPercentage().doubleValue()));
         }
 
         DoughnutChart doughnutChart = new DoughnutChart(pieChartData);
@@ -262,7 +264,7 @@ public class PlanController {
             int dataIndex = startIndex + i;
             if (dataIndex < currentPlanStatus.size()) {
                 AnchorPane currentPane = panes.get(i);
-                FinancialPlanningService.PlanStatusDTO status = currentPlanStatus.get(dataIndex);
+                PlanStatusDTO status = currentPlanStatus.get(dataIndex);
                 loadBudgetGroupPane(currentPane, status);
             }
         }
@@ -272,8 +274,7 @@ public class PlanController {
         budgetGroupNextButton.setDisable(currentPage >= maxPages - 1);
     }
 
-    private void loadBudgetGroupPane(
-            AnchorPane parent, FinancialPlanningService.PlanStatusDTO status) {
+    private void loadBudgetGroupPane(AnchorPane parent, PlanStatusDTO status) {
         try {
             FXMLLoader loader =
                     new FXMLLoader(
@@ -283,7 +284,8 @@ public class PlanController {
             Parent content = loader.load();
 
             BudgetGroupPaneController controller = loader.getController();
-            controller.setData(status.group(), status.spentAmount(), currentPlan.getBaseIncome());
+            controller.setData(
+                    status.getGroup(), status.getSpentAmount(), currentPlan.getBaseIncome());
 
             parent.getChildren().clear();
             parent.getChildren().add(content);
@@ -296,11 +298,11 @@ public class PlanController {
             logger.error(
                     "Error loading budget group pane FXML: '{}' for group: '{}'",
                     Constants.BUDGET_GROUP_PANE_FXML,
-                    status.group() != null ? status.group().getName() : "null",
+                    status.getGroup() != null ? status.getGroup().getName() : "null",
                     e);
             logger.error(
                     "Budget group details - Spent: {}, Base income: {}",
-                    status.spentAmount(),
+                    status.getSpentAmount(),
                     currentPlan.getBaseIncome());
             if (e.getCause() != null) {
                 logger.error("Root cause: {}", e.getCause().getMessage(), e.getCause());
@@ -308,7 +310,7 @@ public class PlanController {
         } catch (Exception e) {
             logger.error(
                     "Unexpected error loading budget group pane for group: '{}'",
-                    status.group() != null ? status.group().getName() : "null",
+                    status.getGroup() != null ? status.getGroup().getName() : "null",
                     e);
         }
     }
@@ -326,7 +328,7 @@ public class PlanController {
         YearMonth startPeriod = currentPeriod.minusMonths(historicalDataMonths);
         YearMonth endPeriod = currentPeriod;
 
-        List<FinancialPlanningService.BudgetGroupHistoricalDataDTO> historicalData =
+        List<BudgetGroupHistoricalDataDTO> historicalData =
                 financialPlanningService.getHistoricalData(
                         currentPlan.getId(), startPeriod, endPeriod);
 

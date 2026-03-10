@@ -83,7 +83,7 @@ public class EditPlanController extends BasePlanManagement {
 
             financialPlan.setName(planName);
             financialPlan.setBaseIncome(baseIncome);
-            financialPlan.setBudgetGroups(budgetGroups);
+            financialPlan.setBudgetGroups(new java.util.ArrayList<>(budgetGroups));
 
             financialPlanningService.updatePlan(financialPlan);
 

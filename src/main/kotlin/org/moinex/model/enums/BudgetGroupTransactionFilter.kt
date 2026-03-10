@@ -12,4 +12,9 @@ enum class BudgetGroupTransactionFilter {
     INCOME,
     EXPENSE,
     BOTH,
+    ;
+
+    fun includeExpenses() = this == EXPENSE || this == BOTH
+
+    fun includeIncomes() = this == INCOME || this == BOTH
 }

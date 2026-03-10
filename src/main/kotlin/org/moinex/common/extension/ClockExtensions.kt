@@ -3,19 +3,24 @@ package org.moinex.common.extension
 import org.moinex.util.Constants
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 
-fun LocalDate.isBeforeOrEqual(other: LocalDate): Boolean = this.isBefore(other) || this.isEqual(other)
+fun LocalDate.isBeforeOrEqual(other: LocalDate): Boolean = !this.isAfter(other)
 
-fun LocalDate.isAfterOrEqual(other: LocalDate): Boolean = this.isAfter(other) || this.isEqual(other)
+fun LocalDate.isAfterOrEqual(other: LocalDate): Boolean = !this.isBefore(other)
 
 fun LocalDate.isBetween(
     start: LocalDate,
     end: LocalDate,
 ): Boolean = this.isAfterOrEqual(start) && this.isBeforeOrEqual(end)
 
-fun LocalDateTime.isBeforeOrEqual(other: LocalDateTime): Boolean = this.isBefore(other) || this.isEqual(other)
+fun LocalDateTime.isBeforeOrEqual(other: LocalDateTime): Boolean = !this.isAfter(other)
 
-fun LocalDateTime.isAfterOrEqual(other: LocalDateTime): Boolean = this.isAfter(other) || this.isEqual(other)
+fun LocalDateTime.isAfterOrEqual(other: LocalDateTime): Boolean = !this.isBefore(other)
+
+fun YearMonth.isBeforeOrEqual(other: YearMonth): Boolean = !this.isAfter(other)
+
+fun YearMonth.isAfterOrEqual(other: YearMonth): Boolean = !this.isBefore(other)
 
 fun LocalDateTime.isBetween(
     start: LocalDateTime,

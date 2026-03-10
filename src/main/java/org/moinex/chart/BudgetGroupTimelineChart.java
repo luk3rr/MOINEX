@@ -8,7 +8,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import lombok.Setter;
-import org.moinex.service.FinancialPlanningService.BudgetGroupHistoricalDataDTO;
+import org.moinex.model.dto.BudgetGroupHistoricalDataDTO;
 import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -49,7 +49,7 @@ public class BudgetGroupTimelineChart extends LineChart<String, Number> {
 
         for (BudgetGroupHistoricalDataDTO data : historicalData) {
             groupedData
-                    .computeIfAbsent(data.groupName(), k -> new java.util.ArrayList<>())
+                    .computeIfAbsent(data.getGroupName(), k -> new java.util.ArrayList<>())
                     .add(data);
         }
 
@@ -69,10 +69,10 @@ public class BudgetGroupTimelineChart extends LineChart<String, Number> {
 
             for (BudgetGroupHistoricalDataDTO data : entry.getValue()) {
                 String periodLabel =
-                        UIUtils.formatShortMonthYear(data.period(), preferencesService);
+                        UIUtils.formatShortMonthYear(data.getPeriod(), preferencesService);
 
-                BigDecimal actualAmount = data.spentAmount();
-                BigDecimal targetAmount = data.targetAmount();
+                BigDecimal actualAmount = data.getSpentAmount();
+                BigDecimal targetAmount = data.getTargetAmount();
 
                 // Add small offset to target if it equals actual to prevent complete overlap
                 if (actualAmount.compareTo(targetAmount) == 0) {

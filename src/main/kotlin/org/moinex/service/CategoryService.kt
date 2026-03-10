@@ -101,6 +101,8 @@ class CategoryService(
         logger.info("$categoryFromDatabase was unarchived")
     }
 
+    fun existsById(id: Int): Boolean = categoryRepository.existsById(id)
+
     fun getCategories(): List<Category> = categoryRepository.findAll()
 
     fun getNonArchivedCategoriesOrderedByName(): List<Category> = categoryRepository.findAllByIsArchivedFalseOrderByNameAsc()

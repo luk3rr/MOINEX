@@ -338,7 +338,7 @@ interface WalletTransactionRepository : JpaRepository<WalletTransaction, Int> {
             "AND wt.type = :walletTransactionType " +
             "AND wt.date BETWEEN :startDate AND :endDate",
     )
-    fun getSumAmountByCategoriesAndDateBetween(
+    fun sumAmountByCategoriesAndDateRange(
         @Param("categoryIds") categoryIds: List<Int>,
         @Param("walletTransactionType") walletTransactionType: WalletTransactionType,
         @Param("startDate") startDate: LocalDateTime,

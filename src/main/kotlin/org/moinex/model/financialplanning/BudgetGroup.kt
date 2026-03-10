@@ -55,8 +55,11 @@ class BudgetGroup(
         require(name.isNotEmpty()) {
             "Budget group name cannot be empty"
         }
-        require(targetPercentage > BigDecimal.ZERO) {
-            "Target percentage must be positive"
+        require(targetPercentage in BigDecimal.ZERO..BigDecimal(100)) {
+            "Budget group target percentage must be between 0 and 100"
+        }
+        require(categories.isNotEmpty()) {
+            "Budget group must have at least one category"
         }
     }
 

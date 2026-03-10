@@ -392,6 +392,19 @@ class WalletService(
         id: Int,
     ): Boolean = walletRepository.existsByNameAndIdNot(name, id)
 
+    fun getTotalWalletTransactionAmountByCategoriesAndTypeAndDateTimeBetween(
+        categoryIds: List<Int>,
+        walletTransactionType: WalletTransactionType,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime,
+    ): BigDecimal =
+        walletTransactionRepository.sumAmountByCategoriesAndDateRange(
+            categoryIds,
+            walletTransactionType,
+            startDate,
+            endDate,
+        )
+
     private fun incrementWalletBalance(
         walletFromDatabase: Wallet,
         amount: BigDecimal,

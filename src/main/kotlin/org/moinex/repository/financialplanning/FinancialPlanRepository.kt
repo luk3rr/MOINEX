@@ -11,11 +11,15 @@ package org.moinex.repository.financialplanning
 import org.moinex.model.financialplanning.FinancialPlan
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import java.util.Optional
 
 @Repository
 interface FinancialPlanRepository : JpaRepository<FinancialPlan, Int> {
     fun existsByName(name: String): Boolean
 
-    fun findByArchivedFalse(): Optional<FinancialPlan>
+    fun findByArchivedFalse(): FinancialPlan?
+
+    fun existsByNameAndIdNot(
+        name: String,
+        id: Int,
+    ): Boolean
 }

@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import lombok.NoArgsConstructor;
 import org.moinex.model.enums.BudgetGroupTransactionFilter;
 import org.moinex.model.financialplanning.BudgetGroup;
+import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.FinancialPlanningService;
 import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
@@ -74,7 +75,8 @@ public class AddPlanController extends BasePlanManagement {
             BigDecimal baseIncome;
             baseIncome = new BigDecimal(baseIncomeText);
 
-            financialPlanningService.createPlan(planName, baseIncome, budgetGroups);
+            FinancialPlan plan = new FinancialPlan(null, planName, baseIncome, budgetGroups, false);
+            financialPlanningService.createPlan(plan);
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
