@@ -72,7 +72,7 @@ interface BondOperationRepository : JpaRepository<BondOperation, Int> {
     )
     fun findEarliestBuyDateByInterestIndex(
         @Param("interestIndex") interestIndex: InterestIndex,
-    ): String?
+    ): LocalDateTime?
 
     @Query(
         "SELECT DISTINCT bo.bond.interestIndex " +

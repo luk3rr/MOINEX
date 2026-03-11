@@ -135,7 +135,8 @@ public class MarketService {
 
         logger.info("Updating Brazilian market indicators - Attempt {}/{}", attempt, MAX_RETRIES);
 
-        return APIUtils.fetchBrazilianMarketIndicatorsAsync()
+        return APIUtils.INSTANCE
+                .fetchBrazilianMarketIndicatorsAsync()
                 .thenApply(
                         jsonObject -> {
                             if (jsonObject == null) {
@@ -266,7 +267,8 @@ public class MarketService {
 
         logger.info("Updating market quotes and commodities - Attempt {}/{}", attempt, MAX_RETRIES);
 
-        return APIUtils.fetchStockPricesAsync(symbols)
+        return APIUtils.INSTANCE
+                .fetchStockPricesAsync(symbols)
                 .thenApply(
                         jsonObject -> {
                             if (jsonObject == null) {

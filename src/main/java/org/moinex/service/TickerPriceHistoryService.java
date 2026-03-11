@@ -175,10 +175,12 @@ public class TickerPriceHistoryService {
                     MAX_RETRIES);
         }
 
-        return APIUtils.fetchStockPriceHistoryAsync(
+        return APIUtils.INSTANCE
+                .fetchStockPriceHistoryAsync(
                         ticker.getSymbol(),
                         startDate.format(Constants.DATE_FORMATTER_NO_TIME),
-                        endDate.format(Constants.DATE_FORMATTER_NO_TIME))
+                        endDate.format(Constants.DATE_FORMATTER_NO_TIME),
+                        null)
                 .thenAccept(
                         jsonObject -> {
                             if (jsonObject.has("error")) {
@@ -410,13 +412,13 @@ public class TickerPriceHistoryService {
      * needed This method is designed to run asynchronously on application startup
      *
      * @param tickerPurchaseRepository Repository to get first purchase dates
-     * @return CompletableFuture that completes when all updates are done
+     * @return CompletableFuture<Boolean> that completes when all updates are done
      */
     @Transactional
-    public CompletableFuture<Void> initializePriceHistory(
+    public CompletableFuture<Boolean> initializePriceHistory(
             TickerPurchaseRepository tickerPurchaseRepository,
             TickerSaleRepository tickerSaleRepository) {
-        return CompletableFuture.runAsync(
+        return CompletableFuture.supplyAsync(
                 () -> {
                     logger.info("Starting smart price history initialization");
 
@@ -426,7 +428,7 @@ public class TickerPriceHistoryService {
                     if (activeTickers.isEmpty()) {
                         logger.info(
                                 "No active tickers found, skipping price history initialization");
-                        return;
+                        return true;
                     }
 
                     logger.info("Found {} active tickers to process", activeTickers.size());
@@ -572,6 +574,7 @@ public class TickerPriceHistoryService {
                             backfillCount,
                             updateCount,
                             skipCount);
+                    return true;
                 });
     }
 
@@ -788,7 +791,8 @@ public class TickerPriceHistoryService {
                     MAX_RETRIES);
         }
 
-        return APIUtils.fetchStockPriceHistoryAsync(
+        return APIUtils.INSTANCE
+                .fetchStockPriceHistoryAsync(
                         ticker.getSymbol(),
                         startDate.format(Constants.DATE_FORMATTER_NO_TIME),
                         endDate.format(Constants.DATE_FORMATTER_NO_TIME),

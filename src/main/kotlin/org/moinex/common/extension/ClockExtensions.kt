@@ -30,3 +30,5 @@ fun LocalDateTime.isBetween(
 fun LocalDate.atEndOfDay(): LocalDateTime = this.atTime(23, 59, 59, 999999999)
 
 fun LocalDate.isOpenEnded(): Boolean = this == Constants.RECURRING_TRANSACTION_DEFAULT_END_DATE
+
+fun LocalDate.toBACENFormat(): String = "%02d/%02d/%04d".format(this.dayOfMonth, this.monthValue, this.year)

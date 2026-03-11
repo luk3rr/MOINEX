@@ -1,12 +1,13 @@
 /*
- * Filename: FundamentalAnalysisService.kt
- * Created on: March 9, 2026
+ * Filename: FundamentalAnalysisService.kt (original filename: FundamentalAnalysisService.java)
+ * Created on: January 9, 2026
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+
+ * Migrate to Kotlin on 09/03/2026
  */
 
 package org.moinex.service
 
-import kotlinx.coroutines.future.await
 import org.json.JSONObject
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.retry.retry
@@ -94,10 +95,7 @@ class FundamentalAnalysisService(
                 logger = logger,
                 operationName = "Fetch fundamental analysis for $symbol ($periodType)",
             ) {
-                val response =
-                    APIUtils
-                        .fetchFundamentalAnalysisAsync(symbol, periodType)
-                        .await()
+                val response = APIUtils.fetchFundamentalAnalysis(symbol, periodType)
 
                 val responseData = response.getJSONObject(symbol)
 

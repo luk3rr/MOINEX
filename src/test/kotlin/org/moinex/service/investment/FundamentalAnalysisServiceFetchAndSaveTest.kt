@@ -3,9 +3,10 @@ package org.moinex.service.investment
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
+import io.mockk.mockkObject
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.factory.investment.FundamentalAnalysisFactory
@@ -18,7 +19,6 @@ import org.moinex.repository.investment.TickerRepository
 import org.moinex.service.FundamentalAnalysisService
 import org.moinex.util.APIUtils
 import java.time.LocalDateTime
-import java.util.concurrent.CompletableFuture
 
 class FundamentalAnalysisServiceFetchAndSaveTest :
     BehaviorSpec({
@@ -27,7 +27,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
 
         val service = FundamentalAnalysisService(fundamentalAnalysisRepository, tickerRepository)
 
-        mockkStatic(APIUtils::class)
+        mockkObject(APIUtils)
 
         afterContainer { clearAllMocks(answers = true) }
 
@@ -57,8 +57,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         )
 
                     every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
-                    every { APIUtils.fetchFundamentalAnalysisAsync("AAPL", PeriodType.ANNUAL) } returns
-                        CompletableFuture.completedFuture(apiResponse)
+                    coEvery { APIUtils.fetchFundamentalAnalysis("AAPL", PeriodType.ANNUAL) } returns apiResponse
                     every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                         val analysis = invocation.invocation.args[0] as FundamentalAnalysis
                         analysis.id = 1
@@ -124,8 +123,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
 
                     every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
                         existingAnalysis
-                    every { APIUtils.fetchFundamentalAnalysisAsync("MSFT", PeriodType.ANNUAL) } returns
-                        CompletableFuture.completedFuture(apiResponse)
+                    coEvery { APIUtils.fetchFundamentalAnalysis("MSFT", PeriodType.ANNUAL) } returns apiResponse
                     every { fundamentalAnalysisRepository.save(any()) } returnsArgument 0
 
                     val result = service.fetchAndSaveAnalysis(ticker, PeriodType.ANNUAL)
@@ -164,8 +162,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                     )
 
                 every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.QUARTERLY) } returns null
-                every { APIUtils.fetchFundamentalAnalysisAsync("NEWCO", PeriodType.QUARTERLY) } returns
-                    CompletableFuture.completedFuture(apiResponse)
+                coEvery { APIUtils.fetchFundamentalAnalysis("NEWCO", PeriodType.QUARTERLY) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
                     analysis.id = 3
@@ -202,8 +199,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                     )
 
                 every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
-                every { APIUtils.fetchFundamentalAnalysisAsync("MINI", PeriodType.ANNUAL) } returns
-                    CompletableFuture.completedFuture(apiResponse)
+                coEvery { APIUtils.fetchFundamentalAnalysis("MINI", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
                     analysis.id = 5
@@ -249,8 +245,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                     )
 
                 every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.QUARTERLY) } returns null
-                every { APIUtils.fetchFundamentalAnalysisAsync("TEST", PeriodType.QUARTERLY) } returns
-                    CompletableFuture.completedFuture(apiResponse)
+                coEvery { APIUtils.fetchFundamentalAnalysis("TEST", PeriodType.QUARTERLY) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
                     analysis.id = 6
@@ -289,8 +284,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                     )
 
                 every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
-                every { APIUtils.fetchFundamentalAnalysisAsync("INTL", PeriodType.ANNUAL) } returns
-                    CompletableFuture.completedFuture(apiResponse)
+                coEvery { APIUtils.fetchFundamentalAnalysis("INTL", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
                     analysis.id = 8
@@ -330,8 +324,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                     )
 
                 every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
-                every { APIUtils.fetchFundamentalAnalysisAsync("CMPLX", PeriodType.ANNUAL) } returns
-                    CompletableFuture.completedFuture(apiResponse)
+                coEvery { APIUtils.fetchFundamentalAnalysis("CMPLX", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
                     analysis.id = 9

@@ -36,6 +36,12 @@ data class RetryConfig(
                 initialDelayMs = 2000,
             )
 
+        val BACEN_API =
+            RetryConfig(
+                maxRetries = 3,
+                initialDelayMs = 1000,
+            )
+
         val FUNDAMENTAL_ANALYSIS =
             RetryConfig(
                 maxRetries = 5,

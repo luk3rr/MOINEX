@@ -350,7 +350,8 @@ public class TickerService {
         logger.info("Downloading {} missing logos", websitesToDownload.size());
 
         try {
-            APIUtils.fetchStockLogosAsync(websitesToDownload.toArray(new String[0]))
+            APIUtils.INSTANCE
+                    .fetchStockLogosAsync(websitesToDownload.toArray(new String[0]))
                     .thenAccept(
                             jsonObject -> {
                                 int successCount = 0;
@@ -439,7 +440,8 @@ public class TickerService {
 
         logger.info("Updating ticker prices - Attempt {}/{}", attempt, MAX_RETRIES);
 
-        return APIUtils.fetchStockPricesAsync(symbols)
+        return APIUtils.INSTANCE
+                .fetchStockPricesAsync(symbols)
                 .thenApply(
                         jsonObject -> {
                             List<Ticker> failed = new ArrayList<>();
