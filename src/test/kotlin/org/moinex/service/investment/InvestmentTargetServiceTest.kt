@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException
 import org.moinex.common.extension.isEqual
 import org.moinex.factory.investment.InvestmentTargetFactory
 import org.moinex.model.enums.AssetType
+import org.moinex.model.investment.InvestmentTarget
 import org.moinex.repository.investment.InvestmentTargetRepository
 import org.moinex.service.InvestmentTargetService
 import java.math.BigDecimal
@@ -35,7 +36,7 @@ class InvestmentTargetServiceTest :
                         AssetType.STOCK to BigDecimal("60"),
                         AssetType.BOND to BigDecimal("40"),
                     )
-                val currentTargets = emptyList<org.moinex.model.investment.InvestmentTarget>()
+                val currentTargets = emptyList<InvestmentTarget>()
                 every { investmentTargetRepository.findAllByIsActiveTrueOrderByAssetTypeAsc() } returns currentTargets
                 every { investmentTargetRepository.save(any()) } returnsArgument 0
 

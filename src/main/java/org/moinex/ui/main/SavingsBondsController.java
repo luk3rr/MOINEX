@@ -355,7 +355,7 @@ public class SavingsBondsController {
                     return new SimpleStringProperty(
                             UIUtils.formatCurrency(
                                     bondService
-                                            .getInvestedValue(bond)
+                                            .getTotalInvestedValue(bond)
                                             .add(
                                                     bondService.getTotalAccumulatedInterestByBondId(
                                                             bond.getId()))));
@@ -370,7 +370,7 @@ public class SavingsBondsController {
                 cellData -> {
                     Bond bond = cellData.getValue();
                     return new SimpleStringProperty(
-                            UIUtils.formatCurrency(bondService.getInvestedValue(bond)));
+                            UIUtils.formatCurrency(bondService.getTotalInvestedValue(bond)));
                 });
 
         TableColumn<Bond, String> maturityDateColumn =
@@ -483,9 +483,9 @@ public class SavingsBondsController {
                                         String avgPrice =
                                                 bondService.getAverageUnitPrice(bond).toString();
                                         String investedValue =
-                                                bondService.getInvestedValue(bond).toString();
+                                                bondService.getTotalInvestedValue(bond).toString();
                                         String profitLoss =
-                                                bondService.calculateProfit(bond).toString();
+                                                bondService.getTotalProfit(bond).toString();
                                         String maturityDate =
                                                 bond.getMaturityDate() != null
                                                         ? UIUtils.formatDateForDisplay(
@@ -522,7 +522,7 @@ public class SavingsBondsController {
 
         BigDecimal profitLoss =
                 bonds.stream()
-                        .map(bondService::calculateProfit)
+                        .map(bondService::getTotalProfit)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal interestReceived = bondService.getAllBondsTotalAccumulatedInterest();

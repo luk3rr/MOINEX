@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
+import org.moinex.model.dto.BondOperationWalletTransactionDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.BondOperation;
@@ -184,31 +185,23 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
             BigDecimal quantity = new BigDecimal(quantityStr);
             BigDecimal fees =
-                    (feesStr != null && !feesStr.isBlank()) ? new BigDecimal(feesStr) : null;
+                    (feesStr != null && !feesStr.isBlank())
+                            ? new BigDecimal(feesStr)
+                            : BigDecimal.ZERO;
             BigDecimal taxes =
-                    (taxesStr != null && !taxesStr.isBlank()) ? new BigDecimal(taxesStr) : null;
+                    (taxesStr != null && !taxesStr.isBlank())
+                            ? new BigDecimal(taxesStr)
+                            : BigDecimal.ZERO;
 
             String netProfitStr = netProfitField.getText();
             BigDecimal netProfit =
                     (netProfitStr != null && !netProfitStr.isBlank())
                             ? new BigDecimal(netProfitStr)
-                            : null;
+                            : BigDecimal.ZERO;
 
-            boolean feesEqual =
-                    (operation.getFees() == null && fees == null)
-                            || (operation.getFees() != null
-                                    && fees != null
-                                    && operation.getFees().compareTo(fees) == 0);
-            boolean taxesEqual =
-                    (operation.getTaxes() == null && taxes == null)
-                            || (operation.getTaxes() != null
-                                    && taxes != null
-                                    && operation.getTaxes().compareTo(taxes) == 0);
-            boolean netProfitEqual =
-                    (operation.getNetProfit() == null && netProfit == null)
-                            || (operation.getNetProfit() != null
-                                    && netProfit != null
-                                    && operation.getNetProfit().compareTo(netProfit) == 0);
+            boolean feesEqual = operation.getFees().compareTo(fees) == 0;
+            boolean taxesEqual = operation.getTaxes().compareTo(taxes) == 0;
+            boolean netProfitEqual = operation.getNetProfit().compareTo(netProfit) == 0;
 
             if (operation.getWalletTransaction().getWallet().getId().equals(wallet.getId())
                     && operation.getWalletTransaction().getDescription().equals(description)
@@ -232,19 +225,21 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                         preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_SALE_MESSAGE));
             } else {
-                bondService.updateOperation(
-                        operation.getId(),
-                        wallet.getId(),
-                        quantity,
-                        unitPrice,
-                        saleDate,
-                        fees,
-                        taxes,
-                        netProfit,
-                        category,
-                        description,
-                        status,
-                        includeInAnalysisCheckBox.isSelected());
+                operation.setQuantity(quantity);
+                operation.setUnitPrice(unitPrice);
+                operation.setFees(fees);
+                operation.setTaxes(taxes);
+                operation.setNetProfit(netProfit);
+
+                bondService.updateBondOperation(
+                        operation,
+                        new BondOperationWalletTransactionDTO(
+                                wallet,
+                                saleDate.atStartOfDay(),
+                                category,
+                                description,
+                                status,
+                                includeInAnalysisCheckBox.isSelected()));
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(

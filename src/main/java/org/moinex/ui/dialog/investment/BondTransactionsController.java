@@ -6,7 +6,6 @@
 
 package org.moinex.ui.dialog.investment;
 
-import java.math.BigDecimal;
 import java.util.List;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -156,7 +155,7 @@ public class BondTransactionsController {
                 message,
                 preferencesService.getBundle())) {
             try {
-                bondService.deleteOperation(selectedOperation.getId());
+                bondService.deleteBondOperation(selectedOperation.getId());
                 loadOperationsFromDatabase();
                 updateOperationTableView();
 
@@ -320,8 +319,8 @@ public class BondTransactionsController {
                     if (op.getOperationType() == OperationType.BUY) {
                         return new SimpleObjectProperty<>(NA_ITEM);
                     }
-                    BigDecimal profitLoss = bondService.calculateOperationProfitLoss(op);
-                    return new SimpleObjectProperty<>(UIUtils.formatCurrencySigned(profitLoss));
+                    return new SimpleObjectProperty<>(
+                            UIUtils.formatCurrencySigned(op.getNetProfit()));
                 });
         profitLossColumn.setCellFactory(
                 column ->

@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
+import org.moinex.model.dto.BondOperationWalletTransactionDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.BondOperation;
@@ -109,20 +110,16 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
             BigDecimal quantity = new BigDecimal(quantityStr);
             BigDecimal fees =
-                    (feesStr != null && !feesStr.isBlank()) ? new BigDecimal(feesStr) : null;
+                    (feesStr != null && !feesStr.isBlank())
+                            ? new BigDecimal(feesStr)
+                            : BigDecimal.ZERO;
             BigDecimal taxes =
-                    (taxesStr != null && !taxesStr.isBlank()) ? new BigDecimal(taxesStr) : null;
+                    (taxesStr != null && !taxesStr.isBlank())
+                            ? new BigDecimal(taxesStr)
+                            : BigDecimal.ZERO;
 
-            boolean feesEqual =
-                    (operation.getFees() == null && fees == null)
-                            || (operation.getFees() != null
-                                    && fees != null
-                                    && operation.getFees().compareTo(fees) == 0);
-            boolean taxesEqual =
-                    (operation.getTaxes() == null && taxes == null)
-                            || (operation.getTaxes() != null
-                                    && taxes != null
-                                    && operation.getTaxes().compareTo(taxes) == 0);
+            boolean feesEqual = operation.getFees().compareTo(fees) == 0;
+            boolean taxesEqual = operation.getTaxes().compareTo(taxes) == 0;
 
             if (operation.getWalletTransaction().getWallet().getId().equals(wallet.getId())
                     && operation.getWalletTransaction().getDescription().equals(description)
@@ -145,19 +142,21 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                         preferencesService.translate(
                                 Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_PURCHASE_MESSAGE));
             } else {
-                bondService.updateOperation(
-                        operation.getId(),
-                        wallet.getId(),
-                        quantity,
-                        unitPrice,
-                        buyDate,
-                        fees,
-                        taxes,
-                        null,
-                        category,
-                        description,
-                        status,
-                        includeInAnalysisCheckBox.isSelected());
+
+                operation.setQuantity(quantity);
+                operation.setUnitPrice(unitPrice);
+                operation.setFees(fees);
+                operation.setTaxes(taxes);
+
+                bondService.updateBondOperation(
+                        operation,
+                        new BondOperationWalletTransactionDTO(
+                                wallet,
+                                buyDate.atStartOfDay(),
+                                category,
+                                description,
+                                status,
+                                includeInAnalysisCheckBox.isSelected()));
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(

@@ -259,7 +259,7 @@ public class ArchivedBondsController {
         investedValueColumn.setCellValueFactory(
                 param -> {
                     Bond bond = param.getValue();
-                    BigDecimal invested = bondService.getInvestedValue(bond);
+                    BigDecimal invested = bondService.getTotalInvestedValue(bond);
                     return new SimpleStringProperty(UIUtils.formatCurrency(invested));
                 });
 

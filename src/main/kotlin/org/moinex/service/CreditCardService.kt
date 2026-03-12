@@ -9,11 +9,13 @@
 package org.moinex.service
 
 import org.moinex.common.ClockProvider
+import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardCredit
 import org.moinex.model.creditcard.CreditCardDebt
 import org.moinex.model.creditcard.CreditCardPayment
+import org.moinex.model.dto.CreditCardInstallmentCalculationDTO
 import org.moinex.model.enums.CreditCardCreditType
 import org.moinex.model.enums.CreditCardInvoiceStatus
 import org.moinex.repository.creditcard.CreditCardCreditRepository
@@ -41,14 +43,7 @@ class CreditCardService(
     private val creditCardCreditRepository: CreditCardCreditRepository,
     private val clockProvider: ClockProvider = ClockProvider(),
 ) {
-    companion object {
-        private val logger = LoggerFactory.getLogger(CreditCardService::class.java)
-
-        private data class InstallmentCalculation(
-            val installmentValue: BigDecimal,
-            val remainder: BigDecimal,
-        )
-    }
+    private val logger = LoggerFactory.getLogger(CreditCardService::class.java)
 
     /**
      * Creates a new credit card
@@ -178,7 +173,7 @@ class CreditCardService(
                     invoiceMonth
                         .plusMonths(installment.toLong())
                         .atDay(debt.creditCard.billingDueDay)
-                        .atTime(23, 59)
+                        .atEndOfDay()
 
                 CreditCardPayment(
                     creditCardDebt = debt,
@@ -551,10 +546,10 @@ class CreditCardService(
     private fun calculateInstallmentValues(
         amount: BigDecimal,
         installments: Int,
-    ): InstallmentCalculation {
+    ): CreditCardInstallmentCalculationDTO {
         val installmentValue = amount.divide(installments.toBigDecimal(), 2, RoundingMode.HALF_UP)
         val remainder = amount.minus(installmentValue.multiply(installments.toBigDecimal()))
-        return InstallmentCalculation(installmentValue, remainder)
+        return CreditCardInstallmentCalculationDTO(installmentValue, remainder)
     }
 
     private fun updateDebtInvoice(
@@ -645,7 +640,7 @@ class CreditCardService(
     private fun handleReducedInstallments(
         payments: MutableList<CreditCardPayment>,
         newInstallments: Int,
-        calculation: InstallmentCalculation,
+        calculation: CreditCardInstallmentCalculationDTO,
     ) {
         payments.forEach { payment ->
             if (payment.installment > newInstallments) {
@@ -660,7 +655,7 @@ class CreditCardService(
         debt: CreditCardDebt,
         payments: MutableList<CreditCardPayment>,
         newInstallments: Int,
-        calculation: InstallmentCalculation,
+        calculation: CreditCardInstallmentCalculationDTO,
     ) {
         updateExistingPayments(payments, calculation)
         createNewPayments(debt, payments, newInstallments, calculation)
@@ -668,7 +663,7 @@ class CreditCardService(
 
     private fun updateExistingPayments(
         payments: MutableList<CreditCardPayment>,
-        calculation: InstallmentCalculation,
+        calculation: CreditCardInstallmentCalculationDTO,
     ) {
         payments.forEach { payment ->
             payment.amount = calculatePaymentAmount(payment.installment, calculation)
@@ -679,7 +674,7 @@ class CreditCardService(
         debt: CreditCardDebt,
         payments: MutableList<CreditCardPayment>,
         newInstallments: Int,
-        calculation: InstallmentCalculation,
+        calculation: CreditCardInstallmentCalculationDTO,
     ) {
         var lastPaymentDate = payments.maxBy { it.installment }.date
 
@@ -703,7 +698,7 @@ class CreditCardService(
 
     private fun calculatePaymentAmount(
         installment: Int,
-        calculation: InstallmentCalculation,
+        calculation: CreditCardInstallmentCalculationDTO,
     ): BigDecimal =
         if (installment == 1) {
             calculation.installmentValue.plus(calculation.remainder)

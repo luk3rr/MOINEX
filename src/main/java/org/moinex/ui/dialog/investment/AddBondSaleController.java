@@ -16,9 +16,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
+import org.moinex.model.dto.BondOperationWalletTransactionDTO;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
+import org.moinex.model.investment.BondOperation;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.BondService;
 import org.moinex.service.CategoryService;
@@ -149,30 +151,39 @@ public final class AddBondSaleController extends BaseBondTransactionManagement {
             BigDecimal unitPrice = new BigDecimal(unitPriceStr);
             BigDecimal quantity = new BigDecimal(quantityStr);
             BigDecimal fees =
-                    (feesStr != null && !feesStr.isBlank()) ? new BigDecimal(feesStr) : null;
+                    (feesStr != null && !feesStr.isBlank())
+                            ? new BigDecimal(feesStr)
+                            : BigDecimal.ZERO;
             BigDecimal taxes =
-                    (taxesStr != null && !taxesStr.isBlank()) ? new BigDecimal(taxesStr) : null;
+                    (taxesStr != null && !taxesStr.isBlank())
+                            ? new BigDecimal(taxesStr)
+                            : BigDecimal.ZERO;
 
             String netProfitStr = netProfitField.getText();
             BigDecimal netProfit =
                     (netProfitStr != null && !netProfitStr.isBlank())
                             ? new BigDecimal(netProfitStr)
-                            : null;
+                            : BigDecimal.ZERO;
 
-            bondService.addOperation(
-                    bond.getId(),
-                    wallet.getId(),
-                    OperationType.SELL,
-                    quantity,
-                    unitPrice,
-                    saleDate,
-                    fees,
-                    taxes,
-                    netProfit,
-                    category,
-                    description,
-                    status,
-                    includeInAnalysisCheckBox.isSelected());
+            bondService.createBondOperation(
+                    new BondOperation(
+                            null,
+                            bond,
+                            OperationType.SELL,
+                            quantity,
+                            unitPrice,
+                            fees,
+                            taxes,
+                            netProfit,
+                            null,
+                            null),
+                    new BondOperationWalletTransactionDTO(
+                            wallet,
+                            saleDate.atStartOfDay(),
+                            category,
+                            description,
+                            status,
+                            includeInAnalysisCheckBox.isSelected()));
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(

@@ -422,7 +422,7 @@ public class SavingsOverviewController {
         }
 
         for (Bond bond : allBonds) {
-            BigDecimal bondInvestedValue = bondService.getInvestedValue(bond);
+            BigDecimal bondInvestedValue = bondService.getTotalInvestedValue(bond);
             BigDecimal bondAccumulatedInterest =
                     bondService.getTotalAccumulatedInterestByBondId(bond.getId());
             BigDecimal bondTotalValue = bondInvestedValue.add(bondAccumulatedInterest);

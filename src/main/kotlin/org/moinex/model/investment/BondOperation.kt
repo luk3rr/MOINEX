@@ -40,24 +40,24 @@ class BondOperation(
     var quantity: BigDecimal,
     @Column(name = "unit_price", nullable = false)
     var unitPrice: BigDecimal,
-    @Column(name = "fees")
-    var fees: BigDecimal? = null,
-    @Column(name = "taxes")
-    var taxes: BigDecimal? = null,
-    @Column(name = "net_profit")
-    var netProfit: BigDecimal? = null,
+    @Column(name = "fees", nullable = false)
+    var fees: BigDecimal = BigDecimal.ZERO,
+    @Column(name = "taxes", nullable = false)
+    var taxes: BigDecimal = BigDecimal.ZERO,
+    @Column(name = "net_profit", nullable = false)
+    var netProfit: BigDecimal = BigDecimal.ZERO,
     @Column(name = "spread")
     var spread: BigDecimal? = null,
     @ManyToOne
-    @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id")
+    @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id", nullable = false)
     var walletTransaction: WalletTransaction? = null,
 ) {
     init {
         quantity = quantity.toRounded()
         unitPrice = unitPrice.toRounded()
-        fees = fees?.toRounded()
-        taxes = taxes?.toRounded()
-        netProfit = netProfit?.toRounded()
+        fees = fees.toRounded()
+        taxes = taxes.toRounded()
+        netProfit = netProfit.toRounded()
         spread = spread?.toRounded()
 
         require(quantity > BigDecimal.ZERO) {
@@ -66,15 +66,11 @@ class BondOperation(
         require(unitPrice >= BigDecimal.ZERO) {
             "Unit price must be non-negative"
         }
-        fees?.let {
-            require(it >= BigDecimal.ZERO) {
-                "Fees must be non-negative"
-            }
+        require(fees >= BigDecimal.ZERO) {
+            "Fees must be non-negative"
         }
-        taxes?.let {
-            require(it >= BigDecimal.ZERO) {
-                "Taxes must be non-negative"
-            }
+        require(taxes >= BigDecimal.ZERO) {
+            "Taxes must be non-negative"
         }
     }
 

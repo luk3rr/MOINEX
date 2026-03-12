@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.enums.BondType;
 import org.moinex.model.enums.InterestIndex;
 import org.moinex.model.enums.InterestType;
+import org.moinex.model.investment.Bond;
 import org.moinex.service.BondService;
 import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
@@ -95,15 +96,18 @@ public final class AddBondController {
         }
 
         try {
-            bondService.addBond(
-                    name,
-                    symbol != null && !symbol.isBlank() ? symbol : null,
-                    bondType,
-                    issuer != null && !issuer.isBlank() ? issuer : null,
-                    maturityDate.atStartOfDay(),
-                    interestType,
-                    interestIndex,
-                    interestRate);
+            bondService.createBond(
+                    new Bond(
+                            null,
+                            name,
+                            symbol,
+                            bondType,
+                            issuer,
+                            maturityDate,
+                            interestType,
+                            interestIndex,
+                            interestRate,
+                            false));
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(Constants.TranslationKeys.BOND_DIALOG_ADDED_TITLE),

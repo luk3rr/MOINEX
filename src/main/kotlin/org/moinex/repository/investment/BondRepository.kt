@@ -19,4 +19,9 @@ interface BondRepository : JpaRepository<Bond, Int> {
     fun findByArchivedTrueOrderByNameAsc(): List<Bond>
 
     fun existsBySymbol(symbol: String): Boolean
+
+    fun existsBySymbolAndIdNot(
+        symbol: String,
+        int: Int,
+    ): Boolean
 }

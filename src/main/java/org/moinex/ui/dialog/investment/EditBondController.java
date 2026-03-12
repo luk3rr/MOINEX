@@ -170,16 +170,15 @@ public final class EditBondController {
         }
 
         try {
-            bondService.updateBond(
-                    bond.getId(),
-                    name,
-                    symbol != null && !symbol.isBlank() ? symbol : null,
-                    bondType,
-                    issuer != null && !issuer.isBlank() ? issuer : null,
-                    maturityDate.atStartOfDay(),
-                    interestType,
-                    interestIndex,
-                    interestRate);
+            bond.setName(name);
+            bond.setSymbol(symbol);
+            bond.setType(bondType);
+            bond.setIssuer(issuer);
+            bond.setMaturityDate(maturityDate);
+            bond.setInterestType(interestType);
+            bond.setInterestIndex(interestIndex);
+            bond.setInterestRate(interestRate);
+            bondService.updateBond(bond);
 
             // Update archived status if changed
             if (archived != bond.getArchived()) {
