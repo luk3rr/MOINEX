@@ -32,7 +32,7 @@ def get_conversion_rate(from_currency: str, to_currency: str = DEFAULT_CURRENCY)
         return base_rate * 100
 
     url = f"{EXCHANGE_API_URL_BASE}/{from_currency}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code == 200:
         data = response.json()

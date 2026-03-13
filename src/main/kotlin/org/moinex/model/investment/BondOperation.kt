@@ -22,6 +22,7 @@ import org.moinex.common.extension.toRounded
 import org.moinex.model.enums.OperationType
 import org.moinex.model.wallettransaction.WalletTransaction
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Entity
 @Table(name = "bond_operation")
@@ -74,5 +75,15 @@ class BondOperation(
         }
     }
 
+    val localDate: LocalDate
+        get() = walletTransaction!!.date.toLocalDate()
+
+    val totalValue: BigDecimal
+        get() = quantity.multiply(unitPrice)
+
     override fun toString(): String = "BondOperation [id=$id, bond=${bond.name}, type=$operationType]"
+
+    fun isPurchase(): Boolean = operationType == OperationType.BUY
+
+    fun isSale(): Boolean = operationType == OperationType.SELL
 }

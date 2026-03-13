@@ -33,7 +33,7 @@ def download_data(url: str) -> list:
     :param url: URL para download
     :return: Dados obtidos
     """
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code == 200:
         data = response.json()

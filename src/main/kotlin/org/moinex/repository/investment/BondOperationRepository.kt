@@ -81,4 +81,13 @@ interface BondOperationRepository : JpaRepository<BondOperation, Int> {
             "AND bo.operationType = 'BUY'",
     )
     fun findAllUsedInterestIndices(): List<InterestIndex>
+
+    @Query(
+        "SELECT bo " +
+            "FROM BondOperation bo " +
+            "LEFT JOIN FETCH bo.walletTransaction wt " +
+            "WHERE bo.bond.archived = false " +
+            "ORDER BY bo.bond.id, wt.date ASC",
+    )
+    fun findAllByNonArchivedBondsOrderByBondAndDate(): List<BondOperation>
 }

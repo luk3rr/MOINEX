@@ -329,13 +329,9 @@ class BondService(
     @Transactional(readOnly = true)
     fun getCurrentMonthInterest(bondId: Int): BigDecimal =
         bondInterestCalculationService
-            .getCurrentMonthInterestFromDatabase(bondId)
-            .orElse(BigDecimal.ZERO)
+            .getCurrentMonthInterest(bondId) ?: BigDecimal.ZERO
 
     @Transactional(readOnly = true)
     fun getTotalAccumulatedInterestByBondId(bondId: Int): BigDecimal =
-        bondInterestCalculationService
-            .getLatestCalculation(bondId)
-            .map { it.accumulatedInterest }
-            .orElse(BigDecimal.ZERO)
+        bondInterestCalculationService.getLatestCalculation(bondId)?.accumulatedInterest ?: BigDecimal.ZERO
 }

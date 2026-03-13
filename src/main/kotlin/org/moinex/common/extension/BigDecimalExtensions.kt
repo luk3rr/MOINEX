@@ -3,7 +3,7 @@ package org.moinex.common.extension
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-fun BigDecimal.toRounded(): BigDecimal = this.setScale(2, RoundingMode.HALF_UP)
+fun BigDecimal.toRounded(scale: Int = 2): BigDecimal = this.setScale(scale, RoundingMode.HALF_UP)
 
 fun BigDecimal.isZero() = this.compareTo(BigDecimal.ZERO) == 0
 

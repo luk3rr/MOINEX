@@ -17,7 +17,6 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.YearMonth
-import java.util.Optional
 
 @Repository
 interface BondInterestCalculationRepository : JpaRepository<BondInterestCalculation, Int> {
@@ -37,7 +36,7 @@ interface BondInterestCalculationRepository : JpaRepository<BondInterestCalculat
     fun findByBondAndReferenceMonth(
         @Param("bond") bond: Bond,
         @Param("referenceMonth") referenceMonth: YearMonth,
-    ): Optional<BondInterestCalculation>
+    ): BondInterestCalculation?
 
     @Query(
         "SELECT b " +
@@ -57,5 +56,17 @@ interface BondInterestCalculationRepository : JpaRepository<BondInterestCalculat
     )
     fun findLastCalculatedMonth(
         @Param("bond") bond: Bond,
-    ): Optional<BondInterestCalculation>
+    ): BondInterestCalculation?
+
+    @Query(
+        "SELECT b " +
+            "FROM BondInterestCalculation b " +
+            "WHERE b.bond = :bond " +
+            "AND b.referenceMonth > :startMonth " +
+            "ORDER BY b.referenceMonth ASC",
+    )
+    fun findByBondAndReferenceMonthAfter(
+        @Param("bond") bond: Bond,
+        @Param("startMonth") startMonth: YearMonth,
+    ): List<BondInterestCalculation>
 }
