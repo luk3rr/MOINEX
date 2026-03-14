@@ -12,6 +12,7 @@ import io.mockk.verify
 import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.retry.RetryException
+import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.MarketIndicatorHistoryFactory
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
@@ -32,8 +33,19 @@ class MarketIndicatorServiceTest :
 
         mockkObject(APIUtils)
 
+        mockkObject(RetryConfig.Companion)
+
         afterContainer {
             clearAllMocks(answers = true)
+        }
+
+        beforeContainer {
+            every { RetryConfig.BACEN_API } returns
+                RetryConfig(
+                    maxRetries = 3,
+                    initialDelayMs = 100,
+                    multiplier = 2.0,
+                )
         }
 
         Given("no bonds with interest indices") {

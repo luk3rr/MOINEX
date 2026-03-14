@@ -33,6 +33,7 @@ data class RetryConfig(
 
         val MARKET_DATA =
             RetryConfig(
+                maxRetries = 5,
                 initialDelayMs = 2000,
             )
 

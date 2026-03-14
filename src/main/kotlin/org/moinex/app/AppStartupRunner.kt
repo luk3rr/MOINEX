@@ -68,11 +68,11 @@ class AppStartupRunner(
             }
 
             runStep("Updating Brazilian market indicators") {
-                marketService.updateBrazilianMarketIndicatorsFromApiAsync().await()
+                marketService.updateBrazilianMarketIndicatorsFromApi()
             }
 
             runStep("Updating market quotes and commodities") {
-                marketService.updateMarketQuotesAndCommoditiesFromApiAsync().await()
+                marketService.updateMarketQuotesAndCommoditiesFromApi()
             }
 
             val priceHistoryInitialized =

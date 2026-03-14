@@ -37,6 +37,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import kotlinx.coroutines.BuildersKt;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.DoughnutChart;
 import org.moinex.model.dto.AllocationDTO;
@@ -173,54 +174,47 @@ public class SavingsOverviewController {
 
     private void loadBrazilianMarketIndicatorsFromDatabase() {
         try {
-            brazilianMarketIndicators = marketService.getBrazilianMarketIndicators();
-            logger.info("Loaded Brazilian market indicators from the database");
-        } catch (jakarta.persistence.EntityNotFoundException e) {
-            marketService
-                    .updateBrazilianMarketIndicatorsFromApiAsync()
-                    .thenAccept(
-                            bmi -> {
-                                Platform.runLater(
-                                        () -> {
-                                            this.brazilianMarketIndicators = bmi;
-                                            scheduledUpdatingBrazilianIndicatorsRetries = 0;
-                                        });
+            var bmi =
+                    (BrazilianMarketIndicators)
+                            BuildersKt.runBlocking(
+                                    kotlinx.coroutines.Dispatchers.getIO(),
+                                    (scope, continuation) ->
+                                            marketService.getBrazilianMarketIndicatorsOrFetch(
+                                                    continuation));
 
-                                logger.info("Updated Brazilian market indicators from the API");
-                            })
-                    .exceptionally(
-                            ex -> {
-                                Platform.runLater(
-                                        this::schedulerRetryForUpdatingBrazilianIndicators);
-                                logger.error(ex.getMessage());
-                                return null;
-                            });
+            Platform.runLater(
+                    () -> {
+                        this.brazilianMarketIndicators = bmi;
+                        scheduledUpdatingBrazilianIndicatorsRetries = 0;
+                    });
+
+            logger.info("Loaded Brazilian market indicators");
+        } catch (Exception ex) {
+            Platform.runLater(this::schedulerRetryForUpdatingBrazilianIndicators);
+            logger.error("Failed to load Brazilian market indicators: {}", ex.getMessage());
         }
     }
 
     private void loadMarketQuotesAndCommoditiesFromDatabase() {
         try {
-            marketQuotesAndCommodities = marketService.getMarketQuotesAndCommodities();
-            logger.info("Loaded market quotes and commodities from the database");
-        } catch (jakarta.persistence.EntityNotFoundException e) {
-            marketService
-                    .updateMarketQuotesAndCommoditiesFromApiAsync()
-                    .thenAccept(
-                            mqc -> {
-                                Platform.runLater(
-                                        () -> {
-                                            this.marketQuotesAndCommodities = mqc;
-                                            this.scheduledUpdatingMarketQuotesRetries = 0;
-                                        });
+            var mqc =
+                    (MarketQuotesAndCommodities)
+                            BuildersKt.runBlocking(
+                                    kotlinx.coroutines.Dispatchers.getIO(),
+                                    (scope, continuation) ->
+                                            marketService.getMarketQuotesAndCommoditiesOrFetch(
+                                                    continuation));
 
-                                logger.info("Updated market quotes and commodities from the API");
-                            })
-                    .exceptionally(
-                            ex -> {
-                                Platform.runLater(this::schedulerEntryForUpdatingMarketQuotes);
-                                logger.error(ex.getMessage());
-                                return null;
-                            });
+            Platform.runLater(
+                    () -> {
+                        this.marketQuotesAndCommodities = mqc;
+                        this.scheduledUpdatingMarketQuotesRetries = 0;
+                    });
+
+            logger.info("Loaded market quotes and commodities");
+        } catch (Exception ex) {
+            Platform.runLater(this::schedulerEntryForUpdatingMarketQuotes);
+            logger.error("Failed to load market quotes and commodities: {}", ex.getMessage());
         }
     }
 

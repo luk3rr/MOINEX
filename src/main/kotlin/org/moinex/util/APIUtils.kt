@@ -108,7 +108,7 @@ object APIUtils {
     }
 
     suspend fun fetchStockPrices(
-        symbols: Array<String>,
+        symbols: List<String>,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): JSONObject =
         withContext(dispatcher) {
@@ -117,7 +117,7 @@ object APIUtils {
 
     suspend fun fetchBrazilianMarketIndicators(dispatcher: CoroutineDispatcher = Dispatchers.IO): JSONObject =
         withContext(dispatcher) {
-            runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT, emptyArray())
+            runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT)
         }
 
     suspend fun fetchFundamentalAnalysis(
@@ -128,7 +128,7 @@ object APIUtils {
         withContext(dispatcher) {
             runPythonScript(
                 Constants.GET_FUNDAMENTAL_DATA_SCRIPT,
-                arrayOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
+                listOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
             )
         }
 
@@ -141,7 +141,7 @@ object APIUtils {
         withContext(dispatcher) {
             runPythonScript(
                 Constants.GET_MARKET_INDICATOR_HISTORY_SCRIPT,
-                arrayOf(
+                listOf(
                     indicatorType.name,
                     startDate.toBACENFormat(),
                     endDate.toBACENFormat(),
@@ -150,7 +150,7 @@ object APIUtils {
         }
 
     suspend fun fetchStockLogos(
-        websites: Array<String>,
+        websites: List<String>,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): JSONObject =
         withContext(dispatcher) {
@@ -167,9 +167,9 @@ object APIUtils {
         withContext(dispatcher) {
             val args =
                 if (specificDates.isNullOrEmpty()) {
-                    arrayOf(symbol, startDate, endDate)
+                    listOf(symbol, startDate, endDate)
                 } else {
-                    arrayOf(symbol, startDate, endDate, JSONArray(specificDates).toString())
+                    listOf(symbol, startDate, endDate, JSONArray(specificDates).toString())
                 }
             runPythonScript("get_stock_price_history.py", args)
         }
@@ -177,14 +177,14 @@ object APIUtils {
     @Deprecated("Use suspend function fetchStockPrices instead", ReplaceWith("fetchStockPrices(symbols)"))
     fun fetchStockPricesAsync(symbols: Array<String>): CompletableFuture<JSONObject> =
         CompletableFuture.supplyAsync(
-            { runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols) },
+            { runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols.toList()) },
             executorService,
         )
 
     @Deprecated("Use suspend function fetchBrazilianMarketIndicators instead", ReplaceWith("fetchBrazilianMarketIndicators()"))
     fun fetchBrazilianMarketIndicatorsAsync(): CompletableFuture<JSONObject> =
         CompletableFuture.supplyAsync(
-            { runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT, emptyArray()) },
+            { runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT) },
             executorService,
         )
 
@@ -197,7 +197,7 @@ object APIUtils {
             {
                 runPythonScript(
                     Constants.GET_FUNDAMENTAL_DATA_SCRIPT,
-                    arrayOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
+                    listOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
                 )
             },
             executorService,
@@ -206,7 +206,7 @@ object APIUtils {
     @Deprecated("Use suspend function fetchStockLogos instead", ReplaceWith("fetchStockLogos(websites)"))
     fun fetchStockLogosAsync(websites: Array<String>): CompletableFuture<JSONObject> =
         CompletableFuture.supplyAsync(
-            { runPythonScript(Constants.GET_STOCK_LOGO_SCRIPT, websites) },
+            { runPythonScript(Constants.GET_STOCK_LOGO_SCRIPT, websites.toList()) },
             executorService,
         )
 
@@ -228,7 +228,7 @@ object APIUtils {
                     } else {
                         arrayOf(symbol, startDate, endDate, JSONArray(specificDates).toString())
                     }
-                runPythonScript("get_stock_price_history.py", args)
+                runPythonScript("get_stock_price_history.py", args.toList())
             },
             executorService,
         )
@@ -239,13 +239,13 @@ object APIUtils {
         args: Array<String>,
     ): CompletableFuture<JSONObject> =
         CompletableFuture.supplyAsync(
-            { runPythonScript(script, args) },
+            { runPythonScript(script, args.toList()) },
             executorService,
         )
 
     fun runPythonScript(
         script: String,
-        args: Array<String>,
+        args: List<String> = emptyList(),
         timeoutSeconds: Long = DEFAULT_SCRIPT_TIMEOUT_SECONDS,
     ): JSONObject {
         val scriptInputStream: InputStream =
