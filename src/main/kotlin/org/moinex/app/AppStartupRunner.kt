@@ -16,13 +16,13 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerSaleRepository
-import org.moinex.service.BondInterestCalculationService
 import org.moinex.service.InvestmentPerformanceCalculationService
-import org.moinex.service.MarketIndicatorService
-import org.moinex.service.MarketService
-import org.moinex.service.RecurringTransactionService
 import org.moinex.service.TickerPriceHistoryService
 import org.moinex.service.TickerService
+import org.moinex.service.investment.BondInterestCalculationService
+import org.moinex.service.investment.MarketIndicatorService
+import org.moinex.service.investment.MarketService
+import org.moinex.service.wallet.RecurringTransactionService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner

@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import org.moinex.model.enums.RecurringTransactionStatus;
 import org.moinex.model.wallettransaction.RecurringTransaction;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.RecurringTransactionService;
+import org.moinex.service.wallet.RecurringTransactionService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;

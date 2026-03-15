@@ -24,7 +24,7 @@ import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.TickerService;
-import org.moinex.service.WalletService;
+import org.moinex.service.wallet.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.SuggestionsHandlerHelper;
 import org.moinex.util.UIUtils;

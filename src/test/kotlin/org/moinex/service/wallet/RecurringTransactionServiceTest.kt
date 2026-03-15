@@ -16,8 +16,8 @@ import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository
-import org.moinex.service.RecurringTransactionService
-import org.moinex.service.WalletService
+import org.moinex.service.wallet.RecurringTransactionService
+import org.moinex.service.wallet.WalletService
 import org.moinex.util.Constants
 import java.math.BigDecimal
 import java.time.LocalDate

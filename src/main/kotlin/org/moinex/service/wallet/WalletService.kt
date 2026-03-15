@@ -1,12 +1,4 @@
-/*
- * Filename: WalletService.kt (original filename: WalletService.java)
- * Created on: August 31, 2024
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrate to Kotlin on 03/04/2026
- */
-
-package org.moinex.service
+package org.moinex.service.wallet
 
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
@@ -171,9 +163,10 @@ class WalletService(
         }
 
         logger.info(
-            "${transaction.type} with status ${transaction.status} of ${UIUtils.formatCurrency(
-                transaction.amount,
-            )} added to wallet with id ${walletFromDatabase.id}",
+            "${transaction.type} with status ${transaction.status} of ${
+                UIUtils.formatCurrency(
+                    transaction.amount,
+                )} added to wallet with id ${walletFromDatabase.id}",
         )
 
         return newTransaction.id!!

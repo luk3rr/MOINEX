@@ -29,6 +29,7 @@ import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.*;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.repository.investment.*;
+import org.moinex.service.wallet.WalletService;
 import org.moinex.util.APIUtils;
 import org.moinex.util.Constants;
 import org.slf4j.Logger;

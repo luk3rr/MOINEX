@@ -15,7 +15,7 @@ import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository
 import org.moinex.repository.wallettransaction.WalletTypeRepository
-import org.moinex.service.WalletService
+import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.Optional

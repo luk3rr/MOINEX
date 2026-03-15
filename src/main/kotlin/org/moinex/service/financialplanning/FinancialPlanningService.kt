@@ -1,12 +1,4 @@
-/*
- * Filename: FinancialPlanningService.kt (original filename: FinancialPlanningService.java)
- * Created on: July 27, 2025
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrate to Kotlin on 09/03/2026
- */
-
-package org.moinex.service
+package org.moinex.service.financialplanning
 
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.findByIdOrThrow
@@ -18,6 +10,9 @@ import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.financialplanning.BudgetGroup
 import org.moinex.model.financialplanning.FinancialPlan
 import org.moinex.repository.financialplanning.FinancialPlanRepository
+import org.moinex.service.CategoryService
+import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

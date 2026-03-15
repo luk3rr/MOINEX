@@ -17,7 +17,7 @@ import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.WalletService;
+import org.moinex.service.wallet.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;

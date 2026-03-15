@@ -20,7 +20,7 @@ import org.moinex.repository.creditcard.CreditCardOperatorRepository
 import org.moinex.repository.creditcard.CreditCardPaymentRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.wallettransaction.WalletRepository
-import org.moinex.service.CreditCardService
+import org.moinex.service.creditcard.CreditCardService
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.YearMonth

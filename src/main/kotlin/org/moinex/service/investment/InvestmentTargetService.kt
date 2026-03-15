@@ -6,7 +6,7 @@
  * Migrate to Kotlin on 08/03/2026
  */
 
-package org.moinex.service
+package org.moinex.service.investment
 
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.common.extension.isBetween

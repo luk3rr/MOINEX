@@ -28,6 +28,8 @@ import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.investment.TickerSale;
+import org.moinex.service.investment.BondInterestCalculationService;
+import org.moinex.service.investment.BondService;
 import org.moinex.util.Constants;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;

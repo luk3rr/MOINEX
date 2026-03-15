@@ -11,6 +11,8 @@ package org.moinex.service
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.model.Category
 import org.moinex.repository.CategoryRepository
+import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

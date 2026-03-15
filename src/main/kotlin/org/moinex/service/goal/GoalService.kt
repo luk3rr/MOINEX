@@ -1,12 +1,4 @@
-/*
- * Filename: GoalService.kt (original filename: GoalService.java)
- * Created on: December  6, 2024
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrate to Kotlin on 03/07/2026
- */
-
-package org.moinex.service
+package org.moinex.service.goal
 
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isNotZero
@@ -14,6 +6,7 @@ import org.moinex.common.extension.isZero
 import org.moinex.model.enums.GoalFundingStrategy
 import org.moinex.model.goal.Goal
 import org.moinex.repository.goal.GoalRepository
+import org.moinex.service.wallet.WalletService
 import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.slf4j.LoggerFactory

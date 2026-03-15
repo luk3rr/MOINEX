@@ -11,8 +11,8 @@ import org.moinex.factory.goal.GoalFactory
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.model.enums.GoalFundingStrategy
 import org.moinex.repository.goal.GoalRepository
-import org.moinex.service.GoalService
-import org.moinex.service.WalletService
+import org.moinex.service.goal.GoalService
+import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 
 class GoalServiceCreateGoalTest :

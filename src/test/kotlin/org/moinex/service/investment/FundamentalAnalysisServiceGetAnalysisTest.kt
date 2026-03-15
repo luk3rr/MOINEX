@@ -17,7 +17,6 @@ import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.PeriodType
 import org.moinex.repository.investment.FundamentalAnalysisRepository
 import org.moinex.repository.investment.TickerRepository
-import org.moinex.service.FundamentalAnalysisService
 import org.moinex.util.APIUtils
 import java.time.LocalDateTime
 import java.util.Optional

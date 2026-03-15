@@ -18,7 +18,6 @@ import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.MarketIndicatorHistoryRepository
-import org.moinex.service.MarketIndicatorService
 import org.moinex.util.APIUtils
 import java.math.BigDecimal
 import java.time.LocalDate

@@ -16,6 +16,8 @@ import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.factory.CategoryFactory
 import org.moinex.repository.CategoryRepository
+import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.wallet.WalletService
 import java.util.Optional
 
 class CategoryServiceTest :

@@ -20,7 +20,6 @@ import org.moinex.model.investment.BrazilianMarketIndicators
 import org.moinex.model.investment.MarketQuotesAndCommodities
 import org.moinex.repository.investment.BrazilianMarketIndicatorsRepository
 import org.moinex.repository.investment.MarketQuotesAndCommoditiesRepository
-import org.moinex.service.MarketService
 import org.moinex.util.APIUtils
 import java.math.BigDecimal
 import java.time.LocalDateTime

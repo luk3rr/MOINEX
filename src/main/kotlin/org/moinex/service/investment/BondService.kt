@@ -6,7 +6,7 @@
  * Migrate to Kotlin on 11/03/2026
  */
 
-package org.moinex.service
+package org.moinex.service.investment
 
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
@@ -20,6 +20,7 @@ import org.moinex.model.investment.BondOperation
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

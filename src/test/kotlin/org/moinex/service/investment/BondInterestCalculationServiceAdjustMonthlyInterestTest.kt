@@ -16,8 +16,6 @@ import org.moinex.model.investment.BondInterestCalculation
 import org.moinex.repository.investment.BondInterestCalculationRepository
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
-import org.moinex.service.BondInterestCalculationService
-import org.moinex.service.MarketIndicatorService
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth

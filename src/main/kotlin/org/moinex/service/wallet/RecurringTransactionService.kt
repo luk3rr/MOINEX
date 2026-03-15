@@ -1,12 +1,4 @@
-/*
- * Filename: RecurringTransactionService.kt (original filename: RecurringTransactionService.java)
- * Created on: November 10, 2024
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrate to Kotlin on 03/08/2026
- */
-
-package org.moinex.service
+package org.moinex.service.wallet
 
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isAfterOrEqual
@@ -19,6 +11,7 @@ import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.RecurringTransaction
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository
+import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,6 +20,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.YearMonth
+import kotlin.collections.forEach
 
 @Service
 class RecurringTransactionService(

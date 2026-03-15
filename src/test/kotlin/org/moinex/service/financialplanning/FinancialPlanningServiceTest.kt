@@ -15,9 +15,9 @@ import org.moinex.model.enums.BudgetGroupTransactionFilter
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.financialplanning.FinancialPlanRepository
 import org.moinex.service.CategoryService
-import org.moinex.service.CreditCardService
-import org.moinex.service.FinancialPlanningService
-import org.moinex.service.WalletService
+import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.financialplanning.FinancialPlanningService
+import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.YearMonth
 import java.util.Optional

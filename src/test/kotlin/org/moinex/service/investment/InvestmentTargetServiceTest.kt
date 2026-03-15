@@ -19,7 +19,6 @@ import org.moinex.factory.investment.InvestmentTargetFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.InvestmentTarget
 import org.moinex.repository.investment.InvestmentTargetRepository
-import org.moinex.service.InvestmentTargetService
 import java.math.BigDecimal
 
 class InvestmentTargetServiceTest :

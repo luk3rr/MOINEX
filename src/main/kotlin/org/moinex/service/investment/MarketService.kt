@@ -6,7 +6,7 @@
  * Migrated to Kotlin on March 14, 2026
  */
 
-package org.moinex.service
+package org.moinex.service.investment
 
 import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.sync.Mutex

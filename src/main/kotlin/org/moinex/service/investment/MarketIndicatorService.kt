@@ -6,7 +6,7 @@
  * Migrate to Kotlin on 10/03/2026
  */
 
-package org.moinex.service
+package org.moinex.service.investment
 
 import org.json.JSONObject
 import org.moinex.common.retry.RetryException
