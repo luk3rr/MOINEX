@@ -14,29 +14,22 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import java.util.Optional
+import java.time.YearMonth
 
 @Repository
 interface NetWorthSnapshotRepository : JpaRepository<NetWorthSnapshot, Int> {
-    /**
-     * Find snapshot by month and year
-     * @param month The month
-     * @param year The year
-     * @return Optional snapshot
-     */
-    fun findByMonthAndYear(
-        month: Int,
-        year: Int,
-    ): Optional<NetWorthSnapshot>
+    fun findByReferenceMonth(referenceMonth: YearMonth): NetWorthSnapshot?
+
+    fun existsByReferenceMonth(referenceMonth: YearMonth): Boolean
 
     /**
-     * Get all snapshots ordered by year and month
+     * Get all snapshots ordered by reference month
      * @return List of snapshots
      */
     @Query(
         "SELECT nws " +
             "FROM NetWorthSnapshot nws " +
-            "ORDER BY nws.year ASC, nws.month ASC",
+            "ORDER BY nws.referenceMonth ASC",
     )
     fun findAllOrderedByDate(): List<NetWorthSnapshot>
 
@@ -45,14 +38,14 @@ interface NetWorthSnapshotRepository : JpaRepository<NetWorthSnapshot, Int> {
     @Query("DELETE FROM NetWorthSnapshot")
     override fun deleteAll()
 
-    /**
-     * Check if snapshot exists for month and year
-     * @param month The month
-     * @param year The year
-     * @return True if exists
-     */
-    fun existsByMonthAndYear(
-        month: Int,
-        year: Int,
-    ): Boolean
+    @Modifying
+    @Transactional
+    @Query(
+        "DELETE FROM NetWorthSnapshot nws " +
+            "WHERE nws.referenceMonth < :startMonth OR nws.referenceMonth > :endMonth",
+    )
+    fun deleteSnapshotsOutsideRange(
+        startMonth: YearMonth,
+        endMonth: YearMonth,
+    )
 }

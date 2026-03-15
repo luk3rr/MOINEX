@@ -39,6 +39,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import kotlinx.coroutines.BuildersKt;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.NetWorthLineChart;
 import org.moinex.model.creditcard.CreditCard;
@@ -117,9 +118,7 @@ public class HomeController {
 
     private CreditCardService creditCardService;
 
-    private NetWorthSnapshotService netWorthSnapshotService;
-
-    private NetWorthCalculationService netWorthCalculationService;
+    private NetWorthService netWorthService;
 
     private Integer walletPaneCurrentPage = 0;
 
@@ -141,15 +140,13 @@ public class HomeController {
             WalletService walletService,
             RecurringTransactionService recurringTransactionService,
             CreditCardService creditCardService,
-            NetWorthSnapshotService netWorthSnapshotService,
-            NetWorthCalculationService netWorthCalculationService,
+            NetWorthService netWorthService,
             ConfigurableApplicationContext springContext,
             PreferencesService preferencesService) {
         this.walletService = walletService;
         this.recurringTransactionService = recurringTransactionService;
         this.creditCardService = creditCardService;
-        this.netWorthSnapshotService = netWorthSnapshotService;
-        this.netWorthCalculationService = netWorthCalculationService;
+        this.netWorthService = netWorthService;
         this.springContext = springContext;
         this.preferencesService = preferencesService;
     }
@@ -184,23 +181,24 @@ public class HomeController {
 
         setOffRecalculateButton();
 
-        netWorthCalculationService
-                .recalculateAllSnapshots()
-                .thenRun(
-                        () ->
-                                Platform.runLater(
-                                        () -> {
-                                            logger.info(
-                                                    "Recalculation completed, updating chart...");
-                                            updateNetWorthLineChart();
-                                            setOnRecalculateButton();
-                                        }))
-                .exceptionally(
-                        throwable -> {
-                            logger.error("Error during recalculation", throwable);
-                            Platform.runLater(this::setOnRecalculateButton);
-                            return null;
-                        });
+        try {
+            BuildersKt.runBlocking(
+                    kotlinx.coroutines.Dispatchers.getIO(),
+                    (scope, continuation) -> netWorthService.recalculateAllSnapshots(continuation));
+
+            Platform.runLater(
+                    () -> {
+                        logger.info("Recalculation completed, updating chart...");
+                        updateNetWorthLineChart();
+                        setOnRecalculateButton();
+                    });
+        } catch (Exception ex) {
+            Platform.runLater(
+                    () -> {
+                        logger.error("Error during recalculation", ex);
+                        setOnRecalculateButton();
+                    });
+        }
     }
 
     /** Disable recalculate button and show loading state */
@@ -844,7 +842,7 @@ public class HomeController {
             recalculateNetWorthButton.setVisible(true);
 
             // Restore button state based on calculation service status
-            if (netWorthCalculationService.isCalculating()) {
+            if (netWorthService.isCalculating()) {
                 setOffRecalculateButton();
             } else {
                 setOnRecalculateButton();
@@ -895,16 +893,16 @@ public class HomeController {
             YearMonth period = YearMonth.of(year, month);
 
             // Try to use cached snapshot first
-            var snapshot = netWorthSnapshotService.getSnapshot(month, year);
+            var snapshot = netWorthService.getSnapshot(YearMonth.of(year, month));
 
             BigDecimal assets;
             BigDecimal liabilities;
             BigDecimal netWorth;
 
-            if (snapshot.isPresent()) {
-                assets = snapshot.get().getAssets();
-                liabilities = snapshot.get().getLiabilities();
-                netWorth = snapshot.get().getNetWorth();
+            if (snapshot != null) {
+                assets = snapshot.getAssets();
+                liabilities = snapshot.getLiabilities();
+                netWorth = snapshot.getNetWorth();
 
                 dataPoints.add(
                         new NetWorthLineChart.NetWorthDataPoint(

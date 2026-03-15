@@ -418,4 +418,26 @@ interface WalletTransactionRepository : JpaRepository<WalletTransaction, Int> {
     fun getTransactionCountByCategory(
         @Param("categoryId") categoryId: Int,
     ): Int
+
+    @Query(
+        "SELECT MIN(wt.date) " +
+            "FROM WalletTransaction wt " +
+            "WHERE wt.wallet.id IN :walletIds " +
+            "AND wt.status = 'CONFIRMED'",
+    )
+    fun findEarliestTransactionDateByWallets(
+        @Param("walletIds") walletIds: List<Int>,
+    ): LocalDateTime?
+
+    @Query(
+        "SELECT wt " +
+            "FROM WalletTransaction wt " +
+            "WHERE wt.wallet.id IN :walletIds " +
+            "AND wt.date >= :date " +
+            "ORDER BY wt.wallet.id ASC, wt.date ASC",
+    )
+    fun findTransactionsByWalletsAfterDate(
+        @Param("walletIds") walletIds: List<Int>,
+        @Param("date") date: LocalDateTime,
+    ): List<WalletTransaction>
 }

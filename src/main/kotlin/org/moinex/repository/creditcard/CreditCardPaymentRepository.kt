@@ -478,4 +478,40 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      */
     @Query("SELECT max(ccp.date) FROM CreditCardPayment ccp")
     fun findLatestPaymentDate(): LocalDateTime?
+
+    /**
+     * Get all paid payments of a wallet from a specific month onward
+     * @param walletId The wallet id
+     * @param startDate The start date (inclusive)
+     * @return List of all paid payments from the specified date onward
+     */
+    @Query(
+        "SELECT ccp " +
+            "FROM CreditCardPayment ccp " +
+            "WHERE ccp.wallet.id = :walletId " +
+            "AND ccp.date >= :startDate " +
+            "ORDER BY ccp.date ASC",
+    )
+    fun findAllPaidPaymentsFromDateOnward(
+        @Param("walletId") walletId: Int,
+        @Param("startDate") startDate: LocalDateTime,
+    ): List<CreditCardPayment>
+
+    /**
+     * Get all paid payments of multiple wallets from a specific date onward
+     * @param walletIds The wallet ids
+     * @param startDate The start date (inclusive)
+     * @return List of all paid payments from the specified date onward
+     */
+    @Query(
+        "SELECT ccp " +
+            "FROM CreditCardPayment ccp " +
+            "WHERE ccp.wallet.id IN :walletIds " +
+            "AND ccp.date >= :startDate " +
+            "ORDER BY ccp.wallet.id ASC, ccp.date ASC",
+    )
+    fun findAllPaidPaymentsByWalletsFromDateOnward(
+        @Param("walletIds") walletIds: List<Int>,
+        @Param("startDate") startDate: LocalDateTime,
+    ): List<CreditCardPayment>
 }

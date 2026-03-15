@@ -9,13 +9,18 @@
 package org.moinex.model
 
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.moinex.common.converter.LocalDateTimeStringConverter
+import org.moinex.common.converter.YearMonthStringConverter
 import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.time.YearMonth
 
 /**
  * Represents a cached snapshot of net worth calculation for a specific month
@@ -28,10 +33,9 @@ class NetWorthSnapshot(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     var id: Int? = null,
-    @Column(name = "month", nullable = false)
-    var month: Int,
-    @Column(name = "year", nullable = false)
-    var year: Int,
+    @Convert(converter = YearMonthStringConverter::class)
+    @Column(name = "reference_month", nullable = false)
+    var referenceMonth: YearMonth,
     @Column(name = "assets", nullable = false, scale = 2)
     var assets: BigDecimal,
     @Column(name = "liabilities", nullable = false, scale = 2)
@@ -47,7 +51,8 @@ class NetWorthSnapshot(
     @Column(name = "negative_wallet_balances", nullable = false, scale = 2)
     var negativeWalletBalances: BigDecimal,
     @Column(name = "calculated_at", nullable = false)
-    var calculatedAt: String,
+    @Convert(converter = LocalDateTimeStringConverter::class)
+    var calculatedAt: LocalDateTime,
 ) {
     init {
         assets = assets.toRounded()
@@ -57,14 +62,7 @@ class NetWorthSnapshot(
         investments = investments.toRounded()
         creditCardDebt = creditCardDebt.toRounded()
         negativeWalletBalances = negativeWalletBalances.toRounded()
-
-        require(month in 1..12) {
-            "Month must be between 1 and 12"
-        }
-        require(year > 0) {
-            "Year must be positive"
-        }
     }
 
-    override fun toString(): String = "NetWorthSnapshot [month=$month, year=$year, netWorth=$netWorth]"
+    override fun toString(): String = "NetWorthSnapshot [referenceMonth=$referenceMonth, netWorth=$netWorth, calculatedAt=$calculatedAt]"
 }

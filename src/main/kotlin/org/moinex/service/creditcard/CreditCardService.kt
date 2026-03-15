@@ -506,6 +506,16 @@ class CreditCardService(
 
     fun getLatestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findLatestPaymentDate() ?: clockProvider.now()
 
+    fun getAllPaidPaymentsFromDateOnward(
+        walletId: Int,
+        startOfTargetMonth: LocalDateTime,
+    ) = creditCardPaymentRepository.findAllPaidPaymentsFromDateOnward(walletId, startOfTargetMonth)
+
+    fun getAllPaidPaymentsByWalletsFromDateOnward(
+        walletIds: List<Int>,
+        startOfTargetMonth: LocalDateTime,
+    ) = creditCardPaymentRepository.findAllPaidPaymentsByWalletsFromDateOnward(walletIds, startOfTargetMonth)
+
     private fun calculateNextInvoiceDate(creditCard: CreditCard): LocalDateTime {
         val now = clockProvider.now()
 
