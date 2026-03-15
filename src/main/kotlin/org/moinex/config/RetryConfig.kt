@@ -49,11 +49,16 @@ data class RetryConfig(
                 initialDelayMs = 2000,
             )
 
-        val TICKER_PRICE_HISTORY =
+        val TICKER_PRICE =
             RetryConfig(
                 maxRetries = 7,
                 initialDelayMs = 1000,
-                multiplier = 1.5,
+            )
+
+        val TICKER_LOGO =
+            RetryConfig(
+                maxRetries = 3,
+                initialDelayMs = 1000,
             )
     }
 }

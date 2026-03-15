@@ -23,7 +23,7 @@ abstract class Transaction(
     var unitPrice: BigDecimal,
     @ManyToOne
     @JoinColumn(name = "wallet_transaction_id", referencedColumnName = "id", nullable = false)
-    var walletTransaction: WalletTransaction,
+    var walletTransaction: WalletTransaction? = null,
 ) {
     init {
         require(quantity > BigDecimal.ZERO) {

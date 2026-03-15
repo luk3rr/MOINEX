@@ -28,6 +28,7 @@ import org.moinex.repository.NetWorthSnapshotRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
+import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
@@ -75,9 +76,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -111,9 +112,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -164,9 +165,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -203,9 +204,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal("500.00")
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -256,17 +257,17 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                coEvery { tickerService.allPurchases } returns listOf(purchase)
-                coEvery { tickerService.allSales } returns emptyList()
-                coEvery { tickerService.allTickers } returns listOf(ticker)
+                coEvery { tickerService.getAllPurchases() } returns listOf(purchase)
+                coEvery { tickerService.getAllSales() } returns emptyList()
+                coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
                 service.recalculateAllSnapshots()
 
                 Then("should calculate ticker investment value") {
-                    coVerify { tickerService.allPurchases }
-                    coVerify { tickerService.allTickers }
+                    coVerify { tickerService.getAllPurchases() }
+                    coVerify { tickerService.getAllTickers() }
                 }
 
                 Then("should include ticker value in investments") {
@@ -309,9 +310,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns listOf(bondOperation)
                 coEvery { bondInterestCalculationService.getMonthlyInterestHistory(bond) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
@@ -360,9 +361,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(WalletTransactionType.EXPENSE) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -405,9 +406,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal("2000.00")
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                coEvery { tickerService.allPurchases } returns listOf(purchase)
-                coEvery { tickerService.allSales } returns emptyList()
-                coEvery { tickerService.allTickers } returns listOf(ticker)
+                coEvery { tickerService.getAllPurchases() } returns listOf(purchase)
+                coEvery { tickerService.getAllSales() } returns emptyList()
+                coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -460,9 +461,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -502,9 +503,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -554,16 +555,16 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                coEvery { tickerService.allPurchases } returns listOf(purchase)
-                coEvery { tickerService.allSales } returns listOf(sale)
-                coEvery { tickerService.allTickers } returns listOf(ticker)
+                coEvery { tickerService.getAllPurchases() } returns listOf(purchase)
+                coEvery { tickerService.getAllSales() } returns listOf(sale)
+                coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
                 service.recalculateAllSnapshots()
 
                 Then("should account for quantity changes from sales") {
-                    coVerify { tickerService.allSales }
+                    coVerify { tickerService.getAllSales() }
                 }
 
                 Then("should calculate correct remaining ticker value") {
@@ -612,9 +613,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns listOf(bondOperation)
                 coEvery { bondInterestCalculationService.getMonthlyInterestHistory(bond) } returns listOf(interestCalculation)
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
@@ -656,9 +657,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns listOf(payment)
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -684,9 +685,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -732,9 +733,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal("1000.00")
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                coEvery { tickerService.allPurchases } returns listOf(purchase)
-                coEvery { tickerService.allSales } returns emptyList()
-                coEvery { tickerService.allTickers } returns listOf(ticker)
+                coEvery { tickerService.getAllPurchases() } returns listOf(purchase)
+                coEvery { tickerService.getAllSales() } returns emptyList()
+                coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -825,9 +826,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns listOf(buyOperation, sellOperation)
                 coEvery { bondInterestCalculationService.getMonthlyInterestHistory(bond) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
@@ -876,9 +877,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 
@@ -913,9 +914,9 @@ class NetWorthServiceTest :
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.allPurchases } returns emptyList()
-                every { tickerService.allSales } returns emptyList()
-                every { tickerService.allTickers } returns emptyList()
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
                 every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
 

@@ -29,13 +29,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import kotlin.coroutines.Continuation;
+import kotlinx.coroutines.BuildersKt;
+import kotlinx.coroutines.Dispatchers;
 import lombok.NoArgsConstructor;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Dividend;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.TickerService;
 import org.moinex.service.investment.FundamentalAnalysisService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.ui.dialog.investment.AddCryptoExchangeController;
 import org.moinex.ui.dialog.investment.AddDividendController;
 import org.moinex.ui.dialog.investment.AddTickerController;
@@ -232,69 +235,61 @@ public class SavingsStocksFundsController {
     private void handleUpdatePortfolioPrices() {
         Platform.runLater(this::setOffUpdatePortfolioPricesButton);
 
-        tickerService
-                .updateTickersPriceFromApiAsync(stocksFundsTabTickerTable.getItems())
-                .thenAccept(
-                        failed ->
-                                Platform.runLater(
-                                        () -> {
-                                            if (failed.isEmpty()) {
-                                                WindowUtils.showSuccessDialog(
-                                                        preferencesService.translate(
-                                                                Constants.TranslationKeys
-                                                                        .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE),
-                                                        preferencesService.translate(
-                                                                Constants.TranslationKeys
-                                                                        .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE));
-                                            } else if (failed.size()
-                                                    == stocksFundsTabTickerTable
-                                                            .getItems()
-                                                            .size()) {
-                                                WindowUtils.showInformationDialog(
-                                                        preferencesService.translate(
-                                                                Constants.TranslationKeys
-                                                                        .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE),
-                                                        preferencesService.translate(
-                                                                Constants.TranslationKeys
-                                                                        .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED));
-                                            } else {
-                                                WindowUtils.showInformationDialog(
-                                                        preferencesService.translate(
-                                                                Constants.TranslationKeys
-                                                                        .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE),
-                                                        preferencesService.translate(
-                                                                        Constants.TranslationKeys
-                                                                                .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED)
-                                                                + "\n"
-                                                                + failed.stream()
-                                                                        .map(Ticker::getSymbol)
-                                                                        .reduce(
-                                                                                (a, b) ->
-                                                                                        a + ", "
-                                                                                                + b)
-                                                                        .orElse(""));
-                                            }
-                                        }))
-                .exceptionally(
-                        e -> {
-                            Platform.runLater(
-                                    () -> {
-                                        WindowUtils.showErrorDialog(
-                                                preferencesService.translate(
-                                                        Constants.TranslationKeys
-                                                                .DIALOG_ERROR_TITLE),
-                                                e.getMessage());
-                                        setOnUpdatePortfolioPricesButton();
-                                    });
-                            return null;
-                        })
-                .whenComplete(
-                        (v, e) ->
-                                Platform.runLater(
-                                        () -> {
-                                            setOnUpdatePortfolioPricesButton();
-                                            updatePortfolioIndicators();
-                                        }));
+        try {
+            List<Ticker> failed =
+                    BuildersKt.runBlocking(
+                            Dispatchers.getIO(),
+                            (scope, continuation) ->
+                                    tickerService.updateTickersPriceFromApi(
+                                            stocksFundsTabTickerTable.getItems(),
+                                            (Continuation<? super List<? extends Ticker>>)
+                                                    continuation));
+
+            Platform.runLater(
+                    () -> {
+                        if (failed.isEmpty()) {
+                            WindowUtils.showSuccessDialog(
+                                    preferencesService.translate(
+                                            Constants.TranslationKeys
+                                                    .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE),
+                                    preferencesService.translate(
+                                            Constants.TranslationKeys
+                                                    .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE));
+                        } else if (failed.size() == stocksFundsTabTickerTable.getItems().size()) {
+                            WindowUtils.showInformationDialog(
+                                    preferencesService.translate(
+                                            Constants.TranslationKeys
+                                                    .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE),
+                                    preferencesService.translate(
+                                            Constants.TranslationKeys
+                                                    .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED));
+                        } else {
+                            WindowUtils.showInformationDialog(
+                                    preferencesService.translate(
+                                            Constants.TranslationKeys
+                                                    .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE),
+                                    preferencesService.translate(
+                                                    Constants.TranslationKeys
+                                                            .SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED)
+                                            + "\n"
+                                            + failed.stream()
+                                                    .map(Ticker::getSymbol)
+                                                    .reduce((a, b) -> a + ", " + b)
+                                                    .orElse(""));
+                        }
+                        setOnUpdatePortfolioPricesButton();
+                        updatePortfolioIndicators();
+                    });
+        } catch (Exception e) {
+            Platform.runLater(
+                    () -> {
+                        WindowUtils.showErrorDialog(
+                                preferencesService.translate(
+                                        Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                                e.getMessage());
+                        setOnUpdatePortfolioPricesButton();
+                    });
+        }
     }
 
     @FXML

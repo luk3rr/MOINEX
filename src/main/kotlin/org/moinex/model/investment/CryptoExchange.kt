@@ -18,6 +18,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateTimeStringConverter
+import org.moinex.common.extension.isCryptocurrency
 import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -49,11 +50,19 @@ class CryptoExchange(
         soldQuantity = soldQuantity.toRounded()
         receivedQuantity = receivedQuantity.toRounded()
 
+        require(soldCrypto.id!! != receivedCrypto.id!!) {
+            "Source and target tickers must be different"
+        }
+
         require(soldQuantity > BigDecimal.ZERO) {
             "Sold quantity must be positive"
         }
         require(receivedQuantity > BigDecimal.ZERO) {
             "Received quantity must be positive"
+        }
+
+        require(soldCrypto.isCryptocurrency() && receivedCrypto.isCryptocurrency()) {
+            "Both tickers must be of type CRYPTO to exchange crypto"
         }
     }
 

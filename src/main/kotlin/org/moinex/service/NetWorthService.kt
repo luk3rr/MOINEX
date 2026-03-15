@@ -31,6 +31,7 @@ import org.moinex.repository.NetWorthSnapshotRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
+import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.util.Constants
@@ -400,23 +401,22 @@ class NetWorthService(
     }
 
     private fun calculateTickerValueAtDate(date: LocalDateTime): BigDecimal {
-        val allPurchases = tickerService.allPurchases
-        val allSales = tickerService.allSales
-
         val quantityChangesAfter =
             (
-                allPurchases
+                tickerService
+                    .getAllPurchases()
                     .asSequence()
-                    .filter { it.walletTransaction.date.isAfter(date) }
+                    .filter { it.walletTransaction!!.date.isAfter(date) }
                     .map { it.ticker.id!! to it.quantity } +
-                    allSales
+                    tickerService
+                        .getAllSales()
                         .asSequence()
-                        .filter { it.walletTransaction.date.isAfter(date) }
+                        .filter { it.walletTransaction!!.date.isAfter(date) }
                         .map { it.ticker.id!! to it.quantity.negate() }
             ).groupingBy { it.first }
                 .fold(BigDecimal.ZERO) { acc, (_, quantity) -> acc.add(quantity) }
 
-        val tickerMap = tickerService.allTickers.associateBy { it.id!! }
+        val tickerMap = tickerService.getAllTickers().associateBy { it.id!! }
 
         return tickerMap.values
             .asSequence()

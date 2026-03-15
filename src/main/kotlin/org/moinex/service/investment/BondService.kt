@@ -11,7 +11,7 @@ package org.moinex.service.investment
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.toRounded
-import org.moinex.model.dto.BondOperationWalletTransactionDTO
+import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.investment.Bond
@@ -110,7 +110,7 @@ class BondService(
     @Transactional
     fun createBondOperation(
         bondOperation: BondOperation,
-        bondOperationWalletTransactionDTO: BondOperationWalletTransactionDTO,
+        walletTransactionContextDTO: WalletTransactionContextDTO,
     ) {
         check(bondRepository.existsById(bondOperation.bond.id!!)) {
             "${bondOperation.bond} does not exist"
@@ -139,7 +139,7 @@ class BondService(
 
         val transactionId =
             walletService.createWalletTransaction(
-                WalletTransaction.from(bondOperationWalletTransactionDTO, transactionType, operationAmount),
+                WalletTransaction.from(walletTransactionContextDTO, transactionType, operationAmount),
             )
 
         val walletTransaction = walletService.getWalletTransactionById(transactionId)
@@ -154,7 +154,7 @@ class BondService(
     @Transactional
     fun updateBondOperation(
         updatedBondOperation: BondOperation,
-        bondOperationWalletTransactionDTO: BondOperationWalletTransactionDTO,
+        walletTransactionContextDTO: WalletTransactionContextDTO,
     ) {
         val bondOperationFromDatabase = bondOperationRepository.findByIdOrThrow(updatedBondOperation.id!!)
 
@@ -177,13 +177,13 @@ class BondService(
         val walletTransaction = bondOperationFromDatabase.walletTransaction!!
 
         walletTransaction.apply {
-            wallet = bondOperationWalletTransactionDTO.wallet
-            category = bondOperationWalletTransactionDTO.category
-            date = bondOperationWalletTransactionDTO.date
+            wallet = walletTransactionContextDTO.wallet
+            category = walletTransactionContextDTO.category
+            date = walletTransactionContextDTO.date
             amount = operationAmount
-            description = bondOperationWalletTransactionDTO.description
-            status = bondOperationWalletTransactionDTO.status
-            includeInAnalysis = bondOperationWalletTransactionDTO.includeInAnalysis
+            description = walletTransactionContextDTO.description
+            status = walletTransactionContextDTO.status
+            includeInAnalysis = walletTransactionContextDTO.includeInAnalysis
         }
 
         walletService.updateWalletTransaction(walletTransaction)

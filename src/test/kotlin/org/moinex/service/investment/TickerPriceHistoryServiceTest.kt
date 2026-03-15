@@ -46,7 +46,7 @@ class TickerPriceHistoryServiceTest :
         afterContainer { clearAllMocks(answers = true) }
 
         beforeContainer {
-            every { RetryConfig.TICKER_PRICE_HISTORY } returns
+            every { RetryConfig.TICKER_PRICE } returns
                 RetryConfig(
                     maxRetries = 3,
                     initialDelayMs = 100,

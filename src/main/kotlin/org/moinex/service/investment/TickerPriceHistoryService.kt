@@ -147,7 +147,7 @@ class TickerPriceHistoryService(
         logger.info("Backfilling price history for {} from {}", ticker, referenceDate)
 
         retry(
-            config = RetryConfig.TICKER_PRICE_HISTORY,
+            config = RetryConfig.TICKER_PRICE,
             logger = logger,
             operationName = "Fetch historical prices for $ticker from $referenceDate to ${LocalDate.now()}",
         ) {
@@ -193,7 +193,7 @@ class TickerPriceHistoryService(
                         val endDate = month.atEndOfMonth()
 
                         retry(
-                            config = RetryConfig.TICKER_PRICE_HISTORY,
+                            config = RetryConfig.TICKER_PRICE,
                             logger = logger,
                             operationName = "Fetch prices for $ticker on specific dates",
                         ) {
@@ -379,13 +379,13 @@ class TickerPriceHistoryService(
             addAll(
                 tickerPurchaseRepository
                     .findAllByTickerId(tickerId)
-                    .map { it.walletTransaction.date.toLocalDate() },
+                    .map { it.walletTransaction!!.date.toLocalDate() },
             )
 
             addAll(
                 tickerSaleRepository
                     .findAllByTickerId(tickerId)
-                    .map { it.walletTransaction.date.toLocalDate() },
+                    .map { it.walletTransaction!!.date.toLocalDate() },
             )
         }
 

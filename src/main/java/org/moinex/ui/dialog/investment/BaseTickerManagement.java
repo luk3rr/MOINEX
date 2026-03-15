@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.enums.AssetType;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.TickerService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;

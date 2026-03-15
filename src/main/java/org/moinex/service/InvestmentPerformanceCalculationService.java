@@ -30,6 +30,7 @@ import org.moinex.model.investment.TickerSale;
 import org.moinex.service.investment.BondInterestCalculationService;
 import org.moinex.service.investment.BondService;
 import org.moinex.service.investment.TickerPriceHistoryService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.util.Constants;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;

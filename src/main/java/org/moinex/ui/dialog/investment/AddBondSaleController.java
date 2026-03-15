@@ -16,7 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.dto.BondOperationWalletTransactionDTO;
+import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
@@ -177,7 +177,7 @@ public final class AddBondSaleController extends BaseBondTransactionManagement {
                             netProfit,
                             null,
                             null),
-                    new BondOperationWalletTransactionDTO(
+                    new WalletTransactionContextDTO(
                             wallet,
                             saleDate.atStartOfDay(),
                             category,

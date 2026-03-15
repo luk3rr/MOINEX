@@ -15,11 +15,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import org.moinex.service.InvestmentPerformanceCalculationService
-import org.moinex.service.TickerService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.MarketIndicatorService
 import org.moinex.service.investment.MarketService
 import org.moinex.service.investment.TickerPriceHistoryService
+import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
@@ -76,7 +76,7 @@ class AppStartupRunner(
             }
 
             runStep("Updating ticker prices") {
-                tickerService.updateAllNonArchivedTickersPricesAsync().await()
+                tickerService.updateAllNonArchivedTickersPrices()
             }
 
             runStep("Recalculating investment performance snapshots") {

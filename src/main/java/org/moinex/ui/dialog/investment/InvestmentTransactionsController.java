@@ -29,7 +29,7 @@ import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.investment.TickerSale;
 import org.moinex.model.wallettransaction.WalletTransaction;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.TickerService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -936,7 +936,7 @@ public class InvestmentTransactionsController {
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_PURCHASE_TITLE),
                 message,
                 preferencesService.getBundle())) {
-            tickerService.deletePurchase(purchase.getId());
+            tickerService.deleteTickerPurchase(purchase.getId());
             loadPurchasesFromDatabase();
             updatePurchaseTableView();
         }
@@ -960,7 +960,7 @@ public class InvestmentTransactionsController {
                         Constants.TranslationKeys.INVESTMENT_DIALOG_CONFIRM_DELETE_SALE_TITLE),
                 message,
                 preferencesService.getBundle())) {
-            tickerService.deleteSale(sale.getId());
+            tickerService.deleteTickerSale(sale.getId());
             loadSalesFromDatabase();
             updateSaleTableView();
         }

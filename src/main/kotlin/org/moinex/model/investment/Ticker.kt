@@ -11,8 +11,6 @@ package org.moinex.model.investment
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -29,9 +27,6 @@ class Ticker(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     var id: Int? = null,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    var type: AssetType,
     @Column(name = "last_update", nullable = false)
     @Convert(converter = LocalDateTimeStringConverter::class)
     var lastUpdate: LocalDateTime,
@@ -44,6 +39,7 @@ class Ticker(
     var domain: String? = null,
     name: String,
     symbol: String,
+    type: AssetType,
     currentQuantity: BigDecimal,
     currentUnitValue: BigDecimal,
     averageUnitValue: BigDecimal,
@@ -51,6 +47,7 @@ class Ticker(
 ) : Asset(
         name = name,
         symbol = symbol,
+        type = type,
         currentQuantity = currentQuantity,
         currentUnitValue = currentUnitValue,
         averageUnitValue = averageUnitValue,

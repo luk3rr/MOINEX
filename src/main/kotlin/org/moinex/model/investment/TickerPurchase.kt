@@ -31,7 +31,7 @@ class TickerPurchase(
     var ticker: Ticker,
     quantity: BigDecimal,
     unitPrice: BigDecimal,
-    walletTransaction: WalletTransaction,
+    walletTransaction: WalletTransaction? = null,
 ) : Transaction(
         quantity = quantity,
         unitPrice = unitPrice,

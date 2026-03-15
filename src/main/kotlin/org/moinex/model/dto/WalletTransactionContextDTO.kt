@@ -5,7 +5,7 @@ import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.wallettransaction.Wallet
 import java.time.LocalDateTime
 
-data class BondOperationWalletTransactionDTO(
+data class WalletTransactionContextDTO(
     val wallet: Wallet,
     val date: LocalDateTime,
     val category: Category,

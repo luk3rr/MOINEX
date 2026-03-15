@@ -13,7 +13,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.dto.BondOperationWalletTransactionDTO;
+import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.investment.BondOperation;
@@ -150,7 +150,7 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
 
                 bondService.updateBondOperation(
                         operation,
-                        new BondOperationWalletTransactionDTO(
+                        new WalletTransactionContextDTO(
                                 wallet,
                                 buyDate.atStartOfDay(),
                                 category,

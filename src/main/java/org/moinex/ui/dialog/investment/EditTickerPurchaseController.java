@@ -21,7 +21,7 @@ import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.TickerService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.service.wallet.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -145,7 +145,7 @@ public final class EditTickerPurchaseController extends BaseTickerTransactionMan
                 purchase.getWalletTransaction()
                         .setIncludeInAnalysis(includeInAnalysisCheckBox.isSelected());
 
-                tickerService.updatePurchase(purchase);
+                tickerService.updateTickerPurchase(purchase);
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(

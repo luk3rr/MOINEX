@@ -33,7 +33,7 @@ class TickerSale(
     var averageCost: BigDecimal,
     quantity: BigDecimal,
     unitPrice: BigDecimal,
-    walletTransaction: WalletTransaction,
+    walletTransaction: WalletTransaction? = null,
 ) : Transaction(
         quantity = quantity,
         unitPrice = unitPrice,

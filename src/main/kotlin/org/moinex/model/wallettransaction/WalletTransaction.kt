@@ -19,7 +19,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateTimeStringConverter
 import org.moinex.model.Category
-import org.moinex.model.dto.BondOperationWalletTransactionDTO
+import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import java.math.BigDecimal
@@ -49,17 +49,17 @@ class WalletTransaction(
 
     companion object {
         fun from(
-            bondOperationWalletTransactionDTO: BondOperationWalletTransactionDTO,
+            walletTransactionContextDTO: WalletTransactionContextDTO,
             type: WalletTransactionType,
             amount: BigDecimal,
         ): WalletTransaction =
             WalletTransaction(
-                date = bondOperationWalletTransactionDTO.date,
-                status = bondOperationWalletTransactionDTO.status,
-                description = bondOperationWalletTransactionDTO.description,
-                includeInAnalysis = bondOperationWalletTransactionDTO.includeInAnalysis,
-                wallet = bondOperationWalletTransactionDTO.wallet,
-                category = bondOperationWalletTransactionDTO.category,
+                date = walletTransactionContextDTO.date,
+                status = walletTransactionContextDTO.status,
+                description = walletTransactionContextDTO.description,
+                includeInAnalysis = walletTransactionContextDTO.includeInAnalysis,
+                wallet = walletTransactionContextDTO.wallet,
+                category = walletTransactionContextDTO.category,
                 type = type,
                 amount = amount,
             )

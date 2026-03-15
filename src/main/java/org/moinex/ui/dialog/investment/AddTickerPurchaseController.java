@@ -15,12 +15,14 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
+import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
+import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.TickerService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.service.wallet.WalletService;
 import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
@@ -89,16 +91,15 @@ public final class AddTickerPurchaseController extends BaseTickerTransactionMana
             LocalTime currentTime = LocalTime.now();
             LocalDateTime dateTimeWithCurrentHour = buyDate.atTime(currentTime);
 
-            tickerService.addPurchase(
-                    ticker.getId(),
-                    wallet.getId(),
-                    quantity,
-                    unitPrice,
-                    category,
-                    dateTimeWithCurrentHour,
-                    description,
-                    status,
-                    includeInAnalysisCheckBox.isSelected());
+            tickerService.createTickerPurchase(
+                    new TickerPurchase(null, ticker, quantity, unitPrice, null),
+                    new WalletTransactionContextDTO(
+                            wallet,
+                            dateTimeWithCurrentHour,
+                            category,
+                            description,
+                            status,
+                            includeInAnalysisCheckBox.isSelected()));
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(

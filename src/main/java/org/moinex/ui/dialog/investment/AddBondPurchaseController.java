@@ -13,7 +13,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.Category;
-import org.moinex.model.dto.BondOperationWalletTransactionDTO;
+import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.OperationType;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
@@ -98,7 +98,7 @@ public final class AddBondPurchaseController extends BaseBondTransactionManageme
                             BigDecimal.ZERO, // netProfit not applicable for purchases
                             null,
                             null),
-                    new BondOperationWalletTransactionDTO(
+                    new WalletTransactionContextDTO(
                             wallet,
                             buyDate.atStartOfDay(),
                             category,

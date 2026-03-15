@@ -9,12 +9,14 @@ package org.moinex.ui.dialog.investment;
 import com.jfoenix.controls.JFXButton;
 import jakarta.persistence.EntityExistsException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import org.moinex.model.enums.AssetType;
+import org.moinex.model.investment.Ticker;
 import org.moinex.service.PreferencesService;
-import org.moinex.service.TickerService;
+import org.moinex.service.investment.TickerService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
@@ -107,7 +109,20 @@ public final class AddTickerController extends BaseTickerManagement {
                 avgUnitPrice = new BigDecimal(avgUnitPriceStr);
             }
 
-            tickerService.addTicker(name, symbol, type, currentPrice, avgUnitPrice, quantity);
+            tickerService.createTicker(
+                    new Ticker(
+                            null,
+                            LocalDateTime.now(),
+                            LocalDateTime.now(),
+                            false,
+                            null,
+                            name,
+                            symbol,
+                            type,
+                            quantity,
+                            currentPrice,
+                            avgUnitPrice,
+                            BigDecimal.ZERO));
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(

@@ -1,8 +1,10 @@
 package org.moinex.common.extension
 
 import org.moinex.model.dto.BondOperationStateDTO
+import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.investment.BondOperation
+import org.moinex.model.investment.Ticker
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -35,3 +37,5 @@ fun List<BondOperation>.getLastBuyPrice(): BigDecimal? =
     filter { it.isPurchase() }
         .maxByOrNull { it.localDate }
         ?.unitPrice
+
+fun Ticker.isCryptocurrency(): Boolean = this.type == AssetType.CRYPTOCURRENCY
