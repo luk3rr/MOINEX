@@ -33,4 +33,8 @@ fun LocalDate.isOpenEnded(): Boolean = this == Constants.RECURRING_TRANSACTION_D
 
 fun LocalDate.toBACENFormat(): String = this.format(Constants.BACEN_DATE_FORMATTER)
 
+fun LocalDate.toNoTimeFormat(): String = this.format(Constants.DATE_FORMATTER_NO_TIME)
+
 fun String.toLocalDateBACENFormat(): LocalDate = LocalDate.parse(this, Constants.BACEN_DATE_FORMATTER)
+
+fun String.toNoTimeFormat(): LocalDate = LocalDate.parse(this, Constants.DATE_FORMATTER_NO_TIME)

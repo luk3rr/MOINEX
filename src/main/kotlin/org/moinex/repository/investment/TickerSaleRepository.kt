@@ -34,4 +34,13 @@ interface TickerSaleRepository : JpaRepository<TickerSale, Int> {
             "WHERE ts.ticker.isArchived = false",
     )
     fun findAllNonArchived(): List<TickerSale>
+
+    @Query(
+        "SELECT ts " +
+            "FROM TickerSale ts " +
+            "WHERE ts.ticker.id = :tickerId",
+    )
+    fun findAllByTickerId(
+        @Param("tickerId") tickerId: Int,
+    ): List<TickerSale>
 }

@@ -13,7 +13,6 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;
@@ -30,6 +29,7 @@ import org.moinex.model.investment.TickerPurchase;
 import org.moinex.model.investment.TickerSale;
 import org.moinex.service.investment.BondInterestCalculationService;
 import org.moinex.service.investment.BondService;
+import org.moinex.service.investment.TickerPriceHistoryService;
 import org.moinex.util.Constants;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -313,14 +313,14 @@ public class InvestmentPerformanceCalculationService {
 
                 BigDecimal costBasis = ticker.getAverageUnitValue().multiply(quantityAtMonthEnd);
 
-                Optional<BigDecimal> priceAtMonthEnd =
+                BigDecimal priceAtMonthEnd =
                         tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, monthEnd);
 
-                if (priceAtMonthEnd.isEmpty()) {
+                if (priceAtMonthEnd == null) {
                     continue;
                 }
 
-                BigDecimal currentValue = priceAtMonthEnd.get().multiply(quantityAtMonthEnd);
+                BigDecimal currentValue = priceAtMonthEnd.multiply(quantityAtMonthEnd);
                 BigDecimal unrealizedGain = currentValue.subtract(costBasis);
 
                 monthAccumulatedGain = monthAccumulatedGain.add(unrealizedGain);
@@ -404,14 +404,13 @@ public class InvestmentPerformanceCalculationService {
                 YearMonth currentMonth = YearMonth.now();
                 LocalDate endDate =
                         month.equals(currentMonth) ? LocalDate.now() : month.atEndOfMonth();
-                Optional<BigDecimal> priceOpt =
+                BigDecimal price =
                         tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, endDate);
 
-                if (priceOpt.isEmpty()) {
+                if (price == null) {
                     continue;
                 }
 
-                BigDecimal price = priceOpt.get();
                 BigDecimal value = quantity.multiply(price);
 
                 portfolioByMonth.merge(month, value, BigDecimal::add);
@@ -537,17 +536,15 @@ public class InvestmentPerformanceCalculationService {
                 continue;
             }
 
-            Optional<BigDecimal> startPriceOpt =
+            BigDecimal startPrice =
                     tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, periodStart);
-            Optional<BigDecimal> endPriceOpt =
+            BigDecimal endPrice =
                     tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, periodEnd);
 
-            if (startPriceOpt.isEmpty() || endPriceOpt.isEmpty()) {
+            if (startPrice == null || endPrice == null) {
                 continue;
             }
 
-            BigDecimal startPrice = startPriceOpt.get();
-            BigDecimal endPrice = endPriceOpt.get();
             BigDecimal periodAppreciation = endPrice.subtract(startPrice).multiply(periodQuantity);
 
             totalAppreciation = totalAppreciation.add(periodAppreciation);

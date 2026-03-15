@@ -24,7 +24,7 @@ data class RetryConfig(
 
         if (!jitter) return capped
 
-        val factor = Random.Default.nextDouble(0.5, 1.5)
+        val factor = Random.nextDouble(0.5, 1.5)
         return (capped * factor).toLong()
     }
 
@@ -47,6 +47,13 @@ data class RetryConfig(
             RetryConfig(
                 maxRetries = 5,
                 initialDelayMs = 2000,
+            )
+
+        val TICKER_PRICE_HISTORY =
+            RetryConfig(
+                maxRetries = 7,
+                initialDelayMs = 1000,
+                multiplier = 1.5,
             )
     }
 }

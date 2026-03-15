@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.extension.toBACENFormat
+import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.error.MoinexException
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.PeriodType
@@ -161,7 +162,7 @@ object APIUtils {
         symbol: String,
         startDate: String,
         endDate: String,
-        specificDates: List<String>? = null,
+        specificDates: Set<LocalDate>? = null,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): JSONObject =
         withContext(dispatcher) {
@@ -169,7 +170,7 @@ object APIUtils {
                 if (specificDates.isNullOrEmpty()) {
                     listOf(symbol, startDate, endDate)
                 } else {
-                    listOf(symbol, startDate, endDate, JSONArray(specificDates).toString())
+                    listOf(symbol, startDate, endDate, JSONArray(specificDates.map { it.toNoTimeFormat() }).toString())
                 }
             runPythonScript("get_stock_price_history.py", args)
         }

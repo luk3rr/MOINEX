@@ -6,7 +6,7 @@ import org.moinex.model.investment.BondOperation
 import java.math.BigDecimal
 import java.time.LocalDate
 
-fun List<BondOperation>.operationsUntil(date: LocalDate) = asSequence().takeWhile { it.localDate <= date }
+fun List<BondOperation>.operationsUntil(date: LocalDate) = this@operationsUntil.asSequence().takeWhile { it.localDate <= date }
 
 fun List<BondOperation>.buyOperationsUntil(date: LocalDate) = operationsUntil(date).filter { it.operationType == OperationType.BUY }
 

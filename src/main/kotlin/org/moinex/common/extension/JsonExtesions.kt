@@ -8,7 +8,7 @@ fun JSONObject.decimal(
     name: String,
     field: String,
 ): BigDecimal {
-    val jsonObj = obj(name)
+    val jsonObj = getJSONObject(name)
     return when (val value = jsonObj[field]) {
         is String -> value.toBigDecimal()
         is Number -> value.toString().toBigDecimal()
@@ -19,13 +19,17 @@ fun JSONObject.decimal(
 fun JSONObject.field(
     obj: String,
     field: String,
-): String = obj(obj).str(field)
+): String = getJSONObject(obj).getString(field)
 
 fun JSONObject.bacenDate(
     obj: String,
     field: String,
-): LocalDate = obj(obj).str(field).toLocalDateBACENFormat()
+): LocalDate = getJSONObject(obj).getString(field).toLocalDateBACENFormat()
 
-fun JSONObject.obj(name: String): JSONObject = getJSONObject(name)
-
-fun JSONObject.str(field: String): String = getString(field)
+fun JSONObject.throwIfError(operationName: String = "API call"): JSONObject {
+    if (has("error")) {
+        val errorMessage = getString("error")
+        throw RuntimeException("$operationName failed: $errorMessage")
+    }
+    return this
+}

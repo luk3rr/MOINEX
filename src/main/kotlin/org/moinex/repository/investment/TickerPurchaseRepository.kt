@@ -27,4 +27,13 @@ interface TickerPurchaseRepository : JpaRepository<TickerPurchase, Int> {
     fun findAllByDateBefore(
         @Param("date") date: LocalDateTime,
     ): List<TickerPurchase>
+
+    @Query(
+        "SELECT tp " +
+            "FROM TickerPurchase tp " +
+            "WHERE tp.ticker.id = :tickerId",
+    )
+    fun findAllByTickerId(
+        @Param("tickerId") tickerId: Int,
+    ): List<TickerPurchase>
 }

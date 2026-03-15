@@ -14,14 +14,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
-import org.moinex.repository.investment.TickerPurchaseRepository
-import org.moinex.repository.investment.TickerSaleRepository
 import org.moinex.service.InvestmentPerformanceCalculationService
-import org.moinex.service.TickerPriceHistoryService
 import org.moinex.service.TickerService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.MarketIndicatorService
 import org.moinex.service.investment.MarketService
+import org.moinex.service.investment.TickerPriceHistoryService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
@@ -32,10 +30,8 @@ import org.springframework.stereotype.Component
 class AppStartupRunner(
     private val marketService: MarketService,
     private val recurringTransactionService: RecurringTransactionService,
-    private val priceHistoryService: TickerPriceHistoryService,
+    private val tickerPriceHistoryService: TickerPriceHistoryService,
     private val tickerService: TickerService,
-    private val tickerPurchaseRepository: TickerPurchaseRepository,
-    private val tickerSaleRepository: TickerSaleRepository,
     private val investmentPerformanceCalculationService: InvestmentPerformanceCalculationService,
     private val marketIndicatorService: MarketIndicatorService,
     private val bondInterestCalculationService: BondInterestCalculationService,
@@ -75,18 +71,8 @@ class AppStartupRunner(
                 marketService.updateMarketQuotesAndCommoditiesFromApi()
             }
 
-            val priceHistoryInitialized =
-                runStep("Initializing price history") {
-                    priceHistoryService
-                        .initializePriceHistory(
-                            tickerPurchaseRepository,
-                            tickerSaleRepository,
-                        ).await()
-                }
-
-            if (priceHistoryInitialized != true) {
-                logger.error("Startup pipeline aborted due to price history initialization failure")
-                return@coroutineScope
+            runStep("Initializing price history") {
+                tickerPriceHistoryService.initializePriceHistory()
             }
 
             runStep("Updating ticker prices") {
