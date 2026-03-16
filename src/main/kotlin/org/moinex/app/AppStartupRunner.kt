@@ -12,10 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
-import org.moinex.service.InvestmentPerformanceCalculationService
 import org.moinex.service.investment.BondInterestCalculationService
+import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.MarketIndicatorService
 import org.moinex.service.investment.MarketService
 import org.moinex.service.investment.TickerPriceHistoryService
@@ -32,7 +31,7 @@ class AppStartupRunner(
     private val recurringTransactionService: RecurringTransactionService,
     private val tickerPriceHistoryService: TickerPriceHistoryService,
     private val tickerService: TickerService,
-    private val investmentPerformanceCalculationService: InvestmentPerformanceCalculationService,
+    private val investmentPerformanceService: InvestmentPerformanceService,
     private val marketIndicatorService: MarketIndicatorService,
     private val bondInterestCalculationService: BondInterestCalculationService,
 ) : ApplicationRunner {
@@ -80,7 +79,7 @@ class AppStartupRunner(
             }
 
             runStep("Recalculating investment performance snapshots") {
-                investmentPerformanceCalculationService.recalculateAllSnapshots().await()
+                investmentPerformanceService.recalculateAllSnapshots()
             }
         }
 

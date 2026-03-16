@@ -8,9 +8,11 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.moinex.common.converter.LocalDateTimeStringConverter
+import org.moinex.common.converter.YearMonthStringConverter
 import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 @Entity
 @Table(name = "investment_performance_snapshot")
@@ -19,10 +21,9 @@ class InvestmentPerformanceSnapshot(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     var id: Int? = null,
-    @Column(name = "month", nullable = false)
-    var month: Int,
-    @Column(name = "year", nullable = false)
-    var year: Int,
+    @Convert(converter = YearMonthStringConverter::class)
+    @Column(name = "reference_month", nullable = false)
+    var referenceMonth: YearMonth,
     @Column(name = "invested_value", nullable = false)
     var investedValue: BigDecimal,
     @Column(name = "portfolio_value", nullable = false)
@@ -40,14 +41,7 @@ class InvestmentPerformanceSnapshot(
         portfolioValue = portfolioValue.toRounded()
         accumulatedCapitalGains = accumulatedCapitalGains.toRounded()
         monthlyCapitalGains = monthlyCapitalGains.toRounded()
-
-        require(month in 1..12) {
-            "Month must be between 1 and 12"
-        }
-        require(year > 0) {
-            "Year must be positive"
-        }
     }
 
-    override fun toString(): String = "InvestmentPerformanceSnapshot [month=$month, year=$year]"
+    override fun toString(): String = "InvestmentPerformanceSnapshot [referenceMonth=$referenceMonth, calculatedAt=$calculatedAt]"
 }

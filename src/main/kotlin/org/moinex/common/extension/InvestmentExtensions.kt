@@ -39,3 +39,7 @@ fun List<BondOperation>.getLastBuyPrice(): BigDecimal? =
         ?.unitPrice
 
 fun Ticker.isCryptocurrency(): Boolean = this.type == AssetType.CRYPTOCURRENCY
+
+fun BondOperation.isPurchase(): Boolean = this.operationType == OperationType.BUY
+
+fun BondOperation.isSale(): Boolean = this.operationType == OperationType.SELL

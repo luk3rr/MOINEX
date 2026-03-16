@@ -51,9 +51,9 @@ import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.model.investment.MarketQuotesAndCommodities;
 import org.moinex.model.investment.Ticker;
 import org.moinex.model.investment.TickerSale;
-import org.moinex.service.InvestmentPerformanceCalculationService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.BondService;
+import org.moinex.service.investment.InvestmentPerformanceService;
 import org.moinex.service.investment.InvestmentTargetService;
 import org.moinex.service.investment.MarketService;
 import org.moinex.service.investment.TickerService;
@@ -110,7 +110,7 @@ public class SavingsOverviewController {
     private PreferencesService preferencesService;
     private InvestmentTargetService investmentTargetService;
     private BondService bondService;
-    private InvestmentPerformanceCalculationService investmentPerformanceCalculationService;
+    private InvestmentPerformanceService investmentPerformanceService;
 
     private List<Ticker> tickers;
     private List<Dividend> dividends;
@@ -146,14 +146,14 @@ public class SavingsOverviewController {
             PreferencesService preferencesService,
             InvestmentTargetService investmentTargetService,
             BondService bondService,
-            InvestmentPerformanceCalculationService investmentPerformanceCalculationService) {
+            InvestmentPerformanceService investmentPerformanceService) {
         this.tickerService = tickerService;
         this.marketService = marketService;
         this.springContext = springContext;
         this.preferencesService = preferencesService;
         this.investmentTargetService = investmentTargetService;
         this.bondService = bondService;
-        this.investmentPerformanceCalculationService = investmentPerformanceCalculationService;
+        this.investmentPerformanceService = investmentPerformanceService;
     }
 
     @FXML
@@ -475,25 +475,26 @@ public class SavingsOverviewController {
 
         setOffRecalculateInvestmentPerformanceButton();
 
-        investmentPerformanceCalculationService
-                .recalculateAllSnapshots()
-                .thenRun(
-                        () ->
-                                Platform.runLater(
-                                        () -> {
-                                            logger.info(
-                                                    "Investment performance recalculation"
-                                                            + " completed, updating chart...");
-                                            updateInvestmentPerformanceChart();
-                                            setOnRecalculateInvestmentPerformanceButton();
-                                        }))
-                .exceptionally(
-                        throwable -> {
-                            logger.error(
-                                    "Error during investment performance recalculation", throwable);
-                            Platform.runLater(this::setOnRecalculateInvestmentPerformanceButton);
-                            return null;
-                        });
+        try {
+            BuildersKt.runBlocking(
+                    kotlinx.coroutines.Dispatchers.getIO(),
+                    (scope, continuation) ->
+                            investmentPerformanceService.recalculateAllSnapshots(continuation));
+
+            Platform.runLater(
+                    () -> {
+                        logger.info(
+                                "Investment performance recalculation completed, updating chart...");
+                        updateInvestmentPerformanceChart();
+                        setOnRecalculateInvestmentPerformanceButton();
+                    });
+        } catch (Exception ex) {
+            Platform.runLater(
+                    () -> {
+                        logger.error("Error during investment performance recalculation", ex);
+                        setOnRecalculateInvestmentPerformanceButton();
+                    });
+        }
     }
 
     private void setOffRecalculateInvestmentPerformanceButton() {
@@ -544,7 +545,7 @@ public class SavingsOverviewController {
                 preferencesService.translate(
                         Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS));
 
-        var performanceData = investmentPerformanceCalculationService.getPerformanceData();
+        var performanceData = investmentPerformanceService.getPerformanceData();
 
         Map<YearMonth, BigDecimal> monthlyInvested = performanceData.getMonthlyInvested();
         Map<YearMonth, BigDecimal> accumulatedGains = performanceData.getAccumulatedGains();

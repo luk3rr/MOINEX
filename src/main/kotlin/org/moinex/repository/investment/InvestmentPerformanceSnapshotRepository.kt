@@ -6,19 +6,16 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import java.util.Optional
+import java.time.YearMonth
 
 @Repository
 interface InvestmentPerformanceSnapshotRepository : JpaRepository<InvestmentPerformanceSnapshot, Int> {
-    fun findByMonthAndYear(
-        month: Int,
-        year: Int,
-    ): Optional<InvestmentPerformanceSnapshot>
+    fun findByReferenceMonth(referenceMonth: YearMonth): InvestmentPerformanceSnapshot?
 
     @Query(
         "SELECT ips " +
             "FROM InvestmentPerformanceSnapshot ips " +
-            "ORDER BY ips.year ASC, ips.month ASC",
+            "ORDER BY ips.referenceMonth ASC",
     )
     fun findAllOrderedByDate(): List<InvestmentPerformanceSnapshot>
 
@@ -27,8 +24,5 @@ interface InvestmentPerformanceSnapshotRepository : JpaRepository<InvestmentPerf
     @Query("DELETE FROM InvestmentPerformanceSnapshot")
     override fun deleteAll()
 
-    fun existsByMonthAndYear(
-        month: Int,
-        year: Int,
-    ): Boolean
+    fun existsByReferenceMonth(referenceMonth: YearMonth): Boolean
 }
