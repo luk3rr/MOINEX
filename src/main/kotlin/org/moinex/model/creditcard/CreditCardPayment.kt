@@ -62,6 +62,10 @@ class CreditCardPayment(
 
     fun isPaid(): Boolean = wallet != null
 
+    fun hasDefaultBillingWallet(): Boolean = creditCardDebt.creditCard.defaultBillingWallet != null
+
+    fun getDefaultBillingWallet(): Wallet? = creditCardDebt.creditCard.defaultBillingWallet
+
     override fun toString(): String =
         "Credit Card Payment [id=$id, installment=$installment, amount=$amount, date=$date, debtId=${creditCardDebt.id}] "
 }
