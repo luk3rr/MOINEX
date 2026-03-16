@@ -16,7 +16,7 @@ import javafx.stage.Stage
 import javafx.util.StringConverter
 import org.moinex.service.PreferencesService
 import org.moinex.util.Constants
-import org.moinex.util.launchOnFxThread
+import org.moinex.util.FxUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -64,7 +64,7 @@ class SettingsController(
 
             val stage = scene.window as Stage
 
-            launchOnFxThread {
+            FxUtils.launchOnFxThread {
                 runCatching {
                     val loader =
                         FXMLLoader(
