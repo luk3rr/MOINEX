@@ -22,7 +22,11 @@ class PreferencesService {
         const val PREF_KEY_LOCALE = "ui.locale"
         const val PREF_KEY_HIDE_MONETARY_VALUES = "ui.hideMonetaryValues"
         const val BRAZILIAN_PORTUGUESE_TAG = "pt-BR"
-        val SUPPORTED_LOCALES = listOf(Locale.forLanguageTag(BRAZILIAN_PORTUGUESE_TAG), Locale.ENGLISH)
+        val SUPPORTED_LOCALES: Map<Locale, String> =
+            linkedMapOf(
+                Locale.forLanguageTag(BRAZILIAN_PORTUGUESE_TAG) to "Português",
+                Locale.ENGLISH to "English",
+            )
         val preferences: Preferences = Preferences.userRoot().node("org.moinex")
     }
 
@@ -41,7 +45,9 @@ class PreferencesService {
 
     private var bundleCache: ResourceBundle? = null
 
-    fun getSupportedLocales(): List<Locale> = SUPPORTED_LOCALES
+    fun getSupportedLocales(): List<Locale> = SUPPORTED_LOCALES.keys.toList()
+
+    fun getSupportedLocalesWithLabels(): Map<Locale, String> = SUPPORTED_LOCALES
 
     fun getBundle(): ResourceBundle =
         bundleCache ?: try {
@@ -75,7 +81,7 @@ class PreferencesService {
 
         val system = Locale.getDefault()
         return system?.let { systemLocale ->
-            SUPPORTED_LOCALES.firstOrNull { supported ->
+            SUPPORTED_LOCALES.keys.firstOrNull { supported ->
                 supported.language.equals(systemLocale.language, ignoreCase = true) &&
                     (
                         supported.country.isEmpty() ||
