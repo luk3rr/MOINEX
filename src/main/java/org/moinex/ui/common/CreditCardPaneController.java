@@ -119,7 +119,7 @@ public class CreditCardPaneController {
                         Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_DEBT),
                 springContext,
                 (AddCreditCardDebtController controller) -> controller.setCreditCard(creditCard),
-                List.of(() -> creditCardController.updateDisplay()));
+                List.of(() -> creditCardController.updateDisplay(null)));
     }
 
     @FXML
@@ -130,7 +130,7 @@ public class CreditCardPaneController {
                         Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_CREDIT),
                 springContext,
                 (AddCreditCardCreditController controller) -> controller.setCreditCard(creditCard),
-                List.of(() -> creditCardController.updateDisplay()));
+                List.of(() -> creditCardController.updateDisplay(null)));
     }
 
     @FXML
@@ -141,7 +141,7 @@ public class CreditCardPaneController {
                         Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_EDIT),
                 springContext,
                 (EditCreditCardController controller) -> controller.setCreditCard(creditCard),
-                List.of(() -> creditCardController.updateDisplay()));
+                List.of(() -> creditCardController.updateDisplay(null)));
     }
 
     @FXML
@@ -168,7 +168,7 @@ public class CreditCardPaneController {
                                 creditCard.getName()));
 
                 // Update credit card display in the main window
-                creditCardController.updateDisplay();
+                creditCardController.updateDisplay(null);
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
@@ -214,7 +214,7 @@ public class CreditCardPaneController {
                                 creditCard.getName()));
 
                 // Update credit card display in the main window
-                creditCardController.updateDisplay();
+                creditCardController.updateDisplay(null);
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
@@ -232,7 +232,7 @@ public class CreditCardPaneController {
                         Constants.TranslationKeys.COMMON_CREDIT_CARD_MODAL_SHOW_CREDITS),
                 springContext,
                 (CreditCardCreditsController controller) -> {},
-                List.of(() -> creditCardController.updateDisplay()));
+                List.of(() -> creditCardController.updateDisplay(null)));
     }
 
     @FXML

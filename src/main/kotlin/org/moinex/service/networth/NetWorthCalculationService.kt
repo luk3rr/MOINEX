@@ -191,7 +191,7 @@ class NetWorthCalculationService(
         wallets: List<Wallet>,
         config: BalanceCalculationConfig,
     ): BigDecimal {
-        logger.info("Future month - projecting from current balance")
+        logger.debug("Future month - projecting from current balance")
         var totalBalance = wallets.sumOf { it.balance.abs() }
 
         val futureTransactions =
