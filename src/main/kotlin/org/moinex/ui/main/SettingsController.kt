@@ -30,6 +30,10 @@ class SettingsController(
     @FXML
     private lateinit var languageComboBox: ComboBox<Locale>
 
+    companion object {
+        private val logger = LoggerFactory.getLogger(SettingsController::class.java)
+    }
+
     @FXML
     fun initialize() {
         languageComboBox.items.setAll(preferencesService.getSupportedLocales())
@@ -81,9 +85,5 @@ class SettingsController(
                 }
             }
         }
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(SettingsController::class.java)
     }
 }

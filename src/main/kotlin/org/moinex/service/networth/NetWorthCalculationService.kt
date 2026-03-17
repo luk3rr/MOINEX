@@ -1,12 +1,12 @@
 /*
- * Filename: NetWorthService.kt (original filenames: NetWorthCalculationService.java, NetWorthSnapshotService.java)
+ * Filename: NetWorthCalculationService.kt (original filenames: NetWorthCalculationService.java, NetWorthSnapshotService.java)
  * Created on: January 22, 2025
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  *
  * Migrate to Kotlin on 15/03/2026
  */
 
-package org.moinex.service
+package org.moinex.service.networth
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -27,7 +27,6 @@ import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.RecurringTransaction
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
-import org.moinex.repository.NetWorthSnapshotRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
@@ -37,15 +36,15 @@ import org.moinex.service.wallet.WalletService
 import org.moinex.util.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 @Service
-class NetWorthService(
-    private val netWorthSnapshotRepository: NetWorthSnapshotRepository,
+class NetWorthCalculationService(
+    private val netWorthService: NetWorthService,
     private val walletService: WalletService,
     private val recurringTransactionService: RecurringTransactionService,
     private val creditCardService: CreditCardService,
@@ -53,15 +52,14 @@ class NetWorthService(
     private val bondService: BondService,
     private val bondInterestCalculationService: BondInterestCalculationService,
 ) {
-    private val logger = LoggerFactory.getLogger(NetWorthService::class.java)
+    private val logger = LoggerFactory.getLogger(NetWorthCalculationService::class.java)
 
     private val calculationMutex = Mutex()
 
     val isCalculating: Boolean
         get() = calculationMutex.isLocked
 
-    @Transactional
-    suspend fun recalculateAllSnapshots() =
+    suspend fun recalculateAllSnapshots(onProgress: ((current: Int, total: Int) -> Unit)? = null) =
         calculationMutex.withLock {
             logger.info("Starting net worth recalculation...")
 
@@ -78,10 +76,13 @@ class NetWorthService(
                 endMonth,
             )
 
-            deleteSnapshotsOutsideRange(startMonth, endMonth)
+            netWorthService.deleteSnapshotsOutsideRange(startMonth, endMonth)
 
             var targetMonth = startMonth
             var monthCount = 0
+            val totalMonths = ChronoUnit.MONTHS.between(startMonth, endMonth).toInt() + 1
+            val batchSize = 10
+            val batch = mutableListOf<NetWorthSnapshot>()
 
             while (targetMonth.isBeforeOrEqual(endMonth)) {
                 monthCount++
@@ -90,49 +91,33 @@ class NetWorthService(
                 logger.info("CALCULATING NET WORTH FOR {}/{}", targetMonth.month, targetMonth.year)
                 logger.info("========================================")
 
-                val walletBalances = calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.POSITIVE)
-                val negativeWalletBalances = calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.NEGATIVE)
-                val investments = calculateInvestmentValueForMonth(targetMonth)
-                val recurringIncome = calculateRecurringTransactionsIncome(targetMonth)
-                val assets = walletBalances.add(investments).add(recurringIncome)
-
-                val creditCardDebt = calculateCreditCardDebt(targetMonth)
-                val recurringTransactionsDebt = calculateRecurringTransactionsDebt(targetMonth)
-                val liabilities = creditCardDebt.add(negativeWalletBalances).add(recurringTransactionsDebt)
-
-                val netWorth = assets.minus(liabilities)
+                val snapshot = calculateMonthData(targetMonth, wallets)
+                batch.add(snapshot)
 
                 logger.info("--- SUMMARY FOR {}/{} ---", targetMonth.month, targetMonth.year)
                 logger.info(
                     "Assets: {} (Wallets: {} + Investments: {} + Recurring Income: {})",
-                    assets,
-                    walletBalances,
-                    investments,
-                    recurringIncome,
+                    snapshot.assets,
+                    snapshot.walletBalances,
+                    snapshot.investments,
+                    snapshot.assets.minus(snapshot.walletBalances).minus(snapshot.investments),
                 )
                 logger.info(
                     "Liabilities: {} (Credit Card: {} + Negative Wallets: {} + Recurring Expenses: {})",
-                    liabilities,
-                    creditCardDebt,
-                    negativeWalletBalances,
-                    recurringTransactionsDebt,
+                    snapshot.liabilities,
+                    snapshot.creditCardDebt,
+                    snapshot.negativeWalletBalances,
+                    snapshot.liabilities.minus(snapshot.creditCardDebt).minus(snapshot.negativeWalletBalances),
                 )
-                logger.info("Net Worth: {}", netWorth)
+                logger.info("Net Worth: {}", snapshot.netWorth)
                 logger.info("========================================\n")
 
-                saveSnapshot(
-                    NetWorthSnapshot(
-                        referenceMonth = targetMonth,
-                        assets = assets,
-                        liabilities = liabilities,
-                        netWorth = netWorth,
-                        walletBalances = walletBalances,
-                        investments = investments,
-                        creditCardDebt = creditCardDebt,
-                        negativeWalletBalances = negativeWalletBalances,
-                        calculatedAt = LocalDateTime.now(),
-                    ),
-                )
+                if (batch.size >= batchSize || targetMonth == endMonth) {
+                    netWorthService.saveBatch(batch.toList())
+                    batch.clear()
+                }
+
+                onProgress?.invoke(monthCount, totalMonths)
 
                 targetMonth = targetMonth.plusMonths(1)
             }
@@ -140,33 +125,33 @@ class NetWorthService(
             logger.info("Calculated {} months of net worth data", monthCount)
         }
 
-    fun getSnapshot(referenceMonth: YearMonth): NetWorthSnapshot? = netWorthSnapshotRepository.findByReferenceMonth(referenceMonth)
+    private fun calculateMonthData(
+        targetMonth: YearMonth,
+        wallets: List<Wallet>,
+    ): NetWorthSnapshot {
+        val walletBalances = calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.POSITIVE)
+        val negativeWalletBalances = calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.NEGATIVE)
+        val investments = calculateInvestmentValueForMonth(targetMonth)
+        val recurringIncome = calculateRecurringTransactionsIncome(targetMonth)
+        val assets = walletBalances.add(investments).add(recurringIncome)
 
-    private fun deleteSnapshotsOutsideRange(
-        startMonth: YearMonth,
-        endMonth: YearMonth,
-    ) {
-        logger.info("Deleting snapshots outside range {} to {}", startMonth, endMonth)
-        netWorthSnapshotRepository.deleteSnapshotsOutsideRange(startMonth, endMonth)
-    }
+        val creditCardDebt = calculateCreditCardDebt(targetMonth)
+        val recurringTransactionsDebt = calculateRecurringTransactionsDebt(targetMonth)
+        val liabilities = creditCardDebt.add(negativeWalletBalances).add(recurringTransactionsDebt)
 
-    private fun saveSnapshot(snapshot: NetWorthSnapshot): NetWorthSnapshot {
-        val existing = netWorthSnapshotRepository.findByReferenceMonth(snapshot.referenceMonth)
+        val netWorth = assets.minus(liabilities)
 
-        val entity =
-            existing?.apply {
-                referenceMonth = snapshot.referenceMonth
-                assets = snapshot.assets
-                liabilities = snapshot.liabilities
-                netWorth = snapshot.netWorth
-                walletBalances = snapshot.walletBalances
-                investments = snapshot.investments
-                creditCardDebt = snapshot.creditCardDebt
-                negativeWalletBalances = snapshot.negativeWalletBalances
-                calculatedAt = LocalDateTime.now()
-            } ?: snapshot
-
-        return netWorthSnapshotRepository.save(entity)
+        return NetWorthSnapshot(
+            referenceMonth = targetMonth,
+            assets = assets,
+            liabilities = liabilities,
+            netWorth = netWorth,
+            walletBalances = walletBalances,
+            investments = investments,
+            creditCardDebt = creditCardDebt,
+            negativeWalletBalances = negativeWalletBalances,
+            calculatedAt = LocalDateTime.now(),
+        )
     }
 
     private fun findEarliestTransactionDate(wallets: List<Wallet>): LocalDateTime? {

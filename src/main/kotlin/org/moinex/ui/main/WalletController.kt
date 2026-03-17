@@ -299,8 +299,6 @@ class WalletController(
         val (walletsCurrentBalance, pendingExpenses, pendingIncomes, totalAmountInWallets) =
             when {
                 selectedIndex == 0 -> {
-                    logger.info("Selected: {}", selectedIndex)
-
                     val balance =
                         wallets
                             .filter { it.isMaster() }
@@ -331,8 +329,6 @@ class WalletController(
 
                 selectedIndex > 0 && selectedIndex - 1 < walletTypes.size -> {
                     val selectedWalletType = walletTypes[selectedIndex - 1]
-
-                    logger.info("Selected: {}", selectedWalletType.name)
 
                     val balance =
                         wallets
@@ -564,7 +560,7 @@ class WalletController(
 
             val allTransactions = transactionsList + futureTransactions
 
-            logger.info(
+            logger.debug(
                 "Found {} ({} future) transactions for {}/{}",
                 allTransactions.size,
                 futureTransactions.size,

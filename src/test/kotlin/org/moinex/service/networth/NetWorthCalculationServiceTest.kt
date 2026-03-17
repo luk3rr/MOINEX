@@ -1,4 +1,4 @@
-package org.moinex.service
+package org.moinex.service.networth
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.clearAllMocks
@@ -24,7 +24,6 @@ import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
-import org.moinex.repository.NetWorthSnapshotRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
@@ -36,9 +35,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 
-class NetWorthServiceTest :
+class NetWorthCalculationServiceTest :
     BehaviorSpec({
-        val netWorthSnapshotRepository = mockk<NetWorthSnapshotRepository>()
+        val netWorthService = mockk<NetWorthService>()
         val walletService = mockk<WalletService>()
         val recurringTransactionService = mockk<RecurringTransactionService>()
         val creditCardService = mockk<CreditCardService>()
@@ -47,8 +46,8 @@ class NetWorthServiceTest :
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
 
         val service =
-            NetWorthService(
-                netWorthSnapshotRepository,
+            NetWorthCalculationService(
+                netWorthService,
                 walletService,
                 recurringTransactionService,
                 creditCardService,
@@ -67,12 +66,17 @@ class NetWorthServiceTest :
 
             When("recalculating all snapshots") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet1, wallet2)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns transactionDate
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -80,16 +84,16 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should delete snapshots outside calculation range") {
-                    verify { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) }
+                    verify { netWorthService.deleteSnapshotsOutsideRange(any(), any()) }
                 }
 
                 Then("should save snapshots for each month") {
-                    verify(atLeast = 1) { netWorthSnapshotRepository.save(any()) }
+                    verify(atLeast = 1) { netWorthService.saveBatch(any()) }
                 }
 
                 Then("should calculate snapshots from earliest transaction date") {
@@ -103,12 +107,17 @@ class NetWorthServiceTest :
 
             When("recalculating snapshots with no historical transactions") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns null
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -116,16 +125,16 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should use current date as earliest date") {
-                    verify { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) }
+                    verify { netWorthService.deleteSnapshotsOutsideRange(any(), any()) }
                 }
 
                 Then("should still save snapshots") {
-                    verify(atLeast = 1) { netWorthSnapshotRepository.save(any()) }
+                    verify(atLeast = 1) { netWorthService.saveBatch(any()) }
                 }
             }
         }
@@ -156,12 +165,17 @@ class NetWorthServiceTest :
 
             When("calculating snapshots with historical transactions") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns earliestDate
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns listOf(transaction1, transaction2)
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -169,7 +183,7 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -178,7 +192,7 @@ class NetWorthServiceTest :
                 }
 
                 Then("should save snapshots for all months") {
-                    verify(atLeast = 1) { netWorthSnapshotRepository.save(any()) }
+                    verify(atLeast = 1) { netWorthService.saveBatch(any()) }
                 }
             }
         }
@@ -195,12 +209,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with credit card debts") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal("500.00")
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -208,7 +227,7 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -218,9 +237,9 @@ class NetWorthServiceTest :
 
                 Then("should include debt in liabilities") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.creditCardDebt == BigDecimal("500.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.creditCardDebt == BigDecimal("500.00") }
                             },
                         )
                     }
@@ -248,12 +267,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with ticker investments") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -261,7 +285,7 @@ class NetWorthServiceTest :
                 coEvery { tickerService.getAllSales() } returns emptyList()
                 coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -272,9 +296,9 @@ class NetWorthServiceTest :
 
                 Then("should include ticker value in investments") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.investments > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.investments > BigDecimal.ZERO }
                             },
                         )
                     }
@@ -301,12 +325,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with bond investments") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -315,7 +344,7 @@ class NetWorthServiceTest :
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns listOf(bondOperation)
                 coEvery { bondInterestCalculationService.getMonthlyInterestHistory(bond) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -325,9 +354,9 @@ class NetWorthServiceTest :
 
                 Then("should include bond value in investments") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.investments > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.investments > BigDecimal.ZERO }
                             },
                         )
                     }
@@ -350,12 +379,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with recurring income") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(WalletTransactionType.INCOME) } returns
                     listOf(recurringIncome)
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(WalletTransactionType.EXPENSE) } returns emptyList()
@@ -365,7 +399,7 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -375,9 +409,9 @@ class NetWorthServiceTest :
 
                 Then("should include recurring income in assets") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.assets > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.assets > BigDecimal.ZERO }
                             },
                         )
                     }
@@ -397,12 +431,17 @@ class NetWorthServiceTest :
 
             When("calculating complete net worth snapshot") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal("2000.00")
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -410,15 +449,15 @@ class NetWorthServiceTest :
                 coEvery { tickerService.getAllSales() } returns emptyList()
                 coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should calculate net worth as assets minus liabilities") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.netWorth == snapshot.assets.minus(snapshot.liabilities)
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.all { it.netWorth == it.assets.minus(it.liabilities) }
                             },
                         )
                     }
@@ -426,9 +465,9 @@ class NetWorthServiceTest :
 
                 Then("should include all asset components") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.assets == snapshot.walletBalances.add(snapshot.investments)
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.all { it.assets == it.walletBalances.add(it.investments) }
                             },
                         )
                     }
@@ -436,9 +475,9 @@ class NetWorthServiceTest :
 
                 Then("should include credit card debt in liabilities") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.creditCardDebt == BigDecimal("2000.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.creditCardDebt == BigDecimal("2000.00") }
                             },
                         )
                     }
@@ -452,12 +491,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with negative wallet") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(negativeWallet, positiveWallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -465,15 +509,15 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should only count positive wallet balances as assets") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.walletBalances == BigDecimal("3000.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.walletBalances == BigDecimal("3000.00") }
                             },
                         )
                     }
@@ -494,12 +538,17 @@ class NetWorthServiceTest :
 
             When("calculating current month net worth with pending transactions") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns listOf(pendingTransaction)
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -507,15 +556,15 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should include pending income in current month assets") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.walletBalances >= BigDecimal("5000.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.walletBalances >= BigDecimal("5000.00") }
                             },
                         )
                     }
@@ -546,12 +595,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with ticker sales") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -559,7 +613,7 @@ class NetWorthServiceTest :
                 coEvery { tickerService.getAllSales() } returns listOf(sale)
                 coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -569,9 +623,9 @@ class NetWorthServiceTest :
 
                 Then("should calculate correct remaining ticker value") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.investments > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.investments > BigDecimal.ZERO }
                             },
                         )
                     }
@@ -604,12 +658,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with bond interest") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -618,15 +677,15 @@ class NetWorthServiceTest :
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns listOf(bondOperation)
                 coEvery { bondInterestCalculationService.getMonthlyInterestHistory(bond) } returns listOf(interestCalculation)
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should use final value from interest calculation") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.investments == BigDecimal("1050.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.investments == BigDecimal("1050.00") }
                             },
                         )
                     }
@@ -648,12 +707,17 @@ class NetWorthServiceTest :
 
             When("calculating historical wallet balance with credit card payments") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.of(2025, 1, 15, 10, 0)
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns listOf(payment)
@@ -661,7 +725,7 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -676,12 +740,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with empty system") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -689,22 +758,22 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should calculate zero net worth") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.netWorth.isZero()
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.netWorth.isZero() }
                             },
                         )
                     }
                 }
 
                 Then("should still save snapshot") {
-                    verify { netWorthSnapshotRepository.save(any()) }
+                    verify { netWorthService.saveBatch(any()) }
                 }
             }
         }
@@ -724,12 +793,17 @@ class NetWorthServiceTest :
 
             When("calculating complete net worth with all components") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet1, wallet2)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.of(2025, 1, 1, 0, 0)
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal("1000.00")
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -737,17 +811,19 @@ class NetWorthServiceTest :
                 coEvery { tickerService.getAllSales() } returns emptyList()
                 coEvery { tickerService.getAllTickers() } returns listOf(ticker)
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should calculate complete net worth correctly") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.assets == snapshot.walletBalances.add(snapshot.investments) &&
-                                    snapshot.liabilities == snapshot.creditCardDebt &&
-                                    snapshot.netWorth == snapshot.assets.minus(snapshot.liabilities)
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.all { snapshot ->
+                                    snapshot.assets == snapshot.walletBalances.add(snapshot.investments) &&
+                                        snapshot.liabilities == snapshot.creditCardDebt &&
+                                        snapshot.netWorth == snapshot.assets.minus(snapshot.liabilities)
+                                }
                             },
                         )
                     }
@@ -755,9 +831,9 @@ class NetWorthServiceTest :
 
                 Then("should include all wallet balances") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.walletBalances == BigDecimal("8000.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.walletBalances == BigDecimal("8000.00") }
                             },
                         )
                     }
@@ -765,9 +841,9 @@ class NetWorthServiceTest :
 
                 Then("should include ticker investments") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.investments > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.investments > BigDecimal.ZERO }
                             },
                         )
                     }
@@ -775,9 +851,9 @@ class NetWorthServiceTest :
 
                 Then("should include credit card debt") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.creditCardDebt == BigDecimal("1000.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.creditCardDebt == BigDecimal("1000.00") }
                             },
                         )
                     }
@@ -817,12 +893,17 @@ class NetWorthServiceTest :
 
             When("calculating net worth with bond sell operations") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -831,7 +912,7 @@ class NetWorthServiceTest :
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns listOf(buyOperation, sellOperation)
                 coEvery { bondInterestCalculationService.getMonthlyInterestHistory(bond) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
@@ -841,56 +922,12 @@ class NetWorthServiceTest :
 
                 Then("should include remaining bond value in investments") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.investments > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.investments > BigDecimal.ZERO }
                             },
                         )
                     }
-                }
-            }
-        }
-
-        Given("a system with existing snapshots to update") {
-            val wallet = WalletFactory.create(id = 1, name = "Wallet", balance = BigDecimal("5000.00"))
-            val existingSnapshot =
-                org.moinex.model.NetWorthSnapshot(
-                    referenceMonth = YearMonth.now(),
-                    assets = BigDecimal("3000.00"),
-                    liabilities = BigDecimal("1000.00"),
-                    netWorth = BigDecimal("2000.00"),
-                    walletBalances = BigDecimal("3000.00"),
-                    investments = BigDecimal.ZERO,
-                    creditCardDebt = BigDecimal("1000.00"),
-                    negativeWalletBalances = BigDecimal.ZERO,
-                    calculatedAt = LocalDateTime.now().minusDays(1),
-                )
-
-            When("recalculating snapshots with existing data") {
-                coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns existingSnapshot
-                every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
-                every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
-                every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
-                coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
-                coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
-                every { tickerService.getAllPurchases() } returns emptyList()
-                every { tickerService.getAllSales() } returns emptyList()
-                every { tickerService.getAllTickers() } returns emptyList()
-                coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
-
-                service.recalculateAllSnapshots()
-
-                Then("should update existing snapshot") {
-                    verify(atLeast = 1) { netWorthSnapshotRepository.save(any()) }
-                }
-
-                Then("should call findByReferenceMonth to check for existing snapshot") {
-                    verify(atLeast = 1) { netWorthSnapshotRepository.findByReferenceMonth(any()) }
                 }
             }
         }
@@ -905,12 +942,17 @@ class NetWorthServiceTest :
             When("calculating net worth with mixed wallet balances") {
                 coEvery { walletService.getAllWalletsOrderedByName() } returns
                     listOf(positiveWallet1, positiveWallet2, negativeWallet1, negativeWallet2, zeroWallet)
-                every { netWorthSnapshotRepository.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
-                every { netWorthSnapshotRepository.findByReferenceMonth(any()) } returns null
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
-                coEvery { recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
                 coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
                 coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
                 coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns emptyList()
@@ -918,16 +960,18 @@ class NetWorthServiceTest :
                 every { tickerService.getAllSales() } returns emptyList()
                 every { tickerService.getAllTickers() } returns emptyList()
                 coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
-                every { netWorthSnapshotRepository.save(any()) } returnsArgument 0
+                every { netWorthService.saveBatch(any()) } returns Unit
 
                 service.recalculateAllSnapshots()
 
                 Then("should correctly separate positive and negative balances") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.walletBalances == BigDecimal("5000.00") &&
-                                    snapshot.negativeWalletBalances == BigDecimal("800.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { snapshot ->
+                                    snapshot.walletBalances == BigDecimal("5000.00") &&
+                                        snapshot.negativeWalletBalances == BigDecimal("800.00")
+                                }
                             },
                         )
                     }
@@ -935,10 +979,12 @@ class NetWorthServiceTest :
 
                 Then("should not include zero balance in either category") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.walletBalances > BigDecimal.ZERO &&
-                                    snapshot.negativeWalletBalances > BigDecimal.ZERO
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { snapshot ->
+                                    snapshot.walletBalances > BigDecimal.ZERO &&
+                                        snapshot.negativeWalletBalances > BigDecimal.ZERO
+                                }
                             },
                         )
                     }
@@ -946,9 +992,9 @@ class NetWorthServiceTest :
 
                 Then("should calculate correct net worth") {
                     verify {
-                        netWorthSnapshotRepository.save(
-                            match { snapshot ->
-                                snapshot.netWorth == BigDecimal("4200.00")
+                        netWorthService.saveBatch(
+                            match { snapshots ->
+                                snapshots.any { it.netWorth == BigDecimal("4200.00") }
                             },
                         )
                     }

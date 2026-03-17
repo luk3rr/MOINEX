@@ -38,9 +38,10 @@ import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
-import org.moinex.service.NetWorthService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.networth.NetWorthCalculationService
+import org.moinex.service.networth.NetWorthService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ResumePaneController
@@ -62,6 +63,7 @@ class HomeController(
     private val recurringTransactionService: RecurringTransactionService,
     private val creditCardService: CreditCardService,
     private val netWorthService: NetWorthService,
+    private val netWorthCalculationService: NetWorthCalculationService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
 ) {
@@ -127,14 +129,18 @@ class HomeController(
     private var creditCardPaneCurrentPage = 0
     private var graphPaneCurrentPage = 0
 
+    companion object {
+        private val logger = LoggerFactory.getLogger(HomeController::class.java)
+    }
+
     @FXML
     fun initialize() {
         loadWalletsFromDatabase()
         loadCreditCardsFromDatabase()
         loadLastTransactionsFromDatabase()
 
-        logger.info("Loaded {} wallets from the database", wallets.size)
-        logger.info("Loaded {} credit cards from the database", creditCards.size)
+        logger.debug("Loaded {} wallets from the database", wallets.size)
+        logger.debug("Loaded {} credit cards from the database", creditCards.size)
 
         updateDisplayWallets()
         updateDisplayCreditCards()
@@ -147,12 +153,15 @@ class HomeController(
 
     @FXML
     fun handleRecalculateNetWorth() {
-        logger.info("Starting net worth recalculation...")
         setOffRecalculateButton()
 
         FxUtils.launchCpuThenUI(
             background = {
-                netWorthService.recalculateAllSnapshots()
+                netWorthCalculationService.recalculateAllSnapshots { current, total ->
+                    FxUtils.onFxThread {
+                        updateRecalculateButtonProgress(current, total)
+                    }
+                }
             },
             onUI = {
                 logger.info("Recalculation completed, updating chart...")
@@ -170,6 +179,18 @@ class HomeController(
             preferencesService.translate(
                 Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
             )
+    }
+
+    private fun updateRecalculateButtonProgress(
+        current: Int,
+        total: Int,
+    ) {
+        val percentage = (current.toDouble() / total * 100).toInt()
+        val baseText =
+            preferencesService.translate(
+                Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
+            )
+        recalculateNetWorthButton.text = "$baseText ($current/$total - $percentage%)"
     }
 
     private fun setOnRecalculateButton() {
@@ -422,7 +443,7 @@ class HomeController(
 
             val allTransactions = nonArchivedTransactions + futureTransactions
 
-            logger.info(
+            logger.debug(
                 "Found {} ({} future) transactions for {}/{}",
                 allTransactions.size,
                 futureTransactions.size,
@@ -710,7 +731,7 @@ class HomeController(
                     preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_TITLE)
                 recalculateNetWorthButton.isVisible = true
 
-                if (netWorthService.isCalculating) {
+                if (netWorthCalculationService.isCalculating) {
                     setOffRecalculateButton()
                 } else {
                     setOnRecalculateButton()
@@ -765,9 +786,5 @@ class HomeController(
         }
 
         return dataPoints
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(HomeController::class.java)
     }
 }
