@@ -11,13 +11,13 @@ import java.math.BigDecimal;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardOperator;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.creditcard.CreditCardService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -78,9 +78,9 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
                 || crcDueDayStr == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -109,9 +109,9 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
                     && defaultWalletChanged) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_MESSAGE));
+                                TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_MESSAGE));
             } else // If there is any modification, update the credit card
             {
                 creditCard.setName(crcName);
@@ -126,9 +126,9 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_UPDATED_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_UPDATED_MESSAGE));
+                                TranslationKeys.CREDITCARD_DIALOG_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) nameField.getScene().getWindow();
@@ -136,13 +136,13 @@ public final class EditCreditCardController extends BaseCreditCardManagement {
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_LIMIT_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_TITLE),
                     e.getMessage());
         }
     }

@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
@@ -126,10 +127,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                 || transactionDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -157,11 +157,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
                     && !includeInAnalysisChanged) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE));
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 walletTransaction.setWallet(wallet);
@@ -179,10 +177,9 @@ public final class EditTransactionController extends BaseWalletTransactionManage
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_MESSAGE));
             }
 
@@ -191,15 +188,15 @@ public final class EditTransactionController extends BaseWalletTransactionManage
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_UPDATING_TRANSACTION_TITLE),
                     e.getMessage());
         }

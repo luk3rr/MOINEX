@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
@@ -138,8 +139,7 @@ public abstract class BaseTransferManagement {
     protected void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transferValueField)));
@@ -254,12 +254,10 @@ public abstract class BaseTransferManagement {
                         String.format(
                                 "%s%n%s | "
                                         + preferencesService.translate(
-                                                Constants.TranslationKeys
-                                                        .WALLETTRANSACTION_SUGGESTION_FROM)
+                                                TranslationKeys.WALLETTRANSACTION_SUGGESTION_FROM)
                                         + " %s | "
                                         + preferencesService.translate(
-                                                Constants.TranslationKeys
-                                                        .WALLETTRANSACTION_SUGGESTION_TO)
+                                                TranslationKeys.WALLETTRANSACTION_SUGGESTION_TO)
                                         + " %s | %s ",
                                 tf.getDescription(),
                                 UIUtils.formatCurrency(tf.getAmount()),
@@ -268,7 +266,7 @@ public abstract class BaseTransferManagement {
                                 tf.getCategory() != null
                                         ? tf.getCategory().getName()
                                         : preferencesService.translate(
-                                                Constants.TranslationKeys
+                                                TranslationKeys
                                                         .WALLETTRANSACTION_SUGGESTION_NO_CATEGORY));
 
         Consumer<Transfer> onSelectCallback = this::fillFieldsWithTransaction;

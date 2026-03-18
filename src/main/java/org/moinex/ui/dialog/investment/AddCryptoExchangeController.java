@@ -14,13 +14,13 @@ import java.time.LocalTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.investment.CryptoExchange;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.TickerService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -70,9 +70,9 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                 || exchangeDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -95,20 +95,18 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE));
 
             Stage stage = (Stage) cryptoReceivedQuantityField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
         } catch (MoinexException.SameSourceDestinationException
                 | EntityNotFoundException
                 | MoinexException.InvalidTickerTypeException
@@ -116,8 +114,7 @@ public class AddCryptoExchangeController extends BaseCryptoExchangeManagement {
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_ERROR_CREATING_EXCHANGE_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_CREATING_EXCHANGE_TITLE),
                     e.getMessage());
         }
     }

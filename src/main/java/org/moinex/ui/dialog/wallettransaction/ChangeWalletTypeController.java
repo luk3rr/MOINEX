@@ -13,6 +13,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
@@ -89,10 +90,9 @@ public class ChangeWalletTypeController {
         if (wt == null || walletNewType == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -102,15 +102,13 @@ public class ChangeWalletTypeController {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE));
         } catch (EntityNotFoundException | MoinexException.AttributeAlreadySetException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
                     e.getMessage());
             return;
         }

@@ -12,6 +12,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.BudgetGroupTransactionFilter;
 import org.moinex.model.financialplanning.BudgetGroup;
@@ -149,16 +150,13 @@ public class BaseBudgetGroupController {
                         return switch (filter) {
                             case INCOME ->
                                     preferencesService.translate(
-                                            Constants.TranslationKeys
-                                                    .FINANCIALPLANNING_FILTER_INCOME);
+                                            TranslationKeys.FINANCIALPLANNING_FILTER_INCOME);
                             case EXPENSE ->
                                     preferencesService.translate(
-                                            Constants.TranslationKeys
-                                                    .FINANCIALPLANNING_FILTER_EXPENSE);
+                                            TranslationKeys.FINANCIALPLANNING_FILTER_EXPENSE);
                             case BOTH ->
                                     preferencesService.translate(
-                                            Constants.TranslationKeys
-                                                    .FINANCIALPLANNING_FILTER_BOTH);
+                                            TranslationKeys.FINANCIALPLANNING_FILTER_BOTH);
                         };
                     }
 
@@ -168,13 +166,13 @@ public class BaseBudgetGroupController {
 
                         String income =
                                 preferencesService.translate(
-                                        Constants.TranslationKeys.FINANCIALPLANNING_FILTER_INCOME);
+                                        TranslationKeys.FINANCIALPLANNING_FILTER_INCOME);
                         String expense =
                                 preferencesService.translate(
-                                        Constants.TranslationKeys.FINANCIALPLANNING_FILTER_EXPENSE);
+                                        TranslationKeys.FINANCIALPLANNING_FILTER_EXPENSE);
                         String both =
                                 preferencesService.translate(
-                                        Constants.TranslationKeys.FINANCIALPLANNING_FILTER_BOTH);
+                                        TranslationKeys.FINANCIALPLANNING_FILTER_BOTH);
 
                         if (string.equals(income)) return BudgetGroupTransactionFilter.INCOME;
                         if (string.equals(expense)) return BudgetGroupTransactionFilter.EXPENSE;
@@ -224,11 +222,9 @@ public class BaseBudgetGroupController {
         if (groupName.isEmpty() || targetPercentageText.isEmpty()) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_REQUIRED_FIELDS_MESSAGE));
             return;
         }
 
@@ -238,10 +234,9 @@ public class BaseBudgetGroupController {
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_INPUT_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_INPUT_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INVALID_INPUT_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_INPUT_MESSAGE));
             return;
         }
 

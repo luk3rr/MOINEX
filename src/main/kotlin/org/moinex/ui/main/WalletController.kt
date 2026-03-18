@@ -29,6 +29,7 @@ import org.moinex.chart.DoughnutChart
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.BalanceDataDTO
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
@@ -121,7 +122,7 @@ class WalletController(
         loadAllDataFromDatabase()
 
         val allWalletsLabel =
-            preferencesService.translate(Constants.TranslationKeys.WALLET_ALL_WALLETS)
+            preferencesService.translate(TranslationKeys.WALLET_ALL_WALLETS)
 
         totalBalancePaneWalletTypeComboBox.items.addAll(
             walletTypes.map { UIUtils.translateWalletType(it, preferencesService) },
@@ -152,7 +153,7 @@ class WalletController(
         WindowUtils.openModalWindow(
             Constants.ADD_TRANSFER_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.WALLET_DIALOG_ADD_TRANSFER_TITLE,
+                TranslationKeys.WALLET_DIALOG_ADD_TRANSFER_TITLE,
             ),
             springContext,
             { _: AddTransferController -> },
@@ -174,7 +175,7 @@ class WalletController(
         WindowUtils.openModalWindow(
             Constants.ADD_WALLET_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.WALLET_DIALOG_ADD_WALLET_TITLE,
+                TranslationKeys.WALLET_DIALOG_ADD_WALLET_TITLE,
             ),
             springContext,
             { _: AddWalletController -> },
@@ -196,7 +197,7 @@ class WalletController(
         WindowUtils.openModalWindow(
             Constants.ARCHIVED_WALLETS_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.WALLET_DIALOG_ARCHIVED_WALLETS_TITLE,
+                TranslationKeys.WALLET_DIALOG_ARCHIVED_WALLETS_TITLE,
             ),
             springContext,
             { _: ArchivedWalletsController -> },
@@ -218,7 +219,7 @@ class WalletController(
         WindowUtils.openModalWindow(
             Constants.TRANSFERS_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.WALLET_DIALOG_VIEW_TRANSFERS_TITLE,
+                TranslationKeys.WALLET_DIALOG_VIEW_TRANSFERS_TITLE,
             ),
             springContext,
             { _: TransferController -> },
@@ -381,7 +382,7 @@ class WalletController(
             Label(
                 MessageFormat.format(
                     preferencesService.translate(
-                        Constants.TranslationKeys.WALLET_TOTAL_BALANCE_FORESEEN,
+                        TranslationKeys.WALLET_TOTAL_BALANCE_FORESEEN,
                     ),
                     UIUtils.formatCurrency(foreseenBalance),
                 ),
@@ -393,7 +394,7 @@ class WalletController(
             Label(
                 MessageFormat.format(
                     preferencesService.translate(
-                        Constants.TranslationKeys.WALLET_TOTAL_BALANCE_CORRESPONDS_TO,
+                        TranslationKeys.WALLET_TOTAL_BALANCE_CORRESPONDS_TO,
                     ),
                     totalAmountInWallets,
                 ),
@@ -644,12 +645,12 @@ class WalletController(
 
         val expensesSeries =
             XYChart.Series<String, Number>().apply {
-                name = preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
+                name = preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_EXPENSES)
             }
 
         val incomesSeries =
             XYChart.Series<String, Number>().apply {
-                name = preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES)
+                name = preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOMES)
             }
 
         var maxValue = 0.0

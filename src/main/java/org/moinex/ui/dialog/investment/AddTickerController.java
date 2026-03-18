@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.PreferencesService;
@@ -49,7 +50,7 @@ public final class AddTickerController extends BaseTickerManagement {
         UIUtils.addTooltipToNode(
                 yahooLookupButton,
                 preferencesService.translate(
-                        Constants.TranslationKeys.INVESTMENT_BUTTON_YAHOO_LOOKUP_TOOLTIP));
+                        TranslationKeys.INVESTMENT_BUTTON_YAHOO_LOOKUP_TOOLTIP));
     }
 
     @FXML
@@ -71,9 +72,9 @@ public final class AddTickerController extends BaseTickerManagement {
                 || currentPriceStr.isBlank()) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -85,9 +86,9 @@ public final class AddTickerController extends BaseTickerManagement {
                         && !(quantityStr == null || quantityStr.isBlank())) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_FIELDS_MESSAGE));
 
             return;
         }
@@ -126,22 +127,22 @@ public final class AddTickerController extends BaseTickerManagement {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_MESSAGE));
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_ADDING_TICKER_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_ADDING_TICKER_TITLE),
                     e.getMessage());
         }
     }

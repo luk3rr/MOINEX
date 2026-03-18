@@ -17,6 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.creditcard.CreditCardCredit;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.creditcard.CreditCardService;
@@ -84,8 +85,7 @@ public class CreditCardCreditsController {
     private void handleAdd() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CREDIT_CARD_CREDIT_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.CREDITCARD_CREDITS_ADD_TITLE),
+                preferencesService.translate(TranslationKeys.CREDITCARD_CREDITS_ADD_TITLE),
                 springContext,
                 (AddCreditCardCreditController controller) -> {},
                 List.of(
@@ -148,8 +148,7 @@ public class CreditCardCreditsController {
     private void configureTableView() {
         TableColumn<CreditCardCredit, Integer> idColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_ID));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
@@ -170,15 +169,13 @@ public class CreditCardCreditsController {
 
         TableColumn<CreditCardCredit, String> descriptionColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_DESCRIPTION));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         TableColumn<CreditCardCredit, String> amountColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_AMOUNT));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -186,8 +183,7 @@ public class CreditCardCreditsController {
 
         TableColumn<CreditCardCredit, String> typeColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_TYPE));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_TYPE));
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -196,15 +192,13 @@ public class CreditCardCreditsController {
 
         TableColumn<CreditCardCredit, String> crcColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_CREDIT_CARD));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_CREDIT_CARD));
         crcColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getCreditCard().getName()));
 
         TableColumn<CreditCardCredit, String> dateColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_DATE));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(

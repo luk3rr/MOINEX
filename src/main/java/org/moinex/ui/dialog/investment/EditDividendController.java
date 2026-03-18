@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.investment.Dividend;
@@ -23,7 +24,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.TickerService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -90,9 +90,9 @@ public final class EditDividendController extends BaseDividendManagement {
                 || dividendDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -113,10 +113,9 @@ public final class EditDividendController extends BaseDividendManagement {
                             == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_NO_CHANGES_DIVIDEND_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_DIVIDEND_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 LocalTime currentTime = LocalTime.now();
@@ -135,10 +134,9 @@ public final class EditDividendController extends BaseDividendManagement {
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
@@ -146,16 +144,13 @@ public final class EditDividendController extends BaseDividendManagement {
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE));
         } catch (EntityNotFoundException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_ERROR_UPDATING_DIVIDEND_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_UPDATING_DIVIDEND_TITLE),
                     e.getMessage());
         }
     }

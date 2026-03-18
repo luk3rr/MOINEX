@@ -17,6 +17,7 @@ import javafx.scene.Scene
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import kotlinx.coroutines.delay
+import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.moinex.util.APIUtils
 import org.moinex.util.Constants
@@ -76,7 +77,7 @@ class JavaFXApp : Application() {
                 },
                 onUI = { (preferencesService, mainRoot) ->
                     primaryStage.apply {
-                        title = preferencesService.translate(Constants.TranslationKeys.APP_TITLE)
+                        title = preferencesService.translate(TranslationKeys.APP_TITLE)
                         scene = Scene(mainRoot)
                         show()
                     }

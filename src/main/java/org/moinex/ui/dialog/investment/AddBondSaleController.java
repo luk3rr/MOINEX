@@ -15,6 +15,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.OperationType;
@@ -139,10 +140,8 @@ public final class AddBondSaleController extends BaseBondTransactionManagement {
                 || quantityStr.isBlank()
                 || saleDate == null) {
             WindowUtils.showInformationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -186,23 +185,19 @@ public final class AddBondSaleController extends BaseBondTransactionManagement {
                             includeInAnalysisCheckBox.isSelected()));
 
             WindowUtils.showSuccessDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_SALE_ADDED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_SALE_ADDED_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_SALE_ADDED_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_SALE_ADDED_MESSAGE));
 
             Stage stage = (Stage) bondNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
+                            TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ERROR_SELLING_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_ERROR_SELLING_TITLE),
                     e.getMessage());
         }
     }

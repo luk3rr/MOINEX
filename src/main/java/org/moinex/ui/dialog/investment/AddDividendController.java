@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
@@ -24,7 +25,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.TickerService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -74,9 +74,9 @@ public final class AddDividendController extends BaseDividendManagement {
                 || dividendDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -99,25 +99,22 @@ public final class AddDividendController extends BaseDividendManagement {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE));
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_ERROR_CREATING_DIVIDEND_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_CREATING_DIVIDEND_TITLE),
                     e.getMessage());
         }
     }

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
 import org.moinex.model.enums.RecurringTransactionStatus;
@@ -71,10 +72,9 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
                 || frequency == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -101,10 +101,10 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_MESSAGE));
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
@@ -112,15 +112,14 @@ public final class AddRecurringTransactionController extends BaseRecurringTransa
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_ERROR_CREATING_RECURRING_TITLE),
                     e.getMessage());
         }

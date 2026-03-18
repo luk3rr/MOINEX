@@ -16,6 +16,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.BondType;
 import org.moinex.model.enums.InterestIndex;
 import org.moinex.model.enums.InterestType;
@@ -74,10 +75,8 @@ public final class AddBondController {
 
         if (name == null || bondType == null || name.isBlank() || maturityDate == null) {
             WindowUtils.showInformationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -87,10 +86,9 @@ public final class AddBondController {
                 interestRate = new BigDecimal(interestRateStr);
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
-                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
                 return;
             }
         }
@@ -110,22 +108,20 @@ public final class AddBondController {
                             false));
 
             WindowUtils.showSuccessDialog(
-                    preferencesService.translate(Constants.TranslationKeys.BOND_DIALOG_ADDED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ADDED_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_ADDED_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_ADDED_MESSAGE));
 
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
 
         } catch (EntityExistsException e) {
             WindowUtils.showErrorDialog(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_MESSAGE));
+                            TranslationKeys.BOND_DIALOG_ALREADY_EXISTS_MESSAGE));
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                    preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                     e.getMessage());
         }
     }

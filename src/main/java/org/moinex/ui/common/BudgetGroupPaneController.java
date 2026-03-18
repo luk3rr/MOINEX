@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
@@ -94,16 +95,14 @@ public class BudgetGroupPaneController {
 
         if (remaining.compareTo(BigDecimal.ZERO) < 0) {
             statusPrefixLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_BUDGET_GROUP_OVERSPENT));
+                    preferencesService.translate(TranslationKeys.COMMON_BUDGET_GROUP_OVERSPENT));
             statusAmountLabel.setText(UIUtils.formatCurrency(remaining.abs()));
             statusPrefixLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
             statusAmountLabel.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
             progressBar.getStyleClass().add(Constants.PROGRESS_BAR_RED_COLOR_STYLE);
         } else {
             statusPrefixLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_BUDGET_GROUP_REMAINING));
+                    preferencesService.translate(TranslationKeys.COMMON_BUDGET_GROUP_REMAINING));
             statusAmountLabel.setText(UIUtils.formatCurrency(remaining));
 
             if (progress.compareTo(new BigDecimal("75")) > 0) {

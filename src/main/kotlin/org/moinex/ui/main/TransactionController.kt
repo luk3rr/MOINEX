@@ -32,6 +32,7 @@ import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.Category
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
@@ -158,7 +159,7 @@ class TransactionController(
         WindowUtils.openModalWindow(
             Constants.ADD_INCOME_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_DIALOG_ADD_INCOME_TITLE,
+                TranslationKeys.TRANSACTION_DIALOG_ADD_INCOME_TITLE,
             ),
             springContext,
             { _: AddIncomeController -> },
@@ -178,7 +179,7 @@ class TransactionController(
         WindowUtils.openModalWindow(
             Constants.ADD_EXPENSE_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE,
+                TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE,
             ),
             springContext,
             { _: AddExpenseController -> },
@@ -200,10 +201,10 @@ class TransactionController(
         if (selectedTransaction == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_EDIT_MESSAGE,
+                    TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_EDIT_MESSAGE,
                 ),
             )
             return
@@ -212,7 +213,7 @@ class TransactionController(
         WindowUtils.openModalWindow(
             Constants.EDIT_TRANSACTION_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_DIALOG_EDIT_TRANSACTION_TITLE,
+                TranslationKeys.TRANSACTION_DIALOG_EDIT_TRANSACTION_TITLE,
             ),
             springContext,
             { controller: EditTransactionController ->
@@ -236,10 +237,10 @@ class TransactionController(
         if (selectedTransaction == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_DELETE_MESSAGE,
+                    TranslationKeys.TRANSACTION_DIALOG_NO_SELECTION_DELETE_MESSAGE,
                 ),
             )
             return
@@ -250,7 +251,7 @@ class TransactionController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_DESCRIPTION,
+                            TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_DESCRIPTION,
                         ),
                         selectedTransaction.description,
                     ),
@@ -259,7 +260,7 @@ class TransactionController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_AMOUNT,
+                            TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_AMOUNT,
                         ),
                         UIUtils.formatCurrency(selectedTransaction.amount),
                     ),
@@ -268,7 +269,7 @@ class TransactionController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE,
+                            TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE,
                         ),
                         UIUtils.formatDateTimeForDisplay(
                             selectedTransaction.date,
@@ -280,7 +281,7 @@ class TransactionController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_STATUS,
+                            TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_STATUS,
                         ),
                         UIUtils.translateTransactionStatus(
                             selectedTransaction.status,
@@ -292,7 +293,7 @@ class TransactionController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET,
+                            TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET,
                         ),
                         selectedTransaction.wallet.name,
                     ),
@@ -301,7 +302,7 @@ class TransactionController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE,
+                            TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE,
                         ),
                         UIUtils.formatCurrency(selectedTransaction.wallet.balance),
                     ),
@@ -309,7 +310,7 @@ class TransactionController(
                 append("\n")
                 append(
                     preferencesService.translate(
-                        Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE_AFTER_TRANSACTION,
+                        TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_WALLET_BALANCE_AFTER_TRANSACTION,
                     ),
                 )
                 append(" ")
@@ -330,7 +331,7 @@ class TransactionController(
         if (
             WindowUtils.showConfirmationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_TITLE,
+                    TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_TITLE,
                 ),
                 message,
                 preferencesService.getBundle(),
@@ -350,7 +351,7 @@ class TransactionController(
         WindowUtils.openModalWindow(
             Constants.RECURRING_TRANSACTIONS_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_DIALOG_PERIODIC_TRANSACTION_TITLE,
+                TranslationKeys.TRANSACTION_DIALOG_PERIODIC_TRANSACTION_TITLE,
             ),
             springContext,
             { _: RecurringTransactionController -> },
@@ -370,7 +371,7 @@ class TransactionController(
         WindowUtils.openModalWindow(
             Constants.MANAGE_CATEGORY_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_DIALOG_MANAGE_CATEGORIES_TITLE,
+                TranslationKeys.TRANSACTION_DIALOG_MANAGE_CATEGORIES_TITLE,
             ),
             springContext,
             { _: ManageCategoryController -> },
@@ -670,12 +671,12 @@ class TransactionController(
                         null -> ""
                         WalletTransactionType.EXPENSE ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES,
+                                TranslationKeys.TRANSACTION_TYPE_EXPENSES,
                             )
 
                         WalletTransactionType.INCOME ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
+                                TranslationKeys.TRANSACTION_TYPE_INCOMES,
                             )
                     }
 
@@ -688,17 +689,17 @@ class TransactionController(
                     when (walletTransactionType) {
                         null ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_FILTER_ALL,
+                                TranslationKeys.TRANSACTION_FILTER_ALL,
                             )
 
                         WalletTransactionType.EXPENSE ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES,
+                                TranslationKeys.TRANSACTION_TYPE_EXPENSES,
                             )
 
                         WalletTransactionType.INCOME ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
+                                TranslationKeys.TRANSACTION_TYPE_INCOMES,
                             )
                     }
 
@@ -785,7 +786,7 @@ class TransactionController(
     private fun createIdColumn(): TableColumn<WalletTransaction, Int> =
         TableColumn<WalletTransaction, Int>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_ID,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_ID,
             ),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.id) }
@@ -811,7 +812,7 @@ class TransactionController(
     private fun createCategoryColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_CATEGORY,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_CATEGORY,
             ),
         ).apply {
             setCellValueFactory { SimpleStringProperty(it.value.category.name) }
@@ -820,7 +821,7 @@ class TransactionController(
     private fun createTypeColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_TYPE,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_TYPE,
             ),
         ).apply {
             setCellValueFactory { param ->
@@ -828,12 +829,12 @@ class TransactionController(
                     when (param.value.type) {
                         WalletTransactionType.EXPENSE ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES,
+                                TranslationKeys.TRANSACTION_TYPE_EXPENSES,
                             )
 
                         WalletTransactionType.INCOME ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
+                                TranslationKeys.TRANSACTION_TYPE_INCOMES,
                             )
                     }
                 SimpleStringProperty(translatedType)
@@ -843,7 +844,7 @@ class TransactionController(
     private fun createStatusColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_STATUS,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_STATUS,
             ),
         ).apply {
             setCellValueFactory { param ->
@@ -851,12 +852,12 @@ class TransactionController(
                     when (param.value.status) {
                         WalletTransactionStatus.PENDING ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_STATUS_PENDING,
+                                TranslationKeys.TRANSACTION_STATUS_PENDING,
                             )
 
                         WalletTransactionStatus.CONFIRMED ->
                             preferencesService.translate(
-                                Constants.TranslationKeys.TRANSACTION_STATUS_CONFIRMED,
+                                TranslationKeys.TRANSACTION_STATUS_CONFIRMED,
                             )
                     }
                 SimpleStringProperty(translatedStatus)
@@ -866,7 +867,7 @@ class TransactionController(
     private fun createDateColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_DATE,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_DATE,
             ),
         ).apply {
             setCellValueFactory {
@@ -879,7 +880,7 @@ class TransactionController(
     private fun createAmountColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_AMOUNT,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_AMOUNT,
             ),
         ).apply {
             setCellValueFactory {
@@ -890,7 +891,7 @@ class TransactionController(
     private fun createDescriptionColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_DESCRIPTION,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_DESCRIPTION,
             ),
         ).apply {
             setCellValueFactory { SimpleStringProperty(it.value.description) }
@@ -899,7 +900,7 @@ class TransactionController(
     private fun createWalletNameColumn(): TableColumn<WalletTransaction, String> =
         TableColumn<WalletTransaction, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_WALLET,
+                TranslationKeys.TRANSACTION_TRANSACTION_LIST_HEADER_WALLET,
             ),
         ).apply {
             setCellValueFactory { SimpleStringProperty(it.value.wallet.name) }

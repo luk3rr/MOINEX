@@ -14,11 +14,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.CalendarEvent;
 import org.moinex.model.enums.CalendarEventType;
 import org.moinex.service.CalendarService;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,10 +78,9 @@ public class AddCalendarEventController {
         if (eventTitle.isEmpty() || eventDate == null || eventType == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -92,16 +91,16 @@ public class AddCalendarEventController {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
+                            TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_MESSAGE));
+                            TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_MESSAGE));
 
             Stage stage = (Stage) titleField.getScene().getWindow();
             stage.close();
         } catch (IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CALENDAR_DIALOG_ERROR_CREATING_EVENT_TITLE),
+                            TranslationKeys.CALENDAR_DIALOG_ERROR_CREATING_EVENT_TITLE),
                     e.getMessage());
         }
     }

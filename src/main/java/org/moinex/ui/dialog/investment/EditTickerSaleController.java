@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
@@ -23,7 +24,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.TickerService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,9 +97,9 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                 || saleDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -121,10 +121,9 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
                             == includeInAnalysisCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_NO_CHANGES_SALE_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_SALE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 LocalTime currentTime = LocalTime.now();
@@ -144,9 +143,9 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) tickerNameLabel.getScene().getWindow();
@@ -154,13 +153,13 @@ public final class EditTickerSaleController extends BaseTickerTransactionManagem
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_ERROR_UPDATING_SALE_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_UPDATING_SALE_TITLE),
                     e.getMessage());
         }
     }

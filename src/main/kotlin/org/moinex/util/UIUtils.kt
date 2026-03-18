@@ -28,6 +28,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.text.Text
 import javafx.util.Duration
 import javafx.util.StringConverter
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.BondType
 import org.moinex.model.enums.CalendarEventType
@@ -175,7 +176,7 @@ class UIUtils(
 
             if (value.toDouble() < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
                 return preferencesService.translate(
-                    Constants.TranslationKeys.UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE,
+                    TranslationKeys.UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE,
                 )
             }
 
@@ -407,15 +408,15 @@ class UIUtils(
 
             val typeKeyMap =
                 mapOf(
-                    "checkingaccount" to Constants.TranslationKeys.WALLET_TYPE_CHECKING,
-                    "savingsaccount" to Constants.TranslationKeys.WALLET_TYPE_SAVINGS,
-                    "broker" to Constants.TranslationKeys.WALLET_TYPE_BROKER,
-                    "criptocurrency" to Constants.TranslationKeys.WALLET_TYPE_CRIPTOCURRENCY,
-                    "foodvoucher" to Constants.TranslationKeys.WALLET_TYPE_FOOD_VOUCHER,
-                    "mealvoucher" to Constants.TranslationKeys.WALLET_TYPE_MEAL_VOUCHER,
-                    "wallet" to Constants.TranslationKeys.WALLET_TYPE_WALLET,
-                    "goal" to Constants.TranslationKeys.WALLET_TYPE_GOAL,
-                    "others" to Constants.TranslationKeys.WALLET_TYPE_OTHERS,
+                    "checkingaccount" to TranslationKeys.WALLET_TYPE_CHECKING,
+                    "savingsaccount" to TranslationKeys.WALLET_TYPE_SAVINGS,
+                    "broker" to TranslationKeys.WALLET_TYPE_BROKER,
+                    "criptocurrency" to TranslationKeys.WALLET_TYPE_CRIPTOCURRENCY,
+                    "foodvoucher" to TranslationKeys.WALLET_TYPE_FOOD_VOUCHER,
+                    "mealvoucher" to TranslationKeys.WALLET_TYPE_MEAL_VOUCHER,
+                    "wallet" to TranslationKeys.WALLET_TYPE_WALLET,
+                    "goal" to TranslationKeys.WALLET_TYPE_GOAL,
+                    "others" to TranslationKeys.WALLET_TYPE_OTHERS,
                 )
 
             return typeKeyMap[name]?.let { preferencesService.translate(it) }
@@ -428,8 +429,8 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "pending" to Constants.TranslationKeys.TRANSACTION_STATUS_PENDING,
-                "confirmed" to Constants.TranslationKeys.TRANSACTION_STATUS_CONFIRMED,
+                "pending" to TranslationKeys.TRANSACTION_STATUS_PENDING,
+                "confirmed" to TranslationKeys.TRANSACTION_STATUS_CONFIRMED,
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
 
@@ -439,8 +440,8 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "income" to Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES,
-                "expense" to Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES,
+                "income" to TranslationKeys.TRANSACTION_TYPE_INCOMES,
+                "expense" to TranslationKeys.TRANSACTION_TYPE_EXPENSES,
             )[type.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: type.name
 
@@ -450,8 +451,8 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "active" to Constants.TranslationKeys.RECURRING_TRANSACTION_STATUS_ACTIVE,
-                "inactive" to Constants.TranslationKeys.RECURRING_TRANSACTION_STATUS_INACTIVE,
+                "active" to TranslationKeys.RECURRING_TRANSACTION_STATUS_ACTIVE,
+                "inactive" to TranslationKeys.RECURRING_TRANSACTION_STATUS_INACTIVE,
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
 
@@ -461,10 +462,10 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "daily" to Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_DAILY,
-                "weekly" to Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_WEEKLY,
-                "monthly" to Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_MONTHLY,
-                "yearly" to Constants.TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_YEARLY,
+                "daily" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_DAILY,
+                "weekly" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_WEEKLY,
+                "monthly" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_MONTHLY,
+                "yearly" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_YEARLY,
             )[frequency.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: frequency.name
 
@@ -475,13 +476,13 @@ class UIUtils(
         ): String =
             mapOf(
                 "credit_card_statement_closing" to
-                    Constants.TranslationKeys.CALENDAR_EVENTTYPE_CREDIT_CARD_STATEMENT_CLOSING,
+                    TranslationKeys.CALENDAR_EVENTTYPE_CREDIT_CARD_STATEMENT_CLOSING,
                 "credit_card_due_date" to
-                    Constants.TranslationKeys.CALENDAR_EVENTTYPE_CREDIT_CARD_DUE_DATE,
+                    TranslationKeys.CALENDAR_EVENTTYPE_CREDIT_CARD_DUE_DATE,
                 "debt_payment_due_date" to
-                    Constants.TranslationKeys.CALENDAR_EVENTTYPE_DEBT_PAYMENT_DUE_DATE,
+                    TranslationKeys.CALENDAR_EVENTTYPE_DEBT_PAYMENT_DUE_DATE,
                 "income_receipt_date" to
-                    Constants.TranslationKeys.CALENDAR_EVENTTYPE_INCOME_RECEIPT_DATE,
+                    TranslationKeys.CALENDAR_EVENTTYPE_INCOME_RECEIPT_DATE,
             )[eventType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: eventType.description
 
@@ -491,12 +492,12 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "stock" to Constants.TranslationKeys.ASSET_TYPE_STOCK,
-                "fund" to Constants.TranslationKeys.ASSET_TYPE_FUND,
-                "cryptocurrency" to Constants.TranslationKeys.ASSET_TYPE_CRYPTO,
-                "reit" to Constants.TranslationKeys.ASSET_TYPE_REIT,
-                "etf" to Constants.TranslationKeys.ASSET_TYPE_ETF,
-                "bond" to Constants.TranslationKeys.ASSET_TYPE_BOND,
+                "stock" to TranslationKeys.ASSET_TYPE_STOCK,
+                "fund" to TranslationKeys.ASSET_TYPE_FUND,
+                "cryptocurrency" to TranslationKeys.ASSET_TYPE_CRYPTO,
+                "reit" to TranslationKeys.ASSET_TYPE_REIT,
+                "etf" to TranslationKeys.ASSET_TYPE_ETF,
+                "bond" to TranslationKeys.ASSET_TYPE_BOND,
             )[assetType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: assetType.name
 
@@ -506,8 +507,8 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "annual" to Constants.TranslationKeys.PERIOD_TYPE_ANNUAL,
-                "quarterly" to Constants.TranslationKeys.PERIOD_TYPE_QUARTERLY,
+                "annual" to TranslationKeys.PERIOD_TYPE_ANNUAL,
+                "quarterly" to TranslationKeys.PERIOD_TYPE_QUARTERLY,
             )[periodType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: periodType.name
 
@@ -517,13 +518,13 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "cdb" to Constants.TranslationKeys.BOND_TYPE_CDB,
-                "lci" to Constants.TranslationKeys.BOND_TYPE_LCI,
-                "lca" to Constants.TranslationKeys.BOND_TYPE_LCA,
-                "treasury_prefixed" to Constants.TranslationKeys.BOND_TYPE_TREASURY_PREFIXED,
-                "treasury_postfixed" to Constants.TranslationKeys.BOND_TYPE_TREASURY_POSTFIXED,
-                "international" to Constants.TranslationKeys.BOND_TYPE_INTERNATIONAL,
-                "other" to Constants.TranslationKeys.BOND_TYPE_OTHER,
+                "cdb" to TranslationKeys.BOND_TYPE_CDB,
+                "lci" to TranslationKeys.BOND_TYPE_LCI,
+                "lca" to TranslationKeys.BOND_TYPE_LCA,
+                "treasury_prefixed" to TranslationKeys.BOND_TYPE_TREASURY_PREFIXED,
+                "treasury_postfixed" to TranslationKeys.BOND_TYPE_TREASURY_POSTFIXED,
+                "international" to TranslationKeys.BOND_TYPE_INTERNATIONAL,
+                "other" to TranslationKeys.BOND_TYPE_OTHER,
             )[bondType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: bondType.name
 
@@ -533,9 +534,9 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "fixed" to Constants.TranslationKeys.INTEREST_TYPE_FIXED,
-                "floating" to Constants.TranslationKeys.INTEREST_TYPE_FLOATING,
-                "zero_coupon" to Constants.TranslationKeys.INTEREST_TYPE_ZERO_COUPON,
+                "fixed" to TranslationKeys.INTEREST_TYPE_FIXED,
+                "floating" to TranslationKeys.INTEREST_TYPE_FLOATING,
+                "zero_coupon" to TranslationKeys.INTEREST_TYPE_ZERO_COUPON,
             )[interestType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: interestType.name
 
@@ -545,12 +546,12 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "cdi" to Constants.TranslationKeys.INTEREST_INDEX_CDI,
-                "selic" to Constants.TranslationKeys.INTEREST_INDEX_SELIC,
-                "ipca" to Constants.TranslationKeys.INTEREST_INDEX_IPCA,
-                "libor" to Constants.TranslationKeys.INTEREST_INDEX_LIBOR,
-                "sofr" to Constants.TranslationKeys.INTEREST_INDEX_SOFR,
-                "other" to Constants.TranslationKeys.INTEREST_INDEX_OTHER,
+                "cdi" to TranslationKeys.INTEREST_INDEX_CDI,
+                "selic" to TranslationKeys.INTEREST_INDEX_SELIC,
+                "ipca" to TranslationKeys.INTEREST_INDEX_IPCA,
+                "libor" to TranslationKeys.INTEREST_INDEX_LIBOR,
+                "sofr" to TranslationKeys.INTEREST_INDEX_SOFR,
+                "other" to TranslationKeys.INTEREST_INDEX_OTHER,
             )[interestIndex.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: interestIndex.name
 
@@ -560,8 +561,8 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "open" to Constants.TranslationKeys.COMMON_CREDIT_CARD_OPEN,
-                "closed" to Constants.TranslationKeys.COMMON_CREDIT_CARD_CLOSED,
+                "open" to TranslationKeys.COMMON_CREDIT_CARD_OPEN,
+                "closed" to TranslationKeys.COMMON_CREDIT_CARD_CLOSED,
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
 
@@ -571,9 +572,9 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "cashback" to Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_CASHBACK,
-                "refund" to Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REFUND,
-                "reward" to Constants.TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REWARD,
+                "cashback" to TranslationKeys.CREDIT_CARD_CREDIT_TYPE_CASHBACK,
+                "refund" to TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REFUND,
+                "reward" to TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REWARD,
             )[creditType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: creditType.name
 
@@ -583,8 +584,8 @@ class UIUtils(
             preferencesService: PreferencesService,
         ): String =
             mapOf(
-                "buy" to Constants.TranslationKeys.OPERATION_TYPE_BUY,
-                "sell" to Constants.TranslationKeys.OPERATION_TYPE_SELL,
+                "buy" to TranslationKeys.OPERATION_TYPE_BUY,
+                "sell" to TranslationKeys.OPERATION_TYPE_SELL,
             )[operationType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: operationType.name
 
@@ -595,12 +596,12 @@ class UIUtils(
         ): String =
             if (wallet.isMaster()) {
                 preferencesService.translate(
-                    Constants.TranslationKeys.HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET,
+                    TranslationKeys.HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET,
                 )
             } else {
                 MessageFormat.format(
                     preferencesService.translate(
-                        Constants.TranslationKeys.HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET,
+                        TranslationKeys.HOME_WALLET_TOOLTIP_IS_VIRTUAL_WALLET,
                     ),
                     wallet.masterWallet?.name,
                 )

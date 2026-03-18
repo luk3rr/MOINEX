@@ -20,6 +20,7 @@ import javafx.scene.layout.AnchorPane
 import javafx.util.StringConverter
 import org.moinex.chart.ChartFactory
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.PlanStatusDTO
 import org.moinex.model.financialplanning.FinancialPlan
 import org.moinex.service.PreferencesService
@@ -92,7 +93,7 @@ class PlanController(
     private fun handleNewPlan() {
         WindowUtils.openModalWindow(
             Constants.ADD_PLAN_FXML,
-            preferencesService.translate(Constants.TranslationKeys.PLAN_DIALOG_ADD_PLAN_TITLE),
+            preferencesService.translate(TranslationKeys.PLAN_DIALOG_ADD_PLAN_TITLE),
             springContext,
             { _: AddPlanController -> },
             listOf(Runnable { updateView() }),
@@ -104,10 +105,10 @@ class PlanController(
         if (currentPlan == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE,
+                    TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE,
+                    TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_MESSAGE,
                 ),
             )
             return
@@ -115,7 +116,7 @@ class PlanController(
 
         WindowUtils.openModalWindow(
             Constants.EDIT_PLAN_FXML,
-            preferencesService.translate(Constants.TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
+            preferencesService.translate(TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
             springContext,
             { controller: EditPlanController -> controller.setPlan(currentPlan) },
             listOf(Runnable { updateView() }),
@@ -297,10 +298,10 @@ class PlanController(
         val timelineChart =
             chartFactory.createBudgetGroupTimelineChart().apply {
                 setXAxisLabel(
-                    this@PlanController.preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_X_AXIS),
+                    this@PlanController.preferencesService.translate(TranslationKeys.PLAN_TIMELINE_X_AXIS),
                 )
                 setYAxisLabel(
-                    this@PlanController.preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_Y_AXIS),
+                    this@PlanController.preferencesService.translate(TranslationKeys.PLAN_TIMELINE_Y_AXIS),
                 )
                 updateData(historicalData)
             }

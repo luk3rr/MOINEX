@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
@@ -134,7 +135,7 @@ public abstract class BaseCryptoExchangeManagement {
     protected void handleCryptoSoldOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                preferencesService.translate(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
+                preferencesService.translate(TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(
@@ -147,7 +148,7 @@ public abstract class BaseCryptoExchangeManagement {
     protected void handleCryptoReceivedOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                preferencesService.translate(Constants.TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
+                preferencesService.translate(TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(

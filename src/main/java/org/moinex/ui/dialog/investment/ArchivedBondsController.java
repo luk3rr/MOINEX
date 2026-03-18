@@ -20,10 +20,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.investment.Bond;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.BondService;
-import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,30 +68,28 @@ public class ArchivedBondsController {
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_TITLE),
+                            TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_UNARCHIVE));
+                            TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_UNARCHIVE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_CONFIRM_UNARCHIVE_TITLE),
+                                TranslationKeys.BOND_DIALOG_CONFIRM_UNARCHIVE_TITLE),
                         selectedBond.getName()),
-                preferencesService.translate(
-                        Constants.TranslationKeys.BOND_DIALOG_CONFIRM_UNARCHIVE_MESSAGE),
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_CONFIRM_UNARCHIVE_MESSAGE),
                 preferencesService.getBundle())) {
             try {
                 bondService.unarchiveBond(selectedBond.getId());
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_TITLE),
+                                TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_TITLE),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .BOND_DIALOG_BOND_UNARCHIVED_MESSAGE),
+                                        TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_MESSAGE),
                                 selectedBond.getName()));
 
                 // Remove this bond from the list and update the table view
@@ -100,7 +98,7 @@ public class ArchivedBondsController {
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_ERROR_UNARCHIVING_TITLE),
+                                TranslationKeys.BOND_DIALOG_ERROR_UNARCHIVING_TITLE),
                         e.getMessage());
             }
         }
@@ -113,39 +111,37 @@ public class ArchivedBondsController {
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_TITLE),
+                            TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_DELETE));
+                            TranslationKeys.BOND_DIALOG_NO_BOND_SELECTED_DELETE));
             return;
         }
 
         // Prevent the removal of a bond with associated operations
         if (bondService.getOperationCountByBond(selectedBond.getId()) > 0) {
             WindowUtils.showInformationDialog(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_HAS_OPERATIONS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_HAS_OPERATIONS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_HAS_OPERATIONS_MESSAGE));
+                            TranslationKeys.BOND_DIALOG_HAS_OPERATIONS_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_TITLE),
+                                TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_TITLE),
                         selectedBond.getName()),
-                preferencesService.translate(
-                        Constants.TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_MESSAGE),
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_CONFIRM_DELETE_MESSAGE),
                 preferencesService.getBundle())) {
             try {
                 bondService.deleteBond(selectedBond.getId());
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_BOND_DELETED_TITLE),
+                                TranslationKeys.BOND_DIALOG_BOND_DELETED_TITLE),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys.BOND_DIALOG_BOND_DELETED_MESSAGE),
+                                        TranslationKeys.BOND_DIALOG_BOND_DELETED_MESSAGE),
                                 selectedBond.getName()));
 
                 // Remove this bond from the list and update the table view
@@ -154,7 +150,7 @@ public class ArchivedBondsController {
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_ERROR_DELETING_TITLE),
+                                TranslationKeys.BOND_DIALOG_ERROR_DELETING_TITLE),
                         e.getMessage());
             }
         }
@@ -204,20 +200,17 @@ public class ArchivedBondsController {
         TableColumn<Bond, Integer> idColumn = getBondIdTableColumn();
 
         TableColumn<Bond, String> nameColumn =
-                new TableColumn<>(
-                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_NAME));
+                new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_NAME));
         nameColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<Bond, String> symbolColumn =
-                new TableColumn<>(
-                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_SYMBOL));
+                new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_SYMBOL));
         symbolColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getSymbol()));
 
         TableColumn<Bond, String> typeColumn =
-                new TableColumn<>(
-                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_TYPE));
+                new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_TYPE));
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -225,15 +218,13 @@ public class ArchivedBondsController {
                                         param.getValue().getType(), preferencesService)));
 
         TableColumn<Bond, String> issuerColumn =
-                new TableColumn<>(
-                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_ISSUER));
+                new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_ISSUER));
         issuerColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getIssuer()));
 
         TableColumn<Bond, String> quantityColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.BOND_TABLE_QUANTITY));
+                        preferencesService.translate(TranslationKeys.BOND_TABLE_QUANTITY));
         quantityColumn.setCellValueFactory(
                 param -> {
                     Bond bond = param.getValue();
@@ -243,8 +234,7 @@ public class ArchivedBondsController {
 
         TableColumn<Bond, String> avgPriceColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE));
+                        preferencesService.translate(TranslationKeys.BOND_TABLE_UNIT_PRICE));
         avgPriceColumn.setCellValueFactory(
                 param -> {
                     Bond bond = param.getValue();
@@ -254,8 +244,7 @@ public class ArchivedBondsController {
 
         TableColumn<Bond, String> investedValueColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.BOND_TABLE_INVESTED_VALUE));
+                        preferencesService.translate(TranslationKeys.BOND_TABLE_INVESTED_VALUE));
         investedValueColumn.setCellValueFactory(
                 param -> {
                     Bond bond = param.getValue();
@@ -264,8 +253,7 @@ public class ArchivedBondsController {
                 });
 
         TableColumn<Bond, String> maturityDateColumn =
-                new TableColumn<>(
-                        preferencesService.translate(Constants.TranslationKeys.BOND_MATURITY_DATE));
+                new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_MATURITY_DATE));
         maturityDateColumn.setCellValueFactory(
                 param -> {
                     Bond bond = param.getValue();
@@ -291,8 +279,7 @@ public class ArchivedBondsController {
 
     private TableColumn<Bond, Integer> getBondIdTableColumn() {
         TableColumn<Bond, Integer> idColumn =
-                new TableColumn<>(
-                        preferencesService.translate(Constants.TranslationKeys.BOND_TABLE_ID));
+                new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         // Align the ID column to the center

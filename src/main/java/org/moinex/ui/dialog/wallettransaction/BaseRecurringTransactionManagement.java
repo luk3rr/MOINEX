@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
 import org.moinex.model.enums.WalletTransactionType;
@@ -145,17 +146,17 @@ public abstract class BaseRecurringTransactionManagement {
             if (endDate != null) {
                 msg =
                         preferencesService.translate(
-                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
+                                        TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
                                 + " "
                                 + startDate
                                 + ", "
                                 + preferencesService.translate(
-                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_ENDS_ON)
+                                        TranslationKeys.WALLETTRANSACTION_INFO_ENDS_ON)
                                 + " "
                                 + endDate
                                 + ", "
                                 + preferencesService.translate(
-                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
+                                        TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
                                 + " "
                                 + UIUtils.translateRecurringTransactionFrequency(
                                         frequency, preferencesService);
@@ -165,8 +166,7 @@ public abstract class BaseRecurringTransactionManagement {
                     msg +=
                             "\n"
                                     + preferencesService.translate(
-                                            Constants.TranslationKeys
-                                                    .WALLETTRANSACTION_INFO_LAST_TRANSACTION)
+                                            TranslationKeys.WALLETTRANSACTION_INFO_LAST_TRANSACTION)
                                     + " "
                                     + recurringTransactionService.getLastTransactionDate(
                                             startDate, endDate, frequency);
@@ -176,12 +176,12 @@ public abstract class BaseRecurringTransactionManagement {
             } else {
                 msg =
                         preferencesService.translate(
-                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
+                                        TranslationKeys.WALLETTRANSACTION_INFO_STARTS_ON)
                                 + " "
                                 + startDate
                                 + ", "
                                 + preferencesService.translate(
-                                        Constants.TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
+                                        TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
                                 + " "
                                 + UIUtils.translateRecurringTransactionFrequency(
                                         frequency, preferencesService);
@@ -211,8 +211,7 @@ public abstract class BaseRecurringTransactionManagement {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY_RECURRING));
+                            TranslationKeys.WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY_RECURRING));
         }
     }
 

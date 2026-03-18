@@ -18,6 +18,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
@@ -77,8 +78,7 @@ public class ManageCategoryController {
     private void handleCreate() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CATEGORY_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.CATEGORY_DIALOG_ADD_CATEGORY_TITLE),
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_ADD_CATEGORY_TITLE),
                 springContext,
                 (AddCategoryController controller) -> {},
                 List.of(
@@ -95,17 +95,15 @@ public class ManageCategoryController {
         if (selectedCategory == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CATEGORY_DIALOG_NO_CATEGORY_SELECTED_TITLE),
+                            TranslationKeys.CATEGORY_DIALOG_NO_CATEGORY_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CATEGORY_DIALOG_NO_CATEGORY_SELECTED_EDIT_MESSAGE));
+                            TranslationKeys.CATEGORY_DIALOG_NO_CATEGORY_SELECTED_EDIT_MESSAGE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.EDIT_CATEGORY_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.CATEGORY_DIALOG_EDIT_CATEGORY_TITLE),
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_EDIT_CATEGORY_TITLE),
                 springContext,
                 (EditCategoryController controller) -> controller.setCategory(selectedCategory),
                 List.of(
@@ -122,10 +120,9 @@ public class ManageCategoryController {
         if (selectedCategory == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CATEGORY_DIALOG_NO_CATEGORY_SELECTED_TITLE),
+                            TranslationKeys.CATEGORY_DIALOG_NO_CATEGORY_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CATEGORY_DIALOG_NO_CATEGORY_SELECTED_REMOVE_MESSAGE));
+                            TranslationKeys.CATEGORY_DIALOG_NO_CATEGORY_SELECTED_REMOVE_MESSAGE));
             return;
         }
 
@@ -133,21 +130,18 @@ public class ManageCategoryController {
         if (categoryService.getTransactionCountByCategory(selectedCategory.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CATEGORY_DIALOG_CATEGORY_HAS_TRANSACTIONS_TITLE),
+                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_HAS_TRANSACTIONS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CATEGORY_DIALOG_CATEGORY_HAS_TRANSACTIONS_MESSAGE));
+                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
-                preferencesService.translate(
-                                Constants.TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE)
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE)
                         + " "
                         + selectedCategory.getName(),
                 preferencesService.translate(
-                        Constants.TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_MESSAGE))) {
+                        TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_MESSAGE))) {
             try {
                 categoryService.deleteCategory(selectedCategory.getId());
 
@@ -156,8 +150,7 @@ public class ManageCategoryController {
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CATEGORY_DIALOG_ERROR_REMOVING_CATEGORY_TITLE),
+                                TranslationKeys.CATEGORY_DIALOG_ERROR_REMOVING_CATEGORY_TITLE),
                         e.getMessage());
             }
         }
@@ -207,8 +200,7 @@ public class ManageCategoryController {
 
         TableColumn<Category, String> categoryColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CATEGORY_TABLE_CATEGORY));
+                        preferencesService.translate(TranslationKeys.CATEGORY_TABLE_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
@@ -225,16 +217,15 @@ public class ManageCategoryController {
     private TableColumn<Category, String> getCategoryStringTableColumn() {
         TableColumn<Category, String> archivedColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CATEGORY_TABLE_ARCHIVED));
+                        preferencesService.translate(TranslationKeys.CATEGORY_TABLE_ARCHIVED));
         archivedColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
                                 param.getValue().isArchived()
                                         ? preferencesService.translate(
-                                                Constants.TranslationKeys.CATEGORY_TABLE_YES)
+                                                TranslationKeys.CATEGORY_TABLE_YES)
                                         : preferencesService.translate(
-                                                Constants.TranslationKeys.CATEGORY_TABLE_NO)));
+                                                TranslationKeys.CATEGORY_TABLE_NO)));
 
         archivedColumn.setCellFactory(
                 column ->
@@ -258,7 +249,7 @@ public class ManageCategoryController {
         TableColumn<Category, Integer> numOfTransactionsColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CATEGORY_TABLE_ASSOCIATED_TRANSACTIONS));
+                                TranslationKeys.CATEGORY_TABLE_ASSOCIATED_TRANSACTIONS));
         numOfTransactionsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(
@@ -286,8 +277,7 @@ public class ManageCategoryController {
     private TableColumn<Category, Integer> getCategoryLongTableColumn() {
         TableColumn<Category, Integer> idColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
+                        preferencesService.translate(TranslationKeys.WALLETTRANSACTION_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(

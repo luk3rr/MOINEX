@@ -29,6 +29,7 @@ import kotlinx.coroutines.Dispatchers;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
 import org.moinex.config.RetryConfig;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.PeriodType;
 import org.moinex.model.investment.FundamentalAnalysis;
 import org.moinex.model.investment.Ticker;
@@ -149,8 +150,7 @@ public class FundamentalAnalysisController {
                                                             .getText()
                                                             .equals(
                                                                     preferencesService.translate(
-                                                                            Constants
-                                                                                    .TranslationKeys
+                                                                            TranslationKeys
                                                                                     .FUNDAMENTAL_ANALYSIS_LAST_UPDATE)));
 
                     // Get all analyses for this ticker
@@ -250,7 +250,7 @@ public class FundamentalAnalysisController {
                     String errorMessage = exception.getMessage();
                     String title =
                             preferencesService.translate(
-                                    Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE);
+                                    TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE);
 
                     // Check if it's a network/API error
                     if (errorMessage != null
@@ -260,20 +260,19 @@ public class FundamentalAnalysisController {
                                     || errorMessage.contains("API error after"))) {
                         title =
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
+                                        TranslationKeys
                                                 .FUNDAMENTAL_ANALYSIS_ERROR_CONNECTION_TITLE);
                         errorMessage =
                                 MessageFormat.format(
                                         preferencesService.translate(
-                                                Constants.TranslationKeys
+                                                TranslationKeys
                                                         .FUNDAMENTAL_ANALYSIS_ERROR_CONNECTION_MESSAGE),
                                         RetryConfig.Companion.getFUNDAMENTAL_ANALYSIS()
                                                 .getMaxRetries());
                     } else {
                         errorMessage =
                                 preferencesService.translate(
-                                                Constants.TranslationKeys
-                                                        .FUNDAMENTAL_ANALYSIS_ERROR_TITLE)
+                                                TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE)
                                         + ":\n\n"
                                         + errorMessage;
                     }
@@ -317,9 +316,8 @@ public class FundamentalAnalysisController {
         } catch (Exception e) {
             logger.error("Error parsing analysis JSON", e);
             WindowUtils.showErrorDialog(
-                    preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
-                    preferencesService.translate(
-                                    Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE)
+                    preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
+                    preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE)
                             + ": "
                             + e.getMessage());
         }
@@ -370,7 +368,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_PROFITABILITY));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_PROFITABILITY));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -380,40 +378,38 @@ public class FundamentalAnalysisController {
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE),
                         profitability,
                         "roe"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROE_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC),
                         profitability,
                         "roic"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ROIC_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN),
                         profitability,
                         "net_margin"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_MARGIN_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN),
                         profitability,
                         "ebitda_margin"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_MARGIN_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -428,7 +424,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_VALUATION));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_VALUATION));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -438,154 +434,137 @@ public class FundamentalAnalysisController {
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
                         valuation,
                         "current_price"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP),
                         valuation,
                         "market_cap"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARKET_CAP_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE),
                         valuation,
                         "enterprise_value"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ENTERPRISE_VALUE_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EPS),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EPS),
                         valuation,
                         "eps"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EPS_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EPS_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO),
                         valuation,
                         "pe_ratio"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PE_RATIO_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO),
                         valuation,
                         "peg_ratio"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PEG_RATIO_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA),
                         valuation,
                         "ev_to_ebitda"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EV_EBITDA_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD),
                         valuation,
                         "earnings_yield"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EARNINGS_YIELD_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD),
                         valuation,
                         "fcf_yield"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_YIELD_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD),
                         valuation,
                         "dividend_yield"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_YIELD_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE),
                         valuation,
                         "dividend_rate"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DIVIDEND_RATE_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO),
                         valuation,
                         "payout_ratio"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_PAYOUT_RATIO_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER),
                         valuation,
                         "graham_number"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_NUMBER_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE),
                         valuation,
                         "graham_fair_value"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_GRAHAM_FAIR_VALUE_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY),
                         valuation,
                         "margin_of_safety"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_MARGIN_OF_SAFETY_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -600,7 +579,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_GROWTH));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_GROWTH));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -613,23 +592,22 @@ public class FundamentalAnalysisController {
                     addMetricToContainer(
                             content,
                             preferencesService.translate(
-                                    Constants.TranslationKeys
-                                            .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY),
+                                    TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY),
                             revenueGrowth,
                             "yoy_growth"),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YOY_TOOLTIP));
             UIUtils.addTooltipToNode(
                     addMetricToContainer(
                             content,
                             preferencesService.translate(
-                                    Constants.TranslationKeys
+                                    TranslationKeys
                                             .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR),
                             revenueGrowth,
                             "cagr"),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_CAGR_TOOLTIP));
 
             if (revenueGrowth.has("years")) {
@@ -642,12 +620,12 @@ public class FundamentalAnalysisController {
                         addMetricToContainer(
                                 content,
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
+                                        TranslationKeys
                                                 .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS),
                                 yearsMetric,
                                 "value"),
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS_TOOLTIP));
             }
         }
@@ -665,7 +643,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_DEBT));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_DEBT));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -675,42 +653,38 @@ public class FundamentalAnalysisController {
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT),
                         debt,
                         "total_debt"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_TOTAL_DEBT_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT),
                         debt,
                         "net_debt"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA),
                         debt,
                         "net_debt_to_ebitda"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_NET_DEBT_EBITDA_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO),
                         debt,
                         "current_ratio"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_RATIO_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -725,7 +699,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_EFFICIENCY));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_EFFICIENCY));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -735,22 +709,20 @@ public class FundamentalAnalysisController {
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER),
                         efficiency,
                         "asset_turnover"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_ASSET_TURNOVER_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA),
                         efficiency,
                         "ebitda"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_EBITDA_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -765,8 +737,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_TAB_CASH_GENERATION));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_CASH_GENERATION));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -776,44 +747,38 @@ public class FundamentalAnalysisController {
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW),
                         cashGeneration,
                         "free_cash_flow"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FREE_CASH_FLOW_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW),
                         cashGeneration,
                         "operating_cash_flow"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_OPERATING_CASH_FLOW_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX),
                         cashGeneration,
                         "capex"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CAPEX_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME),
                         cashGeneration,
                         "fcf_to_net_income"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_FCF_NET_INCOME_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);
@@ -828,8 +793,7 @@ public class FundamentalAnalysisController {
         Tab tab =
                 new Tab(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_TAB_PRICE_PERFORMANCE));
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_TAB_PRICE_PERFORMANCE));
         tab.setClosable(false);
 
         FlowPane content = new FlowPane(15, 15);
@@ -839,134 +803,128 @@ public class FundamentalAnalysisController {
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE),
                         pricePerformance,
                         "current_price"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CURRENT_PRICE_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH),
                         pricePerformance,
                         "day_high"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_HIGH_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW),
                         pricePerformance,
                         "day_low"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DAY_LOW_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D),
                         pricePerformance,
                         "change_1d"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1D_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D),
                         pricePerformance,
                         "change_5d"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_5D_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M),
                         pricePerformance,
                         "change_1m"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1M_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M),
                         pricePerformance,
                         "change_3m"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_3M_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M),
                         pricePerformance,
                         "change_6m"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_6M_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y),
                         pricePerformance,
                         "change_52w"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_1Y_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD),
                         pricePerformance,
                         "change_ytd"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_CHANGE_YTD_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH),
                         pricePerformance,
                         "week_52_high"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_HIGH_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW),
                         pricePerformance,
                         "week_52_low"),
                 preferencesService.translate(
-                        Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_52W_LOW_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH),
                         pricePerformance,
                         "distance_from_52w_high"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_HIGH_TOOLTIP));
         UIUtils.addTooltipToNode(
                 addMetricToContainer(
                         content,
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW),
+                                TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW),
                         pricePerformance,
                         "distance_from_52w_low"),
                 preferencesService.translate(
-                        Constants.TranslationKeys
-                                .FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW_TOOLTIP));
+                        TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_DISTANCE_52W_LOW_TOOLTIP));
 
         ScrollPane scrollPane = new ScrollPane(content);
         scrollPane.setFitToWidth(true);

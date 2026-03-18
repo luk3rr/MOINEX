@@ -22,6 +22,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
 import org.moinex.chart.ChartFactory;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.PreferencesService;
@@ -179,20 +180,17 @@ public class GoalFullPaneController {
         if (goal.isArchived()) {
             // Set the button text according to the goal status
             toggleArchiveGoal.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_UNARCHIVE_GOAL));
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_UNARCHIVE_GOAL));
         }
 
         if (goal.isCompleted()) {
             dateTitleLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_COMPLETION_DATE));
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_COMPLETION_DATE));
             goalTargetDate.setText(
                     UIUtils.formatDateForDisplay(goal.getCompletionDate(), preferencesService));
 
             daysTitleLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_MISSING_DAYS));
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_MISSING_DAYS));
             missingDays.setText(
                     String.valueOf(
                             Constants.calculateDaysUntilTarget(
@@ -206,8 +204,7 @@ public class GoalFullPaneController {
 
             // Set the button text according to the goal status
             toggleCompleteGoal.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_UNCOMPLETE_GOAL));
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_UNCOMPLETE_GOAL));
         } else {
             // Show the current amount
             goalCurrentAmount.setText(UIUtils.formatCurrency(goal.getBalance()));
@@ -268,18 +265,15 @@ public class GoalFullPaneController {
     private void handleAddIncome() {
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_INCOME));
+                            TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_INCOME));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_INCOME_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.COMMON_GOAL_MODAL_ADD_INCOME),
+                preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_ADD_INCOME),
                 springContext,
                 (AddIncomeController controller) -> controller.setWalletComboBox(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -289,18 +283,15 @@ public class GoalFullPaneController {
     private void handleAddExpense() {
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_EXPENSE));
+                            TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_EXPENSE));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_EXPENSE_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.COMMON_GOAL_MODAL_ADD_EXPENSE),
+                preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_ADD_EXPENSE),
                 springContext,
                 (AddExpenseController controller) -> controller.setWalletComboBox(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -310,18 +301,15 @@ public class GoalFullPaneController {
     private void handleAddTransfer() {
         if (goal.isArchived()) {
             WindowUtils.showInformationDialog(
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_TRANSFER));
+                            TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVED_CANNOT_ADD_TRANSFER));
             return;
         }
 
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.COMMON_GOAL_MODAL_ADD_TRANSFER),
+                preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_ADD_TRANSFER),
                 springContext,
                 (AddTransferController controller) -> controller.setReceiverWalletComboBox(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -331,7 +319,7 @@ public class GoalFullPaneController {
     private void handleEditGoal() {
         WindowUtils.openModalWindow(
                 Constants.EDIT_GOAL_FXML,
-                preferencesService.translate(Constants.TranslationKeys.COMMON_GOAL_MODAL_EDIT_GOAL),
+                preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_EDIT_GOAL),
                 springContext,
                 (EditGoalController controller) -> controller.setGoal(goal),
                 List.of(() -> goalController.updateDisplay()));
@@ -343,10 +331,9 @@ public class GoalFullPaneController {
             if (WindowUtils.showConfirmationDialog(
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_REOPEN_TITLE),
+                                    TranslationKeys.COMMON_GOAL_DIALOG_REOPEN_TITLE),
                             goal.getName()),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_REOPEN_MESSAGE),
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_REOPEN_MESSAGE),
                     preferencesService.getBundle())) {
                 goalService.reopenGoal(goal.getId());
 
@@ -357,17 +344,17 @@ public class GoalFullPaneController {
             if (WindowUtils.showConfirmationDialog(
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_TITLE),
+                                    TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_TITLE),
                             goal.getName()),
                     preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_MESSAGE),
+                            TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_MESSAGE),
                     preferencesService.getBundle())) {
                 try {
                     goalService.completeGoal(goal.getId());
                 } catch (EntityNotFoundException | MoinexException.IncompleteGoalException e) {
                     WindowUtils.showErrorDialog(
                             preferencesService.translate(
-                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_ERROR),
+                                    TranslationKeys.COMMON_GOAL_DIALOG_COMPLETE_ERROR),
                             e.getMessage());
                     return;
                 }
@@ -384,10 +371,10 @@ public class GoalFullPaneController {
             if (WindowUtils.showConfirmationDialog(
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_UNARCHIVE_TITLE),
+                                    TranslationKeys.COMMON_GOAL_DIALOG_UNARCHIVE_TITLE),
                             goal.getName()),
                     preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_UNARCHIVE_MESSAGE),
+                            TranslationKeys.COMMON_GOAL_DIALOG_UNARCHIVE_MESSAGE),
                     preferencesService.getBundle())) {
                 goalService.unarchiveGoal(goal.getId());
 
@@ -398,10 +385,10 @@ public class GoalFullPaneController {
             if (WindowUtils.showConfirmationDialog(
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVE_TITLE),
+                                    TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVE_TITLE),
                             goal.getName()),
                     preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVE_MESSAGE),
+                            TranslationKeys.COMMON_GOAL_DIALOG_ARCHIVE_MESSAGE),
                     preferencesService.getBundle())) {
                 goalService.archiveGoal(goal.getId());
 
@@ -417,11 +404,9 @@ public class GoalFullPaneController {
         if (walletService.getWalletTransactionAndTransferCountByWallet(goal.getId()) > 0) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE),
+                            TranslationKeys.COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE));
+                            TranslationKeys.COMMON_GOAL_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE));
             return;
         }
 
@@ -431,27 +416,23 @@ public class GoalFullPaneController {
                         "{0}\n{1}\n{2}\n{3}\n{4}",
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_NAME),
+                                        TranslationKeys.COMMON_GOAL_DIALOG_DELETE_NAME),
                                 goal.getName()),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .COMMON_GOAL_DIALOG_DELETE_INITIAL_AMOUNT),
+                                        TranslationKeys.COMMON_GOAL_DIALOG_DELETE_INITIAL_AMOUNT),
                                 UIUtils.formatCurrency(goal.getInitialBalance())),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .COMMON_GOAL_DIALOG_DELETE_CURRENT_AMOUNT),
+                                        TranslationKeys.COMMON_GOAL_DIALOG_DELETE_CURRENT_AMOUNT),
                                 UIUtils.formatCurrency(goal.getBalance())),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .COMMON_GOAL_DIALOG_DELETE_TARGET_AMOUNT),
+                                        TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TARGET_AMOUNT),
                                 UIUtils.formatCurrency(goal.getTargetBalance())),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .COMMON_GOAL_DIALOG_DELETE_TARGET_DATE),
+                                        TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TARGET_DATE),
                                 UIUtils.formatDateForDisplay(
                                         goal.getTargetDate(), preferencesService)));
 
@@ -463,7 +444,7 @@ public class GoalFullPaneController {
                     "\n"
                             + MessageFormat.format(
                                     preferencesService.translate(
-                                            Constants.TranslationKeys
+                                            TranslationKeys
                                                     .COMMON_GOAL_DIALOG_DELETE_VIRTUAL_WALLETS),
                                     totalOfAssociatedVirtualWallets)
                             + "\n";
@@ -474,8 +455,7 @@ public class GoalFullPaneController {
         try {
             // Confirm the deletion
             if (WindowUtils.showConfirmationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TITLE),
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_DELETE_TITLE),
                     message,
                     preferencesService.getBundle())) {
                 goalService.deleteGoal(goal.getId());
@@ -485,8 +465,7 @@ public class GoalFullPaneController {
             }
         } catch (EntityNotFoundException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_GOAL_DIALOG_DELETE_ERROR),
+                    preferencesService.translate(TranslationKeys.COMMON_GOAL_DIALOG_DELETE_ERROR),
                     e.getMessage());
         }
     }

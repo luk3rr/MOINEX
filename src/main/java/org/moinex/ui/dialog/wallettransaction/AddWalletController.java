@@ -14,6 +14,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.model.wallettransaction.WalletType;
 import org.moinex.service.PreferencesService;
@@ -87,10 +88,9 @@ public class AddWalletController {
         if (walletName.isEmpty() || walletType == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -103,27 +103,22 @@ public class AddWalletController {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_WALLET_CREATED_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_WALLET_CREATED_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_CREATED_MESSAGE));
 
             Stage stage = (Stage) walletNameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_BALANCE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_ERROR_CREATING_WALLET_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_CREATING_WALLET_TITLE),
                     e.getMessage());
         }
     }

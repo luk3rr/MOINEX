@@ -13,6 +13,7 @@ import java.time.YearMonth;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
@@ -21,7 +22,6 @@ import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.creditcard.CreditCardService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -64,9 +64,9 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
                 || invoiceYear == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -91,24 +91,24 @@ public final class AddCreditCardDebtController extends BaseCreditCardDebtManagem
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_MESSAGE));
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
         } catch (EntityNotFoundException
                 | IllegalArgumentException
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
                     e.getMessage());
         }
     }

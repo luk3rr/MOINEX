@@ -12,10 +12,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,11 +51,10 @@ public class AddCategoryController {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
+                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys
-                                            .CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE),
+                                    TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE),
                             name));
 
             Stage stage = (Stage) categoryNameField.getScene().getWindow();
@@ -63,7 +62,7 @@ public class AddCategoryController {
         } catch (IllegalArgumentException | EntityExistsException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CATEGORY_DIALOG_ERROR_ADDING_CATEGORY_TITLE),
+                            TranslationKeys.CATEGORY_DIALOG_ERROR_ADDING_CATEGORY_TITLE),
                     e.getMessage());
         }
     }

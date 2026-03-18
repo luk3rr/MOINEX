@@ -26,6 +26,7 @@ import javafx.scene.text.Text
 import javafx.util.Callback
 import javafx.util.StringConverter
 import org.moinex.common.extension.isValidForFundamentalAnalysis
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Dividend
 import org.moinex.model.investment.Ticker
@@ -112,7 +113,7 @@ class SavingsStocksFundsController(
     fun handleRegisterTicker() {
         WindowUtils.openModalWindow(
             Constants.ADD_TICKER_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_TICKER_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_TICKER_TITLE),
             springContext,
             { _: AddTickerController -> },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -125,15 +126,15 @@ class SavingsStocksFundsController(
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_BUY_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_BUY_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.BUY_TICKER_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_BUY_TICKER_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_BUY_TICKER_TITLE),
             springContext,
             { controller: AddTickerPurchaseController -> controller.setTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -146,15 +147,15 @@ class SavingsStocksFundsController(
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_SELL_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_SELL_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.SALE_TICKER_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_SELL_TICKER_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_SELL_TICKER_TITLE),
             springContext,
             { controller: AddTickerSaleController -> controller.setTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -167,15 +168,15 @@ class SavingsStocksFundsController(
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_ADD_DIVIDEND_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_ADD_DIVIDEND_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.ADD_DIVIDEND_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_DIVIDEND_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_DIVIDEND_TITLE),
             springContext,
             { controller: AddDividendController -> controller.setTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -188,7 +189,7 @@ class SavingsStocksFundsController(
 
         WindowUtils.openModalWindow(
             Constants.ADD_CRYPTO_EXCHANGE_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_CRYPTO_EXCHANGE_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_CRYPTO_EXCHANGE_TITLE),
             springContext,
             { controller: AddCryptoExchangeController ->
                 selectedTicker?.let { controller.setFromCryptoComboBox(it) }
@@ -201,7 +202,7 @@ class SavingsStocksFundsController(
     fun handleOpenTickerArchive() {
         WindowUtils.openModalWindow(
             Constants.ARCHIVED_TICKERS_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_TICKER_ARCHIVE_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_TICKER_ARCHIVE_TITLE),
             springContext,
             { _: ArchivedTickersController -> },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -212,7 +213,7 @@ class SavingsStocksFundsController(
     fun handleShowTransactions() {
         WindowUtils.openModalWindow(
             Constants.INVESTMENT_TRANSACTIONS_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_INVESTMENT_TRANSACTIONS_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_INVESTMENT_TRANSACTIONS_TITLE),
             springContext,
             { _: InvestmentTransactionsController -> },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -236,10 +237,10 @@ class SavingsStocksFundsController(
                             failed.isEmpty() -> {
                                 WindowUtils.showSuccessDialog(
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE,
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE,
                                     ),
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE,
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE,
                                     ),
                                 )
                             }
@@ -247,10 +248,10 @@ class SavingsStocksFundsController(
                             failed.size == stocksFundsTabTickerTable.items.size -> {
                                 WindowUtils.showInformationDialog(
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
                                     ),
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED,
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED,
                                     ),
                                 )
                             }
@@ -259,17 +260,17 @@ class SavingsStocksFundsController(
                                 val failedSymbols = failed.joinToString(", ") { it.symbol }
                                 WindowUtils.showInformationDialog(
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
                                     ),
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED,
+                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED,
                                     ) + "\n$failedSymbols",
                                 )
                             }
                         }
                     }.onFailure { e ->
                         WindowUtils.showErrorDialog(
-                            preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                            preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                             e.message ?: "",
                         )
                     }
@@ -286,15 +287,15 @@ class SavingsStocksFundsController(
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_EDIT_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_EDIT_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.EDIT_TICKER_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_EDIT_TICKER_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_EDIT_TICKER_TITLE),
             springContext,
             { controller: EditTickerController -> controller.setTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
@@ -307,16 +308,16 @@ class SavingsStocksFundsController(
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_MESSAGE),
             )
             return
         }
 
         if (!selectedTicker.isValidForFundamentalAnalysis()) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_MESSAGE),
+                preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_TITLE),
+                preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_INVALID_TICKER_TYPE_MESSAGE),
             )
             return
         }
@@ -324,7 +325,7 @@ class SavingsStocksFundsController(
         WindowUtils.openModalWindow(
             Constants.FUNDAMENTAL_ANALYSIS_FXML,
             MessageFormat.format(
-                preferencesService.translate(Constants.TranslationKeys.FUNDAMENTAL_ANALYSIS_DIALOG_TITLE),
+                preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_DIALOG_TITLE),
                 selectedTicker.symbol,
             ),
             springContext,
@@ -342,23 +343,23 @@ class SavingsStocksFundsController(
 
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_DELETE_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_DELETE_MESSAGE),
             )
             return
         }
 
         if (tickerService.getTransactionCountByTicker(selectedTicker.id!!) > 0) {
             WindowUtils.showErrorDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_HAS_TRANSACTIONS_MESSAGE),
             )
             return
         }
 
         val confirmed =
             WindowUtils.showConfirmationDialog(
-                "${preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE)} " +
+                "${preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE)} " +
                     "${selectedTicker.name} (${selectedTicker.symbol})",
                 "",
                 preferencesService.getBundle(),
@@ -372,7 +373,7 @@ class SavingsStocksFundsController(
                 when (e) {
                     is EntityNotFoundException, is IllegalStateException -> {
                         WindowUtils.showErrorDialog(
-                            preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                            preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                             e.message ?: "",
                         )
                     }
@@ -485,10 +486,10 @@ class SavingsStocksFundsController(
                 override fun toString(tickerType: AssetType?): String =
                     tickerType?.let {
                         UIUtils.translateAssetType(it, preferencesService)
-                    } ?: preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
+                    } ?: preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
 
                 override fun fromString(string: String): AssetType? =
-                    if (string == preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)) {
+                    if (string == preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)) {
                         null
                     } else {
                         AssetType.valueOf(string)
@@ -506,31 +507,31 @@ class SavingsStocksFundsController(
             createIdColumn(),
             createLogoColumn(),
             createStringColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_NAME,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_NAME,
                 Pos.CENTER_LEFT,
             ) { it.name },
             createStringColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_SYMBOL,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_SYMBOL,
                 Pos.CENTER_LEFT,
             ) { it.symbol },
             createStringColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TYPE,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TYPE,
                 Pos.CENTER_LEFT,
             ) { UIUtils.translateAssetType(it.type, preferencesService) },
             createObjectColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED,
                 Pos.CENTER_LEFT,
             ) { it.currentQuantity },
             createStringColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_UNIT_PRICE,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_UNIT_PRICE,
                 Pos.CENTER_LEFT,
             ) { UIUtils.formatCurrencyDynamic(it.currentUnitValue) },
             createStringColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TOTAL_VALUE,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TOTAL_VALUE,
                 Pos.CENTER_LEFT,
             ) { UIUtils.formatCurrencyDynamic(it.currentQuantity.multiply(it.currentUnitValue)) },
             createStringColumn(
-                Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE,
+                TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE,
                 Pos.CENTER_LEFT,
             ) { UIUtils.formatCurrencyDynamic(it.averageUnitValue) },
         )
@@ -540,7 +541,7 @@ class SavingsStocksFundsController(
 
     private fun createIdColumn(): TableColumn<Ticker, Int> =
         TableColumn<Ticker, Int>(
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID),
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.id) }
             cellFactory = createCenteredCellFactory(Pos.CENTER)
@@ -612,7 +613,7 @@ class SavingsStocksFundsController(
             )
         updatePortfolioPricesButton.isDisable = true
         updatePortfolioPricesButton.text =
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATING)
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATING)
 
         isUpdatingPortfolioPrices = true
     }
@@ -624,7 +625,7 @@ class SavingsStocksFundsController(
                 javaClass.getResource(Constants.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)!!.toExternalForm(),
             )
         updatePortfolioPricesButton.text =
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES)
+            preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES)
 
         isUpdatingPortfolioPrices = false
     }

@@ -17,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.AssetType;
 import org.moinex.model.investment.InvestmentTarget;
 import org.moinex.service.PreferencesService;
@@ -137,8 +138,7 @@ public class EditInvestmentTargetController {
             } else if (validationResult.getTotal().compareTo(new BigDecimal("100")) != 0) {
                 validationLabel.setText(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION));
+                                TranslationKeys.INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION));
             }
             validationLabel.setVisible(true);
         }
@@ -156,11 +156,9 @@ public class EditInvestmentTargetController {
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_INVALID_PERCENTAGE_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_INVALID_PERCENTAGE_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_INVALID_PERCENTAGE_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_INVALID_PERCENTAGE_MESSAGE));
                 return;
             }
         }
@@ -170,22 +168,20 @@ public class EditInvestmentTargetController {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE));
 
             targetsContainer.getScene().getWindow().hide();
         } catch (IllegalStateException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION_TITLE),
                     e.getMessage());
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_ERROR_UPDATING_TARGET_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_UPDATING_TARGET_TITLE),
                     e.getMessage());
         }
     }

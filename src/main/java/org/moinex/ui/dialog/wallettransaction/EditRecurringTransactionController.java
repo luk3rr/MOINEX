@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.RecurringTransactionFrequency;
 import org.moinex.model.enums.RecurringTransactionStatus;
@@ -109,10 +110,9 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                 || frequency == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -145,11 +145,9 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
                     && rt.getIncludeInNetWorth() == includeInNetWorthCheckBox.isSelected()) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE));
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_MESSAGE));
             } else // If there is any modification, update the transaction
             {
                 rt.setWallet(wallet);
@@ -178,10 +176,10 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_MESSAGE));
             }
 
@@ -190,16 +188,14 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_RECURRING_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_ERROR_EDITING_RECURRING_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_EDITING_RECURRING_TITLE),
                     e.getMessage());
         }
     }
@@ -209,7 +205,7 @@ public final class EditRecurringTransactionController extends BaseRecurringTrans
         if (!activeCheckBox.isSelected()) {
             infoLabel.setText(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_INFO_RECURRING_INACTIVE));
+                            TranslationKeys.WALLETTRANSACTION_INFO_RECURRING_INACTIVE));
         } else {
             super.updateInfoLabel();
         }

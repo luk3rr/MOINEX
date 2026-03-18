@@ -14,6 +14,7 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.shape.Line
 import javafx.util.StringConverter
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.service.PreferencesService
 import org.moinex.util.Constants
@@ -69,9 +70,9 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
         val netWorthSeries = Series<String, Number>()
 
         preferencesService?.let { prefs ->
-            assetsSeries.name = prefs.translate(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS)
-            liabilitiesSeries.name = prefs.translate(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES)
-            netWorthSeries.name = prefs.translate(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH)
+            assetsSeries.name = prefs.translate(TranslationKeys.HOME_NET_WORTH_ASSETS)
+            liabilitiesSeries.name = prefs.translate(TranslationKeys.HOME_NET_WORTH_LIABILITIES)
+            netWorthSeries.name = prefs.translate(TranslationKeys.HOME_NET_WORTH_NET_WORTH)
         }
 
         dataPoints.forEach { dataPoint ->
@@ -146,9 +147,9 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
 
     private fun createTooltipText(dataPoint: NetWorthDataPointDTO): String {
         val prefs = preferencesService!!
-        val assetsLabel = prefs.translate(Constants.TranslationKeys.HOME_NET_WORTH_ASSETS)
-        val liabilitiesLabel = prefs.translate(Constants.TranslationKeys.HOME_NET_WORTH_LIABILITIES)
-        val netWorthLabel = prefs.translate(Constants.TranslationKeys.HOME_NET_WORTH_NET_WORTH)
+        val assetsLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_ASSETS)
+        val liabilitiesLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_LIABILITIES)
+        val netWorthLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_NET_WORTH)
         val periodLabel = UIUtils.formatFullMonthYear(dataPoint.period, prefs)
 
         return """

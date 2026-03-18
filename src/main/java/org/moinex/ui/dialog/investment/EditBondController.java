@@ -17,6 +17,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.BondType;
 import org.moinex.model.enums.InterestIndex;
 import org.moinex.model.enums.InterestType;
@@ -99,10 +100,8 @@ public final class EditBondController {
 
         if (name == null || bondType == null || name.isBlank() || maturityDate == null) {
             WindowUtils.showInformationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -112,10 +111,9 @@ public final class EditBondController {
                 interestRate = new BigDecimal(interestRateStr);
             } catch (NumberFormatException e) {
                 WindowUtils.showErrorDialog(
-                        preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                        preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_MESSAGE));
                 return;
             }
         }
@@ -163,9 +161,8 @@ public final class EditBondController {
         if (!hasChanges) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_NO_CHANGES_MESSAGE));
             return;
         }
 
@@ -190,22 +187,19 @@ public final class EditBondController {
             }
 
             WindowUtils.showSuccessDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE));
 
             Stage stage = (Stage) saveButton.getScene().getWindow();
             stage.close();
 
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_ERROR_UPDATING_TITLE),
                     e.getMessage());
         } catch (Exception e) {
             WindowUtils.showErrorDialog(
-                    preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                    preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                     e.getMessage());
         }
     }

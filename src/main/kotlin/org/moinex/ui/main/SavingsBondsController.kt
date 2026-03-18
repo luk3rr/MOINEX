@@ -16,6 +16,7 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.text.Text
 import javafx.util.StringConverter
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.enums.BondType
 import org.moinex.model.investment.Bond
 import org.moinex.service.PreferencesService
@@ -82,7 +83,7 @@ class SavingsBondsController(
     fun handleRegisterBond() {
         WindowUtils.openModalWindow(
             Constants.ADD_BOND_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
             springContext,
             { _: AddBondController -> },
             listOf(
@@ -100,15 +101,15 @@ class SavingsBondsController(
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_EDIT_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.EDIT_BOND_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
             springContext,
             { controller: EditBondController -> controller.setBond(selectedBond) },
             listOf(
@@ -126,25 +127,25 @@ class SavingsBondsController(
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_DELETE_MESSAGE),
             )
             return
         }
 
         if (bondService.getOperationCountByBond(selectedBond.id!!) > 0) {
             WindowUtils.showErrorDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_HAS_OPERATIONS_MESSAGE),
             )
             return
         }
 
         val confirmed =
             WindowUtils.showConfirmationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_TITLE),
                 MessageFormat.format(
-                    preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE),
+                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_CONFIRM_DELETE_MESSAGE),
                     selectedBond.name,
                 ),
             )
@@ -154,8 +155,8 @@ class SavingsBondsController(
                 bondService.deleteBond(selectedBond.id!!)
 
                 WindowUtils.showSuccessDialog(
-                    preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE),
-                    preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE),
+                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE),
+                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE),
                 )
 
                 updateBondTableView()
@@ -164,9 +165,9 @@ class SavingsBondsController(
                 val message =
                     when (e) {
                         is IllegalStateException ->
-                            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_ERROR_DELETING_BOND_TITLE)
+                            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_ERROR_DELETING_BOND_TITLE)
 
-                        else -> preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE)
+                        else -> preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE)
                     }
                 WindowUtils.showErrorDialog(message, e.message ?: "")
             }
@@ -177,7 +178,7 @@ class SavingsBondsController(
     fun handleOpenBondArchive() {
         WindowUtils.openModalWindow(
             Constants.ARCHIVED_BONDS_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
             springContext,
             { _: ArchivedBondsController -> },
             listOf(
@@ -195,15 +196,15 @@ class SavingsBondsController(
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_BUY_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_BUY_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.BUY_BOND_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
             springContext,
             { controller: AddBondPurchaseController -> controller.setBond(selectedBond) },
             listOf(
@@ -221,15 +222,15 @@ class SavingsBondsController(
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_SELL_MESSAGE),
             )
             return
         }
 
         WindowUtils.openModalWindow(
             Constants.SALE_BOND_FXML,
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
+            preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
             springContext,
             { controller: AddBondSaleController -> controller.setBond(selectedBond) },
             listOf(
@@ -245,7 +246,7 @@ class SavingsBondsController(
     fun handleShowBondTransactions() {
         WindowUtils.openModalWindow(
             Constants.BOND_TRANSACTIONS_FXML,
-            preferencesService.translate(Constants.TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
+            preferencesService.translate(TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
             springContext,
             { _: BondTransactionsController -> },
             listOf(
@@ -263,8 +264,8 @@ class SavingsBondsController(
 
         if (selectedBond == null) {
             WindowUtils.showInformationDialog(
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(Constants.TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_HISTORY_MESSAGE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_NO_SELECTION_HISTORY_MESSAGE),
             )
             return
         }
@@ -272,7 +273,7 @@ class SavingsBondsController(
         WindowUtils.openModalWindow(
             Constants.BOND_INTEREST_HISTORY_FXML,
             MessageFormat.format(
-                preferencesService.translate(Constants.TranslationKeys.BOND_DIALOG_INTEREST_HISTORY_TITLE),
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_INTEREST_HISTORY_TITLE),
                 selectedBond.name,
             ),
             springContext,
@@ -289,25 +290,25 @@ class SavingsBondsController(
     private fun configureBondTableView() {
         bondsTabBondTable.columns.addAll(
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_NAME,
             ) { it.name },
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_SYMBOL,
             ) { it.symbol ?: "" },
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE,
             ) { UIUtils.translateBondType(it.type, preferencesService) },
             createColumn(
-                Constants.TranslationKeys.BOND_TABLE_QUANTITY,
+                TranslationKeys.BOND_TABLE_QUANTITY,
             ) { bondService.getCurrentQuantity(it).toString() },
             createColumn(
-                Constants.TranslationKeys.BOND_TABLE_UNIT_PRICE,
+                TranslationKeys.BOND_TABLE_UNIT_PRICE,
             ) { UIUtils.formatCurrency(bondService.getAverageUnitPrice(it)) },
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_INVESTED_VALUE,
             ) { UIUtils.formatCurrency(bondService.getTotalInvestedValue(it)) },
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_CURRENT_VALUE,
             ) {
                 UIUtils.formatCurrency(
                     bondService.getTotalInvestedValue(it).add(
@@ -316,20 +317,20 @@ class SavingsBondsController(
                 )
             },
             createColumn(
-                Constants.TranslationKeys.BOND_MATURITY_DATE,
+                TranslationKeys.BOND_MATURITY_DATE,
             ) { it.maturityDate?.let { date -> UIUtils.formatDateForDisplay(date, preferencesService) } ?: "-" },
             createColumn(
-                Constants.TranslationKeys.BOND_INTEREST_RATE,
+                TranslationKeys.BOND_INTEREST_RATE,
             ) { it.interestRate?.let { rate -> "$rate%" } ?: "-" },
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_CURRENT_MONTH_INTEREST,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_CURRENT_MONTH_INTEREST,
             ) {
                 UIUtils.formatCurrency(
                     currentMonthInterestCache.getOrDefault(it.id, BigDecimal.ZERO),
                 )
             },
             createColumn(
-                Constants.TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TOTAL_ACCUMULATED_INTEREST,
+                TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TOTAL_ACCUMULATED_INTEREST,
             ) {
                 UIUtils.formatCurrency(
                     totalAccumulatedInterestCache.getOrDefault(it.id, BigDecimal.ZERO),
@@ -412,7 +413,7 @@ class SavingsBondsController(
                 override fun toString(bondType: BondType?): String =
                     bondType?.let {
                         UIUtils.translateBondType(it, preferencesService)
-                    } ?: preferencesService.translate(Constants.TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
+                    } ?: preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
 
                 override fun fromString(string: String): BondType? = null
             }

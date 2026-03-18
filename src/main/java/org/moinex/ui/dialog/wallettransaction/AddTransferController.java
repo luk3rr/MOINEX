@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Transfer;
@@ -88,10 +89,9 @@ public class AddTransferController extends BaseTransferManagement {
                 || transferDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -113,21 +113,18 @@ public class AddTransferController extends BaseTransferManagement {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_MESSAGE));
 
             Stage stage = (Stage) descriptionField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_VALUE_MESSAGE));
         } catch (MoinexException.SameSourceDestinationException
                 | IllegalArgumentException
@@ -137,8 +134,7 @@ public class AddTransferController extends BaseTransferManagement {
                 | MoinexException.TransferFromMasterToVirtualWalletException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_ERROR_CREATING_TRANSFER_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_CREATING_TRANSFER_TITLE),
                     e.getMessage());
         }
     }
@@ -183,10 +179,10 @@ public class AddTransferController extends BaseTransferManagement {
                     // then an error is thrown... BUT be a buddy and show a message to the user :)
                     WindowUtils.showInformationDialog(
                             preferencesService.translate(
-                                    Constants.TranslationKeys
+                                    TranslationKeys
                                             .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_TITLE),
                             preferencesService.translate(
-                                    Constants.TranslationKeys
+                                    TranslationKeys
                                             .WALLETTRANSACTION_DIALOG_INVALID_TRANSFER_MESSAGE));
                     return;
                 }

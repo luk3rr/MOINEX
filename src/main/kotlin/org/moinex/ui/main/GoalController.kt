@@ -25,6 +25,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.layout.AnchorPane
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.goal.Goal
 import org.moinex.service.PreferencesService
 import org.moinex.service.goal.GoalService
@@ -114,7 +115,7 @@ class GoalController(
     private fun handleAddGoal() {
         WindowUtils.openModalWindow(
             Constants.ADD_GOAL_FXML,
-            preferencesService.translate(Constants.TranslationKeys.GOAL_DIALOG_ADD_GOAL_TITLE),
+            preferencesService.translate(TranslationKeys.GOAL_DIALOG_ADD_GOAL_TITLE),
             springContext,
             { _: AddGoalController -> },
             listOf(
@@ -135,10 +136,10 @@ class GoalController(
         if (goal == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_ADD_DEPOSIT_MESSAGE,
+                    TranslationKeys.GOAL_DIALOG_NO_SELECTION_ADD_DEPOSIT_MESSAGE,
                 ),
             )
             return
@@ -147,10 +148,10 @@ class GoalController(
         if (goal.isArchived) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_ARCHIVED_TITLE,
+                    TranslationKeys.GOAL_DIALOG_ARCHIVED_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_ARCHIVED_MESSAGE,
+                    TranslationKeys.GOAL_DIALOG_ARCHIVED_MESSAGE,
                 ),
             )
             return
@@ -159,7 +160,7 @@ class GoalController(
         WindowUtils.openModalWindow(
             Constants.ADD_TRANSFER_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.GOAL_DIALOG_ADD_TRANSFER_TITLE,
+                TranslationKeys.GOAL_DIALOG_ADD_TRANSFER_TITLE,
             ),
             springContext,
             { controller: AddTransferController -> controller.setReceiverWalletComboBox(goal) },
@@ -181,10 +182,10 @@ class GoalController(
         if (goal == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_EDIT_MESSAGE,
+                    TranslationKeys.GOAL_DIALOG_NO_SELECTION_EDIT_MESSAGE,
                 ),
             )
             return
@@ -192,7 +193,7 @@ class GoalController(
 
         WindowUtils.openModalWindow(
             Constants.EDIT_GOAL_FXML,
-            preferencesService.translate(Constants.TranslationKeys.GOAL_DIALOG_EDIT_GOAL_TITLE),
+            preferencesService.translate(TranslationKeys.GOAL_DIALOG_EDIT_GOAL_TITLE),
             springContext,
             { controller: EditGoalController -> controller.setGoal(goal) },
             listOf(
@@ -213,10 +214,10 @@ class GoalController(
         if (goal == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.GOAL_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_NO_SELECTION_DELETE_MESSAGE,
+                    TranslationKeys.GOAL_DIALOG_NO_SELECTION_DELETE_MESSAGE,
                 ),
             )
             return
@@ -225,10 +226,10 @@ class GoalController(
         if (walletService.getWalletTransactionAndTransferCountByWallet(goal.id!!) > 0) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_TITLE,
+                    TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_MESSAGE,
+                    TranslationKeys.GOAL_DIALOG_HAS_TRANSACTIONS_MESSAGE,
                 ),
             )
             return
@@ -239,7 +240,7 @@ class GoalController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_NAME,
+                            TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_NAME,
                         ),
                         goal.name,
                     ),
@@ -248,7 +249,7 @@ class GoalController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_INITIAL_AMOUNT,
+                            TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_INITIAL_AMOUNT,
                         ),
                         UIUtils.formatCurrency(goal.initialBalance),
                     ),
@@ -257,7 +258,7 @@ class GoalController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_CURRENT_AMOUNT,
+                            TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_CURRENT_AMOUNT,
                         ),
                         UIUtils.formatCurrency(goal.balance),
                     ),
@@ -266,7 +267,7 @@ class GoalController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_AMOUNT,
+                            TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_AMOUNT,
                         ),
                         UIUtils.formatCurrency(goal.targetBalance),
                     ),
@@ -275,7 +276,7 @@ class GoalController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE,
+                            TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE,
                         ),
                         UIUtils.formatDateForDisplay(goal.targetDate, preferencesService),
                     ),
@@ -287,7 +288,7 @@ class GoalController(
             if (
                 WindowUtils.showConfirmationDialog(
                     preferencesService.translate(
-                        Constants.TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TITLE,
+                        TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TITLE,
                     ),
                     message,
                     preferencesService.getBundle(),
@@ -302,7 +303,7 @@ class GoalController(
             }
         }.onFailure { e ->
             WindowUtils.showErrorDialog(
-                preferencesService.translate(Constants.TranslationKeys.DIALOG_ERROR_TITLE),
+                preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
                 e.message ?: "",
             )
         }
@@ -402,15 +403,15 @@ class GoalController(
     private fun filterGoalsByStatus(selectedGoalStatus: String): List<Goal> =
         goals.filter { goal ->
             when (selectedGoalStatus) {
-                preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ALL) -> true
+                preferencesService.translate(TranslationKeys.GOAL_FILTER_ALL) -> true
 
-                preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_COMPLETED) ->
+                preferencesService.translate(TranslationKeys.GOAL_FILTER_COMPLETED) ->
                     goal.isCompleted() && !goal.isArchived
 
-                preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ACTIVE) ->
+                preferencesService.translate(TranslationKeys.GOAL_FILTER_ACTIVE) ->
                     !goal.isCompleted() && !goal.isArchived
 
-                preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ARCHIVED) ->
+                preferencesService.translate(TranslationKeys.GOAL_FILTER_ARCHIVED) ->
                     goal.isArchived
 
                 else -> true
@@ -541,7 +542,7 @@ class GoalController(
                             Tooltip(
                                 MessageFormat.format(
                                     preferencesService.translate(
-                                        Constants.TranslationKeys.GOAL_TABLE_TOOLTIP_MOTIVATION,
+                                        TranslationKeys.GOAL_TABLE_TOOLTIP_MOTIVATION,
                                     ),
                                     it.motivation,
                                 ),
@@ -555,7 +556,7 @@ class GoalController(
 
     private fun createIdColumn(): TableColumn<Goal, Int> =
         TableColumn<Goal, Int>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_ID),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_ID),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.id) }
             setCellFactory {
@@ -579,27 +580,27 @@ class GoalController(
 
     private fun createNameColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_NAME),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_NAME),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.name) }
         }
 
     private fun createStatusColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_STATUS),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_STATUS),
         ).apply {
             setCellValueFactory { param ->
                 val goal = param.value
                 val status =
                     when {
                         goal.isArchived ->
-                            preferencesService.translate(Constants.TranslationKeys.GOAL_STATUS_ARCHIVED)
+                            preferencesService.translate(TranslationKeys.GOAL_STATUS_ARCHIVED)
 
                         goal.isCompleted() ->
-                            preferencesService.translate(Constants.TranslationKeys.GOAL_STATUS_COMPLETED)
+                            preferencesService.translate(TranslationKeys.GOAL_STATUS_COMPLETED)
 
                         else ->
-                            preferencesService.translate(Constants.TranslationKeys.GOAL_STATUS_ACTIVE)
+                            preferencesService.translate(TranslationKeys.GOAL_STATUS_ACTIVE)
                     }
                 SimpleObjectProperty(status)
             }
@@ -607,7 +608,7 @@ class GoalController(
 
     private fun createInitialAmountColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_INITIAL_AMOUNT),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_INITIAL_AMOUNT),
         ).apply {
             setCellValueFactory {
                 SimpleObjectProperty(UIUtils.formatCurrency(it.value.initialBalance))
@@ -616,7 +617,7 @@ class GoalController(
 
     private fun createCurrentAmountColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_CURRENT_AMOUNT),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_CURRENT_AMOUNT),
         ).apply {
             setCellValueFactory {
                 SimpleObjectProperty(UIUtils.formatCurrency(it.value.balance))
@@ -625,7 +626,7 @@ class GoalController(
 
     private fun createTargetAmountColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_TARGET_AMOUNT),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_TARGET_AMOUNT),
         ).apply {
             setCellValueFactory {
                 SimpleObjectProperty(UIUtils.formatCurrency(it.value.targetBalance))
@@ -634,7 +635,7 @@ class GoalController(
 
     private fun createProgressColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_PROGRESS),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_PROGRESS),
         ).apply {
             setCellValueFactory { param ->
                 if (param.value.isCompleted()) {
@@ -655,7 +656,7 @@ class GoalController(
 
     private fun createTargetDateColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_TARGET_DATE),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_TARGET_DATE),
         ).apply {
             setCellValueFactory {
                 SimpleStringProperty(
@@ -666,7 +667,7 @@ class GoalController(
 
     private fun createCompletionDateColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_COMPLETION_DATE),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_COMPLETION_DATE),
         ).apply {
             setCellValueFactory { param ->
                 if (param.value.isCompleted()) {
@@ -684,7 +685,7 @@ class GoalController(
 
     private fun createMonthsUntilTargetColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_TABLE_HEADER_MONTHS_UNTIL_TARGET),
+            preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_MONTHS_UNTIL_TARGET),
         ).apply {
             setCellValueFactory { param ->
                 if (param.value.isCompleted()) {
@@ -703,7 +704,7 @@ class GoalController(
     private fun createRecommendedMonthlyDepositColumn(): TableColumn<Goal, String> =
         TableColumn<Goal, String>(
             preferencesService.translate(
-                Constants.TranslationKeys.GOAL_TABLE_HEADER_RECOMMENDED_MONTHLY_DEPOSIT,
+                TranslationKeys.GOAL_TABLE_HEADER_RECOMMENDED_MONTHLY_DEPOSIT,
             ),
         ).apply {
             setCellValueFactory { param ->
@@ -736,10 +737,10 @@ class GoalController(
 
     private fun populateStatusComboBox() {
         statusComboBox.items.addAll(
-            preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ALL),
-            preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ACTIVE),
-            preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_COMPLETED),
-            preferencesService.translate(Constants.TranslationKeys.GOAL_FILTER_ARCHIVED),
+            preferencesService.translate(TranslationKeys.GOAL_FILTER_ALL),
+            preferencesService.translate(TranslationKeys.GOAL_FILTER_ACTIVE),
+            preferencesService.translate(TranslationKeys.GOAL_FILTER_COMPLETED),
+            preferencesService.translate(TranslationKeys.GOAL_FILTER_ARCHIVED),
         )
         statusComboBox.selectionModel.selectFirst()
     }

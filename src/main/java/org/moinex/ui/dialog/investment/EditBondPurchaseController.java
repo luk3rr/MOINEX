@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
@@ -22,7 +23,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.BondService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -98,10 +98,8 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                 || quantityStr.isBlank()
                 || buyDate == null) {
             WindowUtils.showInformationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -137,10 +135,9 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
                     && taxesEqual
                     && operation.getWalletTransaction().getDate().toLocalDate().equals(buyDate)) {
                 WindowUtils.showInformationDialog(
+                        preferencesService.translate(TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
-                        preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_PURCHASE_MESSAGE));
+                                TranslationKeys.BOND_DIALOG_NO_CHANGES_PURCHASE_MESSAGE));
             } else {
 
                 operation.setQuantity(quantity);
@@ -160,23 +157,22 @@ public final class EditBondPurchaseController extends BaseBondTransactionManagem
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_TITLE),
+                                TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_MESSAGE));
+                                TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) bondNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
+                            TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_PURCHASE_TITLE),
+                            TranslationKeys.BOND_DIALOG_ERROR_UPDATING_PURCHASE_TITLE),
                     e.getMessage());
         }
     }

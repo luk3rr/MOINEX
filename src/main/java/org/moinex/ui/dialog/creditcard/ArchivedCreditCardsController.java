@@ -19,10 +19,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.creditcard.CreditCardService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -76,29 +76,28 @@ public class ArchivedCreditCardsController {
         if (selectedCrc == null) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_UNARCHIVE));
+                            TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_UNARCHIVE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_UNARCHIVE_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_UNARCHIVE_TITLE),
                         selectedCrc.getName()),
                 preferencesService.translate(
-                        Constants.TranslationKeys.CREDITCARD_DIALOG_UNARCHIVE_MESSAGE))) {
+                        TranslationKeys.CREDITCARD_DIALOG_UNARCHIVE_MESSAGE))) {
             try {
                 creditCardService.unarchiveCreditCard(selectedCrc.getId());
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_TITLE),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .CREDITCARD_DIALOG_UNARCHIVED_MESSAGE),
+                                        TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_MESSAGE),
                                 selectedCrc.getName()));
 
                 // Remove this credit card from the list and update the table view
@@ -107,8 +106,7 @@ public class ArchivedCreditCardsController {
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CREDITCARD_DIALOG_ERROR_UNARCHIVING_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_ERROR_UNARCHIVING_TITLE),
                         e.getMessage());
             }
         }
@@ -121,39 +119,36 @@ public class ArchivedCreditCardsController {
         if (selectedCrc == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_DELETE));
+                            TranslationKeys.CREDITCARD_DIALOG_NO_SELECTION_DELETE));
             return;
         }
 
         // Prevent the removal of a credit card with associated transactions
         if (creditCardService.getDebtCountByCreditCard(selectedCrc.getId()) > 0) {
             WindowUtils.showErrorDialog(
+                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_HAS_DEBTS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_HAS_DEBTS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_HAS_DEBTS_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_HAS_DEBTS_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_DELETE_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_DELETE_TITLE),
                         selectedCrc.getName()),
-                preferencesService.translate(
-                        Constants.TranslationKeys.CREDITCARD_DIALOG_DELETE_MESSAGE))) {
+                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DELETE_MESSAGE))) {
             try {
                 creditCardService.deleteCreditCard(selectedCrc.getId());
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_DELETED_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_DELETED_TITLE),
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .CREDITCARD_DIALOG_DELETED_MESSAGE),
+                                        TranslationKeys.CREDITCARD_DIALOG_DELETED_MESSAGE),
                                 selectedCrc.getName()));
 
                 // Remove this credit card from the list and update the table view
@@ -162,7 +157,7 @@ public class ArchivedCreditCardsController {
             } catch (EntityNotFoundException | IllegalStateException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_DELETING_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_ERROR_DELETING_TITLE),
                         e.getMessage());
             }
         }
@@ -210,8 +205,7 @@ public class ArchivedCreditCardsController {
     private void configureTableView() {
         TableColumn<CreditCard, Integer> idColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_ID));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         idColumn.setCellFactory(
@@ -232,22 +226,20 @@ public class ArchivedCreditCardsController {
 
         TableColumn<CreditCard, String> crcColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_CREDIT_CARD));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_CREDIT_CARD));
         crcColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getName()));
 
         TableColumn<CreditCard, String> operatorColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_OPERATOR));
+                        preferencesService.translate(TranslationKeys.CREDITCARD_TABLE_OPERATOR));
         operatorColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getOperator().getName()));
 
         TableColumn<CreditCard, Integer> numOfDebtsColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_TABLE_ASSOCIATED_DEBTS));
+                                TranslationKeys.CREDITCARD_TABLE_ASSOCIATED_DEBTS));
         numOfDebtsColumn.setCellValueFactory(
                 param ->
                         new SimpleObjectProperty<>(

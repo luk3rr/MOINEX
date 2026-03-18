@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import javafx.fxml.FXML;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.model.financialplanning.FinancialPlan;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.financialplanning.FinancialPlanningService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -54,10 +54,9 @@ public class EditPlanController extends BasePlanManagement {
         if (planName.isEmpty() || baseIncomeText.isEmpty()) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -73,11 +72,9 @@ public class EditPlanController extends BasePlanManagement {
                     && areBudgetGroupsEqual()) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FINANCIALPLANNING_DIALOG_NO_CHANGES_TITLE),
+                                TranslationKeys.FINANCIALPLANNING_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .FINANCIALPLANNING_DIALOG_NO_CHANGES_MESSAGE));
+                                TranslationKeys.FINANCIALPLANNING_DIALOG_NO_CHANGES_MESSAGE));
                 return;
             }
 
@@ -89,25 +86,21 @@ public class EditPlanController extends BasePlanManagement {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE));
 
             planNameField.getScene().getWindow().hide();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_BASE_INCOME_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_ERROR_UPDATING_PLAN_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_ERROR_UPDATING_PLAN_TITLE),
                     e.getMessage());
         }
     }

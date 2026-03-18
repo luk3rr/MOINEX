@@ -14,10 +14,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -75,8 +75,7 @@ public class EditCategoryController {
             } catch (IllegalArgumentException | EntityExistsException | EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_NAME_TITLE),
+                                TranslationKeys.CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_NAME_TITLE),
                         e.getMessage());
                 return;
             }
@@ -90,8 +89,7 @@ public class EditCategoryController {
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
+                                TranslationKeys.CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
                         e.getMessage());
                 return;
             }
@@ -103,8 +101,7 @@ public class EditCategoryController {
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
+                                TranslationKeys.CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
                         e.getMessage());
                 return;
             }
@@ -115,23 +112,21 @@ public class EditCategoryController {
             if (nameChanged && archivedChanged) {
                 msg =
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .CATEGORY_DIALOG_CATEGORY_NAME_AND_ARCHIVED_UPDATED_MESSAGE);
             } else if (archivedChanged) {
                 msg =
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE);
+                                TranslationKeys.CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE);
             } else {
                 msg =
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE);
+                                TranslationKeys.CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE);
             }
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
+                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
                     msg);
         }
 

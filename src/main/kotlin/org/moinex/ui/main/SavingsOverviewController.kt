@@ -33,6 +33,7 @@ import kotlinx.coroutines.delay
 import org.moinex.chart.ChartFactory
 import org.moinex.chart.DoughnutChart
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.AllocationDTO
 import org.moinex.model.dto.ProfitabilityMetricsDTO
 import org.moinex.model.dto.TickerPerformanceDTO
@@ -211,7 +212,7 @@ class SavingsOverviewController(
         WindowUtils.openModalWindow(
             Constants.EDIT_INVESTMENT_TARGET_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE,
+                TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE,
             ),
             springContext,
             { _: EditInvestmentTargetController -> },
@@ -464,7 +465,7 @@ class SavingsOverviewController(
         when (graphPaneCurrentPage) {
             0 -> {
                 overviewTabBottonPaneTitle.text =
-                    preferencesService.translate(Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO)
+                    preferencesService.translate(TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO)
                 updateInvestmentDistributionChart()
                 recalculateInvestmentPerformanceButton.isVisible = false
                 recalculateInvestmentPerformanceButton.isManaged = false
@@ -473,7 +474,7 @@ class SavingsOverviewController(
             1 -> {
                 overviewTabBottonPaneTitle.text =
                     preferencesService.translate(
-                        Constants.TranslationKeys.SAVINGS_INVESTMENT_PERFORMANCE,
+                        TranslationKeys.SAVINGS_INVESTMENT_PERFORMANCE,
                     )
                 updateInvestmentPerformanceChart()
                 recalculateInvestmentPerformanceButton.isVisible = true
@@ -490,7 +491,7 @@ class SavingsOverviewController(
             Image(javaClass.getResource(Constants.LOADING_GIF)!!.toExternalForm())
         recalculateInvestmentPerformanceButton.isDisable = true
         recalculateInvestmentPerformanceButton.text =
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BUTTON_RECALCULATING)
+            preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATING)
     }
 
     private fun setOnRecalculateInvestmentPerformanceButton() {
@@ -498,7 +499,7 @@ class SavingsOverviewController(
         recalculateInvestmentPerformanceButtonIcon.image =
             Image(javaClass.getResource(Constants.RELOAD_ICON)!!.toExternalForm())
         recalculateInvestmentPerformanceButton.text =
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_BUTTON_RECALCULATE)
+            preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATE)
     }
 
     private fun updateInvestmentPerformanceChart() {
@@ -516,12 +517,12 @@ class SavingsOverviewController(
 
         val investedSeries = XYChart.Series<String, Number>()
         investedSeries.name =
-            preferencesService.translate(Constants.TranslationKeys.SAVINGS_INVESTED_VALUE)
+            preferencesService.translate(TranslationKeys.SAVINGS_INVESTED_VALUE)
 
         val capitalGainsSeries = XYChart.Series<String, Number>()
         capitalGainsSeries.name =
             preferencesService.translate(
-                Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS,
+                TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS,
             )
 
         val performanceData = investmentPerformanceService.getPerformanceData()
@@ -585,7 +586,7 @@ class SavingsOverviewController(
                 buildString {
                     append(
                         preferencesService.translate(
-                            Constants.TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO,
+                            TranslationKeys.SAVINGS_OVERVIEW_PORTFOLIO,
                         ),
                     )
                     append(": ")
@@ -593,7 +594,7 @@ class SavingsOverviewController(
                     append("\n")
                     append(
                         preferencesService.translate(
-                            Constants.TranslationKeys.SAVINGS_INVESTED_VALUE,
+                            TranslationKeys.SAVINGS_INVESTED_VALUE,
                         ),
                     )
                     append(": ")
@@ -601,7 +602,7 @@ class SavingsOverviewController(
                     append("\n")
                     append(
                         preferencesService.translate(
-                            Constants.TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS,
+                            TranslationKeys.SAVINGS_ACCUMULATED_CAPITAL_GAINS,
                         ),
                     )
                     append(": ")
@@ -609,7 +610,7 @@ class SavingsOverviewController(
                     append("\n")
                     append(
                         preferencesService.translate(
-                            Constants.TranslationKeys.SAVINGS_MONTHLY_CAPITAL_GAINS,
+                            TranslationKeys.SAVINGS_MONTHLY_CAPITAL_GAINS,
                         ),
                     )
                     append(": ")
@@ -625,7 +626,7 @@ class SavingsOverviewController(
 
                 val sign = if (percentageChange >= BigDecimal.ZERO) "+ " else "- "
                 tooltipText +=
-                    "\n${preferencesService.translate(Constants.TranslationKeys.SAVINGS_VARIATION)}: " +
+                    "\n${preferencesService.translate(TranslationKeys.SAVINGS_VARIATION)}: " +
                     "$sign${UIUtils.formatPercentage(percentageChange, preferencesService)}"
             }
 
@@ -896,7 +897,7 @@ class SavingsOverviewController(
         val bestLabel =
             Label(
                 preferencesService.translate(
-                    Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST,
+                    TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST,
                 ),
             )
         bestLabel.styleClass.add(Constants.CUSTOM_TABLE_TITLE_STYLE)
@@ -911,7 +912,7 @@ class SavingsOverviewController(
         val worstLabel =
             Label(
                 preferencesService.translate(
-                    Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST,
+                    TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST,
                 ),
             )
         worstLabel.styleClass.add(Constants.CUSTOM_TABLE_TITLE_STYLE)
@@ -935,7 +936,7 @@ class SavingsOverviewController(
         val assetHeader =
             Label(
                 preferencesService.translate(
-                    Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_ASSET,
+                    TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_ASSET,
                 ),
             )
         assetHeader.styleClass.add(Constants.CUSTOM_TABLE_HEADER_STYLE)
@@ -951,7 +952,7 @@ class SavingsOverviewController(
         val returnHeader =
             Label(
                 preferencesService.translate(
-                    Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_RETURN,
+                    TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_RETURN,
                 ),
             )
         returnHeader.styleClass.add(Constants.CUSTOM_TABLE_HEADER_STYLE)
@@ -961,7 +962,7 @@ class SavingsOverviewController(
         val valueHeader =
             Label(
                 preferencesService.translate(
-                    Constants.TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_VALUE,
+                    TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_VALUE,
                 ),
             )
         valueHeader.styleClass.add(Constants.CUSTOM_TABLE_HEADER_STYLE)
@@ -1047,7 +1048,7 @@ class SavingsOverviewController(
             val (currentValue, typeName) =
                 if (assetType == AssetType.BOND) {
                     totalBondValue to
-                        preferencesService.translate(Constants.TranslationKeys.ASSET_TYPE_BOND)
+                        preferencesService.translate(TranslationKeys.ASSET_TYPE_BOND)
                 } else {
                     val tickerType = AssetType.valueOf(assetType.name)
                     currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO) to
@@ -1222,7 +1223,7 @@ class SavingsOverviewController(
 
         if (allocation.isOnTargetRange()) {
             return preferencesService.translate(
-                Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET,
+                TranslationKeys.SAVINGS_ALLOCATION_STATUS_ON_TARGET,
             )
         }
 
@@ -1231,16 +1232,16 @@ class SavingsOverviewController(
 
         return when {
             allocation.isCriticalLow() ->
-                "${preferencesService.translate(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)} $formattedDiff"
+                "${preferencesService.translate(TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_LOW)} $formattedDiff"
 
             allocation.isWarningLow() ->
-                "${preferencesService.translate(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_LOW)} $formattedDiff"
+                "${preferencesService.translate(TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_LOW)} $formattedDiff"
 
             allocation.isWarningHigh() ->
-                "${preferencesService.translate(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)} $formattedDiff"
+                "${preferencesService.translate(TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)} $formattedDiff"
 
             allocation.isCriticalHigh() ->
-                "${preferencesService.translate(Constants.TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)} $formattedDiff"
+                "${preferencesService.translate(TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)} $formattedDiff"
 
             else -> ""
         }

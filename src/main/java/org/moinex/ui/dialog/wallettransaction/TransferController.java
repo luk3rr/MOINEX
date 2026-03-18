@@ -17,6 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.wallet.WalletService;
@@ -69,14 +70,12 @@ public class TransferController {
     private void configureTableView() {
         TableColumn<Transfer, Integer> idColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_ID));
+                        preferencesService.translate(TranslationKeys.WALLETTRANSACTION_TABLE_ID));
         idColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getId()));
 
         TableColumn<Transfer, String> dateColumn =
                 new TableColumn<>(
-                        preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DATE));
+                        preferencesService.translate(TranslationKeys.WALLETTRANSACTION_TABLE_DATE));
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -86,14 +85,14 @@ public class TransferController {
         TableColumn<Transfer, String> descriptionColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_DESCRIPTION));
+                                TranslationKeys.WALLETTRANSACTION_TABLE_DESCRIPTION));
         descriptionColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getDescription()));
 
         TableColumn<Transfer, String> amountColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_AMOUNT));
+                                TranslationKeys.WALLETTRANSACTION_TABLE_AMOUNT));
         amountColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
@@ -102,21 +101,21 @@ public class TransferController {
         TableColumn<Transfer, String> senderColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_SENDER));
+                                TranslationKeys.WALLETTRANSACTION_TABLE_SENDER));
         senderColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getSenderWallet().getName()));
 
         TableColumn<Transfer, String> receiverColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_RECEIVER));
+                                TranslationKeys.WALLETTRANSACTION_TABLE_RECEIVER));
         receiverColumn.setCellValueFactory(
                 param -> new SimpleStringProperty(param.getValue().getReceiverWallet().getName()));
 
         TableColumn<Transfer, String> categoryColumn =
                 new TableColumn<>(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_TABLE_CATEGORY));
+                                TranslationKeys.WALLETTRANSACTION_TABLE_CATEGORY));
         categoryColumn.setCellValueFactory(
                 param -> {
                     if (param.getValue().getCategory() != null) {
@@ -206,7 +205,7 @@ public class TransferController {
         WindowUtils.openModalWindow(
                 Constants.ADD_TRANSFER_FXML,
                 preferencesService.translate(
-                        Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_ADD_NEW_TRANSFER_TITLE),
+                        TranslationKeys.WALLETTRANSACTION_DIALOG_ADD_NEW_TRANSFER_TITLE),
                 springContext,
                 (AddTransferController controller) -> {},
                 List.of(
@@ -222,10 +221,9 @@ public class TransferController {
         if (selectedTransfer == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_EDIT_MESSAGE));
             return;
         }
@@ -233,7 +231,7 @@ public class TransferController {
         WindowUtils.openModalWindow(
                 Constants.EDIT_TRANSFER_FXML,
                 preferencesService.translate(
-                        Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_EDIT_TRANSFER_TITLE),
+                        TranslationKeys.WALLETTRANSACTION_DIALOG_EDIT_TRANSFER_TITLE),
                 springContext,
                 (EditTransferController controller) -> controller.setTransfer(selectedTransfer),
                 List.of(this::loadTransfersFromDatabase));
@@ -245,31 +243,28 @@ public class TransferController {
         if (selectedTransfer == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
+                            TranslationKeys
                                     .WALLETTRANSACTION_DIALOG_NO_TRANSFER_SELECTED_DELETE_MESSAGE));
             return;
         }
 
         if (WindowUtils.showConfirmationDialog(
                 preferencesService.translate(
-                        Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_TITLE),
+                        TranslationKeys.WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_TITLE),
                 MessageFormat.format(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_MESSAGE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_DELETE_TRANSFER_MESSAGE),
                         selectedTransfer.getId()),
                 preferencesService.getBundle())) {
             try {
                 walletService.deleteTransfer(selectedTransfer.getId());
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_SUCCESS_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_SUCCESS_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_TRANSFER_DELETED_MESSAGE));
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_DELETED_MESSAGE));
 
                 loadTransfersFromDatabase();
                 updateTableView();
@@ -277,7 +272,7 @@ public class TransferController {
             } catch (EntityNotFoundException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_TITLE),
                         e.getMessage());
             }
         }

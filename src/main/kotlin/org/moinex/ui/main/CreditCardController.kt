@@ -29,6 +29,7 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardPayment
@@ -134,7 +135,7 @@ class CreditCardController(
         WindowUtils.openModalWindow(
             Constants.ADD_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE,
+                TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE,
             ),
             springContext,
             { _: AddCreditCardDebtController -> },
@@ -148,7 +149,7 @@ class CreditCardController(
         WindowUtils.openModalWindow(
             Constants.ADD_CREDIT_CARD_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE,
+                TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE,
             ),
             springContext,
             { _: AddCreditCardController -> },
@@ -164,10 +165,10 @@ class CreditCardController(
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE,
                 ),
             )
             return
@@ -179,10 +180,10 @@ class CreditCardController(
         if (payments.any { it.isRefunded() }) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_EDIT_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_EDIT_MESSAGE,
                 ),
             )
             return
@@ -191,7 +192,7 @@ class CreditCardController(
         WindowUtils.openModalWindow(
             Constants.EDIT_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE,
+                TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE,
             ),
             springContext,
             { controller: EditCreditCardDebtController -> controller.setCreditCardDebt(debt) },
@@ -207,10 +208,10 @@ class CreditCardController(
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_REFUND_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_REFUND_MESSAGE,
                 ),
             )
             return
@@ -222,10 +223,10 @@ class CreditCardController(
         if (payments.any { it.isRefunded() }) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_REFUND_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_ALREADY_REFUNDED_REFUND_MESSAGE,
                 ),
             )
             return
@@ -239,7 +240,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION,
                         ),
                         debt.description,
                     ),
@@ -249,7 +250,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT,
                         ),
                         UIUtils.formatCurrency(debt.amount),
                     ),
@@ -259,7 +260,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS,
                         ),
                         debt.installments,
                     ),
@@ -269,7 +270,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID,
                         ),
                         installmentsPaid,
                     ),
@@ -279,7 +280,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PENDING,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PENDING,
                         ),
                         installmentsPending,
                     ),
@@ -289,7 +290,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY,
                         ),
                         debt.category.name,
                     ),
@@ -299,7 +300,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD,
                         ),
                         debt.creditCard.name,
                     ),
@@ -308,7 +309,7 @@ class CreditCardController(
 
                 append(
                     preferencesService.translate(
-                        Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_MESSAGE,
+                        TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_MESSAGE,
                     ),
                 )
             }
@@ -316,7 +317,7 @@ class CreditCardController(
         if (
             WindowUtils.showConfirmationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE,
                 ),
                 message,
                 preferencesService.getBundle(),
@@ -327,10 +328,10 @@ class CreditCardController(
 
             WindowUtils.showSuccessDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE,
                 ),
             )
         }
@@ -343,10 +344,10 @@ class CreditCardController(
         if (selectedPayment == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_DELETE_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_DELETE_MESSAGE,
                 ),
             )
             return
@@ -368,7 +369,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_DESCRIPTION,
                         ),
                         debt.description,
                     ),
@@ -378,7 +379,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_AMOUNT,
                         ),
                         UIUtils.formatCurrency(debt.amount),
                     ),
@@ -388,7 +389,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE,
                         ),
                         UIUtils.formatDateForDisplay(debt.date, preferencesService),
                     ),
@@ -398,7 +399,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS,
                         ),
                         debt.installments,
                     ),
@@ -408,7 +409,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_INSTALLMENTS_PAID,
                         ),
                         installmentsPaid,
                     ),
@@ -418,7 +419,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CATEGORY,
                         ),
                         debt.category.name,
                     ),
@@ -428,7 +429,7 @@ class CreditCardController(
                 append(
                     MessageFormat.format(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_CREDIT_CARD,
                         ),
                         debt.creditCard.name,
                     ),
@@ -439,7 +440,7 @@ class CreditCardController(
                     append(
                         MessageFormat.format(
                             preferencesService.translate(
-                                Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT,
+                                TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_AMOUNT,
                             ),
                             UIUtils.formatCurrency(refundAmount),
                         ),
@@ -457,7 +458,7 @@ class CreditCardController(
                     append(
                         MessageFormat.format(
                             preferencesService.translate(
-                                Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_WALLET,
+                                TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REFUND_WALLET,
                             ),
                             walletNames,
                         ),
@@ -465,7 +466,7 @@ class CreditCardController(
                 } else {
                     append(
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_NO_REFUND_AMOUNT,
+                            TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_NO_REFUND_AMOUNT,
                         ),
                     )
                 }
@@ -474,7 +475,7 @@ class CreditCardController(
         if (
             WindowUtils.showConfirmationDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE,
                 ),
                 message,
                 preferencesService.getBundle(),
@@ -485,10 +486,10 @@ class CreditCardController(
 
             WindowUtils.showSuccessDialog(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE,
                 ),
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE,
+                    TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE,
                 ),
             )
         }
@@ -499,7 +500,7 @@ class CreditCardController(
         WindowUtils.openModalWindow(
             Constants.ARCHIVED_CREDIT_CARDS_FXML,
             preferencesService.translate(
-                Constants.TranslationKeys.CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE,
+                TranslationKeys.CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE,
             ),
             springContext,
             { _: ArchivedCreditCardsController -> },
@@ -593,7 +594,7 @@ class CreditCardController(
             Label(
                 MessageFormat.format(
                     preferencesService.translate(
-                        Constants.TranslationKeys.CREDIT_CARD_TOTAL_DEBTS_PENDING_PAYMENTS,
+                        TranslationKeys.CREDIT_CARD_TOTAL_DEBTS_PENDING_PAYMENTS,
                     ),
                     UIUtils.formatCurrency(totalPendingPayments),
                 ),
@@ -885,14 +886,14 @@ class CreditCardController(
         val idColumn =
             createCreditCardPaymentIdTableColumn(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID,
                 ),
             )
 
         val descriptionColumn =
             TableColumn<CreditCardPayment, String>(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION,
                 ),
             )
         descriptionColumn.setCellValueFactory { param ->
@@ -902,7 +903,7 @@ class CreditCardController(
         val amountColumn =
             TableColumn<CreditCardPayment, String>(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT,
                 ),
             )
         amountColumn.setCellValueFactory { param ->
@@ -912,14 +913,14 @@ class CreditCardController(
         val installmentColumn =
             createCreditCardPaymentInstallmentTableColumn(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT,
                 ),
             )
 
         val crcColumn =
             TableColumn<CreditCardPayment, String>(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD,
                 ),
             )
         crcColumn.setCellValueFactory { param ->
@@ -929,7 +930,7 @@ class CreditCardController(
         val categoryColumn =
             TableColumn<CreditCardPayment, String>(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY,
                 ),
             )
         categoryColumn.setCellValueFactory { param ->
@@ -939,7 +940,7 @@ class CreditCardController(
         val dateColumn =
             TableColumn<CreditCardPayment, String>(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE,
                 ),
             )
         dateColumn.setCellValueFactory { param ->
@@ -951,7 +952,7 @@ class CreditCardController(
         val statusColumn =
             TableColumn<CreditCardPayment, String>(
                 preferencesService.translate(
-                    Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS,
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS,
                 ),
             )
         statusColumn.setCellValueFactory { param ->
@@ -960,22 +961,22 @@ class CreditCardController(
                 when {
                     payment.isRefunded() && !payment.isPaid() ->
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED,
+                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED,
                         )
 
                     payment.isRefunded() && payment.isPaid() ->
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED,
+                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED,
                         )
 
                     !payment.isPaid() ->
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PENDING,
+                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PENDING,
                         )
 
                     else ->
                         preferencesService.translate(
-                            Constants.TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID,
+                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID,
                         )
                 }
             SimpleStringProperty(status)

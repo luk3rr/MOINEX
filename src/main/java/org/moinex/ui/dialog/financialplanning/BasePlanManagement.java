@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.PreferencesService;
@@ -88,7 +89,7 @@ public abstract class BasePlanManagement {
         WindowUtils.openModalWindow(
                 Constants.ADD_BUDGET_GROUP_FXML,
                 preferencesService.translate(
-                        Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_ADD_BUDGET_GROUP_TITLE),
+                        TranslationKeys.FINANCIALPLANNING_DIALOG_ADD_BUDGET_GROUP_TITLE),
                 springContext,
                 (AddBudgetGroupController controller) -> {
                     controller.setAssignedCategories(getAssignedCategories());
@@ -197,11 +198,9 @@ public abstract class BasePlanManagement {
         if (budgetGroups.isEmpty() || budgetGroups.size() < 2) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INSUFFICIENT_GROUPS_MESSAGE));
 
             return false;
         }
@@ -209,21 +208,18 @@ public abstract class BasePlanManagement {
         if (calculateTotalPercentage().compareTo(new BigDecimal("100")) != 0) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_INVALID_PERCENTAGES_MESSAGE));
             return false;
         }
 
         if (hasEmptyGroups()) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_TITLE),
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_MESSAGE));
+                            TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_GROUPS_MESSAGE));
             return false;
         }
 
@@ -241,12 +237,12 @@ public abstract class BasePlanManagement {
         MenuItem editItem =
                 new MenuItem(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_EDIT));
+                                TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_EDIT));
         editItem.setOnAction(event -> handleEditBudgetGroup(group));
         MenuItem deleteItem =
                 new MenuItem(
                         preferencesService.translate(
-                                Constants.TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_DELETE));
+                                TranslationKeys.FINANCIALPLANNING_CONTEXT_MENU_DELETE));
         deleteItem.setOnAction(event -> handleDeleteBudgetGroup(group));
         contextMenu.getItems().addAll(editItem, deleteItem);
 
@@ -269,7 +265,7 @@ public abstract class BasePlanManagement {
         WindowUtils.openModalWindow(
                 Constants.EDIT_BUDGET_GROUP_FXML,
                 preferencesService.translate(
-                        Constants.TranslationKeys.FINANCIALPLANNING_DIALOG_EDIT_BUDGET_GROUP_TITLE),
+                        TranslationKeys.FINANCIALPLANNING_DIALOG_EDIT_BUDGET_GROUP_TITLE),
                 springContext,
                 (EditBudgetGroupController controller) -> {
                     controller.setAssignedCategories(getAssignedCategories());
@@ -358,29 +354,27 @@ public abstract class BasePlanManagement {
             budgetGroupInfo.setText(
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys
-                                            .FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS),
+                                    TranslationKeys.FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS),
                             UIUtils.formatPercentage(totalPercentage, preferencesService)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
         } else if (hasEmptyGroups) {
             budgetGroupInfo.setText(
                     preferencesService.translate(
-                            Constants.TranslationKeys.FINANCIALPLANNING_INFO_EMPTY_GROUPS));
+                            TranslationKeys.FINANCIALPLANNING_INFO_EMPTY_GROUPS));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else if (totalPercentage.compareTo(new BigDecimal("100")) < 0) {
             BigDecimal remaining = new BigDecimal("100").subtract(totalPercentage);
             budgetGroupInfo.setText(
                     MessageFormat.format(
                             preferencesService.translate(
-                                    Constants.TranslationKeys
-                                            .FINANCIALPLANNING_INFO_PERCENTAGE_BELOW),
+                                    TranslationKeys.FINANCIALPLANNING_INFO_PERCENTAGE_BELOW),
                             UIUtils.formatPercentage(totalPercentage, preferencesService),
                             UIUtils.formatPercentage(remaining, preferencesService)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else {
             budgetGroupInfo.setText(
                     preferencesService.translate(
-                            Constants.TranslationKeys.FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED));
+                            TranslationKeys.FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_GREEN_STYLE);
         }
         budgetGroupInfo.setVisible(true);

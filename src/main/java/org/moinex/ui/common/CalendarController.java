@@ -29,6 +29,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.CalendarEvent;
 import org.moinex.service.CalendarService;
 import org.moinex.service.PreferencesService;
@@ -103,8 +104,7 @@ public class CalendarController {
     private void handleAddEvent() {
         WindowUtils.openModalWindow(
                 Constants.ADD_CALENDAR_EVENT_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.COMMON_CALENDAR_MODAL_ADD_EVENT),
+                preferencesService.translate(TranslationKeys.COMMON_CALENDAR_MODAL_ADD_EVENT),
                 springContext,
                 (AddCalendarEventController controller) -> {},
                 List.of(this::drawCalendar));

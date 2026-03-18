@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
@@ -162,8 +163,7 @@ public abstract class BaseWalletTransactionManagement {
     protected void handleOpenCalculator() {
         WindowUtils.openPopupWindow(
                 Constants.CALCULATOR_FXML,
-                preferencesService.translate(
-                        Constants.TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
                 springContext,
                 (CalculatorController controller) -> {},
                 List.of(() -> calculatorService.updateComponentWithResult(transactionValueField)));
@@ -233,7 +233,7 @@ public abstract class BaseWalletTransactionManagement {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY));
+                            TranslationKeys.WALLETTRANSACTION_TOOLTIP_NEED_CATEGORY));
         }
     }
 

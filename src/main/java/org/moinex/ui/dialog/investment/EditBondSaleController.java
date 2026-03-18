@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.WalletTransactionStatus;
@@ -173,10 +174,8 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                 || quantityStr.isBlank()
                 || saleDate == null) {
             WindowUtils.showInformationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -220,10 +219,9 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
                     && netProfitEqual
                     && operation.getWalletTransaction().getDate().toLocalDate().equals(saleDate)) {
                 WindowUtils.showInformationDialog(
+                        preferencesService.translate(TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_TITLE),
-                        preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_NO_CHANGES_SALE_MESSAGE));
+                                TranslationKeys.BOND_DIALOG_NO_CHANGES_SALE_MESSAGE));
             } else {
                 operation.setQuantity(quantity);
                 operation.setUnitPrice(unitPrice);
@@ -243,23 +241,22 @@ public final class EditBondSaleController extends BaseBondTransactionManagement 
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_TITLE),
+                                TranslationKeys.BOND_DIALOG_SALE_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.BOND_DIALOG_SALE_UPDATED_MESSAGE));
+                                TranslationKeys.BOND_DIALOG_SALE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) bondNameLabel.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
+                            TranslationKeys.BOND_DIALOG_INVALID_NUMBER_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.BOND_DIALOG_ERROR_UPDATING_SALE_TITLE),
+                            TranslationKeys.BOND_DIALOG_ERROR_UPDATING_SALE_TITLE),
                     e.getMessage());
         }
     }

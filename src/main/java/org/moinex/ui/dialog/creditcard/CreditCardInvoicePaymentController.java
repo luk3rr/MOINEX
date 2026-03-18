@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.wallettransaction.Wallet;
@@ -173,10 +174,9 @@ public class CreditCardInvoicePaymentController {
         if (wallet == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_WALLET_NOT_SELECTED_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_WALLET_NOT_SELECTED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CREDITCARD_DIALOG_WALLET_NOT_SELECTED_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_WALLET_NOT_SELECTED_MESSAGE));
             return;
         }
 
@@ -192,10 +192,9 @@ public class CreditCardInvoicePaymentController {
         if (invoiceAmount.compareTo(BigDecimal.ZERO) == 0) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_MESSAGE));
         } else {
             try {
                 creditCardService.payInvoice(
@@ -203,9 +202,9 @@ public class CreditCardInvoicePaymentController {
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE));
+                                TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE));
 
                 Stage stage = (Stage) crcNameLabel.getScene().getWindow();
                 stage.close();
@@ -214,8 +213,7 @@ public class CreditCardInvoicePaymentController {
                     | MoinexException.InsufficientResourcesException e) {
                 WindowUtils.showErrorDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE),
                         e.getMessage());
             }
         }

@@ -14,13 +14,13 @@ import java.time.LocalTime;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.investment.CryptoExchange;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.TickerService;
-import org.moinex.util.Constants;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -87,9 +87,9 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
                 || exchangeDate == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -115,10 +115,9 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
                             .equals(dateTimeWithCurrentHour.toLocalDate())) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_NO_CHANGES_EXCHANGE_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_NO_CHANGES_EXCHANGE_MESSAGE));
             } else // If there is any modification, update the exchange
             {
                 cryptoExchange.setSoldCrypto(soldCrypto);
@@ -132,10 +131,9 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE),
+                                TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE));
+                                TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) cryptoReceivedQuantityField.getScene().getWindow();
@@ -143,18 +141,15 @@ public final class EditCryptoExchangeController extends BaseCryptoExchangeManage
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE));
         } catch (EntityNotFoundException
                 | MoinexException.SameSourceDestinationException
                 | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_ERROR_UPDATING_EXCHANGE_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_ERROR_UPDATING_EXCHANGE_TITLE),
                     e.getMessage());
         }
     }

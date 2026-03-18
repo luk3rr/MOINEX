@@ -14,6 +14,7 @@ import javafx.scene.Parent
 import javafx.scene.control.ComboBox
 import javafx.stage.Stage
 import javafx.util.StringConverter
+import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.moinex.util.Constants
 import org.moinex.util.FxUtils
@@ -79,7 +80,7 @@ class SettingsController(
                     val mainRoot = loader.load<Parent>()
 
                     scene.root = mainRoot
-                    stage.title = preferencesService.translate(Constants.TranslationKeys.APP_TITLE)
+                    stage.title = preferencesService.translate(TranslationKeys.APP_TITLE)
                 }.onFailure { e ->
                     logger.error("Failed to reload main UI after language change", e)
                 }

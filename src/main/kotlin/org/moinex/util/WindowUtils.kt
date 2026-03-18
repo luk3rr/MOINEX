@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.moinex.app.JavaFXApp
+import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
@@ -44,9 +45,9 @@ object WindowUtils {
     ): String {
         return resources?.getString(
             when (type) {
-                AlertType.CONFIRMATION -> Constants.TranslationKeys.DIALOG_CONFIRMATION_TITLE
-                AlertType.INFORMATION -> Constants.TranslationKeys.DIALOG_INFO_TITLE
-                AlertType.ERROR -> Constants.TranslationKeys.DIALOG_ERROR_TITLE
+                AlertType.CONFIRMATION -> TranslationKeys.DIALOG_CONFIRMATION_TITLE
+                AlertType.INFORMATION -> TranslationKeys.DIALOG_INFO_TITLE
+                AlertType.ERROR -> TranslationKeys.DIALOG_ERROR_TITLE
                 else -> return ""
             },
         ) ?: when (type) {
@@ -68,8 +69,8 @@ object WindowUtils {
 
         val (yesButton, noButton) =
             if (resources != null) {
-                ButtonType(resources.getString(Constants.TranslationKeys.DIALOG_BUTTON_YES)) to
-                    ButtonType(resources.getString(Constants.TranslationKeys.DIALOG_BUTTON_NO))
+                ButtonType(resources.getString(TranslationKeys.DIALOG_BUTTON_YES)) to
+                    ButtonType(resources.getString(TranslationKeys.DIALOG_BUTTON_NO))
             } else {
                 ButtonType.YES to ButtonType.NO
             }
@@ -123,7 +124,7 @@ object WindowUtils {
                 )
 
             val title =
-                resources?.getString(Constants.TranslationKeys.DIALOG_SUCCESS_TITLE) ?: "Success"
+                resources?.getString(TranslationKeys.DIALOG_SUCCESS_TITLE) ?: "Success"
             setAttributes(title, header, message)
             showAndWait()
         }

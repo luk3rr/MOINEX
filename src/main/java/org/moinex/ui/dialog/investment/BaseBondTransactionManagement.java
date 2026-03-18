@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
@@ -184,11 +185,9 @@ public abstract class BaseBondTransactionManagement {
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_TITLE),
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_MESSAGE));
+                            TranslationKeys.INVESTMENT_DIALOG_INVALID_NUMBER_CALCULATION_MESSAGE));
 
             totalPrice = new BigDecimal("0.00");
 
@@ -286,7 +285,7 @@ public abstract class BaseBondTransactionManagement {
             UIUtils.addTooltipToNode(
                     categoryComboBox,
                     preferencesService.translate(
-                            Constants.TranslationKeys.INVESTMENT_TOOLTIP_CATEGORY_REQUIRED));
+                            TranslationKeys.INVESTMENT_TOOLTIP_CATEGORY_REQUIRED));
         }
     }
 

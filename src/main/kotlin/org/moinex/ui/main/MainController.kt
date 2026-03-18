@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import javafx.util.Pair
+import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
@@ -152,7 +153,7 @@ class MainController(
     private fun handleOpenCalculator() {
         WindowUtils.openPopupWindow(
             Constants.CALCULATOR_FXML,
-            preferencesService.translate(Constants.TranslationKeys.MAIN_CALCULATOR),
+            preferencesService.translate(TranslationKeys.MAIN_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
             listOf(Runnable { }),
@@ -164,7 +165,7 @@ class MainController(
     private fun handleOpenCalendar() {
         WindowUtils.openPopupWindow(
             Constants.CALENDAR_FXML,
-            preferencesService.translate(Constants.TranslationKeys.MAIN_CALENDAR),
+            preferencesService.translate(TranslationKeys.MAIN_CALENDAR),
             springContext,
             { _: CalendarController -> },
             listOf(Runnable { }),

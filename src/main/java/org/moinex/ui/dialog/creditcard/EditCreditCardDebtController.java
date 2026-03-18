@@ -13,6 +13,7 @@ import java.util.List;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardDebt;
@@ -102,9 +103,9 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                 || invoiceYear == null) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -137,10 +138,9 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
                     && invoice.equals(invoiceDateYearMonth)) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_DEBT_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_DEBT_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CREDITCARD_DIALOG_NO_CHANGES_DEBT_MESSAGE));
+                                TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_DEBT_MESSAGE));
             } else // If there is any modification, update the debt
             {
                 crcDebt.setCreditCard(crc);
@@ -153,11 +153,9 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CREDITCARD_DIALOG_TRANSACTION_UPDATED_TITLE),
+                                TranslationKeys.CREDITCARD_DIALOG_TRANSACTION_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .CREDITCARD_DIALOG_TRANSACTION_UPDATED_MESSAGE));
+                                TranslationKeys.CREDITCARD_DIALOG_TRANSACTION_UPDATED_MESSAGE));
             }
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
@@ -165,13 +163,13 @@ public final class EditCreditCardDebtController extends BaseCreditCardDebtManage
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
                     e.getMessage());
         }
     }

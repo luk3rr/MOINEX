@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.Category;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardDebt;
@@ -237,7 +238,7 @@ public abstract class BaseCreditCardDebtManagement {
         if (installments < 1) {
             msgLabel.setText(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_INSTALLMENTS));
+                            TranslationKeys.CREDITCARD_DEBT_INVALID_INSTALLMENTS));
             return;
         }
 
@@ -270,7 +271,7 @@ public abstract class BaseCreditCardDebtManagement {
                 msgLabel.setText(
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys.CREDITCARD_DEBT_REPEAT_MONTHS),
+                                        TranslationKeys.CREDITCARD_DEBT_REPEAT_MONTHS),
                                 installments,
                                 UIUtils.formatCurrency(exactInstallmentValue)));
             } else {
@@ -279,8 +280,7 @@ public abstract class BaseCreditCardDebtManagement {
                 msgLabel.setText(
                         MessageFormat.format(
                                 preferencesService.translate(
-                                        Constants.TranslationKeys
-                                                .CREDITCARD_DEBT_REPEAT_MONTHS_UNEVEN),
+                                        TranslationKeys.CREDITCARD_DEBT_REPEAT_MONTHS_UNEVEN),
                                 installments,
                                 UIUtils.formatCurrency(exactInstallmentValue.add(remainder)),
                                 installments - 1,
@@ -288,8 +288,7 @@ public abstract class BaseCreditCardDebtManagement {
             }
         } catch (NumberFormatException e) {
             msgLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DEBT_INVALID_VALUE));
+                    preferencesService.translate(TranslationKeys.CREDITCARD_DEBT_INVALID_VALUE));
         }
     }
 

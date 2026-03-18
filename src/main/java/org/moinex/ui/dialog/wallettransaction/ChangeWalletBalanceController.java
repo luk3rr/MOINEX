@@ -14,6 +14,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.wallet.WalletService;
@@ -85,10 +86,9 @@ public class ChangeWalletBalanceController {
         if (wt == null || newBalanceStr.isBlank()) {
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -99,10 +99,9 @@ public class ChangeWalletBalanceController {
             if (wt.getBalance().compareTo(newBalance) == 0) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_NO_CHANGES_MADE_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_NO_CHANGES_BALANCE_MESSAGE));
                 return;
             } else // Update balance
@@ -112,10 +111,9 @@ public class ChangeWalletBalanceController {
 
                 WindowUtils.showSuccessDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys
-                                        .WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE),
+                                TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys
+                                TranslationKeys
                                         .WALLETTRANSACTION_DIALOG_WALLET_BALANCE_UPDATED_MESSAGE));
             }
 
@@ -124,16 +122,14 @@ public class ChangeWalletBalanceController {
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_INPUT_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_INVALID_BALANCE_MESSAGE));
             return;
         } catch (EntityNotFoundException | IllegalStateException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .WALLETTRANSACTION_DIALOG_ERROR_UPDATING_BALANCE_TITLE),
+                            TranslationKeys.WALLETTRANSACTION_DIALOG_ERROR_UPDATING_BALANCE_TITLE),
                     e.getMessage());
             return;
         }

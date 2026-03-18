@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.error.MoinexException;
 import org.moinex.model.enums.GoalFundingStrategy;
 import org.moinex.model.goal.Goal;
@@ -79,10 +80,8 @@ public final class AddGoalController extends BaseGoalManagement {
 
         if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
             WindowUtils.showInformationDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
+                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
+                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE));
 
             return;
         }
@@ -94,9 +93,9 @@ public final class AddGoalController extends BaseGoalManagement {
             if (selectedToggle == null) {
                 WindowUtils.showInformationDialog(
                         preferencesService.translate(
-                                Constants.TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_TITLE),
+                                TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_TITLE),
                         preferencesService.translate(
-                                Constants.TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_MESSAGE));
+                                TranslationKeys.GOAL_DIALOG_STRATEGY_REQUIRED_MESSAGE));
                 return;
             }
             strategy = (GoalFundingStrategy) selectedToggle.getUserData();
@@ -137,26 +136,23 @@ public final class AddGoalController extends BaseGoalManagement {
                     strategy);
 
             WindowUtils.showSuccessDialog(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE));
+                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
+                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE));
 
             Stage stage = (Stage) nameField.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
+                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_TITLE),
-                    preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
+                            TranslationKeys.GOAL_DIALOG_INVALID_BALANCE_MESSAGE));
         } catch (IllegalArgumentException
                 | EntityExistsException
                 | EntityNotFoundException
                 | MoinexException.InsufficientResourcesException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.GOAL_DIALOG_ERROR_CREATING_GOAL_TITLE),
+                            TranslationKeys.GOAL_DIALOG_ERROR_CREATING_GOAL_TITLE),
                     e.getMessage());
         }
     }

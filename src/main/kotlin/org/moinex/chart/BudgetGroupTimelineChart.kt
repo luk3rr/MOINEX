@@ -12,6 +12,7 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import org.moinex.common.extension.isZero
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.BudgetGroupHistoricalDataDTO
 import org.moinex.service.PreferencesService
 import org.moinex.util.Constants
@@ -55,8 +56,8 @@ class BudgetGroupTimelineChart : LineChart<String, Number>(CategoryAxis(), Numbe
             val actualSeriesData = Series<String, Number>()
             val targetSeriesData = Series<String, Number>()
 
-            val actualLabel = preferencesService?.translate(Constants.TranslationKeys.PLAN_TIMELINE_ACTUAL) ?: ""
-            val targetLabel = preferencesService?.translate(Constants.TranslationKeys.PLAN_TIMELINE_TARGET) ?: ""
+            val actualLabel = preferencesService?.translate(TranslationKeys.PLAN_TIMELINE_ACTUAL) ?: ""
+            val targetLabel = preferencesService?.translate(TranslationKeys.PLAN_TIMELINE_TARGET) ?: ""
 
             actualSeriesData.name = "$groupName ($actualLabel)"
             targetSeriesData.name = "$groupName ($targetLabel)"
@@ -84,8 +85,8 @@ class BudgetGroupTimelineChart : LineChart<String, Number>(CategoryAxis(), Numbe
     private fun applyStyling() {
         val prefs = preferencesService ?: return
 
-        val actualLabel = prefs.translate(Constants.TranslationKeys.PLAN_TIMELINE_ACTUAL)
-        val targetLabel = prefs.translate(Constants.TranslationKeys.PLAN_TIMELINE_TARGET)
+        val actualLabel = prefs.translate(TranslationKeys.PLAN_TIMELINE_ACTUAL)
+        val targetLabel = prefs.translate(TranslationKeys.PLAN_TIMELINE_TARGET)
 
         data.forEach { series ->
             series.node?.let { node ->

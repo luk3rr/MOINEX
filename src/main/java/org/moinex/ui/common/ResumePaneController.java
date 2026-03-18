@@ -14,6 +14,7 @@ import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.WalletTransactionStatus;
 import org.moinex.model.enums.WalletTransactionType;
 import org.moinex.model.wallettransaction.WalletTransaction;
@@ -278,7 +279,7 @@ public class ResumePaneController {
 
         if (savingsPercentage > 0) {
             savingsLabel.setText(
-                    preferencesService.translate(Constants.TranslationKeys.COMMON_RESUME_SAVINGS));
+                    preferencesService.translate(TranslationKeys.COMMON_RESUME_SAVINGS));
             savingsCurrentValue.setText(
                     UIUtils.formatPercentage(savingsPercentage, preferencesService));
             savingsCurrentSign.setText("+");
@@ -290,8 +291,7 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().add(Constants.POSITIVE_BALANCE_STYLE);
         } else if (savingsPercentage < 0) {
             savingsLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
+                    preferencesService.translate(TranslationKeys.COMMON_RESUME_NO_SAVINGS));
             savingsCurrentValue.setText(
                     UIUtils.formatPercentage(savingsPercentage, preferencesService));
 
@@ -311,8 +311,7 @@ public class ResumePaneController {
             savingsCurrentSign.getStyleClass().add(Constants.NEGATIVE_BALANCE_STYLE);
         } else {
             savingsLabel.setText(
-                    preferencesService.translate(
-                            Constants.TranslationKeys.COMMON_RESUME_NO_SAVINGS));
+                    preferencesService.translate(TranslationKeys.COMMON_RESUME_NO_SAVINGS));
             savingsCurrentValue.setText(UIUtils.formatPercentage(0.0, preferencesService));
             savingsCurrentSign.setText(" ");
 

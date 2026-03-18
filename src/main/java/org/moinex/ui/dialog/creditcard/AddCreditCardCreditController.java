@@ -20,6 +20,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.model.creditcard.CreditCardCredit;
 import org.moinex.model.enums.CreditCardCreditType;
@@ -113,9 +114,9 @@ public class AddCreditCardCreditController {
 
             WindowUtils.showInformationDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE));
             return;
         }
 
@@ -137,23 +138,22 @@ public class AddCreditCardCreditController {
 
             WindowUtils.showSuccessDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE));
 
             Stage stage = (Stage) crcComboBox.getScene().getWindow();
             stage.close();
         } catch (NumberFormatException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_TITLE),
                     preferencesService.translate(
-                            Constants.TranslationKeys
-                                    .CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_MESSAGE));
+                            TranslationKeys.CREDITCARD_DIALOG_INVALID_CREDIT_VALUE_MESSAGE));
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             WindowUtils.showErrorDialog(
                     preferencesService.translate(
-                            Constants.TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
+                            TranslationKeys.CREDITCARD_DIALOG_ERROR_CREATING_DEBT_TITLE),
                     e.getMessage());
         }
     }

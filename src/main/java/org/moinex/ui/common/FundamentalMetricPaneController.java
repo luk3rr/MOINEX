@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
+import org.moinex.constants.TranslationKeys;
 import org.moinex.service.PreferencesService;
 import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
@@ -87,8 +88,7 @@ public class FundamentalMetricPaneController {
                 Label dateLabel =
                         new Label(
                                 preferencesService.translate(
-                                                Constants.TranslationKeys
-                                                        .FUNDAMENTAL_ANALYSIS_REFERENCE_DATE)
+                                                TranslationKeys.FUNDAMENTAL_ANALYSIS_REFERENCE_DATE)
                                         + ": "
                                         + formatDate(dateToShow));
                 dateLabel.getStyleClass().add("metric-metadata-label");

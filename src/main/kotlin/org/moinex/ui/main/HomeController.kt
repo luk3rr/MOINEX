@@ -33,6 +33,7 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.chart.ChartFactory
+import org.moinex.constants.TranslationKeys
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.model.enums.WalletTransactionType
@@ -178,7 +179,7 @@ class HomeController(
         recalculateNetWorthButton.isDisable = true
         recalculateNetWorthButton.text =
             preferencesService.translate(
-                Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
+                TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
             )
     }
 
@@ -189,7 +190,7 @@ class HomeController(
         val percentage = (current.toDouble() / total * 100).toInt()
         val baseText =
             preferencesService.translate(
-                Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
+                TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
             )
         recalculateNetWorthButton.text = "$baseText ($current/$total - $percentage%)"
     }
@@ -199,7 +200,7 @@ class HomeController(
         recalculateNetWorthButtonIcon.image =
             Image(javaClass.getResource(Constants.RELOAD_ICON)!!.toExternalForm())
         recalculateNetWorthButton.text =
-            preferencesService.translate(Constants.TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON)
+            preferencesService.translate(TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON)
     }
 
     private fun setButtonsActions() {
@@ -322,7 +323,7 @@ class HomeController(
         val transactionColumn =
             TableColumn<WalletTransaction, WalletTransaction>(
                 MessageFormat.format(
-                    preferencesService.translate(Constants.TranslationKeys.HOME_TRANSACTIONS_TABLE_TITLE),
+                    preferencesService.translate(TranslationKeys.HOME_TRANSACTIONS_TABLE_TITLE),
                     Constants.HOME_LAST_TRANSACTIONS_SIZE,
                 ),
             )
@@ -475,12 +476,12 @@ class HomeController(
 
         val expensesSeries =
             XYChart.Series<String, Number>().apply {
-                name = preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_EXPENSES)
+                name = preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_EXPENSES)
             }
 
         val incomesSeries =
             XYChart.Series<String, Number>().apply {
-                name = preferencesService.translate(Constants.TranslationKeys.TRANSACTION_TYPE_INCOMES)
+                name = preferencesService.translate(TranslationKeys.TRANSACTION_TYPE_INCOMES)
             }
 
         var maxValue = 0.0
@@ -537,7 +538,7 @@ class HomeController(
 
             monthResumePaneTitle.text =
                 MessageFormat.format(
-                    preferencesService.translate(Constants.TranslationKeys.HOME_RESUME_TITLE),
+                    preferencesService.translate(TranslationKeys.HOME_RESUME_TITLE),
                     UIUtils.formatShortMonthYear(currentDate, preferencesService),
                 )
 
@@ -567,7 +568,7 @@ class HomeController(
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
-                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NAME,
+                        TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NAME,
                     ),
                 )
             }
@@ -579,7 +580,7 @@ class HomeController(
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
-                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_OPERATOR,
+                        TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_OPERATOR,
                     ),
                 )
             }
@@ -590,7 +591,7 @@ class HomeController(
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
-                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_AVAILABLE_CREDIT,
+                        TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_AVAILABLE_CREDIT,
                     ),
                 )
             }
@@ -601,7 +602,7 @@ class HomeController(
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
-                        Constants.TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER,
+                        TranslationKeys.HOME_CREDIT_CARD_TOOLTIP_CREDIT_CARD_NUMBER,
                     ),
                 )
             }
@@ -640,7 +641,7 @@ class HomeController(
                 styleClass.add(Constants.HOME_WALLET_ITEM_NAME_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
-                    preferencesService.translate(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME),
+                    preferencesService.translate(TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME),
                 )
             }
 
@@ -650,7 +651,7 @@ class HomeController(
                 alignment = Pos.TOP_LEFT
                 UIUtils.addTooltipToNode(
                     this,
-                    preferencesService.translate(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_TYPE),
+                    preferencesService.translate(TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_TYPE),
                 )
             }
 
@@ -659,7 +660,7 @@ class HomeController(
                 styleClass.add(Constants.HOME_WALLET_ITEM_BALANCE_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
-                    preferencesService.translate(Constants.TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_BALANCE),
+                    preferencesService.translate(TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_BALANCE),
                 )
             }
 
@@ -672,7 +673,7 @@ class HomeController(
                     val virtualWalletLabel =
                         Label(
                             preferencesService.translate(
-                                Constants.TranslationKeys.HOME_WALLET_VIRTUAL_WALLET,
+                                TranslationKeys.HOME_WALLET_VIRTUAL_WALLET,
                             ),
                         ).apply {
                             alignment = Pos.BOTTOM_LEFT
@@ -718,7 +719,7 @@ class HomeController(
         when (graphPaneCurrentPage) {
             0 -> {
                 graphTitle.text =
-                    preferencesService.translate(Constants.TranslationKeys.HOME_MONEY_FLOW_TITLE)
+                    preferencesService.translate(TranslationKeys.HOME_MONEY_FLOW_TITLE)
                 updateMoneyFlowBarChart()
                 graphView.children.add(moneyFlowBarChart!!)
                 AnchorPane.setTopAnchor(moneyFlowBarChart!!, 0.0)
@@ -729,7 +730,7 @@ class HomeController(
             }
             1 -> {
                 graphTitle.text =
-                    preferencesService.translate(Constants.TranslationKeys.HOME_NET_WORTH_TITLE)
+                    preferencesService.translate(TranslationKeys.HOME_NET_WORTH_TITLE)
                 recalculateNetWorthButton.isVisible = true
 
                 if (netWorthCalculationService.isCalculating) {
