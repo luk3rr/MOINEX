@@ -13,6 +13,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.moinex.common.extension.isEqual
+import org.moinex.constants.Constants
 import org.moinex.factory.investment.BondFactory
 import org.moinex.factory.investment.BondInterestCalculationFactory
 import org.moinex.factory.investment.BondOperationFactory
@@ -25,7 +26,6 @@ import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.OperationType
 import org.moinex.repository.investment.InvestmentPerformanceSnapshotRepository
-import org.moinex.util.Constants
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.YearMonth
