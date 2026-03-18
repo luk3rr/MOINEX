@@ -16,12 +16,12 @@ import org.moinex.common.extension.bacenDate
 import org.moinex.common.extension.decimal
 import org.moinex.common.retry.retry
 import org.moinex.config.RetryConfig
+import org.moinex.constants.Constants
 import org.moinex.model.investment.BrazilianMarketIndicators
 import org.moinex.model.investment.MarketQuotesAndCommodities
 import org.moinex.repository.investment.BrazilianMarketIndicatorsRepository
 import org.moinex.repository.investment.MarketQuotesAndCommoditiesRepository
 import org.moinex.util.APIUtils
-import org.moinex.util.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

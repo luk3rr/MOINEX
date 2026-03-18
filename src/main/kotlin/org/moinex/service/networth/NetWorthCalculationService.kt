@@ -19,6 +19,7 @@ import org.moinex.common.extension.isOpenEnded
 import org.moinex.common.extension.isPending
 import org.moinex.common.extension.nextFrom
 import org.moinex.config.BalanceCalculationConfig
+import org.moinex.constants.Constants
 import org.moinex.model.NetWorthSnapshot
 import org.moinex.model.creditcard.CreditCardPayment
 import org.moinex.model.dto.BondOperationCalculationDTO
@@ -33,7 +34,6 @@ import org.moinex.service.investment.BondService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
-import org.moinex.util.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal

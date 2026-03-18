@@ -29,6 +29,7 @@ import org.moinex.chart.DoughnutChart
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.BalanceDataDTO
 import org.moinex.model.wallettransaction.Wallet
@@ -44,7 +45,6 @@ import org.moinex.ui.dialog.wallettransaction.AddWalletController
 import org.moinex.ui.dialog.wallettransaction.ArchivedWalletsController
 import org.moinex.ui.dialog.wallettransaction.TransferController
 import org.moinex.util.Animation
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory

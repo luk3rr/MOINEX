@@ -28,6 +28,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.text.Text
 import javafx.util.Duration
 import javafx.util.StringConverter
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.BondType

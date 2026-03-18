@@ -12,10 +12,10 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import org.moinex.common.extension.isZero
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.BudgetGroupHistoricalDataDTO
 import org.moinex.service.PreferencesService
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import java.math.BigDecimal
 

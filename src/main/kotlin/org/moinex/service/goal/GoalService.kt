@@ -3,11 +3,11 @@ package org.moinex.service.goal
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isNotZero
 import org.moinex.common.extension.isZero
+import org.moinex.constants.Constants
 import org.moinex.model.enums.GoalFundingStrategy
 import org.moinex.model.goal.Goal
 import org.moinex.repository.goal.GoalRepository
 import org.moinex.service.wallet.WalletService
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

@@ -14,10 +14,10 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.shape.Line
 import javafx.util.StringConverter
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.service.PreferencesService
-import org.moinex.util.Constants
 import org.moinex.util.FxUtils
 import org.moinex.util.UIUtils
 import java.time.YearMonth

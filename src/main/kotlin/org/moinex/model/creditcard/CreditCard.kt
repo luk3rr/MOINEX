@@ -19,8 +19,8 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.moinex.common.extension.toRounded
+import org.moinex.constants.Constants
 import org.moinex.model.wallettransaction.Wallet
-import org.moinex.util.Constants
 import java.math.BigDecimal
 
 @Entity

@@ -13,6 +13,7 @@ import kotlinx.coroutines.sync.withLock
 import org.moinex.common.extension.getEffectiveEndDate
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isNotZero
+import org.moinex.constants.Constants
 import org.moinex.model.dto.InvestmentPerformanceDTO
 import org.moinex.model.enums.OperationType
 import org.moinex.model.investment.Bond
@@ -23,7 +24,6 @@ import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPurchase
 import org.moinex.model.investment.TickerSale
 import org.moinex.repository.investment.InvestmentPerformanceSnapshotRepository
-import org.moinex.util.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -11,8 +11,8 @@ package org.moinex.ui.main
 import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import org.moinex.constants.Constants
 import org.moinex.service.PreferencesService
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext

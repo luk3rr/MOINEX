@@ -33,6 +33,7 @@ import kotlinx.coroutines.delay
 import org.moinex.chart.ChartFactory
 import org.moinex.chart.DoughnutChart
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.dto.AllocationDTO
 import org.moinex.model.dto.ProfitabilityMetricsDTO
@@ -51,7 +52,6 @@ import org.moinex.service.investment.TickerService
 import org.moinex.ui.common.ProfitabilityMetricsPaneController
 import org.moinex.ui.dialog.investment.EditInvestmentTargetController
 import org.moinex.util.Animation
-import org.moinex.util.Constants
 import org.moinex.util.FxUtils
 import org.moinex.util.UIUtils
 import org.moinex.util.WindowUtils

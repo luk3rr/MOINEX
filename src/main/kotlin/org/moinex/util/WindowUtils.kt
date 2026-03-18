@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.moinex.app.JavaFXApp
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory

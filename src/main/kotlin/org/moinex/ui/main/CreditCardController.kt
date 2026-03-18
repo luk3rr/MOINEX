@@ -29,6 +29,7 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
@@ -42,7 +43,6 @@ import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController
 import org.moinex.ui.dialog.creditcard.ArchivedCreditCardsController
 import org.moinex.ui.dialog.creditcard.EditCreditCardDebtController
 import org.moinex.util.Animation
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory

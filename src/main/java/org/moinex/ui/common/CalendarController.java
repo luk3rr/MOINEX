@@ -29,12 +29,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import lombok.NoArgsConstructor;
+import org.moinex.constants.Constants;
 import org.moinex.constants.TranslationKeys;
 import org.moinex.model.CalendarEvent;
 import org.moinex.service.CalendarService;
 import org.moinex.service.PreferencesService;
 import org.moinex.ui.dialog.AddCalendarEventController;
-import org.moinex.util.Constants;
 import org.moinex.util.UIUtils;
 import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +139,7 @@ public class CalendarController {
 
         Integer currentDate = 1;
         int totalGridCells = dateOffset + monthMaxDate;
-        int totalRows = (int) Math.ceil(totalGridCells / Constants.WEEK_DAYS.doubleValue());
+        int totalRows = (int) Math.ceil((double) totalGridCells / Constants.WEEK_DAYS);
 
         Map<Integer, List<CalendarEvent>> calendarEventMap = getCalendarEventsMonth(dateFocus);
 

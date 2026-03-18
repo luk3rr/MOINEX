@@ -26,6 +26,7 @@ import javafx.scene.text.Text
 import javafx.util.Callback
 import javafx.util.StringConverter
 import org.moinex.common.extension.isValidForFundamentalAnalysis
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Dividend
@@ -41,7 +42,6 @@ import org.moinex.ui.dialog.investment.ArchivedTickersController
 import org.moinex.ui.dialog.investment.EditTickerController
 import org.moinex.ui.dialog.investment.FundamentalAnalysisController
 import org.moinex.ui.dialog.investment.InvestmentTransactionsController
-import org.moinex.util.Constants
 import org.moinex.util.FxUtils
 import org.moinex.util.UIUtils
 import org.moinex.util.WindowUtils

@@ -13,8 +13,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.MappedSuperclass
 import org.moinex.common.extension.isZero
+import org.moinex.constants.Constants
 import org.moinex.model.enums.AssetType
-import org.moinex.util.Constants
 import java.math.BigDecimal
 
 @MappedSuperclass

@@ -12,6 +12,7 @@ import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.retry.retry
 import org.moinex.config.RetryConfig
+import org.moinex.constants.Constants
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.WalletTransactionType
@@ -28,7 +29,6 @@ import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
 import org.moinex.service.wallet.WalletService
 import org.moinex.util.APIUtils
-import org.moinex.util.Constants
 import org.moinex.util.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

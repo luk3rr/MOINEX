@@ -8,7 +8,7 @@ package org.moinex.common.converter
 
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
-import org.moinex.util.Constants
+import org.moinex.constants.Constants
 import java.time.YearMonth
 
 @Converter(autoApply = false)

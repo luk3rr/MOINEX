@@ -12,13 +12,13 @@ import org.json.JSONObject
 import org.moinex.common.retry.RetryException
 import org.moinex.common.retry.retry
 import org.moinex.config.RetryConfig
+import org.moinex.constants.Constants
 import org.moinex.model.dto.SyncMarketIndicatorResultDTO
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.MarketIndicatorHistoryRepository
 import org.moinex.util.APIUtils
-import org.moinex.util.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -25,6 +25,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.layout.AnchorPane
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.goal.Goal
 import org.moinex.service.PreferencesService
@@ -34,7 +35,6 @@ import org.moinex.ui.common.GoalFullPaneController
 import org.moinex.ui.dialog.goal.AddGoalController
 import org.moinex.ui.dialog.goal.EditGoalController
 import org.moinex.ui.dialog.wallettransaction.AddTransferController
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory

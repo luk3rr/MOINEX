@@ -14,9 +14,9 @@ import javafx.scene.Parent
 import javafx.scene.control.ComboBox
 import javafx.stage.Stage
 import javafx.util.StringConverter
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
-import org.moinex.util.Constants
 import org.moinex.util.FxUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext

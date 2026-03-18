@@ -33,6 +33,7 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.chart.ChartFactory
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.dto.NetWorthDataPointDTO
@@ -47,7 +48,6 @@ import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ResumePaneController
 import org.moinex.util.Animation
-import org.moinex.util.Constants
 import org.moinex.util.FxUtils
 import org.moinex.util.UIUtils
 import org.slf4j.LoggerFactory

@@ -17,10 +17,10 @@ import javafx.scene.Scene
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import kotlinx.coroutines.delay
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.moinex.util.APIUtils
-import org.moinex.util.Constants
 import org.moinex.util.FxUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean

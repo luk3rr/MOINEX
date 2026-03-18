@@ -32,6 +32,7 @@ import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.constants.Constants
 import org.moinex.constants.TranslationKeys
 import org.moinex.model.Category
 import org.moinex.model.enums.WalletTransactionStatus
@@ -48,7 +49,6 @@ import org.moinex.ui.dialog.wallettransaction.AddIncomeController
 import org.moinex.ui.dialog.wallettransaction.EditTransactionController
 import org.moinex.ui.dialog.wallettransaction.RecurringTransactionController
 import org.moinex.util.Animation
-import org.moinex.util.Constants
 import org.moinex.util.UIUtils
 import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
