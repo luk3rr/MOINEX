@@ -507,7 +507,7 @@ class HomeController(
 
         expensesSeries.data.forEachIndexed { i, expenseData ->
             val incomeData = incomesSeries.data[i]
-            val targetExpenseValue = monthlyExpenses[expenseData.xValue]
+            val targetExpenseValue = monthlyExpenses.getOrDefault(expenseData.xValue, 0.0)
             val targetIncomeValue = monthlyIncomes.getOrDefault(expenseData.xValue, 0.0)
 
             UIUtils.addTooltipToXYChartNode(expenseData.node, UIUtils.formatCurrency(targetExpenseValue))
