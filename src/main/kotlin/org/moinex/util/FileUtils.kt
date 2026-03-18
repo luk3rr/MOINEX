@@ -11,4 +11,13 @@ object FileUtils {
         dir: String,
         filename: String,
     ): Path = Paths.get(dir, filename)
+
+    fun createDirectoriesIfNotExists(path: Path): Result<Path> =
+        runCatching {
+            if (!Files.exists(path)) {
+                Files.createDirectories(path)
+            } else {
+                path
+            }
+        }
 }

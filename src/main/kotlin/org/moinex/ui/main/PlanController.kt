@@ -18,8 +18,7 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import javafx.util.StringConverter
-import org.moinex.chart.BudgetGroupTimelineChart
-import org.moinex.chart.DoughnutChart
+import org.moinex.chart.ChartFactory
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.model.dto.PlanStatusDTO
 import org.moinex.model.financialplanning.FinancialPlan
@@ -43,6 +42,7 @@ class PlanController(
     private val springContext: ConfigurableApplicationContext,
     private val financialPlanningService: FinancialPlanningService,
     private val preferencesService: PreferencesService,
+    private val chartFactory: ChartFactory,
 ) {
     @FXML
     private lateinit var periodComboBox: ComboBox<YearMonth>
@@ -191,8 +191,7 @@ class PlanController(
             }
 
         val doughnutChart =
-            DoughnutChart(FXCollections.observableArrayList(pieChartData)).apply {
-                setI18nService(preferencesService)
+            chartFactory.createDoughnutChart(FXCollections.observableArrayList(pieChartData)).apply {
                 setShowCenterLabel(false)
                 isLegendVisible = true
                 labelsVisible = false
@@ -296,13 +295,12 @@ class PlanController(
             )
 
         val timelineChart =
-            BudgetGroupTimelineChart().apply {
-                setPreferencesService(preferencesService)
+            chartFactory.createBudgetGroupTimelineChart().apply {
                 setXAxisLabel(
-                    preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_X_AXIS),
+                    this@PlanController.preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_X_AXIS),
                 )
                 setYAxisLabel(
-                    preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_Y_AXIS),
+                    this@PlanController.preferencesService.translate(Constants.TranslationKeys.PLAN_TIMELINE_Y_AXIS),
                 )
                 updateData(historicalData)
             }

@@ -32,7 +32,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
-import org.moinex.chart.NetWorthLineChart
+import org.moinex.chart.ChartFactory
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.model.enums.WalletTransactionType
@@ -66,6 +66,7 @@ class HomeController(
     private val netWorthCalculationService: NetWorthCalculationService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
+    private val chartFactory: ChartFactory,
 ) {
     @FXML
     private lateinit var walletPrevButton: JFXButton
@@ -749,8 +750,7 @@ class HomeController(
         val dataPoints = calculateNetWorthData()
 
         val netWorthChart =
-            NetWorthLineChart().apply {
-                preferencesService = this@HomeController.preferencesService
+            chartFactory.createNetWorthLineChart().apply {
                 updateData(dataPoints)
             }
 

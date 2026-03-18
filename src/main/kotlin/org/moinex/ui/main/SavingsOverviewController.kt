@@ -30,6 +30,7 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import org.moinex.chart.ChartFactory
 import org.moinex.chart.DoughnutChart
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.model.dto.AllocationDTO
@@ -70,6 +71,7 @@ class SavingsOverviewController(
     private val investmentTargetService: InvestmentTargetService,
     private val bondService: BondService,
     private val investmentPerformanceService: InvestmentPerformanceService,
+    private val chartFactory: ChartFactory,
 ) {
     @FXML
     private lateinit var overviewTotalInvestedField: Text
@@ -393,8 +395,7 @@ class SavingsOverviewController(
                     .map { PieChart.Data(it.key, it.value.toDouble()) },
             )
 
-        val doughnutChart = DoughnutChart(pieChartData)
-        doughnutChart.setI18nService(preferencesService)
+        val doughnutChart = chartFactory.createDoughnutChart(pieChartData)
         doughnutChart.labelsVisible = false
 
         doughnutChart.data.forEach { data ->

@@ -24,6 +24,7 @@ import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
+import org.moinex.chart.ChartFactory
 import org.moinex.chart.DoughnutChart
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
@@ -62,6 +63,7 @@ class WalletController(
     private val recurringTransactionService: RecurringTransactionService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
+    private val chartFactory: ChartFactory,
 ) {
     @FXML
     private lateinit var walletPane1: AnchorPane
@@ -490,8 +492,7 @@ class WalletController(
             }
 
         val doughnutChart =
-            DoughnutChart(pieChartData).apply {
-                setI18nService(preferencesService)
+            chartFactory.createDoughnutChart(pieChartData).apply {
                 labelsVisible = false
             }
 

@@ -21,7 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import lombok.NoArgsConstructor;
-import org.moinex.chart.CircularProgressBar;
+import org.moinex.chart.ChartFactory;
 import org.moinex.error.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.service.PreferencesService;
@@ -93,6 +93,8 @@ public class GoalFullPaneController {
 
     private PreferencesService preferencesService;
 
+    private ChartFactory chartFactory;
+
     private Goal goal;
 
     /**
@@ -108,12 +110,14 @@ public class GoalFullPaneController {
             ConfigurableApplicationContext springContext,
             GoalController goalController,
             WalletService walletService,
-            PreferencesService preferencesService) {
+            PreferencesService preferencesService,
+            ChartFactory chartFactory) {
         this.goalService = goalService;
         this.springContext = springContext;
         this.goalController = goalController;
         this.walletService = walletService;
         this.preferencesService = preferencesService;
+        this.chartFactory = chartFactory;
     }
 
     /** Load goal information from the database */
@@ -165,11 +169,10 @@ public class GoalFullPaneController {
         }
 
         // Add the progress bar to the pane
-        CircularProgressBar progressBar =
-                new CircularProgressBar(
+        var progressBar =
+                chartFactory.createCircularProgressBar(
                         Constants.GOAL_PANE_PROGRESS_BAR_RADIUS,
                         Constants.GOAL_PANE_PROGRESS_BAR_WIDTH);
-        progressBar.setI18nService(preferencesService);
 
         double percentage;
 
