@@ -12,13 +12,13 @@ import io.mockk.verify
 import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.retry.RetryException
+import org.moinex.common.util.APIUtils
 import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.MarketIndicatorHistoryFactory
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.MarketIndicatorHistoryRepository
-import org.moinex.util.APIUtils
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -829,7 +829,7 @@ class MarketIndicatorServiceTest :
                     LocalDate.of(2025, 1, 1).atStartOfDay()
                 every { marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator) } returns null
                 coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } throws
-                    RetryException("Failed after retries", Exception("Network error"))
+                    RetryException("Failed after retries", Exception("Network exception"))
 
                 service.updateAllIndicators()
 
@@ -840,7 +840,7 @@ class MarketIndicatorServiceTest :
         }
 
         Given("API call fails with unexpected exception") {
-            When("synchronization fails with unexpected error") {
+            When("synchronization fails with unexpected exception") {
                 val indicator = InterestIndex.SELIC
 
                 every { bondOperationRepository.findAllUsedInterestIndices() } returns listOf(indicator)
@@ -848,7 +848,7 @@ class MarketIndicatorServiceTest :
                     LocalDate.of(2025, 1, 1).atStartOfDay()
                 every { marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator) } returns null
                 coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } throws
-                    RuntimeException("Unexpected error")
+                    RuntimeException("Unexpected exception")
 
                 service.updateAllIndicators()
 
@@ -880,7 +880,7 @@ class MarketIndicatorServiceTest :
         }
 
         Given("API call fails with unexpected exception type") {
-            When("synchronization fails with non-RetryException error") {
+            When("synchronization fails with non-RetryException exception") {
                 val indicator = InterestIndex.CDI
 
                 every { bondOperationRepository.findAllUsedInterestIndices() } returns listOf(indicator)
@@ -911,11 +911,11 @@ class MarketIndicatorServiceTest :
                     LocalDate.of(2025, 1, 1).atStartOfDay()
                 every { marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator) } returns null
                 coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } throws
-                    Exception("JSON parsing error")
+                    Exception("JSON parsing exception")
 
                 service.updateAllIndicators()
 
-                Then("should handle JSON parsing error gracefully") {
+                Then("should handle JSON parsing exception gracefully") {
                     verify(exactly = 0) { marketIndicatorHistoryRepository.save(any()) }
                 }
             }
@@ -934,7 +934,7 @@ class MarketIndicatorServiceTest :
 
                 service.updateAllIndicators()
 
-                Then("should handle missing field error gracefully") {
+                Then("should handle missing field exception gracefully") {
                     verify(exactly = 0) { marketIndicatorHistoryRepository.save(any()) }
                 }
             }
@@ -962,7 +962,7 @@ class MarketIndicatorServiceTest :
 
                 service.updateAllIndicators()
 
-                Then("should handle date parsing error gracefully") {
+                Then("should handle date parsing exception gracefully") {
                     verify(exactly = 0) { marketIndicatorHistoryRepository.save(any()) }
                 }
             }
@@ -990,7 +990,7 @@ class MarketIndicatorServiceTest :
 
                 service.updateAllIndicators()
 
-                Then("should handle invalid rate value error gracefully") {
+                Then("should handle invalid rate value exception gracefully") {
                     verify(exactly = 0) { marketIndicatorHistoryRepository.save(any()) }
                 }
             }

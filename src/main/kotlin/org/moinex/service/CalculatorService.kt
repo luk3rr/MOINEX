@@ -10,7 +10,7 @@ package org.moinex.service
 
 import javafx.scene.control.TextField
 import org.moinex.common.extension.toRounded
-import org.moinex.util.WindowUtils
+import org.moinex.common.util.WindowUtils
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 

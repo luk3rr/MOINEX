@@ -9,16 +9,16 @@
 package org.moinex.service.investment
 
 import org.json.JSONObject
+import org.moinex.common.constants.Constants
 import org.moinex.common.retry.RetryException
 import org.moinex.common.retry.retry
+import org.moinex.common.util.APIUtils
 import org.moinex.config.RetryConfig
-import org.moinex.constants.Constants
 import org.moinex.model.dto.SyncMarketIndicatorResultDTO
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.MarketIndicatorHistoryRepository
-import org.moinex.util.APIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -197,7 +197,7 @@ class MarketIndicatorService(
                         logger.error("Failed to sync {} after retries: {}", indicatorType, e.message)
                     }
                     else -> {
-                        logger.error("Unexpected error synchronizing indicator {}: {}", indicatorType, e.message)
+                        logger.error("Unexpected exception synchronizing indicator {}: {}", indicatorType, e.message)
                     }
                 }
                 SyncMarketIndicatorResultDTO(indicatorType, synced = false)

@@ -1,12 +1,12 @@
 /*
- * Filename: Animation.kt (original filename: Animation.java)
+ * Filename: AnimationUtils.kt (original filename: AnimationUtils.java)
  * Created on: October 12, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  *
  * Migrated to Kotlin on 18/03/2026
  */
 
-package org.moinex.util
+package org.moinex.common.util
 
 import javafx.animation.FadeTransition
 import javafx.animation.Interpolator
@@ -19,10 +19,10 @@ import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.stage.Stage
 import javafx.util.Duration
-import org.moinex.constants.Constants
+import org.moinex.common.constants.Constants
 import kotlin.math.ceil
 
-object Animation {
+object AnimationUtils {
     /**
      * Animates a bar chart
      *

@@ -1,12 +1,4 @@
-/*
- * Filename: SuggestionsHandlerHelper.kt (original filename: SuggestionsHandlerHelper.java)
- * Created on: March 15, 2025
- * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * Migrated to Kotlin on 18/03/2026
- */
-
-package org.moinex.util
+package org.moinex.common.helper
 
 import javafx.beans.value.ChangeListener
 import javafx.scene.control.Label
@@ -18,7 +10,7 @@ import javafx.scene.input.KeyEvent
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.stage.Popup
-import org.moinex.constants.Constants
+import org.moinex.common.constants.Constants
 import java.util.function.Consumer
 import java.util.function.Function
 

@@ -12,7 +12,8 @@ import java.time.LocalDate;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.TranslationKeys;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.model.Category;
 import org.moinex.model.dto.WalletTransactionContextDTO;
 import org.moinex.model.enums.OperationType;
@@ -24,7 +25,6 @@ import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.BondService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

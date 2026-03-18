@@ -12,14 +12,14 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.Constants;
-import org.moinex.constants.TranslationKeys;
+import org.moinex.common.constants.Constants;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.model.Category;
 import org.moinex.model.enums.BudgetGroupTransactionFilter;
 import org.moinex.model.financialplanning.BudgetGroup;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

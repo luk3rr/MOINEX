@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.FundamentalAnalysisFactory
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.model.enums.AssetType
@@ -16,7 +17,6 @@ import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis
 import org.moinex.repository.investment.FundamentalAnalysisRepository
 import org.moinex.repository.investment.TickerRepository
-import org.moinex.util.APIUtils
 import java.time.LocalDateTime
 
 class FundamentalAnalysisServiceFetchAndSaveTest :
@@ -139,8 +139,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
             }
         }
 
-        Given("API returns error for financial data not available") {
-            When("fetching analysis with partial data error") {
+        Given("API returns exception for financial data not available") {
+            When("fetching analysis with partial data exception") {
                 val ticker =
                     TickerFactory.create(
                         id = 3,
@@ -154,7 +154,7 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         mapOf(
                             "NEWCO" to
                                 mapOf(
-                                    "error" to "Financial data not available",
+                                    "exception" to "Financial data not available",
                                     "company_name" to "",
                                 ),
                         ),

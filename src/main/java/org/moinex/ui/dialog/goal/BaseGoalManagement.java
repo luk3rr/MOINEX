@@ -11,12 +11,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.Constants;
+import org.moinex.common.constants.Constants;
+import org.moinex.common.util.UIUtils;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.goal.GoalService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Base class to implement the common behavior of the Add and Edit Goal */

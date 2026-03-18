@@ -6,12 +6,12 @@
  * Migrated to Kotlin on 18/03/2026
  */
 
-package org.moinex.error
+package org.moinex.exception
 
 sealed class MoinexException(
     message: String,
 ) : RuntimeException(message) {
-    /** Exception thrown when there is an error fetching data from an API */
+    /** Exception thrown when there is an exception fetching data from an API */
     class APIFetchException(
         message: String,
     ) : MoinexException(message)

@@ -14,10 +14,10 @@ import javafx.scene.Parent
 import javafx.scene.control.ComboBox
 import javafx.stage.Stage
 import javafx.util.StringConverter
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.FxUtils
 import org.moinex.service.PreferencesService
-import org.moinex.util.FxUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

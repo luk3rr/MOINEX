@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
-import org.moinex.constants.Constants
+import org.moinex.common.constants.Constants
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.wallet.RecurringTransactionFactory
 import org.moinex.factory.wallet.WalletFactory
@@ -17,8 +17,6 @@ import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository
-import org.moinex.service.wallet.RecurringTransactionService
-import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Year

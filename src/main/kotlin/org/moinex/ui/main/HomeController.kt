@@ -32,9 +32,12 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
-import org.moinex.chart.ChartFactory
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.chart.ChartFactory
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.AnimationUtils
+import org.moinex.common.util.FxUtils
+import org.moinex.common.util.UIUtils
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.model.enums.WalletTransactionType
@@ -47,9 +50,6 @@ import org.moinex.service.networth.NetWorthService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ResumePaneController
-import org.moinex.util.Animation
-import org.moinex.util.FxUtils
-import org.moinex.util.UIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -494,7 +494,7 @@ class HomeController(
         }
 
         (moneyFlowBarChart!!.yAxis as? NumberAxis)?.let { numberAxis ->
-            Animation.setDynamicYAxisBounds(numberAxis, maxValue)
+            AnimationUtils.setDynamicYAxisBounds(numberAxis, maxValue)
             numberAxis.tickLabelFormatter =
                 object : StringConverter<Number>() {
                     override fun toString(value: Number): String = UIUtils.formatCurrency(value)
@@ -514,8 +514,8 @@ class HomeController(
             UIUtils.addTooltipToXYChartNode(expenseData.node, UIUtils.formatCurrency(targetExpenseValue))
             UIUtils.addTooltipToXYChartNode(incomeData.node, UIUtils.formatCurrency(targetIncomeValue))
 
-            Animation.xyChartAnimation(expenseData, targetExpenseValue)
-            Animation.xyChartAnimation(incomeData, targetIncomeValue)
+            AnimationUtils.xyChartAnimation(expenseData, targetExpenseValue)
+            AnimationUtils.xyChartAnimation(incomeData, targetIncomeValue)
         }
     }
 

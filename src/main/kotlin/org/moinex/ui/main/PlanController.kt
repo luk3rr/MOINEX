@@ -18,10 +18,12 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import javafx.util.StringConverter
-import org.moinex.chart.ChartFactory
+import org.moinex.common.chart.ChartFactory
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.PlanStatusDTO
 import org.moinex.model.financialplanning.FinancialPlan
 import org.moinex.service.PreferencesService
@@ -29,8 +31,6 @@ import org.moinex.service.financialplanning.FinancialPlanningService
 import org.moinex.ui.common.BudgetGroupPaneController
 import org.moinex.ui.dialog.financialplanning.AddPlanController
 import org.moinex.ui.dialog.financialplanning.EditPlanController
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

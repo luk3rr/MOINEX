@@ -4,7 +4,7 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-package org.moinex.chart
+package org.moinex.common.chart
 
 import javafx.collections.ObservableList
 import javafx.scene.chart.PieChart

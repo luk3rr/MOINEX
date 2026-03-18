@@ -19,11 +19,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.TranslationKeys;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.model.creditcard.CreditCard;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.creditcard.CreditCardService;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

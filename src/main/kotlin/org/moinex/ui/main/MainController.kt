@@ -23,12 +23,12 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import javafx.util.Pair
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.WindowUtils
 import org.moinex.service.PreferencesService
 import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -241,7 +241,7 @@ class MainController(
                 }
                 else -> {
                     logger.error(
-                        "Unexpected error loading content. FXML: '{}', StyleSheet: '{}'",
+                        "Unexpected exception loading content. FXML: '{}', StyleSheet: '{}'",
                         fxmlFile,
                         styleSheet,
                         e,

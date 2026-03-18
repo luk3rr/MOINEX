@@ -16,8 +16,10 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.text.Text
 import javafx.util.StringConverter
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BondType
 import org.moinex.model.investment.Bond
 import org.moinex.service.PreferencesService
@@ -29,8 +31,6 @@ import org.moinex.ui.dialog.investment.ArchivedBondsController
 import org.moinex.ui.dialog.investment.BondInterestHistoryController
 import org.moinex.ui.dialog.investment.BondTransactionsController
 import org.moinex.ui.dialog.investment.EditBondController
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

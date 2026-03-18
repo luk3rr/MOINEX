@@ -11,13 +11,13 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.FundamentalAnalysisFactory
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.PeriodType
 import org.moinex.repository.investment.FundamentalAnalysisRepository
 import org.moinex.repository.investment.TickerRepository
-import org.moinex.util.APIUtils
 import java.time.LocalDateTime
 import java.util.Optional
 

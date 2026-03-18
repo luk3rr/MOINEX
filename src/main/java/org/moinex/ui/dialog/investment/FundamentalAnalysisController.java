@@ -28,17 +28,17 @@ import kotlinx.coroutines.BuildersKt;
 import kotlinx.coroutines.Dispatchers;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
+import org.moinex.common.constants.Constants;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.UIUtils;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.config.RetryConfig;
-import org.moinex.constants.Constants;
-import org.moinex.constants.TranslationKeys;
 import org.moinex.model.enums.PeriodType;
 import org.moinex.model.investment.FundamentalAnalysis;
 import org.moinex.model.investment.Ticker;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.FundamentalAnalysisService;
 import org.moinex.ui.common.FundamentalMetricPaneController;
-import org.moinex.util.UIUtils;
-import org.moinex.util.WindowUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,12 +252,12 @@ public class FundamentalAnalysisController {
                             preferencesService.translate(
                                     TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE);
 
-                    // Check if it's a network/API error
+                    // Check if it's a network/API exception
                     if (errorMessage != null
                             && (errorMessage.contains("Network is unreachable")
                                     || errorMessage.contains("Connection")
                                     || errorMessage.contains("Max retries exceeded")
-                                    || errorMessage.contains("API error after"))) {
+                                    || errorMessage.contains("API exception after"))) {
                         title =
                                 preferencesService.translate(
                                         TranslationKeys

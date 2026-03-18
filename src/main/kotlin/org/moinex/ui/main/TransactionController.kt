@@ -27,13 +27,16 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.util.StringConverter
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.setAnchorPaneConstraints
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.util.AnimationUtils
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
@@ -48,9 +51,6 @@ import org.moinex.ui.dialog.wallettransaction.AddExpenseController
 import org.moinex.ui.dialog.wallettransaction.AddIncomeController
 import org.moinex.ui.dialog.wallettransaction.EditTransactionController
 import org.moinex.ui.dialog.wallettransaction.RecurringTransactionController
-import org.moinex.util.Animation
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -503,7 +503,7 @@ class TransactionController(
         val maxTotal =
             monthlyTotals.values.maxOfOrNull { it.values.sum() } ?: 0.0
 
-        Animation.setDynamicYAxisBounds(numberAxis, maxTotal)
+        AnimationUtils.setDynamicYAxisBounds(numberAxis, maxTotal)
 
         numberAxis.tickLabelFormatter =
             object : StringConverter<Number>() {
@@ -533,7 +533,7 @@ class TransactionController(
                         "Total: ${UIUtils.formatCurrency(monthTotal)}",
                 )
 
-                Animation.stackedXYChartAnimation(listOf(data), listOf(value))
+                AnimationUtils.stackedXYChartAnimation(listOf(data), listOf(value))
             }
         }
     }

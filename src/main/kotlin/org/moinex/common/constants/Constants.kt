@@ -1,4 +1,4 @@
-package org.moinex.constants
+package org.moinex.common.constants
 
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
@@ -300,7 +300,7 @@ object Constants {
     const val INSTALLMENTS_FIELD_MAX_DIGITS: Int = 3
     const val MAX_INSTALLMENTS: Int = 999
 
-    // Animation constants
+    // AnimationUtils constants
     const val MENU_COLLAPSED_WIDTH: Double = 80.0
     const val MENU_EXPANDED_WIDTH: Double = 220.0
 

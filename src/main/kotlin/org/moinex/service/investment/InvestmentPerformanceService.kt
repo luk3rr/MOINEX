@@ -10,10 +10,10 @@ package org.moinex.service.investment
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.moinex.common.constants.Constants
 import org.moinex.common.extension.getEffectiveEndDate
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isNotZero
-import org.moinex.constants.Constants
 import org.moinex.model.dto.InvestmentPerformanceDTO
 import org.moinex.model.enums.OperationType
 import org.moinex.model.investment.Bond

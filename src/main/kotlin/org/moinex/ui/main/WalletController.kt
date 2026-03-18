@@ -24,13 +24,16 @@ import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
-import org.moinex.chart.ChartFactory
-import org.moinex.chart.DoughnutChart
+import org.moinex.common.chart.ChartFactory
+import org.moinex.common.chart.DoughnutChart
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.util.AnimationUtils
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.BalanceDataDTO
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
@@ -44,9 +47,6 @@ import org.moinex.ui.dialog.wallettransaction.AddTransferController
 import org.moinex.ui.dialog.wallettransaction.AddWalletController
 import org.moinex.ui.dialog.wallettransaction.ArchivedWalletsController
 import org.moinex.ui.dialog.wallettransaction.TransferController
-import org.moinex.util.Animation
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -663,7 +663,7 @@ class WalletController(
         }
 
         (moneyFlowBarChart!!.yAxis as? NumberAxis)?.let { numberAxis ->
-            Animation.setDynamicYAxisBounds(numberAxis, maxValue)
+            AnimationUtils.setDynamicYAxisBounds(numberAxis, maxValue)
             numberAxis.tickLabelFormatter =
                 object : StringConverter<Number>() {
                     override fun toString(value: Number): String = UIUtils.formatCurrency(value)
@@ -683,8 +683,8 @@ class WalletController(
             UIUtils.addTooltipToXYChartNode(expenseData.node, UIUtils.formatCurrency(targetExpenseValue))
             UIUtils.addTooltipToXYChartNode(incomeData.node, UIUtils.formatCurrency(targetIncomeValue))
 
-            Animation.xyChartAnimation(expenseData, targetExpenseValue)
-            Animation.xyChartAnimation(incomeData, targetIncomeValue)
+            AnimationUtils.xyChartAnimation(expenseData, targetExpenseValue)
+            AnimationUtils.xyChartAnimation(incomeData, targetIncomeValue)
         }
     }
 

@@ -15,9 +15,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.Constants;
-import org.moinex.constants.TranslationKeys;
-import org.moinex.error.MoinexException;
+import org.moinex.common.constants.Constants;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.UIUtils;
+import org.moinex.common.util.WindowUtils;
+import org.moinex.exception.MoinexException;
 import org.moinex.model.Category;
 import org.moinex.model.wallettransaction.Transfer;
 import org.moinex.model.wallettransaction.Wallet;
@@ -25,8 +27,6 @@ import org.moinex.service.CalculatorService;
 import org.moinex.service.CategoryService;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.UIUtils;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -176,7 +176,8 @@ public class AddTransferController extends BaseTransferManagement {
                         && otherWallet.isVirtual()
                         && otherWallet.getMasterWallet().equals(currentWallet)) {
                     // If the current wallet is the SENDER and is a master wallet of the receiver,
-                    // then an error is thrown... BUT be a buddy and show a message to the user :)
+                    // then an exception is thrown... BUT be a buddy and show a message to the user
+                    // :)
                     WindowUtils.showInformationDialog(
                             preferencesService.translate(
                                     TranslationKeys

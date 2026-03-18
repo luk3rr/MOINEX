@@ -14,12 +14,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.TranslationKeys;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.UIUtils;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.UIUtils;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

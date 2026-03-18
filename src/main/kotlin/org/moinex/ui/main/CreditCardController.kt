@@ -29,8 +29,11 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.AnimationUtils
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardPayment
@@ -42,9 +45,6 @@ import org.moinex.ui.dialog.creditcard.AddCreditCardController
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController
 import org.moinex.ui.dialog.creditcard.ArchivedCreditCardsController
 import org.moinex.ui.dialog.creditcard.EditCreditCardDebtController
-import org.moinex.util.Animation
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -720,7 +720,7 @@ class CreditCardController(
                 monthData.values.sumOf { it }
             } ?: 0.0
 
-        Animation.setDynamicYAxisBounds(numberAxis, maxTotal)
+        AnimationUtils.setDynamicYAxisBounds(numberAxis, maxTotal)
 
         numberAxis.tickLabelFormatter =
             object : StringConverter<Number>() {
@@ -747,7 +747,7 @@ class CreditCardController(
                         "Total: ${UIUtils.formatCurrency(monthTotal)}",
                 )
 
-                Animation.stackedXYChartAnimation(listOf(data), listOf(value))
+                AnimationUtils.stackedXYChartAnimation(listOf(data), listOf(value))
             }
         }
     }

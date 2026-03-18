@@ -14,14 +14,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.TranslationKeys;
-import org.moinex.error.MoinexException;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.WindowUtils;
+import org.moinex.exception.MoinexException;
 import org.moinex.model.goal.Goal;
 import org.moinex.model.wallettransaction.Wallet;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.goal.GoalService;
 import org.moinex.service.wallet.WalletService;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

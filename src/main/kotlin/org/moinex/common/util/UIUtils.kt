@@ -6,7 +6,7 @@
  * Migrated to Kotlin on 18/03/2026
  */
 
-package org.moinex.util
+package org.moinex.common.util
 
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
@@ -26,10 +26,11 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.text.Text
+import javafx.util.Callback
 import javafx.util.Duration
 import javafx.util.StringConverter
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.BondType
 import org.moinex.model.enums.CalendarEventType
@@ -284,7 +285,7 @@ class UIUtils(
         ) {
             comboBox.apply {
                 cellFactory =
-                    javafx.util.Callback {
+                    Callback {
                         object : ListCell<T>() {
                             override fun updateItem(
                                 item: T?,
@@ -362,7 +363,7 @@ class UIUtils(
             alignment: Pos,
         ) {
             column.cellFactory =
-                javafx.util.Callback {
+                Callback {
                     object : TableCell<S, T>() {
                         override fun updateItem(
                             item: T?,

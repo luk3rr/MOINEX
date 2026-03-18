@@ -14,13 +14,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.TranslationKeys;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.UIUtils;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.model.CalendarEvent;
 import org.moinex.model.enums.CalendarEventType;
 import org.moinex.service.CalendarService;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.UIUtils;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

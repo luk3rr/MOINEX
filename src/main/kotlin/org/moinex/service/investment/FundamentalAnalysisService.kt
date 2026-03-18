@@ -13,15 +13,15 @@ import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isCacheExpired
 import org.moinex.common.extension.isValidForFundamentalAnalysis
 import org.moinex.common.retry.retry
+import org.moinex.common.util.APIUtils
 import org.moinex.config.RetryConfig
-import org.moinex.error.MoinexException
+import org.moinex.exception.MoinexException
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis
 import org.moinex.model.investment.Ticker
 import org.moinex.repository.investment.FundamentalAnalysisRepository
 import org.moinex.repository.investment.TickerRepository
-import org.moinex.util.APIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -116,10 +116,10 @@ class FundamentalAnalysisService(
         tickerData: JSONObject,
         symbol: String,
     ) {
-        if (!tickerData.has("error")) return
+        if (!tickerData.has("exception")) return
 
-        val errorMsg = tickerData.getString("error")
-        logger.warn("API returned error for {}: {}", symbol, errorMsg)
+        val errorMsg = tickerData.getString("exception")
+        logger.warn("API returned exception for {}: {}", symbol, errorMsg)
 
         when {
             errorMsg.contains("Financial data not available") -> {
@@ -129,7 +129,7 @@ class FundamentalAnalysisService(
                 )
             }
             else -> {
-                throw MoinexException.APIFetchException("API error: $errorMsg")
+                throw MoinexException.APIFetchException("API exception: $errorMsg")
             }
         }
     }

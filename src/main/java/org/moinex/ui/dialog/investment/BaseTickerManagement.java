@@ -11,11 +11,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.Constants;
+import org.moinex.common.constants.Constants;
+import org.moinex.common.util.UIUtils;
 import org.moinex.model.enums.AssetType;
 import org.moinex.service.PreferencesService;
 import org.moinex.service.investment.TickerService;
-import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Base class to implement common methods for AddTickerController and EditTickerController */

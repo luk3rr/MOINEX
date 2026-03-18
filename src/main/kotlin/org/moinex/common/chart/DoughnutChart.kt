@@ -6,7 +6,7 @@
  * Migrated to Kotlin on 18/03/2026
  */
 
-package org.moinex.chart
+package org.moinex.common.chart
 
 import javafx.animation.ScaleTransition
 import javafx.collections.ObservableList
@@ -18,8 +18,8 @@ import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.util.Duration
+import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
-import org.moinex.util.UIUtils
 
 class DoughnutChart(
     pieData: ObservableList<Data>,

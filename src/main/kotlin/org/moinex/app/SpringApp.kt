@@ -8,8 +8,8 @@
 
 package org.moinex.app
 
+import org.moinex.common.util.FileUtils
 import org.moinex.config.AppConfig
-import org.moinex.util.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ConfigurableApplicationContext

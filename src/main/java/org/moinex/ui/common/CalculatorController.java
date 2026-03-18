@@ -13,10 +13,10 @@ import javafx.stage.Stage;
 import lombok.NoArgsConstructor;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
-import org.moinex.constants.TranslationKeys;
+import org.moinex.common.constants.TranslationKeys;
+import org.moinex.common.util.WindowUtils;
 import org.moinex.service.CalculatorService;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.WindowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

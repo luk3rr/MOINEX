@@ -1,6 +1,6 @@
 package org.moinex.common.extension
 
-import org.moinex.constants.Constants
+import org.moinex.common.constants.Constants
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year

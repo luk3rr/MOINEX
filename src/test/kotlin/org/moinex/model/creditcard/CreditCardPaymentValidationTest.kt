@@ -3,8 +3,8 @@ package org.moinex.model.creditcard
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import org.moinex.common.constants.Constants
 import org.moinex.common.extension.isZero
-import org.moinex.constants.Constants
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.creditcard.CreditCardOperatorFactory

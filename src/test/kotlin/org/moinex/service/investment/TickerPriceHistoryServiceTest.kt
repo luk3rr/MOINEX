@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.util.APIUtils
 import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.factory.investment.TickerPriceHistoryFactory
@@ -19,7 +20,6 @@ import org.moinex.repository.investment.TickerPriceHistoryRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
-import org.moinex.util.APIUtils
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -336,7 +336,7 @@ class TickerPriceHistoryServiceTest :
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
                     listOf(ticker)
                 every { tickerPurchaseRepository.findAllByTickerId(1) } throws
-                    RuntimeException("Database error")
+                    RuntimeException("Database exception")
 
                 service.initializePriceHistory()
 

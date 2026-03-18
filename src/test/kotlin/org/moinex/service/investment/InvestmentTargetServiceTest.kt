@@ -325,7 +325,7 @@ class InvestmentTargetServiceTest :
                     result.isValid shouldBe false
                 }
 
-                Then("should contain error messages") {
+                Then("should contain exception messages") {
                     result.errors.size shouldBe 2
                 }
             }
@@ -345,7 +345,7 @@ class InvestmentTargetServiceTest :
                     result.isValid shouldBe false
                 }
 
-                Then("should contain total error") {
+                Then("should contain total exception") {
                     result.errors.any { it.contains("100") } shouldBe true
                 }
             }
@@ -381,7 +381,7 @@ class InvestmentTargetServiceTest :
                     result.isValid shouldBe false
                 }
 
-                Then("should have total error") {
+                Then("should have total exception") {
                     result.errors.any { it.contains("100") } shouldBe true
                 }
             }

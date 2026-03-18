@@ -17,9 +17,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.moinex.common.constants.Constants
 import org.moinex.common.converter.LocalDateTimeStringConverter
 import org.moinex.common.extension.toRounded
-import org.moinex.constants.Constants
 import org.moinex.model.wallettransaction.Wallet
 import java.math.BigDecimal
 import java.time.LocalDateTime

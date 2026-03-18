@@ -11,6 +11,8 @@ import io.mockk.mockkObject
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.extension.toRounded
+import org.moinex.common.util.APIUtils
+import org.moinex.common.util.FileUtils
 import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.model.enums.AssetType
@@ -21,8 +23,6 @@ import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
 import org.moinex.service.wallet.WalletService
-import org.moinex.util.APIUtils
-import org.moinex.util.FileUtils
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -138,7 +138,7 @@ class TickerServiceUpdatePricesTest :
                 }
             }
 
-            And("API returns error for some tickers") {
+            And("API returns exception for some tickers") {
                 When("updating ticker prices with partial failures") {
                     val ticker1 =
                         TickerFactory.create(
@@ -163,7 +163,7 @@ class TickerServiceUpdatePricesTest :
                             ).put(
                                 "INVALID",
                                 JSONObject()
-                                    .put("error", "Ticker not found"),
+                                    .put("exception", "Ticker not found"),
                             )
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
@@ -426,11 +426,11 @@ class TickerServiceUpdatePricesTest :
                         .put(
                             "INVALID1",
                             JSONObject()
-                                .put("error", "Not found"),
+                                .put("exception", "Not found"),
                         ).put(
                             "INVALID2",
                             JSONObject()
-                                .put("error", "Not found"),
+                                .put("exception", "Not found"),
                         )
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
@@ -480,7 +480,7 @@ class TickerServiceUpdatePricesTest :
                         ).put(
                             "INVALID",
                             JSONObject()
-                                .put("error", "Ticker not found"),
+                                .put("exception", "Ticker not found"),
                         )
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
@@ -551,8 +551,8 @@ class TickerServiceUpdatePricesTest :
                 }
             }
 
-            And("API returns error for logo download") {
-                When("updating ticker prices with logo download error") {
+            And("API returns exception for logo download") {
+                When("updating ticker prices with logo download exception") {
                     every { FileUtils.getPath(any(), any()) } returns mockk<Path>(relaxed = true)
                     every { FileUtils.exists(any()) } returns false
                     val ticker =
@@ -577,7 +577,7 @@ class TickerServiceUpdatePricesTest :
                             .put(
                                 "apple.com",
                                 JSONObject()
-                                    .put("error", "Logo not found"),
+                                    .put("exception", "Logo not found"),
                             )
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
@@ -587,7 +587,7 @@ class TickerServiceUpdatePricesTest :
 
                     service.updateAllNonArchivedTickersPrices()
 
-                    Then("should update ticker price despite logo error") {
+                    Then("should update ticker price despite logo exception") {
                         ticker.currentUnitValue shouldBe BigDecimal("150.00")
                     }
 
@@ -598,7 +598,7 @@ class TickerServiceUpdatePricesTest :
             }
 
             And("logo download returns malformed JSON") {
-                When("updating ticker prices with logo processing error") {
+                When("updating ticker prices with logo processing exception") {
                     every { FileUtils.getPath(any(), any()) } returns mockk<Path>(relaxed = true)
                     every { FileUtils.exists(any()) } returns false
                     val ticker =

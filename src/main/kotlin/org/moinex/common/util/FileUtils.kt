@@ -1,4 +1,4 @@
-package org.moinex.util
+package org.moinex.common.util
 
 import java.nio.file.Files
 import java.nio.file.Path

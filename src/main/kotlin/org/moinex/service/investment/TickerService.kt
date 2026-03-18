@@ -8,11 +8,13 @@
 
 package org.moinex.service.investment
 
+import org.moinex.common.constants.Constants
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.retry.retry
+import org.moinex.common.util.APIUtils
+import org.moinex.common.util.FileUtils
 import org.moinex.config.RetryConfig
-import org.moinex.constants.Constants
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.WalletTransactionType
@@ -28,8 +30,6 @@ import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
 import org.moinex.service.wallet.WalletService
-import org.moinex.util.APIUtils
-import org.moinex.util.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -50,7 +50,7 @@ class TickerService(
 
     companion object {
         private const val API_RESPONSE_LOGO_PATH_FIELD = "logo_path"
-        private const val API_RESPONSE_ERROR_FIELD = "error"
+        private const val API_RESPONSE_ERROR_FIELD = "exception"
         private const val API_RESPONSE_PRICE_FIELD = "price"
         private const val API_RESPONSE_WEBSITE_FIELD = "website"
     }

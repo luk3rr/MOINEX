@@ -6,7 +6,7 @@
  * Migrated to Kotlin on 16/03/2026
  */
 
-package org.moinex.chart
+package org.moinex.common.chart
 
 import javafx.geometry.Side
 import javafx.scene.chart.CategoryAxis
@@ -14,12 +14,12 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.shape.Line
 import javafx.util.StringConverter
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.FxUtils
+import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.service.PreferencesService
-import org.moinex.util.FxUtils
-import org.moinex.util.UIUtils
 import java.time.YearMonth
 
 class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()) {

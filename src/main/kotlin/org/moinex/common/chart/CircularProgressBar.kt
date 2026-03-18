@@ -6,15 +6,15 @@
  * Migrated to Kotlin on 18/03/2026
  */
 
-package org.moinex.chart
+package org.moinex.common.chart
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
 import javafx.scene.text.TextAlignment
+import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
-import org.moinex.util.UIUtils
 
 class CircularProgressBar(
     radius: Double,

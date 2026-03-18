@@ -1,4 +1,4 @@
-package org.moinex.constants
+package org.moinex.common.constants
 
 object TranslationKeys {
     // App

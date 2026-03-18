@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import lombok.NoArgsConstructor;
-import org.moinex.constants.Constants;
+import org.moinex.common.constants.Constants;
+import org.moinex.common.util.UIUtils;
 import org.moinex.model.dto.ProfitabilityMetricsDTO;
 import org.moinex.service.PreferencesService;
-import org.moinex.util.UIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 

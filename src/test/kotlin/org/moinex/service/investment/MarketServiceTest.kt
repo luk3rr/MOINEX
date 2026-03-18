@@ -13,6 +13,7 @@ import io.mockk.mockkObject
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.retry.RetryException
+import org.moinex.common.util.APIUtils
 import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.BrazilianMarketIndicatorsFactory
 import org.moinex.factory.investment.MarketQuotesAndCommoditiesFactory
@@ -20,7 +21,6 @@ import org.moinex.model.investment.BrazilianMarketIndicators
 import org.moinex.model.investment.MarketQuotesAndCommodities
 import org.moinex.repository.investment.BrazilianMarketIndicatorsRepository
 import org.moinex.repository.investment.MarketQuotesAndCommoditiesRepository
-import org.moinex.util.APIUtils
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -355,7 +355,7 @@ class MarketServiceTest :
         Given("API fails when updating Brazilian market indicators") {
             When("API throws exception during fetch") {
                 every { brazilianMarketIndicatorsRepository.findAll() } returns emptyList()
-                coEvery { APIUtils.fetchBrazilianMarketIndicators() } throws RuntimeException("API error")
+                coEvery { APIUtils.fetchBrazilianMarketIndicators() } throws RuntimeException("API exception")
 
                 Then("should throw RetryException after retries") {
                     shouldThrow<RetryException> {
@@ -368,7 +368,7 @@ class MarketServiceTest :
         Given("API fails when updating market quotes and commodities") {
             When("API throws exception during fetch") {
                 every { marketQuotesAndCommoditiesRepository.findAll() } returns emptyList()
-                coEvery { APIUtils.fetchStockPrices(any()) } throws RuntimeException("API error")
+                coEvery { APIUtils.fetchStockPrices(any()) } throws RuntimeException("API exception")
 
                 Then("should throw RetryException after retries") {
                     shouldThrow<RetryException> {

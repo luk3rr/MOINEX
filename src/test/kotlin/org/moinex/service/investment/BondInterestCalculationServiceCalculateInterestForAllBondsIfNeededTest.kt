@@ -174,12 +174,12 @@ class BondInterestCalculationServiceCalculateInterestForAllBondsIfNeededTest :
                         any(),
                         any(),
                     )
-                } throws RuntimeException("Unexpected error")
+                } throws RuntimeException("Unexpected exception")
                 every { bondInterestCalculationRepository.findLastCalculatedMonth(any()) } returns null
 
                 service.calculateInterestForAllBondsIfNeeded()
 
-                Then("should continue processing despite error") {
+                Then("should continue processing despite exception") {
                     verify { bondOperationRepository.findByBondOrderByOperationDateAsc(bond) }
                 }
             }

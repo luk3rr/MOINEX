@@ -2,6 +2,7 @@ package org.moinex.service.wallet
 
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
+import org.moinex.common.util.UIUtils
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.Transfer
@@ -12,7 +13,6 @@ import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository
 import org.moinex.repository.wallettransaction.WalletTypeRepository
-import org.moinex.util.UIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service

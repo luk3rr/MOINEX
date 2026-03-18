@@ -10,7 +10,7 @@
  * and safe with respect to thread confinement rules of JavaFX.
  */
 
-package org.moinex.util
+package org.moinex.common.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

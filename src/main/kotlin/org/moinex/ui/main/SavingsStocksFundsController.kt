@@ -25,9 +25,12 @@ import javafx.scene.image.ImageView
 import javafx.scene.text.Text
 import javafx.util.Callback
 import javafx.util.StringConverter
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.isValidForFundamentalAnalysis
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.util.FxUtils
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Dividend
 import org.moinex.model.investment.Ticker
@@ -42,9 +45,6 @@ import org.moinex.ui.dialog.investment.ArchivedTickersController
 import org.moinex.ui.dialog.investment.EditTickerController
 import org.moinex.ui.dialog.investment.FundamentalAnalysisController
 import org.moinex.ui.dialog.investment.InvestmentTransactionsController
-import org.moinex.util.FxUtils
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

@@ -2,7 +2,7 @@ package org.moinex.common.converter
 
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
-import org.moinex.constants.Constants
+import org.moinex.common.constants.Constants
 import java.time.LocalDate
 
 @Converter(autoApply = false)

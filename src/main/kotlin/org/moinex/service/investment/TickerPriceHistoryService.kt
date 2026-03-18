@@ -15,6 +15,7 @@ import org.json.JSONObject
 import org.moinex.common.extension.throwIfError
 import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.common.retry.retry
+import org.moinex.common.util.APIUtils
 import org.moinex.config.RetryConfig
 import org.moinex.model.dto.TickerPriceInitializationStatsDTO
 import org.moinex.model.investment.Ticker
@@ -23,7 +24,6 @@ import org.moinex.repository.investment.TickerPriceHistoryRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
-import org.moinex.util.APIUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -23,10 +23,12 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.AnchorPane
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.setAnchorPaneConstraints
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.goal.Goal
 import org.moinex.service.PreferencesService
 import org.moinex.service.goal.GoalService
@@ -35,8 +37,6 @@ import org.moinex.ui.common.GoalFullPaneController
 import org.moinex.ui.dialog.goal.AddGoalController
 import org.moinex.ui.dialog.goal.EditGoalController
 import org.moinex.ui.dialog.wallettransaction.AddTransferController
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

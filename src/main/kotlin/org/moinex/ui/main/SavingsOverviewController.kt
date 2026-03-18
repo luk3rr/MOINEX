@@ -30,11 +30,15 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import org.moinex.chart.ChartFactory
-import org.moinex.chart.DoughnutChart
+import org.moinex.common.chart.ChartFactory
+import org.moinex.common.chart.DoughnutChart
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.util.AnimationUtils
+import org.moinex.common.util.FxUtils
+import org.moinex.common.util.UIUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.AllocationDTO
 import org.moinex.model.dto.ProfitabilityMetricsDTO
 import org.moinex.model.dto.TickerPerformanceDTO
@@ -51,10 +55,6 @@ import org.moinex.service.investment.MarketService
 import org.moinex.service.investment.TickerService
 import org.moinex.ui.common.ProfitabilityMetricsPaneController
 import org.moinex.ui.dialog.investment.EditInvestmentTargetController
-import org.moinex.util.Animation
-import org.moinex.util.FxUtils
-import org.moinex.util.UIUtils
-import org.moinex.util.WindowUtils
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -564,7 +564,7 @@ class SavingsOverviewController(
             portfolioValues.values
                 .maxOfOrNull { it.toDouble() } ?: 0.0
 
-        Animation.setDynamicYAxisBounds(yAxis, maxTotal)
+        AnimationUtils.setDynamicYAxisBounds(yAxis, maxTotal)
 
         UIUtils.formatCurrencyYAxis(yAxis)
         UIUtils.applyDefaultChartStyle(stackedBarChart)

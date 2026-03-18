@@ -6,9 +6,10 @@
  * Migrated to Kotlin on 18/03/2026
  */
 
-package org.moinex.util
+package org.moinex.common.util
 
 import javafx.fxml.FXMLLoader
+import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
@@ -18,8 +19,8 @@ import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.moinex.app.JavaFXApp
-import org.moinex.constants.Constants
-import org.moinex.constants.TranslationKeys
+import org.moinex.common.constants.Constants
+import org.moinex.common.constants.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
@@ -154,7 +155,7 @@ object WindowUtils {
                     setControllerFactory { springContext.getBean(it) }
                 }
 
-            val root = loader.load<javafx.scene.Parent>()
+            val root = loader.load<Parent>()
 
             Stage().apply {
                 initModality(Modality.APPLICATION_MODAL)
@@ -198,7 +199,7 @@ object WindowUtils {
                     setControllerFactory { springContext.getBean(it) }
                 }
 
-            val root = loader.load<javafx.scene.Parent>()
+            val root = loader.load<Parent>()
 
             Stage().apply {
                 scene =

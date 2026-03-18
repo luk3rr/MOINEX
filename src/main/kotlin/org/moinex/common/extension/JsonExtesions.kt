@@ -27,8 +27,8 @@ fun JSONObject.bacenDate(
 ): LocalDate = getJSONObject(obj).getString(field).toLocalDateBACENFormat()
 
 fun JSONObject.throwIfError(operationName: String = "API call"): JSONObject {
-    if (has("error")) {
-        val errorMessage = getString("error")
+    if (has("exception")) {
+        val errorMessage = getString("exception")
         throw RuntimeException("$operationName failed: $errorMessage")
     }
     return this
