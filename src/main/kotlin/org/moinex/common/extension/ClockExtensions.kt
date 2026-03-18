@@ -3,6 +3,7 @@ package org.moinex.common.extension
 import org.moinex.util.Constants
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Year
 import java.time.YearMonth
 
 fun LocalDate.isBeforeOrEqual(other: LocalDate): Boolean = !this.isAfter(other)
@@ -23,6 +24,10 @@ fun YearMonth.isBeforeOrEqual(other: YearMonth): Boolean = !this.isAfter(other)
 fun YearMonth.isAfterOrEqual(other: YearMonth): Boolean = !this.isBefore(other)
 
 fun YearMonth.getEffectiveEndDate(): LocalDate = if (this == YearMonth.now()) LocalDate.now() else this.atEndOfMonth()
+
+fun Year.isBeforeOrEqual(other: Year): Boolean = !this.isAfter(other)
+
+fun Year.isAfterOrEqual(other: Year): Boolean = !this.isBefore(other)
 
 fun LocalDateTime.isBetween(
     start: LocalDateTime,
