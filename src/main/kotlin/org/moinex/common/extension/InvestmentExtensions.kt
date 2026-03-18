@@ -4,9 +4,14 @@ import org.moinex.model.dto.BondOperationStateDTO
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.investment.BondOperation
+import org.moinex.model.investment.FundamentalAnalysis
 import org.moinex.model.investment.Ticker
+import org.moinex.service.investment.FundamentalAnalysisService.Companion.CACHE_VALIDITY_HOURS
+import org.moinex.service.investment.FundamentalAnalysisService.Companion.RECOMMENDED_UPDATE_HOURS
+import org.moinex.service.investment.FundamentalAnalysisService.Companion.VALID_TICKER_TYPES
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 fun List<BondOperation>.operationsUntil(date: LocalDate) = this@operationsUntil.asSequence().takeWhile { it.localDate <= date }
 
@@ -39,6 +44,18 @@ fun List<BondOperation>.getLastBuyPrice(): BigDecimal? =
         ?.unitPrice
 
 fun Ticker.isCryptocurrency(): Boolean = this.type == AssetType.CRYPTOCURRENCY
+
+fun Ticker.isValidForFundamentalAnalysis(): Boolean = type in VALID_TICKER_TYPES
+
+fun FundamentalAnalysis?.isCacheExpired(): Boolean {
+    if (this == null) return true
+    return lastUpdate.plusHours(CACHE_VALIDITY_HOURS.toLong()).isBefore(LocalDateTime.now())
+}
+
+fun FundamentalAnalysis?.isUpdateRecommended(): Boolean {
+    if (this == null) return true
+    return lastUpdate.plusHours(RECOMMENDED_UPDATE_HOURS.toLong()).isBefore(LocalDateTime.now())
+}
 
 fun BondOperation.isPurchase(): Boolean = this.operationType == OperationType.BUY
 

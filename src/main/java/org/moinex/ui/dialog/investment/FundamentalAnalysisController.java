@@ -6,6 +6,8 @@
 
 package org.moinex.ui.dialog.investment;
 
+import static org.moinex.common.extension.InvestmentExtensionsKt.isUpdateRecommended;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
@@ -171,9 +173,7 @@ public class FundamentalAnalysisController {
                                     UIUtils.formatDateTimeForDisplay(
                                             analysis.get().getLastUpdate(), preferencesService);
 
-                            boolean recommendedUpdate =
-                                    FundamentalAnalysisService.Companion.isUpdateRecommended(
-                                            analysis.get());
+                            boolean recommendedUpdate = isUpdateRecommended(analysis.get());
 
                             statusLabel.setText(
                                     UIUtils.translatePeriodType(periodType, preferencesService)

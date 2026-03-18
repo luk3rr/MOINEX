@@ -10,6 +10,8 @@ package org.moinex.service.investment
 
 import org.json.JSONObject
 import org.moinex.common.extension.findByIdOrThrow
+import org.moinex.common.extension.isCacheExpired
+import org.moinex.common.extension.isValidForFundamentalAnalysis
 import org.moinex.common.retry.retry
 import org.moinex.config.RetryConfig
 import org.moinex.error.MoinexException
@@ -36,19 +38,7 @@ class FundamentalAnalysisService(
         const val CACHE_VALIDITY_HOURS = 24 * 7
         const val RECOMMENDED_UPDATE_HOURS = 24
 
-        private val VALID_TICKER_TYPES = setOf(AssetType.STOCK, AssetType.REIT)
-
-        fun Ticker.isValidForFundamentalAnalysis(): Boolean = type in VALID_TICKER_TYPES
-
-        fun FundamentalAnalysis?.isCacheExpired(): Boolean {
-            if (this == null) return true
-            return lastUpdate.plusHours(CACHE_VALIDITY_HOURS.toLong()).isBefore(LocalDateTime.now())
-        }
-
-        fun FundamentalAnalysis?.isUpdateRecommended(): Boolean {
-            if (this == null) return true
-            return lastUpdate.plusHours(RECOMMENDED_UPDATE_HOURS.toLong()).isBefore(LocalDateTime.now())
-        }
+        val VALID_TICKER_TYPES = setOf(AssetType.STOCK, AssetType.REIT)
     }
 
     @Transactional
