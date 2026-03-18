@@ -131,4 +131,8 @@ public class BudgetGroupTimelineChart extends LineChart<String, Number> {
     public void setYAxisLabel(String label) {
         getYAxis().setLabel(label);
     }
+
+    public void setPreferencesService(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
+    }
 }

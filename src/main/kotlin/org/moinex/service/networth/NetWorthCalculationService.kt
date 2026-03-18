@@ -59,7 +59,7 @@ class NetWorthCalculationService(
     val isCalculating: Boolean
         get() = calculationMutex.isLocked
 
-    suspend fun recalculateAllSnapshots(onProgress: ((current: Int, total: Int) -> Unit)? = null) =
+    suspend fun recalculateAllSnapshots(onProgress: (suspend (current: Int, total: Int) -> Unit)? = null) =
         calculationMutex.withLock {
             logger.info("Starting net worth recalculation...")
 

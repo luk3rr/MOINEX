@@ -158,7 +158,7 @@ class HomeController(
         FxUtils.launchCpuThenUI(
             background = {
                 netWorthCalculationService.recalculateAllSnapshots { current, total ->
-                    FxUtils.onFxThread {
+                    FxUtils.withFxThread {
                         updateRecalculateButtonProgress(current, total)
                     }
                 }

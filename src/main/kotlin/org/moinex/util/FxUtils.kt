@@ -12,7 +12,6 @@
 
 package org.moinex.util
 
-import javafx.application.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,7 +20,6 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.moinex.config.AppDispatchers
-import java.util.concurrent.CountDownLatch
 
 object FxUtils {
     /**
@@ -35,111 +33,6 @@ object FxUtils {
      * this scope.
      */
     private val uiScope = CoroutineScope(SupervisorJob() + Dispatchers.JavaFx)
-
-    /**
-     * Executes a block synchronously on the JavaFX Application Thread.
-     *
-     * If the current thread is already the FX thread, the block is executed
-     * immediately. Otherwise the block is scheduled with `Platform.runLater`
-     * and the calling thread waits until execution completes.
-     *
-     * This method is useful when a result from a UI operation must be obtained
-     * synchronously from a background thread.
-     *
-     * The implementation avoids busy waiting and guarantees proper memory
-     * visibility between threads.
-     *
-     * @param action block to execute on the JavaFX thread
-     * @return the value returned by the block
-     */
-    fun <T> onFxThread(action: () -> T): T {
-        if (Platform.isFxApplicationThread()) {
-            return action()
-        }
-
-        val latch = CountDownLatch(1)
-        var result: Result<T>? = null
-
-        Platform.runLater {
-            result =
-                runCatching {
-                    action()
-                }
-            latch.countDown()
-        }
-
-        latch.await()
-
-        return result!!.getOrThrow()
-    }
-
-    /**
-     * Launches a coroutine on the JavaFX Application Thread.
-     *
-     * This function is intended for asynchronous UI work that should not block
-     * the caller thread. The coroutine runs inside the shared UI scope.
-     *
-     * Typical uses include:
-     * - updating UI controls
-     * - loading JavaFX scenes
-     * - reacting to background results
-     *
-     * @param block suspend function executed on the FX thread
-     * @return the Job representing the launched coroutine
-     */
-    fun launchOnFxThread(block: suspend () -> Unit): Job =
-        uiScope.launch {
-            block()
-        }
-
-    /**
-     * Launches a coroutine on a background thread pool optimized for I/O work.
-     *
-     * This function should be used for operations that must not run on the
-     * JavaFX thread, such as:
-     *
-     * - database access
-     * - network requests
-     * - disk I/O
-     *
-     * The coroutine is still bound to the shared application scope so it can
-     * safely interact with UI operations when needed.
-     *
-     * @param block suspend function executed in the background
-     * @return the Job representing the launched coroutine
-     */
-    fun launchOnBackground(block: suspend () -> Unit): Job =
-        uiScope.launch(AppDispatchers.IO) {
-            block()
-        }
-
-    /**
-     * Executes I/O work in the background and delivers the result to the UI thread.
-     *
-     * This helper provides a convenient pattern for common UI applications:
-     *
-     * 1. Perform a slow operation in the background
-     * 2. Update the UI once the result becomes available
-     *
-     * Internally this uses `withContext` to switch execution contexts while
-     * preserving structured concurrency.
-     *
-     * @param background suspend function executed in the background
-     * @param onUI suspend function executed on the FX thread with the result
-     * @return the Job representing the launched coroutine
-     */
-    fun <T> launchBackgroundThenUI(
-        background: suspend () -> T,
-        onUI: suspend (T) -> Unit,
-    ): Job =
-        uiScope.launch {
-            val result =
-                withContext(AppDispatchers.IO) {
-                    background()
-                }
-
-            onUI(result)
-        }
 
     /**
      * Switches execution to the JavaFX Application Thread and returns the result.
@@ -233,6 +126,74 @@ object FxUtils {
         uiScope.launch {
             val result =
                 withContext(AppDispatchers.CPU) {
+                    background()
+                }
+
+            onUI(result)
+        }
+
+    /**
+     * Launches a coroutine on the JavaFX Application Thread.
+     *
+     * This function is intended for asynchronous UI work that should not block
+     * the caller thread. The coroutine runs inside the shared UI scope.
+     *
+     * Typical uses include:
+     * - updating UI controls
+     * - loading JavaFX scenes
+     * - reacting to background results
+     *
+     * @param block suspend function executed on the FX thread
+     * @return the Job representing the launched coroutine
+     */
+    fun launchOnFxThread(block: suspend () -> Unit): Job =
+        uiScope.launch {
+            block()
+        }
+
+    /**
+     * Launches a coroutine on a background thread pool optimized for I/O work.
+     *
+     * This function should be used for operations that must not run on the
+     * JavaFX thread, such as:
+     *
+     * - database access
+     * - network requests
+     * - disk I/O
+     *
+     * The coroutine is still bound to the shared application scope so it can
+     * safely interact with UI operations when needed.
+     *
+     * @param block suspend function executed in the background
+     * @return the Job representing the launched coroutine
+     */
+    fun launchOnBackground(block: suspend () -> Unit): Job =
+        uiScope.launch(AppDispatchers.IO) {
+            block()
+        }
+
+    /**
+     * Executes I/O work in the background and delivers the result to the UI thread.
+     *
+     * This helper provides a convenient pattern for common UI applications:
+     *
+     * 1. Perform a slow operation in the background
+     * 2. Update the UI once the result becomes available
+     *
+     * Internally this uses `withContext` to switch execution contexts while
+     * preserving structured concurrency.
+     *
+     * @param background suspend function executed in the background
+     * @param onUI suspend function executed on the FX thread with the result
+     * @return the Job representing the launched coroutine
+     */
+    fun <T> launchBackgroundThenUI(
+        background: suspend () -> T,
+        onUI: suspend (T) -> Unit,
+    ): Job =
+        uiScope.launch {
+            val result =
+                withContext(AppDispatchers.IO) {
                     background()
                 }
 
