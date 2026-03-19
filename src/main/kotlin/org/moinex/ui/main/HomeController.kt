@@ -380,12 +380,12 @@ class HomeController(
             }
 
         val dateLabel =
-            Label(UIUtils.formatDateForDisplay(transaction.date, preferencesService)).apply {
+            Label(UIUtils.formatDateForDisplay(transaction.date)).apply {
                 minWidth = Constants.HOME_LAST_TRANSACTIONS_DATE_LABEL_WIDTH.toDouble()
             }
 
         val transactionStatusLabel =
-            Label(UIUtils.translateTransactionStatus(transaction.status, preferencesService)).apply {
+            Label(UIUtils.translateTransactionStatus(transaction.status)).apply {
                 minWidth = Constants.HOME_LAST_TRANSACTIONS_STATUS_LABEL_WIDTH.toDouble()
             }
 
@@ -539,7 +539,7 @@ class HomeController(
             monthResumePaneTitle.text =
                 MessageFormat.format(
                     preferencesService.translate(TranslationKeys.HOME_RESUME_TITLE),
-                    UIUtils.formatShortMonthYear(currentDate, preferencesService),
+                    UIUtils.formatShortMonthYear(currentDate),
                 )
 
             resumePaneController.updateResumePane(currentDate.monthValue, currentDate.year)
@@ -646,7 +646,7 @@ class HomeController(
             }
 
         val walletTypeLabel =
-            Label(UIUtils.translateWalletType(wallet.type, preferencesService)).apply {
+            Label(UIUtils.translateWalletType(wallet.type)).apply {
                 styleClass.add(Constants.HOME_WALLET_TYPE_STYLE)
                 alignment = Pos.TOP_LEFT
                 UIUtils.addTooltipToNode(
@@ -680,7 +680,7 @@ class HomeController(
                             styleClass.add(Constants.HOME_VIRTUAL_WALLET_INFO_STYLE)
                             UIUtils.addTooltipToNode(
                                 this,
-                                UIUtils.getVirtualWalletInfo(wallet, preferencesService),
+                                UIUtils.getVirtualWalletInfo(wallet),
                             )
                         }
                     children.add(virtualWalletLabel)

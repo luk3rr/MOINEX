@@ -63,7 +63,7 @@ class BudgetGroupTimelineChart : LineChart<String, Number>(CategoryAxis(), Numbe
             targetSeriesData.name = "$groupName ($targetLabel)"
 
             dataList.forEach { data ->
-                val periodLabel = UIUtils.formatShortMonthYear(data.period, preferencesService!!)
+                val periodLabel = UIUtils.formatShortMonthYear(data.period)
 
                 val actualAmount = data.spentAmount
                 var targetAmount = data.targetAmount

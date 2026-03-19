@@ -14,7 +14,6 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
 import javafx.scene.text.TextAlignment
 import org.moinex.common.util.UIUtils
-import org.moinex.service.PreferencesService
 
 class CircularProgressBar(
     radius: Double,
@@ -23,7 +22,6 @@ class CircularProgressBar(
     private val progressColor: Color = Color.web(BELIZE_BLUE)
     private val backgroundColor: Color = Color.web(LIGHT_GRAY)
     private val fontColor: Color = Color.web(BLACK)
-    var preferencesService: PreferencesService? = null
 
     companion object {
         private const val BELIZE_BLUE = "#3498db"
@@ -69,9 +67,7 @@ class CircularProgressBar(
         )
 
         gc.fill = fontColor
-        val formattedPercent =
-            preferencesService?.let { UIUtils.formatPercentage(clampedPercent, it) }
-                ?: String.format("%.1f %%", clampedPercent)
+        val formattedPercent = UIUtils.formatPercentage(clampedPercent)
         gc.fillText(formattedPercent, width / 2, height / 2)
     }
 }

@@ -149,7 +149,7 @@ public class CalendarController {
         double calendarHeight = calendar.getPrefHeight();
 
         // Create the weekday labels
-        String[] weekdayAbbreviations = UIUtils.getWeekdayAbbreviations(preferencesService);
+        String[] weekdayAbbreviations = UIUtils.getWeekdayAbbreviations();
         for (int j = 0; j < weekdayAbbreviations.length; j++) {
             Text dayLabel = new Text(weekdayAbbreviations[j]);
             dayLabel.setFont(Constants.CALENDAR_WEEKDAY_FONT_CONFIG);

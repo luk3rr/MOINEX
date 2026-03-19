@@ -59,7 +59,7 @@ public final class AddBondController {
         populateComboBoxes();
         configureListeners();
 
-        UIUtils.setDatePickerFormat(maturityDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(maturityDatePicker);
     }
 
     @FXML
@@ -133,10 +133,8 @@ public final class AddBondController {
     }
 
     private void configureComboBoxes() {
-        UIUtils.configureComboBox(
-                bondTypeComboBox, t -> UIUtils.translateBondType(t, preferencesService));
-        UIUtils.configureComboBox(
-                interestTypeComboBox, t -> UIUtils.translateInterestType(t, preferencesService));
+        UIUtils.configureComboBox(bondTypeComboBox, UIUtils::translateBondType);
+        UIUtils.configureComboBox(interestTypeComboBox, UIUtils::translateInterestType);
         UIUtils.configureComboBox(interestIndexComboBox, InterestIndex::name);
     }
 

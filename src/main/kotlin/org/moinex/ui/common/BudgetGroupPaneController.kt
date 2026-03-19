@@ -84,10 +84,10 @@ class BudgetGroupPaneController(
 
         groupNameLabel.text = group.name
         targetPercentageLabel.text =
-            UIUtils.formatPercentage(group.targetPercentage, preferencesService)
+            UIUtils.formatPercentage(group.targetPercentage)
         targetAmountLabel.text = UIUtils.formatCurrency(targetAmount)
         spentAmountLabel.text = UIUtils.formatCurrency(spentAmount)
-        progressPercentageLabel.text = UIUtils.formatPercentage(progress, preferencesService)
+        progressPercentageLabel.text = UIUtils.formatPercentage(progress)
 
         progressBar.progress =
             progress.divide(PERCENTAGE_DIVISOR, PROGRESS_BAR_PRECISION, RoundingMode.HALF_UP).toDouble()

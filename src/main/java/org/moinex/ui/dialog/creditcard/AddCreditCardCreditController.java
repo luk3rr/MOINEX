@@ -95,7 +95,7 @@ public class AddCreditCardCreditController {
         populateCreditCardCombobox();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(datePicker, preferencesService);
+        UIUtils.setDatePickerFormat(datePicker);
     }
 
     @FXML
@@ -193,9 +193,7 @@ public class AddCreditCardCreditController {
 
     private void configureComboBoxes() {
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
-        UIUtils.configureComboBox(
-                creditTypeComboBox,
-                type -> UIUtils.translateCreditCardCreditType(type, preferencesService));
+        UIUtils.configureComboBox(creditTypeComboBox, UIUtils::translateCreditCardCreditType);
     }
 
     private void configureSuggestions() {

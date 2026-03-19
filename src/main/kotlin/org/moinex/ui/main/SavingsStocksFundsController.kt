@@ -485,7 +485,7 @@ class SavingsStocksFundsController(
             object : StringConverter<AssetType>() {
                 override fun toString(tickerType: AssetType?): String =
                     tickerType?.let {
-                        UIUtils.translateAssetType(it, preferencesService)
+                        UIUtils.translateAssetType(it)
                     } ?: preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
 
                 override fun fromString(string: String): AssetType? =
@@ -517,7 +517,7 @@ class SavingsStocksFundsController(
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TYPE,
                 Pos.CENTER_LEFT,
-            ) { UIUtils.translateAssetType(it.type, preferencesService) },
+            ) { UIUtils.translateAssetType(it.type) },
             createObjectColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED,
                 Pos.CENTER_LEFT,

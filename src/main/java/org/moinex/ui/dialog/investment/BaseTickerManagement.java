@@ -70,8 +70,7 @@ public abstract class BaseTickerManagement {
     }
 
     protected void configureComboBoxes() {
-        UIUtils.configureComboBox(
-                typeComboBox, t -> UIUtils.translateAssetType(t, preferencesService));
+        UIUtils.configureComboBox(typeComboBox, UIUtils::translateAssetType);
     }
 
     protected void configureListeners() {

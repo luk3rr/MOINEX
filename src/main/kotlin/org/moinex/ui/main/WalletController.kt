@@ -125,11 +125,11 @@ class WalletController(
             preferencesService.translate(TranslationKeys.WALLET_ALL_WALLETS)
 
         totalBalancePaneWalletTypeComboBox.items.addAll(
-            walletTypes.map { UIUtils.translateWalletType(it, preferencesService) },
+            walletTypes.map { UIUtils.translateWalletType(it) },
         )
 
         moneyFlowPaneWalletTypeComboBox.items.addAll(
-            walletTypes.map { UIUtils.translateWalletType(it, preferencesService) },
+            walletTypes.map { UIUtils.translateWalletType(it) },
         )
 
         totalBalancePaneWalletTypeComboBox.items.addFirst(allWalletsLabel)
@@ -472,7 +472,7 @@ class WalletController(
 
                 val walletTypeName = checkBox.text
                 walletTypes
-                    .find { UIUtils.translateWalletType(it, preferencesService) == walletTypeName }
+                    .find { UIUtils.translateWalletType(it) == walletTypeName }
                     ?.let { walletType ->
                         val totalBalanceGroup =
                             wallets
@@ -485,7 +485,7 @@ class WalletController(
 
                         pieChartData.add(
                             PieChart.Data(
-                                UIUtils.translateWalletType(walletType, preferencesService),
+                                UIUtils.translateWalletType(walletType),
                                 totalBalanceGroup.toDouble(),
                             ),
                         )
@@ -511,10 +511,7 @@ class WalletController(
 
             val tooltipText =
                 "${data.name}\n${UIUtils.formatCurrency(value)} (${
-                    UIUtils.formatPercentage(
-                        percentage,
-                        preferencesService,
-                    )
+                    UIUtils.formatPercentage(percentage)
                 })"
 
             UIUtils.addTooltipToNode(node, tooltipText)
@@ -694,7 +691,7 @@ class WalletController(
 
         doughnutChartCheckBoxes =
             walletTypes.map { wt ->
-                CheckBox(UIUtils.translateWalletType(wt, preferencesService)).apply {
+                CheckBox(UIUtils.translateWalletType(wt)).apply {
                     styleClass.add(Constants.WALLET_CHECK_BOX_STYLE)
                     isSelected = true
                     selectedProperty().addListener { _, _, _ -> updateDoughnutChart() }

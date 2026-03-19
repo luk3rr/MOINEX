@@ -259,8 +259,7 @@ public class ArchivedTickersController {
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateAssetType(
-                                        param.getValue().getType(), preferencesService)));
+                                UIUtils.translateAssetType(param.getValue().getType())));
 
         TableColumn<Ticker, BigDecimal> quantityColumn =
                 new TableColumn<>(

@@ -98,7 +98,7 @@ public class FundamentalAnalysisController {
                                 if (empty || item == null) {
                                     setText(null);
                                 } else {
-                                    setText(UIUtils.translatePeriodType(item, preferencesService));
+                                    setText(UIUtils.translatePeriodType(item));
                                 }
                             }
                         });
@@ -111,7 +111,7 @@ public class FundamentalAnalysisController {
                         if (empty || item == null) {
                             setText(null);
                         } else {
-                            setText(UIUtils.translatePeriodType(item, preferencesService));
+                            setText(UIUtils.translatePeriodType(item));
                         }
                     }
                 });
@@ -171,23 +171,19 @@ public class FundamentalAnalysisController {
                         if (analysis.isPresent()) {
                             String lastUpdate =
                                     UIUtils.formatDateTimeForDisplay(
-                                            analysis.get().getLastUpdate(), preferencesService);
+                                            analysis.get().getLastUpdate());
 
                             boolean recommendedUpdate = isUpdateRecommended(analysis.get());
 
                             statusLabel.setText(
-                                    UIUtils.translatePeriodType(periodType, preferencesService)
-                                            + ": "
-                                            + lastUpdate);
+                                    UIUtils.translatePeriodType(periodType) + ": " + lastUpdate);
                             if (recommendedUpdate) {
                                 statusLabel.getStyleClass().add("cache-status-label-expired");
                             } else {
                                 statusLabel.getStyleClass().add("cache-status-label-valid");
                             }
                         } else {
-                            statusLabel.setText(
-                                    UIUtils.translatePeriodType(periodType, preferencesService)
-                                            + ": --");
+                            statusLabel.setText(UIUtils.translatePeriodType(periodType) + ": --");
                             statusLabel.getStyleClass().add("cache-status-label-unavailable");
                         }
 

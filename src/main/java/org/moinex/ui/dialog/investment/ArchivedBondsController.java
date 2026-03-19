@@ -214,8 +214,7 @@ public class ArchivedBondsController {
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateBondType(
-                                        param.getValue().getType(), preferencesService)));
+                                UIUtils.translateBondType(param.getValue().getType())));
 
         TableColumn<Bond, String> issuerColumn =
                 new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_ISSUER));
@@ -259,8 +258,7 @@ public class ArchivedBondsController {
                     Bond bond = param.getValue();
                     if (bond.getMaturityDate() != null) {
                         return new SimpleStringProperty(
-                                UIUtils.formatDateForDisplay(
-                                        bond.getMaturityDate(), preferencesService));
+                                UIUtils.formatDateForDisplay(bond.getMaturityDate()));
                     }
                     return new SimpleStringProperty("-");
                 });

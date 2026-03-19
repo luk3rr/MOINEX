@@ -123,7 +123,7 @@ public abstract class BaseBondTransactionManagement {
 
         populateComboBoxes();
 
-        UIUtils.setDatePickerFormat(transactionDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(transactionDatePicker);
 
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
         UIUtils.resetLabel(walletCurrentBalanceValueLabel);
@@ -291,8 +291,7 @@ public abstract class BaseBondTransactionManagement {
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(
-                statusComboBox, t -> UIUtils.translateTransactionStatus(t, preferencesService));
+        UIUtils.configureComboBox(statusComboBox, UIUtils::translateTransactionStatus);
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

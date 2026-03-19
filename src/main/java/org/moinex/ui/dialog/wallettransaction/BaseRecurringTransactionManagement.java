@@ -95,8 +95,8 @@ public abstract class BaseRecurringTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(startDatePicker, preferencesService);
-        UIUtils.setDatePickerFormat(endDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(startDatePicker);
+        UIUtils.setDatePickerFormat(endDatePicker);
 
         startDatePicker.setOnAction(e -> updateInfoLabel());
 
@@ -158,8 +158,7 @@ public abstract class BaseRecurringTransactionManagement {
                                 + preferencesService.translate(
                                         TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
                                 + " "
-                                + UIUtils.translateRecurringTransactionFrequency(
-                                        frequency, preferencesService);
+                                + UIUtils.translateRecurringTransactionFrequency(frequency);
 
                 try {
 
@@ -183,8 +182,7 @@ public abstract class BaseRecurringTransactionManagement {
                                 + preferencesService.translate(
                                         TranslationKeys.WALLETTRANSACTION_INFO_FREQUENCY)
                                 + " "
-                                + UIUtils.translateRecurringTransactionFrequency(
-                                        frequency, preferencesService);
+                                + UIUtils.translateRecurringTransactionFrequency(frequency);
             }
         }
 
@@ -217,11 +215,9 @@ public abstract class BaseRecurringTransactionManagement {
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
+        UIUtils.configureComboBox(typeComboBox, UIUtils::translateTransactionType);
         UIUtils.configureComboBox(
-                typeComboBox, t -> UIUtils.translateTransactionType(t, preferencesService));
-        UIUtils.configureComboBox(
-                frequencyComboBox,
-                f -> UIUtils.translateRecurringTransactionFrequency(f, preferencesService));
+                frequencyComboBox, UIUtils::translateRecurringTransactionFrequency);
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 }

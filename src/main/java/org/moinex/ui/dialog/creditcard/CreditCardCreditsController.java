@@ -187,8 +187,7 @@ public class CreditCardCreditsController {
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateCreditCardCreditType(
-                                        param.getValue().getType(), preferencesService)));
+                                UIUtils.translateCreditCardCreditType(param.getValue().getType())));
 
         TableColumn<CreditCardCredit, String> crcColumn =
                 new TableColumn<>(
@@ -202,8 +201,7 @@ public class CreditCardCreditsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.formatDateForDisplay(
-                                        param.getValue().getDate(), preferencesService)));
+                                UIUtils.formatDateForDisplay(param.getValue().getDate())));
 
         creditCardCreditsTableView.getColumns().add(idColumn);
         creditCardCreditsTableView.getColumns().add(descriptionColumn);

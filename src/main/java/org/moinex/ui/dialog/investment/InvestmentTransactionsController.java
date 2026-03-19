@@ -221,8 +221,7 @@ public class InvestmentTransactionsController {
                                                 .toLowerCase();
                                 String date =
                                         UIUtils.formatDateTimeForDisplay(
-                                                d.getWalletTransaction().getDate(),
-                                                preferencesService);
+                                                d.getWalletTransaction().getDate());
                                 String status =
                                         d.getWalletTransaction().getStatus().name().toLowerCase();
 
@@ -258,8 +257,7 @@ public class InvestmentTransactionsController {
                                 String tickerSymbol = p.getTicker().getSymbol().toLowerCase();
                                 String date =
                                         UIUtils.formatDateTimeForDisplay(
-                                                p.getWalletTransaction().getDate(),
-                                                preferencesService);
+                                                p.getWalletTransaction().getDate());
                                 String quantity = p.getQuantity().toString();
                                 String unitPrice = p.getUnitPrice().toString();
                                 String amount = p.getWalletTransaction().getAmount().toString();
@@ -305,8 +303,7 @@ public class InvestmentTransactionsController {
                                 String tickerSymbol = s.getTicker().getSymbol().toLowerCase();
                                 String date =
                                         UIUtils.formatDateTimeForDisplay(
-                                                s.getWalletTransaction().getDate(),
-                                                preferencesService);
+                                                s.getWalletTransaction().getDate());
                                 String quantity = s.getQuantity().toString();
                                 String unitPrice = s.getUnitPrice().toString();
                                 String amount = s.getWalletTransaction().getAmount().toString();
@@ -351,9 +348,7 @@ public class InvestmentTransactionsController {
                                 String sourceCrypto = ce.getSoldCrypto().getName().toLowerCase();
                                 String targetCrypto =
                                         ce.getReceivedCrypto().getName().toLowerCase();
-                                String date =
-                                        UIUtils.formatDateTimeForDisplay(
-                                                ce.getDate(), preferencesService);
+                                String date = UIUtils.formatDateTimeForDisplay(ce.getDate());
                                 String sourceQuantity = ce.getSoldQuantity().toString();
                                 String targetQuantity = ce.getReceivedQuantity().toString();
                                 String description = ce.getDescription().toLowerCase();
@@ -394,8 +389,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getTicker().getType(),
-                                        preferencesService)));
+                                        param.getValue().getTicker().getType())));
 
         TableColumn<TickerPurchase, String> dateColumn =
                 new TableColumn<>(
@@ -404,8 +398,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getWalletTransaction().getDate(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getDate())));
 
         TableColumn<TickerPurchase, String> quantityColumn =
                 new TableColumn<>(
@@ -446,8 +439,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateTransactionStatus(
-                                        param.getValue().getWalletTransaction().getStatus(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getStatus())));
 
         // Add the columns to the table view
         purchaseTableView.getColumns().add(idColumn);
@@ -509,8 +501,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getTicker().getType(),
-                                        preferencesService)));
+                                        param.getValue().getTicker().getType())));
 
         TableColumn<TickerSale, String> dateColumn =
                 new TableColumn<>(
@@ -519,8 +510,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getWalletTransaction().getDate(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getDate())));
 
         TableColumn<TickerSale, String> quantityColumn =
                 new TableColumn<>(
@@ -561,8 +551,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateTransactionStatus(
-                                        param.getValue().getWalletTransaction().getStatus(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getStatus())));
 
         // Add the columns to the table view
         saleTableView.getColumns().add(idColumn);
@@ -624,8 +613,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateAssetType(
-                                        param.getValue().getTicker().getType(),
-                                        preferencesService)));
+                                        param.getValue().getTicker().getType())));
 
         TableColumn<Dividend, String> dateColumn =
                 new TableColumn<>(
@@ -634,8 +622,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getWalletTransaction().getDate(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getDate())));
 
         TableColumn<Dividend, String> amountColumn =
                 new TableColumn<>(
@@ -662,8 +649,7 @@ public class InvestmentTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateTransactionStatus(
-                                        param.getValue().getWalletTransaction().getStatus(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getStatus())));
 
         // Add the columns to the table view
         dividendTableView.getColumns().add(idColumn);
@@ -748,8 +734,7 @@ public class InvestmentTransactionsController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getDate(), preferencesService)));
+                                UIUtils.formatDateTimeForDisplay(param.getValue().getDate())));
 
         TableColumn<CryptoExchange, String> descriptionColumn =
                 new TableColumn<>(
@@ -1008,8 +993,7 @@ public class InvestmentTransactionsController {
                         MessageFormat.format(
                                 preferencesService.translate(
                                         TranslationKeys.INVESTMENT_DELETE_DATE),
-                                UIUtils.formatDateTimeForDisplay(
-                                        cryptoExchange.getDate(), preferencesService)),
+                                UIUtils.formatDateTimeForDisplay(cryptoExchange.getDate())),
                         MessageFormat.format(
                                 preferencesService.translate(
                                         TranslationKeys.INVESTMENT_DELETE_DESCRIPTION),
@@ -1048,10 +1032,10 @@ public class InvestmentTransactionsController {
                         UIUtils.formatCurrency(wt.getAmount())),
                 MessageFormat.format(
                         preferencesService.translate(TranslationKeys.INVESTMENT_DELETE_DATE),
-                        UIUtils.formatDateTimeForDisplay(wt.getDate(), preferencesService)),
+                        UIUtils.formatDateTimeForDisplay(wt.getDate())),
                 MessageFormat.format(
                         preferencesService.translate(TranslationKeys.INVESTMENT_DELETE_STATUS),
-                        UIUtils.translateTransactionStatus(wt.getStatus(), preferencesService)),
+                        UIUtils.translateTransactionStatus(wt.getStatus())),
                 MessageFormat.format(
                         preferencesService.translate(TranslationKeys.INVESTMENT_DELETE_WALLET),
                         wt.getWallet().getName()),

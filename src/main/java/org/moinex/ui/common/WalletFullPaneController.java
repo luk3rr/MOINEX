@@ -197,7 +197,7 @@ public class WalletFullPaneController {
         setupDynamicVisibility();
 
         walletName.setText(wallet.getName());
-        walletType.setText(UIUtils.translateWalletType(wallet.getType(), preferencesService));
+        walletType.setText(UIUtils.translateWalletType(wallet.getType()));
         walletIcon.setImage(
                 new Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.getType().getIcon()));
 
@@ -456,6 +456,6 @@ public class WalletFullPaneController {
         virtualWalletInfo.setVisible(true);
         virtualWalletInfo.setManaged(true);
 
-        virtualWalletInfo.setText(UIUtils.getVirtualWalletInfo(wallet, preferencesService));
+        virtualWalletInfo.setText(UIUtils.getVirtualWalletInfo(wallet));
     }
 }

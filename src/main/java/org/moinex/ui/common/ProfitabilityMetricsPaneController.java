@@ -119,11 +119,11 @@ public class ProfitabilityMetricsPaneController {
     }
 
     private void setDividendYield(BigDecimal variable, BigDecimal total) {
-        dividendYieldVariable.setText(UIUtils.formatPercentage(variable, preferencesService));
+        dividendYieldVariable.setText(UIUtils.formatPercentage(variable));
         dividendYieldFixed.setText("-");
         dividendYieldFixed.getStyleClass().clear();
         dividendYieldFixed.getStyleClass().add(Constants.INFO_LABEL_NEUTRAL_STYLE);
-        dividendYieldTotal.setText(UIUtils.formatPercentage(total, preferencesService));
+        dividendYieldTotal.setText(UIUtils.formatPercentage(total));
     }
 
     private String formatValueWithSign(BigDecimal value, boolean isPercentage) {
@@ -136,7 +136,7 @@ public class ProfitabilityMetricsPaneController {
 
         String formattedValue =
                 isPercentage
-                        ? UIUtils.formatPercentage(value.abs(), preferencesService)
+                        ? UIUtils.formatPercentage(value.abs())
                         : UIUtils.formatCurrency(value.abs());
 
         return sign + formattedValue;

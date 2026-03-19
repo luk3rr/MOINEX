@@ -252,8 +252,7 @@ public class RecurringTransactionController {
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateTransactionType(
-                                        param.getValue().getType(), preferencesService)));
+                                UIUtils.translateTransactionType(param.getValue().getType())));
 
         TableColumn<RecurringTransaction, String> categoryColumn =
                 new TableColumn<>(
@@ -270,7 +269,7 @@ public class RecurringTransactionController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateRecurringTransactionStatus(
-                                        param.getValue().getStatus(), preferencesService)));
+                                        param.getValue().getStatus())));
 
         TableColumn<RecurringTransaction, String> frequencyColumn =
                 new TableColumn<>(
@@ -280,7 +279,7 @@ public class RecurringTransactionController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateRecurringTransactionFrequency(
-                                        param.getValue().getFrequency(), preferencesService)));
+                                        param.getValue().getFrequency())));
 
         TableColumn<RecurringTransaction, String> startDateColumn =
                 new TableColumn<>(
@@ -289,8 +288,7 @@ public class RecurringTransactionController {
         startDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.formatDateForDisplay(
-                                        param.getValue().getStartDate(), preferencesService)));
+                                UIUtils.formatDateForDisplay(param.getValue().getStartDate())));
 
         TableColumn<RecurringTransaction, String> endDateColumn =
                 getRecurringTransactionStringTableColumn();
@@ -356,8 +354,7 @@ public class RecurringTransactionController {
                         return new SimpleStringProperty("-");
                     } else {
                         return new SimpleStringProperty(
-                                UIUtils.formatDateForDisplay(
-                                        param.getValue().getNextDueDate(), preferencesService));
+                                UIUtils.formatDateForDisplay(param.getValue().getNextDueDate()));
                     }
                 });
 
@@ -387,8 +384,7 @@ public class RecurringTransactionController {
         endDateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.formatDateForDisplay(
-                                        param.getValue().getEndDate(), preferencesService)));
+                                UIUtils.formatDateForDisplay(param.getValue().getEndDate())));
 
         // If the end date is the default date, show "Indefinite"
         endDateColumn.setCellFactory(
@@ -460,8 +456,7 @@ public class RecurringTransactionController {
                     @Override
                     public String toString(RecurringTransactionStatus transactionType) {
                         return transactionType != null
-                                ? UIUtils.translateRecurringTransactionStatus(
-                                        transactionType, preferencesService)
+                                ? UIUtils.translateRecurringTransactionStatus(transactionType)
                                 : preferencesService.translate(
                                         TranslationKeys
                                                 .WALLETTRANSACTION_COMBOBOX_ALL); // Show "All"
@@ -479,8 +474,7 @@ public class RecurringTransactionController {
                         // Try to match the translated string back to the enum
                         for (RecurringTransactionStatus status :
                                 RecurringTransactionStatus.values()) {
-                            if (UIUtils.translateRecurringTransactionStatus(
-                                            status, preferencesService)
+                            if (UIUtils.translateRecurringTransactionStatus(status)
                                     .equals(string)) {
                                 return status;
                             }

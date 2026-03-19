@@ -108,7 +108,7 @@ public class CreditCardInvoicePaymentController {
 
         totalToPayLabel.setText(UIUtils.formatCurrency(invoiceAmount));
 
-        crcInvoiceMonthLabel.setText(UIUtils.formatShortMonthYear(invoiceDate, preferencesService));
+        crcInvoiceMonthLabel.setText(UIUtils.formatShortMonthYear(invoiceDate));
 
         crcAvailableRebateLabel.setText(UIUtils.formatCurrency(creditCard.getAvailableRebate()));
 

@@ -62,7 +62,7 @@ public final class EditBondController {
         populateComboBoxes();
         configureListeners();
 
-        UIUtils.setDatePickerFormat(maturityDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(maturityDatePicker);
     }
 
     public void setBond(Bond bond) {
@@ -211,10 +211,8 @@ public final class EditBondController {
     }
 
     private void configureComboBoxes() {
-        UIUtils.configureComboBox(
-                bondTypeComboBox, t -> UIUtils.translateBondType(t, preferencesService));
-        UIUtils.configureComboBox(
-                interestTypeComboBox, t -> UIUtils.translateInterestType(t, preferencesService));
+        UIUtils.configureComboBox(bondTypeComboBox, UIUtils::translateBondType);
+        UIUtils.configureComboBox(interestTypeComboBox, UIUtils::translateInterestType);
         UIUtils.configureComboBox(interestIndexComboBox, InterestIndex::name);
     }
 

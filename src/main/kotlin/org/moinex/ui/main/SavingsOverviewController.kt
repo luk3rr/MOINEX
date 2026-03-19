@@ -297,19 +297,19 @@ class SavingsOverviewController(
     private fun updateBrazilianMarketIndicators() {
         brazilianMarketIndicators?.let { bmi ->
             overviewTabSelicValueField.text =
-                UIUtils.formatPercentage(bmi.selicTarget, preferencesService)
+                UIUtils.formatPercentage(bmi.selicTarget)
 
             overviewTabIPCALastMonthValueField.text =
-                UIUtils.formatPercentage(bmi.ipcaLastMonth, preferencesService)
+                UIUtils.formatPercentage(bmi.ipcaLastMonth)
 
             overviewTabIPCALastMonthDescriptionField.text =
                 "IPCA ${bmi.ipcaLastMonthReference}"
 
             overviewTabIPCA12MonthsValueField.text =
-                UIUtils.formatPercentage(bmi.ipca12Months, preferencesService)
+                UIUtils.formatPercentage(bmi.ipca12Months)
 
             brazilianMarketIndicatorsLastUpdateValue.text =
-                UIUtils.formatDateTimeForDisplay(bmi.lastUpdate, preferencesService)
+                UIUtils.formatDateTimeForDisplay(bmi.lastUpdate)
         }
     }
 
@@ -327,10 +327,10 @@ class SavingsOverviewController(
             overviewTabOilBrentValueField.text = UIUtils.formatCurrency(mqc.oilBrent)
 
             marketQuotesLastUpdateValue.text =
-                UIUtils.formatDateTimeForDisplay(mqc.lastUpdate, preferencesService)
+                UIUtils.formatDateTimeForDisplay(mqc.lastUpdate)
 
             commoditiesLastUpdateValue.text =
-                UIUtils.formatDateTimeForDisplay(mqc.lastUpdate, preferencesService)
+                UIUtils.formatDateTimeForDisplay(mqc.lastUpdate)
         }
     }
 
@@ -408,7 +408,7 @@ class SavingsOverviewController(
 
             val tooltipText =
                 "${data.name}\n${UIUtils.formatCurrency(value)} " +
-                    "(${UIUtils.formatPercentage(percentage, preferencesService)})"
+                    "(${UIUtils.formatPercentage(percentage)})"
 
             UIUtils.addTooltipToNode(data.node, tooltipText)
         }
@@ -428,7 +428,7 @@ class SavingsOverviewController(
 
         allTickers.forEach { ticker ->
             val tickerCurrentValue = ticker.currentQuantity.multiply(ticker.currentUnitValue)
-            val typeName = UIUtils.translateAssetType(ticker.type, preferencesService)
+            val typeName = UIUtils.translateAssetType(ticker.type)
             investmentByType.merge(typeName, tickerCurrentValue, BigDecimal::add)
         }
 
@@ -436,7 +436,7 @@ class SavingsOverviewController(
             val bondInvestedValue = bondService.getTotalInvestedValue(bond)
             val bondAccumulatedInterest = bondService.getTotalAccumulatedInterestByBondId(bond.id!!)
             val bondTotalValue = bondInvestedValue.add(bondAccumulatedInterest)
-            val typeName = UIUtils.translateBondType(bond.type, preferencesService)
+            val typeName = UIUtils.translateBondType(bond.type)
             investmentByType.merge(typeName, bondTotalValue, BigDecimal::add)
         }
 
@@ -627,7 +627,7 @@ class SavingsOverviewController(
                 val sign = if (percentageChange >= BigDecimal.ZERO) "+ " else "- "
                 tooltipText +=
                     "\n${preferencesService.translate(TranslationKeys.SAVINGS_VARIATION)}: " +
-                    "$sign${UIUtils.formatPercentage(percentageChange, preferencesService)}"
+                    "$sign${UIUtils.formatPercentage(percentageChange)}"
             }
 
             investedData.node?.let { UIUtils.addTooltipToNode(it, tooltipText) }
@@ -1000,7 +1000,7 @@ class SavingsOverviewController(
         val percentageLabel =
             Label(
                 performer.getSign() +
-                    UIUtils.formatPercentage(performer.profitLossPercentage, preferencesService),
+                    UIUtils.formatPercentage(performer.profitLossPercentage),
             )
         percentageLabel.styleClass.add(Constants.CUSTOM_TABLE_CELL_STYLE)
 
@@ -1052,7 +1052,7 @@ class SavingsOverviewController(
                 } else {
                     val tickerType = AssetType.valueOf(assetType.name)
                     currentAllocation.getOrDefault(tickerType, BigDecimal.ZERO) to
-                        UIUtils.translateAssetType(tickerType, preferencesService)
+                        UIUtils.translateAssetType(tickerType)
                 }
 
             val currentPercentage =
@@ -1178,8 +1178,8 @@ class SavingsOverviewController(
 
         val currentLabel =
             Label(
-                "${UIUtils.formatPercentage(allocation.currentPercentage, preferencesService)} / " +
-                    UIUtils.formatPercentage(allocation.targetPercentage, preferencesService),
+                "${UIUtils.formatPercentage(allocation.currentPercentage)} / " +
+                    UIUtils.formatPercentage(allocation.targetPercentage),
             )
         currentLabel.styleClass.add(Constants.ALLOCATION_INFO_LABEL_STYLE)
 
@@ -1228,7 +1228,7 @@ class SavingsOverviewController(
         }
 
         val absDifference = allocation.difference.abs()
-        val formattedDiff = UIUtils.formatPercentage(absDifference, preferencesService)
+        val formattedDiff = UIUtils.formatPercentage(absDifference)
 
         return when {
             allocation.isCriticalLow() ->

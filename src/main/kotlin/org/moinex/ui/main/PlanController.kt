@@ -207,10 +207,7 @@ class PlanController(
 
             val tooltipText =
                 "${data.name}\n${UIUtils.formatCurrency(value)} (${
-                    UIUtils.formatPercentage(
-                        percentage,
-                        preferencesService,
-                    )
+                    UIUtils.formatPercentage(percentage)
                 })"
 
             UIUtils.addTooltipToNode(data.node, tooltipText)

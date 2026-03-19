@@ -19,7 +19,6 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.util.Duration
 import org.moinex.common.util.UIUtils
-import org.moinex.service.PreferencesService
 
 class DoughnutChart(
     pieData: ObservableList<Data>,
@@ -29,7 +28,6 @@ class DoughnutChart(
     private val stackPane = StackPane()
     private val seriesTotal: Double
     private var showCenterLabel = true
-    var preferencesService: PreferencesService? = null
 
     init {
         innerCircle.apply {
@@ -48,9 +46,7 @@ class DoughnutChart(
         data.forEach { data ->
             val node = data.node
             val percentage = (data.pieValue / seriesTotal) * 100
-            val formattedPercent =
-                preferencesService?.let { UIUtils.formatPercentage(percentage, it) }
-                    ?: String.format("%.1f %%", percentage)
+            val formattedPercent = UIUtils.formatPercentage(percentage)
 
             UIUtils.addTooltipToNode(node, formattedPercent)
 

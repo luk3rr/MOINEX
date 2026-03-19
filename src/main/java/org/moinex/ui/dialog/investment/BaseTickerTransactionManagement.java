@@ -133,7 +133,7 @@ public abstract class BaseTickerTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(transactionDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(transactionDatePicker);
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -272,8 +272,7 @@ public abstract class BaseTickerTransactionManagement {
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(
-                statusComboBox, t -> UIUtils.translateTransactionStatus(t, preferencesService));
+        UIUtils.configureComboBox(statusComboBox, UIUtils::translateTransactionStatus);
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

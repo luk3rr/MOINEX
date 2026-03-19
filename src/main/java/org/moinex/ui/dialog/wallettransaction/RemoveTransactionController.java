@@ -118,9 +118,7 @@ public class RemoveTransactionController {
                 .append("\n")
                 .append(preferencesService.translate(TranslationKeys.WALLETTRANSACTION_LABEL_DATE))
                 .append(" ")
-                .append(
-                        UIUtils.formatDateTimeForDisplay(
-                                selectedTransaction.getDate(), preferencesService))
+                .append(UIUtils.formatDateTimeForDisplay(selectedTransaction.getDate()))
                 .append("\n")
                 .append(
                         preferencesService.translate(
@@ -231,8 +229,7 @@ public class RemoveTransactionController {
         dateColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.formatDateTimeForDisplay(
-                                        param.getValue().getDate(), preferencesService)));
+                                UIUtils.formatDateTimeForDisplay(param.getValue().getDate())));
 
         TableColumn<WalletTransaction, String> walletNameColumn =
                 new TableColumn<>(

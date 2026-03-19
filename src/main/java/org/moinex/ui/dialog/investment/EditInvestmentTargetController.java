@@ -75,7 +75,7 @@ public class EditInvestmentTargetController {
         HBox row = new HBox(10.0);
         row.setAlignment(Pos.CENTER_LEFT);
 
-        Label typeLabel = new Label(UIUtils.translateAssetType(assetType, preferencesService));
+        Label typeLabel = new Label(UIUtils.translateAssetType(assetType));
         typeLabel.setMinWidth(200.0);
         typeLabel.setStyle("-fx-font-weight: bold;");
 
@@ -123,8 +123,7 @@ public class EditInvestmentTargetController {
         InvestmentTargetService.Companion.ValidationResult validationResult =
                 investmentTargetService.validate(targets);
 
-        totalPercentageLabel.setText(
-                UIUtils.formatPercentage(validationResult.getTotal(), preferencesService));
+        totalPercentageLabel.setText(UIUtils.formatPercentage(validationResult.getTotal()));
 
         if (validationResult.isValid()
                 && validationResult.getTotal().compareTo(new BigDecimal("100")) == 0) {

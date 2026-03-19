@@ -278,7 +278,7 @@ class GoalController(
                         preferencesService.translate(
                             TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE,
                         ),
-                        UIUtils.formatDateForDisplay(goal.targetDate, preferencesService),
+                        UIUtils.formatDateForDisplay(goal.targetDate),
                     ),
                 )
                 append("\n")
@@ -433,10 +433,10 @@ class GoalController(
                     val initialAmount = goal.initialBalance.toString()
                     val currentAmount = goal.balance.toString()
                     val targetAmount = goal.targetBalance.toString()
-                    val targetDate = UIUtils.formatDateForDisplay(goal.targetDate, preferencesService)
+                    val targetDate = UIUtils.formatDateForDisplay(goal.targetDate)
                     val completionDate =
                         goal.completionDate?.let {
-                            UIUtils.formatDateForDisplay(it, preferencesService)
+                            UIUtils.formatDateForDisplay(it)
                         } ?: "-"
                     val status = if (goal.isCompleted()) "completed" else "active"
                     val monthsUntilTarget =
@@ -639,7 +639,7 @@ class GoalController(
         ).apply {
             setCellValueFactory { param ->
                 if (param.value.isCompleted()) {
-                    SimpleObjectProperty(UIUtils.formatPercentage(100, preferencesService))
+                    SimpleObjectProperty(UIUtils.formatPercentage(100))
                 } else {
                     val progress =
                         if (param.value.balance.isZero()) {
@@ -649,7 +649,7 @@ class GoalController(
                                 .divide(param.value.targetBalance, 2, RoundingMode.HALF_UP)
                                 .multiply(BigDecimal(100))
                         }
-                    SimpleObjectProperty(UIUtils.formatPercentage(progress, preferencesService))
+                    SimpleObjectProperty(UIUtils.formatPercentage(progress))
                 }
             }
         }
@@ -660,7 +660,7 @@ class GoalController(
         ).apply {
             setCellValueFactory {
                 SimpleStringProperty(
-                    UIUtils.formatDateForDisplay(it.value.targetDate, preferencesService),
+                    UIUtils.formatDateForDisplay(it.value.targetDate),
                 )
             }
         }
@@ -671,12 +671,7 @@ class GoalController(
         ).apply {
             setCellValueFactory { param ->
                 if (param.value.isCompleted()) {
-                    SimpleStringProperty(
-                        UIUtils.formatDateForDisplay(
-                            param.value.completionDate,
-                            preferencesService,
-                        ),
-                    )
+                    SimpleStringProperty(UIUtils.formatDateForDisplay(param.value.completionDate))
                 } else {
                     SimpleObjectProperty("-")
                 }

@@ -76,13 +76,13 @@ class UIUtils(
     preferencesService: PreferencesService,
 ) {
     init {
-        userPreferencesService = preferencesService
+        Companion.preferencesService = preferencesService
     }
 
     companion object {
         private val currencyFormat = DecimalFormat(Constants.CURRENCY_FORMAT)
         private val percentageFormat = DecimalFormat(Constants.PERCENTAGE_FORMAT)
-        private var userPreferencesService: PreferencesService? = null
+        private lateinit var preferencesService: PreferencesService
 
         @JvmStatic
         fun addTooltipToXYChartNode(
@@ -130,14 +130,14 @@ class UIUtils(
         @JvmStatic
         fun formatCurrency(value: Number?): String {
             if (value == null) return "-"
-            if (userPreferencesService?.hideMonetaryValues == true) return "****"
+            if (preferencesService.hideMonetaryValues) return "****"
             return currencyFormat.format(value)
         }
 
         @JvmStatic
         fun formatCurrencySigned(value: Number?): String {
             if (value == null) return "-"
-            if (userPreferencesService?.hideMonetaryValues == true) return "****"
+            if (preferencesService.hideMonetaryValues) return "****"
 
             val formatted = currencyFormat.format(value)
             return if (value.toDouble() > 0) "+ $formatted" else formatted
@@ -146,7 +146,7 @@ class UIUtils(
         @JvmStatic
         fun formatCurrencyDynamic(value: Number?): String {
             if (value == null) return "-"
-            if (userPreferencesService?.hideMonetaryValues == true) return "****"
+            if (preferencesService.hideMonetaryValues) return "****"
 
             val fractionDigits =
                 when (value) {
@@ -169,12 +169,9 @@ class UIUtils(
         }
 
         @JvmStatic
-        fun formatPercentage(
-            value: Number?,
-            preferencesService: PreferencesService,
-        ): String {
+        fun formatPercentage(value: Number?): String {
             if (value == null) return "-"
-            if (userPreferencesService?.hideMonetaryValues == true) return "****"
+            if (preferencesService.hideMonetaryValues) return "****"
 
             if (value.toDouble() < Constants.NEGATIVE_PERCENTAGE_THRESHOLD) {
                 return preferencesService.translate(
@@ -188,7 +185,7 @@ class UIUtils(
         @JvmStatic
         fun formatPercentageForFundamentalAnalysis(value: Number?): String {
             if (value == null) return "-"
-            if (userPreferencesService?.hideMonetaryValues == true) return "****"
+            if (preferencesService.hideMonetaryValues) return "****"
 
             return DecimalFormat("#,##0.00")
                 .apply {
@@ -209,10 +206,7 @@ class UIUtils(
         }
 
         @JvmStatic
-        fun setDatePickerFormat(
-            datePicker: DatePicker,
-            preferencesService: PreferencesService,
-        ) {
+        fun setDatePickerFormat(datePicker: DatePicker) {
             val locale = preferencesService.locale
             Locale.setDefault(locale)
 
@@ -402,10 +396,7 @@ class UIUtils(
 
         // Translation methods
         @JvmStatic
-        fun translateWalletType(
-            walletType: WalletType,
-            preferencesService: PreferencesService,
-        ): String {
+        fun translateWalletType(walletType: WalletType): String {
             val name = walletType.name.lowercase().replace(" ", "")
 
             val typeKeyMap =
@@ -426,10 +417,7 @@ class UIUtils(
         }
 
         @JvmStatic
-        fun translateTransactionStatus(
-            status: WalletTransactionStatus,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateTransactionStatus(status: WalletTransactionStatus): String =
             mapOf(
                 "pending" to TranslationKeys.TRANSACTION_STATUS_PENDING,
                 "confirmed" to TranslationKeys.TRANSACTION_STATUS_CONFIRMED,
@@ -437,10 +425,7 @@ class UIUtils(
                 ?: status.name
 
         @JvmStatic
-        fun translateTransactionType(
-            type: WalletTransactionType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateTransactionType(type: WalletTransactionType): String =
             mapOf(
                 "income" to TranslationKeys.TRANSACTION_TYPE_INCOMES,
                 "expense" to TranslationKeys.TRANSACTION_TYPE_EXPENSES,
@@ -448,10 +433,7 @@ class UIUtils(
                 ?: type.name
 
         @JvmStatic
-        fun translateRecurringTransactionStatus(
-            status: RecurringTransactionStatus,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateRecurringTransactionStatus(status: RecurringTransactionStatus): String =
             mapOf(
                 "active" to TranslationKeys.RECURRING_TRANSACTION_STATUS_ACTIVE,
                 "inactive" to TranslationKeys.RECURRING_TRANSACTION_STATUS_INACTIVE,
@@ -459,10 +441,7 @@ class UIUtils(
                 ?: status.name
 
         @JvmStatic
-        fun translateRecurringTransactionFrequency(
-            frequency: RecurringTransactionFrequency,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateRecurringTransactionFrequency(frequency: RecurringTransactionFrequency): String =
             mapOf(
                 "daily" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_DAILY,
                 "weekly" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_WEEKLY,
@@ -472,10 +451,7 @@ class UIUtils(
                 ?: frequency.name
 
         @JvmStatic
-        fun translateCalendarEventType(
-            eventType: CalendarEventType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateCalendarEventType(eventType: CalendarEventType): String =
             mapOf(
                 "credit_card_statement_closing" to
                     TranslationKeys.CALENDAR_EVENTTYPE_CREDIT_CARD_STATEMENT_CLOSING,
@@ -489,10 +465,7 @@ class UIUtils(
                 ?: eventType.description
 
         @JvmStatic
-        fun translateAssetType(
-            assetType: AssetType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateAssetType(assetType: AssetType): String =
             mapOf(
                 "stock" to TranslationKeys.ASSET_TYPE_STOCK,
                 "fund" to TranslationKeys.ASSET_TYPE_FUND,
@@ -504,10 +477,7 @@ class UIUtils(
                 ?: assetType.name
 
         @JvmStatic
-        fun translatePeriodType(
-            periodType: PeriodType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translatePeriodType(periodType: PeriodType): String =
             mapOf(
                 "annual" to TranslationKeys.PERIOD_TYPE_ANNUAL,
                 "quarterly" to TranslationKeys.PERIOD_TYPE_QUARTERLY,
@@ -515,10 +485,7 @@ class UIUtils(
                 ?: periodType.name
 
         @JvmStatic
-        fun translateBondType(
-            bondType: BondType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateBondType(bondType: BondType): String =
             mapOf(
                 "cdb" to TranslationKeys.BOND_TYPE_CDB,
                 "lci" to TranslationKeys.BOND_TYPE_LCI,
@@ -531,10 +498,7 @@ class UIUtils(
                 ?: bondType.name
 
         @JvmStatic
-        fun translateInterestType(
-            interestType: InterestType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateInterestType(interestType: InterestType): String =
             mapOf(
                 "fixed" to TranslationKeys.INTEREST_TYPE_FIXED,
                 "floating" to TranslationKeys.INTEREST_TYPE_FLOATING,
@@ -543,10 +507,7 @@ class UIUtils(
                 ?: interestType.name
 
         @JvmStatic
-        fun translateInterestIndex(
-            interestIndex: InterestIndex,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateInterestIndex(interestIndex: InterestIndex): String =
             mapOf(
                 "cdi" to TranslationKeys.INTEREST_INDEX_CDI,
                 "selic" to TranslationKeys.INTEREST_INDEX_SELIC,
@@ -558,10 +519,7 @@ class UIUtils(
                 ?: interestIndex.name
 
         @JvmStatic
-        fun translateCreditCardInvoiceStatus(
-            status: CreditCardInvoiceStatus,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateCreditCardInvoiceStatus(status: CreditCardInvoiceStatus): String =
             mapOf(
                 "open" to TranslationKeys.COMMON_CREDIT_CARD_OPEN,
                 "closed" to TranslationKeys.COMMON_CREDIT_CARD_CLOSED,
@@ -569,10 +527,7 @@ class UIUtils(
                 ?: status.name
 
         @JvmStatic
-        fun translateCreditCardCreditType(
-            creditType: CreditCardCreditType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateCreditCardCreditType(creditType: CreditCardCreditType): String =
             mapOf(
                 "cashback" to TranslationKeys.CREDIT_CARD_CREDIT_TYPE_CASHBACK,
                 "refund" to TranslationKeys.CREDIT_CARD_CREDIT_TYPE_REFUND,
@@ -581,10 +536,7 @@ class UIUtils(
                 ?: creditType.name
 
         @JvmStatic
-        fun translateOperationType(
-            operationType: OperationType,
-            preferencesService: PreferencesService,
-        ): String =
+        fun translateOperationType(operationType: OperationType): String =
             mapOf(
                 "buy" to TranslationKeys.OPERATION_TYPE_BUY,
                 "sell" to TranslationKeys.OPERATION_TYPE_SELL,
@@ -592,10 +544,7 @@ class UIUtils(
                 ?: operationType.name
 
         @JvmStatic
-        fun getVirtualWalletInfo(
-            wallet: Wallet,
-            preferencesService: PreferencesService,
-        ): String =
+        fun getVirtualWalletInfo(wallet: Wallet): String =
             if (wallet.isMaster()) {
                 preferencesService.translate(
                     TranslationKeys.HOME_WALLET_TOOLTIP_NOT_VIRTUAL_WALLET,
@@ -620,31 +569,19 @@ class UIUtils(
         fun getYearFormatter(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
 
         @JvmStatic
-        fun formatShortMonthYear(
-            dateTime: LocalDateTime,
-            preferencesService: PreferencesService,
-        ): String = dateTime.format(getShortMonthYearFormatter(preferencesService.locale))
+        fun formatShortMonthYear(dateTime: LocalDateTime): String = dateTime.format(getShortMonthYearFormatter(preferencesService.locale))
 
         @JvmStatic
-        fun formatShortMonthYear(
-            yearMonth: YearMonth,
-            preferencesService: PreferencesService,
-        ): String = yearMonth.format(getShortMonthYearFormatter(preferencesService.locale))
+        fun formatShortMonthYear(yearMonth: YearMonth): String = yearMonth.format(getShortMonthYearFormatter(preferencesService.locale))
 
         @JvmStatic
-        fun formatFullMonthYear(
-            yearMonth: YearMonth,
-            preferencesService: PreferencesService,
-        ): String = yearMonth.format(getFullMonthYearFormatter(preferencesService.locale))
+        fun formatFullMonthYear(yearMonth: YearMonth): String = yearMonth.format(getFullMonthYearFormatter(preferencesService.locale))
 
         @JvmStatic
-        fun formatYear(
-            year: Year,
-            preferencesService: PreferencesService,
-        ): String = year.format(getYearFormatter(preferencesService.locale))
+        fun formatYear(year: Year): String = year.format(getYearFormatter(preferencesService.locale))
 
         @JvmStatic
-        fun getWeekdayAbbreviations(preferencesService: PreferencesService): Array<String> {
+        fun getWeekdayAbbreviations(): Array<String> {
             val locale = preferencesService.locale
             return arrayOf(
                 DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT, locale),
@@ -658,22 +595,13 @@ class UIUtils(
         }
 
         @JvmStatic
-        fun getMonthDisplayName(
-            month: Month,
-            preferencesService: PreferencesService,
-        ): String = month.getDisplayName(TextStyle.FULL, preferencesService.locale)
+        fun getMonthDisplayName(month: Month): String = month.getDisplayName(TextStyle.FULL, preferencesService.locale)
 
         @JvmStatic
-        fun getMonthShortDisplayName(
-            month: Month,
-            preferencesService: PreferencesService,
-        ): String = month.getDisplayName(TextStyle.SHORT, preferencesService.locale)
+        fun getMonthShortDisplayName(month: Month): String = month.getDisplayName(TextStyle.SHORT, preferencesService.locale)
 
         @JvmStatic
-        fun formatDateForDisplay(
-            date: LocalDate?,
-            preferencesService: PreferencesService,
-        ): String {
+        fun formatDateForDisplay(date: LocalDate?): String {
             if (date == null) return ""
             val formatter =
                 DateTimeFormatter
@@ -683,10 +611,7 @@ class UIUtils(
         }
 
         @JvmStatic
-        fun formatDateForDisplay(
-            dateTime: LocalDateTime?,
-            preferencesService: PreferencesService,
-        ): String {
+        fun formatDateForDisplay(dateTime: LocalDateTime?): String {
             if (dateTime == null) return ""
             val formatter =
                 DateTimeFormatter
@@ -696,10 +621,7 @@ class UIUtils(
         }
 
         @JvmStatic
-        fun formatDateTimeForDisplay(
-            dateTime: LocalDateTime?,
-            preferencesService: PreferencesService,
-        ): String {
+        fun formatDateTimeForDisplay(dateTime: LocalDateTime?): String {
             if (dateTime == null) return ""
             val formatter =
                 DateTimeFormatter

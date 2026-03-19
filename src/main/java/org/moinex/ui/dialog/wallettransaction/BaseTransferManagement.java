@@ -102,7 +102,7 @@ public abstract class BaseTransferManagement {
         populateComboBoxes();
 
         // Configure the date picker
-        UIUtils.setDatePickerFormat(transferDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(transferDatePicker);
 
         // Reset all labels
         UIUtils.resetLabel(senderWalletAfterBalanceValueLabel);

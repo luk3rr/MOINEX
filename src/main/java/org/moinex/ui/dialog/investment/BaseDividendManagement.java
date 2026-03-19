@@ -130,7 +130,7 @@ public abstract class BaseDividendManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(dividendDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(dividendDatePicker);
 
         // Reset all labels
         UIUtils.resetLabel(walletAfterBalanceValueLabel);
@@ -251,8 +251,7 @@ public abstract class BaseDividendManagement {
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(
-                statusComboBox, s -> UIUtils.translateTransactionStatus(s, preferencesService));
+        UIUtils.configureComboBox(statusComboBox, UIUtils::translateTransactionStatus);
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

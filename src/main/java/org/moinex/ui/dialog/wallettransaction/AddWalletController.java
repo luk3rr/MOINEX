@@ -152,7 +152,6 @@ public class AddWalletController {
     }
 
     private void configureComboBoxes() {
-        UIUtils.configureComboBox(
-                walletTypeComboBox, wt -> UIUtils.translateWalletType(wt, preferencesService));
+        UIUtils.configureComboBox(walletTypeComboBox, UIUtils::translateWalletType);
     }
 }

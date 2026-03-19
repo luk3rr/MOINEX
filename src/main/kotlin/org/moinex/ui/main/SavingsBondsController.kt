@@ -297,7 +297,7 @@ class SavingsBondsController(
             ) { it.symbol ?: "" },
             createColumn(
                 TranslationKeys.SAVINGS_BONDS_TABLE_HEADER_TYPE,
-            ) { UIUtils.translateBondType(it.type, preferencesService) },
+            ) { UIUtils.translateBondType(it.type) },
             createColumn(
                 TranslationKeys.BOND_TABLE_QUANTITY,
             ) { bondService.getCurrentQuantity(it).toString() },
@@ -318,7 +318,7 @@ class SavingsBondsController(
             },
             createColumn(
                 TranslationKeys.BOND_MATURITY_DATE,
-            ) { it.maturityDate?.let { date -> UIUtils.formatDateForDisplay(date, preferencesService) } ?: "-" },
+            ) { it.maturityDate?.let { date -> UIUtils.formatDateForDisplay(date) } ?: "-" },
             createColumn(
                 TranslationKeys.BOND_INTEREST_RATE,
             ) { it.interestRate?.let { rate -> "$rate%" } ?: "-" },
@@ -370,14 +370,14 @@ class SavingsBondsController(
                         listOf(
                             bond.name.lowercase(),
                             bond.symbol?.lowercase() ?: "",
-                            UIUtils.translateBondType(bond.type, preferencesService).lowercase(),
+                            UIUtils.translateBondType(bond.type).lowercase(),
                             bond.issuer?.lowercase() ?: "",
                             bondService.getCurrentQuantity(bond).toString(),
                             bondService.getAverageUnitPrice(bond).toString(),
                             bondService.getTotalInvestedValue(bond).toString(),
                             bondService.getTotalProfit(bond).toString(),
                             bond.maturityDate?.let {
-                                UIUtils.formatDateForDisplay(it, preferencesService).lowercase()
+                                UIUtils.formatDateForDisplay(it).lowercase()
                             } ?: "",
                             bond.interestRate?.toString() ?: "",
                         ).any { it.contains(searchText) }
@@ -412,7 +412,7 @@ class SavingsBondsController(
             object : StringConverter<BondType>() {
                 override fun toString(bondType: BondType?): String =
                     bondType?.let {
-                        UIUtils.translateBondType(it, preferencesService)
+                        UIUtils.translateBondType(it)
                     } ?: preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_FILTER_ALL)
 
                 override fun fromString(string: String): BondType? = null

@@ -321,8 +321,7 @@ public abstract class BaseCreditCardDebtManagement {
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
         UIUtils.configureComboBox(crcComboBox, CreditCard::getName);
         UIUtils.configureComboBox(
-                invoiceMonthComboBox,
-                month -> UIUtils.getMonthDisplayName(Month.of(month), preferencesService));
+                invoiceMonthComboBox, month -> UIUtils.getMonthDisplayName(Month.of(month)));
         UIUtils.configureComboBox(invoiceYearComboBox, Object::toString);
     }
 

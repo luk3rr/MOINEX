@@ -137,7 +137,7 @@ public class FundamentalMetricPaneController {
     private String formatDate(String dateStr) {
         try {
             LocalDateTime date = LocalDateTime.parse(dateStr);
-            return UIUtils.formatDateForDisplay(date, preferencesService);
+            return UIUtils.formatDateForDisplay(date);
         } catch (Exception e) {
             return dateStr;
         }

@@ -118,7 +118,7 @@ class CreditCardController(
         debtsListMonthFilterComboBox.value = now.month
         debtsListYearFilterComboBox.value = Year.of(now.year)
 
-        invoiceMonth.text = UIUtils.formatShortMonthYear(getTableCurrentMonthYear(), preferencesService)
+        invoiceMonth.text = UIUtils.formatShortMonthYear(getTableCurrentMonthYear())
 
         debtsListMonthFilterComboBox.setOnAction { updateDebtsTableView() }
 
@@ -391,7 +391,7 @@ class CreditCardController(
                         preferencesService.translate(
                             TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE,
                         ),
-                        UIUtils.formatDateForDisplay(debt.date, preferencesService),
+                        UIUtils.formatDateForDisplay(debt.date),
                     ),
                 )
                 append("\n")
@@ -743,7 +743,7 @@ class CreditCardController(
                 UIUtils.addTooltipToXYChartNode(
                     data.node,
                     "${series.name}: ${UIUtils.formatCurrency(value)} " +
-                        "(${UIUtils.formatPercentage(percentage, preferencesService)})\n" +
+                        "(${UIUtils.formatPercentage(percentage)})\n" +
                         "Total: ${UIUtils.formatCurrency(monthTotal)}",
                 )
 
@@ -795,7 +795,7 @@ class CreditCardController(
 
         debtsListMonthFilterComboBox.converter =
             object : StringConverter<Month>() {
-                override fun toString(month: Month?): String = month?.let { UIUtils.getMonthDisplayName(it, preferencesService) } ?: ""
+                override fun toString(month: Month?): String = month?.let { UIUtils.getMonthDisplayName(it) } ?: ""
 
                 override fun fromString(string: String): Month = Month.valueOf(string.uppercase())
             }
@@ -854,10 +854,7 @@ class CreditCardController(
             .addListener { _, _, newMonth ->
                 if (newMonth != null && debtsListYearFilterComboBox.value != null) {
                     invoiceMonth.text =
-                        UIUtils.formatShortMonthYear(
-                            getTableCurrentMonthYear(),
-                            preferencesService,
-                        )
+                        UIUtils.formatShortMonthYear(getTableCurrentMonthYear())
                 }
 
                 updateDebtsTableView()
@@ -868,10 +865,7 @@ class CreditCardController(
             .addListener { _, _, newYear ->
                 if (newYear != null && debtsListMonthFilterComboBox.value != null) {
                     invoiceMonth.text =
-                        UIUtils.formatShortMonthYear(
-                            getTableCurrentMonthYear(),
-                            preferencesService,
-                        )
+                        UIUtils.formatShortMonthYear(getTableCurrentMonthYear())
                 }
 
                 updateDebtsTableView()
@@ -945,7 +939,7 @@ class CreditCardController(
             )
         dateColumn.setCellValueFactory { param ->
             SimpleStringProperty(
-                UIUtils.formatDateForDisplay(param.value.date, preferencesService),
+                UIUtils.formatDateForDisplay(param.value.date),
             )
         }
 

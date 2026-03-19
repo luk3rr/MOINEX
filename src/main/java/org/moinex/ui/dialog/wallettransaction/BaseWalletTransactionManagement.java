@@ -134,7 +134,7 @@ public abstract class BaseWalletTransactionManagement {
         populateComboBoxes();
 
         // Configure date picker
-        UIUtils.setDatePickerFormat(transactionDatePicker, preferencesService);
+        UIUtils.setDatePickerFormat(transactionDatePicker);
 
         // Set default value for includeInAnalysis checkbox
         if (includeInAnalysisCheckBox != null) {
@@ -239,8 +239,7 @@ public abstract class BaseWalletTransactionManagement {
 
     protected void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(
-                statusComboBox, w -> UIUtils.translateTransactionStatus(w, preferencesService));
+        UIUtils.configureComboBox(statusComboBox, UIUtils::translateTransactionStatus);
         UIUtils.configureComboBox(categoryComboBox, Category::getName);
     }
 

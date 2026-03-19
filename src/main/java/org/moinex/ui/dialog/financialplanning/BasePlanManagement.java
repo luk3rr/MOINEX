@@ -355,7 +355,7 @@ public abstract class BasePlanManagement {
                     MessageFormat.format(
                             preferencesService.translate(
                                     TranslationKeys.FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS),
-                            UIUtils.formatPercentage(totalPercentage, preferencesService)));
+                            UIUtils.formatPercentage(totalPercentage)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_RED_STYLE);
         } else if (hasEmptyGroups) {
             budgetGroupInfo.setText(
@@ -368,8 +368,8 @@ public abstract class BasePlanManagement {
                     MessageFormat.format(
                             preferencesService.translate(
                                     TranslationKeys.FINANCIALPLANNING_INFO_PERCENTAGE_BELOW),
-                            UIUtils.formatPercentage(totalPercentage, preferencesService),
-                            UIUtils.formatPercentage(remaining, preferencesService)));
+                            UIUtils.formatPercentage(totalPercentage),
+                            UIUtils.formatPercentage(remaining)));
             budgetGroupInfo.getStyleClass().add(Constants.INFO_LABEL_YELLOW_STYLE);
         } else {
             budgetGroupInfo.setText(

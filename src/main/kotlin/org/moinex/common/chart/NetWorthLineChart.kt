@@ -76,7 +76,7 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
         }
 
         dataPoints.forEach { dataPoint ->
-            val periodLabel = UIUtils.formatShortMonthYear(dataPoint.period, preferencesService!!)
+            val periodLabel = UIUtils.formatShortMonthYear(dataPoint.period)
 
             assetsSeries.data.add(Data(periodLabel, dataPoint.assets))
             liabilitiesSeries.data.add(Data(periodLabel, dataPoint.liabilities))
@@ -139,7 +139,7 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
         xAxis: CategoryAxis,
     ) {
         dataPoints.forEach { dataPoint ->
-            val periodLabel = UIUtils.formatShortMonthYear(dataPoint.period, preferencesService!!)
+            val periodLabel = UIUtils.formatShortMonthYear(dataPoint.period)
             val tooltipText = createTooltipText(dataPoint)
             UIUtils.addTooltipToAxisLabel(xAxis, periodLabel, tooltipText)
         }
@@ -150,7 +150,7 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
         val assetsLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_ASSETS)
         val liabilitiesLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_LIABILITIES)
         val netWorthLabel = prefs.translate(TranslationKeys.HOME_NET_WORTH_NET_WORTH)
-        val periodLabel = UIUtils.formatFullMonthYear(dataPoint.period, prefs)
+        val periodLabel = UIUtils.formatFullMonthYear(dataPoint.period)
 
         return """
             $periodLabel

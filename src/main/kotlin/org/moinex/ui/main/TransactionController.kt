@@ -119,8 +119,8 @@ class TransactionController(
         populateYearComboBox()
         populateTransactionTypeComboBox()
 
-        UIUtils.setDatePickerFormat(transactionsStartDatePicker, preferencesService)
-        UIUtils.setDatePickerFormat(transactionsEndDatePicker, preferencesService)
+        UIUtils.setDatePickerFormat(transactionsStartDatePicker)
+        UIUtils.setDatePickerFormat(transactionsEndDatePicker)
 
         val currentDate = LocalDateTime.now()
 
@@ -271,10 +271,7 @@ class TransactionController(
                         preferencesService.translate(
                             TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_REGISTER_DATE,
                         ),
-                        UIUtils.formatDateTimeForDisplay(
-                            selectedTransaction.date,
-                            preferencesService,
-                        ),
+                        UIUtils.formatDateTimeForDisplay(selectedTransaction.date),
                     ),
                 )
                 append("\n")
@@ -283,10 +280,7 @@ class TransactionController(
                         preferencesService.translate(
                             TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_STATUS,
                         ),
-                        UIUtils.translateTransactionStatus(
-                            selectedTransaction.status,
-                            preferencesService,
-                        ),
+                        UIUtils.translateTransactionStatus(selectedTransaction.status),
                     ),
                 )
                 append("\n")
@@ -529,7 +523,7 @@ class TransactionController(
                 UIUtils.addTooltipToXYChartNode(
                     data.node,
                     "${series.name}: ${UIUtils.formatCurrency(value)} " +
-                        "(${UIUtils.formatPercentage(percentage, preferencesService)})\n" +
+                        "(${UIUtils.formatPercentage(percentage)})\n" +
                         "Total: ${UIUtils.formatCurrency(monthTotal)}",
                 )
 
@@ -755,7 +749,7 @@ class TransactionController(
 
         monthYearResumeMonthComboBox.converter =
             object : StringConverter<Month>() {
-                override fun toString(month: Month?): String = month?.let { UIUtils.getMonthDisplayName(it, preferencesService) } ?: ""
+                override fun toString(month: Month?): String = month?.let { UIUtils.getMonthDisplayName(it) } ?: ""
 
                 override fun fromString(string: String): Month = Month.valueOf(string.uppercase())
             }
@@ -872,7 +866,7 @@ class TransactionController(
         ).apply {
             setCellValueFactory {
                 SimpleStringProperty(
-                    UIUtils.formatDateTimeForDisplay(it.value.date, preferencesService),
+                    UIUtils.formatDateTimeForDisplay(it.value.date),
                 )
             }
         }

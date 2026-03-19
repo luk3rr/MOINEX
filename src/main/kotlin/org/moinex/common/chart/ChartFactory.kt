@@ -15,10 +15,7 @@ import org.springframework.stereotype.Component
 class ChartFactory(
     private val preferencesService: PreferencesService,
 ) {
-    fun createDoughnutChart(pieData: ObservableList<PieChart.Data>): DoughnutChart =
-        DoughnutChart(pieData).apply {
-            this.preferencesService = this@ChartFactory.preferencesService
-        }
+    fun createDoughnutChart(pieData: ObservableList<PieChart.Data>): DoughnutChart = DoughnutChart(pieData)
 
     fun createBudgetGroupTimelineChart(): BudgetGroupTimelineChart =
         BudgetGroupTimelineChart().apply {
@@ -28,10 +25,7 @@ class ChartFactory(
     fun createCircularProgressBar(
         radius: Double,
         width: Double,
-    ): CircularProgressBar =
-        CircularProgressBar(radius, width).apply {
-            this.preferencesService = this@ChartFactory.preferencesService
-        }
+    ): CircularProgressBar = CircularProgressBar(radius, width)
 
     fun createNetWorthLineChart(): NetWorthLineChart =
         NetWorthLineChart().apply {

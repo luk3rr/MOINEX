@@ -164,8 +164,7 @@ public class ChangeWalletTypeController {
 
     private void configureComboBoxes() {
         UIUtils.configureComboBox(walletComboBox, Wallet::getName);
-        UIUtils.configureComboBox(
-                newTypeComboBox, wt -> UIUtils.translateWalletType(wt, preferencesService));
+        UIUtils.configureComboBox(newTypeComboBox, UIUtils::translateWalletType);
     }
 
     private void updateCurrentTypeLabel(Wallet wt) {
@@ -174,6 +173,6 @@ public class ChangeWalletTypeController {
             return;
         }
 
-        currentTypeLabel.setText(UIUtils.translateWalletType(wt.getType(), preferencesService));
+        currentTypeLabel.setText(UIUtils.translateWalletType(wt.getType()));
     }
 }

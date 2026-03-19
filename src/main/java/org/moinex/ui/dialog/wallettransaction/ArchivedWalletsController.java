@@ -230,8 +230,7 @@ public class ArchivedWalletsController {
         typeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateWalletType(
-                                        param.getValue().getType(), preferencesService)));
+                                UIUtils.translateWalletType(param.getValue().getType())));
 
         TableColumn<Wallet, Integer> numOfTransactionsColumn = getLongTableColumn();
 

@@ -304,16 +304,14 @@ public class CreditCardPaneController {
                         : pendingPayments.divide(limit, 2, RoundingMode.HALF_UP);
 
         limitProgressBar.setProgress(limitProgress.doubleValue());
-        limitProgressLabel.setText(
-                UIUtils.formatPercentage(limitProgress.doubleValue() * 100, preferencesService));
+        limitProgressLabel.setText(UIUtils.formatPercentage(limitProgress.doubleValue() * 100));
 
         dueDateLabel.setText(String.valueOf(creditCard.getBillingDueDay()));
 
         closureDayLabel.setText(String.valueOf(creditCard.getClosingDay()));
 
         nextInvoiceLabel.setText(
-                UIUtils.formatShortMonthYear(
-                        creditCardService.getNextInvoiceDate(creditCard), preferencesService));
+                UIUtils.formatShortMonthYear(creditCardService.getNextInvoiceDate(creditCard)));
 
         updateInvoiceInfo();
 
@@ -326,8 +324,7 @@ public class CreditCardPaneController {
             return;
         }
 
-        invoiceMonthNavigatorBarLabel.setText(
-                UIUtils.formatShortMonthYear(currentDisplayedMonth, preferencesService));
+        invoiceMonthNavigatorBarLabel.setText(UIUtils.formatShortMonthYear(currentDisplayedMonth));
 
         BigDecimal totalDebts =
                 creditCardService.getInvoiceAmount(
@@ -344,8 +341,7 @@ public class CreditCardPaneController {
                                 creditCard.getId(),
                                 YearMonth.of(
                                         currentDisplayedMonth.getYear(),
-                                        currentDisplayedMonth.getMonthValue())),
-                        preferencesService));
+                                        currentDisplayedMonth.getMonthValue()))));
     }
 
     /** Set the default values for the credit card pane */

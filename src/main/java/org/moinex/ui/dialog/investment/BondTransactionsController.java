@@ -130,9 +130,7 @@ public class BondTransactionsController {
             return;
         }
 
-        String operationType =
-                UIUtils.translateOperationType(
-                        selectedOperation.getOperationType(), preferencesService);
+        String operationType = UIUtils.translateOperationType(selectedOperation.getOperationType());
         String bondName = selectedOperation.getBond().getName();
         String symbol = selectedOperation.getBond().getSymbol();
         String bondDisplay =
@@ -190,8 +188,7 @@ public class BondTransactionsController {
                                                 : "";
                                 String date =
                                         UIUtils.formatDateForDisplay(
-                                                op.getWalletTransaction().getDate(),
-                                                preferencesService);
+                                                op.getWalletTransaction().getDate());
                                 String quantity = op.getQuantity().toString();
                                 String unitPrice = op.getUnitPrice().toString();
                                 String fees = op.getFees() != null ? op.getFees().toString() : "";
@@ -233,7 +230,7 @@ public class BondTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.translateOperationType(
-                                        param.getValue().getOperationType(), preferencesService)));
+                                        param.getValue().getOperationType())));
 
         TableColumn<BondOperation, String> bondNameColumn =
                 new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_BOND));
@@ -252,8 +249,7 @@ public class BondTransactionsController {
         bondTypeColumn.setCellValueFactory(
                 param ->
                         new SimpleStringProperty(
-                                UIUtils.translateBondType(
-                                        param.getValue().getBond().getType(), preferencesService)));
+                                UIUtils.translateBondType(param.getValue().getBond().getType())));
 
         TableColumn<BondOperation, String> dateColumn =
                 new TableColumn<>(preferencesService.translate(TranslationKeys.BOND_TABLE_DATE));
@@ -261,8 +257,7 @@ public class BondTransactionsController {
                 param ->
                         new SimpleStringProperty(
                                 UIUtils.formatDateForDisplay(
-                                        param.getValue().getWalletTransaction().getDate(),
-                                        preferencesService)));
+                                        param.getValue().getWalletTransaction().getDate())));
 
         TableColumn<BondOperation, String> quantityColumn =
                 new TableColumn<>(
