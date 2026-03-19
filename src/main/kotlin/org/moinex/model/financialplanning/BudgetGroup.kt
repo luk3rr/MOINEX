@@ -58,9 +58,6 @@ class BudgetGroup(
         require(targetPercentage in BigDecimal.ZERO..BigDecimal(100)) {
             "Budget group target percentage must be between 0 and 100"
         }
-        require(categories.isNotEmpty()) {
-            "Budget group must have at least one category"
-        }
     }
 
     fun isSame(other: BudgetGroup?): Boolean {

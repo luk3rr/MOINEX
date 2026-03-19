@@ -11,16 +11,17 @@ import jakarta.persistence.EntityNotFoundException
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.financialplanning.BudgetGroupFactory
 import org.moinex.factory.financialplanning.FinancialPlanFactory
+import org.moinex.model.Category
 import org.moinex.model.enums.BudgetGroupTransactionFilter
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.financialplanning.FinancialPlanRepository
 import org.moinex.service.CategoryService
 import org.moinex.service.creditcard.CreditCardService
-import org.moinex.service.financialplanning.FinancialPlanningService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.YearMonth
 import java.util.Optional
+import kotlin.collections.emptySet
 
 class FinancialPlanningServiceTest :
     BehaviorSpec({
@@ -169,6 +170,32 @@ class FinancialPlanningServiceTest :
             When("attempting to create a plan with archived category") {
                 every { financialPlanRepository.existsByName("Plan with Archived Category") } returns false
                 every { categoryService.existsById(1) } returns true
+
+                Then("should throw IllegalStateException") {
+                    shouldThrow<IllegalStateException> {
+                        service.createPlan(plan)
+                    }
+                }
+            }
+        }
+
+        Given("a budget group with no categories") {
+            val budgetGroup =
+                BudgetGroupFactory.create(
+                    id = 1,
+                    name = "Empty Group",
+                    targetPercentage = BigDecimal("100.00"),
+                    categories = emptySet<Category>().toMutableSet(),
+                )
+
+            val plan =
+                FinancialPlanFactory.create(
+                    name = "Plan with Empty Group",
+                    budgetGroups = mutableListOf(budgetGroup),
+                )
+
+            When("attempting to create a plan with empty budget group") {
+                every { financialPlanRepository.existsByName("Plan with Empty Group") } returns false
 
                 Then("should throw IllegalStateException") {
                     shouldThrow<IllegalStateException> {

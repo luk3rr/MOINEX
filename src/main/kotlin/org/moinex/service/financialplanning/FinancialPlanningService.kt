@@ -122,6 +122,12 @@ class FinancialPlanningService(
             .toRounded()
 
     private fun validateCategories(groups: List<BudgetGroup>) {
+        groups.forEach { group ->
+            check(group.categories.isNotEmpty()) {
+                "$group must have at least one category."
+            }
+        }
+
         groups
             .asSequence()
             .flatMap { it.categories }
