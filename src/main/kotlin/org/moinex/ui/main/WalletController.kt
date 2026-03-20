@@ -166,7 +166,7 @@ class WalletController(
                     updateDoughnutChart()
                 },
             ),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -188,7 +188,7 @@ class WalletController(
                     updateDoughnutChart()
                 },
             ),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -210,7 +210,7 @@ class WalletController(
                     updateDoughnutChart()
                 },
             ),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -231,7 +231,7 @@ class WalletController(
                     updateDoughnutChart()
                 },
             ),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -424,7 +424,7 @@ class WalletController(
                 val loader =
                     FXMLLoader(
                         javaClass.getResource(Constants.WALLET_FULL_PANE_FXML),
-                        preferencesService.getBundle(),
+                        preferencesService.bundle,
                     )
                 loader.setControllerFactory { springContext.getBean(it) }
                 val newContent = loader.load<Parent>()

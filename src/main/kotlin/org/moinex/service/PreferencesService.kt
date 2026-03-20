@@ -34,7 +34,7 @@ class PreferencesService {
         set(value) {
             field = value
             preferences.put(PREF_KEY_LOCALE, toPreferenceValue(value))
-            bundleCache = null
+            bundle = resolveBundle()
         }
 
     var hideMonetaryValues: Boolean = resolveInitialHideMonetaryValues()
@@ -43,23 +43,16 @@ class PreferencesService {
             preferences.putBoolean(PREF_KEY_HIDE_MONETARY_VALUES, value)
         }
 
-    private var bundleCache: ResourceBundle? = null
+    var bundle: ResourceBundle = resolveBundle()
 
     fun getSupportedLocales(): List<Locale> = SUPPORTED_LOCALES.keys.toList()
 
     fun getSupportedLocalesWithLabels(): Map<Locale, String> = SUPPORTED_LOCALES
 
-    fun getBundle(): ResourceBundle =
-        bundleCache ?: try {
-            ResourceBundle.getBundle(BUNDLE_BASE_NAME, locale).also { bundleCache = it }
-        } catch (_: MissingResourceException) {
-            ResourceBundle.getBundle(BUNDLE_BASE_NAME, Locale.ENGLISH).also { bundleCache = it }
-        }
-
     fun translate(key: String?): String =
         key?.let {
             try {
-                getBundle().getString(it)
+                bundle.getString(it)
             } catch (_: MissingResourceException) {
                 it
             }
@@ -92,6 +85,13 @@ class PreferencesService {
     }
 
     private fun resolveInitialHideMonetaryValues(): Boolean = preferences.getBoolean(PREF_KEY_HIDE_MONETARY_VALUES, false)
+
+    private fun resolveBundle(): ResourceBundle =
+        runCatching {
+            ResourceBundle.getBundle(BUNDLE_BASE_NAME, locale)
+        }.getOrElse {
+            ResourceBundle.getBundle(BUNDLE_BASE_NAME, Locale.ENGLISH)
+        }
 
     private fun toPreferenceValue(locale: Locale): String =
         locale.language +

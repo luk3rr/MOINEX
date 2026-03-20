@@ -147,7 +147,7 @@ object WindowUtils {
         onHiddenActions: List<Runnable> = emptyList(),
         resources: ResourceBundle? = null,
     ) {
-        val bundle = resources ?: springContext.getBean<PreferencesService>().getBundle()
+        val bundle = resources ?: springContext.getBean<PreferencesService>().bundle
 
         runCatching {
             val loader =
@@ -191,7 +191,7 @@ object WindowUtils {
         onHiddenActions: List<Runnable> = emptyList(),
         resources: ResourceBundle? = null,
     ) {
-        val bundle = resources ?: springContext.getBean<PreferencesService>().getBundle()
+        val bundle = resources ?: springContext.getBean<PreferencesService>().bundle
 
         runCatching {
             val loader =

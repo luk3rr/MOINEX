@@ -524,7 +524,7 @@ class HomeController(
             val loader =
                 FXMLLoader(
                     javaClass.getResource(Constants.RESUME_PANE_FXML),
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()

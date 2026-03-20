@@ -291,7 +291,7 @@ class GoalController(
                         TranslationKeys.GOAL_DIALOG_CONFIRMATION_DELETE_TITLE,
                     ),
                     message,
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             ) {
                 goalService.deleteGoal(goal.id!!)
@@ -366,7 +366,7 @@ class GoalController(
             val loader =
                 FXMLLoader(
                     javaClass.getResource(Constants.GOAL_FULL_PANE_FXML),
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()

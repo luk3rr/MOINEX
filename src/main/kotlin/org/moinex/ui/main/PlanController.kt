@@ -246,7 +246,7 @@ class PlanController(
             val loader =
                 FXMLLoader(
                     javaClass.getResource(Constants.BUDGET_GROUP_PANE_FXML),
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val content = loader.load<Parent>()

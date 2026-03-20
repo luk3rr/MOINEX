@@ -157,7 +157,7 @@ class MainController(
             springContext,
             { _: CalculatorController -> },
             listOf(Runnable { }),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -169,7 +169,7 @@ class MainController(
             springContext,
             { _: CalendarController -> },
             listOf(Runnable { }),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -203,7 +203,7 @@ class MainController(
             val loader =
                 FXMLLoader(
                     javaClass.getResource(fxmlFile),
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
@@ -270,7 +270,7 @@ class MainController(
         val keyValueSidebarWidth = KeyValue(sidebar.prefWidthProperty(), targetWidth)
         val keyFrame =
             KeyFrame(
-                Duration.millis(Constants.MENU_ANIMATION_DURATION.toDouble()),
+                Duration.millis(Constants.MENU_ANIMATION_DURATION),
                 keyValueSidebarWidth,
             )
 

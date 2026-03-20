@@ -66,7 +66,7 @@ class JavaFXApp : Application() {
                     val loader =
                         FXMLLoader(
                             javaClass.getResource(Constants.MAIN_FXML),
-                            preferencesService.getBundle(),
+                            preferencesService.bundle,
                         )
                     loader.setControllerFactory { springContext.getBean(it) }
                     val mainRoot = loader.load<Parent>()

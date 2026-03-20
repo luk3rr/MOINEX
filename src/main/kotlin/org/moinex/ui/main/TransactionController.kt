@@ -328,7 +328,7 @@ class TransactionController(
                     TranslationKeys.TRANSACTION_DIALOG_CONFIRMATION_DELETE_TITLE,
                 ),
                 message,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
         ) {
             walletService.deleteWalletTransaction(selectedTransaction.id!!)
@@ -539,7 +539,7 @@ class TransactionController(
             val loader =
                 FXMLLoader(
                     javaClass.getResource(Constants.RESUME_PANE_FXML),
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
@@ -579,7 +579,7 @@ class TransactionController(
             val loader =
                 FXMLLoader(
                     javaClass.getResource(Constants.RESUME_PANE_FXML),
-                    preferencesService.getBundle(),
+                    preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()

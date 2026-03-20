@@ -362,7 +362,7 @@ class SavingsStocksFundsController(
                 "${preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE)} " +
                     "${selectedTicker.name} (${selectedTicker.symbol})",
                 "",
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
 
         if (confirmed) {

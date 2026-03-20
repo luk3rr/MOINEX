@@ -45,7 +45,7 @@ class GoalsPlansController(
                 Constants.GOALS_STYLE_SHEET,
                 springContext,
                 javaClass,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
 
             UIUtils.loadContentIntoTab(
@@ -54,7 +54,7 @@ class GoalsPlansController(
                 Constants.PLANS_STYLE_SHEET,
                 springContext,
                 javaClass,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
         }.onFailure { e ->
             logger.error("Error loading content: '{}'", e.message, e)

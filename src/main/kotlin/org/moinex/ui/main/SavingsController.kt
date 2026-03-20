@@ -48,7 +48,7 @@ class SavingsController(
                 Constants.SAVINGS_OVERVIEW_STYLE_SHEET,
                 springContext,
                 javaClass,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
 
             UIUtils.loadContentIntoTab(
@@ -57,7 +57,7 @@ class SavingsController(
                 Constants.SAVINGS_STOCKS_FUNDS_STYLE_SHEET,
                 springContext,
                 javaClass,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
 
             UIUtils.loadContentIntoTab(
@@ -66,7 +66,7 @@ class SavingsController(
                 Constants.SAVINGS_BONDS_STYLE_SHEET,
                 springContext,
                 javaClass,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
         }.onFailure { e ->
             logger.error("Error loading content: '{}' - Cause: {}", e.message, e.cause, e)

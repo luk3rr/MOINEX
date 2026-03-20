@@ -31,6 +31,7 @@ import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.constants.Constants
 import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -140,7 +141,7 @@ class CreditCardController(
             springContext,
             { _: AddCreditCardDebtController -> },
             listOf(Runnable { updateDisplay() }),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -154,7 +155,7 @@ class CreditCardController(
             springContext,
             { _: AddCreditCardController -> },
             listOf(Runnable { updateDisplayCards() }),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -197,7 +198,7 @@ class CreditCardController(
             springContext,
             { controller: EditCreditCardDebtController -> controller.setCreditCardDebt(debt) },
             listOf(Runnable { updateDisplay() }),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -320,7 +321,7 @@ class CreditCardController(
                     TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_REFUND_TITLE,
                 ),
                 message,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
         ) {
             creditCardService.refundDebt(debt.id!!, null)
@@ -478,7 +479,7 @@ class CreditCardController(
                     TranslationKeys.CREDIT_CARD_DIALOG_CONFIRMATION_DELETE_TITLE,
                 ),
                 message,
-                preferencesService.getBundle(),
+                preferencesService.bundle,
             )
         ) {
             creditCardService.deleteDebt(debt.id!!)
@@ -505,7 +506,7 @@ class CreditCardController(
             springContext,
             { _: ArchivedCreditCardsController -> },
             listOf(Runnable { updateDisplay() }),
-            preferencesService.getBundle(),
+            preferencesService.bundle,
         )
     }
 
@@ -622,7 +623,7 @@ class CreditCardController(
                 val loader =
                     FXMLLoader(
                         javaClass.getResource(Constants.CRC_PANE_FXML),
-                        preferencesService.getBundle(),
+                        preferencesService.bundle,
                     )
                 loader.setControllerFactory { springContext.getBean(it) }
                 val newContent = loader.load<Parent>()
@@ -758,7 +759,7 @@ class CreditCardController(
         val oldestDebtDate = creditCardService.getEarliestPaymentDate()
         val newestDebtDate = creditCardService.getLatestPaymentDate()
 
-        var startYearMonth = YearMonth.from(oldestDebtDate)
+        val startYearMonth = YearMonth.from(oldestDebtDate)
         var endYearMonth = YearMonth.from(newestDebtDate)
 
         val yearMonths = mutableListOf<YearMonth>()
@@ -805,11 +806,11 @@ class CreditCardController(
         val oldestDebtDate = creditCardService.getEarliestPaymentDate()
         val youngest = LocalDate.now().plusYears(Constants.YEAR_RESUME_FUTURE_YEARS.toLong())
 
-        var startYear = Year.from(oldestDebtDate)
+        val startYear = Year.from(oldestDebtDate)
         var currentYear = Year.from(youngest)
 
         val years = mutableListOf<Year>()
-        while (!startYear.isAfter(currentYear)) {
+        while (startYear.isBeforeOrEqual(currentYear)) {
             years.add(currentYear)
             currentYear = currentYear.minusYears(1)
         }
