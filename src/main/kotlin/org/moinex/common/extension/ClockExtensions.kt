@@ -19,6 +19,8 @@ fun LocalDateTime.isBeforeOrEqual(other: LocalDateTime): Boolean = !this.isAfter
 
 fun LocalDateTime.isAfterOrEqual(other: LocalDateTime): Boolean = !this.isBefore(other)
 
+fun LocalDateTime.toYearMonth(): YearMonth = YearMonth.of(this.year, this.monthValue)
+
 fun YearMonth.isBeforeOrEqual(other: YearMonth): Boolean = !this.isAfter(other)
 
 fun YearMonth.isAfterOrEqual(other: YearMonth): Boolean = !this.isBefore(other)

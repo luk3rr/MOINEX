@@ -12,13 +12,13 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.fxml.FXML
 import javafx.geometry.Pos
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constants.Constants
 import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.service.CategoryService
@@ -181,7 +181,7 @@ class ManageCategoryController(
             preferencesService.translate(TranslationKeys.WALLETTRANSACTION_TABLE_ID),
         ).apply {
             setCellValueFactory { param -> SimpleObjectProperty(param.value.id) }
-            setCellFactory { createCenteredTableCell() }
+            UIUtils.alignTableColumn(this, Pos.CENTER)
         }
 
     private fun createCategoryColumn(): TableColumn<Category, String> =
@@ -204,7 +204,7 @@ class ManageCategoryController(
                     },
                 )
             }
-            setCellFactory { createCenteredTableCell() }
+            UIUtils.alignTableColumn(this, Pos.CENTER)
         }
 
     private fun createTransactionsColumn(): TableColumn<Category, Int> =
@@ -214,23 +214,6 @@ class ManageCategoryController(
             setCellValueFactory { param ->
                 SimpleObjectProperty(categoryService.getTransactionCountByCategory(param.value.id!!))
             }
-            setCellFactory { createCenteredTableCell() }
-        }
-
-    private fun <T> createCenteredTableCell(): TableCell<Category, T> =
-        object : TableCell<Category, T>() {
-            override fun updateItem(
-                item: T?,
-                empty: Boolean,
-            ) {
-                super.updateItem(item, empty)
-                if (item == null || empty) {
-                    text = null
-                } else {
-                    text = item.toString()
-                    alignment = Pos.CENTER
-                    style = "-fx-padding: 0;"
-                }
-            }
+            UIUtils.alignTableColumn(this, Pos.CENTER)
         }
 }

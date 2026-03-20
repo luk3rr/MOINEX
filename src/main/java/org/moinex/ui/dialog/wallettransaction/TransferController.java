@@ -131,7 +131,8 @@ public class TransferController {
                         senderColumn,
                         receiverColumn,
                         categoryColumn),
-                Pos.CENTER);
+                Pos.CENTER,
+                "");
 
         transfersTableView.getColumns().add(idColumn);
         transfersTableView.getColumns().add(dateColumn);

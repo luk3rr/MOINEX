@@ -355,6 +355,7 @@ class UIUtils(
         fun <S, T> alignTableColumn(
             column: TableColumn<S, T>,
             alignment: Pos,
+            style: String = "-fx-padding: 0;",
         ) {
             column.cellFactory =
                 Callback {
@@ -366,10 +367,11 @@ class UIUtils(
                             super.updateItem(item, empty)
                             if (item == null || empty) {
                                 text = null
-                                style = ""
+                                this.style = ""
                             } else {
                                 text = item.toString()
                                 this.alignment = alignment
+                                this.style = style
                             }
                         }
                     }
@@ -380,8 +382,9 @@ class UIUtils(
         fun alignTableColumn(
             columns: List<TableColumn<*, *>>,
             alignment: Pos,
+            style: String = "",
         ) {
-            columns.forEach { alignTableColumn(it, alignment) }
+            columns.forEach { alignTableColumn(it, alignment, style) }
         }
 
         @JvmStatic

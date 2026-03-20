@@ -94,7 +94,7 @@ class CreditCardPaneController(
     private lateinit var limitProgressBar: ProgressBar
 
     private var currentDisplayedMonth = YearMonth.now()
-    private var creditCard: CreditCard? = null
+    private lateinit var creditCard: CreditCard
 
     companion object {
         private const val GREEN_LABEL_STYLE = "-fx-text-fill: green"
@@ -112,7 +112,7 @@ class CreditCardPaneController(
             Constants.ADD_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_DEBT),
             springContext,
-            { controller: AddCreditCardDebtController -> controller.setCreditCard(creditCard) },
+            { controller: AddCreditCardDebtController -> controller.creditCard = creditCard },
             listOf(Runnable { creditCardController.updateDisplay() }),
         )
     }
@@ -141,25 +141,23 @@ class CreditCardPaneController(
 
     @FXML
     private fun handleArchiveCreditCard() {
-        val card = creditCard ?: return
-
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                     preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_TITLE),
-                    card.name,
+                    creditCard.name,
                 ),
                 preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_MESSAGE),
                 preferencesService.bundle,
             )
         ) {
             runCatching {
-                creditCardService.archiveCreditCard(card.id!!)
+                creditCardService.archiveCreditCard(creditCard.id!!)
 
                 WindowUtils.showSuccessDialog(
                     preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_SUCCESS_TITLE),
                     MessageFormat.format(
                         preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_ARCHIVE_SUCCESS_MESSAGE),
-                        card.name,
+                        creditCard.name,
                     ),
                 )
 
@@ -179,9 +177,7 @@ class CreditCardPaneController(
 
     @FXML
     private fun handleDeleteCreditCard() {
-        val card = creditCard ?: return
-
-        if (creditCardService.getDebtCountByCreditCard(card.id!!) > 0) {
+        if (creditCardService.getDebtCountByCreditCard(creditCard.id!!) > 0) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_HAS_DEBTS_TITLE),
                 preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_HAS_DEBTS_MESSAGE),
@@ -192,20 +188,20 @@ class CreditCardPaneController(
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                     preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_TITLE),
-                    card.name,
+                    creditCard.name,
                 ),
                 preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_MESSAGE),
                 preferencesService.bundle,
             )
         ) {
             runCatching {
-                creditCardService.deleteCreditCard(card.id!!)
+                creditCardService.deleteCreditCard(creditCard.id!!)
 
                 WindowUtils.showSuccessDialog(
                     preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE),
                     MessageFormat.format(
                         preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE),
-                        card.name,
+                        creditCard.name,
                     ),
                 )
 
@@ -260,14 +256,9 @@ class CreditCardPaneController(
     }
 
     fun updateCreditCardPane(
-        crc: CreditCard?,
+        crc: CreditCard,
         month: YearMonth,
     ): VBox {
-        if (crc == null) {
-            setDefaultValues()
-            return rootVBox
-        }
-
         creditCard = crc
         currentDisplayedMonth = month
 
@@ -311,43 +302,16 @@ class CreditCardPaneController(
     }
 
     fun updateInvoiceInfo() {
-        val card = creditCard ?: return
-
         invoiceMonthNavigatorBarLabel.text = UIUtils.formatShortMonthYear(currentDisplayedMonth)
 
         val totalDebts =
-            creditCardService.getInvoiceAmount(
-                card.id!!,
-                YearMonth.of(currentDisplayedMonth.year, currentDisplayedMonth.monthValue),
-            )
+            creditCardService.getInvoiceAmount(creditCard.id!!, currentDisplayedMonth)
 
         invoiceMonthLabel.text = UIUtils.formatCurrency(totalDebts)
 
         invoiceStatusLabel.text =
             UIUtils.translateCreditCardInvoiceStatus(
-                creditCardService.getInvoiceStatus(
-                    card.id!!,
-                    YearMonth.of(currentDisplayedMonth.year, currentDisplayedMonth.monthValue),
-                ),
+                creditCardService.getInvoiceStatus(creditCard.id!!, currentDisplayedMonth),
             )
-    }
-
-    private fun setDefaultValues() {
-        listOf(
-            crcName,
-            crcOperator,
-            limitLabel,
-            pendingPaymentsLabel,
-            availableLimitLabel,
-            availableRebateLabel,
-            closureDayLabel,
-            nextInvoiceLabel,
-            dueDateLabel,
-            invoiceStatusLabel,
-            invoiceMonthLabel,
-            invoiceMonthNavigatorBarLabel,
-        ).forEach { it.text = "" }
-
-        crcOperatorIcon.image = Image(Constants.DEFAULT_ICON)
     }
 }
