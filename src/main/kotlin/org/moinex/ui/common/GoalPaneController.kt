@@ -102,10 +102,9 @@ class GoalPaneController(
     @FXML
     private lateinit var idealPerMonthHBox: HBox
 
-    private var goal: Goal? = null
+    private lateinit var goal: Goal
 
     companion object {
-        private const val DEFAULT_DATE_DISPLAY = "YY-MM-DD"
         private const val PERCENTAGE_MULTIPLIER = 100.0
     }
 
@@ -114,22 +113,10 @@ class GoalPaneController(
         // Still empty
     }
 
-    fun loadGoalInfo() {
-        goal?.let {
-            goal = goalService.getGoalById(it.id!!)
-        }
-    }
+    fun updateGoalPane(gl: Goal): VBox {
+        goal = goalService.getGoalById(gl.id!!)
 
-    fun updateGoalPane(gl: Goal?): VBox {
-        if (gl == null) {
-            setDefaultValues()
-            return rootVBox
-        }
-
-        goal = gl
-        loadGoalInfo()
-
-        val currentGoal = goal ?: return rootVBox
+        val currentGoal = goal
 
         goalName.text = currentGoal.name
         goalMotivation.text = currentGoal.motivation
@@ -238,7 +225,7 @@ class GoalPaneController(
 
     @FXML
     private fun handleAddIncome() {
-        val currentGoal = goal ?: return
+        val currentGoal = goal
 
         if (currentGoal.isArchived) {
             WindowUtils.showInformationDialog(
@@ -259,7 +246,7 @@ class GoalPaneController(
 
     @FXML
     private fun handleAddExpense() {
-        val currentGoal = goal ?: return
+        val currentGoal = goal
 
         if (currentGoal.isArchived) {
             WindowUtils.showInformationDialog(
@@ -280,7 +267,7 @@ class GoalPaneController(
 
     @FXML
     private fun handleAddTransfer() {
-        val currentGoal = goal ?: return
+        val currentGoal = goal
 
         if (currentGoal.isArchived) {
             WindowUtils.showInformationDialog(
@@ -312,7 +299,7 @@ class GoalPaneController(
 
     @FXML
     private fun handleCompleteGoal() {
-        val currentGoal = goal ?: return
+        val currentGoal = goal
 
         if (currentGoal.isCompleted()) {
             handleReopenGoal(currentGoal)
@@ -367,7 +354,7 @@ class GoalPaneController(
 
     @FXML
     private fun handleArchiveGoal() {
-        val currentGoal = goal ?: return
+        val currentGoal = goal
 
         if (currentGoal.isArchived) {
             handleUnarchiveGoal(currentGoal)
@@ -408,7 +395,7 @@ class GoalPaneController(
 
     @FXML
     private fun handleDeleteGoal() {
-        val currentGoal = goal ?: return
+        val currentGoal = goal
 
         if (walletService.getWalletTransactionAndTransferCountByWallet(currentGoal.id!!) > 0) {
             WindowUtils.showInformationDialog(
@@ -481,24 +468,5 @@ class GoalPaneController(
         } else {
             baseMessage
         }
-    }
-
-    private fun setDefaultValues() {
-        goalName.text = ""
-        goalMotivation.text = ""
-        goalIcon.image = null
-        goalTargetDate.text = DEFAULT_DATE_DISPLAY
-        missingDays.text = "0"
-
-        setLabelValue(goalTargetAmount, BigDecimal.ZERO)
-        setLabelValue(goalIdealAMountPerMonth, BigDecimal.ZERO)
-    }
-
-    private fun setLabelValue(
-        valueLabel: Label,
-        value: BigDecimal,
-    ) {
-        valueLabel.text = UIUtils.formatCurrency(value)
-        UIUtils.setLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE)
     }
 }
