@@ -549,7 +549,7 @@ class TransactionController(
             )
 
             val resumePaneController = loader.getController<ResumePaneController>()
-            resumePaneController.updateResumePane(selectedYear.value)
+            resumePaneController.updateResumePane(selectedYear)
 
             newContent.setAnchorPaneConstraints(left = 10.0, right = 10.0)
 
@@ -589,10 +589,7 @@ class TransactionController(
             )
 
             val resumePaneController = loader.getController<ResumePaneController>()
-            resumePaneController.updateResumePane(
-                selectedYearMonth.monthValue,
-                selectedYearMonth.year,
-            )
+            resumePaneController.updateResumePane(selectedYearMonth)
 
             newContent.setAnchorPaneConstraints(left = 10.0, right = 10.0)
 

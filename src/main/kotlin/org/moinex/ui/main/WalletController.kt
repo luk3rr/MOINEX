@@ -42,7 +42,7 @@ import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
-import org.moinex.ui.common.WalletFullPaneController
+import org.moinex.ui.common.WalletPaneController
 import org.moinex.ui.dialog.wallettransaction.AddTransferController
 import org.moinex.ui.dialog.wallettransaction.AddWalletController
 import org.moinex.ui.dialog.wallettransaction.ArchivedWalletsController
@@ -433,8 +433,8 @@ class WalletController(
                     javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
                 )
 
-                val walletFullPaneController = loader.getController<WalletFullPaneController>()
-                walletFullPaneController.updateWalletPane(wallet)
+                val walletPaneController = loader.getController<WalletPaneController>()
+                walletPaneController.updateWalletPane(wallet)
 
                 AnchorPane.setTopAnchor(newContent, 0.0)
                 AnchorPane.setBottomAnchor(newContent, 0.0)

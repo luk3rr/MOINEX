@@ -150,8 +150,8 @@ object Constants {
     const val ADD_CALENDAR_EVENT_FXML: String = UI_DIALOG_PATH + "add_calendar_event.fxml"
 
     // UI common package
-    const val WALLET_FULL_PANE_FXML: String = UI_COMMON_PATH + "wallet_full_pane.fxml"
-    const val GOAL_FULL_PANE_FXML: String = UI_COMMON_PATH + "goal_full_pane.fxml"
+    const val WALLET_FULL_PANE_FXML: String = UI_COMMON_PATH + "wallet_pane.fxml"
+    const val GOAL_FULL_PANE_FXML: String = UI_COMMON_PATH + "goal_pane.fxml"
     const val BUDGET_GROUP_PANE_FXML: String = UI_COMMON_PATH + "budget_group_pane.fxml"
     const val BUDGET_GROUP_PREVIEW_PANE_FXML: String = UI_COMMON_PATH + "budget_group_preview_pane.fxml"
 

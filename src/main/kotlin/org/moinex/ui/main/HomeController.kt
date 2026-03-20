@@ -542,7 +542,7 @@ class HomeController(
                     UIUtils.formatShortMonthYear(currentDate),
                 )
 
-            resumePaneController.updateResumePane(currentDate.monthValue, currentDate.year)
+            resumePaneController.updateResumePane(YearMonth.of(currentDate.year, currentDate.monthValue))
 
             AnchorPane.setTopAnchor(newContent, 0.0)
             AnchorPane.setBottomAnchor(newContent, 0.0)

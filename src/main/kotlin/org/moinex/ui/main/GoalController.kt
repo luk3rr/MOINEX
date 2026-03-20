@@ -33,7 +33,7 @@ import org.moinex.model.goal.Goal
 import org.moinex.service.PreferencesService
 import org.moinex.service.goal.GoalService
 import org.moinex.service.wallet.WalletService
-import org.moinex.ui.common.GoalFullPaneController
+import org.moinex.ui.common.GoalPaneController
 import org.moinex.ui.dialog.goal.AddGoalController
 import org.moinex.ui.dialog.goal.EditGoalController
 import org.moinex.ui.dialog.wallettransaction.AddTransferController
@@ -375,8 +375,8 @@ class GoalController(
                 javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
-            val goalFullPaneController = loader.getController<GoalFullPaneController>()
-            goalFullPaneController.updateGoalPane(goal)
+            val goalPaneController = loader.getController<GoalPaneController>()
+            goalPaneController.updateGoalPane(goal)
 
             newContent.setAnchorPaneConstraints()
 
