@@ -233,7 +233,8 @@ class BondInterestCalculationServiceCalculateInterestForAllBondsIfNeededTest :
                     bondOperationRepository.findAllByNonArchivedBondsOrderByBondAndDate()
                 } returns listOf(operation)
 
-                every { bondOperationRepository.findByBondOrderByOperationDateAsc(activeBond) } returns listOf(operation)
+                every { bondOperationRepository.findByBondOrderByOperationDateAsc(activeBond) } returns
+                    listOf(operation)
                 every {
                     marketIndicatorService.getIndicatorHistoryBetween(
                         InterestIndex.CDI,

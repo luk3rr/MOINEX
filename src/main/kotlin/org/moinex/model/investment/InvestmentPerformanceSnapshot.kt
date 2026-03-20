@@ -43,5 +43,6 @@ class InvestmentPerformanceSnapshot(
         monthlyCapitalGains = monthlyCapitalGains.toRounded()
     }
 
-    override fun toString(): String = "InvestmentPerformanceSnapshot [referenceMonth=$referenceMonth, calculatedAt=$calculatedAt]"
+    override fun toString(): String =
+        "InvestmentPerformanceSnapshot [referenceMonth=$referenceMonth, calculatedAt=$calculatedAt]"
 }

@@ -560,22 +560,27 @@ class UIUtils(
 
         // Date formatting methods
         @JvmStatic
-        fun getShortMonthYearFormatter(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern("MMM/yy", locale)
+        fun getShortMonthYearFormatter(locale: Locale): DateTimeFormatter =
+            DateTimeFormatter.ofPattern("MMM/yy", locale)
 
         @JvmStatic
-        fun getFullMonthYearFormatter(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", locale)
+        fun getFullMonthYearFormatter(locale: Locale): DateTimeFormatter =
+            DateTimeFormatter.ofPattern("MMMM yyyy", locale)
 
         @JvmStatic
         fun getYearFormatter(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
 
         @JvmStatic
-        fun formatShortMonthYear(dateTime: LocalDateTime): String = dateTime.format(getShortMonthYearFormatter(preferencesService.locale))
+        fun formatShortMonthYear(dateTime: LocalDateTime): String =
+            dateTime.format(getShortMonthYearFormatter(preferencesService.locale))
 
         @JvmStatic
-        fun formatShortMonthYear(yearMonth: YearMonth): String = yearMonth.format(getShortMonthYearFormatter(preferencesService.locale))
+        fun formatShortMonthYear(yearMonth: YearMonth): String =
+            yearMonth.format(getShortMonthYearFormatter(preferencesService.locale))
 
         @JvmStatic
-        fun formatFullMonthYear(yearMonth: YearMonth): String = yearMonth.format(getFullMonthYearFormatter(preferencesService.locale))
+        fun formatFullMonthYear(yearMonth: YearMonth): String =
+            yearMonth.format(getFullMonthYearFormatter(preferencesService.locale))
 
         @JvmStatic
         fun formatYear(year: Year): String = year.format(getYearFormatter(preferencesService.locale))
@@ -598,7 +603,8 @@ class UIUtils(
         fun getMonthDisplayName(month: Month): String = month.getDisplayName(TextStyle.FULL, preferencesService.locale)
 
         @JvmStatic
-        fun getMonthShortDisplayName(month: Month): String = month.getDisplayName(TextStyle.SHORT, preferencesService.locale)
+        fun getMonthShortDisplayName(month: Month): String =
+            month.getDisplayName(TextStyle.SHORT, preferencesService.locale)
 
         @JvmStatic
         fun formatDateForDisplay(date: LocalDate?): String {

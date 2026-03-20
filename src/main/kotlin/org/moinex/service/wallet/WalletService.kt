@@ -197,8 +197,16 @@ class WalletService(
 
         if (transactionFromDatabase.status == WalletTransactionStatus.CONFIRMED) {
             when (transactionFromDatabase.type) {
-                WalletTransactionType.INCOME -> decrementWalletBalance(transactionFromDatabase.wallet, transactionFromDatabase.amount)
-                WalletTransactionType.EXPENSE -> incrementWalletBalance(transactionFromDatabase.wallet, transactionFromDatabase.amount)
+                WalletTransactionType.INCOME ->
+                    decrementWalletBalance(
+                        transactionFromDatabase.wallet,
+                        transactionFromDatabase.amount,
+                    )
+                WalletTransactionType.EXPENSE ->
+                    incrementWalletBalance(
+                        transactionFromDatabase.wallet,
+                        transactionFromDatabase.amount,
+                    )
             }
         }
 
@@ -276,7 +284,8 @@ class WalletService(
 
     fun getAllArchivedWallets(): List<Wallet> = walletRepository.findAllByIsArchivedTrue()
 
-    fun getAllNonArchivedWalletsOrderedByName(): List<Wallet> = walletRepository.findAllByIsArchivedFalseOrderByNameAsc()
+    fun getAllNonArchivedWalletsOrderedByName(): List<Wallet> =
+        walletRepository.findAllByIsArchivedFalseOrderByNameAsc()
 
     fun getAllWalletsOrderedByName(): List<Wallet> = walletRepository.findAllByOrderByNameAsc()
 
@@ -349,7 +358,8 @@ class WalletService(
             PageRequest.ofSize(n),
         )
 
-    fun getOldestWalletTransactionDate(): LocalDateTime = walletTransactionRepository.findOldestTransactionDate() ?: LocalDateTime.now()
+    fun getOldestWalletTransactionDate(): LocalDateTime =
+        walletTransactionRepository.findOldestTransactionDate() ?: LocalDateTime.now()
 
     fun getWalletTransactionAndTransferCountByWallet(walletId: Int): Int =
         walletTransactionRepository.getTransactionCountByWallet(walletId) +
@@ -367,7 +377,8 @@ class WalletService(
         date: LocalDateTime,
     ): List<WalletTransaction> = walletTransactionRepository.findTransactionsByWalletAfterDate(walletId, date)
 
-    fun getFirstWalletTransactionDate(walletId: Int): LocalDateTime? = walletTransactionRepository.findFirstTransactionDate(walletId)
+    fun getFirstWalletTransactionDate(walletId: Int): LocalDateTime? =
+        walletTransactionRepository.findFirstTransactionDate(walletId)
 
     fun getEarliestTransactionDateByWallets(walletIds: List<Int>): LocalDateTime? =
         walletTransactionRepository.findEarliestTransactionDateByWallets(walletIds)
@@ -382,7 +393,8 @@ class WalletService(
     fun getTransfersByWalletAndMonth(
         walletId: Int,
         yearMonth: YearMonth,
-    ): List<Transfer> = transfersRepository.findTransfersByWalletAndMonth(walletId, yearMonth.monthValue, yearMonth.year)
+    ): List<Transfer> =
+        transfersRepository.findTransfersByWalletAndMonth(walletId, yearMonth.monthValue, yearMonth.year)
 
     fun getTransferSuggestions(): List<Transfer> = transfersRepository.findSuggestions()
 
@@ -566,7 +578,9 @@ class WalletService(
             return
         }
 
-        if (oldTransaction.status == WalletTransactionStatus.CONFIRMED && newStatus == WalletTransactionStatus.PENDING) {
+        if (oldTransaction.status == WalletTransactionStatus.CONFIRMED &&
+            newStatus == WalletTransactionStatus.PENDING
+        ) {
             when (oldTransaction.type) {
                 WalletTransactionType.EXPENSE -> incrementWalletBalance(oldTransaction.wallet, oldTransaction.amount)
                 WalletTransactionType.INCOME -> decrementWalletBalance(oldTransaction.wallet, oldTransaction.amount)

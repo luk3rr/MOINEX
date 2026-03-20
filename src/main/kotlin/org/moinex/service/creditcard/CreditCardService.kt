@@ -192,7 +192,11 @@ class CreditCardService(
     ) {
         val debtFromDatabase = creditCardDebtRepository.findByIdOrThrow(updatedDebt.id!!)
 
-        val payments = creditCardPaymentRepository.getPaymentsByDebtOrderedByInstallment(updatedDebt.id!!).toMutableList()
+        val payments =
+            creditCardPaymentRepository
+                .getPaymentsByDebtOrderedByInstallment(
+                    updatedDebt.id!!,
+                ).toMutableList()
 
         check(payments.none { it.isRefunded() }) {
             "$debtFromDatabase has already been refunded and cannot be updated"
@@ -436,9 +440,11 @@ class CreditCardService(
         yearMonth: YearMonth,
     ) = creditCardPaymentRepository.getCreditCardPayments(creditCardId, yearMonth.monthValue, yearMonth.year)
 
-    fun getPaymentsByMonth(yearMonth: YearMonth) = creditCardPaymentRepository.getCreditCardPayments(yearMonth.monthValue, yearMonth.year)
+    fun getPaymentsByMonth(yearMonth: YearMonth) =
+        creditCardPaymentRepository.getCreditCardPayments(yearMonth.monthValue, yearMonth.year)
 
-    fun getPaymentsByDebtOrderedByInstallment(debtId: Int) = creditCardPaymentRepository.getPaymentsByDebtOrderedByInstallment(debtId)
+    fun getPaymentsByDebtOrderedByInstallment(debtId: Int) =
+        creditCardPaymentRepository.getPaymentsByDebtOrderedByInstallment(debtId)
 
     fun getTotalEffectivePaidPaymentsByMonth(yearMonth: YearMonth) =
         creditCardPaymentRepository.getEffectivePaidPaymentsByMonth(yearMonth.monthValue, yearMonth.year)
@@ -470,13 +476,21 @@ class CreditCardService(
     fun getTotalPendingPaymentsByCreditCardAndMonth(
         creditCardId: Int,
         yearMonth: YearMonth,
-    ) = creditCardPaymentRepository.getPendingPaymentsByCreditCardAndMonth(creditCardId, yearMonth.monthValue, yearMonth.year)
+    ) = creditCardPaymentRepository.getPendingPaymentsByCreditCardAndMonth(
+        creditCardId,
+        yearMonth.monthValue,
+        yearMonth.year,
+    )
 
     fun getTotalPaymentsByCategoriesAndDateTimeBetween(
         categoryIds: List<Int>,
         startDateTime: LocalDateTime,
         endDateTime: LocalDateTime,
-    ) = creditCardPaymentRepository.getTotalPaymentsByCategoriesAndDateTimeBetween(categoryIds, startDateTime, endDateTime)
+    ) = creditCardPaymentRepository.getTotalPaymentsByCategoriesAndDateTimeBetween(
+        categoryIds,
+        startDateTime,
+        endDateTime,
+    )
 
     fun getDebtCountByCategory(categoryId: Int) = creditCardDebtRepository.getDebtCountByCategory(categoryId)
 
@@ -493,7 +507,14 @@ class CreditCardService(
 
         val nextInvoiceDate = getNextInvoiceDate(creditCardFromDatabase).withHour(0).withMinute(0).withSecond(1)
 
-        val invoiceClosingDate = LocalDateTime.of(yearMonth.year, yearMonth.monthValue, nextInvoiceDate.dayOfMonth, 23, 59)
+        val invoiceClosingDate =
+            LocalDateTime.of(
+                yearMonth.year,
+                yearMonth.monthValue,
+                nextInvoiceDate.dayOfMonth,
+                23,
+                59,
+            )
 
         return if (invoiceClosingDate.isAfter(nextInvoiceDate) || invoiceClosingDate.isEqual(nextInvoiceDate)) {
             CreditCardInvoiceStatus.OPEN
@@ -502,9 +523,11 @@ class CreditCardService(
         }
     }
 
-    fun getEarliestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findEarliestPaymentDate() ?: clockProvider.now()
+    fun getEarliestPaymentDate(): LocalDateTime =
+        creditCardPaymentRepository.findEarliestPaymentDate() ?: clockProvider.now()
 
-    fun getLatestPaymentDate(): LocalDateTime = creditCardPaymentRepository.findLatestPaymentDate() ?: clockProvider.now()
+    fun getLatestPaymentDate(): LocalDateTime =
+        creditCardPaymentRepository.findLatestPaymentDate() ?: clockProvider.now()
 
     fun getAllPaidPaymentsFromDateOnward(
         walletId: Int,
@@ -575,7 +598,12 @@ class CreditCardService(
             payment.date = paymentDate
         }
 
-        logger.info("Invoice month of debt {} on credit card {} updated to {}", debt.id, debt.creditCard.id, invoiceMonth)
+        logger.info(
+            "Invoice month of debt {} on credit card {} updated to {}",
+            debt.id,
+            debt.creditCard.id,
+            invoiceMonth,
+        )
     }
 
     private fun updateDebtAmount(

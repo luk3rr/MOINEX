@@ -67,7 +67,9 @@ class MarketIndicatorServiceTest :
                 service.updateAllIndicators()
 
                 Then("should skip synchronization for indicators without purchase dates") {
-                    verify(exactly = 0) { marketIndicatorHistoryRepository.findEarliestByIndicatorType(InterestIndex.CDI) }
+                    verify(
+                        exactly = 0,
+                    ) { marketIndicatorHistoryRepository.findEarliestByIndicatorType(InterestIndex.CDI) }
                 }
             }
         }
@@ -410,7 +412,8 @@ class MarketIndicatorServiceTest :
                     earliestPurchaseDate.atStartOfDay()
                 every { marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator) } returns earliestData
                 every { marketIndicatorHistoryRepository.findLatestByIndicatorType(indicator) } returns latestData
-                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns JSONObject().put("data", JSONArray())
+                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns
+                    JSONObject().put("data", JSONArray())
 
                 service.updateAllIndicators()
 
@@ -436,7 +439,8 @@ class MarketIndicatorServiceTest :
                 every { bondOperationRepository.findEarliestBuyDateByInterestIndex(indicator) } returns
                     earliestPurchaseDate.atStartOfDay()
                 every { marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator) } returns earliestData
-                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns JSONObject().put("data", JSONArray())
+                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns
+                    JSONObject().put("data", JSONArray())
 
                 service.updateAllIndicators()
 
@@ -455,7 +459,8 @@ class MarketIndicatorServiceTest :
                 every { bondOperationRepository.findEarliestBuyDateByInterestIndex(indicator) } returns
                     earliestPurchaseDate.atStartOfDay()
                 every { marketIndicatorHistoryRepository.findEarliestByIndicatorType(indicator) } returns null
-                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns JSONObject().put("data", JSONArray())
+                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns
+                    JSONObject().put("data", JSONArray())
 
                 service.updateAllIndicators()
 
@@ -512,7 +517,9 @@ class MarketIndicatorServiceTest :
                 every { marketIndicatorHistoryRepository.save(any()) } returnsArgument 0
 
                 Then("should skip existing indicators") {
-                    verify(exactly = 0) { marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(any(), any()) }
+                    verify(
+                        exactly = 0,
+                    ) { marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(any(), any()) }
                 }
             }
         }
@@ -538,7 +545,8 @@ class MarketIndicatorServiceTest :
                     )
 
                 every { marketIndicatorHistoryRepository.findLatestByIndicatorType(any()) } returns null
-                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns JSONObject().put("data", JSONArray())
+                coEvery { APIUtils.fetchMarketIndicatorHistory(any(), any(), any()) } returns
+                    JSONObject().put("data", JSONArray())
 
                 service.updateAllIndicators()
 
@@ -897,7 +905,9 @@ class MarketIndicatorServiceTest :
                 }
 
                 Then("should not attempt to save any data") {
-                    verify(exactly = 0) { marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(any(), any()) }
+                    verify(
+                        exactly = 0,
+                    ) { marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(any(), any()) }
                 }
             }
         }

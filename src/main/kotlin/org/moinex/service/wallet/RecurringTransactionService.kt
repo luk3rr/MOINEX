@@ -49,7 +49,10 @@ class RecurringTransactionService(
 
     @Transactional
     fun updateRecurringTransaction(updatedRecurringTransaction: RecurringTransaction) {
-        val recurringTransactionFromDatabase = recurringTransactionRepository.findByIdOrThrow(updatedRecurringTransaction.id!!)
+        val recurringTransactionFromDatabase =
+            recurringTransactionRepository.findByIdOrThrow(
+                updatedRecurringTransaction.id!!,
+            )
 
         recurringTransactionFromDatabase.apply {
             wallet = updatedRecurringTransaction.wallet
@@ -166,7 +169,13 @@ class RecurringTransactionService(
                         currentDate = calculateNextDueDate(currentDate, recurringTransaction.frequency)
                     }
 
-                    if (updateRecurringTransactionState) updateRecurringTransactionState(recurringTransaction, currentDate, endInterval)
+                    if (updateRecurringTransactionState) {
+                        updateRecurringTransactionState(
+                            recurringTransaction,
+                            currentDate,
+                            endInterval,
+                        )
+                    }
                 }
         }
 

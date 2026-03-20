@@ -134,7 +134,8 @@ class RecurringTransactionServiceTest :
                             includeInNetWorth = true,
                         )
 
-                    every { recurringTransactionRepository.findById(1) } returns Optional.of(existingRecurringTransaction)
+                    every { recurringTransactionRepository.findById(1) } returns
+                        Optional.of(existingRecurringTransaction)
 
                     service.updateRecurringTransaction(updatedRecurringTransaction)
 
@@ -208,7 +209,8 @@ class RecurringTransactionServiceTest :
 
             And("there are no active recurring transactions") {
                 When("processing recurring transactions") {
-                    every { recurringTransactionRepository.findByStatus(RecurringTransactionStatus.ACTIVE) } returns emptyList()
+                    every { recurringTransactionRepository.findByStatus(RecurringTransactionStatus.ACTIVE) } returns
+                        emptyList()
 
                     service.processRecurringTransactions()
 
@@ -357,7 +359,8 @@ class RecurringTransactionServiceTest :
                             ),
                         )
 
-                    every { recurringTransactionRepository.findByType(WalletTransactionType.EXPENSE) } returns expenseTransactions
+                    every { recurringTransactionRepository.findByType(WalletTransactionType.EXPENSE) } returns
+                        expenseTransactions
 
                     val result = service.getAllRecurringTransactionsByType(WalletTransactionType.EXPENSE)
 
@@ -381,7 +384,8 @@ class RecurringTransactionServiceTest :
                             ),
                         )
 
-                    every { recurringTransactionRepository.findByType(WalletTransactionType.INCOME) } returns incomeTransactions
+                    every { recurringTransactionRepository.findByType(WalletTransactionType.INCOME) } returns
+                        incomeTransactions
 
                     val result = service.getAllRecurringTransactionsByType(WalletTransactionType.INCOME)
 

@@ -3,91 +3,91 @@
  */
 
 plugins {
-    java
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.spring") version "2.1.0"
-    kotlin("plugin.jpa") version "2.1.0"
-    kotlin("plugin.allopen") version "2.1.0"
-    id("org.springframework.boot") version "3.5.11"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("org.openjfx.javafxplugin") version "0.1.0"
-    id("org.beryx.jlink") version "3.0.1"
-    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
-    id("com.diffplug.spotless") version "6.25.0"
-    jacoco
-    `maven-publish`
+	java
+	kotlin("jvm") version "2.1.0"
+	kotlin("plugin.spring") version "2.1.0"
+	kotlin("plugin.jpa") version "2.1.0"
+	kotlin("plugin.allopen") version "2.1.0"
+	id("org.springframework.boot") version "3.5.11"
+	id("io.spring.dependency-management") version "1.1.7"
+	id("org.openjfx.javafxplugin") version "0.1.0"
+	id("org.beryx.jlink") version "3.0.1"
+	id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+	id("com.diffplug.spotless") version "6.25.0"
+	jacoco
+	`maven-publish`
 }
 
 allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
+	annotation("jakarta.persistence.Entity")
+	annotation("jakarta.persistence.MappedSuperclass")
+	annotation("jakarta.persistence.Embeddable")
 }
 
 repositories {
-    mavenLocal()
-    maven {
-        url = uri("https://repo.maven.apache.org/maven2/")
-    }
+	mavenLocal()
+	maven {
+		url = uri("https://repo.maven.apache.org/maven2/")
+	}
 }
 
 dependencies {
-    // Kotlin
-    implementation(kotlin("stdlib"))
-    implementation(kotlin("reflect"))
-    implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.core)
-    implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.reactor)
-    implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.javafx)
+	// Kotlin
+	implementation(kotlin("stdlib"))
+	implementation(kotlin("reflect"))
+	implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.core)
+	implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.reactor)
+	implementation(libs.org.jetbrains.kotlinx.kotlinx.coroutines.javafx)
 
-    // Spring Boot
-    implementation(libs.org.springframework.boot.spring.boot.starter)
-    implementation(libs.org.springframework.boot.spring.boot.starter.data.jpa)
+	// Spring Boot
+	implementation(libs.org.springframework.boot.spring.boot.starter)
+	implementation(libs.org.springframework.boot.spring.boot.starter.data.jpa)
 
-    // Database
-    implementation(libs.org.xerial.sqlite.jdbc)
-    implementation(libs.org.hibernate.orm.hibernate.community.dialects)
+	// Database
+	implementation(libs.org.xerial.sqlite.jdbc)
+	implementation(libs.org.hibernate.orm.hibernate.community.dialects)
 
-    // JavaFX
-    implementation(libs.org.openjfx.javafx.controls)
-    implementation(libs.org.openjfx.javafx.fxml)
-    implementation(libs.com.jfoenix.jfoenix)
+	// JavaFX
+	implementation(libs.org.openjfx.javafx.controls)
+	implementation(libs.org.openjfx.javafx.fxml)
+	implementation(libs.com.jfoenix.jfoenix)
 
-    // Utilities
-    implementation(libs.com.opencsv.opencsv)
-    implementation(libs.org.apache.commons.commons.lang3)
-    implementation(libs.commons.beanutils.commons.beanutils)
-    implementation(libs.org.reflections.reflections)
-    implementation(libs.net.objecthunter.exp4j)
-    implementation(libs.org.json.json)
-    implementation(libs.net.minidev.json.smart)
+	// Utilities
+	implementation(libs.com.opencsv.opencsv)
+	implementation(libs.org.apache.commons.commons.lang3)
+	implementation(libs.commons.beanutils.commons.beanutils)
+	implementation(libs.org.reflections.reflections)
+	implementation(libs.net.objecthunter.exp4j)
+	implementation(libs.org.json.json)
+	implementation(libs.net.minidev.json.smart)
 
-    // Logging
-    implementation(libs.org.slf4j.slf4j.api)
-    implementation(libs.ch.qos.logback.logback.classic)
+	// Logging
+	implementation(libs.org.slf4j.slf4j.api)
+	implementation(libs.ch.qos.logback.logback.classic)
 
-    // Flyway
-    implementation(libs.org.flywaydb.flyway.core)
+	// Flyway
+	implementation(libs.org.flywaydb.flyway.core)
 
-    // Code Quality
-    implementation(libs.com.google.googlejavaformat.google.java.format)
+	// Code Quality
+	implementation(libs.com.google.googlejavaformat.google.java.format)
 
-    // Lombok
-    compileOnly(libs.org.projectlombok.lombok)
-    annotationProcessor(libs.org.projectlombok.lombok)
+	// Lombok
+	compileOnly(libs.org.projectlombok.lombok)
+	annotationProcessor(libs.org.projectlombok.lombok)
 
-    // Testing
-    testImplementation(libs.com.h2database.h2)
-    testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
-    testImplementation(libs.org.junit.jupiter.junit.jupiter.api)
-    testImplementation(libs.org.junit.jupiter.junit.jupiter.engine)
-    testImplementation(libs.org.mockito.mockito.core)
-    testImplementation(libs.org.mockito.mockito.junit.jupiter)
-    testImplementation(kotlin("test"))
-    testImplementation(libs.io.kotest.kotest.runner.junit5)
-    testImplementation(libs.io.kotest.kotest.assertions.core)
-    testImplementation(libs.io.kotest.kotest.extensions.spring)
-    testImplementation(libs.io.mockk.mockk)
-    testImplementation(libs.org.assertj.assertj.core)
+	// Testing
+	testImplementation(libs.com.h2database.h2)
+	testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
+	testImplementation(libs.org.junit.jupiter.junit.jupiter.api)
+	testImplementation(libs.org.junit.jupiter.junit.jupiter.engine)
+	testImplementation(libs.org.mockito.mockito.core)
+	testImplementation(libs.org.mockito.mockito.junit.jupiter)
+	testImplementation(kotlin("test"))
+	testImplementation(libs.io.kotest.kotest.runner.junit5)
+	testImplementation(libs.io.kotest.kotest.assertions.core)
+	testImplementation(libs.io.kotest.kotest.extensions.spring)
+	testImplementation(libs.io.mockk.mockk)
+	testImplementation(libs.org.assertj.assertj.core)
 }
 
 group = "org.moinex.app"
@@ -95,90 +95,90 @@ version = "1.0-SNAPSHOT"
 description = "Moinex"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 javafx {
-    version =
-        libs.versions.org.openjfx.javafx.controls
-            .get()
-    modules = listOf("javafx.controls", "javafx.fxml")
+	version =
+		libs.versions.org.openjfx.javafx.controls
+			.get()
+	modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 springBoot {
-    mainClass.set("org.moinex.app.App")
+	mainClass.set("org.moinex.app.App")
 }
 
 publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-    }
+	publications.create<MavenPublication>("maven") {
+		from(components["java"])
+	}
 }
 
 tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-    options.release.set(21)
+	options.encoding = "UTF-8"
+	options.release.set(21)
 }
 
 tasks.withType<Javadoc> {
-    options.encoding = "UTF-8"
+	options.encoding = "UTF-8"
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    archiveFileName.set("moinex.jar")
-    mainClass.set("org.moinex.app.App")
+	archiveFileName.set("moinex.jar")
+	mainClass.set("org.moinex.app.App")
 }
 
 jacoco {
-    toolVersion =
-        libs.versions.org.jacoco.jacoco
-            .get()
+	toolVersion =
+		libs.versions.org.jacoco.jacoco
+			.get()
 }
 
 tasks.jacocoTestReport {
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
 }
 
 ktlint {
-    version.set(
-        libs.versions.org.jlleitschuh.gradle.ktlint
-            .get(),
-    )
-    android.set(false)
-    outputToConsole.set(true)
-    ignoreFailures.set(false)
-    filter {
-        exclude("**/generated/**")
-        exclude("**/build/**")
-    }
+	version.set(
+		libs.versions.org.jlleitschuh.gradle.ktlint
+			.get(),
+	)
+	android.set(false)
+	outputToConsole.set(true)
+	ignoreFailures.set(false)
+	filter {
+		exclude("**/generated/**")
+		exclude("**/build/**")
+	}
 }
 
 spotless {
-    java {
-        target("src/*/java/**/*.java")
-        googleJavaFormat("1.22.0").aosp()
-        formatAnnotations()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
+	java {
+		target("src/*/java/**/*.java")
+		googleJavaFormat("1.22.0").aosp()
+		formatAnnotations()
+		removeUnusedImports()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "21"
-        freeCompilerArgs =
-            listOf(
-                "-Xjsr305=strict",
-                "-Xemit-jvm-type-annotations",
-            )
-    }
+	kotlinOptions {
+		jvmTarget = "21"
+		freeCompilerArgs =
+			listOf(
+				"-Xjsr305=strict",
+				"-Xemit-jvm-type-annotations",
+			)
+	}
 }

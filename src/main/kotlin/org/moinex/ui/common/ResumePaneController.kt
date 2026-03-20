@@ -281,7 +281,11 @@ class ResumePaneController(
             if (confirmedIncome <= BigDecimal.ZERO) {
                 BigDecimal.ZERO
             } else {
-                (confirmedIncome.minus(confirmedExpenses)).divide(confirmedIncome, 2, RoundingMode.HALF_UP).multiply(PERCENTAGE_MULTIPLIER)
+                (
+                    confirmedIncome.minus(
+                        confirmedExpenses,
+                    )
+                ).divide(confirmedIncome, 2, RoundingMode.HALF_UP).multiply(PERCENTAGE_MULTIPLIER)
             }
 
         UIUtils.removeTooltipFromNode(savingsCurrentValue)
@@ -328,7 +332,11 @@ class ResumePaneController(
 
         val foreseenSavingsPercentage =
             if (foreseenIncome > BigDecimal.ZERO) {
-                (foreseenIncome.minus(foreseenExpenses)).divide(foreseenIncome, 2, RoundingMode.HALF_UP).multiply(PERCENTAGE_MULTIPLIER)
+                (
+                    foreseenIncome.minus(
+                        foreseenExpenses,
+                    )
+                ).divide(foreseenIncome, 2, RoundingMode.HALF_UP).multiply(PERCENTAGE_MULTIPLIER)
             } else {
                 BigDecimal.ZERO
             }

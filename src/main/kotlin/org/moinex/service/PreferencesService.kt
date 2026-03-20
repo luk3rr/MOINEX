@@ -84,7 +84,8 @@ class PreferencesService {
         } ?: Locale.forLanguageTag(BRAZILIAN_PORTUGUESE_TAG)
     }
 
-    private fun resolveInitialHideMonetaryValues(): Boolean = preferences.getBoolean(PREF_KEY_HIDE_MONETARY_VALUES, false)
+    private fun resolveInitialHideMonetaryValues(): Boolean =
+        preferences.getBoolean(PREF_KEY_HIDE_MONETARY_VALUES, false)
 
     private fun resolveBundle(): ResourceBundle =
         runCatching {

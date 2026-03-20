@@ -169,7 +169,9 @@ class SavingsStocksFundsController(
         if (selectedTicker == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_TITLE),
-                preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_ADD_DIVIDEND_MESSAGE),
+                preferencesService.translate(
+                    TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_NO_SELECTION_ADD_DIVIDEND_MESSAGE,
+                ),
             )
             return
         }
@@ -359,7 +361,9 @@ class SavingsStocksFundsController(
 
         val confirmed =
             WindowUtils.showConfirmationDialog(
-                "${preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE)} " +
+                "${preferencesService.translate(
+                    TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_CONFIRMATION_DELETE_TITLE,
+                )} " +
                     "${selectedTicker.name} (${selectedTicker.symbol})",
                 "",
                 preferencesService.bundle,

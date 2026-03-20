@@ -604,7 +604,9 @@ class InvestmentPerformanceService(
             .subtract(purchases.sumOf { it.quantity })
             .add(sales.sumOf { it.quantity })
 
-    private inline fun processTickersWithTransactions(action: (Ticker, List<TickerPurchase>, List<TickerSale>) -> Unit) {
+    private inline fun processTickersWithTransactions(
+        action: (Ticker, List<TickerPurchase>, List<TickerSale>) -> Unit,
+    ) {
         val allTickers = tickerService.getAllNonArchivedTickers()
         val purchasesByTicker = tickerService.getAllPurchases().groupBy { it.ticker.id!! }
         val salesByTicker = tickerService.getAllSales().groupBy { it.ticker.id!! }

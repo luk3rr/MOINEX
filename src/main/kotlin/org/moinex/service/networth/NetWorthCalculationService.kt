@@ -130,7 +130,8 @@ class NetWorthCalculationService(
         wallets: List<Wallet>,
     ): NetWorthSnapshot {
         val walletBalances = calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.POSITIVE)
-        val negativeWalletBalances = calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.NEGATIVE)
+        val negativeWalletBalances =
+            calculateWalletBalancesForMonth(targetMonth, wallets, BalanceCalculationConfig.NEGATIVE)
         val investments = calculateInvestmentValueForMonth(targetMonth)
         val recurringIncome = calculateRecurringTransactionsIncome(targetMonth)
         val assets = walletBalances.add(investments).add(recurringIncome)
@@ -174,7 +175,9 @@ class NetWorthCalculationService(
 
         val totalBalance =
             when {
-                targetMonth.isAfter(currentMonth) -> calculateFutureWalletBalances(targetMonth, currentMonth, filteredWallets, config)
+                targetMonth.isAfter(
+                    currentMonth,
+                ) -> calculateFutureWalletBalances(targetMonth, currentMonth, filteredWallets, config)
                 targetMonth == currentMonth -> calculateCurrentMonthWalletBalances(targetMonth, filteredWallets, config)
                 else -> calculateHistoricalWalletBalances(targetMonth, filteredWallets, config)
             }
@@ -308,12 +311,20 @@ class NetWorthCalculationService(
         walletTransactionType: WalletTransactionType,
         debugLabel: String,
     ): BigDecimal {
-        logger.debug("=== Calculating RECURRING TRANSACTIONS {} for {}/{} ===", debugLabel, targetMonth.month, targetMonth.year)
+        logger.debug(
+            "=== Calculating RECURRING TRANSACTIONS {} for {}/{} ===",
+            debugLabel,
+            targetMonth.month,
+            targetMonth.year,
+        )
 
         val startOfMonth = targetMonth.atDay(1)
         val endOfMonth = targetMonth.atEndOfMonth()
 
-        val allRecurringTransactions = recurringTransactionService.getAllRecurringTransactionsByType(walletTransactionType)
+        val allRecurringTransactions =
+            recurringTransactionService.getAllRecurringTransactionsByType(
+                walletTransactionType,
+            )
 
         val totalAmount =
             allRecurringTransactions

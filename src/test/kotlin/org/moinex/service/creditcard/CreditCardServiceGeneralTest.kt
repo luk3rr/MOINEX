@@ -282,7 +282,8 @@ class CreditCardServiceGeneralTest :
 
             When("attempting to archive a credit card with pending payments") {
                 every { creditCardRepository.findById(2) } returns Optional.of(creditCard)
-                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(2) } returns BigDecimal("500.00")
+                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(2) } returns
+                    BigDecimal("500.00")
 
                 Then("should throw IllegalStateException") {
                     shouldThrow<IllegalStateException> {
@@ -645,7 +646,8 @@ class CreditCardServiceGeneralTest :
 
             When("checking invoice status for current month") {
                 every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
-                every { creditCardPaymentRepository.getNextInvoiceDate(1) } returns LocalDateTime.of(2026, 3, 15, 23, 59)
+                every { creditCardPaymentRepository.getNextInvoiceDate(1) } returns
+                    LocalDateTime.of(2026, 3, 15, 23, 59)
 
                 val invoiceMonth = YearMonth.of(2026, 3)
                 val result = service.getInvoiceStatus(1, invoiceMonth)
@@ -668,7 +670,8 @@ class CreditCardServiceGeneralTest :
 
             When("checking invoice status for past month") {
                 every { creditCardRepository.findById(2) } returns Optional.of(creditCard)
-                every { creditCardPaymentRepository.getNextInvoiceDate(2) } returns LocalDateTime.of(2026, 4, 15, 23, 59)
+                every { creditCardPaymentRepository.getNextInvoiceDate(2) } returns
+                    LocalDateTime.of(2026, 4, 15, 23, 59)
 
                 val invoiceMonth = YearMonth.of(2026, 3)
                 val result = service.getInvoiceStatus(2, invoiceMonth)

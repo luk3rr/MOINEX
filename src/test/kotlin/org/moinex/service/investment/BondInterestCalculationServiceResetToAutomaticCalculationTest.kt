@@ -100,9 +100,15 @@ class BondInterestCalculationServiceResetToAutomaticCalculationTest :
                         any(),
                     )
                 } returns marketData
-                every { bondInterestCalculationRepository.findByBondAndReferenceMonthAfter(bond, month) } returns emptyList()
+                every { bondInterestCalculationRepository.findByBondAndReferenceMonthAfter(bond, month) } returns
+                    emptyList()
                 every { bondInterestCalculationRepository.save(any()) } returnsArgument 0
-                every { bondInterestCalculationRepository.saveAll(any<List<BondInterestCalculation>>()) } returnsArgument 0
+                every {
+                    bondInterestCalculationRepository.saveAll(
+                        any<List<BondInterestCalculation>>(),
+                    )
+                } returnsArgument
+                    0
 
                 service.resetToAutomaticCalculation(1, month)
 

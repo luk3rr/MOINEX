@@ -55,7 +55,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                             ),
                         )
 
-                    every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
+                    every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                        null
                     coEvery { APIUtils.fetchFundamentalAnalysis("AAPL", PeriodType.ANNUAL) } returns apiResponse
                     every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                         val analysis = invocation.invocation.args[0] as FundamentalAnalysis
@@ -160,7 +161,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         ),
                     )
 
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.QUARTERLY) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.QUARTERLY) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("NEWCO", PeriodType.QUARTERLY) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
@@ -197,7 +199,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         ),
                     )
 
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("MINI", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
@@ -243,7 +246,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         ),
                     )
 
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.QUARTERLY) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.QUARTERLY) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("TEST", PeriodType.QUARTERLY) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
@@ -282,7 +286,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         ),
                     )
 
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("INTL", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis
@@ -322,7 +327,8 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
                         ),
                     )
 
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("CMPLX", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } answers { invocation ->
                     val analysis = invocation.invocation.args[0] as FundamentalAnalysis

@@ -55,7 +55,9 @@ class CreditCardPayment(
 
         require(amount > BigDecimal.ZERO) { "Amount must be greater than zero" }
         require(rebateUsed >= BigDecimal.ZERO) { "Rebate used must be greater than or equal to zero" }
-        require(installment in 1..Constants.MAX_INSTALLMENTS) { "Installment must be between 1 and ${Constants.MAX_INSTALLMENTS}" }
+        require(installment in 1..Constants.MAX_INSTALLMENTS) {
+            "Installment must be between 1 and ${Constants.MAX_INSTALLMENTS}"
+        }
     }
 
     fun isRefunded(): Boolean = refunded

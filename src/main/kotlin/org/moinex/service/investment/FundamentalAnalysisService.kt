@@ -134,7 +134,8 @@ class FundamentalAnalysisService(
         }
     }
 
-    fun getAllAnalysesForTicker(tickerId: Int): List<FundamentalAnalysis> = fundamentalAnalysisRepository.findByTickerId(tickerId)
+    fun getAllAnalysesForTicker(tickerId: Int): List<FundamentalAnalysis> =
+        fundamentalAnalysisRepository.findByTickerId(tickerId)
 
     private fun createNewAnalysis(
         ticker: Ticker,

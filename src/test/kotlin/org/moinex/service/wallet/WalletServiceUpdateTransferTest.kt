@@ -515,7 +515,13 @@ class WalletServiceUpdateTransferTest :
 
         Given("a transfer between virtual wallets with same master changing amount") {
             val walletType = WalletTypeFactory.create(7, "Master")
-            val masterWallet = WalletFactory.create(id = 29, name = "Master", balance = BigDecimal("2000.00"), type = walletType)
+            val masterWallet =
+                WalletFactory.create(
+                    id = 29,
+                    name = "Master",
+                    balance = BigDecimal("2000.00"),
+                    type = walletType,
+                )
             val virtualWallet1 =
                 WalletFactory.create(
                     id = 30,

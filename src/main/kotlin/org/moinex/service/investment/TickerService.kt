@@ -290,8 +290,10 @@ class TickerService(
             "Source quantity must be less than or equal to the current quantity"
         }
 
-        sourcerTickerFromDatabase.currentQuantity = sourcerTickerFromDatabase.currentQuantity.subtract(cryptoExchange.soldQuantity)
-        targetTickerFromDatabase.currentQuantity = targetTickerFromDatabase.currentQuantity.add(cryptoExchange.receivedQuantity)
+        sourcerTickerFromDatabase.currentQuantity =
+            sourcerTickerFromDatabase.currentQuantity.subtract(cryptoExchange.soldQuantity)
+        targetTickerFromDatabase.currentQuantity =
+            targetTickerFromDatabase.currentQuantity.add(cryptoExchange.receivedQuantity)
 
         val newCryptoExchange = cryptoExchangeRepository.save(cryptoExchange)
 
@@ -329,7 +331,9 @@ class TickerService(
             cryptoExchangeFromDatabase.soldCrypto.currentQuantity.add(cryptoExchangeFromDatabase.soldQuantity)
 
         cryptoExchangeFromDatabase.receivedCrypto.currentQuantity =
-            cryptoExchangeFromDatabase.receivedCrypto.currentQuantity.subtract(cryptoExchangeFromDatabase.receivedQuantity)
+            cryptoExchangeFromDatabase.receivedCrypto.currentQuantity.subtract(
+                cryptoExchangeFromDatabase.receivedQuantity,
+            )
 
         tickerRepository.save(cryptoExchangeFromDatabase.soldCrypto)
         tickerRepository.save(cryptoExchangeFromDatabase.receivedCrypto)
@@ -430,7 +434,8 @@ class TickerService(
 
     fun getAllNonArchivedTickers() = tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc()
 
-    fun getAllNonArchivedTickersByType(type: AssetType) = tickerRepository.findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(type)
+    fun getAllNonArchivedTickersByType(type: AssetType) =
+        tickerRepository.findAllByTypeAndIsArchivedFalseOrderBySymbolAsc(type)
 
     fun getAllPurchases() = tickerPurchaseRepository.findAll().toList()
 

@@ -156,7 +156,12 @@ class WalletServiceGeneralTest :
         Given("a wallet with a non-existent wallet type") {
             val currentType = WalletTypeFactory.create(1, "Savings")
             val wallet = WalletFactory.create(id = 7, name = "My Wallet", type = currentType)
-            val updatedWallet = WalletFactory.create(id = 7, name = "My Wallet", type = WalletTypeFactory.create(999, "Invalid"))
+            val updatedWallet =
+                WalletFactory.create(
+                    id = 7,
+                    name = "My Wallet",
+                    type = WalletTypeFactory.create(999, "Invalid"),
+                )
 
             When("attempting to change to non-existent wallet type") {
                 every { walletRepository.findById(7) } returns Optional.of(wallet)

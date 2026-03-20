@@ -13,7 +13,8 @@ import java.time.YearMonth
 
 @Converter(autoApply = false)
 class YearMonthStringConverter : AttributeConverter<YearMonth, String> {
-    override fun convertToDatabaseColumn(attribute: YearMonth?): String? = attribute?.format(Constants.DB_MONTH_YEAR_FORMATTER)
+    override fun convertToDatabaseColumn(attribute: YearMonth?): String? =
+        attribute?.format(Constants.DB_MONTH_YEAR_FORMATTER)
 
     override fun convertToEntityAttribute(dbData: String?): YearMonth? =
         dbData?.let {

@@ -97,7 +97,8 @@ class WalletServiceArchiveWalletTest :
         Given("a non-archived virtual wallet") {
             val walletType = WalletType(1, "Master")
             val masterWallet = Wallet(5, walletType, "Master Wallet", BigDecimal("5000.00"), masterWallet = null)
-            val virtualWallet = Wallet(6, walletType, "Virtual Wallet", BigDecimal("1000.00"), masterWallet = masterWallet)
+            val virtualWallet =
+                Wallet(6, walletType, "Virtual Wallet", BigDecimal("1000.00"), masterWallet = masterWallet)
 
             When("archiving the virtual wallet") {
                 every { walletRepository.findById(6) } returns Optional.of(virtualWallet)

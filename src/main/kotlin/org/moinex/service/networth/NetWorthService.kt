@@ -60,7 +60,9 @@ class NetWorthService(
         return netWorthSnapshotRepository.save(entity)
     }
 
-    fun findByReferenceMonth(referenceMonth: YearMonth): NetWorthSnapshot? = netWorthSnapshotRepository.findByReferenceMonth(referenceMonth)
+    fun findByReferenceMonth(referenceMonth: YearMonth): NetWorthSnapshot? =
+        netWorthSnapshotRepository.findByReferenceMonth(referenceMonth)
 
-    fun getSnapshot(referenceMonth: YearMonth): NetWorthSnapshot? = netWorthSnapshotRepository.findByReferenceMonth(referenceMonth)
+    fun getSnapshot(referenceMonth: YearMonth): NetWorthSnapshot? =
+        netWorthSnapshotRepository.findByReferenceMonth(referenceMonth)
 }

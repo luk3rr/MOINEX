@@ -277,7 +277,8 @@ class InvestmentTargetServiceTest :
 
         Given("no active target for a specific asset type") {
             When("getting target by asset type") {
-                every { investmentTargetRepository.findByAssetTypeAndIsActiveTrue(AssetType.CRYPTOCURRENCY) } returns null
+                every { investmentTargetRepository.findByAssetTypeAndIsActiveTrue(AssetType.CRYPTOCURRENCY) } returns
+                    null
 
                 Then("should throw EntityNotFoundException") {
                     shouldThrow<EntityNotFoundException> {

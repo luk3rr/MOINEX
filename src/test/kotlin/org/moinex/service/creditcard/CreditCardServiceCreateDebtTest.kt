@@ -110,7 +110,9 @@ class CreditCardServiceCreateDebtTest :
                     verify {
                         creditCardPaymentRepository.saveAll(
                             match<List<CreditCardPayment>> { payments ->
-                                payments[0].date.year == 2026 && payments[0].date.monthValue == 3 && payments[0].date.dayOfMonth == 15
+                                payments[0].date.year == 2026 &&
+                                    payments[0].date.monthValue == 3 &&
+                                    payments[0].date.dayOfMonth == 15
                             },
                         )
                     }
@@ -273,7 +275,8 @@ class CreditCardServiceCreateDebtTest :
 
             When("creating the debt") {
                 every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
-                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(1) } returns BigDecimal("500.00")
+                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(1) } returns
+                    BigDecimal("500.00")
 
                 Then("should throw IllegalStateException") {
                     shouldThrow<IllegalStateException> {
@@ -310,7 +313,8 @@ class CreditCardServiceCreateDebtTest :
 
             When("creating the debt") {
                 every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
-                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(1) } returns BigDecimal("500.00")
+                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(1) } returns
+                    BigDecimal("500.00")
                 every { creditCardDebtRepository.save(debt) } returns debt
                 every { creditCardPaymentRepository.saveAll(any<List<CreditCardPayment>>()) } returns emptyList()
 

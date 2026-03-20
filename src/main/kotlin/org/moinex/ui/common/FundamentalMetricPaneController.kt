@@ -96,7 +96,9 @@ class FundamentalMetricPaneController(
     private fun addDateLabel(dateStr: String) {
         val dateLabel =
             Label(
-                "${preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_REFERENCE_DATE)}: ${formatDate(dateStr)}",
+                "${preferencesService.translate(
+                    TranslationKeys.FUNDAMENTAL_ANALYSIS_REFERENCE_DATE,
+                )}: ${formatDate(dateStr)}",
             ).apply {
                 styleClass.add(METRIC_METADATA_LABEL_STYLE)
             }

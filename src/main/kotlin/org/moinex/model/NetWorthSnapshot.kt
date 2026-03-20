@@ -64,5 +64,6 @@ class NetWorthSnapshot(
         negativeWalletBalances = negativeWalletBalances.toRounded()
     }
 
-    override fun toString(): String = "NetWorthSnapshot [referenceMonth=$referenceMonth, netWorth=$netWorth, calculatedAt=$calculatedAt]"
+    override fun toString(): String =
+        "NetWorthSnapshot [referenceMonth=$referenceMonth, netWorth=$netWorth, calculatedAt=$calculatedAt]"
 }

@@ -80,9 +80,15 @@ class BondInterestCalculationServiceAdjustMonthlyInterestTest :
                         any(),
                     )
                 } returns marketData
-                every { bondInterestCalculationRepository.findByBondAndReferenceMonthAfter(bond, month) } returns emptyList()
+                every { bondInterestCalculationRepository.findByBondAndReferenceMonthAfter(bond, month) } returns
+                    emptyList()
                 every { bondInterestCalculationRepository.save(any()) } returnsArgument 0
-                every { bondInterestCalculationRepository.saveAll(any<List<BondInterestCalculation>>()) } returnsArgument 0
+                every {
+                    bondInterestCalculationRepository.saveAll(
+                        any<List<BondInterestCalculation>>(),
+                    )
+                } returnsArgument
+                    0
 
                 val newInterest = BigDecimal("15.00")
                 service.adjustMonthlyInterest(1, month, newInterest)
@@ -160,7 +166,12 @@ class BondInterestCalculationServiceAdjustMonthlyInterestTest :
                     )
                 } returns marketData
                 every { bondInterestCalculationRepository.save(any()) } returnsArgument 0
-                every { bondInterestCalculationRepository.saveAll(any<List<BondInterestCalculation>>()) } returnsArgument 0
+                every {
+                    bondInterestCalculationRepository.saveAll(
+                        any<List<BondInterestCalculation>>(),
+                    )
+                } returnsArgument
+                    0
 
                 service.adjustMonthlyInterest(1, adjustMonth, BigDecimal("15.00"))
 
@@ -262,7 +273,12 @@ class BondInterestCalculationServiceAdjustMonthlyInterestTest :
                     )
                 } returns marketData
                 every { bondInterestCalculationRepository.save(any()) } returnsArgument 0
-                every { bondInterestCalculationRepository.saveAll(any<List<BondInterestCalculation>>()) } returnsArgument 0
+                every {
+                    bondInterestCalculationRepository.saveAll(
+                        any<List<BondInterestCalculation>>(),
+                    )
+                } returnsArgument
+                    0
 
                 service.adjustMonthlyInterest(1, adjustMonth, BigDecimal("20.00"))
 
@@ -327,7 +343,12 @@ class BondInterestCalculationServiceAdjustMonthlyInterestTest :
                     )
                 } returns marketData
                 every { bondInterestCalculationRepository.save(any()) } returnsArgument 0
-                every { bondInterestCalculationRepository.saveAll(any<List<BondInterestCalculation>>()) } returnsArgument 0
+                every {
+                    bondInterestCalculationRepository.saveAll(
+                        any<List<BondInterestCalculation>>(),
+                    )
+                } returnsArgument
+                    0
 
                 service.adjustMonthlyInterest(1, month, BigDecimal("10.00"))
 

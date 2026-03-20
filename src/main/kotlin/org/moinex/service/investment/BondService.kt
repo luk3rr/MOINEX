@@ -270,11 +270,16 @@ class BondService(
     fun getAllOperations(): List<BondOperation> = bondOperationRepository.findAllByOrderByOperationDateDesc()
 
     @Transactional(readOnly = true)
-    fun getOperationsByBond(bond: Bond): List<BondOperation> = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
+    fun getOperationsByBond(bond: Bond): List<BondOperation> =
+        bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
 
     @Transactional(readOnly = true)
     fun getTotalProfit(bond: Bond): BigDecimal {
-        val operations = bondOperationRepository.findByBondAndOperationTypeOrderByOperationDateAsc(bond, OperationType.SELL)
+        val operations =
+            bondOperationRepository.findByBondAndOperationTypeOrderByOperationDateAsc(
+                bond,
+                OperationType.SELL,
+            )
 
         return operations.sumOf { it.netProfit }
     }
@@ -319,7 +324,8 @@ class BondService(
     }
 
     @Transactional(readOnly = true)
-    fun getOperationsByDateBefore(date: LocalDateTime): List<BondOperation> = bondOperationRepository.findAllByDateBefore(date)
+    fun getOperationsByDateBefore(date: LocalDateTime): List<BondOperation> =
+        bondOperationRepository.findAllByDateBefore(date)
 
     @Transactional(readOnly = true)
     fun getMonthlyInterestHistory(bondId: Int): List<BondInterestCalculation> {

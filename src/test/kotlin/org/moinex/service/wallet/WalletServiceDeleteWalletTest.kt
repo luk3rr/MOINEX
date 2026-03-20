@@ -159,7 +159,8 @@ class WalletServiceDeleteWalletTest :
         Given("a virtual wallet without transactions or transfers") {
             val walletType = WalletType(1, "Master")
             val masterWallet = Wallet(5, walletType, "Master Wallet", BigDecimal("5000.00"), masterWallet = null)
-            val virtualWallet = Wallet(50, walletType, "Virtual Wallet", BigDecimal("1000.00"), masterWallet = masterWallet)
+            val virtualWallet =
+                Wallet(50, walletType, "Virtual Wallet", BigDecimal("1000.00"), masterWallet = masterWallet)
 
             When("deleting the virtual wallet") {
                 every { walletRepository.findById(50) } returns Optional.of(virtualWallet)

@@ -64,7 +64,8 @@ class InvestmentTargetService(
         logger.info("Investment targets saved successfully")
     }
 
-    fun getAllActiveTargets(): List<InvestmentTarget> = investmentTargetRepository.findAllByIsActiveTrueOrderByAssetTypeAsc()
+    fun getAllActiveTargets(): List<InvestmentTarget> =
+        investmentTargetRepository.findAllByIsActiveTrueOrderByAssetTypeAsc()
 
     fun getTargetByType(assetType: AssetType): InvestmentTarget =
         investmentTargetRepository.findByAssetTypeAndIsActiveTrue(assetType)

@@ -624,8 +624,10 @@ class InvestmentPerformanceServiceTest :
                 every { tickerService.getAllPurchasesByTicker(cryptoTicker.id!!) } returns emptyList()
                 every { bondService.getAllNonArchivedBonds() } returns emptyList()
                 every { bondService.getAllOperations() } returns emptyList()
-                every { tickerPriceHistoryService.getClosestPriceBeforeDate(stockTicker, any()) } returns BigDecimal("55.00")
-                every { tickerPriceHistoryService.getClosestPriceBeforeDate(cryptoTicker, any()) } returns BigDecimal("32000.00")
+                every { tickerPriceHistoryService.getClosestPriceBeforeDate(stockTicker, any()) } returns
+                    BigDecimal("55.00")
+                every { tickerPriceHistoryService.getClosestPriceBeforeDate(cryptoTicker, any()) } returns
+                    BigDecimal("32000.00")
                 every { snapshotRepository.save(any()) } returnsArgument 0
 
                 val result = service.getPerformanceData()

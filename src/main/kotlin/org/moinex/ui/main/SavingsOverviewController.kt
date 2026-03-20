@@ -1241,7 +1241,9 @@ class SavingsOverviewController(
                 "${preferencesService.translate(TranslationKeys.SAVINGS_ALLOCATION_STATUS_WARNING_HIGH)} $formattedDiff"
 
             allocation.isCriticalHigh() ->
-                "${preferencesService.translate(TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH)} $formattedDiff"
+                "${preferencesService.translate(
+                    TranslationKeys.SAVINGS_ALLOCATION_STATUS_CRITICAL_HIGH,
+                )} $formattedDiff"
 
             else -> ""
         }

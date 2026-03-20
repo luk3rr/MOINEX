@@ -117,7 +117,8 @@ class ManageCategoryController(
         }
 
         if (WindowUtils.showConfirmationDialog(
-                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE) + " " + selectedCategory.name,
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE) + " " +
+                    selectedCategory.name,
                 preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_REMOVE_CATEGORY_MESSAGE),
             )
         ) {

@@ -321,7 +321,8 @@ class FundamentalAnalysisServiceGetAnalysisTest :
                     )
 
                 every { tickerRepository.findById(8) } returns Optional.of(ticker)
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("NEWCO", PeriodType.ANNUAL) } returns apiResponse
                 every { fundamentalAnalysisRepository.save(any()) } returns newAnalysis
 
@@ -366,7 +367,8 @@ class FundamentalAnalysisServiceGetAnalysisTest :
                     )
 
                 every { tickerRepository.findById(11) } returns Optional.of(ticker)
-                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns null
+                every { fundamentalAnalysisRepository.findByTickerAndPeriodType(ticker, PeriodType.ANNUAL) } returns
+                    null
                 coEvery { APIUtils.fetchFundamentalAnalysis("RETRY", PeriodType.ANNUAL) } returns successResponse
                 every { fundamentalAnalysisRepository.save(any()) } returns savedAnalysis
 

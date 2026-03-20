@@ -130,8 +130,10 @@ class WalletServiceUpdateWalletBalanceTest :
         Given("a virtual wallet being incremented") {
             val walletType = WalletType(1, "Master")
             val masterWallet = Wallet(6, walletType, "Master Wallet", BigDecimal("5000.00"), masterWallet = null)
-            val virtualWallet = Wallet(7, walletType, "Virtual Wallet", BigDecimal("1000.00"), masterWallet = masterWallet)
-            val updatedVirtual = Wallet(7, walletType, "Virtual Wallet", BigDecimal("1500.00"), masterWallet = masterWallet)
+            val virtualWallet =
+                Wallet(7, walletType, "Virtual Wallet", BigDecimal("1000.00"), masterWallet = masterWallet)
+            val updatedVirtual =
+                Wallet(7, walletType, "Virtual Wallet", BigDecimal("1500.00"), masterWallet = masterWallet)
 
             When("incrementing virtual wallet") {
                 every { walletRepository.findById(7) } returns Optional.of(virtualWallet)
@@ -151,8 +153,10 @@ class WalletServiceUpdateWalletBalanceTest :
         Given("a virtual wallet being decremented") {
             val walletType = WalletType(1, "Master")
             val masterWallet = Wallet(8, walletType, "Master Wallet", BigDecimal("5000.00"), masterWallet = null)
-            val virtualWallet = Wallet(9, walletType, "Virtual Wallet", BigDecimal("2000.00"), masterWallet = masterWallet)
-            val updatedVirtual = Wallet(9, walletType, "Virtual Wallet", BigDecimal("1500.00"), masterWallet = masterWallet)
+            val virtualWallet =
+                Wallet(9, walletType, "Virtual Wallet", BigDecimal("2000.00"), masterWallet = masterWallet)
+            val updatedVirtual =
+                Wallet(9, walletType, "Virtual Wallet", BigDecimal("1500.00"), masterWallet = masterWallet)
 
             When("decrementing virtual wallet") {
                 every { walletRepository.findById(9) } returns Optional.of(virtualWallet)
@@ -172,8 +176,10 @@ class WalletServiceUpdateWalletBalanceTest :
         Given("a virtual wallet being decremented below zero") {
             val walletType = WalletType(1, "Master")
             val masterWallet = Wallet(10, walletType, "Master Wallet", BigDecimal("5000.00"), masterWallet = null)
-            val virtualWallet = Wallet(11, walletType, "Virtual Wallet", BigDecimal("500.00"), masterWallet = masterWallet)
-            val updatedVirtual = Wallet(11, walletType, "Virtual Wallet", BigDecimal("-100.00"), masterWallet = masterWallet)
+            val virtualWallet =
+                Wallet(11, walletType, "Virtual Wallet", BigDecimal("500.00"), masterWallet = masterWallet)
+            val updatedVirtual =
+                Wallet(11, walletType, "Virtual Wallet", BigDecimal("-100.00"), masterWallet = masterWallet)
 
             When("decrementing virtual wallet below zero") {
                 every { walletRepository.findById(11) } returns Optional.of(virtualWallet)

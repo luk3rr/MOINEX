@@ -628,13 +628,27 @@ class FinancialPlanningServiceTest :
                 }
 
                 Then("should have correct target amounts") {
-                    result.filter { it.groupName == "Food" }.all { it.targetAmount == BigDecimal("2500.00") } shouldBe true
-                    result.filter { it.groupName == "Transport" }.all { it.targetAmount == BigDecimal("2500.00") } shouldBe true
+                    result.filter { it.groupName == "Food" }.all { it.targetAmount == BigDecimal("2500.00") } shouldBe
+                        true
+                    result.filter { it.groupName == "Transport" }.all {
+                        it.targetAmount ==
+                            BigDecimal(
+                                "2500.00",
+                            )
+                    } shouldBe
+                        true
                 }
 
                 Then("should have correct spent amounts for each group") {
-                    result.filter { it.groupName == "Food" }.all { it.spentAmount == BigDecimal("1500.00") } shouldBe true
-                    result.filter { it.groupName == "Transport" }.all { it.spentAmount == BigDecimal("1000.00") } shouldBe true
+                    result.filter { it.groupName == "Food" }.all { it.spentAmount == BigDecimal("1500.00") } shouldBe
+                        true
+                    result.filter { it.groupName == "Transport" }.all {
+                        it.spentAmount ==
+                            BigDecimal(
+                                "1000.00",
+                            )
+                    } shouldBe
+                        true
                 }
             }
         }

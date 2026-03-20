@@ -312,7 +312,10 @@ class TransactionController(
                 if (selectedTransaction.isConfirmed()) {
                     val balanceAfter =
                         when {
-                            selectedTransaction.isExpense() -> selectedTransaction.wallet.balance.add(selectedTransaction.amount)
+                            selectedTransaction.isExpense() ->
+                                selectedTransaction.wallet.balance.add(
+                                    selectedTransaction.amount,
+                                )
                             else -> selectedTransaction.wallet.balance.subtract(selectedTransaction.amount)
                         }
                     append(UIUtils.formatCurrency(balanceAfter))
@@ -450,7 +453,11 @@ class TransactionController(
 
             val creditCardPayments =
                 when {
-                    selectedWalletTransactionType == WalletTransactionType.EXPENSE -> creditCardService.getAllPaidPaymentsByMonth(yearMonth)
+                    selectedWalletTransactionType == WalletTransactionType.EXPENSE ->
+                        creditCardService
+                            .getAllPaidPaymentsByMonth(
+                                yearMonth,
+                            )
                     else -> emptyList()
                 }
 

@@ -426,7 +426,8 @@ class MarketServiceTest :
                         selicTarget = BigDecimal("13.25"),
                     )
 
-                every { brazilianMarketIndicatorsRepository.findAll() } returns listOf(indicator1, indicator2, indicator3)
+                every { brazilianMarketIndicatorsRepository.findAll() } returns
+                    listOf(indicator1, indicator2, indicator3)
                 every { brazilianMarketIndicatorsRepository.delete(any()) } returns Unit
 
                 val result = service.getBrazilianMarketIndicatorsOrFetch()

@@ -107,7 +107,8 @@ class CategoryService(
 
     fun getCategories(): List<Category> = categoryRepository.findAll()
 
-    fun getNonArchivedCategoriesOrderedByName(): List<Category> = categoryRepository.findAllByIsArchivedFalseOrderByNameAsc()
+    fun getNonArchivedCategoriesOrderedByName(): List<Category> =
+        categoryRepository.findAllByIsArchivedFalseOrderByNameAsc()
 
     fun getTransactionCountByCategory(categoryId: Int): Int =
         walletService.getWalletTransactionAndTransferCountByCategory(categoryId) +

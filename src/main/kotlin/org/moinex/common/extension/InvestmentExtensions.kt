@@ -13,9 +13,17 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-fun List<BondOperation>.operationsUntil(date: LocalDate) = this@operationsUntil.asSequence().takeWhile { it.localDate <= date }
+fun List<BondOperation>.operationsUntil(date: LocalDate) =
+    this@operationsUntil.asSequence().takeWhile {
+        it.localDate <=
+            date
+    }
 
-fun List<BondOperation>.buyOperationsUntil(date: LocalDate) = operationsUntil(date).filter { it.operationType == OperationType.BUY }
+fun List<BondOperation>.buyOperationsUntil(date: LocalDate) =
+    operationsUntil(date).filter {
+        it.operationType ==
+            OperationType.BUY
+    }
 
 fun List<BondOperation>.calculateOperationStateUntil(date: LocalDate): BondOperationStateDTO =
     this
@@ -36,7 +44,8 @@ fun List<BondOperation>.calculateOperationStateUntil(date: LocalDate): BondOpera
             }
         }
 
-fun List<BondOperation>.calculateQuantityUntil(date: LocalDate): BigDecimal = calculateOperationStateUntil(date).quantity
+fun List<BondOperation>.calculateQuantityUntil(date: LocalDate): BigDecimal =
+    calculateOperationStateUntil(date).quantity
 
 fun List<BondOperation>.getLastBuyPrice(): BigDecimal? =
     filter { it.isPurchase() }

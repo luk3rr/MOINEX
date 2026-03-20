@@ -183,14 +183,20 @@ object APIUtils {
             executorService,
         )
 
-    @Deprecated("Use suspend function fetchBrazilianMarketIndicators instead", ReplaceWith("fetchBrazilianMarketIndicators()"))
+    @Deprecated(
+        "Use suspend function fetchBrazilianMarketIndicators instead",
+        ReplaceWith("fetchBrazilianMarketIndicators()"),
+    )
     fun fetchBrazilianMarketIndicatorsAsync(): CompletableFuture<JSONObject> =
         CompletableFuture.supplyAsync(
             { runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT) },
             executorService,
         )
 
-    @Deprecated("Use suspend function fetchFundamentalAnalysis instead", ReplaceWith("fetchFundamentalAnalysis(symbol, period)"))
+    @Deprecated(
+        "Use suspend function fetchFundamentalAnalysis instead",
+        ReplaceWith("fetchFundamentalAnalysis(symbol, period)"),
+    )
     fun fetchFundamentalAnalysisAsync(
         symbol: String,
         period: PeriodType,

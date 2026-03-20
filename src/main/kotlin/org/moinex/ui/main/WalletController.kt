@@ -607,7 +607,9 @@ class WalletController(
                             crcPayments
                                 .filter { crcPayments ->
                                     when {
-                                        crcPayments.isPaid() -> crcPayments.wallet!!.type.id!! == selectedWalletType.id!!
+                                        crcPayments.isPaid() ->
+                                            crcPayments.wallet!!.type.id!! ==
+                                                selectedWalletType.id!!
 
                                         crcPayments.hasDefaultBillingWallet() && !crcPayments.isRefunded() ->
                                             crcPayments.getDefaultBillingWallet()!!.type.id!! ==

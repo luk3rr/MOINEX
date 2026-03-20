@@ -142,7 +142,9 @@ class MarketService(
         deleteAction: (T) -> Unit,
     ) = items.drop(1).forEach(deleteAction)
 
-    private fun JSONObject.parseBrazilianMarketIndicators(indicators: BrazilianMarketIndicators): BrazilianMarketIndicators =
+    private fun JSONObject.parseBrazilianMarketIndicators(
+        indicators: BrazilianMarketIndicators,
+    ): BrazilianMarketIndicators =
         indicators.apply {
             selicTarget = decimal(SELIC_TARGET_FIELD, VALUE_FIELD)
             ipca12Months = decimal(IPCA_12_MONTHS_FIELD, VALUE_FIELD)
