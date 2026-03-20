@@ -7,10 +7,12 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.util.UIUtils
 import org.moinex.factory.goal.GoalFactory
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.model.enums.GoalFundingStrategy
 import org.moinex.repository.goal.GoalRepository
+import org.moinex.service.PreferencesService
 import org.moinex.service.goal.GoalService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
@@ -19,6 +21,9 @@ class GoalServiceCreateGoalTest :
     BehaviorSpec({
         val goalRepository = mockk<GoalRepository>()
         val walletService = mockk<WalletService>()
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+
+        UIUtils(preferencesService)
 
         val service = GoalService(goalRepository, walletService)
 

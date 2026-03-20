@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.util.UIUtils
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType
@@ -15,6 +16,7 @@ import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository
 import org.moinex.repository.wallettransaction.WalletTypeRepository
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.util.Optional
@@ -25,6 +27,9 @@ class WalletServiceUpdateWalletBalanceTest :
         val transfersRepository = mockk<TransferRepository>()
         val walletTransactionRepository = mockk<WalletTransactionRepository>()
         val walletTypeRepository = mockk<WalletTypeRepository>()
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+
+        UIUtils(preferencesService)
 
         val service =
             WalletService(
