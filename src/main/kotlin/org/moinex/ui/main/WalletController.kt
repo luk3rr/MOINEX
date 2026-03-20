@@ -31,6 +31,7 @@ import org.moinex.common.constants.TranslationKeys
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
+import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -436,10 +437,7 @@ class WalletController(
                 val walletPaneController = loader.getController<WalletPaneController>()
                 walletPaneController.updateWalletPane(wallet)
 
-                AnchorPane.setTopAnchor(newContent, 0.0)
-                AnchorPane.setBottomAnchor(newContent, 0.0)
-                AnchorPane.setLeftAnchor(newContent, 0.0)
-                AnchorPane.setRightAnchor(newContent, 0.0)
+                newContent.setAnchorPaneConstraints()
 
                 when (i % ITEMS_PER_PAGE) {
                     0 -> walletPane1.children.add(newContent)

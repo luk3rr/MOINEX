@@ -379,6 +379,18 @@ class UIUtils(
         }
 
         @JvmStatic
+        fun <T> createListCell(textExtractor: (T) -> String = { it.toString() }): ListCell<T> =
+            object : ListCell<T>() {
+                override fun updateItem(
+                    item: T?,
+                    empty: Boolean,
+                ) {
+                    super.updateItem(item, empty)
+                    text = if (item == null || empty) null else textExtractor(item)
+                }
+            }
+
+        @JvmStatic
         fun alignTableColumn(
             columns: List<TableColumn<*, *>>,
             alignment: Pos,

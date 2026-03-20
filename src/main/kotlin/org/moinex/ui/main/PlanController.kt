@@ -118,7 +118,7 @@ class PlanController(
             Constants.EDIT_PLAN_FXML,
             preferencesService.translate(TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
             springContext,
-            { controller: EditPlanController -> controller.setPlan(currentPlan) },
+            { controller: EditPlanController -> controller.setPlan(currentPlan!!) },
             listOf(Runnable { updateView() }),
         )
     }
