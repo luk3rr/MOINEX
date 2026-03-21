@@ -7,6 +7,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.util.APIUtils
@@ -40,10 +41,14 @@ class TickerPriceHistoryServiceTest :
                 tickerSaleRepository,
             )
 
-        mockkObject(RetryConfig.Companion)
-        mockkObject(APIUtils)
+        beforeSpec {
+            mockkObject(RetryConfig.Companion)
+            mockkObject(APIUtils)
+        }
 
-        afterContainer { clearAllMocks(answers = true) }
+        afterSpec {
+            unmockkAll()
+        }
 
         beforeContainer {
             every { RetryConfig.TICKER_PRICE } returns
@@ -53,6 +58,8 @@ class TickerPriceHistoryServiceTest :
                     multiplier = 2.0,
                 )
         }
+
+        afterContainer { clearAllMocks(answers = true) }
 
         Given("no active tickers in the database") {
             When("initializing price history") {

@@ -7,6 +7,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.util.APIUtils
@@ -26,7 +27,13 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
 
         val service = FundamentalAnalysisService(fundamentalAnalysisRepository, tickerRepository)
 
-        mockkObject(APIUtils)
+        beforeSpec {
+            mockkObject(APIUtils)
+        }
+
+        afterSpec {
+            unmockkAll()
+        }
 
         afterContainer { clearAllMocks(answers = true) }
 

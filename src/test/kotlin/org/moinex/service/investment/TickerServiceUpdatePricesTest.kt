@@ -8,6 +8,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.extension.toRounded
@@ -46,9 +47,11 @@ class TickerServiceUpdatePricesTest :
                 walletService,
             )
 
-        mockkObject(APIUtils)
-        mockkObject(RetryConfig.Companion)
-        mockkObject(FileUtils)
+        beforeSpec {
+            mockkObject(APIUtils)
+            mockkObject(RetryConfig.Companion)
+            mockkObject(FileUtils)
+        }
 
         afterContainer {
             clearAllMocks(answers = true)
@@ -67,6 +70,10 @@ class TickerServiceUpdatePricesTest :
                     initialDelayMs = 100,
                     multiplier = 2.0,
                 )
+        }
+
+        afterSpec {
+            unmockkAll()
         }
 
         Given("no active tickers in the database") {
@@ -116,7 +123,10 @@ class TickerServiceUpdatePricesTest :
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
                         listOf(ticker1, ticker2)
-                    coEvery { APIUtils.fetchStockPrices(listOf("AAPL", "GOOGL")) } returns apiResponse
+                    coEvery { APIUtils.fetchStockPrices(any()) } returns
+                        apiResponse
+                    coEvery { APIUtils.fetchStockLogos(any()) } returns
+                        JSONObject()
                     every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
                         listOf(ticker1, ticker2)
 
@@ -168,7 +178,10 @@ class TickerServiceUpdatePricesTest :
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
                         listOf(ticker1, ticker2)
-                    coEvery { APIUtils.fetchStockPrices(listOf("AAPL", "INVALID")) } returns apiResponse
+                    coEvery { APIUtils.fetchStockPrices(any()) } returns
+                        apiResponse
+                    coEvery { APIUtils.fetchStockLogos(any()) } returns
+                        JSONObject()
                     every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
                         listOf(ticker1)
 
@@ -206,7 +219,8 @@ class TickerServiceUpdatePricesTest :
                     val apiResponse = JSONObject()
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                    coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns apiResponse
+                    coEvery { APIUtils.fetchStockPrices(any()) } returns
+                        apiResponse
                     every { tickerRepository.saveAll(any<List<Ticker>>()) } returns emptyList()
 
                     val failed =
@@ -260,7 +274,10 @@ class TickerServiceUpdatePricesTest :
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
                     listOf(stock, crypto)
-                coEvery { APIUtils.fetchStockPrices(listOf("AAPL", "BTC")) } returns apiResponse
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    apiResponse
+                coEvery { APIUtils.fetchStockLogos(any()) } returns
+                    JSONObject()
                 every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
                     listOf(stock, crypto)
 
@@ -304,7 +321,9 @@ class TickerServiceUpdatePricesTest :
                         )
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns apiResponse
+                coEvery { APIUtils.fetchStockPrices(any()) } returns apiResponse
+                coEvery { APIUtils.fetchStockLogos(any()) } returns
+                    JSONObject()
                 every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
                     listOf(ticker)
 
@@ -339,7 +358,7 @@ class TickerServiceUpdatePricesTest :
                         )
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns apiResponse
+                coEvery { APIUtils.fetchStockPrices(any()) } returns apiResponse
                 every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
                     listOf(ticker)
 
@@ -390,7 +409,7 @@ class TickerServiceUpdatePricesTest :
                         )
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns apiResponse
+                coEvery { APIUtils.fetchStockPrices(any()) } returns apiResponse
                 every { tickerRepository.saveAll(any<List<Ticker>>()) } returns
                     listOf(ticker)
 
@@ -435,7 +454,8 @@ class TickerServiceUpdatePricesTest :
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
                     listOf(ticker1, ticker2)
-                coEvery { APIUtils.fetchStockPrices(listOf("INVALID1", "INVALID2")) } returns apiResponse
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    apiResponse
                 every { tickerRepository.saveAll(any<List<Ticker>>()) } returns emptyList()
 
                 val failed =
@@ -485,7 +505,8 @@ class TickerServiceUpdatePricesTest :
 
                 every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns
                     listOf(ticker1, ticker2)
-                coEvery { APIUtils.fetchStockPrices(listOf("AAPL", "INVALID")) } returns apiResponse
+                coEvery { APIUtils.fetchStockPrices(any()) } returns
+                    apiResponse
                 every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker1)
 
                 service.updateAllNonArchivedTickersPrices()
@@ -535,8 +556,10 @@ class TickerServiceUpdatePricesTest :
                             )
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                    coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns priceResponse
-                    coEvery { APIUtils.fetchStockLogos(listOf("apple.com")) } returns logoResponse
+                    coEvery { APIUtils.fetchStockPrices(any()) } returns
+                        priceResponse
+                    coEvery { APIUtils.fetchStockLogos(any()) } returns
+                        logoResponse
                     every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker)
 
                     service.updateAllNonArchivedTickersPrices()
@@ -581,8 +604,10 @@ class TickerServiceUpdatePricesTest :
                             )
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                    coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns priceResponse
-                    coEvery { APIUtils.fetchStockLogos(listOf("apple.com")) } returns logoResponse
+                    coEvery { APIUtils.fetchStockPrices(any()) } returns
+                        priceResponse
+                    coEvery { APIUtils.fetchStockLogos(any()) } returns
+                        logoResponse
                     every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker)
 
                     service.updateAllNonArchivedTickersPrices()
@@ -626,8 +651,10 @@ class TickerServiceUpdatePricesTest :
                             )
 
                     every { tickerRepository.findAllByIsArchivedFalseOrderBySymbolAsc() } returns listOf(ticker)
-                    coEvery { APIUtils.fetchStockPrices(listOf("AAPL")) } returns priceResponse
-                    coEvery { APIUtils.fetchStockLogos(listOf("apple.com")) } returns logoResponse
+                    coEvery { APIUtils.fetchStockPrices(any()) } returns
+                        priceResponse
+                    coEvery { APIUtils.fetchStockLogos(any()) } returns
+                        logoResponse
                     every { tickerRepository.saveAll(any<List<Ticker>>()) } returns listOf(ticker)
 
                     service.updateAllNonArchivedTickersPrices()

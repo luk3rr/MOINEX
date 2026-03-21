@@ -127,6 +127,19 @@ tasks.withType<Javadoc> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+
+	jvmArgs(
+		"-XX:+EnableDynamicAgentLoading",
+		"--add-opens=java.base/java.lang=ALL-UNNAMED",
+		"--add-opens=java.base/java.util=ALL-UNNAMED",
+	)
+
+	maxParallelForks =
+		Runtime
+			.getRuntime()
+			.availableProcessors()
+			.div(2)
+			.coerceAtLeast(1)
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
@@ -161,24 +174,14 @@ ktlint {
 	}
 }
 
-spotless {
-	java {
-		target("src/*/java/**/*.java")
-		googleJavaFormat("1.22.0").aosp()
-		formatAnnotations()
-		removeUnusedImports()
-		trimTrailingWhitespace()
-		endWithNewline()
-	}
-}
-
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-	kotlinOptions {
-		jvmTarget = "21"
-		freeCompilerArgs =
+	compilerOptions {
+		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+		freeCompilerArgs.set(
 			listOf(
 				"-Xjsr305=strict",
 				"-Xemit-jvm-type-annotations",
-			)
+			),
+		)
 	}
 }

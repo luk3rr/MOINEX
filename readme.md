@@ -62,10 +62,6 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 
 O Moinex está disponível para **Linux** e **Windows**.
 
-**Requisitos:**
-- Java 21 ou superior
-- Python 3 (para scripts de integração com APIs financeiras)
-
 ## Instalação
 
 ### Windows 

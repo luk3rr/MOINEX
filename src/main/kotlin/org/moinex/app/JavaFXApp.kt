@@ -17,6 +17,7 @@ import javafx.scene.Scene
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.APIUtils
@@ -91,7 +92,9 @@ class JavaFXApp : Application() {
 
     override fun stop() {
         runCatching {
-            APIUtils.shutdownExecutor()
+            runBlocking {
+                APIUtils.shutdownExecutor()
+            }
             springContext.close()
             super.stop()
         }.onFailure { e ->

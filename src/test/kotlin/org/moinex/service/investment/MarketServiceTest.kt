@@ -10,6 +10,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.retry.RetryException
@@ -32,9 +33,10 @@ class MarketServiceTest :
 
         val service = MarketService(brazilianMarketIndicatorsRepository, marketQuotesAndCommoditiesRepository)
 
-        mockkObject(APIUtils)
-
-        mockkObject(RetryConfig.Companion)
+        beforeSpec {
+            mockkObject(APIUtils)
+            mockkObject(RetryConfig.Companion)
+        }
 
         afterContainer {
             clearAllMocks(answers = true)
@@ -47,6 +49,10 @@ class MarketServiceTest :
                     initialDelayMs = 100,
                     multiplier = 2.0,
                 )
+        }
+
+        afterSpec {
+            unmockkAll()
         }
 
         Given("API returns valid Brazilian market indicators data") {

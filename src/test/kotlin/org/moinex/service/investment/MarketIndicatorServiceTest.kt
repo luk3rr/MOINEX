@@ -8,6 +8,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONArray
 import org.json.JSONObject
@@ -30,9 +31,14 @@ class MarketIndicatorServiceTest :
 
         val service = MarketIndicatorService(marketIndicatorHistoryRepository, bondOperationRepository)
 
-        mockkObject(APIUtils)
+        beforeSpec {
+            mockkObject(APIUtils)
+            mockkObject(RetryConfig.Companion)
+        }
 
-        mockkObject(RetryConfig.Companion)
+        afterSpec {
+            unmockkAll()
+        }
 
         afterContainer {
             clearAllMocks(answers = true)
