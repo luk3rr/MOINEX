@@ -211,12 +211,10 @@ object APIUtils {
 
             when {
                 exitCode != 0 -> {
-                    logger.error("Script '$scriptName' failed with exit code: $exitCode")
-                    if (errorOutput.isNotBlank()) {
-                        logger.debug("Error output: $errorOutput")
-                    }
+                    val errorMessage = errorOutput.lines().lastOrNull { it.isNotBlank() } ?: errorOutput
+                    logger.error("Script '$scriptName' failed with exit code: $exitCode - $errorMessage")
                     throw MoinexException.APIFetchException(
-                        "Script '$scriptName' failed with exit code: $exitCode",
+                        "Script '$scriptName' failed with exit code: $exitCode - $errorMessage",
                     )
                 }
                 else -> {
