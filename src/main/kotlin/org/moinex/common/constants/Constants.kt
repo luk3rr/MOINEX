@@ -68,31 +68,38 @@ object Constants {
     const val EDIT_GOAL_FXML: String = UI_DIALOG_GOAL_PATH + ("edit_goal." + "fxml")
     const val ADD_GOAL_FXML: String = UI_DIALOG_GOAL_PATH + "add_goal.fxml"
     const val UI_DIALOG_INVESTMENT_PATH: String = UI_DIALOG_PATH + "investment/"
+    const val UI_DIALOG_INVESTMENT_CREATE_PATH: String = UI_DIALOG_INVESTMENT_PATH + "create/"
+    const val UI_DIALOG_INVESTMENT_UPDATE_PATH: String = UI_DIALOG_INVESTMENT_PATH + "update/"
+    const val UI_DIALOG_INVESTMENT_VIEW_PATH: String = UI_DIALOG_INVESTMENT_PATH + "view/"
 
-    // UI investment package
-    const val BUY_TICKER_FXML: String = UI_DIALOG_INVESTMENT_PATH + "buy_ticker.fxml"
-    const val SALE_TICKER_FXML: String = UI_DIALOG_INVESTMENT_PATH + "sale_ticker.fxml"
-    const val ADD_TICKER_FXML: String = UI_DIALOG_INVESTMENT_PATH + "add_ticker.fxml"
-    const val ADD_BOND_FXML: String = UI_DIALOG_INVESTMENT_PATH + "add_bond.fxml"
-    const val EDIT_BOND_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_bond.fxml"
-    const val BUY_BOND_FXML: String = UI_DIALOG_INVESTMENT_PATH + "buy_bond.fxml"
-    const val SALE_BOND_FXML: String = UI_DIALOG_INVESTMENT_PATH + "sale_bond.fxml"
-    const val BOND_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_PATH + "bond_transactions.fxml"
-    const val BOND_INTEREST_HISTORY_FXML: String = UI_DIALOG_INVESTMENT_PATH + "bond_interest_history.fxml"
-    const val ADD_DIVIDEND_FXML: String = UI_DIALOG_INVESTMENT_PATH + ("add_dividend." + "fxml")
-    const val ADD_CRYPTO_EXCHANGE_FXML: String = UI_DIALOG_INVESTMENT_PATH + "add_crypto_exchange.fxml"
-    const val ARCHIVED_TICKERS_FXML: String = UI_DIALOG_INVESTMENT_PATH + "archived_tickers.fxml"
-    const val ARCHIVED_BONDS_FXML: String = UI_DIALOG_INVESTMENT_PATH + "archived_bonds.fxml"
-    const val EDIT_TICKER_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_ticker.fxml"
-    const val EDIT_TICKER_PURCHASE_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_ticker_purchase.fxml"
-    const val EDIT_TICKER_SALE_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_ticker_sale.fxml"
-    const val EDIT_BOND_PURCHASE_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_bond_purchase.fxml"
-    const val EDIT_BOND_SALE_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_bond_sale.fxml"
-    const val EDIT_DIVIDEND_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_dividend.fxml"
-    const val EDIT_CRYPTO_EXCHANGE_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_crypto_exchange.fxml"
-    const val INVESTMENT_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_PATH + "investment_transactions.fxml"
-    const val EDIT_INVESTMENT_TARGET_FXML: String = UI_DIALOG_INVESTMENT_PATH + "edit_investment_target.fxml"
-    const val FUNDAMENTAL_ANALYSIS_FXML: String = UI_DIALOG_INVESTMENT_PATH + "fundamental_analysis.fxml"
+    // UI investment package - Create
+    const val BUY_TICKER_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "buy_ticker.fxml"
+    const val SALE_TICKER_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "sale_ticker.fxml"
+    const val ADD_TICKER_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "add_ticker.fxml"
+    const val ADD_BOND_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "add_bond.fxml"
+    const val BUY_BOND_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "buy_bond.fxml"
+    const val SALE_BOND_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "sale_bond.fxml"
+    const val ADD_DIVIDEND_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "add_dividend.fxml"
+    const val ADD_CRYPTO_EXCHANGE_FXML: String = UI_DIALOG_INVESTMENT_CREATE_PATH + "add_crypto_exchange.fxml"
+
+    // UI investment package - Update
+    const val EDIT_BOND_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_bond.fxml"
+    const val EDIT_TICKER_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_ticker.fxml"
+    const val EDIT_TICKER_PURCHASE_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_ticker_purchase.fxml"
+    const val EDIT_TICKER_SALE_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_ticker_sale.fxml"
+    const val EDIT_BOND_PURCHASE_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_bond_purchase.fxml"
+    const val EDIT_BOND_SALE_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_bond_sale.fxml"
+    const val EDIT_DIVIDEND_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_dividend.fxml"
+    const val EDIT_CRYPTO_EXCHANGE_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_crypto_exchange.fxml"
+    const val EDIT_INVESTMENT_TARGET_FXML: String = UI_DIALOG_INVESTMENT_UPDATE_PATH + "edit_investment_target.fxml"
+
+    // UI investment package - View
+    const val BOND_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "bond_transactions.fxml"
+    const val BOND_INTEREST_HISTORY_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "bond_interest_history.fxml"
+    const val ARCHIVED_TICKERS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "archived_tickers.fxml"
+    const val ARCHIVED_BONDS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "archived_bonds.fxml"
+    const val INVESTMENT_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "investment_transactions.fxml"
+    const val FUNDAMENTAL_ANALYSIS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "fundamental_analysis.fxml"
     const val UI_DIALOG_WALLETTRANSACTION_PATH: String = UI_DIALOG_PATH + "wallettransaction/"
 
     // UI wallettransaction package

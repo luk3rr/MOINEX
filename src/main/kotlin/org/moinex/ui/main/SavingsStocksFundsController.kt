@@ -16,14 +16,12 @@ import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.control.ComboBox
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.text.Text
-import javafx.util.Callback
 import javafx.util.StringConverter
 import org.moinex.common.constants.Constants
 import org.moinex.common.constants.TranslationKeys
@@ -36,16 +34,15 @@ import org.moinex.model.investment.Dividend
 import org.moinex.model.investment.Ticker
 import org.moinex.service.PreferencesService
 import org.moinex.service.investment.TickerService
-import org.moinex.ui.dialog.investment.AddCryptoExchangeController
-import org.moinex.ui.dialog.investment.AddDividendController
-import org.moinex.ui.dialog.investment.AddTickerController
-import org.moinex.ui.dialog.investment.AddTickerPurchaseController
-import org.moinex.ui.dialog.investment.AddTickerSaleController
-import org.moinex.ui.dialog.investment.ArchivedTickersController
-import org.moinex.ui.dialog.investment.EditTickerController
-import org.moinex.ui.dialog.investment.FundamentalAnalysisController
-import org.moinex.ui.dialog.investment.InvestmentTransactionsController
-import org.slf4j.LoggerFactory
+import org.moinex.ui.dialog.investment.create.AddCryptoExchangeController
+import org.moinex.ui.dialog.investment.create.AddDividendController
+import org.moinex.ui.dialog.investment.create.AddTickerController
+import org.moinex.ui.dialog.investment.create.AddTickerPurchaseController
+import org.moinex.ui.dialog.investment.create.AddTickerSaleController
+import org.moinex.ui.dialog.investment.update.EditTickerController
+import org.moinex.ui.dialog.investment.view.ArchivedTickersController
+import org.moinex.ui.dialog.investment.view.FundamentalAnalysisController
+import org.moinex.ui.dialog.investment.view.InvestmentTransactionsController
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -87,10 +84,6 @@ class SavingsStocksFundsController(
     private lateinit var tickers: List<Ticker>
     private lateinit var dividends: List<Dividend>
     private var isUpdatingPortfolioPrices = false
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(SavingsStocksFundsController::class.java)
-    }
 
     @FXML
     fun initialize() {
@@ -136,7 +129,7 @@ class SavingsStocksFundsController(
             Constants.BUY_TICKER_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_BUY_TICKER_TITLE),
             springContext,
-            { controller: AddTickerPurchaseController -> controller.setTicker(selectedTicker) },
+            { controller: AddTickerPurchaseController -> controller.initializeTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
         )
     }
@@ -157,7 +150,7 @@ class SavingsStocksFundsController(
             Constants.SALE_TICKER_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_SELL_TICKER_TITLE),
             springContext,
-            { controller: AddTickerSaleController -> controller.setTicker(selectedTicker) },
+            { controller: AddTickerSaleController -> controller.initializeTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
         )
     }
@@ -180,7 +173,7 @@ class SavingsStocksFundsController(
             Constants.ADD_DIVIDEND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_DIVIDEND_TITLE),
             springContext,
-            { controller: AddDividendController -> controller.setTicker(selectedTicker) },
+            { controller: AddDividendController -> controller.initializeTicker(selectedTicker) },
             listOf(Runnable { updatePortfolioIndicators() }),
         )
     }
@@ -512,31 +505,24 @@ class SavingsStocksFundsController(
             createLogoColumn(),
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_NAME,
-                Pos.CENTER_LEFT,
             ) { it.name },
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_SYMBOL,
-                Pos.CENTER_LEFT,
             ) { it.symbol },
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TYPE,
-                Pos.CENTER_LEFT,
             ) { UIUtils.translateAssetType(it.type) },
             createObjectColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_QUANTITY_OWNED,
-                Pos.CENTER_LEFT,
             ) { it.currentQuantity },
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_UNIT_PRICE,
-                Pos.CENTER_LEFT,
             ) { UIUtils.formatCurrencyDynamic(it.currentUnitValue) },
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_TOTAL_VALUE,
-                Pos.CENTER_LEFT,
             ) { UIUtils.formatCurrencyDynamic(it.currentQuantity.multiply(it.currentUnitValue)) },
             createStringColumn(
                 TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_AVERAGE_UNIT_PRICE,
-                Pos.CENTER_LEFT,
             ) { UIUtils.formatCurrencyDynamic(it.averageUnitValue) },
         )
 
@@ -548,13 +534,13 @@ class SavingsStocksFundsController(
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_TABLE_HEADER_ID),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.id) }
-            cellFactory = createCenteredCellFactory(Pos.CENTER)
+            cellFactory = UIUtils.createCellFactory(Pos.CENTER)
         }
 
     private fun createLogoColumn(): TableColumn<Ticker, ImageView> =
         TableColumn<Ticker, ImageView>("").apply {
             setCellValueFactory { SimpleObjectProperty(UIUtils.loadTickerLogo(it.value, 40.0)) }
-            cellFactory = createCenteredCellFactory(Pos.CENTER)
+            cellFactory = UIUtils.createCellFactory(Pos.CENTER)
             prefWidth = 45.0
             maxWidth = 45.0
             minWidth = 45.0
@@ -563,51 +549,22 @@ class SavingsStocksFundsController(
 
     private fun createStringColumn(
         headerKey: String,
-        alignment: Pos,
+        alignment: Pos = Pos.CENTER_LEFT,
         valueExtractor: (Ticker) -> String,
     ): TableColumn<Ticker, String> =
         TableColumn<Ticker, String>(preferencesService.translate(headerKey)).apply {
             setCellValueFactory { SimpleStringProperty(valueExtractor(it.value)) }
-            cellFactory = createCenteredCellFactory(alignment)
+            cellFactory = UIUtils.createCellFactory(alignment)
         }
 
     private fun <T> createObjectColumn(
         headerKey: String,
-        alignment: Pos,
+        alignment: Pos = Pos.CENTER_LEFT,
         valueExtractor: (Ticker) -> T,
     ): TableColumn<Ticker, T> =
         TableColumn<Ticker, T>(preferencesService.translate(headerKey)).apply {
             setCellValueFactory { SimpleObjectProperty(valueExtractor(it.value)) }
-            cellFactory = createCenteredCellFactory(alignment)
-        }
-
-    private fun <T> createCenteredCellFactory(alignment: Pos): Callback<TableColumn<Ticker, T>, TableCell<Ticker, T>> =
-        Callback {
-            object : TableCell<Ticker, T>() {
-                override fun updateItem(
-                    item: T?,
-                    empty: Boolean,
-                ) {
-                    super.updateItem(item, empty)
-                    when {
-                        item == null || empty -> {
-                            text = null
-                            graphic = null
-                        }
-
-                        item is ImageView -> {
-                            graphic = item
-                            style = "-fx-padding: 0; -fx-alignment: CENTER;"
-                        }
-
-                        else -> {
-                            text = item.toString()
-                            val cssAlignment = if (alignment == Pos.CENTER) "CENTER" else "CENTER-LEFT"
-                            style = "-fx-padding: 0 10px; -fx-alignment: $cssAlignment;"
-                        }
-                    }
-                }
-            }
+            cellFactory = UIUtils.createCellFactory(alignment)
         }
 
     private fun setOffUpdatePortfolioPricesButton() {

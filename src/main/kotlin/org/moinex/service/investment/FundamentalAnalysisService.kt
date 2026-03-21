@@ -116,6 +116,12 @@ class FundamentalAnalysisService(
         tickerData: JSONObject,
         symbol: String,
     ) {
+        if (tickerData.has("error")) {
+            val errorMsg = tickerData.getString("error")
+            logger.error("API returned error for {}: {}", symbol, errorMsg)
+            throw MoinexException.APIFetchException("API error: $errorMsg")
+        }
+
         if (!tickerData.has("exception")) return
 
         val errorMsg = tickerData.getString("exception")

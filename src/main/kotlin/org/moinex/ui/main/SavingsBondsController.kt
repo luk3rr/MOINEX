@@ -24,13 +24,13 @@ import org.moinex.model.enums.BondType
 import org.moinex.model.investment.Bond
 import org.moinex.service.PreferencesService
 import org.moinex.service.investment.BondService
-import org.moinex.ui.dialog.investment.AddBondController
-import org.moinex.ui.dialog.investment.AddBondPurchaseController
-import org.moinex.ui.dialog.investment.AddBondSaleController
-import org.moinex.ui.dialog.investment.ArchivedBondsController
-import org.moinex.ui.dialog.investment.BondInterestHistoryController
-import org.moinex.ui.dialog.investment.BondTransactionsController
-import org.moinex.ui.dialog.investment.EditBondController
+import org.moinex.ui.dialog.investment.create.AddBondController
+import org.moinex.ui.dialog.investment.create.AddBondPurchaseController
+import org.moinex.ui.dialog.investment.create.AddBondSaleController
+import org.moinex.ui.dialog.investment.update.EditBondController
+import org.moinex.ui.dialog.investment.view.ArchivedBondsController
+import org.moinex.ui.dialog.investment.view.BondInterestHistoryController
+import org.moinex.ui.dialog.investment.view.BondTransactionsController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -206,7 +206,7 @@ class SavingsBondsController(
             Constants.BUY_BOND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
             springContext,
-            { controller: AddBondPurchaseController -> controller.setBond(selectedBond) },
+            { controller: AddBondPurchaseController -> controller.initializeBond(selectedBond) },
             listOf(
                 Runnable {
                     updateBondTableView()
@@ -232,7 +232,7 @@ class SavingsBondsController(
             Constants.SALE_BOND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
             springContext,
-            { controller: AddBondSaleController -> controller.setBond(selectedBond) },
+            { controller: AddBondSaleController -> controller.initializeBond(selectedBond) },
             listOf(
                 Runnable {
                     updateBondTableView()

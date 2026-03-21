@@ -379,6 +379,37 @@ class UIUtils(
         }
 
         @JvmStatic
+        fun <S, T> createCellFactory(alignment: Pos): Callback<TableColumn<S, T>, TableCell<S, T>> =
+            Callback {
+                object : TableCell<S, T>() {
+                    override fun updateItem(
+                        item: T?,
+                        empty: Boolean,
+                    ) {
+                        super.updateItem(item, empty)
+                        when {
+                            item == null || empty -> {
+                                text = null
+                                graphic = null
+                            }
+
+                            item is ImageView -> {
+                                graphic = item
+                                style = "-fx-padding: 0; -fx-alignment: CENTER;"
+                            }
+
+                            else -> {
+                                text = item.toString()
+                                val cssAlignment =
+                                    if (alignment == Pos.CENTER) "CENTER" else "CENTER-LEFT"
+                                style = "-fx-padding: 0 10px; -fx-alignment: $cssAlignment;"
+                            }
+                        }
+                    }
+                }
+            }
+
+        @JvmStatic
         fun <T> createListCell(textExtractor: (T) -> String = { it.toString() }): ListCell<T> =
             object : ListCell<T>() {
                 override fun updateItem(

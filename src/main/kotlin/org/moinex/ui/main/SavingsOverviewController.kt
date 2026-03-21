@@ -54,7 +54,7 @@ import org.moinex.service.investment.InvestmentTargetService
 import org.moinex.service.investment.MarketService
 import org.moinex.service.investment.TickerService
 import org.moinex.ui.common.ProfitabilityMetricsPaneController
-import org.moinex.ui.dialog.investment.EditInvestmentTargetController
+import org.moinex.ui.dialog.investment.update.EditInvestmentTargetController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
