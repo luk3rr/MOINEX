@@ -52,7 +52,7 @@ if not exist "python-embedded\python.exe" (
 
 REM Build the JAR
 echo [INFO] Compilando o projeto com Gradle...
-call gradlew clean build -x test
+call gradlew.bat clean build -x test
 
 if not exist "build\libs\moinex.jar" (
     echo [ERROR] JAR nao foi gerado. Verifique a compilacao Gradle.
@@ -65,19 +65,22 @@ REM Create output directory
 set OUTPUT_DIR=installer-output
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
-REM Extract version from build.gradle.kts or use git tag
-for /f "tokens=*" %%i in ('powershell -Command "(Get-Content build.gradle.kts | Select-String 'version = ').ToString() -replace 'version = |"', ''"') do set VERSION=%%i
+REM Extract version from git tag first, fallback to build.gradle.kts
+for /f "tokens=*" %%i in ('git describe --tags --abbrev^=0 2^>nul') do set GIT_TAG=%%i
 
-REM If version is empty or SNAPSHOT, try to get from git tag
-if "%VERSION%"=="" set VERSION=1.0.0
-if "%VERSION%"=="1.0-SNAPSHOT" (
-    for /f "tokens=*" %%i in ('git describe --tags --abbrev^=0 2^>nul') do set GIT_TAG=%%i
-    if not "!GIT_TAG!"=="" (
-        REM Remove 'v' prefix if present
-        set VERSION=!GIT_TAG:v=!
-    ) else (
-        set VERSION=1.0.0
-    )
+if not "!GIT_TAG!"=="" (
+    REM Remove 'v' prefix if present
+    set VERSION=!GIT_TAG:v=!
+    echo [INFO] Versao obtida da tag Git: !VERSION!
+) else (
+    REM Fallback to build.gradle.kts version
+    for /f "tokens=*" %%i in ('powershell -Command "(Get-Content build.gradle.kts | Select-String 'version = ').ToString() -replace 'version = |\"\"', ''"') do set VERSION=%%i
+    
+    REM If version is empty or SNAPSHOT, use default
+    if "!VERSION!"=="" set VERSION=1.0.0
+    if "!VERSION!"=="1.0-SNAPSHOT" set VERSION=1.0.0
+    
+    echo [INFO] Versao obtida do build.gradle.kts: !VERSION!
 )
 
 REM Copy Python embedded to build directory so jpackage can include it
