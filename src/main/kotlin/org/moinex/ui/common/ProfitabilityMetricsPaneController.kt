@@ -10,7 +10,7 @@ package org.moinex.ui.common
 
 import javafx.fxml.FXML
 import javafx.scene.control.Label
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Styles
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.ProfitabilityMetricsDTO
 import org.springframework.stereotype.Controller
@@ -166,7 +166,7 @@ class ProfitabilityMetricsPaneController {
             text = DASH_PLACEHOLDER
             styleClass.apply {
                 clear()
-                add(Constants.INFO_LABEL_NEUTRAL_STYLE)
+                add(Styles.INFO_LABEL_NEUTRAL_STYLE)
             }
         }
         totalDividendsTotal.text = UIUtils.formatCurrency(total)
@@ -181,7 +181,7 @@ class ProfitabilityMetricsPaneController {
             text = DASH_PLACEHOLDER
             styleClass.apply {
                 clear()
-                add(Constants.INFO_LABEL_NEUTRAL_STYLE)
+                add(Styles.INFO_LABEL_NEUTRAL_STYLE)
             }
         }
         dividendYieldTotal.text = UIUtils.formatPercentage(total)
@@ -213,10 +213,10 @@ class ProfitabilityMetricsPaneController {
         dynamicColor: Boolean,
     ): String =
         when {
-            !dynamicColor -> Constants.INFO_LABEL_NEUTRAL_STYLE
-            value < BigDecimal.ZERO -> Constants.INFO_LABEL_RED_STYLE
-            value > BigDecimal.ZERO -> Constants.INFO_LABEL_GREEN_STYLE
-            else -> Constants.INFO_LABEL_NEUTRAL_STYLE
+            !dynamicColor -> Styles.INFO_LABEL_NEUTRAL_STYLE
+            value < BigDecimal.ZERO -> Styles.INFO_LABEL_RED_STYLE
+            value > BigDecimal.ZERO -> Styles.INFO_LABEL_GREEN_STYLE
+            else -> Styles.INFO_LABEL_NEUTRAL_STYLE
         }
 
     private fun addColorStyleClass(
@@ -227,9 +227,9 @@ class ProfitabilityMetricsPaneController {
         val colorClass = getColorStyleClass(value, dynamicColor)
         label.styleClass.apply {
             removeAll(
-                Constants.INFO_LABEL_RED_STYLE,
-                Constants.INFO_LABEL_GREEN_STYLE,
-                Constants.INFO_LABEL_NEUTRAL_STYLE,
+                Styles.INFO_LABEL_RED_STYLE,
+                Styles.INFO_LABEL_GREEN_STYLE,
+                Styles.INFO_LABEL_NEUTRAL_STYLE,
             )
             add(colorClass)
         }

@@ -13,10 +13,8 @@
 package org.moinex.common.util
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.moinex.config.AppDispatchers
@@ -32,7 +30,7 @@ object FxUtils {
      * All asynchronous UI operations launched through this utility run inside
      * this scope.
      */
-    private val uiScope = CoroutineScope(SupervisorJob() + Dispatchers.JavaFx)
+    private val uiScope = CoroutineScope(SupervisorJob() + AppDispatchers.UI)
 
     /**
      * Switches execution to the JavaFX Application Thread and returns the result.

@@ -12,7 +12,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.MappedSuperclass
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.common.extension.isZero
 import org.moinex.model.enums.AssetType
 import java.math.BigDecimal

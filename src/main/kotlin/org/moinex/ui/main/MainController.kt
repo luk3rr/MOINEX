@@ -23,8 +23,10 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import javafx.util.Pair
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.PreferencesService
 import org.moinex.ui.common.CalculatorController
@@ -101,58 +103,58 @@ class MainController(
             )
 
         rootPane.stylesheets.add(
-            javaClass.getResource(Constants.MAIN_STYLE_SHEET)!!.toExternalForm(),
+            javaClass.getResource(Files.MAIN_STYLE_SHEET)!!.toExternalForm(),
         )
 
         footbarArea.stylesheets.add(
-            javaClass.getResource(Constants.MAIN_STYLE_SHEET)!!.toExternalForm(),
+            javaClass.getResource(Files.MAIN_STYLE_SHEET)!!.toExternalForm(),
         )
 
         menuButton.setOnAction { toggleMenu() }
 
         homeButton.setOnAction {
-            loadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET)
+            loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
             updateSelectedButton(homeButton)
         }
 
         walletButton.setOnAction {
-            loadContent(Constants.WALLET_FXML, Constants.WALLET_STYLE_SHEET)
+            loadContent(Files.WALLET_FXML, Files.WALLET_STYLE_SHEET)
             updateSelectedButton(walletButton)
         }
 
         creditCardButton.setOnAction {
-            loadContent(Constants.CREDIT_CARD_FXML, Constants.CREDIT_CARD_STYLE_SHEET)
+            loadContent(Files.CREDIT_CARD_FXML, Files.CREDIT_CARD_STYLE_SHEET)
             updateSelectedButton(creditCardButton)
         }
 
         transactionButton.setOnAction {
-            loadContent(Constants.TRANSACTION_FXML, Constants.TRANSACTION_STYLE_SHEET)
+            loadContent(Files.TRANSACTION_FXML, Files.TRANSACTION_STYLE_SHEET)
             updateSelectedButton(transactionButton)
         }
 
         goalsAndPlanButton.setOnAction {
-            loadContent(Constants.GOALS_AND_PLANS_FXML, Constants.GOALS_AND_PLANS_STYLE_SHEET)
+            loadContent(Files.GOALS_AND_PLANS_FXML, Files.GOALS_AND_PLANS_STYLE_SHEET)
             updateSelectedButton(goalsAndPlanButton)
         }
 
         savingsButton.setOnAction {
-            loadContent(Constants.SAVINGS_FXML, Constants.SAVINGS_STYLE_SHEET)
+            loadContent(Files.SAVINGS_FXML, Files.SAVINGS_STYLE_SHEET)
             updateSelectedButton(savingsButton)
         }
 
         settingsButton.setOnAction {
-            loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET)
+            loadContent(Files.SETTINGS_FXML, Files.SETTINGS_STYLE_SHEET)
             updateSelectedButton(settingsButton)
         }
 
-        loadContent(Constants.HOME_FXML, Constants.HOME_STYLE_SHEET)
+        loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
         updateSelectedButton(homeButton)
     }
 
     @FXML
     private fun handleOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
+            Files.CALCULATOR_FXML,
             preferencesService.translate(TranslationKeys.MAIN_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
@@ -164,7 +166,7 @@ class MainController(
     @FXML
     private fun handleOpenCalendar() {
         WindowUtils.openPopupWindow(
-            Constants.CALENDAR_FXML,
+            Files.CALENDAR_FXML,
             preferencesService.translate(TranslationKeys.MAIN_CALENDAR),
             springContext,
             { _: CalendarController -> },
@@ -175,7 +177,7 @@ class MainController(
 
     @FXML
     private fun handleOpenSettings() {
-        loadContent(Constants.SETTINGS_FXML, Constants.SETTINGS_STYLE_SHEET)
+        loadContent(Files.SETTINGS_FXML, Files.SETTINGS_STYLE_SHEET)
         updateSelectedButton(settingsButton)
     }
 
@@ -186,9 +188,9 @@ class MainController(
         toggleMonetaryValuesIcon.image =
             Image(
                 if (preferencesService.showMonetaryValues()) {
-                    Constants.SHOW_ICON
+                    Files.SHOW_ICON
                 } else {
-                    Constants.HIDE_ICON
+                    Files.HIDE_ICON
                 },
             )
 
@@ -213,7 +215,7 @@ class MainController(
             )
 
             newContent.stylesheets.add(
-                javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
             AnchorPane.setTopAnchor(newContent, 0.0)
@@ -253,9 +255,9 @@ class MainController(
 
     private fun updateSelectedButton(selectedButton: Button) {
         sidebarButtons.forEach { button ->
-            button.styleClass.remove(Constants.SIDEBAR_SELECTED_BUTTON_STYLE)
+            button.styleClass.remove(Styles.SIDEBAR_SELECTED_BUTTON_STYLE)
         }
-        selectedButton.styleClass.add(Constants.SIDEBAR_SELECTED_BUTTON_STYLE)
+        selectedButton.styleClass.add(Styles.SIDEBAR_SELECTED_BUTTON_STYLE)
     }
 
     private fun toggleMenu() {

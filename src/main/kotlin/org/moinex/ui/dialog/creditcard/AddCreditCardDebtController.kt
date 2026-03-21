@@ -10,7 +10,7 @@ package org.moinex.ui.dialog.creditcard
 
 import javafx.fxml.FXML
 import javafx.stage.Stage
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCardDebt
 import org.moinex.service.CalculatorService

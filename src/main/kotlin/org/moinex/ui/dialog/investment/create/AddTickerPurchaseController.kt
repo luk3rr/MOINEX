@@ -11,7 +11,7 @@ package org.moinex.ui.dialog.investment.create
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.stage.Stage
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.WalletTransactionType

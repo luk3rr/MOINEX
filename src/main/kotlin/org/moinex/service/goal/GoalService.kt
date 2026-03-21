@@ -1,6 +1,6 @@
 package org.moinex.service.goal
 
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isNotZero
 import org.moinex.common.extension.isZero

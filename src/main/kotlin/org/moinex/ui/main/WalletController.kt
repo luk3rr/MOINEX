@@ -26,8 +26,10 @@ import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.chart.DoughnutChart
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
@@ -152,7 +154,7 @@ class WalletController(
     @FXML
     private fun handleAddTransfer() {
         WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
+            Files.ADD_TRANSFER_FXML,
             preferencesService.translate(
                 TranslationKeys.WALLET_DIALOG_ADD_TRANSFER_TITLE,
             ),
@@ -174,7 +176,7 @@ class WalletController(
     @FXML
     private fun handleAddWallet() {
         WindowUtils.openModalWindow(
-            Constants.ADD_WALLET_FXML,
+            Files.ADD_WALLET_FXML,
             preferencesService.translate(
                 TranslationKeys.WALLET_DIALOG_ADD_WALLET_TITLE,
             ),
@@ -196,7 +198,7 @@ class WalletController(
     @FXML
     private fun handleViewArchivedWallets() {
         WindowUtils.openModalWindow(
-            Constants.ARCHIVED_WALLETS_FXML,
+            Files.ARCHIVED_WALLETS_FXML,
             preferencesService.translate(
                 TranslationKeys.WALLET_DIALOG_ARCHIVED_WALLETS_TITLE,
             ),
@@ -218,7 +220,7 @@ class WalletController(
     @FXML
     private fun handleViewTransfers() {
         WindowUtils.openModalWindow(
-            Constants.TRANSFERS_FXML,
+            Files.TRANSFERS_FXML,
             preferencesService.translate(
                 TranslationKeys.WALLET_DIALOG_VIEW_TRANSFERS_TITLE,
             ),
@@ -376,7 +378,7 @@ class WalletController(
 
         val totalBalanceValueLabel =
             Label(UIUtils.formatCurrency(walletsCurrentBalance)).apply {
-                styleClass.add(Constants.TOTAL_BALANCE_VALUE_LABEL_STYLE)
+                styleClass.add(Styles.TOTAL_BALANCE_VALUE_LABEL_STYLE)
             }
 
         val balanceForeseenLabel =
@@ -388,7 +390,7 @@ class WalletController(
                     UIUtils.formatCurrency(foreseenBalance),
                 ),
             ).apply {
-                styleClass.add(Constants.TOTAL_BALANCE_FORESEEN_LABEL_STYLE)
+                styleClass.add(Styles.TOTAL_BALANCE_FORESEEN_LABEL_STYLE)
             }
 
         val totalWalletsLabel =
@@ -400,7 +402,7 @@ class WalletController(
                     totalAmountInWallets,
                 ),
             ).apply {
-                styleClass.add(Constants.WALLET_TOTAL_BALANCE_WALLETS_LABEL_STYLE)
+                styleClass.add(Styles.WALLET_TOTAL_BALANCE_WALLETS_LABEL_STYLE)
             }
 
         totalBalancePaneInfoVBox.children.setAll(
@@ -424,14 +426,14 @@ class WalletController(
             runCatching {
                 val loader =
                     FXMLLoader(
-                        javaClass.getResource(Constants.WALLET_FULL_PANE_FXML),
+                        javaClass.getResource(Files.WALLET_FULL_PANE_FXML),
                         preferencesService.bundle,
                     )
                 loader.setControllerFactory { springContext.getBean(it) }
                 val newContent = loader.load<Parent>()
 
                 newContent.stylesheets.add(
-                    javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                    javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
                 )
 
                 val walletPaneController = loader.getController<WalletPaneController>()
@@ -448,7 +450,7 @@ class WalletController(
             }.onFailure { e ->
                 logger.error(
                     "Error loading wallet full pane FXML: '{}' for {}:",
-                    Constants.WALLET_FULL_PANE_FXML,
+                    Files.WALLET_FULL_PANE_FXML,
                     wallet,
                     e,
                 )
@@ -466,7 +468,7 @@ class WalletController(
         doughnutChartCheckBoxes
             .filter { it.isSelected }
             .forEach { checkBox ->
-                checkBox.styleClass.add(Constants.WALLET_CHECK_BOX_STYLE)
+                checkBox.styleClass.add(Styles.WALLET_CHECK_BOX_STYLE)
 
                 val walletTypeName = checkBox.text
                 walletTypes
@@ -692,7 +694,7 @@ class WalletController(
         doughnutChartCheckBoxes =
             walletTypes.map { wt ->
                 CheckBox(UIUtils.translateWalletType(wt)).apply {
-                    styleClass.add(Constants.WALLET_CHECK_BOX_STYLE)
+                    styleClass.add(Styles.WALLET_CHECK_BOX_STYLE)
                     isSelected = true
                     selectedProperty().addListener { _, _, _ -> updateDoughnutChart() }
                 }

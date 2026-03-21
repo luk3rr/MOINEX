@@ -16,8 +16,8 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCardCredit
@@ -57,7 +57,7 @@ class CreditCardCreditsController(
     @FXML
     private fun handleAdd() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CREDIT_CARD_CREDIT_FXML,
+            Files.ADD_CREDIT_CARD_CREDIT_FXML,
             preferencesService.translate(TranslationKeys.CREDITCARD_CREDITS_ADD_TITLE),
             springContext,
             { _: AddCreditCardCreditController -> },

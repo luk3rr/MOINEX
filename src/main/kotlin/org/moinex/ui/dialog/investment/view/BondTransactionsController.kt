@@ -17,8 +17,10 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.OperationType
@@ -74,7 +76,7 @@ class BondTransactionsController(
 
         if (selectedOperation.operationType == OperationType.BUY) {
             WindowUtils.openModalWindow(
-                Constants.EDIT_BOND_PURCHASE_FXML,
+                Files.EDIT_BOND_PURCHASE_FXML,
                 preferencesService.translate(TranslationKeys.BOND_DIALOG_EDIT_PURCHASE_TITLE),
                 springContext,
                 { controller: EditBondPurchaseController ->
@@ -89,7 +91,7 @@ class BondTransactionsController(
             )
         } else {
             WindowUtils.openModalWindow(
-                Constants.EDIT_BOND_SALE_FXML,
+                Files.EDIT_BOND_SALE_FXML,
                 preferencesService.translate(TranslationKeys.BOND_DIALOG_EDIT_SALE_TITLE),
                 springContext,
                 { controller: EditBondSaleController ->
@@ -304,16 +306,16 @@ class BondTransactionsController(
                             } else {
                                 text = item
                                 styleClass.removeAll(
-                                    Constants.POSITIVE_BALANCE_STYLE,
-                                    Constants.NEGATIVE_BALANCE_STYLE,
-                                    Constants.NEUTRAL_BALANCE_STYLE,
+                                    Styles.POSITIVE_BALANCE_STYLE,
+                                    Styles.NEGATIVE_BALANCE_STYLE,
+                                    Styles.NEUTRAL_BALANCE_STYLE,
                                 )
 
                                 if (item != Constants.NA_DATA) {
                                     when {
-                                        item.startsWith("+") -> styleClass.add(Constants.POSITIVE_BALANCE_STYLE)
-                                        item.startsWith("-") -> styleClass.add(Constants.NEGATIVE_BALANCE_STYLE)
-                                        else -> styleClass.add(Constants.NEUTRAL_BALANCE_STYLE)
+                                        item.startsWith("+") -> styleClass.add(Styles.POSITIVE_BALANCE_STYLE)
+                                        item.startsWith("-") -> styleClass.add(Styles.NEGATIVE_BALANCE_STYLE)
+                                        else -> styleClass.add(Styles.NEUTRAL_BALANCE_STYLE)
                                     }
                                 }
                             }

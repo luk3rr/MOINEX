@@ -14,7 +14,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Wallet

@@ -19,8 +19,8 @@ import javafx.scene.control.Label
 import javafx.scene.layout.AnchorPane
 import javafx.util.StringConverter
 import org.moinex.common.chart.ChartFactory
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -92,7 +92,7 @@ class PlanController(
     @FXML
     private fun handleNewPlan() {
         WindowUtils.openModalWindow(
-            Constants.ADD_PLAN_FXML,
+            Files.ADD_PLAN_FXML,
             preferencesService.translate(TranslationKeys.PLAN_DIALOG_ADD_PLAN_TITLE),
             springContext,
             { _: AddPlanController -> },
@@ -115,7 +115,7 @@ class PlanController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_PLAN_FXML,
+            Files.EDIT_PLAN_FXML,
             preferencesService.translate(TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
             springContext,
             { controller: EditPlanController -> controller.setPlan(currentPlan!!) },
@@ -245,7 +245,7 @@ class PlanController(
         runCatching {
             val loader =
                 FXMLLoader(
-                    javaClass.getResource(Constants.BUDGET_GROUP_PANE_FXML),
+                    javaClass.getResource(Files.BUDGET_GROUP_PANE_FXML),
                     preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
@@ -263,7 +263,7 @@ class PlanController(
         }.onFailure { e ->
             logger.error(
                 "Error loading budget group pane FXML: '{}' for group: '{}'",
-                Constants.BUDGET_GROUP_PANE_FXML,
+                Files.BUDGET_GROUP_PANE_FXML,
                 status.group.name,
                 e,
             )

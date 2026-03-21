@@ -15,8 +15,8 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import org.json.JSONObject
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.springframework.context.annotation.Scope

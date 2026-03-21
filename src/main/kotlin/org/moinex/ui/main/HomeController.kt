@@ -33,8 +33,11 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.chart.ChartFactory
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -175,7 +178,7 @@ class HomeController(
 
     private fun setOffRecalculateButton() {
         recalculateNetWorthButtonIcon.image =
-            Image(javaClass.getResource(Constants.LOADING_GIF)!!.toExternalForm())
+            Image(javaClass.getResource(Files.LOADING_GIF)!!.toExternalForm())
         recalculateNetWorthButton.isDisable = true
         recalculateNetWorthButton.text =
             preferencesService.translate(
@@ -198,7 +201,7 @@ class HomeController(
     private fun setOnRecalculateButton() {
         recalculateNetWorthButton.isDisable = false
         recalculateNetWorthButtonIcon.image =
-            Image(javaClass.getResource(Constants.RELOAD_ICON)!!.toExternalForm())
+            Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
         recalculateNetWorthButton.text =
             preferencesService.translate(TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON)
     }
@@ -270,18 +273,18 @@ class HomeController(
             val wallet = wallets[i]
             val walletHBox = createWalletItemNode(wallet)
 
-            AnchorPane.setTopAnchor(walletHBox, 0.0)
-            AnchorPane.setBottomAnchor(walletHBox, 0.0)
+            var left = 0.0
+            var right = 0.0
 
             if (i % 2 == 0) {
                 walletView1.children.add(walletHBox)
-                AnchorPane.setLeftAnchor(walletHBox, 0.0)
-                AnchorPane.setRightAnchor(walletHBox, 10.0)
+                right = 10.0
             } else {
                 walletView2.children.add(walletHBox)
-                AnchorPane.setLeftAnchor(walletHBox, 10.0)
-                AnchorPane.setRightAnchor(walletHBox, 0.0)
+                left = 10.0
             }
+
+            walletHBox.setAnchorPaneConstraints(left = left, right = right)
         }
 
         walletPrevButton.isDisable = walletPaneCurrentPage == 0
@@ -299,18 +302,18 @@ class HomeController(
             val creditCard = creditCards[i]
             val crcHbox = createCreditCardItemNode(creditCard)
 
-            AnchorPane.setTopAnchor(crcHbox, 0.0)
-            AnchorPane.setBottomAnchor(crcHbox, 0.0)
+            var left = 0.0
+            var right = 0.0
 
             if (i % 2 == 0) {
                 creditCardView1.children.add(crcHbox)
-                AnchorPane.setLeftAnchor(crcHbox, 0.0)
-                AnchorPane.setRightAnchor(crcHbox, 10.0)
+                right = 10.0
             } else {
                 creditCardView2.children.add(crcHbox)
-                AnchorPane.setLeftAnchor(crcHbox, 10.0)
-                AnchorPane.setRightAnchor(crcHbox, 0.0)
+                left = 10.0
             }
+
+            crcHbox.setAnchorPaneConstraints(left = left, right = right)
         }
 
         creditCardPrevButton.isDisable = creditCardPaneCurrentPage == 0
@@ -355,9 +358,9 @@ class HomeController(
         val icon =
             ImageView(
                 if (transaction.type == WalletTransactionType.INCOME) {
-                    Constants.HOME_INCOME_ICON
+                    Files.HOME_INCOME_ICON
                 } else {
-                    Constants.HOME_EXPENSE_ICON
+                    Files.HOME_EXPENSE_ICON
                 },
             ).apply {
                 fitHeight = Constants.HOME_LAST_TRANSACTIONS_ICON_SIZE.toDouble()
@@ -410,9 +413,9 @@ class HomeController(
             alignment = Pos.CENTER_LEFT
             styleClass.add(
                 if (transaction.type == WalletTransactionType.INCOME) {
-                    Constants.HOME_LAST_TRANSACTIONS_INCOME_ITEM_STYLE
+                    Styles.HOME_LAST_TRANSACTIONS_INCOME_ITEM_STYLE
                 } else {
-                    Constants.HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE
+                    Styles.HOME_LAST_TRANSACTIONS_EXPENSE_ITEM_STYLE
                 },
             )
         }
@@ -523,14 +526,14 @@ class HomeController(
         runCatching {
             val loader =
                 FXMLLoader(
-                    javaClass.getResource(Constants.RESUME_PANE_FXML),
+                    javaClass.getResource(Files.RESUME_PANE_FXML),
                     preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
 
             newContent.stylesheets.add(
-                javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
             val resumePaneController = loader.getController<ResumePaneController>()
@@ -552,7 +555,7 @@ class HomeController(
             monthResumeView.children.clear()
             monthResumeView.children.add(newContent)
         }.onFailure { e ->
-            logger.error("Error loading resume pane FXML: '{}'", Constants.RESUME_PANE_FXML, e)
+            logger.error("Error loading resume pane FXML: '{}'", Files.RESUME_PANE_FXML, e)
             e.cause?.let {
                 logger.error("Root cause: {}", it.message, it)
             }
@@ -564,7 +567,7 @@ class HomeController(
             Label(creditCard.name).apply {
                 maxWidth = Constants.HOME_ITEM_NODE_NAME_MAX_LENGTH.toDouble()
                 textOverrun = OverrunStyle.ELLIPSIS
-                styleClass.add(Constants.HOME_CREDIT_CARD_ITEM_NAME_STYLE)
+                styleClass.add(Styles.HOME_CREDIT_CARD_ITEM_NAME_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
@@ -575,7 +578,7 @@ class HomeController(
 
         val crcOperatorLabel =
             Label(creditCard.operator.name).apply {
-                styleClass.add(Constants.HOME_CREDIT_CARD_ITEM_OPERATOR_STYLE)
+                styleClass.add(Styles.HOME_CREDIT_CARD_ITEM_OPERATOR_STYLE)
                 alignment = Pos.TOP_LEFT
                 UIUtils.addTooltipToNode(
                     this,
@@ -587,7 +590,7 @@ class HomeController(
 
         val availableCredit =
             Label(UIUtils.formatCurrency(creditCardService.getAvailableCredit(creditCard.id!!))).apply {
-                styleClass.add(Constants.HOME_CREDIT_CARD_ITEM_BALANCE_STYLE)
+                styleClass.add(Styles.HOME_CREDIT_CARD_ITEM_BALANCE_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
@@ -598,7 +601,7 @@ class HomeController(
 
         val digitsLabel =
             Label(UIUtils.formatCreditCardNumber(creditCard.lastFourDigits)).apply {
-                styleClass.add(Constants.HOME_CREDIT_CARD_ITEM_DIGITS_STYLE)
+                styleClass.add(Styles.HOME_CREDIT_CARD_ITEM_DIGITS_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(
@@ -614,7 +617,7 @@ class HomeController(
             }
 
         val icon =
-            ImageView(Constants.CRC_OPERATOR_ICONS_PATH + creditCard.operator.icon).apply {
+            ImageView(Files.CRC_OPERATOR_ICONS_PATH + creditCard.operator.icon).apply {
                 fitHeight = Constants.CRC_OPERATOR_ICONS_SIZE.toDouble()
                 fitWidth = Constants.CRC_OPERATOR_ICONS_SIZE.toDouble()
             }
@@ -628,7 +631,7 @@ class HomeController(
         val spacer = Region().apply { HBox.setHgrow(this, Priority.ALWAYS) }
 
         return HBox(10.0).apply {
-            styleClass.add(Constants.HOME_CREDIT_CARD_ITEM_STYLE)
+            styleClass.add(Styles.HOME_CREDIT_CARD_ITEM_STYLE)
             children.addAll(infoVbox, spacer, iconVBox)
         }
     }
@@ -638,7 +641,7 @@ class HomeController(
             Label(wallet.name).apply {
                 maxWidth = Constants.HOME_ITEM_NODE_NAME_MAX_LENGTH.toDouble()
                 textOverrun = OverrunStyle.ELLIPSIS
-                styleClass.add(Constants.HOME_WALLET_ITEM_NAME_STYLE)
+                styleClass.add(Styles.HOME_WALLET_ITEM_NAME_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_NAME),
@@ -647,7 +650,7 @@ class HomeController(
 
         val walletTypeLabel =
             Label(UIUtils.translateWalletType(wallet.type)).apply {
-                styleClass.add(Constants.HOME_WALLET_TYPE_STYLE)
+                styleClass.add(Styles.HOME_WALLET_TYPE_STYLE)
                 alignment = Pos.TOP_LEFT
                 UIUtils.addTooltipToNode(
                     this,
@@ -657,7 +660,7 @@ class HomeController(
 
         val balanceLabel =
             Label(UIUtils.formatCurrency(wallet.balance)).apply {
-                styleClass.add(Constants.HOME_WALLET_ITEM_BALANCE_STYLE)
+                styleClass.add(Styles.HOME_WALLET_ITEM_BALANCE_STYLE)
                 UIUtils.addTooltipToNode(
                     this,
                     preferencesService.translate(TranslationKeys.HOME_WALLET_TOOLTIP_WALLET_BALANCE),
@@ -677,7 +680,7 @@ class HomeController(
                             ),
                         ).apply {
                             alignment = Pos.BOTTOM_LEFT
-                            styleClass.add(Constants.HOME_VIRTUAL_WALLET_INFO_STYLE)
+                            styleClass.add(Styles.HOME_VIRTUAL_WALLET_INFO_STYLE)
                             UIUtils.addTooltipToNode(
                                 this,
                                 UIUtils.getVirtualWalletInfo(wallet),
@@ -688,7 +691,7 @@ class HomeController(
             }
 
         val icon =
-            ImageView(Constants.WALLET_TYPE_ICONS_PATH + wallet.type.icon).apply {
+            ImageView(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon).apply {
                 fitHeight = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
                 fitWidth = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
             }
@@ -702,7 +705,7 @@ class HomeController(
         val spacer = Region().apply { HBox.setHgrow(this, Priority.ALWAYS) }
 
         return HBox(10.0).apply {
-            styleClass.add(Constants.HOME_WALLET_ITEM_STYLE)
+            styleClass.add(Styles.HOME_WALLET_ITEM_STYLE)
             children.addAll(infoVbox, spacer, iconVBox)
         }
     }

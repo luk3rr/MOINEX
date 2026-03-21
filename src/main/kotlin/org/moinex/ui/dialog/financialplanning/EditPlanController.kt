@@ -10,7 +10,7 @@ package org.moinex.ui.dialog.financialplanning
 
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.financialplanning.BudgetGroup

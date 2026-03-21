@@ -17,8 +17,8 @@ import javafx.scene.Scene
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import kotlinx.coroutines.delay
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.service.PreferencesService
@@ -50,7 +50,7 @@ class JavaFXApp : Application() {
         hostServicesInstance = hostServices
 
         runCatching {
-            val splashLoader = FXMLLoader(javaClass.getResource(Constants.SPLASH_SCREEN_FXML))
+            val splashLoader = FXMLLoader(javaClass.getResource(Files.SPLASH_SCREEN_FXML))
             val splashRoot = splashLoader.load<Parent>()
             val splashStage =
                 Stage().apply {
@@ -64,7 +64,7 @@ class JavaFXApp : Application() {
                     val preferencesService = springContext.getBean<PreferencesService>()
                     val loader =
                         FXMLLoader(
-                            javaClass.getResource(Constants.MAIN_FXML),
+                            javaClass.getResource(Files.MAIN_FXML),
                             preferencesService.bundle,
                         )
                     loader.setControllerFactory { springContext.getBean(it) }

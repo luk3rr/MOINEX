@@ -9,7 +9,7 @@
 package org.moinex.service.investment
 
 import org.json.JSONObject
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.common.retry.RetryException
 import org.moinex.common.retry.retry
 import org.moinex.common.util.APIUtils

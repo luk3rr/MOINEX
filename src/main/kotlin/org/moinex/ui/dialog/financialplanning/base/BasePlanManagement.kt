@@ -18,8 +18,10 @@ import javafx.scene.control.MenuItem
 import javafx.scene.control.TextField
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isNotEqual
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.UIUtils
@@ -33,7 +35,6 @@ import org.moinex.ui.common.BudgetGroupPreviewController
 import org.moinex.ui.dialog.financialplanning.AddBudgetGroupController
 import org.moinex.ui.dialog.financialplanning.EditBudgetGroupController
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import java.math.BigDecimal
 import java.text.MessageFormat
@@ -93,7 +94,7 @@ abstract class BasePlanManagement(
     @FXML
     private fun handleAddBudgetGroup() {
         WindowUtils.openModalWindow(
-            Constants.ADD_BUDGET_GROUP_FXML,
+            Files.ADD_BUDGET_GROUP_FXML,
             preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_ADD_BUDGET_GROUP_TITLE),
             springContext,
             { controller: AddBudgetGroupController ->
@@ -120,11 +121,11 @@ abstract class BasePlanManagement(
         for (i in start until end) {
             val budgetGroup = budgetGroups[i]
             runCatching {
-                val loader = FXMLLoader(javaClass.getResource(Constants.BUDGET_GROUP_PREVIEW_PANE_FXML))
+                val loader = FXMLLoader(javaClass.getResource(Files.BUDGET_GROUP_PREVIEW_PANE_FXML))
                 loader.setControllerFactory { clazz -> springContext.getBean(clazz) }
                 val newContent = loader.load<AnchorPane>()
                 newContent.stylesheets.add(
-                    javaClass.getResource(Constants.COMMON_STYLE_SHEET)?.toExternalForm()
+                    javaClass.getResource(Files.COMMON_STYLE_SHEET)?.toExternalForm()
                         ?: throw IllegalStateException("CSS not found"),
                 )
 
@@ -225,7 +226,7 @@ abstract class BasePlanManagement(
 
     private fun handleEditBudgetGroup(groupToEdit: BudgetGroup) {
         WindowUtils.openModalWindow(
-            Constants.EDIT_BUDGET_GROUP_FXML,
+            Files.EDIT_BUDGET_GROUP_FXML,
             preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_EDIT_BUDGET_GROUP_TITLE),
             springContext,
             { controller: EditBudgetGroupController ->
@@ -280,9 +281,9 @@ abstract class BasePlanManagement(
 
     private fun validateAndDisplayBudgetInfo() {
         budgetGroupInfo.styleClass.removeAll(
-            Constants.INFO_LABEL_RED_STYLE,
-            Constants.INFO_LABEL_YELLOW_STYLE,
-            Constants.INFO_LABEL_GREEN_STYLE,
+            Styles.INFO_LABEL_RED_STYLE,
+            Styles.INFO_LABEL_YELLOW_STYLE,
+            Styles.INFO_LABEL_GREEN_STYLE,
         )
 
         if (budgetGroups.isEmpty()) {
@@ -300,13 +301,13 @@ abstract class BasePlanManagement(
                         preferencesService.translate(TranslationKeys.FINANCIALPLANNING_INFO_PERCENTAGE_EXCEEDS),
                         UIUtils.formatPercentage(totalPercentage),
                     )
-                budgetGroupInfo.styleClass.add(Constants.INFO_LABEL_RED_STYLE)
+                budgetGroupInfo.styleClass.add(Styles.INFO_LABEL_RED_STYLE)
             }
 
             hasEmptyGroups -> {
                 budgetGroupInfo.text =
                     preferencesService.translate(TranslationKeys.FINANCIALPLANNING_INFO_EMPTY_GROUPS)
-                budgetGroupInfo.styleClass.add(Constants.INFO_LABEL_YELLOW_STYLE)
+                budgetGroupInfo.styleClass.add(Styles.INFO_LABEL_YELLOW_STYLE)
             }
 
             totalPercentage < BigDecimal(100) -> {
@@ -317,13 +318,13 @@ abstract class BasePlanManagement(
                         UIUtils.formatPercentage(totalPercentage),
                         UIUtils.formatPercentage(remaining),
                     )
-                budgetGroupInfo.styleClass.add(Constants.INFO_LABEL_YELLOW_STYLE)
+                budgetGroupInfo.styleClass.add(Styles.INFO_LABEL_YELLOW_STYLE)
             }
 
             else -> {
                 budgetGroupInfo.text =
                     preferencesService.translate(TranslationKeys.FINANCIALPLANNING_INFO_CORRECTLY_CONFIGURED)
-                budgetGroupInfo.styleClass.add(Constants.INFO_LABEL_GREEN_STYLE)
+                budgetGroupInfo.styleClass.add(Styles.INFO_LABEL_GREEN_STYLE)
             }
         }
 

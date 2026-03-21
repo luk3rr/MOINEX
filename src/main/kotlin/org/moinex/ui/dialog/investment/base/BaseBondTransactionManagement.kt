@@ -15,8 +15,9 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -208,9 +209,9 @@ abstract class BaseBondTransactionManagement(
             val walletAfterBalanceValue = calculateWalletBalance(wt, transactionValue)
 
             if (walletAfterBalanceValue < BigDecimal.ZERO) {
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Styles.NEGATIVE_BALANCE_STYLE)
             } else {
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Styles.NEUTRAL_BALANCE_STYLE)
             }
 
             walletAfterBalanceValueLabel.text = UIUtils.formatCurrency(walletAfterBalanceValue)

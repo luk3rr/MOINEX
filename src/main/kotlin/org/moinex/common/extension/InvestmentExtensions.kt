@@ -65,7 +65,3 @@ fun FundamentalAnalysis?.isUpdateRecommended(): Boolean {
     if (this == null) return true
     return lastUpdate.plusHours(RECOMMENDED_UPDATE_HOURS.toLong()).isBefore(LocalDateTime.now())
 }
-
-fun BondOperation.isPurchase(): Boolean = this.operationType == OperationType.BUY
-
-fun BondOperation.isSale(): Boolean = this.operationType == OperationType.SELL

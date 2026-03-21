@@ -20,8 +20,8 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Transfer
@@ -69,7 +69,7 @@ class TransferController(
     @FXML
     private fun handleAdd() {
         WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
+            Files.ADD_TRANSFER_FXML,
             preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_ADD_NEW_TRANSFER_TITLE),
             springContext,
             { _: AddTransferController -> },
@@ -96,7 +96,7 @@ class TransferController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_TRANSFER_FXML,
+            Files.EDIT_TRANSFER_FXML,
             preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EDIT_TRANSFER_TITLE),
             springContext,
             { controller: EditTransferController -> controller.setTransfer(selectedTransfer) },

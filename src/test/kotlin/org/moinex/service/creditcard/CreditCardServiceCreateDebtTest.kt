@@ -6,7 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.creditcard.CreditCardDebtFactory
 import org.moinex.factory.creditcard.CreditCardFactory

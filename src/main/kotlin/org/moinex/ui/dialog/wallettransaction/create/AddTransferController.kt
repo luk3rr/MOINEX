@@ -12,8 +12,8 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
@@ -167,9 +167,9 @@ class AddTransferController(
 
             val style =
                 if (afterBalance < BigDecimal.ZERO) {
-                    Constants.NEGATIVE_BALANCE_STYLE
+                    Styles.NEGATIVE_BALANCE_STYLE
                 } else {
-                    Constants.NEUTRAL_BALANCE_STYLE
+                    Styles.NEUTRAL_BALANCE_STYLE
                 }
 
             UIUtils.setLabelStyle(afterBalanceLabel, style)

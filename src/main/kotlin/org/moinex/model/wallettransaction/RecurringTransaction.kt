@@ -18,7 +18,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Inheritance
 import jakarta.persistence.Table
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.common.converter.LocalDateStringConverter
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual

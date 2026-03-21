@@ -15,8 +15,8 @@ import javafx.scene.control.ProgressBar
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.VBox
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -109,7 +109,7 @@ class CreditCardPaneController(
     @FXML
     private fun handleAddDebt() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CREDIT_CARD_DEBT_FXML,
+            Files.ADD_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_DEBT),
             springContext,
             { controller: AddCreditCardDebtController -> controller.creditCard = creditCard },
@@ -120,7 +120,7 @@ class CreditCardPaneController(
     @FXML
     private fun handleAddCredit() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CREDIT_CARD_CREDIT_FXML,
+            Files.ADD_CREDIT_CARD_CREDIT_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_CREDIT),
             springContext,
             { controller: AddCreditCardCreditController -> controller.setCreditCard(creditCard) },
@@ -131,7 +131,7 @@ class CreditCardPaneController(
     @FXML
     private fun handleEditCreditCard() {
         WindowUtils.openModalWindow(
-            Constants.EDIT_CREDIT_CARD_FXML,
+            Files.EDIT_CREDIT_CARD_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_EDIT),
             springContext,
             { controller: EditCreditCardController -> controller.setCreditCard(creditCard) },
@@ -222,7 +222,7 @@ class CreditCardPaneController(
     @FXML
     private fun handleShowRebates() {
         WindowUtils.openModalWindow(
-            Constants.CREDIT_CARD_CREDITS_FXML,
+            Files.CREDIT_CARD_CREDITS_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_SHOW_CREDITS),
             springContext,
             { _: CreditCardCreditsController -> },
@@ -245,7 +245,7 @@ class CreditCardPaneController(
     @FXML
     private fun handleRegisterPayment() {
         WindowUtils.openModalWindow(
-            Constants.CREDIT_CARD_INVOICE_PAYMENT_FXML,
+            Files.CREDIT_CARD_INVOICE_PAYMENT_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_REGISTER_PAYMENT),
             springContext,
             { controller: CreditCardInvoicePaymentController ->
@@ -264,7 +264,7 @@ class CreditCardPaneController(
 
         crcName.text = crc.name
         crcOperator.text = crc.operator.name
-        crcOperatorIcon.image = Image(Constants.CRC_OPERATOR_ICONS_PATH + crc.operator.icon)
+        crcOperatorIcon.image = Image(Files.CRC_OPERATOR_ICONS_PATH + crc.operator.icon)
 
         val limit = crc.maxDebt
         val pendingPayments = creditCardService.getTotalPendingPaymentsByCreditCard(crc.id!!)

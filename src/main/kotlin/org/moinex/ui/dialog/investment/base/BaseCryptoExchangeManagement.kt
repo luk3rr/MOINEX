@@ -14,9 +14,10 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import kotlinx.coroutines.Runnable
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.AssetType
@@ -115,7 +116,7 @@ abstract class BaseCryptoExchangeManagement(
     @FXML
     protected fun handleCryptoSoldOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
+            Files.CALCULATOR_FXML,
             preferencesService.translate(TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
@@ -126,7 +127,7 @@ abstract class BaseCryptoExchangeManagement(
     @FXML
     protected fun handleCryptoReceivedOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
+            Files.CALCULATOR_FXML,
             preferencesService.translate(TranslationKeys.INVESTMENT_LABEL_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
@@ -138,9 +139,9 @@ abstract class BaseCryptoExchangeManagement(
         val cryptoSold = cryptoSoldComboBox.value ?: return
 
         if (cryptoSold.currentQuantity < BigDecimal.ZERO) {
-            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel, Styles.NEGATIVE_BALANCE_STYLE)
         } else {
-            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+            UIUtils.setLabelStyle(cryptoSoldCurrentBalanceValueLabel, Styles.NEUTRAL_BALANCE_STYLE)
         }
 
         cryptoSoldCurrentBalanceValueLabel.text = cryptoSold.currentQuantity.toString()
@@ -150,9 +151,9 @@ abstract class BaseCryptoExchangeManagement(
         val cryptoReceived = cryptoReceivedComboBox.value ?: return
 
         if (cryptoReceived.currentQuantity < BigDecimal.ZERO) {
-            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel, Styles.NEGATIVE_BALANCE_STYLE)
         } else {
-            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+            UIUtils.setLabelStyle(cryptoReceivedCurrentBalanceValueLabel, Styles.NEUTRAL_BALANCE_STYLE)
         }
 
         cryptoReceivedCurrentBalanceValueLabel.text = cryptoReceived.currentQuantity.toString()
@@ -178,9 +179,9 @@ abstract class BaseCryptoExchangeManagement(
             val cryptoSoldAfterBalance = cryptoSold.currentQuantity.subtract(exchangeQuantity)
 
             if (cryptoSoldAfterBalance < BigDecimal.ZERO) {
-                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel, Styles.NEGATIVE_BALANCE_STYLE)
             } else {
-                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+                UIUtils.setLabelStyle(cryptoSoldAfterBalanceValueLabel, Styles.NEUTRAL_BALANCE_STYLE)
             }
 
             cryptoSoldAfterBalanceValueLabel.text = cryptoSoldAfterBalance.toString()
@@ -209,9 +210,9 @@ abstract class BaseCryptoExchangeManagement(
             val cryptoReceivedAfterBalance = cryptoReceived.currentQuantity.add(exchangeQuantity)
 
             if (cryptoReceivedAfterBalance < BigDecimal.ZERO) {
-                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel, Styles.NEGATIVE_BALANCE_STYLE)
             } else {
-                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+                UIUtils.setLabelStyle(cryptoReceivedAfterBalanceValueLabel, Styles.NEUTRAL_BALANCE_STYLE)
             }
 
             cryptoReceivedAfterBalanceValueLabel.text = cryptoReceivedAfterBalance.toString()

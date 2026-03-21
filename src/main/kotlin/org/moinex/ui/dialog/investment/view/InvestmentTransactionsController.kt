@@ -17,8 +17,8 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionStatus
@@ -657,7 +657,7 @@ class InvestmentTransactionsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_TICKER_PURCHASE_FXML,
+            Files.EDIT_TICKER_PURCHASE_FXML,
             preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EDIT_TICKER_PURCHASE),
             springContext,
             { controller: EditTickerPurchaseController -> controller.setPurchase(purchase) },
@@ -680,7 +680,7 @@ class InvestmentTransactionsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_TICKER_SALE_FXML,
+            Files.EDIT_TICKER_SALE_FXML,
             preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EDIT_TICKER_SALE),
             springContext,
             { controller: EditTickerSaleController -> controller.setSale(sale) },
@@ -703,7 +703,7 @@ class InvestmentTransactionsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_DIVIDEND_FXML,
+            Files.EDIT_DIVIDEND_FXML,
             preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EDIT_DIVIDEND),
             springContext,
             { controller: EditDividendController -> controller.setDividend(dividend) },
@@ -726,7 +726,7 @@ class InvestmentTransactionsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_CRYPTO_EXCHANGE_FXML,
+            Files.EDIT_CRYPTO_EXCHANGE_FXML,
             preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EDIT_CRYPTO_EXCHANGE),
             springContext,
             { controller: EditCryptoExchangeController -> controller.setCryptoExchange(cryptoExchange) },

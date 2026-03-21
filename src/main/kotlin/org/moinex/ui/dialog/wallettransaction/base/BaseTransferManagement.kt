@@ -15,8 +15,10 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -127,7 +129,7 @@ abstract class BaseTransferManagement(
     @FXML
     protected fun handleOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
+            Files.CALCULATOR_FXML,
             preferencesService.translate(TranslationKeys.WALLETTRANSACTION_LABEL_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
@@ -157,9 +159,9 @@ abstract class BaseTransferManagement(
 
         val style =
             if (wallet.balance < BigDecimal.ZERO) {
-                Constants.NEGATIVE_BALANCE_STYLE
+                Styles.NEGATIVE_BALANCE_STYLE
             } else {
-                Constants.NEUTRAL_BALANCE_STYLE
+                Styles.NEUTRAL_BALANCE_STYLE
             }
 
         UIUtils.setLabelStyle(balanceLabel, style)

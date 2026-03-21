@@ -10,8 +10,9 @@ package org.moinex.ui.common
 
 import javafx.fxml.FXML
 import javafx.scene.control.Label
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
@@ -198,7 +199,7 @@ class ResumePaneController(
             text = UIUtils.formatCurrency(confirmed)
             styleClass.apply {
                 clear()
-                add(Constants.POSITIVE_BALANCE_STYLE)
+                add(Styles.POSITIVE_BALANCE_STYLE)
             }
         }
         incomesCurrentSign.text = DEFAULT_SIGN
@@ -215,7 +216,7 @@ class ResumePaneController(
             text = UIUtils.formatCurrency(confirmed)
             styleClass.apply {
                 clear()
-                add(Constants.NEGATIVE_BALANCE_STYLE)
+                add(Styles.NEGATIVE_BALANCE_STYLE)
             }
         }
         expensesCurrentSign.text = DEFAULT_SIGN
@@ -234,7 +235,7 @@ class ResumePaneController(
                 balanceCurrentSign.text = POSITIVE_SIGN
                 applyStyleToLabels(
                     listOf(balanceCurrentValue, balanceCurrentSign),
-                    Constants.POSITIVE_BALANCE_STYLE,
+                    Styles.POSITIVE_BALANCE_STYLE,
                 )
             }
             current < BigDecimal.ZERO -> {
@@ -242,7 +243,7 @@ class ResumePaneController(
                 balanceCurrentSign.text = NEGATIVE_SIGN
                 applyStyleToLabels(
                     listOf(balanceCurrentValue, balanceCurrentSign),
-                    Constants.NEGATIVE_BALANCE_STYLE,
+                    Styles.NEGATIVE_BALANCE_STYLE,
                 )
             }
             else -> {
@@ -250,7 +251,7 @@ class ResumePaneController(
                 balanceCurrentSign.text = EMPTY_SIGN
                 applyStyleToLabels(
                     listOf(balanceCurrentValue, balanceCurrentSign),
-                    Constants.NEUTRAL_BALANCE_STYLE,
+                    Styles.NEUTRAL_BALANCE_STYLE,
                 )
             }
         }
@@ -297,7 +298,7 @@ class ResumePaneController(
                 savingsCurrentSign.text = POSITIVE_SIGN
                 applyStyleToLabels(
                     listOf(savingsCurrentValue, savingsCurrentSign),
-                    Constants.POSITIVE_BALANCE_STYLE,
+                    Styles.POSITIVE_BALANCE_STYLE,
                 )
             }
             savingsPercentage < BigDecimal.ZERO -> {
@@ -316,7 +317,7 @@ class ResumePaneController(
 
                 applyStyleToLabels(
                     listOf(savingsCurrentValue, savingsCurrentSign),
-                    Constants.NEGATIVE_BALANCE_STYLE,
+                    Styles.NEGATIVE_BALANCE_STYLE,
                 )
             }
             else -> {
@@ -325,7 +326,7 @@ class ResumePaneController(
                 savingsCurrentSign.text = DEFAULT_SIGN
                 applyStyleToLabels(
                     listOf(savingsCurrentValue, savingsCurrentSign),
-                    Constants.NEUTRAL_BALANCE_STYLE,
+                    Styles.NEUTRAL_BALANCE_STYLE,
                 )
             }
         }

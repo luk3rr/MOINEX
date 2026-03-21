@@ -12,8 +12,8 @@ import com.jfoenix.controls.JFXButton
 import jakarta.persistence.EntityExistsException
 import javafx.fxml.FXML
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Ticker

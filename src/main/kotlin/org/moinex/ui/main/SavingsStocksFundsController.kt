@@ -23,8 +23,8 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.text.Text
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isValidForFundamentalAnalysis
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -105,7 +105,7 @@ class SavingsStocksFundsController(
     @FXML
     fun handleRegisterTicker() {
         WindowUtils.openModalWindow(
-            Constants.ADD_TICKER_FXML,
+            Files.ADD_TICKER_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_TICKER_TITLE),
             springContext,
             { _: AddTickerController -> },
@@ -126,7 +126,7 @@ class SavingsStocksFundsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.BUY_TICKER_FXML,
+            Files.BUY_TICKER_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_BUY_TICKER_TITLE),
             springContext,
             { controller: AddTickerPurchaseController -> controller.initializeTicker(selectedTicker) },
@@ -147,7 +147,7 @@ class SavingsStocksFundsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.SALE_TICKER_FXML,
+            Files.SALE_TICKER_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_SELL_TICKER_TITLE),
             springContext,
             { controller: AddTickerSaleController -> controller.initializeTicker(selectedTicker) },
@@ -170,7 +170,7 @@ class SavingsStocksFundsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.ADD_DIVIDEND_FXML,
+            Files.ADD_DIVIDEND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_DIVIDEND_TITLE),
             springContext,
             { controller: AddDividendController -> controller.initializeTicker(selectedTicker) },
@@ -183,7 +183,7 @@ class SavingsStocksFundsController(
         val selectedTicker = stocksFundsTabTickerTable.selectionModel.selectedItem
 
         WindowUtils.openModalWindow(
-            Constants.ADD_CRYPTO_EXCHANGE_FXML,
+            Files.ADD_CRYPTO_EXCHANGE_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_ADD_CRYPTO_EXCHANGE_TITLE),
             springContext,
             { controller: AddCryptoExchangeController ->
@@ -196,7 +196,7 @@ class SavingsStocksFundsController(
     @FXML
     fun handleOpenTickerArchive() {
         WindowUtils.openModalWindow(
-            Constants.ARCHIVED_TICKERS_FXML,
+            Files.ARCHIVED_TICKERS_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_TICKER_ARCHIVE_TITLE),
             springContext,
             { _: ArchivedTickersController -> },
@@ -207,7 +207,7 @@ class SavingsStocksFundsController(
     @FXML
     fun handleShowTransactions() {
         WindowUtils.openModalWindow(
-            Constants.INVESTMENT_TRANSACTIONS_FXML,
+            Files.INVESTMENT_TRANSACTIONS_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_INVESTMENT_TRANSACTIONS_TITLE),
             springContext,
             { _: InvestmentTransactionsController -> },
@@ -289,7 +289,7 @@ class SavingsStocksFundsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_TICKER_FXML,
+            Files.EDIT_TICKER_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_EDIT_TICKER_TITLE),
             springContext,
             { controller: EditTickerController -> controller.setTicker(selectedTicker) },
@@ -318,7 +318,7 @@ class SavingsStocksFundsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.FUNDAMENTAL_ANALYSIS_FXML,
+            Files.FUNDAMENTAL_ANALYSIS_FXML,
             MessageFormat.format(
                 preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_DIALOG_TITLE),
                 selectedTicker.symbol,
@@ -570,7 +570,7 @@ class SavingsStocksFundsController(
     private fun setOffUpdatePortfolioPricesButton() {
         updatePricesButtonIcon.image =
             Image(
-                javaClass.getResource(Constants.LOADING_GIF)!!.toExternalForm(),
+                javaClass.getResource(Files.LOADING_GIF)!!.toExternalForm(),
             )
         updatePortfolioPricesButton.isDisable = true
         updatePortfolioPricesButton.text =
@@ -583,7 +583,7 @@ class SavingsStocksFundsController(
         updatePortfolioPricesButton.isDisable = false
         updatePricesButtonIcon.image =
             Image(
-                javaClass.getResource(Constants.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)!!.toExternalForm(),
+                javaClass.getResource(Files.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)!!.toExternalForm(),
             )
         updatePortfolioPricesButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES)

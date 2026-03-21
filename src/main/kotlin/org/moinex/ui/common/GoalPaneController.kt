@@ -18,8 +18,9 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.moinex.common.chart.ChartFactory
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -124,9 +125,9 @@ class GoalPaneController(
         goalIcon.image =
             Image(
                 if (currentGoal.isCompleted()) {
-                    Constants.TROPHY_ICON
+                    Files.TROPHY_ICON
                 } else {
-                    Constants.WALLET_TYPE_ICONS_PATH + currentGoal.type.icon
+                    Files.WALLET_TYPE_ICONS_PATH + currentGoal.type.icon
                 },
             )
 
@@ -236,7 +237,7 @@ class GoalPaneController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.ADD_INCOME_FXML,
+            Files.ADD_INCOME_FXML,
             preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_ADD_INCOME),
             springContext,
             { controller: AddIncomeController -> controller.setWalletComboBox(currentGoal) },
@@ -257,7 +258,7 @@ class GoalPaneController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.ADD_EXPENSE_FXML,
+            Files.ADD_EXPENSE_FXML,
             preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_ADD_EXPENSE),
             springContext,
             { controller: AddExpenseController -> controller.setWalletComboBox(currentGoal) },
@@ -278,7 +279,7 @@ class GoalPaneController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
+            Files.ADD_TRANSFER_FXML,
             preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_ADD_TRANSFER),
             springContext,
             { controller: AddTransferController -> controller.setReceiverWalletComboBox(currentGoal) },
@@ -289,7 +290,7 @@ class GoalPaneController(
     @FXML
     private fun handleEditGoal() {
         WindowUtils.openModalWindow(
-            Constants.EDIT_GOAL_FXML,
+            Files.EDIT_GOAL_FXML,
             preferencesService.translate(TranslationKeys.COMMON_GOAL_MODAL_EDIT_GOAL),
             springContext,
             { controller: EditGoalController -> controller.setGoal(goal) },

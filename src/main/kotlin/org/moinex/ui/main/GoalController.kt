@@ -16,15 +16,15 @@ import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.ComboBox
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.AnchorPane
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.UIUtils
@@ -114,7 +114,7 @@ class GoalController(
     @FXML
     private fun handleAddGoal() {
         WindowUtils.openModalWindow(
-            Constants.ADD_GOAL_FXML,
+            Files.ADD_GOAL_FXML,
             preferencesService.translate(TranslationKeys.GOAL_DIALOG_ADD_GOAL_TITLE),
             springContext,
             { _: AddGoalController -> },
@@ -158,7 +158,7 @@ class GoalController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
+            Files.ADD_TRANSFER_FXML,
             preferencesService.translate(
                 TranslationKeys.GOAL_DIALOG_ADD_TRANSFER_TITLE,
             ),
@@ -192,7 +192,7 @@ class GoalController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_GOAL_FXML,
+            Files.EDIT_GOAL_FXML,
             preferencesService.translate(TranslationKeys.GOAL_DIALOG_EDIT_GOAL_TITLE),
             springContext,
             { controller: EditGoalController -> controller.setGoal(goal) },
@@ -365,14 +365,14 @@ class GoalController(
         runCatching {
             val loader =
                 FXMLLoader(
-                    javaClass.getResource(Constants.GOAL_FULL_PANE_FXML),
+                    javaClass.getResource(Files.GOAL_FULL_PANE_FXML),
                     preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
 
             newContent.stylesheets.add(
-                javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
             val goalPaneController = loader.getController<GoalPaneController>()
@@ -388,7 +388,7 @@ class GoalController(
         }.onFailure { e ->
             logger.error(
                 "Error loading goal full pane FXML: '{}' for goal ID: {}",
-                Constants.GOAL_FULL_PANE_FXML,
+                Files.GOAL_FULL_PANE_FXML,
                 goal.id,
                 e,
             )
@@ -559,23 +559,7 @@ class GoalController(
             preferencesService.translate(TranslationKeys.GOAL_TABLE_HEADER_ID),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.id) }
-            setCellFactory {
-                object : TableCell<Goal, Int>() {
-                    override fun updateItem(
-                        item: Int?,
-                        empty: Boolean,
-                    ) {
-                        super.updateItem(item, empty)
-                        if (item == null || empty) {
-                            text = null
-                        } else {
-                            text = item.toString()
-                            alignment = Pos.CENTER
-                            style = "-fx-padding: 0;"
-                        }
-                    }
-                }
-            }
+            UIUtils.alignTableColumn(this, Pos.CENTER)
         }
 
     private fun createNameColumn(): TableColumn<Goal, String> =

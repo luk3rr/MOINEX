@@ -19,7 +19,7 @@ import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.stage.Stage
 import javafx.util.Duration
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import kotlin.math.ceil
 
 object AnimationUtils {

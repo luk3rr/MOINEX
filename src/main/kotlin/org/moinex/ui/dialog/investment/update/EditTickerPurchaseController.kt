@@ -11,7 +11,7 @@ package org.moinex.ui.dialog.investment.update
 import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.stage.Stage
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils

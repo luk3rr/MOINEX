@@ -19,14 +19,13 @@ import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.moinex.app.JavaFXApp
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import java.util.ResourceBundle
-import java.util.function.Consumer
 
 object WindowUtils {
     private val logger = LoggerFactory.getLogger(WindowUtils::class.java)
@@ -116,7 +115,7 @@ object WindowUtils {
             graphic =
                 ImageView(
                     Image(
-                        WindowUtils::class.java.getResource(Constants.SUCCESS_ICON)?.toString()
+                        WindowUtils::class.java.getResource(Files.SUCCESS_ICON)?.toString()
                             ?: throw IllegalStateException("Success icon not found"),
                     ),
                 )
@@ -157,7 +156,7 @@ object WindowUtils {
                     Scene(root).apply {
                         stylesheets.add(
                             WindowUtils::class.java
-                                .getResource(Constants.COMMON_STYLE_SHEET)
+                                .getResource(Files.COMMON_STYLE_SHEET)
                                 ?.toExternalForm()
                                 ?: throw IllegalStateException("Common stylesheet not found"),
                         )
@@ -199,7 +198,7 @@ object WindowUtils {
                     Scene(root).apply {
                         stylesheets.add(
                             WindowUtils::class.java
-                                .getResource(Constants.COMMON_STYLE_SHEET)
+                                .getResource(Files.COMMON_STYLE_SHEET)
                                 ?.toExternalForm()
                                 ?: throw IllegalStateException("Common stylesheet not found"),
                         )

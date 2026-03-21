@@ -10,8 +10,8 @@ package org.moinex.ui.dialog.creditcard
 
 import javafx.fxml.FXML
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCardDebt
@@ -183,9 +183,9 @@ class EditCreditCardDebtController(
                 }
 
             if (availableLimitAfterDebt < BigDecimal.ZERO) {
-                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Constants.NEGATIVE_BALANCE_STYLE)
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Styles.NEGATIVE_BALANCE_STYLE)
             } else {
-                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Constants.NEUTRAL_BALANCE_STYLE)
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Styles.NEUTRAL_BALANCE_STYLE)
             }
 
             crcLimitAvailableAfterDebtLabel.text = UIUtils.formatCurrency(availableLimitAfterDebt)

@@ -14,8 +14,8 @@ import javafx.scene.Parent
 import javafx.scene.control.ComboBox
 import javafx.stage.Stage
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
@@ -73,7 +73,7 @@ class SettingsController(
                 runCatching {
                     val loader =
                         FXMLLoader(
-                            javaClass.getResource(Constants.MAIN_FXML),
+                            javaClass.getResource(Files.MAIN_FXML),
                             preferencesService.bundle,
                         )
                     loader.setControllerFactory { springContext.getBean(it) }

@@ -12,8 +12,9 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -278,9 +279,9 @@ class EditBondSaleController(
             val walletAfterBalanceValue = wt.balance.add(transactionValue)
 
             if (walletAfterBalanceValue < BigDecimal.ZERO) {
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Styles.NEGATIVE_BALANCE_STYLE)
             } else {
-                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+                UIUtils.setLabelStyle(walletAfterBalanceValueLabel, Styles.NEUTRAL_BALANCE_STYLE)
             }
 
             walletAfterBalanceValueLabel.text = UIUtils.formatCurrency(walletAfterBalanceValue)
@@ -292,9 +293,9 @@ class EditBondSaleController(
     private fun updateNetProfitColor(valueStr: String) {
         if (valueStr.isBlank() || valueStr == "-") {
             netProfitField.styleClass.removeAll(
-                Constants.NEGATIVE_BALANCE_STYLE,
-                Constants.POSITIVE_BALANCE_STYLE,
-                Constants.NEUTRAL_BALANCE_STYLE,
+                Styles.NEGATIVE_BALANCE_STYLE,
+                Styles.POSITIVE_BALANCE_STYLE,
+                Styles.NEUTRAL_BALANCE_STYLE,
             )
             return
         }
@@ -303,21 +304,21 @@ class EditBondSaleController(
             val value = valueStr.toBigDecimal()
 
             netProfitField.styleClass.removeAll(
-                Constants.NEGATIVE_BALANCE_STYLE,
-                Constants.POSITIVE_BALANCE_STYLE,
-                Constants.NEUTRAL_BALANCE_STYLE,
+                Styles.NEGATIVE_BALANCE_STYLE,
+                Styles.POSITIVE_BALANCE_STYLE,
+                Styles.NEUTRAL_BALANCE_STYLE,
             )
 
             when {
-                value > BigDecimal.ZERO -> netProfitField.styleClass.add(Constants.POSITIVE_BALANCE_STYLE)
-                value < BigDecimal.ZERO -> netProfitField.styleClass.add(Constants.NEGATIVE_BALANCE_STYLE)
-                else -> netProfitField.styleClass.add(Constants.NEUTRAL_BALANCE_STYLE)
+                value > BigDecimal.ZERO -> netProfitField.styleClass.add(Styles.POSITIVE_BALANCE_STYLE)
+                value < BigDecimal.ZERO -> netProfitField.styleClass.add(Styles.NEGATIVE_BALANCE_STYLE)
+                else -> netProfitField.styleClass.add(Styles.NEUTRAL_BALANCE_STYLE)
             }
         }.onFailure {
             netProfitField.styleClass.removeAll(
-                Constants.NEGATIVE_BALANCE_STYLE,
-                Constants.POSITIVE_BALANCE_STYLE,
-                Constants.NEUTRAL_BALANCE_STYLE,
+                Styles.NEGATIVE_BALANCE_STYLE,
+                Styles.POSITIVE_BALANCE_STYLE,
+                Styles.NEUTRAL_BALANCE_STYLE,
             )
         }
     }

@@ -11,7 +11,7 @@ package org.moinex.ui.main
 import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Files
 import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
@@ -44,8 +44,8 @@ class SavingsController(
         runCatching {
             UIUtils.loadContentIntoTab(
                 overviewTab,
-                Constants.SAVINGS_OVERVIEW_FXML,
-                Constants.SAVINGS_OVERVIEW_STYLE_SHEET,
+                Files.SAVINGS_OVERVIEW_FXML,
+                Files.SAVINGS_OVERVIEW_STYLE_SHEET,
                 springContext,
                 javaClass,
                 preferencesService.bundle,
@@ -53,8 +53,8 @@ class SavingsController(
 
             UIUtils.loadContentIntoTab(
                 stocksFundsTab,
-                Constants.SAVINGS_STOCKS_FUNDS_FXML,
-                Constants.SAVINGS_STOCKS_FUNDS_STYLE_SHEET,
+                Files.SAVINGS_STOCKS_FUNDS_FXML,
+                Files.SAVINGS_STOCKS_FUNDS_STYLE_SHEET,
                 springContext,
                 javaClass,
                 preferencesService.bundle,
@@ -62,8 +62,8 @@ class SavingsController(
 
             UIUtils.loadContentIntoTab(
                 bondsTab,
-                Constants.SAVINGS_BONDS_FXML,
-                Constants.SAVINGS_BONDS_STYLE_SHEET,
+                Files.SAVINGS_BONDS_FXML,
+                Files.SAVINGS_BONDS_STYLE_SHEET,
                 springContext,
                 javaClass,
                 preferencesService.bundle,

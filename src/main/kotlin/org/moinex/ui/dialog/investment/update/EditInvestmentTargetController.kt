@@ -15,8 +15,8 @@ import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.extension.isNotEqual
 import org.moinex.common.util.UIUtils

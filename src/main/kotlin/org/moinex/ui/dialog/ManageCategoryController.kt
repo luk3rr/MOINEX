@@ -16,8 +16,8 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -57,7 +57,7 @@ class ManageCategoryController(
     @FXML
     private fun handleCreate() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CATEGORY_FXML,
+            Files.ADD_CATEGORY_FXML,
             preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_ADD_CATEGORY_TITLE),
             springContext,
             { _: AddCategoryController -> },
@@ -83,7 +83,7 @@ class ManageCategoryController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_CATEGORY_FXML,
+            Files.EDIT_CATEGORY_FXML,
             preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_EDIT_CATEGORY_TITLE),
             springContext,
             { controller: EditCategoryController -> controller.setCategory(selectedCategory) },

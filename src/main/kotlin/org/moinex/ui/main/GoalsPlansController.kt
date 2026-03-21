@@ -11,7 +11,7 @@ package org.moinex.ui.main
 import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Files
 import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
@@ -41,8 +41,8 @@ class GoalsPlansController(
         runCatching {
             UIUtils.loadContentIntoTab(
                 goalsTab,
-                Constants.GOALS_FXML,
-                Constants.GOALS_STYLE_SHEET,
+                Files.GOALS_FXML,
+                Files.GOALS_STYLE_SHEET,
                 springContext,
                 javaClass,
                 preferencesService.bundle,
@@ -50,8 +50,8 @@ class GoalsPlansController(
 
             UIUtils.loadContentIntoTab(
                 plansTab,
-                Constants.PLANS_FXML,
-                Constants.PLANS_STYLE_SHEET,
+                Files.PLANS_FXML,
+                Files.PLANS_STYLE_SHEET,
                 springContext,
                 javaClass,
                 preferencesService.bundle,

@@ -11,8 +11,8 @@ package org.moinex.common.chart
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.BudgetGroupHistoricalDataDTO
@@ -24,7 +24,7 @@ class BudgetGroupTimelineChart : LineChart<String, Number>(CategoryAxis(), Numbe
 
     init {
         setupChart()
-        stylesheets.add(javaClass.getResource(Constants.TIMELINE_CHART_STYLE_SHEET)!!.toExternalForm())
+        stylesheets.add(javaClass.getResource(Files.TIMELINE_CHART_STYLE_SHEET)!!.toExternalForm())
     }
 
     private fun setupChart() {

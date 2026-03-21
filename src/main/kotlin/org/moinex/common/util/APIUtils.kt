@@ -13,7 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Scripts
 import org.moinex.common.extension.toBACENFormat
 import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.exception.MoinexException
@@ -27,10 +28,10 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.PosixFilePermissions
 import java.time.LocalDate
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.pathString
+import org.moinex.common.constant.Files as FilesConstants
 
 object APIUtils {
     private val executorService = Executors.newCachedThreadPool()
@@ -114,12 +115,12 @@ object APIUtils {
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): JSONObject =
         withContext(dispatcher) {
-            runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols)
+            runPythonScript(Scripts.GET_STOCK_PRICE_SCRIPT, symbols)
         }
 
     suspend fun fetchBrazilianMarketIndicators(dispatcher: CoroutineDispatcher = Dispatchers.IO): JSONObject =
         withContext(dispatcher) {
-            runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT)
+            runPythonScript(Scripts.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT)
         }
 
     suspend fun fetchFundamentalAnalysis(
@@ -129,7 +130,7 @@ object APIUtils {
     ): JSONObject =
         withContext(dispatcher) {
             runPythonScript(
-                Constants.GET_FUNDAMENTAL_DATA_SCRIPT,
+                Scripts.GET_FUNDAMENTAL_DATA_SCRIPT,
                 listOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
             )
         }
@@ -142,7 +143,7 @@ object APIUtils {
     ): JSONObject =
         withContext(dispatcher) {
             runPythonScript(
-                Constants.GET_MARKET_INDICATOR_HISTORY_SCRIPT,
+                Scripts.GET_MARKET_INDICATOR_HISTORY_SCRIPT,
                 listOf(
                     indicatorType.name,
                     startDate.toBACENFormat(),
@@ -156,7 +157,7 @@ object APIUtils {
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
     ): JSONObject =
         withContext(dispatcher) {
-            runPythonScript(Constants.GET_STOCK_LOGO_SCRIPT, websites)
+            runPythonScript(Scripts.GET_STOCK_LOGO_SCRIPT, websites)
         }
 
     suspend fun fetchStockPriceHistory(
@@ -176,88 +177,13 @@ object APIUtils {
             runPythonScript("get_stock_price_history.py", args)
         }
 
-    @Deprecated("Use suspend function fetchStockPrices instead", ReplaceWith("fetchStockPrices(symbols)"))
-    fun fetchStockPricesAsync(symbols: Array<String>): CompletableFuture<JSONObject> =
-        CompletableFuture.supplyAsync(
-            { runPythonScript(Constants.GET_STOCK_PRICE_SCRIPT, symbols.toList()) },
-            executorService,
-        )
-
-    @Deprecated(
-        "Use suspend function fetchBrazilianMarketIndicators instead",
-        ReplaceWith("fetchBrazilianMarketIndicators()"),
-    )
-    fun fetchBrazilianMarketIndicatorsAsync(): CompletableFuture<JSONObject> =
-        CompletableFuture.supplyAsync(
-            { runPythonScript(Constants.GET_BRAZILIAN_MARKET_INDICATORS_SCRIPT) },
-            executorService,
-        )
-
-    @Deprecated(
-        "Use suspend function fetchFundamentalAnalysis instead",
-        ReplaceWith("fetchFundamentalAnalysis(symbol, period)"),
-    )
-    fun fetchFundamentalAnalysisAsync(
-        symbol: String,
-        period: PeriodType,
-    ): CompletableFuture<JSONObject> =
-        CompletableFuture.supplyAsync(
-            {
-                runPythonScript(
-                    Constants.GET_FUNDAMENTAL_DATA_SCRIPT,
-                    listOf(symbol, "--period", period.name.lowercase(), "--format", "json"),
-                )
-            },
-            executorService,
-        )
-
-    @Deprecated("Use suspend function fetchStockLogos instead", ReplaceWith("fetchStockLogos(websites)"))
-    fun fetchStockLogosAsync(websites: Array<String>): CompletableFuture<JSONObject> =
-        CompletableFuture.supplyAsync(
-            { runPythonScript(Constants.GET_STOCK_LOGO_SCRIPT, websites.toList()) },
-            executorService,
-        )
-
-    @Deprecated(
-        "Use suspend function fetchStockPriceHistory instead",
-        ReplaceWith("fetchStockPriceHistory(symbol, startDate, endDate, specificDates)"),
-    )
-    fun fetchStockPriceHistoryAsync(
-        symbol: String,
-        startDate: String,
-        endDate: String,
-        specificDates: List<String>? = null,
-    ): CompletableFuture<JSONObject> =
-        CompletableFuture.supplyAsync(
-            {
-                val args =
-                    if (specificDates.isNullOrEmpty()) {
-                        arrayOf(symbol, startDate, endDate)
-                    } else {
-                        arrayOf(symbol, startDate, endDate, JSONArray(specificDates).toString())
-                    }
-                runPythonScript("get_stock_price_history.py", args.toList())
-            },
-            executorService,
-        )
-
-    @Deprecated("Use suspend function with runPythonScript directly", ReplaceWith("runPythonScript(script, args)"))
-    fun runPythonScriptAsync(
-        script: String,
-        args: Array<String>,
-    ): CompletableFuture<JSONObject> =
-        CompletableFuture.supplyAsync(
-            { runPythonScript(script, args.toList()) },
-            executorService,
-        )
-
     fun runPythonScript(
         script: String,
         args: List<String> = emptyList(),
         timeoutSeconds: Long = DEFAULT_SCRIPT_TIMEOUT_SECONDS,
     ): JSONObject {
         val scriptInputStream: InputStream =
-            APIUtils::class.java.getResourceAsStream(Constants.SCRIPT_PATH + script)
+            APIUtils::class.java.getResourceAsStream(FilesConstants.SCRIPT_PATH + script)
                 ?: throw MoinexException.ScriptNotFoundException("Python $script script not found")
 
         if (shuttingDown) {

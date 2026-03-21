@@ -29,8 +29,9 @@ import javafx.scene.text.Text
 import javafx.util.Callback
 import javafx.util.Duration
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.BondType
 import org.moinex.model.enums.CalendarEventType
@@ -70,6 +71,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import java.util.ResourceBundle
 import kotlin.math.absoluteValue
+import org.moinex.common.constant.Files as FilesConstant
 
 @Component
 class UIUtils(
@@ -101,7 +103,7 @@ class UIUtils(
 
             Tooltip(text)
                 .apply {
-                    styleClass.add(Constants.TOOLTIP_STYLE)
+                    styleClass.add(Styles.TOOLTIP_STYLE)
                     showDelay = Duration.seconds(Constants.TOOLTIP_ANIMATION_DELAY)
                     showDuration = Duration.hours(1.0)
                     hideDelay = Duration.seconds(Constants.TOOLTIP_ANIMATION_DURATION)
@@ -242,7 +244,7 @@ class UIUtils(
 
         fun resetLabel(label: Label) {
             label.text = "-"
-            setLabelStyle(label, Constants.NEUTRAL_BALANCE_STYLE)
+            setLabelStyle(label, Styles.NEUTRAL_BALANCE_STYLE)
         }
 
         fun setLabelStyle(
@@ -250,9 +252,9 @@ class UIUtils(
             style: String,
         ) {
             label.styleClass.removeAll(
-                Constants.NEGATIVE_BALANCE_STYLE,
-                Constants.POSITIVE_BALANCE_STYLE,
-                Constants.NEUTRAL_BALANCE_STYLE,
+                Styles.NEGATIVE_BALANCE_STYLE,
+                Styles.POSITIVE_BALANCE_STYLE,
+                Styles.NEUTRAL_BALANCE_STYLE,
             )
             label.styleClass.add(style)
         }
@@ -304,9 +306,9 @@ class UIUtils(
 
             val style =
                 if (balance < BigDecimal.ZERO) {
-                    Constants.NEGATIVE_BALANCE_STYLE
+                    Styles.NEGATIVE_BALANCE_STYLE
                 } else {
-                    Constants.NEUTRAL_BALANCE_STYLE
+                    Styles.NEUTRAL_BALANCE_STYLE
                 }
             setLabelStyle(balanceLabel, style)
         }
@@ -411,7 +413,7 @@ class UIUtils(
         fun applyDefaultChartStyle(chart: Chart) {
             chart.stylesheets.add(
                 UIUtils::class.java
-                    .getResource(Constants.CHARTS_COLORS_STYLE_SHEET)
+                    .getResource(FilesConstant.CHARTS_COLORS_STYLE_SHEET)
                     ?.toExternalForm()
                     ?: throw IllegalStateException("Chart stylesheet not found"),
             )
@@ -651,7 +653,7 @@ class UIUtils(
                         .split("/")[0]
 
                 val filename = "$domain.png"
-                val logoPath = Paths.get(Constants.LOGOS_DIR, filename)
+                val logoPath = Paths.get(FilesConstant.LOGOS_DIR, filename)
 
                 if (Files.exists(logoPath)) {
                     val imageUrl = "file://${logoPath.toAbsolutePath()}"

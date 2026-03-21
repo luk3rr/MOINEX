@@ -14,7 +14,7 @@ import javafx.scene.control.DatePicker
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.CalendarEvent

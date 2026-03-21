@@ -29,8 +29,10 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
@@ -134,7 +136,7 @@ class CreditCardController(
     @FXML
     private fun handleAddDebt() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CREDIT_CARD_DEBT_FXML,
+            Files.ADD_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(
                 TranslationKeys.CREDIT_CARD_DIALOG_ADD_DEBT_TITLE,
             ),
@@ -148,7 +150,7 @@ class CreditCardController(
     @FXML
     private fun handleAddCreditCard() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CREDIT_CARD_FXML,
+            Files.ADD_CREDIT_CARD_FXML,
             preferencesService.translate(
                 TranslationKeys.CREDIT_CARD_DIALOG_ADD_CREDIT_CARD_TITLE,
             ),
@@ -191,7 +193,7 @@ class CreditCardController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_CREDIT_CARD_DEBT_FXML,
+            Files.EDIT_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(
                 TranslationKeys.CREDIT_CARD_DIALOG_EDIT_DEBT_TITLE,
             ),
@@ -499,7 +501,7 @@ class CreditCardController(
     @FXML
     private fun handleViewArchivedCreditCards() {
         WindowUtils.openModalWindow(
-            Constants.ARCHIVED_CREDIT_CARDS_FXML,
+            Files.ARCHIVED_CREDIT_CARDS_FXML,
             preferencesService.translate(
                 TranslationKeys.CREDIT_CARD_DIALOG_CREDIT_CARD_ARCHIVE_TITLE,
             ),
@@ -588,7 +590,7 @@ class CreditCardController(
 
         val totalTotalDebtsLabel =
             Label(UIUtils.formatCurrency(totalDebts)).apply {
-                styleClass.add(Constants.TOTAL_BALANCE_VALUE_LABEL_STYLE)
+                styleClass.add(Styles.TOTAL_BALANCE_VALUE_LABEL_STYLE)
             }
 
         val totalPendingPaymentsLabel =
@@ -600,7 +602,7 @@ class CreditCardController(
                     UIUtils.formatCurrency(totalPendingPayments),
                 ),
             ).apply {
-                styleClass.add(Constants.TOTAL_BALANCE_FORESEEN_LABEL_STYLE)
+                styleClass.add(Styles.TOTAL_BALANCE_FORESEEN_LABEL_STYLE)
             }
 
         totalDebtsInfoVBox.children.setAll(totalTotalDebtsLabel, totalPendingPaymentsLabel)
@@ -622,14 +624,14 @@ class CreditCardController(
             runCatching {
                 val loader =
                     FXMLLoader(
-                        javaClass.getResource(Constants.CRC_PANE_FXML),
+                        javaClass.getResource(Files.CRC_PANE_FXML),
                         preferencesService.bundle,
                     )
                 loader.setControllerFactory { springContext.getBean(it) }
                 val newContent = loader.load<Parent>()
 
                 newContent.stylesheets.add(
-                    javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                    javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
                 )
 
                 val crcPaneController = loader.getController<CreditCardPaneController>()
@@ -644,7 +646,7 @@ class CreditCardController(
             }.onFailure { e ->
                 logger.error(
                     "Error loading credit card pane FXML: '{}' for card ID: {}",
-                    Constants.CRC_PANE_FXML,
+                    Files.CRC_PANE_FXML,
                     crc.id,
                     e,
                 )

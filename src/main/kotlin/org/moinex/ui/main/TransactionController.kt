@@ -27,8 +27,9 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isConfirmed
@@ -157,7 +158,7 @@ class TransactionController(
     @FXML
     private fun handleAddIncome() {
         WindowUtils.openModalWindow(
-            Constants.ADD_INCOME_FXML,
+            Files.ADD_INCOME_FXML,
             preferencesService.translate(
                 TranslationKeys.TRANSACTION_DIALOG_ADD_INCOME_TITLE,
             ),
@@ -177,7 +178,7 @@ class TransactionController(
     @FXML
     private fun handleAddExpense() {
         WindowUtils.openModalWindow(
-            Constants.ADD_EXPENSE_FXML,
+            Files.ADD_EXPENSE_FXML,
             preferencesService.translate(
                 TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE,
             ),
@@ -211,7 +212,7 @@ class TransactionController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_TRANSACTION_FXML,
+            Files.EDIT_TRANSACTION_FXML,
             preferencesService.translate(
                 TranslationKeys.TRANSACTION_DIALOG_EDIT_TRANSACTION_TITLE,
             ),
@@ -346,7 +347,7 @@ class TransactionController(
     @FXML
     private fun handleRecurringTransactions() {
         WindowUtils.openModalWindow(
-            Constants.RECURRING_TRANSACTIONS_FXML,
+            Files.RECURRING_TRANSACTIONS_FXML,
             preferencesService.translate(
                 TranslationKeys.TRANSACTION_DIALOG_PERIODIC_TRANSACTION_TITLE,
             ),
@@ -366,7 +367,7 @@ class TransactionController(
     @FXML
     private fun handleManageCategories() {
         WindowUtils.openModalWindow(
-            Constants.MANAGE_CATEGORY_FXML,
+            Files.MANAGE_CATEGORY_FXML,
             preferencesService.translate(
                 TranslationKeys.TRANSACTION_DIALOG_MANAGE_CATEGORIES_TITLE,
             ),
@@ -545,14 +546,14 @@ class TransactionController(
         runCatching {
             val loader =
                 FXMLLoader(
-                    javaClass.getResource(Constants.RESUME_PANE_FXML),
+                    javaClass.getResource(Files.RESUME_PANE_FXML),
                     preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
 
             newContent.stylesheets.add(
-                javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
             val resumePaneController = loader.getController<ResumePaneController>()
@@ -564,7 +565,7 @@ class TransactionController(
         }.onFailure { e ->
             logger.error(
                 "Error loading resume pane FXML: '{}' for year: {}",
-                Constants.RESUME_PANE_FXML,
+                Files.RESUME_PANE_FXML,
                 selectedYear.value,
                 e,
             )
@@ -585,14 +586,14 @@ class TransactionController(
         runCatching {
             val loader =
                 FXMLLoader(
-                    javaClass.getResource(Constants.RESUME_PANE_FXML),
+                    javaClass.getResource(Files.RESUME_PANE_FXML),
                     preferencesService.bundle,
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
 
             newContent.stylesheets.add(
-                javaClass.getResource(Constants.COMMON_STYLE_SHEET)!!.toExternalForm(),
+                javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
             val resumePaneController = loader.getController<ResumePaneController>()
@@ -604,7 +605,7 @@ class TransactionController(
         }.onFailure { e ->
             logger.error(
                 "Error loading resume pane FXML: '{}' for month/year: {}/{}",
-                Constants.RESUME_PANE_FXML,
+                Files.RESUME_PANE_FXML,
                 selectedYearMonth.monthValue,
                 selectedYearMonth.year,
                 e,

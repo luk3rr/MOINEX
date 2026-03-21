@@ -13,8 +13,10 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.stage.Stage
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
 import org.moinex.common.extension.toYearMonth
 import org.moinex.common.helper.SuggestionsHandlerHelper
@@ -124,7 +126,7 @@ abstract class BaseCreditCardDebtManagement(
     @FXML
     protected open fun handleOpenCalculator() {
         WindowUtils.openPopupWindow(
-            Constants.CALCULATOR_FXML,
+            Files.CALCULATOR_FXML,
             preferencesService.translate(TranslationKeys.MAIN_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
@@ -185,9 +187,9 @@ abstract class BaseCreditCardDebtManagement(
                 creditCardService.getAvailableCredit(crc.id!!).subtract(debtValue)
 
             if (availableLimitAfterDebt < BigDecimal.ZERO) {
-                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Constants.NEGATIVE_BALANCE_STYLE)
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Styles.NEGATIVE_BALANCE_STYLE)
             } else {
-                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Constants.NEUTRAL_BALANCE_STYLE)
+                UIUtils.setLabelStyle(crcLimitAvailableAfterDebtLabel, Styles.NEUTRAL_BALANCE_STYLE)
             }
 
             crcLimitAvailableAfterDebtLabel.text = UIUtils.formatCurrency(availableLimitAfterDebt)

@@ -32,8 +32,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.chart.DoughnutChart
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
@@ -210,7 +212,7 @@ class SavingsOverviewController(
     @FXML
     fun handleEditInvestmentTarget() {
         WindowUtils.openModalWindow(
-            Constants.EDIT_INVESTMENT_TARGET_FXML,
+            Files.EDIT_INVESTMENT_TARGET_FXML,
             preferencesService.translate(
                 TranslationKeys.INVESTMENT_DIALOG_EDIT_TARGET_TITLE,
             ),
@@ -488,7 +490,7 @@ class SavingsOverviewController(
 
     private fun setOffRecalculateInvestmentPerformanceButton() {
         recalculateInvestmentPerformanceButtonIcon.image =
-            Image(javaClass.getResource(Constants.LOADING_GIF)!!.toExternalForm())
+            Image(javaClass.getResource(Files.LOADING_GIF)!!.toExternalForm())
         recalculateInvestmentPerformanceButton.isDisable = true
         recalculateInvestmentPerformanceButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATING)
@@ -497,7 +499,7 @@ class SavingsOverviewController(
     private fun setOnRecalculateInvestmentPerformanceButton() {
         recalculateInvestmentPerformanceButton.isDisable = false
         recalculateInvestmentPerformanceButtonIcon.image =
-            Image(javaClass.getResource(Constants.RELOAD_ICON)!!.toExternalForm())
+            Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
         recalculateInvestmentPerformanceButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATE)
     }
@@ -877,11 +879,11 @@ class SavingsOverviewController(
 
     private fun updateProfitabilityMetricsPanel() {
         val metrics = calculateProfitabilityMetricsByType()
-        val variableMetrics = metrics["variable"]!!
-        val fixedMetrics = metrics["fixed"]!!
-        val totalMetrics = metrics["total"]!!
+        val variableMetrics = metrics["variable"]
+        val fixedMetrics = metrics["fixed"]
+        val totalMetrics = metrics["total"]
 
-        profitabilityMetricsPaneController.setMetrics(variableMetrics, fixedMetrics, totalMetrics)
+        profitabilityMetricsPaneController.setMetrics(variableMetrics!!, fixedMetrics!!, totalMetrics!!)
     }
 
     private fun updateTopPerformersPanel() {
@@ -900,7 +902,7 @@ class SavingsOverviewController(
                     TranslationKeys.SAVINGS_TOP_PERFORMERS_BEST,
                 ),
             )
-        bestLabel.styleClass.add(Constants.CUSTOM_TABLE_TITLE_STYLE)
+        bestLabel.styleClass.add(Styles.CUSTOM_TABLE_TITLE_STYLE)
         bestLabel.alignment = Pos.CENTER
         bestBox.children.add(bestLabel)
         bestBox.alignment = Pos.CENTER
@@ -915,7 +917,7 @@ class SavingsOverviewController(
                     TranslationKeys.SAVINGS_TOP_PERFORMERS_WORST,
                 ),
             )
-        worstLabel.styleClass.add(Constants.CUSTOM_TABLE_TITLE_STYLE)
+        worstLabel.styleClass.add(Styles.CUSTOM_TABLE_TITLE_STYLE)
         worstLabel.alignment = Pos.CENTER
         worstBox.children.add(worstLabel)
         worstBox.alignment = Pos.CENTER
@@ -939,7 +941,7 @@ class SavingsOverviewController(
                     TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_ASSET,
                 ),
             )
-        assetHeader.styleClass.add(Constants.CUSTOM_TABLE_HEADER_STYLE)
+        assetHeader.styleClass.add(Styles.CUSTOM_TABLE_HEADER_STYLE)
         configureColumnWidth(assetHeader, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH)
         assetHeader.alignment = Pos.CENTER_LEFT
 
@@ -955,7 +957,7 @@ class SavingsOverviewController(
                     TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_RETURN,
                 ),
             )
-        returnHeader.styleClass.add(Constants.CUSTOM_TABLE_HEADER_STYLE)
+        returnHeader.styleClass.add(Styles.CUSTOM_TABLE_HEADER_STYLE)
         configureColumnWidth(returnHeader, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH)
         returnHeader.alignment = Pos.CENTER
 
@@ -965,7 +967,7 @@ class SavingsOverviewController(
                     TranslationKeys.SAVINGS_TOP_PERFORMERS_HEADER_VALUE,
                 ),
             )
-        valueHeader.styleClass.add(Constants.CUSTOM_TABLE_HEADER_STYLE)
+        valueHeader.styleClass.add(Styles.CUSTOM_TABLE_HEADER_STYLE)
         configureColumnWidth(valueHeader, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH)
         valueHeader.alignment = Pos.CENTER_RIGHT
 
@@ -987,7 +989,7 @@ class SavingsOverviewController(
         row.alignment = Pos.CENTER_LEFT
 
         val symbolLabel = Label(performer.symbol)
-        symbolLabel.styleClass.add(Constants.CUSTOM_TABLE_CELL_STYLE)
+        symbolLabel.styleClass.add(Styles.CUSTOM_TABLE_CELL_STYLE)
         configureColumnWidth(symbolLabel, Constants.TOP_PERFORMERS_ASSET_COLUMN_WIDTH)
         symbolLabel.alignment = Pos.CENTER_LEFT
 
@@ -1002,19 +1004,19 @@ class SavingsOverviewController(
                 performer.getSign() +
                     UIUtils.formatPercentage(performer.profitLossPercentage),
             )
-        percentageLabel.styleClass.add(Constants.CUSTOM_TABLE_CELL_STYLE)
+        percentageLabel.styleClass.add(Styles.CUSTOM_TABLE_CELL_STYLE)
 
         when {
-            performer.isPositive() -> percentageLabel.styleClass.add(Constants.INFO_LABEL_GREEN_STYLE)
-            performer.isNegative() -> percentageLabel.styleClass.add(Constants.INFO_LABEL_RED_STYLE)
-            else -> percentageLabel.styleClass.add(Constants.INFO_LABEL_NEUTRAL_STYLE)
+            performer.isPositive() -> percentageLabel.styleClass.add(Styles.INFO_LABEL_GREEN_STYLE)
+            performer.isNegative() -> percentageLabel.styleClass.add(Styles.INFO_LABEL_RED_STYLE)
+            else -> percentageLabel.styleClass.add(Styles.INFO_LABEL_NEUTRAL_STYLE)
         }
 
         configureColumnWidth(percentageLabel, Constants.TOP_PERFORMERS_RETURN_COLUMN_WIDTH)
         percentageLabel.alignment = Pos.CENTER
 
         val valueLabel = Label(UIUtils.formatCurrencyDynamic(performer.currentValue))
-        valueLabel.styleClass.add(Constants.CUSTOM_TABLE_CELL_STYLE)
+        valueLabel.styleClass.add(Styles.CUSTOM_TABLE_CELL_STYLE)
         configureColumnWidth(valueLabel, Constants.TOP_PERFORMERS_VALUE_COLUMN_WIDTH)
         valueLabel.alignment = Pos.CENTER_RIGHT
 
@@ -1133,10 +1135,10 @@ class SavingsOverviewController(
         val barContainer = VBox(ALLOCATION_BAR_CONTAINER_SPACING.toDouble())
 
         val typeLabel = Label(allocation.typeName)
-        typeLabel.styleClass.add(Constants.ALLOCATION_TYPE_LABEL_STYLE)
+        typeLabel.styleClass.add(Styles.ALLOCATION_TYPE_LABEL_STYLE)
 
         val progressBar = HBox()
-        progressBar.styleClass.add(Constants.ALLOCATION_PROGRESS_BAR_STYLE)
+        progressBar.styleClass.add(Styles.ALLOCATION_PROGRESS_BAR_STYLE)
         progressBar.prefHeight = ALLOCATION_PROGRESS_BAR_HEIGHT
 
         val achievementPercentage = allocation.getAchievementPercentage()
@@ -1151,19 +1153,19 @@ class SavingsOverviewController(
 
         when {
             allocation.isCriticalLow() ->
-                filledBar.styleClass.add(Constants.ALLOCATION_FILLED_BAR_CRITICAL_LOW_STYLE)
+                filledBar.styleClass.add(Styles.ALLOCATION_FILLED_BAR_CRITICAL_LOW_STYLE)
 
             allocation.isWarningLow() ->
-                filledBar.styleClass.add(Constants.ALLOCATION_FILLED_BAR_WARNING_LOW_STYLE)
+                filledBar.styleClass.add(Styles.ALLOCATION_FILLED_BAR_WARNING_LOW_STYLE)
 
             allocation.isOnTargetRange() ->
-                filledBar.styleClass.add(Constants.ALLOCATION_FILLED_BAR_ON_TARGET_STYLE)
+                filledBar.styleClass.add(Styles.ALLOCATION_FILLED_BAR_ON_TARGET_STYLE)
 
             allocation.isWarningHigh() ->
-                filledBar.styleClass.add(Constants.ALLOCATION_FILLED_BAR_WARNING_HIGH_STYLE)
+                filledBar.styleClass.add(Styles.ALLOCATION_FILLED_BAR_WARNING_HIGH_STYLE)
 
             allocation.isCriticalHigh() ->
-                filledBar.styleClass.add(Constants.ALLOCATION_FILLED_BAR_CRITICAL_HIGH_STYLE)
+                filledBar.styleClass.add(Styles.ALLOCATION_FILLED_BAR_CRITICAL_HIGH_STYLE)
         }
 
         filledBar.prefHeight = ALLOCATION_FILLED_BAR_HEIGHT
@@ -1181,31 +1183,31 @@ class SavingsOverviewController(
                 "${UIUtils.formatPercentage(allocation.currentPercentage)} / " +
                     UIUtils.formatPercentage(allocation.targetPercentage),
             )
-        currentLabel.styleClass.add(Constants.ALLOCATION_INFO_LABEL_STYLE)
+        currentLabel.styleClass.add(Styles.ALLOCATION_INFO_LABEL_STYLE)
 
         val spacer = Region()
         HBox.setHgrow(spacer, Priority.ALWAYS)
 
         val statusText = getStatusText(allocation)
         val statusLabel = Label(statusText)
-        statusLabel.styleClass.add(Constants.ALLOCATION_DIFF_LABEL_STYLE)
+        statusLabel.styleClass.add(Styles.ALLOCATION_DIFF_LABEL_STYLE)
 
         if (!allocation.isNotInStrategy()) {
             when {
                 allocation.isCriticalLow() ->
-                    statusLabel.styleClass.add(Constants.ALLOCATION_DIFF_CRITICAL_LOW_STYLE)
+                    statusLabel.styleClass.add(Styles.ALLOCATION_DIFF_CRITICAL_LOW_STYLE)
 
                 allocation.isWarningLow() ->
-                    statusLabel.styleClass.add(Constants.ALLOCATION_DIFF_WARNING_LOW_STYLE)
+                    statusLabel.styleClass.add(Styles.ALLOCATION_DIFF_WARNING_LOW_STYLE)
 
                 allocation.isOnTargetRange() ->
-                    statusLabel.styleClass.add(Constants.ALLOCATION_DIFF_ON_TARGET_STYLE)
+                    statusLabel.styleClass.add(Styles.ALLOCATION_DIFF_ON_TARGET_STYLE)
 
                 allocation.isWarningHigh() ->
-                    statusLabel.styleClass.add(Constants.ALLOCATION_DIFF_WARNING_HIGH_STYLE)
+                    statusLabel.styleClass.add(Styles.ALLOCATION_DIFF_WARNING_HIGH_STYLE)
 
                 allocation.isCriticalHigh() ->
-                    statusLabel.styleClass.add(Constants.ALLOCATION_DIFF_CRITICAL_HIGH_STYLE)
+                    statusLabel.styleClass.add(Styles.ALLOCATION_DIFF_CRITICAL_HIGH_STYLE)
             }
         }
 

@@ -14,8 +14,8 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.shape.Line
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.model.dto.NetWorthDataPointDTO
@@ -30,7 +30,7 @@ class NetWorthLineChart : LineChart<String, Number>(CategoryAxis(), NumberAxis()
 
     init {
         setupChart()
-        stylesheets.add(javaClass.getResource(Constants.TIMELINE_CHART_STYLE_SHEET)!!.toExternalForm())
+        stylesheets.add(javaClass.getResource(Files.TIMELINE_CHART_STYLE_SHEET)!!.toExternalForm())
     }
 
     private fun setupChart() {

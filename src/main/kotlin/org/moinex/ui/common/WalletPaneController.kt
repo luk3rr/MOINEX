@@ -16,8 +16,10 @@ import javafx.scene.control.MenuItem
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.VBox
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
@@ -177,7 +179,7 @@ class WalletPaneController(
 
         walletName.text = wallet.name
         walletType.text = UIUtils.translateWalletType(wallet.type)
-        walletIcon.image = Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.type.icon)
+        walletIcon.image = Image(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon)
 
         val confirmedIncomesSum =
             transactions
@@ -237,7 +239,7 @@ class WalletPaneController(
     @FXML
     private fun handleAddIncome() {
         WindowUtils.openModalWindow(
-            Constants.ADD_INCOME_FXML,
+            Files.ADD_INCOME_FXML,
             preferencesService.translate(TranslationKeys.COMMON_WALLET_MODAL_ADD_INCOME),
             springContext,
             { controller: AddIncomeController -> controller.setWalletComboBox(wallet) },
@@ -248,7 +250,7 @@ class WalletPaneController(
     @FXML
     private fun handleAddExpense() {
         WindowUtils.openModalWindow(
-            Constants.ADD_EXPENSE_FXML,
+            Files.ADD_EXPENSE_FXML,
             preferencesService.translate(TranslationKeys.COMMON_WALLET_MODAL_ADD_EXPENSE),
             springContext,
             { controller: AddExpenseController -> controller.setWalletComboBox(wallet) },
@@ -259,7 +261,7 @@ class WalletPaneController(
     @FXML
     private fun handleAddTransfer() {
         WindowUtils.openModalWindow(
-            Constants.ADD_TRANSFER_FXML,
+            Files.ADD_TRANSFER_FXML,
             preferencesService.translate(TranslationKeys.COMMON_WALLET_MODAL_ADD_TRANSFER),
             springContext,
             { controller: AddTransferController -> controller.setSenderWalletComboBox(wallet) },
@@ -270,7 +272,7 @@ class WalletPaneController(
     @FXML
     private fun handleRenameWallet() {
         WindowUtils.openModalWindow(
-            Constants.RENAME_WALLET_FXML,
+            Files.RENAME_WALLET_FXML,
             preferencesService.translate(TranslationKeys.COMMON_WALLET_MODAL_RENAME),
             springContext,
             { controller: RenameWalletController -> controller.setWalletComboBox(wallet) },
@@ -281,7 +283,7 @@ class WalletPaneController(
     @FXML
     private fun handleChangeWalletType() {
         WindowUtils.openModalWindow(
-            Constants.CHANGE_WALLET_TYPE_FXML,
+            Files.CHANGE_WALLET_TYPE_FXML,
             preferencesService.translate(TranslationKeys.COMMON_WALLET_MODAL_CHANGE_TYPE),
             springContext,
             { controller: ChangeWalletTypeController -> controller.setWalletComboBox(wallet) },
@@ -292,7 +294,7 @@ class WalletPaneController(
     @FXML
     private fun handleChangeWalletBalance() {
         WindowUtils.openModalWindow(
-            Constants.CHANGE_WALLET_BALANCE_FXML,
+            Files.CHANGE_WALLET_BALANCE_FXML,
             preferencesService.translate(TranslationKeys.COMMON_WALLET_MODAL_CHANGE_BALANCE),
             springContext,
             { controller: ChangeWalletBalanceController -> controller.setWalletComboBox(wallet) },
@@ -382,13 +384,13 @@ class WalletPaneController(
         if (value < BigDecimal.ZERO) {
             signLabel.text = NEGATIVE_SIGN
             valueLabel.text = UIUtils.formatCurrency(value.abs())
-            UIUtils.setLabelStyle(signLabel, Constants.NEGATIVE_BALANCE_STYLE)
-            UIUtils.setLabelStyle(valueLabel, Constants.NEGATIVE_BALANCE_STYLE)
+            UIUtils.setLabelStyle(signLabel, Styles.NEGATIVE_BALANCE_STYLE)
+            UIUtils.setLabelStyle(valueLabel, Styles.NEGATIVE_BALANCE_STYLE)
         } else {
             signLabel.text = DEFAULT_SIGN
             valueLabel.text = UIUtils.formatCurrency(value)
-            UIUtils.setLabelStyle(signLabel, Constants.NEUTRAL_BALANCE_STYLE)
-            UIUtils.setLabelStyle(valueLabel, Constants.NEUTRAL_BALANCE_STYLE)
+            UIUtils.setLabelStyle(signLabel, Styles.NEUTRAL_BALANCE_STYLE)
+            UIUtils.setLabelStyle(valueLabel, Styles.NEUTRAL_BALANCE_STYLE)
         }
     }
 

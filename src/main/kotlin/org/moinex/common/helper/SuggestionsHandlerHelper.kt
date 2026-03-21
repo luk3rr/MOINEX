@@ -10,7 +10,8 @@ import javafx.scene.input.KeyEvent
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.stage.Popup
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
+
 class SuggestionsHandlerHelper<T>(
     private val componentField: TextField,
     private val filterFunction: (T) -> String,

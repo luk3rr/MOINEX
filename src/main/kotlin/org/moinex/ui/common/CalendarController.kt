@@ -23,8 +23,9 @@ import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.text.Text
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.CalendarEvent
@@ -77,7 +78,7 @@ class CalendarController(
     @FXML
     private fun handleAddEvent() {
         WindowUtils.openModalWindow(
-            Constants.ADD_CALENDAR_EVENT_FXML,
+            Files.ADD_CALENDAR_EVENT_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CALENDAR_MODAL_ADD_EVENT),
             springContext,
             { _: AddCalendarEventController -> },

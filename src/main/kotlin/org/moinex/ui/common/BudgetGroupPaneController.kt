@@ -11,8 +11,8 @@ package org.moinex.ui.common
 import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.control.ProgressBar
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Styles
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.model.financialplanning.BudgetGroup
 import org.moinex.service.PreferencesService
@@ -101,19 +101,19 @@ class BudgetGroupPaneController(
         progress: BigDecimal,
     ) {
         statusPrefixLabel.styleClass.removeAll(
-            Constants.INFO_LABEL_RED_STYLE,
-            Constants.INFO_LABEL_YELLOW_STYLE,
-            Constants.INFO_LABEL_GREEN_STYLE,
+            Styles.INFO_LABEL_RED_STYLE,
+            Styles.INFO_LABEL_YELLOW_STYLE,
+            Styles.INFO_LABEL_GREEN_STYLE,
         )
         statusAmountLabel.styleClass.removeAll(
-            Constants.INFO_LABEL_RED_STYLE,
-            Constants.INFO_LABEL_YELLOW_STYLE,
-            Constants.INFO_LABEL_GREEN_STYLE,
+            Styles.INFO_LABEL_RED_STYLE,
+            Styles.INFO_LABEL_YELLOW_STYLE,
+            Styles.INFO_LABEL_GREEN_STYLE,
         )
         progressBar.styleClass.removeAll(
-            Constants.PROGRESS_BAR_RED_COLOR_STYLE,
-            Constants.PROGRESS_BAR_YELLOW_COLOR_STYLE,
-            Constants.PROGRESS_BAR_GREEN_COLOR_STYLE,
+            Styles.PROGRESS_BAR_RED_COLOR_STYLE,
+            Styles.PROGRESS_BAR_YELLOW_COLOR_STYLE,
+            Styles.PROGRESS_BAR_GREEN_COLOR_STYLE,
         )
 
         val remaining = targetAmount.subtract(spentAmount)
@@ -122,22 +122,22 @@ class BudgetGroupPaneController(
             statusPrefixLabel.text =
                 preferencesService.translate(TranslationKeys.COMMON_BUDGET_GROUP_OVERSPENT)
             statusAmountLabel.text = UIUtils.formatCurrency(remaining.abs())
-            statusPrefixLabel.styleClass.add(Constants.INFO_LABEL_RED_STYLE)
-            statusAmountLabel.styleClass.add(Constants.INFO_LABEL_RED_STYLE)
-            progressBar.styleClass.add(Constants.PROGRESS_BAR_RED_COLOR_STYLE)
+            statusPrefixLabel.styleClass.add(Styles.INFO_LABEL_RED_STYLE)
+            statusAmountLabel.styleClass.add(Styles.INFO_LABEL_RED_STYLE)
+            progressBar.styleClass.add(Styles.PROGRESS_BAR_RED_COLOR_STYLE)
         } else {
             statusPrefixLabel.text =
                 preferencesService.translate(TranslationKeys.COMMON_BUDGET_GROUP_REMAINING)
             statusAmountLabel.text = UIUtils.formatCurrency(remaining)
 
             if (progress > PROGRESS_WARNING_THRESHOLD) {
-                statusPrefixLabel.styleClass.add(Constants.INFO_LABEL_YELLOW_STYLE)
-                statusAmountLabel.styleClass.add(Constants.INFO_LABEL_YELLOW_STYLE)
-                progressBar.styleClass.add(Constants.PROGRESS_BAR_YELLOW_COLOR_STYLE)
+                statusPrefixLabel.styleClass.add(Styles.INFO_LABEL_YELLOW_STYLE)
+                statusAmountLabel.styleClass.add(Styles.INFO_LABEL_YELLOW_STYLE)
+                progressBar.styleClass.add(Styles.PROGRESS_BAR_YELLOW_COLOR_STYLE)
             } else {
-                statusPrefixLabel.styleClass.add(Constants.INFO_LABEL_GREEN_STYLE)
-                statusAmountLabel.styleClass.add(Constants.INFO_LABEL_GREEN_STYLE)
-                progressBar.styleClass.add(Constants.PROGRESS_BAR_GREEN_COLOR_STYLE)
+                statusPrefixLabel.styleClass.add(Styles.INFO_LABEL_GREEN_STYLE)
+                statusAmountLabel.styleClass.add(Styles.INFO_LABEL_GREEN_STYLE)
+                progressBar.styleClass.add(Styles.PROGRESS_BAR_GREEN_COLOR_STYLE)
             }
         }
     }

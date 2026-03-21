@@ -17,8 +17,9 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import org.json.JSONObject
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Constants
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isUpdateRecommended
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -385,7 +386,7 @@ class FundamentalAnalysisController(
         periodComboBox.items.addAll(PeriodType.entries.toTypedArray())
         periodComboBox.value = PeriodType.ANNUAL
 
-        UIUtils.Companion.configureComboBox(periodComboBox) { UIUtils.Companion.translatePeriodType(it) }
+        UIUtils.configureComboBox(periodComboBox) { UIUtils.translatePeriodType(it) }
 
         periodComboBox.valueProperty().addListener { _, _, newVal ->
             if (newVal != null) {
@@ -431,10 +432,10 @@ class FundamentalAnalysisController(
             val analysis = analyses.firstOrNull { it.periodType == periodType }
 
             if (analysis != null) {
-                val lastUpdate = UIUtils.Companion.formatDateTimeForDisplay(analysis.lastUpdate)
+                val lastUpdate = UIUtils.formatDateTimeForDisplay(analysis.lastUpdate)
                 val recommendedUpdate = analysis.isUpdateRecommended()
 
-                statusLabel.text = "${UIUtils.Companion.translatePeriodType(periodType)}: $lastUpdate"
+                statusLabel.text = "${UIUtils.translatePeriodType(periodType)}: $lastUpdate"
 
                 if (recommendedUpdate) {
                     statusLabel.styleClass.add(CACHE_STATUS_LABEL_EXPIRED_CLASS)
@@ -442,7 +443,7 @@ class FundamentalAnalysisController(
                     statusLabel.styleClass.add(CACHE_STATUS_LABEL_VALID_CLASS)
                 }
             } else {
-                statusLabel.text = "${UIUtils.Companion.translatePeriodType(periodType)}: --"
+                statusLabel.text = "${UIUtils.translatePeriodType(periodType)}: --"
                 statusLabel.styleClass.add(CACHE_STATUS_LABEL_UNAVAILABLE_CLASS)
             }
 
@@ -492,15 +493,15 @@ class FundamentalAnalysisController(
         }
 
         companyNameValueLabel.text =
-            UIUtils.Companion.getOrDefault(currentAnalysis!!.companyName, Constants.NA_DATA).toString()
+            UIUtils.getOrDefault(currentAnalysis!!.companyName, Constants.NA_DATA).toString()
         sectorValueLabel.text =
-            UIUtils.Companion.getOrDefault(currentAnalysis!!.sector, Constants.NA_DATA).toString()
+            UIUtils.getOrDefault(currentAnalysis!!.sector, Constants.NA_DATA).toString()
         industryValueLabel.text =
-            UIUtils.Companion.getOrDefault(currentAnalysis!!.industry, Constants.NA_DATA).toString()
+            UIUtils.getOrDefault(currentAnalysis!!.industry, Constants.NA_DATA).toString()
         currencyValueLabel.text =
-            UIUtils.Companion.getOrDefault(currentAnalysis!!.currency, Constants.NA_DATA).toString()
+            UIUtils.getOrDefault(currentAnalysis!!.currency, Constants.NA_DATA).toString()
 
-        val logo = UIUtils.Companion.loadTickerLogo(ticker, 80.0)
+        val logo = UIUtils.loadTickerLogo(ticker, 80.0)
         logo?.let { logoView ->
             companyLogoImageView.image = logoView.image
         }
@@ -575,7 +576,7 @@ class FundamentalAnalysisController(
             )
             val node = addMetricToContainer(container, preferencesService.translate(labelKey), data, jsonKey)
             if (node != null) {
-                UIUtils.Companion.addTooltipToNode(node, preferencesService.translate(tooltipKey))
+                UIUtils.addTooltipToNode(node, preferencesService.translate(tooltipKey))
                 logger.debug("Successfully added metric: {}", labelKey)
             } else {
                 logger.debug("Metric returned null: {}", labelKey)
@@ -617,7 +618,7 @@ class FundamentalAnalysisController(
                 yearsMetric.put(JSON_METRIC_TYPE, JSON_VALUE_NUMBER)
                 yearsMetric.put(JSON_METRIC_DATA_TEMPORALITY, JSON_VALUE_CALCULATED)
 
-                UIUtils.Companion.addTooltipToNode(
+                UIUtils.addTooltipToNode(
                     addMetricToContainer(
                         content,
                         preferencesService.translate(TranslationKeys.FUNDAMENTAL_ANALYSIS_METRIC_REVENUE_GROWTH_YEARS),
@@ -659,7 +660,7 @@ class FundamentalAnalysisController(
         )
 
         return runCatching {
-            val loader = FXMLLoader(javaClass.getResource(Constants.FUNDAMENTAL_METRIC_PANE_FXML))
+            val loader = FXMLLoader(javaClass.getResource(Files.FUNDAMENTAL_METRIC_PANE_FXML))
             loader.setControllerFactory { springContext.getBean(it) }
 
             val metricPane = loader.load<VBox>()
@@ -706,7 +707,7 @@ class FundamentalAnalysisController(
                     preferencesService.translate(
                         TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_CONNECTION_MESSAGE,
                     ),
-                    RetryConfig.Companion.FUNDAMENTAL_ANALYSIS.maxRetries,
+                    RetryConfig.FUNDAMENTAL_ANALYSIS.maxRetries,
                 )
         } else {
             errorMessage =

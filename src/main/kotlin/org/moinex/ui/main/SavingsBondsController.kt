@@ -16,8 +16,8 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.text.Text
 import javafx.util.StringConverter
-import org.moinex.common.constants.Constants
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BondType
@@ -31,7 +31,6 @@ import org.moinex.ui.dialog.investment.update.EditBondController
 import org.moinex.ui.dialog.investment.view.ArchivedBondsController
 import org.moinex.ui.dialog.investment.view.BondInterestHistoryController
 import org.moinex.ui.dialog.investment.view.BondTransactionsController
-import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -67,10 +66,6 @@ class SavingsBondsController(
     private val currentMonthInterestCache = mutableMapOf<Int, BigDecimal>()
     private val totalAccumulatedInterestCache = mutableMapOf<Int, BigDecimal>()
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(SavingsBondsController::class.java)
-    }
-
     @FXML
     fun initialize() {
         configureBondTableView()
@@ -82,7 +77,7 @@ class SavingsBondsController(
     @FXML
     fun handleRegisterBond() {
         WindowUtils.openModalWindow(
-            Constants.ADD_BOND_FXML,
+            Files.ADD_BOND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE),
             springContext,
             { _: AddBondController -> },
@@ -108,7 +103,7 @@ class SavingsBondsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.EDIT_BOND_FXML,
+            Files.EDIT_BOND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_EDIT_BOND_TITLE),
             springContext,
             { controller: EditBondController -> controller.setBond(selectedBond) },
@@ -177,7 +172,7 @@ class SavingsBondsController(
     @FXML
     fun handleOpenBondArchive() {
         WindowUtils.openModalWindow(
-            Constants.ARCHIVED_BONDS_FXML,
+            Files.ARCHIVED_BONDS_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_ARCHIVE_TITLE),
             springContext,
             { _: ArchivedBondsController -> },
@@ -203,7 +198,7 @@ class SavingsBondsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.BUY_BOND_FXML,
+            Files.BUY_BOND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BUY_BOND_TITLE),
             springContext,
             { controller: AddBondPurchaseController -> controller.initializeBond(selectedBond) },
@@ -229,7 +224,7 @@ class SavingsBondsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.SALE_BOND_FXML,
+            Files.SALE_BOND_FXML,
             preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_SELL_BOND_TITLE),
             springContext,
             { controller: AddBondSaleController -> controller.initializeBond(selectedBond) },
@@ -245,7 +240,7 @@ class SavingsBondsController(
     @FXML
     fun handleShowBondTransactions() {
         WindowUtils.openModalWindow(
-            Constants.BOND_TRANSACTIONS_FXML,
+            Files.BOND_TRANSACTIONS_FXML,
             preferencesService.translate(TranslationKeys.BOND_DIALOG_TRANSACTIONS_TITLE),
             springContext,
             { _: BondTransactionsController -> },
@@ -271,7 +266,7 @@ class SavingsBondsController(
         }
 
         WindowUtils.openModalWindow(
-            Constants.BOND_INTEREST_HISTORY_FXML,
+            Files.BOND_INTEREST_HISTORY_FXML,
             MessageFormat.format(
                 preferencesService.translate(TranslationKeys.BOND_DIALOG_INTEREST_HISTORY_TITLE),
                 selectedBond.name,

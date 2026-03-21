@@ -12,7 +12,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.common.extension.isEqual
 import org.moinex.factory.investment.BondFactory
 import org.moinex.factory.investment.BondInterestCalculationFactory

@@ -3,7 +3,7 @@ package org.moinex.model.creditcard
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Constants
 import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.creditcard.CreditCardOperatorFactory
 import java.math.BigDecimal

@@ -13,7 +13,7 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.scene.control.CheckBox
 import javafx.stage.Stage
-import org.moinex.common.constants.TranslationKeys
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException

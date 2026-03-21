@@ -8,7 +8,7 @@
 
 package org.moinex.service.investment
 
-import org.moinex.common.constants.Constants
+import org.moinex.common.constant.Files
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.retry.retry
@@ -475,7 +475,7 @@ class TickerService(
                         .replace("www.", "")
                         .substringBefore("/") + ".png"
 
-                val logoPath = FileUtils.getPath(Constants.LOGOS_DIR, filename)
+                val logoPath = FileUtils.getPath(Files.LOGOS_DIR, filename)
                 FileUtils.exists(logoPath)
             }.getOrDefault(false)
         } ?: false

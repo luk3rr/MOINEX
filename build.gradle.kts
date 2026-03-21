@@ -107,7 +107,7 @@ javafx {
 }
 
 springBoot {
-	mainClass.set("org.moinex.app.App")
+	mainClass.set("org.moinex.app.AppKt")
 }
 
 publishing {
@@ -131,7 +131,7 @@ tasks.withType<Test> {
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 	archiveFileName.set("moinex.jar")
-	mainClass.set("org.moinex.app.App")
+	mainClass.set("org.moinex.app.AppKt")
 }
 
 jacoco {
