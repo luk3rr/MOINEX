@@ -29,9 +29,9 @@ import org.moinex.service.PreferencesService
 import org.moinex.service.goal.GoalService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.dialog.goal.EditGoalController
-import org.moinex.ui.dialog.wallettransaction.AddExpenseController
-import org.moinex.ui.dialog.wallettransaction.AddIncomeController
-import org.moinex.ui.dialog.wallettransaction.AddTransferController
+import org.moinex.ui.dialog.wallettransaction.create.AddExpenseController
+import org.moinex.ui.dialog.wallettransaction.create.AddIncomeController
+import org.moinex.ui.dialog.wallettransaction.create.AddTransferController
 import org.moinex.ui.main.GoalController
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Scope

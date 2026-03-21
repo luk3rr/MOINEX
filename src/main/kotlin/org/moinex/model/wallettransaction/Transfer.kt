@@ -44,8 +44,8 @@ class Transfer(
     @Column(name = "description")
     var description: String? = null,
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
-    var category: Category,
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    var category: Category?,
 ) {
     init {
         amount = amount.toRounded()

@@ -47,10 +47,10 @@ import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ResumePaneController
 import org.moinex.ui.dialog.ManageCategoryController
-import org.moinex.ui.dialog.wallettransaction.AddExpenseController
-import org.moinex.ui.dialog.wallettransaction.AddIncomeController
-import org.moinex.ui.dialog.wallettransaction.EditTransactionController
-import org.moinex.ui.dialog.wallettransaction.RecurringTransactionController
+import org.moinex.ui.dialog.wallettransaction.create.AddExpenseController
+import org.moinex.ui.dialog.wallettransaction.create.AddIncomeController
+import org.moinex.ui.dialog.wallettransaction.update.EditTransactionController
+import org.moinex.ui.dialog.wallettransaction.view.RecurringTransactionController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

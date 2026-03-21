@@ -36,7 +36,7 @@ import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.GoalPaneController
 import org.moinex.ui.dialog.goal.AddGoalController
 import org.moinex.ui.dialog.goal.EditGoalController
-import org.moinex.ui.dialog.wallettransaction.AddTransferController
+import org.moinex.ui.dialog.wallettransaction.create.AddTransferController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller

@@ -30,12 +30,12 @@ import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
-import org.moinex.ui.dialog.wallettransaction.AddExpenseController
-import org.moinex.ui.dialog.wallettransaction.AddIncomeController
-import org.moinex.ui.dialog.wallettransaction.AddTransferController
-import org.moinex.ui.dialog.wallettransaction.ChangeWalletBalanceController
-import org.moinex.ui.dialog.wallettransaction.ChangeWalletTypeController
-import org.moinex.ui.dialog.wallettransaction.RenameWalletController
+import org.moinex.ui.dialog.wallettransaction.create.AddExpenseController
+import org.moinex.ui.dialog.wallettransaction.create.AddIncomeController
+import org.moinex.ui.dialog.wallettransaction.create.AddTransferController
+import org.moinex.ui.dialog.wallettransaction.update.ChangeWalletBalanceController
+import org.moinex.ui.dialog.wallettransaction.update.ChangeWalletTypeController
+import org.moinex.ui.dialog.wallettransaction.update.RenameWalletController
 import org.moinex.ui.main.WalletController
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Scope
@@ -117,11 +117,12 @@ class WalletPaneController(
     @FXML
     private lateinit var changeWalletTypeMenuItem: MenuItem
 
-    private var wallet: Wallet? = null
     private var crcPaidAmount = BigDecimal.ZERO
     private var crcPendingAmount = BigDecimal.ZERO
     private var transactions = mutableListOf<WalletTransaction>()
     private var transfers = mutableListOf<Transfer>()
+
+    private lateinit var wallet: Wallet
 
     companion object {
         private const val NEGATIVE_SIGN = "-"
@@ -134,31 +135,24 @@ class WalletPaneController(
     }
 
     fun loadWalletInfo() {
-        val currentWallet =
-            wallet ?: run {
-                transactions.clear()
-                transfers.clear()
-                return
-            }
-
-        wallet = walletService.getWalletById(currentWallet.id!!)
+        wallet = walletService.getWalletById(wallet.id!!)
 
         val now = LocalDate.now()
         val yearMonth = YearMonth.of(now.year, now.monthValue)
 
         transactions =
             walletService
-                .getAllNonArchivedWalletTransactionsByWalletAndMonth(currentWallet.id!!, yearMonth)
+                .getAllNonArchivedWalletTransactionsByWalletAndMonth(wallet.id!!, yearMonth)
                 .toMutableList()
 
         transfers =
             walletService
-                .getTransfersByWalletAndMonth(currentWallet.id!!, yearMonth)
+                .getTransfersByWalletAndMonth(wallet.id!!, yearMonth)
                 .toMutableList()
 
         crcPaidAmount =
             creditCardService.getTotalEffectivePaidPaymentsByWalletAndMonth(
-                currentWallet.id!!,
+                wallet.id!!,
                 yearMonth,
             )
 
@@ -168,27 +162,22 @@ class WalletPaneController(
             payments
                 .filter {
                     it.creditCardDebt.creditCard.defaultBillingWallet
-                        ?.id!! == currentWallet.id!!
+                        ?.id!! == wallet.id!!
                 }.filter { !it.isPaid() && !it.isRefunded() }
                 .sumOf { it.amount }
     }
 
-    fun updateWalletPane(wt: Wallet?): VBox {
-        if (wt == null) {
-            setDefaultValues()
-            return rootVBox
-        }
-
+    fun updateWalletPane(wt: Wallet): VBox {
         wallet = wt
         loadWalletInfo()
 
-        val currentWallet = wallet ?: return rootVBox
+        val wallet = wallet
 
         setupDynamicVisibility()
 
-        walletName.text = currentWallet.name
-        walletType.text = UIUtils.translateWalletType(currentWallet.type)
-        walletIcon.image = Image(Constants.WALLET_TYPE_ICONS_PATH + currentWallet.type.icon)
+        walletName.text = wallet.name
+        walletType.text = UIUtils.translateWalletType(wallet.type)
+        walletIcon.image = Image(Constants.WALLET_TYPE_ICONS_PATH + wallet.type.icon)
 
         val confirmedIncomesSum =
             transactions
@@ -216,29 +205,29 @@ class WalletPaneController(
 
         val creditedTransfersSum =
             transfers
-                .filter { it.receiverWallet.id!! == currentWallet.id!! }
+                .filter { it.receiverWallet.id!! == wallet.id!! }
                 .sumOf { it.amount }
 
         val debitedTransfersSum =
             transfers
-                .filter { it.senderWallet.id!! == currentWallet.id!! }
+                .filter { it.senderWallet.id!! == wallet.id!! }
                 .sumOf { it.amount }
 
         val openingBalance =
-            currentWallet.balance - confirmedIncomesSum + confirmedExpensesSum -
+            wallet.balance - confirmedIncomesSum + confirmedExpensesSum -
                 creditedTransfersSum + debitedTransfersSum
 
-        val foreseenBalance = currentWallet.balance + pendingIncomesSum - pendingExpensesSum
+        val foreseenBalance = wallet.balance + pendingIncomesSum - pendingExpensesSum
 
         setLabelValue(openingBalanceSign, openingBalanceValue, openingBalance)
         setLabelValue(incomesSign, incomesValue, confirmedIncomesSum)
         setLabelValue(expensesSign, expensesValue, confirmedExpensesSum)
         setLabelValue(creditedTransfersSign, creditedTransfersValue, creditedTransfersSum)
         setLabelValue(debitedTransfersSign, debitedTransfersValue, debitedTransfersSum)
-        setLabelValue(currentBalanceSign, currentBalanceValue, currentWallet.balance)
+        setLabelValue(currentBalanceSign, currentBalanceValue, wallet.balance)
         setLabelValue(foreseenBalanceSign, foreseenBalanceValue, foreseenBalance)
 
-        if (currentWallet.type.name == Constants.GOAL_DEFAULT_WALLET_TYPE_NAME) {
+        if (wallet.type.name == Constants.GOAL_DEFAULT_WALLET_TYPE_NAME) {
             menuButton.items.remove(changeWalletTypeMenuItem)
         }
 
@@ -313,27 +302,23 @@ class WalletPaneController(
 
     @FXML
     private fun handleArchiveWallet() {
-        val currentWallet = wallet ?: return
-
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                     preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_TITLE),
-                    currentWallet.name,
+                    wallet.name,
                 ),
                 preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_ARCHIVE_MESSAGE),
                 preferencesService.bundle,
             )
         ) {
-            walletService.archiveWallet(currentWallet.id!!)
+            walletService.archiveWallet(wallet.id!!)
             walletController.updateDisplay()
         }
     }
 
     @FXML
     private fun handleDeleteWallet() {
-        val currentWallet = wallet ?: return
-
-        if (walletService.getWalletTransactionAndTransferCountByWallet(currentWallet.id!!) > 0) {
+        if (walletService.getWalletTransactionAndTransferCountByWallet(wallet.id!!) > 0) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_TITLE),
                 preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_HAS_TRANSACTIONS_MESSAGE),
@@ -342,7 +327,7 @@ class WalletPaneController(
         }
 
         val totalOfAssociatedVirtualWallets =
-            walletService.getCountOfVirtualWalletsByMasterWalletId(currentWallet.id!!)
+            walletService.getCountOfVirtualWalletsByMasterWalletId(wallet.id!!)
 
         val virtualWalletsMessage =
             if (totalOfAssociatedVirtualWallets == 0) {
@@ -357,7 +342,7 @@ class WalletPaneController(
         if (WindowUtils.showConfirmationDialog(
                 MessageFormat.format(
                     preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_TITLE),
-                    currentWallet.name,
+                    wallet.name,
                 ),
                 preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_MESSAGE) +
                     "\n" + virtualWalletsMessage,
@@ -365,13 +350,13 @@ class WalletPaneController(
             )
         ) {
             runCatching {
-                walletService.deleteWallet(currentWallet.id!!)
+                walletService.deleteWallet(wallet.id!!)
 
                 WindowUtils.showSuccessDialog(
                     preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_SUCCESS_TITLE),
                     MessageFormat.format(
                         preferencesService.translate(TranslationKeys.COMMON_WALLET_DIALOG_DELETE_SUCCESS_MESSAGE),
-                        currentWallet.name,
+                        wallet.name,
                     ),
                 )
 
@@ -387,20 +372,6 @@ class WalletPaneController(
                 }
             }
         }
-    }
-
-    private fun setDefaultValues() {
-        walletName.text = ""
-        walletType.text = ""
-        walletIcon.image = null
-
-        setLabelValue(openingBalanceSign, openingBalanceValue, BigDecimal.ZERO)
-        setLabelValue(incomesSign, incomesValue, BigDecimal.ZERO)
-        setLabelValue(expensesSign, expensesValue, BigDecimal.ZERO)
-        setLabelValue(creditedTransfersSign, creditedTransfersValue, BigDecimal.ZERO)
-        setLabelValue(debitedTransfersSign, debitedTransfersValue, BigDecimal.ZERO)
-        setLabelValue(currentBalanceSign, currentBalanceValue, BigDecimal.ZERO)
-        setLabelValue(foreseenBalanceSign, foreseenBalanceValue, BigDecimal.ZERO)
     }
 
     private fun setLabelValue(
@@ -422,9 +393,7 @@ class WalletPaneController(
     }
 
     private fun setupDynamicVisibility() {
-        val currentWallet = wallet ?: return
-
-        if (currentWallet.isMaster()) {
+        if (wallet.isMaster()) {
             virtualWalletInfo.apply {
                 isVisible = false
                 isManaged = false
@@ -435,7 +404,7 @@ class WalletPaneController(
         virtualWalletInfo.apply {
             isVisible = true
             isManaged = true
-            text = UIUtils.getVirtualWalletInfo(currentWallet)
+            text = UIUtils.getVirtualWalletInfo(wallet)
         }
     }
 }

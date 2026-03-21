@@ -65,8 +65,10 @@ object Constants {
     const val UI_DIALOG_GOAL_PATH: String = UI_DIALOG_PATH + "goal/"
 
     // UI goal package
-    const val EDIT_GOAL_FXML: String = UI_DIALOG_GOAL_PATH + ("edit_goal." + "fxml")
+    const val EDIT_GOAL_FXML: String = UI_DIALOG_GOAL_PATH + "edit_goal.fxml"
     const val ADD_GOAL_FXML: String = UI_DIALOG_GOAL_PATH + "add_goal.fxml"
+
+    // UI investment package
     const val UI_DIALOG_INVESTMENT_PATH: String = UI_DIALOG_PATH + "investment/"
     const val UI_DIALOG_INVESTMENT_CREATE_PATH: String = UI_DIALOG_INVESTMENT_PATH + "create/"
     const val UI_DIALOG_INVESTMENT_UPDATE_PATH: String = UI_DIALOG_INVESTMENT_PATH + "update/"
@@ -100,29 +102,38 @@ object Constants {
     const val ARCHIVED_BONDS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "archived_bonds.fxml"
     const val INVESTMENT_TRANSACTIONS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "investment_transactions.fxml"
     const val FUNDAMENTAL_ANALYSIS_FXML: String = UI_DIALOG_INVESTMENT_VIEW_PATH + "fundamental_analysis.fxml"
-    const val UI_DIALOG_WALLETTRANSACTION_PATH: String = UI_DIALOG_PATH + "wallettransaction/"
 
     // UI wallettransaction package
-    const val ADD_WALLET_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "add_wallet.fxml"
-    const val ADD_INCOME_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "add_income.fxml"
-    const val ADD_TRANSFER_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + ("add_transfer." + "fxml")
-    const val EDIT_TRANSFER_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + ("edit_transfer." + "fxml")
-    const val ADD_EXPENSE_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "add_expense.fxml"
-    const val ARCHIVED_WALLETS_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "archived_wallets.fxml"
-    const val TRANSFERS_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "transfers.fxml"
-    const val EDIT_TRANSACTION_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "edit_transaction.fxml"
-    const val REMOVE_TRANSACTION_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "remove_transaction.fxml"
-    const val CHANGE_WALLET_TYPE_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "change_wallet_type.fxml"
-    const val CHANGE_WALLET_BALANCE_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "change_wallet_balance.fxml"
-    const val RENAME_WALLET_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "rename_wallet.fxml"
-    const val RECURRING_TRANSACTIONS_FXML: String = UI_DIALOG_WALLETTRANSACTION_PATH + "recurring_transaction.fxml"
+    const val UI_DIALOG_WALLETTRANSACTION_PATH: String = UI_DIALOG_PATH + "wallettransaction/"
+    const val UI_DIALOG_WALLETTRANSACTION_CREATE_PATH: String = UI_DIALOG_WALLETTRANSACTION_PATH + "create/"
+    const val UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH: String = UI_DIALOG_WALLETTRANSACTION_PATH + "update/"
+    const val UI_DIALOG_WALLETTRANSACTION_VIEW_PATH: String = UI_DIALOG_WALLETTRANSACTION_PATH + "view/"
+
+    // UI wallettransaction package - Create
+    const val ADD_WALLET_FXML: String = UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_wallet.fxml"
+    const val ADD_INCOME_FXML: String = UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_income.fxml"
+    const val ADD_TRANSFER_FXML: String = UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_transfer.fxml"
+    const val ADD_EXPENSE_FXML: String = UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_expense.fxml"
     const val ADD_RECURRING_TRANSACTION_FXML: String =
         UI_DIALOG_WALLETTRANSACTION_PATH + "add_recurring_transaction.fxml"
+
+    // UI wallettransaction package - Update
+    const val EDIT_TRANSFER_FXML: String = UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "edit_transfer.fxml"
+    const val EDIT_TRANSACTION_FXML: String = UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "edit_transaction.fxml"
     const val EDIT_RECURRING_TRANSACTION_FXML: String =
-        UI_DIALOG_WALLETTRANSACTION_PATH + "edit_recurring_transaction.fxml"
-    const val UI_DIALOG_FINANCIALPLANNING_PATH: String = UI_DIALOG_PATH + "financialplanning/"
+        UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "edit_recurring_transaction.fxml"
+    const val CHANGE_WALLET_TYPE_FXML: String = UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "change_wallet_type.fxml"
+    const val CHANGE_WALLET_BALANCE_FXML: String =
+        UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "change_wallet_balance.fxml"
+    const val RENAME_WALLET_FXML: String = UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "rename_wallet.fxml"
+
+    // UI wallettransaction package - View
+    const val ARCHIVED_WALLETS_FXML: String = UI_DIALOG_WALLETTRANSACTION_VIEW_PATH + "archived_wallets.fxml"
+    const val TRANSFERS_FXML: String = UI_DIALOG_WALLETTRANSACTION_VIEW_PATH + "transfers.fxml"
+    const val RECURRING_TRANSACTIONS_FXML: String = UI_DIALOG_WALLETTRANSACTION_VIEW_PATH + "recurring_transaction.fxml"
 
     // UI financial planning package
+    const val UI_DIALOG_FINANCIALPLANNING_PATH: String = UI_DIALOG_PATH + "financialplanning/"
     const val ADD_BUDGET_GROUP_FXML: String = UI_DIALOG_FINANCIALPLANNING_PATH + "add_budget_group.fxml"
     const val EDIT_BUDGET_GROUP_FXML: String = UI_DIALOG_FINANCIALPLANNING_PATH + "edit_budget_group.fxml"
     const val ADD_PLAN_FXML: String = UI_DIALOG_FINANCIALPLANNING_PATH + "add_plan.fxml"

@@ -441,7 +441,7 @@ class WalletServiceUpdateTransferTest :
                 }
 
                 Then("should update category") {
-                    transferFromDb.category.id shouldBe 2
+                    transferFromDb.category!!.id shouldBe 2
                 }
 
                 Then("should not modify wallet balances") {

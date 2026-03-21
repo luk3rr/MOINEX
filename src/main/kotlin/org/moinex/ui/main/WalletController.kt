@@ -44,10 +44,10 @@ import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.WalletPaneController
-import org.moinex.ui.dialog.wallettransaction.AddTransferController
-import org.moinex.ui.dialog.wallettransaction.AddWalletController
-import org.moinex.ui.dialog.wallettransaction.ArchivedWalletsController
-import org.moinex.ui.dialog.wallettransaction.TransferController
+import org.moinex.ui.dialog.wallettransaction.create.AddTransferController
+import org.moinex.ui.dialog.wallettransaction.create.AddWalletController
+import org.moinex.ui.dialog.wallettransaction.view.ArchivedWalletsController
+import org.moinex.ui.dialog.wallettransaction.view.TransferController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
