@@ -84,7 +84,6 @@ class UIUtils(
         private val percentageFormat = DecimalFormat(Constants.PERCENTAGE_FORMAT)
         private lateinit var preferencesService: PreferencesService
 
-        @JvmStatic
         fun addTooltipToXYChartNode(
             node: Node,
             text: String,
@@ -94,7 +93,6 @@ class UIUtils(
             addTooltipToNode(node, text)
         }
 
-        @JvmStatic
         fun addTooltipToNode(
             node: Node?,
             text: String?,
@@ -110,7 +108,6 @@ class UIUtils(
                 }.also { Tooltip.install(node, it) }
         }
 
-        @JvmStatic
         fun addTooltipToAxisLabel(
             axis: CategoryAxis,
             labelText: String,
@@ -122,19 +119,16 @@ class UIUtils(
                 ?.let { addTooltipToNode(it, tooltipText) }
         }
 
-        @JvmStatic
         fun removeTooltipFromNode(node: Node) {
             Tooltip.install(node, null)
         }
 
-        @JvmStatic
         fun formatCurrency(value: Number?): String {
             if (value == null) return "-"
             if (preferencesService.hideMonetaryValues) return "****"
             return currencyFormat.format(value)
         }
 
-        @JvmStatic
         fun formatCurrencySigned(value: Number?): String {
             if (value == null) return "-"
             if (preferencesService.hideMonetaryValues) return "****"
@@ -143,7 +137,6 @@ class UIUtils(
             return if (value.toDouble() > 0) "+ $formatted" else formatted
         }
 
-        @JvmStatic
         fun formatCurrencyDynamic(value: Number?): String {
             if (value == null) return "-"
             if (preferencesService.hideMonetaryValues) return "****"
@@ -168,7 +161,6 @@ class UIUtils(
             return absValue.scale().coerceAtLeast(2)
         }
 
-        @JvmStatic
         fun formatPercentage(value: Number?): String {
             if (value == null) return "-"
             if (preferencesService.hideMonetaryValues) return "****"
@@ -182,7 +174,6 @@ class UIUtils(
             return "${percentageFormat.format(value.toDouble().absoluteValue)} %"
         }
 
-        @JvmStatic
         fun formatPercentageForFundamentalAnalysis(value: Number?): String {
             if (value == null) return "-"
             if (preferencesService.hideMonetaryValues) return "****"
@@ -193,7 +184,6 @@ class UIUtils(
                 }.format(value.toDouble()) + " %"
         }
 
-        @JvmStatic
         fun formatNumWithDecimalPlaces(
             value: Number?,
             decimalPlaces: Int,
@@ -205,7 +195,6 @@ class UIUtils(
                 }.format(value)
         }
 
-        @JvmStatic
         fun setDatePickerFormat(datePicker: DatePicker) {
             val locale = preferencesService.locale
             Locale.setDefault(locale)
@@ -226,7 +215,6 @@ class UIUtils(
             }
         }
 
-        @JvmStatic
         fun formatCreditCardNumber(lastFourDigits: String?): String {
             if (lastFourDigits == null) return "-"
             require(lastFourDigits.length == 4) {
@@ -235,7 +223,6 @@ class UIUtils(
             return Constants.CREDIT_CARD_NUMBER_FORMAT.replace("####", lastFourDigits)
         }
 
-        @JvmStatic
         fun formatCurrencyYAxis(yAxis: NumberAxis) {
             yAxis.tickLabelFormatter =
                 object : StringConverter<Number>() {
@@ -253,13 +240,11 @@ class UIUtils(
                 }
         }
 
-        @JvmStatic
         fun resetLabel(label: Label) {
             label.text = "-"
             setLabelStyle(label, Constants.NEUTRAL_BALANCE_STYLE)
         }
 
-        @JvmStatic
         fun setLabelStyle(
             label: Label,
             style: String,
@@ -272,7 +257,6 @@ class UIUtils(
             label.styleClass.add(style)
         }
 
-        @JvmStatic
         fun <T> configureComboBox(
             comboBox: ComboBox<T>,
             displayFunction: (T) -> String,
@@ -311,7 +295,6 @@ class UIUtils(
             }
         }
 
-        @JvmStatic
         fun updateWalletBalanceLabelStyle(
             wallet: Wallet,
             balanceLabel: Label,
@@ -328,7 +311,6 @@ class UIUtils(
             setLabelStyle(balanceLabel, style)
         }
 
-        @JvmStatic
         @JvmOverloads
         @Throws(IOException::class)
         fun loadContentIntoTab(
@@ -351,7 +333,6 @@ class UIUtils(
             tab.content = content
         }
 
-        @JvmStatic
         fun <S, T> alignTableColumn(
             column: TableColumn<S, T>,
             alignment: Pos,
@@ -378,7 +359,6 @@ class UIUtils(
                 }
         }
 
-        @JvmStatic
         fun <S, T> createCellFactory(alignment: Pos): Callback<TableColumn<S, T>, TableCell<S, T>> =
             Callback {
                 object : TableCell<S, T>() {
@@ -409,7 +389,6 @@ class UIUtils(
                 }
             }
 
-        @JvmStatic
         fun <T> createListCell(textExtractor: (T) -> String = { it.toString() }): ListCell<T> =
             object : ListCell<T>() {
                 override fun updateItem(
@@ -421,7 +400,6 @@ class UIUtils(
                 }
             }
 
-        @JvmStatic
         fun alignTableColumn(
             columns: List<TableColumn<*, *>>,
             alignment: Pos,
@@ -430,7 +408,6 @@ class UIUtils(
             columns.forEach { alignTableColumn(it, alignment, style) }
         }
 
-        @JvmStatic
         fun applyDefaultChartStyle(chart: Chart) {
             chart.stylesheets.add(
                 UIUtils::class.java
@@ -441,7 +418,6 @@ class UIUtils(
         }
 
         // Translation methods
-        @JvmStatic
         fun translateWalletType(walletType: WalletType): String {
             val name = walletType.name.lowercase().replace(" ", "")
 
@@ -462,7 +438,6 @@ class UIUtils(
                 ?: walletType.name
         }
 
-        @JvmStatic
         fun translateTransactionStatus(status: WalletTransactionStatus): String =
             mapOf(
                 "pending" to TranslationKeys.TRANSACTION_STATUS_PENDING,
@@ -470,7 +445,6 @@ class UIUtils(
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
 
-        @JvmStatic
         fun translateTransactionType(type: WalletTransactionType): String =
             mapOf(
                 "income" to TranslationKeys.TRANSACTION_TYPE_INCOMES,
@@ -478,7 +452,6 @@ class UIUtils(
             )[type.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: type.name
 
-        @JvmStatic
         fun translateRecurringTransactionStatus(status: RecurringTransactionStatus): String =
             mapOf(
                 "active" to TranslationKeys.RECURRING_TRANSACTION_STATUS_ACTIVE,
@@ -486,7 +459,6 @@ class UIUtils(
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
 
-        @JvmStatic
         fun translateRecurringTransactionFrequency(frequency: RecurringTransactionFrequency): String =
             mapOf(
                 "daily" to TranslationKeys.RECURRING_TRANSACTION_FREQUENCY_DAILY,
@@ -496,7 +468,6 @@ class UIUtils(
             )[frequency.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: frequency.name
 
-        @JvmStatic
         fun translateCalendarEventType(eventType: CalendarEventType): String =
             mapOf(
                 "credit_card_statement_closing" to
@@ -510,7 +481,6 @@ class UIUtils(
             )[eventType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: eventType.description
 
-        @JvmStatic
         fun translateAssetType(assetType: AssetType): String =
             mapOf(
                 "stock" to TranslationKeys.ASSET_TYPE_STOCK,
@@ -522,7 +492,6 @@ class UIUtils(
             )[assetType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: assetType.name
 
-        @JvmStatic
         fun translatePeriodType(periodType: PeriodType): String =
             mapOf(
                 "annual" to TranslationKeys.PERIOD_TYPE_ANNUAL,
@@ -530,7 +499,6 @@ class UIUtils(
             )[periodType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: periodType.name
 
-        @JvmStatic
         fun translateBondType(bondType: BondType): String =
             mapOf(
                 "cdb" to TranslationKeys.BOND_TYPE_CDB,
@@ -543,7 +511,6 @@ class UIUtils(
             )[bondType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: bondType.name
 
-        @JvmStatic
         fun translateInterestType(interestType: InterestType): String =
             mapOf(
                 "fixed" to TranslationKeys.INTEREST_TYPE_FIXED,
@@ -552,7 +519,6 @@ class UIUtils(
             )[interestType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: interestType.name
 
-        @JvmStatic
         fun translateInterestIndex(interestIndex: InterestIndex): String =
             mapOf(
                 "cdi" to TranslationKeys.INTEREST_INDEX_CDI,
@@ -564,7 +530,6 @@ class UIUtils(
             )[interestIndex.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: interestIndex.name
 
-        @JvmStatic
         fun translateCreditCardInvoiceStatus(status: CreditCardInvoiceStatus): String =
             mapOf(
                 "open" to TranslationKeys.COMMON_CREDIT_CARD_OPEN,
@@ -572,7 +537,6 @@ class UIUtils(
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
 
-        @JvmStatic
         fun translateCreditCardCreditType(creditType: CreditCardCreditType): String =
             mapOf(
                 "cashback" to TranslationKeys.CREDIT_CARD_CREDIT_TYPE_CASHBACK,
@@ -581,7 +545,6 @@ class UIUtils(
             )[creditType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: creditType.name
 
-        @JvmStatic
         fun translateOperationType(operationType: OperationType): String =
             mapOf(
                 "buy" to TranslationKeys.OPERATION_TYPE_BUY,
@@ -589,7 +552,6 @@ class UIUtils(
             )[operationType.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: operationType.name
 
-        @JvmStatic
         fun getVirtualWalletInfo(wallet: Wallet): String =
             if (wallet.isMaster()) {
                 preferencesService.translate(
@@ -605,33 +567,25 @@ class UIUtils(
             }
 
         // Date formatting methods
-        @JvmStatic
         fun getShortMonthYearFormatter(locale: Locale): DateTimeFormatter =
             DateTimeFormatter.ofPattern("MMM/yy", locale)
 
-        @JvmStatic
         fun getFullMonthYearFormatter(locale: Locale): DateTimeFormatter =
             DateTimeFormatter.ofPattern("MMMM yyyy", locale)
 
-        @JvmStatic
         fun getYearFormatter(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy", locale)
 
-        @JvmStatic
         fun formatShortMonthYear(dateTime: LocalDateTime): String =
             dateTime.format(getShortMonthYearFormatter(preferencesService.locale))
 
-        @JvmStatic
         fun formatShortMonthYear(yearMonth: YearMonth): String =
             yearMonth.format(getShortMonthYearFormatter(preferencesService.locale))
 
-        @JvmStatic
         fun formatFullMonthYear(yearMonth: YearMonth): String =
             yearMonth.format(getFullMonthYearFormatter(preferencesService.locale))
 
-        @JvmStatic
         fun formatYear(year: Year): String = year.format(getYearFormatter(preferencesService.locale))
 
-        @JvmStatic
         fun getWeekdayAbbreviations(): Array<String> {
             val locale = preferencesService.locale
             return arrayOf(
@@ -645,14 +599,11 @@ class UIUtils(
             )
         }
 
-        @JvmStatic
         fun getMonthDisplayName(month: Month): String = month.getDisplayName(TextStyle.FULL, preferencesService.locale)
 
-        @JvmStatic
         fun getMonthShortDisplayName(month: Month): String =
             month.getDisplayName(TextStyle.SHORT, preferencesService.locale)
 
-        @JvmStatic
         fun formatDateForDisplay(date: LocalDate?): String {
             if (date == null) return ""
             val formatter =
@@ -662,7 +613,6 @@ class UIUtils(
             return date.format(formatter)
         }
 
-        @JvmStatic
         fun formatDateForDisplay(dateTime: LocalDateTime?): String {
             if (dateTime == null) return ""
             val formatter =
@@ -672,7 +622,6 @@ class UIUtils(
             return dateTime.format(formatter)
         }
 
-        @JvmStatic
         fun formatDateTimeForDisplay(dateTime: LocalDateTime?): String {
             if (dateTime == null) return ""
             val formatter =
@@ -682,13 +631,11 @@ class UIUtils(
             return dateTime.format(formatter)
         }
 
-        @JvmStatic
         fun getOrDefault(
             value: Any?,
             default: Any,
         ): Any = if (value == null || value.toString() == "null") default else value
 
-        @JvmStatic
         fun loadTickerLogo(
             ticker: Ticker?,
             size: Double,

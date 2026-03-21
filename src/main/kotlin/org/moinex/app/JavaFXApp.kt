@@ -33,7 +33,6 @@ class JavaFXApp : Application() {
         private val logger = LoggerFactory.getLogger(JavaFXApp::class.java)
         private lateinit var hostServicesInstance: HostServices
 
-        @JvmStatic
         fun getHostServicesInstance(): HostServices {
             check(::hostServicesInstance.isInitialized) {
                 "HostServices not initialized yet"

@@ -18,7 +18,6 @@ import java.nio.file.Paths
 object SpringApp {
     private val logger = LoggerFactory.getLogger(SpringApp::class.java)
 
-    @JvmStatic
     fun start(args: Array<String>): ConfigurableApplicationContext {
         createApplicationDirectories()
         return SpringApplicationBuilder().sources(AppConfig::class.java).run(*args)

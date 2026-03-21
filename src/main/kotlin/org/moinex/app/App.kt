@@ -11,7 +11,6 @@ package org.moinex.app
 import javafx.application.Application
 
 object App {
-    @JvmStatic
     fun main(args: Array<String>) {
         Application.launch(JavaFXApp::class.java, *args)
     }

@@ -60,7 +60,6 @@ object WindowUtils {
         }
     }
 
-    @JvmStatic
     @JvmOverloads
     fun showConfirmationDialog(
         header: String,
@@ -83,7 +82,6 @@ object WindowUtils {
         return alert.showAndWait().orElse(noButton) == yesButton
     }
 
-    @JvmStatic
     @JvmOverloads
     fun showInformationDialog(
         header: String,
@@ -96,7 +94,6 @@ object WindowUtils {
         }
     }
 
-    @JvmStatic
     @JvmOverloads
     fun showErrorDialog(
         header: String,
@@ -109,7 +106,6 @@ object WindowUtils {
         }
     }
 
-    @JvmStatic
     @JvmOverloads
     fun showSuccessDialog(
         header: String,
@@ -132,12 +128,10 @@ object WindowUtils {
         }
     }
 
-    @JvmStatic
     fun centerWindowOnScreen(stage: Stage) {
         stage.centerOnScreen()
     }
 
-    @JvmStatic
     @JvmOverloads
     fun <T> openModalWindow(
         fxmlFileName: String,
@@ -181,7 +175,6 @@ object WindowUtils {
         }
     }
 
-    @JvmStatic
     @JvmOverloads
     fun <T> openPopupWindow(
         fxmlFileName: String,
@@ -224,7 +217,6 @@ object WindowUtils {
         }
     }
 
-    @JvmStatic
     fun openUrl(url: String) {
         runCatching {
             JavaFXApp.getHostServicesInstance().showDocument(url)

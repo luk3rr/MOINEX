@@ -13,13 +13,10 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 object Constants {
-    @JvmStatic
-    val INSTANCE = this
     const val APP_NAME: String = "Moinex"
 
     const val SCRIPT_PATH: String = "/scripts/"
 
-    @JvmField
     val PYTHON_INTERPRETER: String = pythonInterpreter
 
     const val GET_STOCK_PRICE_SCRIPT: String = "get_stock_price.py"
@@ -35,10 +32,8 @@ object Constants {
     const val YAHOO_LOOKUP_URL: String = "https://finance.yahoo.com/research-hub/screener/most_actives"
 
     // Data directories
-    @JvmField
     val MOINEX_DATA_DIR: String = System.getProperty("user.home") + "/.moinex"
 
-    @JvmField
     val LOGOS_DIR: String = MOINEX_DATA_DIR + "/logos"
 
     // Paths
@@ -348,10 +343,8 @@ object Constants {
     const val NON_LEAP_YEAR_FEBRUARY_DAYS: Int = 28
     const val WEEK_DAYS: Int = 7
 
-    @JvmField
     val CALENDAR_WEEKDAY_FONT_CONFIG: Font? = Font.font("Arial", FontWeight.BOLD, 14.0)
 
-    @JvmField
     val CALENDAR_DATE_FONT_CONFIG: Font? = Font.font("Arial", FontWeight.BOLD, 14.0)
 
     const val CALENDAR_CELL_BORDER_WIDTH: Double = 0.5
@@ -369,13 +362,10 @@ object Constants {
     // Enough time for you to become poor :)
     // Or rich, who knows?
     // WARNING: Do not change this value. If you do, update too on the database
-    @JvmField
     val RECURRING_TRANSACTION_DEFAULT_END_DATE: LocalDate = LocalDate.of(2100, 12, 31)
 
-    @JvmField
     val RECURRING_TRANSACTION_DEFAULT_TIME: LocalTime? = LocalTime.of(23, 59, 59, 0)
 
-    @JvmField
     val RECURRING_TRANSACTION_DUE_DATE_DEFAULT_TIME: LocalTime? = LocalTime.of(0, 0, 0, 0)
 
     const val NA_DATA: String = "N/A"
@@ -388,23 +378,17 @@ object Constants {
     const val DB_MONTH_YEAR_FORMAT: String = "yyyy-MM"
     const val BACEN_DATE_FORMAT: String = "dd/MM/yyyy"
 
-    @JvmField
     val DB_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DB_DATE_FORMAT)
 
-    @JvmField
     val DATE_FORMATTER_NO_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT_NO_TIME)
 
-    @JvmField
     val SHORT_DATE_FORMATTER_NO_TIME: DateTimeFormatter =
         DateTimeFormatter.ofPattern(SHORT_DATE_FORMAT_NO_TIME)
 
-    @JvmField
     val DATE_FORMATTER_WITH_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT_WITH_TIME)
 
-    @JvmField
     val DB_MONTH_YEAR_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DB_MONTH_YEAR_FORMAT)
 
-    @JvmField
     val BACEN_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(BACEN_DATE_FORMAT)
 
     // Define the pattern for positive and negative currency values
@@ -424,7 +408,6 @@ object Constants {
 
     const val INVESTMENT_CALCULATION_PRECISION: Int = 8
 
-    @JvmField
     val INVESTMENT_VALUE_REGEX: String = "\\d*\\.?\\d{0," + INVESTMENT_CALCULATION_PRECISION + "}"
 
     // Yahoo Finance API constants
@@ -448,7 +431,6 @@ object Constants {
      * @return The regex
      * @throws IllegalArgumentException If n is negative
      */
-    @JvmStatic
     fun getDigitsRegexUpTo(n: Int): String {
         require(n >= 0) { "n must be non-negative" }
 
@@ -462,7 +444,6 @@ object Constants {
      * @param targetDate The target date
      * @return The number of months until the target date
      */
-    @JvmStatic
     fun calculateMonthsUntilTarget(
         beginDate: LocalDate,
         targetDate: LocalDate?,
@@ -475,7 +456,6 @@ object Constants {
      * @param targetDate The target date
      * @return The number of days until the target date
      */
-    @JvmStatic
     fun calculateDaysUntilTarget(
         beginDate: LocalDate,
         targetDate: LocalDate?,
@@ -487,7 +467,6 @@ object Constants {
      * @param price The price to be rounded
      * @param tickerType The ticker type
      */
-    @JvmStatic
     fun roundPrice(
         price: BigDecimal,
         assetType: AssetType,
