@@ -43,6 +43,7 @@ abstract class BaseDividendManagement(
     protected val calculatorService: CalculatorService,
     protected val tickerService: TickerService,
     protected val preferencesService: PreferencesService,
+    protected val springContext: ConfigurableApplicationContext,
 ) {
     @FXML
     protected lateinit var tickerNameLabel: Label
@@ -74,7 +75,6 @@ abstract class BaseDividendManagement(
     @FXML
     protected lateinit var includeInAnalysisCheckBox: CheckBox
 
-    protected lateinit var springContext: ConfigurableApplicationContext
     protected lateinit var suggestionsHandler: SuggestionsHandlerHelper<WalletTransaction>
     protected var wallets: List<Wallet> = emptyList()
     protected var categories: List<Category> = emptyList()

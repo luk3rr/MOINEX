@@ -21,6 +21,7 @@ import org.moinex.service.PreferencesService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.dialog.investment.base.BaseDividendManagement
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.time.LocalTime
 
@@ -31,12 +32,14 @@ class EditDividendController(
     calculatorService: CalculatorService,
     tickerService: TickerService,
     preferencesService: PreferencesService,
+    springContext: ConfigurableApplicationContext,
 ) : BaseDividendManagement(
         walletService,
         categoryService,
         calculatorService,
         tickerService,
         preferencesService,
+        springContext,
     ) {
     private lateinit var dividend: Dividend
 
