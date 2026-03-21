@@ -81,21 +81,13 @@ abstract class BaseCreditCardDebtManagement(
     protected var categories: List<Category> = emptyList()
     protected var creditCards: List<CreditCard> = emptyList()
 
-    var creditCard: CreditCard? = null
-        set(value) {
-            if (value != null && creditCards.none { it.id!! == value.id!! }) {
-                return
-            }
-            field = value
-            if (value != null) {
-                crcComboBox.value = value
-                updateCreditCardLimitLabels()
-            }
-        }
-
     companion object {
         private const val INVOICE_YEAR_RANGE = 2
         private const val MONTHS_IN_YEAR = 12
+    }
+
+    fun setCreditCard(creditCard: CreditCard) {
+        crcComboBox.value = creditCard
     }
 
     @FXML
@@ -259,14 +251,13 @@ abstract class BaseCreditCardDebtManagement(
             invoiceYearComboBox.items.add(year)
         }
 
-        setDefaultInvoiceMonthAndYear()
-
         categoryComboBox.items.addAll(categories)
         crcComboBox.items.addAll(creditCards)
     }
 
     protected fun setDefaultInvoiceMonthAndYear() {
-        val invoiceDate = creditCard?.let { creditCardService.getNextInvoiceDate(it) }?.toYearMonth() ?: YearMonth.now()
+        val invoiceDate =
+            crcComboBox.value?.let { creditCardService.getNextInvoiceDate(it) }?.toYearMonth() ?: YearMonth.now()
         invoiceMonthComboBox.value = invoiceDate.monthValue
         invoiceYearComboBox.value = invoiceDate.year
     }
@@ -306,6 +297,7 @@ abstract class BaseCreditCardDebtManagement(
         crcComboBox.valueProperty().addListener { _, _, _ ->
             updateCreditCardLimitLabels()
             updateAvailableLimitAfterDebtLabel()
+            setDefaultInvoiceMonthAndYear()
         }
 
         valueField.textProperty().addListener { _, oldValue, newValue ->

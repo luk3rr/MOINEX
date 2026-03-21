@@ -112,7 +112,7 @@ class CreditCardPaneController(
             Files.ADD_CREDIT_CARD_DEBT_FXML,
             preferencesService.translate(TranslationKeys.COMMON_CREDIT_CARD_MODAL_ADD_DEBT),
             springContext,
-            { controller: AddCreditCardDebtController -> controller.creditCard = creditCard },
+            { controller: AddCreditCardDebtController -> controller.setCreditCard(creditCard) },
             listOf(Runnable { creditCardController.updateDisplay() }),
         )
     }
