@@ -137,7 +137,7 @@ object WindowUtils {
         fxmlFileName: String,
         title: String,
         springContext: ApplicationContext,
-        controllerSetup: Consumer<T>, // TODO: Após migração apra kotlin, utilizar controllerSetup: (T) -> Unit
+        controllerSetup: (T) -> Unit,
         onHiddenActions: List<Runnable> = emptyList(),
         resources: ResourceBundle? = null,
     ) {
@@ -164,7 +164,7 @@ object WindowUtils {
                     }
 
                 val controller: T = loader.getController()
-                controllerSetup.accept(controller)
+                controllerSetup(controller)
 
                 this.title = title
                 setOnHidden { onHiddenActions.forEach(Runnable::run) }
@@ -180,7 +180,7 @@ object WindowUtils {
         fxmlFileName: String,
         title: String,
         springContext: ApplicationContext,
-        controllerSetup: Consumer<T>, // TODO: Após migração apra kotlin, utilizar controllerSetup: (T) -> Unit
+        controllerSetup: (T) -> Unit,
         onHiddenActions: List<Runnable> = emptyList(),
         resources: ResourceBundle? = null,
     ) {
@@ -206,7 +206,7 @@ object WindowUtils {
                     }
 
                 val controller: T = loader.getController()
-                controllerSetup.accept(controller)
+                controllerSetup(controller)
 
                 this.title = title
                 setOnHidden { onHiddenActions.forEach(Runnable::run) }

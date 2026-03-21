@@ -37,7 +37,7 @@ class BudgetGroup(
     var targetPercentage: BigDecimal,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", nullable = false)
-    var plan: FinancialPlan? = null, // TODO: Set plan when creating
+    var plan: FinancialPlan? = null,
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "budget_group_categories",

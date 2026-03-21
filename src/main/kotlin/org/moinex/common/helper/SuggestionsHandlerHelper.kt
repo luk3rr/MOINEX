@@ -11,14 +11,11 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.stage.Popup
 import org.moinex.common.constants.Constants
-import java.util.function.Consumer
-import java.util.function.Function
-
 class SuggestionsHandlerHelper<T>(
     private val componentField: TextField,
-    private val filterFunction: Function<T, String>, // TODO: Após migração para kotlin, utilizar (T) -> String
-    private val displayFunction: Function<T, String>, // TODO: Após migração para kotlin, utilizar (T) -> String
-    private val onSelectCallback: Consumer<T>, // TODO: Após migração para kotlin, utilizar (T) -> Unit
+    private val filterFunction: (T) -> String,
+    private val displayFunction: (T) -> String,
+    private val onSelectCallback: (T) -> Unit,
 ) {
     private val suggestionListView = ListView<T>()
     private val suggestionsPopup = Popup()
@@ -53,8 +50,7 @@ class SuggestionsHandlerHelper<T>(
                 val filteredSuggestions =
                     suggestions
                         .filter { item ->
-                            filterFunction
-                                .apply(item)
+                            filterFunction(item)
                                 .lowercase()
                                 .contains(newValue.lowercase())
                         }.take(Constants.SUGGESTIONS_MAX_ITEMS)
@@ -87,7 +83,7 @@ class SuggestionsHandlerHelper<T>(
                             } else {
                                 VBox().apply {
                                     spacing = 2.0
-                                    children.add(Label(displayFunction.apply(item)))
+                                    children.add(Label(displayFunction(item)))
                                 }
                             }
                     }
@@ -105,7 +101,7 @@ class SuggestionsHandlerHelper<T>(
 
             selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                 newValue?.let {
-                    onSelectCallback.accept(it)
+                    onSelectCallback(it)
                     suggestionsPopup.hide()
                 }
             }
