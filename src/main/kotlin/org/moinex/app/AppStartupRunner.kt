@@ -8,11 +8,9 @@
 
 package org.moinex.app
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import org.moinex.common.util.FxUtils
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.MarketIndicatorService
@@ -39,44 +37,68 @@ class AppStartupRunner(
 
     override fun run(args: ApplicationArguments) {
         logger.info("AppStartupRunner started")
-        recurringTransactionService.processRecurringTransactions()
 
-        CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
-            try {
-                logger.info("Startup pipeline beginning")
-                startupPipeline()
-                logger.info("Startup pipeline completed successfully")
-            } catch (e: Exception) {
-                logger.error("Startup pipeline failed with exception", e)
-            }
+        FxUtils.launchOnBackground {
+            logger.info("Processing recurring transactions")
+            recurringTransactionService.processRecurringTransactions()
+
+            logger.info("Startup pipeline beginning")
+            startupPipeline()
+            logger.info("Startup pipeline completed successfully")
         }
     }
 
     private suspend fun startupPipeline() =
         coroutineScope {
-            runStep("Updating market indicator history") {
-                marketIndicatorService.updateAllIndicators()
-            }
+            val marketIndicatorStep =
+                async {
+                    runStep("Updating market indicator history") {
+                        marketIndicatorService.updateAllIndicators()
+                    }
+                }
 
-            runStep("Calculating bond interest") {
-                bondInterestCalculationService.calculateInterestForAllBondsIfNeeded()
-            }
+            val brazilianMarketIndicatorsStep =
+                async {
+                    runStep("Updating Brazilian market indicators") {
+                        marketService.updateBrazilianMarketIndicatorsFromApi()
+                    }
+                }
 
-            runStep("Updating Brazilian market indicators") {
-                marketService.updateBrazilianMarketIndicatorsFromApi()
-            }
+            val quotesAndCommoditiesStep =
+                async {
+                    runStep("Updating market quotes and commodities") {
+                        marketService.updateMarketQuotesAndCommoditiesFromApi()
+                    }
+                }
 
-            runStep("Updating market quotes and commodities") {
-                marketService.updateMarketQuotesAndCommoditiesFromApi()
-            }
+            marketIndicatorStep.await()
+            brazilianMarketIndicatorsStep.await()
+            quotesAndCommoditiesStep.await()
 
-            runStep("Initializing price history") {
-                tickerPriceHistoryService.initializePriceHistory()
-            }
+            val bondInterestCalculationStep =
+                async {
+                    runStep("Calculating bond interest") {
+                        bondInterestCalculationService.calculateInterestForAllBondsIfNeeded()
+                    }
+                }
 
-            runStep("Updating ticker prices") {
-                tickerService.updateAllNonArchivedTickersPrices()
-            }
+            val tickerPriceHistoryStep =
+                async {
+                    runStep("Initializing price history") {
+                        tickerPriceHistoryService.initializePriceHistory()
+                    }
+                }
+
+            val nonArchivedTickerPricesStep =
+                async {
+                    runStep("Updating ticker prices") {
+                        tickerService.updateAllNonArchivedTickersPrices()
+                    }
+                }
+
+            bondInterestCalculationStep.await()
+            tickerPriceHistoryStep.await()
+            nonArchivedTickerPricesStep.await()
 
             runStep("Recalculating investment performance snapshots") {
                 investmentPerformanceService.recalculateAllSnapshots()
