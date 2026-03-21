@@ -159,7 +159,8 @@ class RecurringTransactionService(
             recurringTransactions
                 .filter { !includeOnlyForAnalysis || it.includeInAnalysis }
                 .forEach { recurringTransaction ->
-                    var currentDate = recurringTransaction.nextDueDate
+                    val effectiveStartDate = maxOf(recurringTransaction.nextDueDate, recurringTransaction.startDate)
+                    var currentDate = effectiveStartDate
 
                     while (shouldGenerateWalletTransaction(currentDate, endInterval, recurringTransaction)) {
                         if (currentDate.isAfterOrEqual(startInterval)) {

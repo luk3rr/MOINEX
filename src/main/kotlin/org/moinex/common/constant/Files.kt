@@ -82,7 +82,7 @@ object Files {
     const val ADD_TRANSFER_FXML: String = UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_transfer.fxml"
     const val ADD_EXPENSE_FXML: String = UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_expense.fxml"
     const val ADD_RECURRING_TRANSACTION_FXML: String =
-        UI_DIALOG_WALLETTRANSACTION_PATH + "add_recurring_transaction.fxml"
+        UI_DIALOG_WALLETTRANSACTION_CREATE_PATH + "add_recurring_transaction.fxml"
 
     // UI wallettransaction package - Update
     const val EDIT_TRANSFER_FXML: String = UI_DIALOG_WALLETTRANSACTION_UPDATE_PATH + "edit_transfer.fxml"

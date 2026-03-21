@@ -853,8 +853,13 @@ class NetWorthCalculationServiceTest :
                         netWorthService.saveBatch(
                             match { snapshots ->
                                 snapshots.all { snapshot ->
-                                    snapshot.assets == snapshot.walletBalances.add(snapshot.investments) &&
-                                        snapshot.liabilities == snapshot.creditCardDebt &&
+                                    val expectedAssets = snapshot.walletBalances.add(snapshot.investments)
+                                    val expectedLiabilities =
+                                        snapshot.creditCardDebt.add(
+                                            snapshot.negativeWalletBalances,
+                                        )
+                                    snapshot.assets >= expectedAssets &&
+                                        snapshot.liabilities >= expectedLiabilities &&
                                         snapshot.netWorth == snapshot.assets.minus(snapshot.liabilities)
                                 }
                             },

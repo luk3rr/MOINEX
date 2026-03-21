@@ -14,7 +14,6 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual
-import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isNotZero
 import org.moinex.common.extension.isOpenEnded
 import org.moinex.common.extension.isPending
@@ -23,6 +22,7 @@ import org.moinex.config.BalanceCalculationConfig
 import org.moinex.model.NetWorthSnapshot
 import org.moinex.model.creditcard.CreditCardPayment
 import org.moinex.model.dto.BondOperationCalculationDTO
+import org.moinex.model.enums.BalanceType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.RecurringTransaction
@@ -171,15 +171,13 @@ class NetWorthCalculationService(
         logger.debug("=== Calculating {} for {}/{} ===", config.logPrefix, targetMonth.month, targetMonth.year)
         logger.debug("Target month: {} | Current month: {}", targetMonth, currentMonth)
 
-        val filteredWallets = wallets.filter(config.walletFilter)
-
         val totalBalance =
             when {
                 targetMonth.isAfter(
                     currentMonth,
-                ) -> calculateFutureWalletBalances(targetMonth, currentMonth, filteredWallets, config)
-                targetMonth == currentMonth -> calculateCurrentMonthWalletBalances(targetMonth, filteredWallets, config)
-                else -> calculateHistoricalWalletBalances(targetMonth, filteredWallets, config)
+                ) -> calculateFutureWalletBalances(targetMonth, currentMonth, wallets, config)
+                targetMonth == currentMonth -> calculateCurrentMonthWalletBalances(targetMonth, wallets, config)
+                else -> calculateHistoricalWalletBalances(targetMonth, wallets, config)
             }
 
         val result = config.resultTransform(totalBalance)
@@ -195,7 +193,6 @@ class NetWorthCalculationService(
         config: BalanceCalculationConfig,
     ): BigDecimal {
         logger.debug("Future month - projecting from current balance")
-        var totalBalance = wallets.sumOf { it.balance.abs() }
 
         val futureTransactions =
             recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -203,7 +200,9 @@ class NetWorthCalculationService(
                 targetMonth,
             )
 
-        totalBalance = applyTransactionsImpact(totalBalance, futureTransactions)
+        logger.debug("  Applying {} future transactions to project wallet balances", futureTransactions.size)
+
+        val totalBalance = projectWalletBalances(futureTransactions, emptyList(), config, wallets)
 
         logger.debug("Total future {}: {}", config.logPrefix.lowercase(), totalBalance)
         return totalBalance
@@ -215,7 +214,6 @@ class NetWorthCalculationService(
         config: BalanceCalculationConfig,
     ): BigDecimal {
         logger.debug("Current month - including pending and scheduled transactions")
-        var totalBalance = wallets.sumOf { it.balance.abs() }
 
         val scheduledTransactions =
             recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -223,27 +221,59 @@ class NetWorthCalculationService(
                 targetMonth,
             )
 
-        totalBalance = applyTransactionsImpact(totalBalance, scheduledTransactions)
-
         val currentMonthTransactions = walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(targetMonth)
         val pendingTransactions = currentMonthTransactions.filter { it.isPending() }
 
-        totalBalance = applyTransactionsImpact(totalBalance, pendingTransactions)
+        val totalBalance = projectWalletBalances(scheduledTransactions, pendingTransactions, config, wallets)
 
         logger.debug("Total current month {}: {}", config.logPrefix.lowercase(), totalBalance)
         return totalBalance
     }
 
-    private fun applyTransactionsImpact(
-        baseBalance: BigDecimal,
-        transactions: List<WalletTransaction>,
+    private fun projectWalletBalances(
+        recurringTransactions: List<WalletTransaction>,
+        pendingTransactions: List<WalletTransaction>,
+        config: BalanceCalculationConfig,
+        wallets: List<Wallet>,
     ): BigDecimal {
-        val (incomes, expenses) = transactions.partition { it.isIncome() }
+        val allTransactions = recurringTransactions + pendingTransactions
 
-        val incomesTotal = incomes.sumOf { it.amount }
-        val expensesTotal = expenses.sumOf { it.amount }
+        if (allTransactions.isEmpty()) {
+            return wallets
+                .filter { config.walletFilter(it) }
+                .sumOf { it.balance.abs() }
+        }
 
-        return baseBalance.add(incomesTotal).subtract(expensesTotal)
+        val affectedWalletIds = allTransactions.map { it.wallet.id!! }.toSet()
+        val allWallets = walletService.getAllWalletsOrderedByName()
+        val relevantWallets = allWallets.filter { it.id in affectedWalletIds || config.walletFilter(it) }
+
+        val projectedBalances = mutableMapOf<Int, BigDecimal>()
+        relevantWallets.forEach { wallet ->
+            projectedBalances[wallet.id!!] = wallet.balance
+        }
+
+        allTransactions.forEach { transaction ->
+            val walletId = transaction.wallet.id!!
+            val currentBalance = projectedBalances[walletId] ?: BigDecimal.ZERO
+
+            val newBalance =
+                when (transaction.type) {
+                    WalletTransactionType.INCOME -> currentBalance.add(transaction.amount)
+                    WalletTransactionType.EXPENSE -> currentBalance.subtract(transaction.amount)
+                }
+
+            projectedBalances[walletId] = newBalance
+        }
+
+        return projectedBalances
+            .entries
+            .filter { (_, balance) ->
+                when (config.balanceType) {
+                    BalanceType.POSITIVE -> balance > BigDecimal.ZERO
+                    BalanceType.NEGATIVE -> balance < BigDecimal.ZERO
+                }
+            }.sumOf { (_, balance) -> balance.abs() }
     }
 
     private fun calculateHistoricalWalletBalances(
