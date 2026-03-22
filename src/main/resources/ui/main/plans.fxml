@@ -35,6 +35,7 @@
                            <children>
                               <AnchorPane maxWidth="450.0" minWidth="350.0" prefWidth="400.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                                  <children>
+                                    <Label fx:id="planNameLabel" styleClass="title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                     <VBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="50.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
                                        <children>
                                           <Label text="%plan.baseMonthlyIncome">

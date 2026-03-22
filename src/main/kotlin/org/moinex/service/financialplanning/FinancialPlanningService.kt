@@ -39,16 +39,15 @@ class FinancialPlanningService(
 
         plan.budgetGroups.forEach { group -> group.plan = plan }
 
-        getNonArchivedPlan()?.let {
-            it.apply {
-                archived = true
-            }
-            logger.info("Archived previous $it")
+        getNonArchivedPlan()?.let { previousPlan ->
+            previousPlan.endDate = plan.startDate.minusDays(1)
+            previousPlan.archived = true
+            logger.info("Archived previous $previousPlan with endDate=${previousPlan.endDate}")
         } ?: logger.info("No active financial plan found, creating a new one")
 
         val newPlan = financialPlanRepository.save(plan)
 
-        logger.info("$newPlan created successfully")
+        logger.info("$newPlan created successfully with startDate=${newPlan.startDate}")
 
         return newPlan.id!!
     }
@@ -110,7 +109,37 @@ class FinancialPlanningService(
             }.toList()
     }
 
+    fun getHistoricalDataAcrossPlans(
+        startPeriod: YearMonth,
+        endPeriod: YearMonth,
+    ): List<BudgetGroupHistoricalDataDTO> =
+        generateSequence(startPeriod) { it.plusMonths(1) }
+            .takeWhile { it.isBeforeOrEqual(endPeriod) }
+            .flatMap { period ->
+                val plan = getPlanForPeriod(period)
+                if (plan != null) {
+                    getPlanStatus(plan.id!!, period)
+                        .map { status ->
+                            BudgetGroupHistoricalDataDTO(
+                                status.group.name,
+                                period,
+                                status.spentAmount,
+                                calculateTargetAmount(plan.baseIncome, status.group.targetPercentage),
+                            )
+                        }.asSequence()
+                } else {
+                    emptySequence()
+                }
+            }.toList()
+
+    fun getPlanForPeriod(period: YearMonth): FinancialPlan? {
+        val date = period.atDay(15)
+        return financialPlanRepository.findPlanForDate(date)
+    }
+
     fun getNonArchivedPlan(): FinancialPlan? = financialPlanRepository.findByArchivedFalse()
+
+    fun getActivePlan(): FinancialPlan? = financialPlanRepository.findByArchivedFalse()
 
     private fun calculateTargetAmount(
         baseIncome: BigDecimal,

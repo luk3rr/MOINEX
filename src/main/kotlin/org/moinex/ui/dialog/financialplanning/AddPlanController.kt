@@ -82,7 +82,13 @@ class AddPlanController(
         runCatching {
             val baseIncome = formData.baseIncome.toBigDecimal()
 
-            val plan = FinancialPlan(name = formData.name, baseIncome = baseIncome, budgetGroups = budgetGroups)
+            val plan =
+                FinancialPlan(
+                    name = formData.name,
+                    baseIncome = baseIncome,
+                    budgetGroups = budgetGroups,
+                    startDate = formData.startDate!!,
+                )
             financialPlanningService.createPlan(plan)
 
             WindowUtils.showSuccessDialog(

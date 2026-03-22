@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -40,6 +41,14 @@
                             <font><Font size="10.0" /></font>
                         </Label>
                         <TextField fx:id="baseIncomeField" prefWidth="150.0" promptText="\$ 0.00" />
+                    </children>
+                </VBox>
+                <VBox>
+                    <children>
+                        <Label text="%financialplanning.label.startDate">
+                            <font><Font size="10.0" /></font>
+                        </Label>
+                        <DatePicker fx:id="startDatePicker" prefWidth="150.0" />
                     </children>
                 </VBox>
             </children>

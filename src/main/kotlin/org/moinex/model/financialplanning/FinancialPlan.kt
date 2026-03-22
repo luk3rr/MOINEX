@@ -10,6 +10,7 @@ package org.moinex.model.financialplanning
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -17,9 +18,11 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import org.moinex.common.converter.LocalDateStringConverter
 import org.moinex.common.extension.isEqual
 import org.moinex.common.extension.toRounded
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Entity
 @Table(name = "financial_plan")
@@ -38,6 +41,12 @@ class FinancialPlan(
         fetch = FetchType.EAGER,
     )
     var budgetGroups: MutableList<BudgetGroup> = mutableListOf(),
+    @Column(name = "start_date", nullable = false)
+    @Convert(converter = LocalDateStringConverter::class)
+    var startDate: LocalDate = LocalDate.now(),
+    @Column(name = "end_date")
+    @Convert(converter = LocalDateStringConverter::class)
+    var endDate: LocalDate? = null,
     @Column(name = "archived", nullable = false)
     var archived: Boolean = false,
 ) {

@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TextField
@@ -51,6 +52,9 @@ abstract class BasePlanManagement(
     protected lateinit var baseIncomeField: TextField
 
     @FXML
+    protected lateinit var startDatePicker: DatePicker
+
+    @FXML
     protected lateinit var budgetGroupInfo: Label
 
     @FXML
@@ -80,6 +84,7 @@ abstract class BasePlanManagement(
     open fun initialize() {
         configureBaseIncomeListener()
         configureButtonsActions()
+        UIUtils.setDatePickerFormat(startDatePicker)
         budgetGroupInfo.isVisible = false
     }
 
@@ -335,5 +340,6 @@ abstract class BasePlanManagement(
         PlanFormDTO(
             name = planNameField.text.trim(),
             baseIncome = baseIncomeField.text.trim(),
+            startDate = startDatePicker.value,
         )
 }

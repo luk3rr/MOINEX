@@ -34,6 +34,7 @@ class EditPlanController(
 
         planNameField.text = plan.name
         baseIncomeField.text = plan.baseIncome.toString()
+        startDatePicker.value = plan.startDate
         budgetGroups = deepCopyBudgetGroups(plan.budgetGroups)
 
         updateBudgetGroupsContainer()

@@ -49,6 +49,9 @@ class PlanController(
     private lateinit var periodComboBox: ComboBox<YearMonth>
 
     @FXML
+    private lateinit var planNameLabel: Label
+
+    @FXML
     private lateinit var baseMonthlyIncome: Label
 
     @FXML
@@ -102,7 +105,9 @@ class PlanController(
 
     @FXML
     private fun handleEditPlan() {
-        if (currentPlan == null) {
+        val activePlan = financialPlanningService.getActivePlan()
+
+        if (activePlan == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
                     TranslationKeys.PLAN_DIALOG_NO_ACTIVE_PLAN_TITLE,
@@ -118,7 +123,7 @@ class PlanController(
             Files.EDIT_PLAN_FXML,
             preferencesService.translate(TranslationKeys.PLAN_DIALOG_EDIT_PLAN_TITLE),
             springContext,
-            { controller: EditPlanController -> controller.setPlan(currentPlan!!) },
+            { controller: EditPlanController -> controller.setPlan(activePlan) },
             listOf(Runnable { updateView() }),
         )
     }
@@ -163,15 +168,22 @@ class PlanController(
     private fun updateView() {
         val selectedPeriod = periodComboBox.value ?: return
 
-        currentPlan = financialPlanningService.getNonArchivedPlan()
+        currentPlan = financialPlanningService.getPlanForPeriod(selectedPeriod)
 
-        currentPlan?.let {
+        currentPlan?.let { plan ->
             currentPlanStatus =
                 financialPlanningService
-                    .getPlanStatus(currentPlan!!.id!!, selectedPeriod)
+                    .getPlanStatus(plan.id!!, selectedPeriod)
                     .sortedByDescending { it.group.targetPercentage }
 
-            baseMonthlyIncome.text = UIUtils.formatCurrency(currentPlan!!.baseIncome)
+            planNameLabel.text =
+                java.text.MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.FINANCIALPLANNING_LABEL_PLAN_PERIOD),
+                    plan.name,
+                    UIUtils.formatDateForDisplay(plan.startDate),
+                )
+
+            baseMonthlyIncome.text = UIUtils.formatCurrency(plan.baseIncome)
 
             updateDoughnutChart()
 
@@ -179,7 +191,17 @@ class PlanController(
 
             updateBudgetGroupPanes()
             updateTimelineChart()
-        } ?: logger.warn("No active financial plan found. Please create a new plan.")
+        } ?: run {
+            planNameLabel.text = ""
+            baseMonthlyIncome.text = UIUtils.formatCurrency(BigDecimal.ZERO)
+            currentPlanStatus = emptyList()
+            pieChartAnchorPane.children.clear()
+            budgetGroupPane1.children.clear()
+            budgetGroupPane2.children.clear()
+            budgetGroupPane3.children.clear()
+            timelineChartAnchorPane.children.clear()
+            logger.warn("No financial plan found for period {}.", selectedPeriod)
+        }
     }
 
     private fun updateDoughnutChart() {
@@ -286,8 +308,7 @@ class PlanController(
         val startPeriod = currentPeriod.minusMonths(HISTORICAL_DATA_MONTHS.toLong())
 
         val historicalData =
-            financialPlanningService.getHistoricalData(
-                currentPlan!!.id!!,
+            financialPlanningService.getHistoricalDataAcrossPlans(
                 startPeriod,
                 currentPeriod,
             )

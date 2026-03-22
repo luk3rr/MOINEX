@@ -1157,6 +1157,8 @@ object TranslationKeys {
     const val FINANCIALPLANNING_PROMPT_TEXT_TARGET_PERCENTAGE: String =
         "financialplanning.promptText.targetPercentage"
     const val FINANCIALPLANNING_PROMPT_TEXT_PLAN_NAME: String = "financialplanning.promptText.planName"
+    const val FINANCIALPLANNING_LABEL_START_DATE: String = "financialplanning.label.startDate"
+    const val FINANCIALPLANNING_LABEL_PLAN_PERIOD: String = "financialplanning.label.planPeriod"
 
     // Financial Planning Budget Templates
     const val FINANCIALPLANNING_TEMPLATE_50_30_20_NAME: String = "financialplanning.template.50-30-20.name"
