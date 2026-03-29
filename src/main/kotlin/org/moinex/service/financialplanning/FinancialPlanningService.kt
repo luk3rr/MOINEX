@@ -67,9 +67,24 @@ class FinancialPlanningService(
             baseIncome = updatedPlan.baseIncome
         }
 
-        planFromDatabase.budgetGroups.clear()
-        updatedPlan.budgetGroups.forEach { group -> group.plan = planFromDatabase }
-        planFromDatabase.budgetGroups.addAll(updatedPlan.budgetGroups)
+        val updatedGroupsById = updatedPlan.budgetGroups.filter { it.id != null }.associateBy { it.id!! }
+
+        planFromDatabase.budgetGroups.removeIf { it.id !in updatedGroupsById.keys }
+
+        planFromDatabase.budgetGroups.forEach { existingGroup ->
+            updatedGroupsById[existingGroup.id]?.let { updatedGroup ->
+                existingGroup.name = updatedGroup.name
+                existingGroup.targetPercentage = updatedGroup.targetPercentage
+                existingGroup.transactionTypeFilter = updatedGroup.transactionTypeFilter
+                existingGroup.categories.clear()
+                existingGroup.categories.addAll(updatedGroup.categories)
+            }
+        }
+
+        updatedPlan.budgetGroups.filter { it.id == null }.forEach { newGroup ->
+            newGroup.plan = planFromDatabase
+            planFromDatabase.budgetGroups.add(newGroup)
+        }
 
         logger.info("$planFromDatabase updated successfully")
     }
