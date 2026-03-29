@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="350.0" spacing="10.0" styleClass="dialog-container" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.wishlist.MarkAsPurchasedController">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+
+    <Label styleClass="dialog-title" text="%wishlist.mark_as_purchased.select_payment_method" />
+
+    <VBox spacing="10">
+        <RadioButton fx:id="walletRadioButton" text="%wishlist.payment_method.wallet" />
+        <RadioButton fx:id="creditCardRadioButton" text="%wishlist.payment_method.credit_card" />
+    </VBox>
+   <HBox alignment="CENTER" spacing="10.0">
+      <children>
+         <JFXButton minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.cancel" />
+         <JFXButton minWidth="80.0" onAction="#handleConfirm" stylesheets="@../../../css/component/buttons.css" text="%dialog.button.confirm" />
+      </children>
+   </HBox>
+</VBox>

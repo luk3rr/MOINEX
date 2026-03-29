@@ -21,7 +21,6 @@ import javafx.scene.chart.StackedBarChart
 import javafx.scene.chart.XYChart
 import javafx.scene.control.ComboBox
 import javafx.scene.control.DatePicker
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
@@ -789,23 +788,7 @@ class TransactionController(
             ),
         ).apply {
             setCellValueFactory { SimpleObjectProperty(it.value.id) }
-            setCellFactory {
-                object : TableCell<WalletTransaction, Int>() {
-                    override fun updateItem(
-                        item: Int?,
-                        empty: Boolean,
-                    ) {
-                        super.updateItem(item, empty)
-                        if (item == null || empty) {
-                            text = null
-                        } else {
-                            text = item.toString()
-                            alignment = Pos.CENTER
-                            style = "-fx-padding: 0;"
-                        }
-                    }
-                }
-            }
+            UIUtils.alignTableColumn(this, Pos.CENTER)
         }
 
     private fun createCategoryColumn(): TableColumn<WalletTransaction, String> =

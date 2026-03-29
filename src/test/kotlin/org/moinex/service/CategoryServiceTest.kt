@@ -18,15 +18,17 @@ import org.moinex.factory.CategoryFactory
 import org.moinex.repository.CategoryRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
+import org.moinex.service.wishlist.WishlistService
 import java.util.Optional
 
 class CategoryServiceTest :
     BehaviorSpec({
         val categoryRepository = mockk<CategoryRepository>()
         val creditCardService = mockk<CreditCardService>()
+        val wishListService = mockk<WishlistService>(relaxed = true)
         val walletService = mockk<WalletService>()
 
-        val service = CategoryService(categoryRepository, creditCardService, walletService)
+        val service = CategoryService(categoryRepository, creditCardService, walletService, wishListService)
 
         afterContainer { clearAllMocks(answers = true) }
 

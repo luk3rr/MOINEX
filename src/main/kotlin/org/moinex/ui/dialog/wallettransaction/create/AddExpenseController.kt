@@ -38,8 +38,14 @@ class AddExpenseController(
         preferencesService,
         springContext,
     ) {
+    private var onTransactionCreatedCallback: ((Int) -> Unit)? = null
+
     init {
         walletTransactionType = WalletTransactionType.EXPENSE
+    }
+
+    fun setOnTransactionCreatedCallback(callback: (Int) -> Unit) {
+        this.onTransactionCreatedCallback = callback
     }
 
     @FXML
@@ -70,18 +76,21 @@ class AddExpenseController(
             val currentTime = LocalTime.now()
             val dateTimeWithCurrentHour = expenseDate.atTime(currentTime)
 
-            walletService.createWalletTransaction(
-                WalletTransaction(
-                    date = dateTimeWithCurrentHour,
-                    status = status,
-                    description = description,
-                    includeInAnalysis = includeInAnalysisCheckBox.isSelected,
-                    wallet = wallet,
-                    category = category,
-                    type = walletTransactionType,
-                    amount = expenseValue,
-                ),
-            )
+            val transactionId =
+                walletService.createWalletTransaction(
+                    WalletTransaction(
+                        date = dateTimeWithCurrentHour,
+                        status = status,
+                        description = description,
+                        includeInAnalysis = includeInAnalysisCheckBox.isSelected,
+                        wallet = wallet,
+                        category = category,
+                        type = walletTransactionType,
+                        amount = expenseValue,
+                    ),
+                )
+
+            onTransactionCreatedCallback?.invoke(transactionId)
 
             WindowUtils.showSuccessDialog(
                 preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_TITLE),

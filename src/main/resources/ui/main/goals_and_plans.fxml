@@ -11,6 +11,7 @@
         <tabs>
           <Tab fx:id="goalsTab" text="%goalsPlans.tab.goals" />
           <Tab fx:id="plansTab" text="%goalsPlans.tab.plans" />
+          <Tab fx:id="wishlistTab" text="%goalsPlans.tab.wishlist" />
         </tabs>
       </TabPane>
    </children>

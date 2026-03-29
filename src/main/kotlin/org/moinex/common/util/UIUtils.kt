@@ -16,6 +16,7 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.Chart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.ComboBox
+import javafx.scene.control.Control
 import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.ListCell
@@ -26,6 +27,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.text.Text
+import javafx.scene.text.TextFlow
 import javafx.util.Callback
 import javafx.util.Duration
 import javafx.util.StringConverter
@@ -101,13 +103,18 @@ class UIUtils(
         ) {
             if (node == null || text == null) return
 
-            Tooltip(text)
-                .apply {
+            val tooltip =
+                Tooltip(text).apply {
                     styleClass.add(Styles.TOOLTIP_STYLE)
                     showDelay = Duration.seconds(Constants.TOOLTIP_ANIMATION_DELAY)
                     showDuration = Duration.hours(1.0)
                     hideDelay = Duration.seconds(Constants.TOOLTIP_ANIMATION_DURATION)
-                }.also { Tooltip.install(node, it) }
+                }
+
+            when (node) {
+                is Control -> node.tooltip = tooltip
+                else -> Tooltip.install(node, tooltip)
+            }
         }
 
         fun addTooltipToAxisLabel(
@@ -257,6 +264,31 @@ class UIUtils(
                 Styles.NEUTRAL_BALANCE_STYLE,
             )
             label.styleClass.add(style)
+        }
+
+        fun createDetailLabel(
+            labelKey: String,
+            value: String,
+            showColon: Boolean = false,
+        ): Label {
+            val labelText = preferencesService.translate(labelKey)
+
+            return Label().apply {
+                val keyText = Text(labelText).apply { style = Styles.DETAIL_KEY_LABEL_STYLE }
+                val separator = if (showColon) Text(":") else Text(": ")
+                val valueText = Text(value).apply { style = Styles.DETAIL_VALUE_LABEL_STYLE }
+
+                graphic =
+                    if (value.isNotEmpty() || showColon) {
+                        TextFlow(
+                            keyText,
+                            separator,
+                            if (!showColon) valueText else Text(""),
+                        )
+                    } else {
+                        TextFlow(keyText)
+                    }
+            }
         }
 
         fun <T> configureComboBox(

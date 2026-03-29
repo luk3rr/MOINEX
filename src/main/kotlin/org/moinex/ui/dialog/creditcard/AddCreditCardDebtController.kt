@@ -12,6 +12,7 @@ import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
+import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCardDebt
 import org.moinex.service.CalculatorService
 import org.moinex.service.CategoryService
@@ -38,6 +39,26 @@ class AddCreditCardDebtController(
         springContext,
         preferencesService,
     ) {
+    private var onDebtCreatedCallback: ((Int) -> Unit)? = null
+
+    fun setOnDebtCreatedCallback(callback: (Int) -> Unit) {
+        this.onDebtCreatedCallback = callback
+    }
+
+    fun prefillDescription(description: String) {
+        descriptionField.text = description
+    }
+
+    fun prefillAmount(amount: BigDecimal) {
+        valueField.text = amount.toPlainString()
+        updateAvailableLimitAfterDebtLabel()
+        updateMsgLabel()
+    }
+
+    fun prefillCategory(category: Category) {
+        categoryComboBox.value = category
+    }
+
     @FXML
     override fun handleSave() {
         val formData = getFieldsFromInterface()
@@ -55,17 +76,20 @@ class AddCreditCardDebtController(
             val installments = formData.installmentsStr.ifEmpty { "1" }.toInt()
             val invoiceDateYearMonth = YearMonth.of(formData.invoiceYear!!, formData.invoiceMonth!!)
 
-            creditCardService.createDebt(
-                CreditCardDebt(
-                    category = formData.category!!,
-                    installments = installments,
-                    creditCard = formData.creditCard!!,
-                    date = LocalDateTime.now(),
-                    amount = debtValue,
-                    description = formData.description,
-                ),
-                invoiceDateYearMonth,
-            )
+            val debtId =
+                creditCardService.createDebt(
+                    CreditCardDebt(
+                        category = formData.category!!,
+                        installments = installments,
+                        creditCard = formData.creditCard!!,
+                        date = LocalDateTime.now(),
+                        amount = debtValue,
+                        description = formData.description,
+                    ),
+                    invoiceDateYearMonth,
+                )
+
+            onDebtCreatedCallback?.invoke(debtId)
 
             WindowUtils.showSuccessDialog(
                 preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),

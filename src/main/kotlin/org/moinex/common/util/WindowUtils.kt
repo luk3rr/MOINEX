@@ -9,6 +9,7 @@
 package org.moinex.common.util
 
 import javafx.fxml.FXMLLoader
+import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Alert
@@ -127,6 +128,22 @@ object WindowUtils {
         }
     }
 
+    @JvmOverloads
+    fun showDetailDialog(
+        header: String,
+        content: Node,
+        resources: ResourceBundle? = null,
+    ) {
+        Alert(AlertType.INFORMATION).apply {
+            title = getAlertTitle(AlertType.INFORMATION, resources)
+            headerText = header
+            dialogPane.content = content
+            dialogPane.minWidth = 500.0
+            isResizable = true
+            showAndWait()
+        }
+    }
+
     fun centerWindowOnScreen(stage: Stage) {
         stage.centerOnScreen()
     }
@@ -217,11 +234,19 @@ object WindowUtils {
     }
 
     fun openUrl(url: String) {
+        val normalizedUrl =
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                "https://$url"
+            } else {
+                url
+            }
+
         runCatching {
-            JavaFXApp.getHostServicesInstance().showDocument(url)
+            val hostServices = JavaFXApp.getHostServicesInstance()
+            hostServices.showDocument(normalizedUrl)
         }.onFailure { e ->
-            logger.error("Error opening URL: {}", url, e)
-            showErrorDialog("Error", "Could not open URL: $url")
+            logger.error("Error opening URL: {}", normalizedUrl, e)
+            showErrorDialog("Error", "Could not open URL: $normalizedUrl\n\nError: ${e.message}")
         }
     }
 }

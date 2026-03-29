@@ -68,4 +68,8 @@ object Styles {
     // Wallet pane styles
     const val WALLET_TOTAL_BALANCE_WALLETS_LABEL_STYLE: String = "total-balance-wallets-label"
     const val WALLET_CHECK_BOX_STYLE: String = "check-box"
+
+    // Detail
+    const val DETAIL_KEY_LABEL_STYLE = "-fx-font-weight: bold;"
+    const val DETAIL_VALUE_LABEL_STYLE = "-fx-font-weight: normal;"
 }

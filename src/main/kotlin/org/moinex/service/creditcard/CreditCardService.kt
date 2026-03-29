@@ -144,12 +144,12 @@ class CreditCardService(
     fun createDebt(
         debt: CreditCardDebt,
         invoiceMonth: YearMonth,
-    ) {
+    ): Int {
         check(debt.amount <= getAvailableCredit(debt.creditCard.id!!)) {
             "${debt.creditCard} does not have enough credit"
         }
 
-        creditCardDebtRepository.save(debt)
+        val newDebt = creditCardDebtRepository.save(debt)
 
         val (installmentValue, remainder) = calculateInstallmentValues(debt.amount, debt.installments)
 
@@ -183,6 +183,8 @@ class CreditCardService(
             debt.amount,
             debt.description,
         )
+
+        return newDebt.id!!
     }
 
     @Transactional
@@ -538,6 +540,8 @@ class CreditCardService(
         walletIds: List<Int>,
         startOfTargetMonth: LocalDateTime,
     ) = creditCardPaymentRepository.findAllPaidPaymentsByWalletsFromDateOnward(walletIds, startOfTargetMonth)
+
+    fun getCreditCardDebtById(id: Int) = creditCardDebtRepository.findByIdOrThrow(id)
 
     private fun calculateNextInvoiceDate(creditCard: CreditCard): LocalDateTime {
         val now = clockProvider.now()

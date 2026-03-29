@@ -13,6 +13,7 @@ import org.moinex.model.Category
 import org.moinex.repository.CategoryRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
+import org.moinex.service.wishlist.WishlistService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +23,7 @@ class CategoryService(
     private val categoryRepository: CategoryRepository,
     private val creditCardService: CreditCardService,
     private val walletService: WalletService,
+    private val wishlistService: WishlistService,
 ) {
     private val logger = LoggerFactory.getLogger(CategoryService::class.java)
 
@@ -43,7 +45,7 @@ class CategoryService(
         val categoryFromDatabase = categoryRepository.findByIdOrThrow(id)
 
         check(getTransactionCountByCategory(id) == 0) {
-            "Category ${categoryFromDatabase.name} cannot be deleted because it has associated transactions"
+            "Category ${categoryFromDatabase.name} cannot be deleted because it has associated transactions, debts, or wishlist items"
         }
 
         categoryRepository.delete(categoryFromDatabase)
@@ -112,5 +114,6 @@ class CategoryService(
 
     fun getTransactionCountByCategory(categoryId: Int): Int =
         walletService.getWalletTransactionAndTransferCountByCategory(categoryId) +
-            creditCardService.getDebtCountByCategory(categoryId)
+            creditCardService.getDebtCountByCategory(categoryId) +
+            wishlistService.getItemCountByCategory(categoryId)
 }

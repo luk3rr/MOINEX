@@ -280,4 +280,21 @@ abstract class BaseWalletTransactionManagement(
             transactionValueField.textProperty().addListener(it)
         }
     }
+
+    fun prefillDescription(text: String) {
+        suggestionsHandler.disable()
+        descriptionField.text = text
+        suggestionsHandler.enable()
+    }
+
+    fun prefillTransactionValue(value: BigDecimal) {
+        transactionValueField.text = value.toString()
+        walletAfterBalance()
+    }
+
+    fun prefillCategory(category: Category) {
+        if (categories.any { it.id == category.id }) {
+            categoryComboBox.value = category
+        }
+    }
 }

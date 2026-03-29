@@ -4,8 +4,10 @@ import org.moinex.config.BalanceCalculationConfig
 import org.moinex.model.enums.BalanceType
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
+import org.moinex.model.enums.WishlistItemStatus
 import org.moinex.model.wallettransaction.RecurringTransaction
 import org.moinex.model.wallettransaction.WalletTransaction
+import org.moinex.model.wishlist.WishlistItem
 import java.time.LocalDate
 
 fun WalletTransaction.isIncome(): Boolean = this.type == WalletTransactionType.INCOME
@@ -21,3 +23,7 @@ fun RecurringTransaction.nextFrom(date: LocalDate): LocalDate = date.plus(1, thi
 fun BalanceCalculationConfig.isPositive(): Boolean = this.balanceType == BalanceType.POSITIVE
 
 fun BalanceCalculationConfig.isNegative(): Boolean = this.balanceType == BalanceType.NEGATIVE
+
+fun WishlistItem.isPurchased(): Boolean = this.status == WishlistItemStatus.PURCHASED
+
+fun WishlistItem.isPending(): Boolean = this.status == WishlistItemStatus.PENDING

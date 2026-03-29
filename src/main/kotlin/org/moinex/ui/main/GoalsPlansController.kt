@@ -32,6 +32,9 @@ class GoalsPlansController(
     @FXML
     private lateinit var plansTab: Tab
 
+    @FXML
+    private lateinit var wishlistTab: Tab
+
     companion object {
         private val logger = LoggerFactory.getLogger(GoalsPlansController::class.java)
     }
@@ -52,6 +55,15 @@ class GoalsPlansController(
                 plansTab,
                 Files.PLANS_FXML,
                 Files.PLANS_STYLE_SHEET,
+                springContext,
+                javaClass,
+                preferencesService.bundle,
+            )
+
+            UIUtils.loadContentIntoTab(
+                wishlistTab,
+                Files.WISHLIST_FXML,
+                Files.WISHLIST_STYLE_SHEET,
                 springContext,
                 javaClass,
                 preferencesService.bundle,

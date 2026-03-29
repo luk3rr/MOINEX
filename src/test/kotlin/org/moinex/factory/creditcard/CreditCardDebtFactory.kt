@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 object CreditCardDebtFactory {
     fun create(
-        id: Int? = null,
+        id: Int? = 1,
         category: Category? = null,
         installments: Int = 1,
         creditCard: CreditCard? = null,

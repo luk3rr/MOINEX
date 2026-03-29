@@ -105,6 +105,13 @@ object Files {
     const val EDIT_BUDGET_GROUP_FXML: String = UI_DIALOG_FINANCIALPLANNING_PATH + "edit_budget_group.fxml"
     const val ADD_PLAN_FXML: String = UI_DIALOG_FINANCIALPLANNING_PATH + "add_plan.fxml"
     const val EDIT_PLAN_FXML: String = UI_DIALOG_FINANCIALPLANNING_PATH + "edit_plan.fxml"
+
+    // UI wishlist package
+    const val UI_DIALOG_WISHLIST_PATH: String = UI_DIALOG_PATH + "wishlist/"
+    const val ADD_WISHLIST_ITEM_FXML: String = UI_DIALOG_WISHLIST_PATH + "add_wishlist_item.fxml"
+    const val EDIT_WISHLIST_ITEM_FXML: String = UI_DIALOG_WISHLIST_PATH + "edit_wishlist_item.fxml"
+    const val MARK_AS_PURCHASED_FXML: String = UI_DIALOG_WISHLIST_PATH + "mark_as_purchased.fxml"
+
     const val UI_COMMON_PATH: String = "/ui/common/"
     const val CSS_SCENE_PATH: String = "/css/scene/"
     const val CSS_COMMON_PATH: String = "/css/common/"
@@ -123,6 +130,7 @@ object Files {
     const val SAVINGS_OVERVIEW_FXML: String = UI_MAIN_PATH + "savings_overview.fxml"
     const val SAVINGS_STOCKS_FUNDS_FXML: String = UI_MAIN_PATH + "savings_stocks_funds.fxml"
     const val SAVINGS_BONDS_FXML: String = UI_MAIN_PATH + "savings_bonds.fxml"
+    const val WISHLIST_FXML: String = UI_MAIN_PATH + "wishlist.fxml"
     const val CSV_IMPORT_FXML: String = UI_MAIN_PATH + "csv_import.fxml"
     const val SETTINGS_FXML: String = UI_MAIN_PATH + "settings.fxml"
     const val SPLASH_SCREEN_FXML: String = UI_MAIN_PATH + ("splash_screen." + "fxml")
@@ -174,6 +182,7 @@ object Files {
     const val SAVINGS_OVERVIEW_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val SAVINGS_STOCKS_FUNDS_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val SAVINGS_BONDS_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
+    const val WISHLIST_STYLE_SHEET: String = CSS_SCENE_PATH + "wishlist.css"
     const val CSV_IMPORT_STYLE_SHEET: String = CSS_SCENE_PATH + "csv_import.css"
     const val SETTINGS_STYLE_SHEET: String = CSS_SCENE_PATH + "settings.css"
     const val CHARTS_COLORS_STYLE_SHEET: String = CSS_COMPONENT_PATH + "charts.css"
