@@ -30,7 +30,7 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 #### Gestão de Transações
 ![Transactions](./docs/img/screenshots/transactions.png)
 
-#### Metas 
+#### Metas
 ![Goals](./docs/img/screenshots/goals.png)
 
 #### Investimentos
@@ -64,7 +64,7 @@ O Moinex está disponível para **Linux** e **Windows**.
 
 ## Instalação
 
-### Windows 
+### Windows
 
 1. Acesse a [página de releases](https://github.com/luk3rr/MOINEX/releases/latest)
 2. Baixe o arquivo `Moinex-X.X.X.exe` da última versão
@@ -150,4 +150,4 @@ sh scripts/uninstall.sh
 
 ## Licença
 
-Este projeto está licenciado sob a licença GPL-3.0. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a licença AGPL-3.0. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
