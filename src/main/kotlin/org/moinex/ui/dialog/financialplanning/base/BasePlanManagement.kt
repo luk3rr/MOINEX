@@ -9,6 +9,7 @@
 package org.moinex.ui.dialog.financialplanning.base
 
 import com.jfoenix.controls.JFXButton
+import javafx.beans.value.ChangeListener
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
@@ -74,6 +75,7 @@ abstract class BasePlanManagement(
 
     protected var budgetGroups = mutableListOf<BudgetGroup>()
     protected var paneCurrentPage = 0
+    private var baseIncomeListener: ChangeListener<String>? = null
 
     companion object {
         private const val ITEMS_PER_PAGE = 3
@@ -255,13 +257,20 @@ abstract class BasePlanManagement(
     }
 
     private fun configureBaseIncomeListener() {
-        baseIncomeField.textProperty().addListener { _, oldValue, newValue ->
-            if (newValue.matches(Regex(Constants.MONETARY_VALUE_REGEX))) {
-                baseIncomeField.text = newValue
-                updateBudgetGroupsContainer()
-            } else {
-                baseIncomeField.text = oldValue
+        baseIncomeListener =
+            ChangeListener { _, oldValue, newValue ->
+                if (newValue.matches(Regex(Constants.MONETARY_VALUE_REGEX))) {
+                    baseIncomeField.text = newValue
+                    updateBudgetGroupsContainer()
+                } else {
+                    baseIncomeField.text = oldValue
+                }
             }
+    }
+
+    protected fun enableBaseIncomeListener() {
+        baseIncomeListener?.let { listener ->
+            baseIncomeField.textProperty().addListener(listener)
         }
     }
 

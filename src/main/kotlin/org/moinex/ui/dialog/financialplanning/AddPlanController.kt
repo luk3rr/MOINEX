@@ -8,11 +8,13 @@
 
 package org.moinex.ui.dialog.financialplanning
 
-import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
+import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.RadioButton
 import javafx.scene.control.ToggleGroup
+import javafx.scene.layout.VBox
+import javafx.util.StringConverter
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BudgetGroupTransactionFilter
@@ -44,6 +46,9 @@ class AddPlanController(
     private lateinit var option3: RadioButton
 
     @FXML
+    private lateinit var option4: RadioButton
+
+    @FXML
     private lateinit var option1Description: Label
 
     @FXML
@@ -52,17 +57,34 @@ class AddPlanController(
     @FXML
     private lateinit var option3Description: Label
 
+    @FXML
+    private lateinit var option4Description: Label
+
+    @FXML
+    private lateinit var planSelectionContainer: VBox
+
+    @FXML
+    private lateinit var planSelectionComboBox: ComboBox<FinancialPlan>
+
     companion object {
         private const val OPTION_1 = "option1"
         private const val OPTION_2 = "option2"
         private const val OPTION_3 = "option3"
+        private const val OPTION_4 = "option4"
     }
 
     @FXML
     override fun initialize() {
         super.initialize()
+
+        option1.toggleGroup = templateToggleGroup
+        option2.toggleGroup = templateToggleGroup
+        option3.toggleGroup = templateToggleGroup
+        option4.toggleGroup = templateToggleGroup
+
         configureTemplateToggleGroupListener()
         configureRadioButtons()
+        configurePlanSelectionComboBox()
     }
 
     @FXML
@@ -109,7 +131,7 @@ class AddPlanController(
                         ),
                     )
                 }
-                is EntityNotFoundException, is IllegalArgumentException -> {
+                else -> {
                     WindowUtils.showErrorDialog(
                         preferencesService.translate(
                             TranslationKeys.FINANCIALPLANNING_DIALOG_ERROR_CREATING_PLAN_TITLE,
@@ -117,7 +139,6 @@ class AddPlanController(
                         e.message ?: "Unknown error",
                     )
                 }
-                else -> throw e
             }
         }
     }
@@ -134,6 +155,10 @@ class AddPlanController(
         option3.text = preferencesService.translate(TranslationKeys.FINANCIALPLANNING_TEMPLATE_CUSTOM_NAME)
         option3Description.text =
             preferencesService.translate(TranslationKeys.FINANCIALPLANNING_TEMPLATE_CUSTOM_DESCRIPTION)
+
+        option4.text = preferencesService.translate(TranslationKeys.FINANCIALPLANNING_TEMPLATE_COPY_PLAN_NAME)
+        option4Description.text =
+            preferencesService.translate(TranslationKeys.FINANCIALPLANNING_TEMPLATE_COPY_PLAN_DESCRIPTION)
     }
 
     private fun configureTemplateToggleGroupListener() {
@@ -150,11 +175,17 @@ class AddPlanController(
         pane2.children.clear()
         pane3.children.clear()
 
+        planSelectionContainer.isVisible = false
+        planSelectionContainer.isManaged = false
+
         when (selectedRadioButton.id) {
             OPTION_1 -> createBudgetGroupFromTemplate(getTemplate503020())
             OPTION_2 -> createBudgetGroupFromTemplate(getTemplate303040())
             OPTION_3 -> createCustomTemplate()
+            OPTION_4 -> showPlanSelection()
         }
+
+        enableBaseIncomeListener()
     }
 
     private fun getTemplate503020(): List<BudgetGroup> =
@@ -202,6 +233,46 @@ class AddPlanController(
 
     private fun createCustomTemplate() {
         budgetGroups = mutableListOf()
+        updateBudgetGroupsContainer()
+    }
+
+    private fun configurePlanSelectionComboBox() {
+        planSelectionComboBox.converter =
+            object : StringConverter<FinancialPlan>() {
+                override fun toString(plan: FinancialPlan?): String = plan?.name ?: ""
+
+                override fun fromString(string: String?): FinancialPlan? = null
+            }
+
+        planSelectionComboBox.valueProperty().addListener { _, _, newPlan ->
+            newPlan?.let { copyPlanGroups(it) }
+        }
+    }
+
+    private fun showPlanSelection() {
+        planSelectionContainer.isVisible = true
+        planSelectionContainer.isManaged = true
+
+        val allPlans = financialPlanningService.getAllPlans()
+        planSelectionComboBox.items.setAll(allPlans)
+
+        if (allPlans.isEmpty()) {
+            budgetGroups = mutableListOf()
+            updateBudgetGroupsContainer()
+        }
+    }
+
+    private fun copyPlanGroups(plan: FinancialPlan) {
+        budgetGroups =
+            plan.budgetGroups
+                .map { group ->
+                    BudgetGroup(
+                        name = group.name,
+                        targetPercentage = group.targetPercentage,
+                        categories = group.categories.toMutableSet(),
+                        transactionTypeFilter = group.transactionTypeFilter,
+                    )
+                }.toMutableList()
         updateBudgetGroupsContainer()
     }
 }

@@ -1158,7 +1158,8 @@ object TranslationKeys {
         "financialplanning.promptText.targetPercentage"
     const val FINANCIALPLANNING_PROMPT_TEXT_PLAN_NAME: String = "financialplanning.promptText.planName"
     const val FINANCIALPLANNING_LABEL_START_DATE: String = "financialplanning.label.startDate"
-    const val FINANCIALPLANNING_LABEL_PLAN_PERIOD: String = "financialplanning.label.planPeriod"
+    const val FINANCIALPLANNING_LABEL_ACTIVE_PLAN_PERIOD: String = "financialplanning.label.activePlanPeriod"
+    const val FINANCIALPLANNING_LABEL_ARCHIVED_PLAN_PERIOD: String = "financialplanning.label.archivedPlanPeriod"
 
     // Financial Planning Budget Templates
     const val FINANCIALPLANNING_TEMPLATE_50_30_20_NAME: String = "financialplanning.template.50-30-20.name"
@@ -1170,6 +1171,9 @@ object TranslationKeys {
     const val FINANCIALPLANNING_TEMPLATE_CUSTOM_NAME: String = "financialplanning.template.custom.name"
     const val FINANCIALPLANNING_TEMPLATE_CUSTOM_DESCRIPTION: String =
         "financialplanning.template.custom.description"
+    const val FINANCIALPLANNING_TEMPLATE_COPY_PLAN_NAME: String = "financialplanning.template.copy-plan.name"
+    const val FINANCIALPLANNING_TEMPLATE_COPY_PLAN_DESCRIPTION: String =
+        "financialplanning.template.copy-plan.description"
     const val FINANCIALPLANNING_TEMPLATE_ESSENTIALS: String = "financialplanning.template.essentials"
     const val FINANCIALPLANNING_TEMPLATE_WANTS: String = "financialplanning.template.wants"
     const val FINANCIALPLANNING_TEMPLATE_INVESTMENTS: String = "financialplanning.template.investments"

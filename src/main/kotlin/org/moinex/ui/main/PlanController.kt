@@ -36,6 +36,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.MessageFormat
 import java.time.YearMonth
 
 @Controller
@@ -50,6 +51,9 @@ class PlanController(
 
     @FXML
     private lateinit var planNameLabel: Label
+
+    @FXML
+    private lateinit var planPeriodLabel: Label
 
     @FXML
     private lateinit var baseMonthlyIncome: Label
@@ -130,7 +134,9 @@ class PlanController(
 
     private fun populatePeriodComboBox() {
         val current = YearMonth.now()
-        val periods = (0 until HISTORICAL_DATA_MONTHS).map { current.minusMonths(it.toLong()) }
+        val nextMonth = current.plusMonths(1)
+        val periods = mutableListOf(nextMonth)
+        periods.addAll((0 until HISTORICAL_DATA_MONTHS).map { current.minusMonths(it.toLong()) })
 
         periodComboBox.items = FXCollections.observableArrayList(periods)
         periodComboBox.value = current
@@ -176,12 +182,21 @@ class PlanController(
                     .getPlanStatus(plan.id!!, selectedPeriod)
                     .sortedByDescending { it.group.targetPercentage }
 
-            planNameLabel.text =
-                java.text.MessageFormat.format(
-                    preferencesService.translate(TranslationKeys.FINANCIALPLANNING_LABEL_PLAN_PERIOD),
-                    plan.name,
-                    UIUtils.formatDateForDisplay(plan.startDate),
-                )
+            planNameLabel.text = plan.name
+
+            planPeriodLabel.text =
+                if (plan.archived) {
+                    MessageFormat.format(
+                        preferencesService.translate(TranslationKeys.FINANCIALPLANNING_LABEL_ARCHIVED_PLAN_PERIOD),
+                        UIUtils.formatDateForDisplay(plan.startDate),
+                        UIUtils.formatDateForDisplay(plan.endDate!!),
+                    )
+                } else {
+                    MessageFormat.format(
+                        preferencesService.translate(TranslationKeys.FINANCIALPLANNING_LABEL_ACTIVE_PLAN_PERIOD),
+                        UIUtils.formatDateForDisplay(plan.startDate),
+                    )
+                }
 
             baseMonthlyIncome.text = UIUtils.formatCurrency(plan.baseIncome)
 
@@ -193,6 +208,7 @@ class PlanController(
             updateTimelineChart()
         } ?: run {
             planNameLabel.text = ""
+            planPeriodLabel.text = ""
             baseMonthlyIncome.text = UIUtils.formatCurrency(BigDecimal.ZERO)
             currentPlanStatus = emptyList()
             pieChartAnchorPane.children.clear()

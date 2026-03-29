@@ -156,6 +156,8 @@ class FinancialPlanningService(
 
     fun getActivePlan(): FinancialPlan? = financialPlanRepository.findByArchivedFalse()
 
+    fun getAllPlans(): List<FinancialPlan> = financialPlanRepository.findAll()
+
     private fun calculateTargetAmount(
         baseIncome: BigDecimal,
         targetPercentage: BigDecimal,
