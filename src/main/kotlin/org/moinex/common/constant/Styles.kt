@@ -72,4 +72,14 @@ object Styles {
     // Detail
     const val DETAIL_KEY_LABEL_STYLE = "-fx-font-weight: bold;"
     const val DETAIL_VALUE_LABEL_STYLE = "-fx-font-weight: normal;"
+    const val DETAIL_VALUE_COPYABLE_STYLE = "-fx-font-weight: normal; -fx-cursor: hand;"
+    const val DETAIL_VALUE_COPYABLE_HOVER_STYLE = "-fx-font-weight: normal; -fx-cursor: hand; -fx-underline: true;"
+
+    // Notification
+    const val NOTIFICATION_STYLE =
+        "-fx-background-color: rgba(0, 0, 0, 0.8); " +
+            "-fx-text-fill: white; " +
+            "-fx-padding: 5 10; " +
+            "-fx-background-radius: 5; " +
+            "-fx-font-size: 11px;"
 }

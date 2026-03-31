@@ -17,6 +17,7 @@ object TranslationKeys {
     const val MAIN_CALCULATOR: String = "main.calculator"
 
     const val UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE: String = "uiutils.formatPercentage.tooMuchNegative"
+    const val UIUTILS_COPIED_TO_CLIPBOARD: String = "uiutils.copiedToClipboard"
 
     // Dialogs
     const val DIALOG_CONFIRMATION_TITLE: String = "dialog.confirmation.title"

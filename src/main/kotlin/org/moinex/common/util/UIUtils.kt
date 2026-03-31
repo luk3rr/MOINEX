@@ -8,6 +8,9 @@
 
 package org.moinex.common.util
 
+import javafx.animation.FadeTransition
+import javafx.animation.PauseTransition
+import javafx.animation.SequentialTransition
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -26,8 +29,12 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.input.Clipboard
+import javafx.scene.input.ClipboardContent
+import javafx.scene.layout.StackPane
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
+import javafx.stage.Popup
 import javafx.util.Callback
 import javafx.util.Duration
 import javafx.util.StringConverter
@@ -130,6 +137,56 @@ class UIUtils(
 
         fun removeTooltipFromNode(node: Node) {
             Tooltip.install(node, null)
+        }
+
+        fun showTemporaryNotification(
+            message: String,
+            targetNode: Node,
+            offsetY: Double = -25.0,
+            fadeInDuration: Double = 200.0,
+            displayDuration: Double = 1000.0,
+            fadeOutDuration: Double = 200.0,
+        ) {
+            val window = targetNode.scene?.window ?: return
+            val screenBounds = targetNode.localToScreen(targetNode.boundsInLocal) ?: return
+
+            val notification =
+                Label(message).apply {
+                    style = Styles.NOTIFICATION_STYLE
+                    opacity = 0.0
+                    isMouseTransparent = true
+                }
+
+            val popup =
+                Popup().apply {
+                    content.add(notification)
+                    isAutoFix = false
+                    isAutoHide = false
+                }
+
+            FxUtils.launchOnFxThread {
+                val notifWidth = notification.width.takeIf { it > 0 } ?: notification.prefWidth(-1.0)
+                popup.x = screenBounds.minX + (screenBounds.width - notifWidth) / 2
+                popup.y = screenBounds.minY + offsetY
+
+                val fadeIn =
+                    FadeTransition(Duration.millis(fadeInDuration), notification).apply {
+                        fromValue = 0.0
+                        toValue = 1.0
+                        setOnFinished { popup.show(window) }
+                    }
+
+                val pause = PauseTransition(Duration.millis(displayDuration))
+
+                val fadeOut =
+                    FadeTransition(Duration.millis(fadeOutDuration), notification).apply {
+                        fromValue = 1.0
+                        toValue = 0.0
+                        setOnFinished { popup.hide() }
+                    }
+
+                SequentialTransition(fadeIn, pause, fadeOut).play()
+            }
         }
 
         fun formatCurrency(value: Number?): String {
@@ -266,28 +323,74 @@ class UIUtils(
             label.styleClass.add(style)
         }
 
+        private fun createCopyableDetailGraphic(
+            keyText: Text,
+            separator: Text,
+            valueText: Text,
+            value: String,
+        ): StackPane =
+            StackPane().apply {
+                val textFlow = TextFlow(keyText, separator, valueText)
+                children.add(textFlow)
+                alignment = Pos.CENTER_LEFT
+
+                valueText.setOnMouseClicked {
+                    Clipboard.getSystemClipboard().setContent(
+                        ClipboardContent().apply { putString(value) },
+                    )
+                    showTemporaryNotification(
+                        preferencesService.translate(TranslationKeys.UIUTILS_COPIED_TO_CLIPBOARD),
+                        textFlow,
+                    )
+                }
+                valueText.setOnMouseEntered {
+                    valueText.style = Styles.DETAIL_VALUE_COPYABLE_HOVER_STYLE
+                }
+                valueText.setOnMouseExited {
+                    valueText.style = Styles.DETAIL_VALUE_COPYABLE_STYLE
+                }
+            }
+
+        private fun createDetailGraphic(
+            keyText: Text,
+            separator: Text,
+            valueText: Text,
+            value: String,
+            showColon: Boolean,
+            copyable: Boolean,
+        ): Node {
+            if (value.isEmpty() && !showColon) {
+                return TextFlow(keyText)
+            }
+
+            if (copyable && !showColon && value.isNotEmpty()) {
+                return createCopyableDetailGraphic(keyText, separator, valueText, value)
+            }
+
+            return TextFlow(
+                keyText,
+                separator,
+                if (!showColon) valueText else Text(""),
+            )
+        }
+
         fun createDetailLabel(
             labelKey: String,
             value: String,
             showColon: Boolean = false,
+            copyable: Boolean = false,
         ): Label {
             val labelText = preferencesService.translate(labelKey)
 
             return Label().apply {
                 val keyText = Text(labelText).apply { style = Styles.DETAIL_KEY_LABEL_STYLE }
                 val separator = if (showColon) Text(":") else Text(": ")
-                val valueText = Text(value).apply { style = Styles.DETAIL_VALUE_LABEL_STYLE }
-
-                graphic =
-                    if (value.isNotEmpty() || showColon) {
-                        TextFlow(
-                            keyText,
-                            separator,
-                            if (!showColon) valueText else Text(""),
-                        )
-                    } else {
-                        TextFlow(keyText)
+                val valueText =
+                    Text(value).apply {
+                        style = if (copyable) Styles.DETAIL_VALUE_COPYABLE_STYLE else Styles.DETAIL_VALUE_LABEL_STYLE
                     }
+
+                graphic = createDetailGraphic(keyText, separator, valueText, value, showColon, copyable)
             }
         }
 

@@ -314,30 +314,37 @@ class WishlistController(
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_LABEL_TITLE,
                         selectedItem.title,
+                        copyable = true,
                     ),
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_LABEL_ESTIMATED_PRICE,
                         UIUtils.formatCurrency(selectedItem.estimatedPrice),
+                        copyable = true,
                     ),
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_DETAILS_TARGET_DATE,
                         selectedItem.targetDate?.toString() ?: "-",
+                        copyable = true,
                     ),
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_LABEL_CATEGORY,
                         selectedItem.category.name,
+                        copyable = true,
                     ),
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_LABEL_PRIORITY,
                         translatePriority(selectedItem.priority),
+                        copyable = true,
                     ),
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_LABEL_STATUS,
                         translateStatus(selectedItem.status),
+                        copyable = true,
                     ),
                     UIUtils.createDetailLabel(
                         TranslationKeys.WISHLIST_DETAILS_NOTES,
                         selectedItem.notes ?: "-",
+                        copyable = true,
                     ),
                 )
 
@@ -346,6 +353,7 @@ class WishlistController(
                         UIUtils.createDetailLabel(
                             TranslationKeys.WISHLIST_DETAILS_PURCHASED_DATE,
                             UIUtils.formatDateForDisplay(selectedItem.purchasedAt),
+                            copyable = true,
                         ),
                     )
 
@@ -354,10 +362,12 @@ class WishlistController(
                             UIUtils.createDetailLabel(
                                 TranslationKeys.WISHLIST_DETAILS_PAYMENT_METHOD,
                                 preferencesService.translate(TranslationKeys.WISHLIST_PAYMENT_METHOD_WALLET),
+                                copyable = true,
                             ),
                             UIUtils.createDetailLabel(
                                 TranslationKeys.WISHLIST_DETAILS_TRANSACTION_ID,
                                 transaction.id?.toString() ?: "-",
+                                copyable = true,
                             ),
                         )
                     }
@@ -367,10 +377,12 @@ class WishlistController(
                             UIUtils.createDetailLabel(
                                 TranslationKeys.WISHLIST_DETAILS_PAYMENT_METHOD,
                                 preferencesService.translate(TranslationKeys.WISHLIST_PAYMENT_METHOD_CREDIT_CARD),
+                                copyable = true,
                             ),
                             UIUtils.createDetailLabel(
                                 TranslationKeys.WISHLIST_DETAILS_DEBT_ID,
                                 debt.id?.toString() ?: "-",
+                                copyable = true,
                             ),
                         )
                     }
