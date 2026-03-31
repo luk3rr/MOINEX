@@ -12,6 +12,11 @@ import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.chart.CategoryAxis
+import javafx.scene.chart.NumberAxis
+import javafx.scene.chart.PieChart
+import javafx.scene.chart.StackedBarChart
+import javafx.scene.chart.XYChart
 import javafx.scene.control.ComboBox
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Hyperlink
@@ -23,11 +28,17 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.input.Clipboard
 import javafx.scene.input.ClipboardContent
+import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
+import javafx.util.StringConverter
+import org.moinex.common.chart.ChartFactory
+import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isPending
 import org.moinex.common.extension.isPurchased
+import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -44,11 +55,15 @@ import org.moinex.ui.dialog.wishlist.EditWishlistItemController
 import org.moinex.ui.dialog.wishlist.MarkAsPurchasedController
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.YearMonth
 
 @Controller
 class WishlistController(
     private val wishlistService: WishlistService,
     private val categoryService: CategoryService,
+    private val chartFactory: ChartFactory,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
 ) {
@@ -70,6 +85,12 @@ class WishlistController(
     @FXML
     private lateinit var totalValueLabel: Label
 
+    @FXML
+    private lateinit var categoryChartPane: AnchorPane
+
+    @FXML
+    private lateinit var timelineChartPane: AnchorPane
+
     private val allItems = FXCollections.observableArrayList<WishlistItem>()
     private val filteredItems = FXCollections.observableArrayList<WishlistItem>()
     private var categories: List<Category> = emptyList()
@@ -83,6 +104,7 @@ class WishlistController(
         loadItemsFromDatabase()
         updateSummary()
         updateTableView()
+        updateCharts()
     }
 
     @FXML
@@ -92,7 +114,12 @@ class WishlistController(
             preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_ADD_TITLE),
             springContext,
             { _: AddWishlistItemController -> },
-            listOf(Runnable { loadItemsFromDatabase() }),
+            listOf(
+                Runnable {
+                    loadItemsFromDatabase()
+                    updateScreen()
+                },
+            ),
         )
     }
 
@@ -114,7 +141,12 @@ class WishlistController(
             { controller: EditWishlistItemController ->
                 controller.setItem(selectedItem)
             },
-            listOf(Runnable { loadItemsFromDatabase() }),
+            listOf(
+                Runnable {
+                    loadItemsFromDatabase()
+                    updateScreen()
+                },
+            ),
         )
     }
 
@@ -139,6 +171,8 @@ class WishlistController(
             runCatching {
                 wishlistService.deleteItem(selectedItem.id!!)
                 loadItemsFromDatabase()
+                updateScreen()
+
                 WindowUtils.showSuccessDialog(
                     preferencesService.translate(TranslationKeys.WISHLIST_DELETED_TITLE),
                     preferencesService.translate(TranslationKeys.WISHLIST_DELETED_MESSAGE),
@@ -211,8 +245,7 @@ class WishlistController(
             listOf(
                 Runnable {
                     loadItemsFromDatabase()
-                    updateTableView()
-                    updateSummary()
+                    updateScreen()
                 },
             ),
         )
@@ -241,8 +274,7 @@ class WishlistController(
             listOf(
                 Runnable {
                     loadItemsFromDatabase()
-                    updateTableView()
-                    updateSummary()
+                    updateScreen()
                 },
             ),
         )
@@ -277,8 +309,7 @@ class WishlistController(
             runCatching {
                 wishlistService.markAsPending(selectedItem.id!!)
                 loadItemsFromDatabase()
-                updateTableView()
-                updateSummary()
+                updateScreen()
 
                 WindowUtils.showSuccessDialog(
                     preferencesService.translate(TranslationKeys.WISHLIST_MARKED_PENDING_TITLE),
@@ -576,8 +607,154 @@ class WishlistController(
             }
 
         filteredItems.setAll(filtered)
+    }
+
+    private fun updateScreen() {
         updateSummary()
         updateTableView()
+        updateCharts()
+    }
+
+    private fun updateCharts() {
+        updateCategoryDistributionChart()
+        updateMonthlyTimelineChart()
+    }
+
+    private fun updateCategoryDistributionChart() {
+        categoryChartPane.children.clear()
+
+        val pendingItems = allItems.filter { it.isPending() }
+        if (pendingItems.isEmpty()) return
+
+        val groupedByCategory =
+            pendingItems
+                .groupBy { it.category }
+                .mapValues { (_, items) -> items.sumOf { it.estimatedPrice } }
+                .filter { it.value > BigDecimal.ZERO }
+
+        if (groupedByCategory.isEmpty()) return
+
+        val totalValue = groupedByCategory.values.fold(BigDecimal.ZERO, BigDecimal::add)
+
+        val pieData =
+            FXCollections.observableArrayList(
+                groupedByCategory.map { (category, value) ->
+                    PieChart.Data(category.name, value.toDouble())
+                },
+            )
+
+        val doughnutChart =
+            chartFactory.createDoughnutChart(pieData).apply {
+                labelsVisible = false
+                isLegendVisible = true
+            }
+
+        doughnutChart.data.forEach { data ->
+            val value = BigDecimal(data.pieValue)
+            val percentage =
+                value
+                    .divide(totalValue, 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal(100))
+
+            UIUtils.addTooltipToNode(
+                data.node,
+                "${data.name}\n${UIUtils.formatCurrency(value)} (${UIUtils.formatPercentage(percentage)})",
+            )
+        }
+
+        UIUtils.applyDefaultChartStyle(doughnutChart)
+        categoryChartPane.children.add(doughnutChart)
+        doughnutChart.setAnchorPaneConstraints()
+    }
+
+    private fun updateMonthlyTimelineChart() {
+        timelineChartPane.children.clear()
+
+        val pendingWithDate = allItems.filter { it.isPending() && it.targetDate != null }
+        if (pendingWithDate.isEmpty()) return
+
+        val categoryAxis = CategoryAxis()
+        val numberAxis = NumberAxis()
+        val stackedBarChart = StackedBarChart(categoryAxis, numberAxis)
+
+        stackedBarChart.verticalGridLinesVisible = false
+        timelineChartPane.children.add(stackedBarChart)
+        stackedBarChart.setAnchorPaneConstraints()
+        stackedBarChart.data.clear()
+
+        val formatter = UIUtils.getShortMonthYearFormatter(preferencesService.locale)
+        val currentMonth = YearMonth.now()
+        val startMonth = currentMonth.minusMonths(Constants.WISHLIST_XYBAR_CHART_PAST_MONTHS.toLong())
+        val endMonth =
+            pendingWithDate
+                .mapNotNull { it.targetDate }
+                .maxOfOrNull { YearMonth.from(it) } ?: currentMonth
+
+        val months = mutableListOf<YearMonth>()
+        var m = startMonth
+        while (!m.isAfter(endMonth)) {
+            months.add(m)
+            m = m.plusMonths(1)
+        }
+
+        val categories = categoryService.getNonArchivedCategoriesOrderedByName()
+        val monthlyTotals = linkedMapOf<YearMonth, MutableMap<Category, Double>>()
+        months.forEach { month -> monthlyTotals[month] = linkedMapOf() }
+
+        pendingWithDate.forEach { item ->
+            val month = YearMonth.from(item.targetDate!!)
+            if (month in monthlyTotals) {
+                val catMap = monthlyTotals.getOrPut(month) { linkedMapOf() }
+                catMap[item.category] = (catMap[item.category] ?: 0.0) + item.estimatedPrice.toDouble()
+            }
+        }
+
+        monthlyTotals.entries.removeIf { it.value.isEmpty() }
+        if (monthlyTotals.isEmpty()) return
+
+        categories.forEach { category ->
+            val series = XYChart.Series<String, Number>()
+            series.name = category.name
+
+            monthlyTotals.keys.forEach { yearMonth ->
+                val total = monthlyTotals[yearMonth]?.get(category) ?: 0.0
+                series.data.add(XYChart.Data(yearMonth.format(formatter), total))
+            }
+
+            if (series.data.any { it.yValue.toDouble() > 0 }) {
+                stackedBarChart.data.add(series)
+            }
+        }
+
+        val maxTotal = monthlyTotals.values.maxOfOrNull { it.values.sum() } ?: 0.0
+        AnimationUtils.setDynamicYAxisBounds(numberAxis, maxTotal)
+
+        numberAxis.tickLabelFormatter =
+            object : StringConverter<Number>() {
+                override fun toString(value: Number): String = UIUtils.formatCurrency(value)
+
+                override fun fromString(string: String): Number = 0
+            }
+
+        UIUtils.applyDefaultChartStyle(stackedBarChart)
+
+        stackedBarChart.data.forEach { series ->
+            series.data.forEach { data ->
+                val yearMonth = YearMonth.parse(data.xValue, formatter)
+                val monthTotal = monthlyTotals[yearMonth]?.values?.sumOf { it } ?: 0.0
+                val value = data.yValue.toDouble()
+                val percentage = if (monthTotal > 0) (value / monthTotal) * 100 else 0.0
+
+                UIUtils.addTooltipToXYChartNode(
+                    data.node,
+                    "${series.name}: ${UIUtils.formatCurrency(value)} " +
+                        "(${UIUtils.formatPercentage(percentage)})\n" +
+                        "Total: ${UIUtils.formatCurrency(monthTotal)}",
+                )
+
+                AnimationUtils.stackedXYChartAnimation(listOf(data), listOf(value))
+            }
+        }
     }
 
     private fun updateSummary() {

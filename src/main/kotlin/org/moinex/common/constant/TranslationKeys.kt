@@ -1798,4 +1798,6 @@ object TranslationKeys {
         "wishlist.mark_as_purchased.select_payment_method"
     const val WISHLIST_PAYMENT_METHOD_WALLET: String = "wishlist.payment_method.wallet"
     const val WISHLIST_PAYMENT_METHOD_CREDIT_CARD: String = "wishlist.payment_method.credit_card"
+    const val WISHLIST_CHART_CATEGORY_DISTRIBUTION_TITLE: String = "wishlist.chart.categoryDistribution.title"
+    const val WISHLIST_CHART_MONTHLY_TIMELINE_TITLE: String = "wishlist.chart.monthlyTimeline.title"
 }

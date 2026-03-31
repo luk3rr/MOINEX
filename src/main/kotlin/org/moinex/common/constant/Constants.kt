@@ -66,6 +66,7 @@ object Constants {
     const val MONTH_RESUME_FUTURE_MONTHS: Int = 6
 
     const val CRC_XYBAR_CHART_MAX_MONTHS: Int = 25
+    const val WISHLIST_XYBAR_CHART_PAST_MONTHS: Int = 6
     const val XYBAR_CHART_TICKS: Int = 6
 
     const val FADE_IN_ANIMATION_DURATION: Double = 1.0 // s

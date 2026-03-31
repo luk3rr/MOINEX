@@ -7,6 +7,11 @@
     -fx-background-color: transparent;
 }
 
+/* Remove background from chart legend */
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
 /* GRUPO 1 – Azul → Verde (frio, base) */
 .chart-bar.series0  { -fx-bar-fill: #16a34a; }
 .chart-bar.series1  { -fx-bar-fill: #22c55e; }
