@@ -25,6 +25,8 @@ INDICATOR_MAPPING = {
     "CDI": CDI_SERIES,
 }
 
+TIMEOUT_SECONDS = 20
+
 
 def download_data(url: str) -> list:
     """
@@ -33,7 +35,7 @@ def download_data(url: str) -> list:
     :param url: URL para download
     :return: Dados obtidos
     """
-    response = requests.get(url, timeout=10)
+    response = requests.get(url, timeout=TIMEOUT_SECONDS)
 
     if response.status_code == 200:
         data = response.json()

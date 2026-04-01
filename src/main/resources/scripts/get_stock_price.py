@@ -8,11 +8,29 @@ import sys
 import json
 import yfinance as yf
 import requests
+import time
 from urllib.parse import urlparse
 
 DEFAULT_CURRENCY = "BRL"
 
 EXCHANGE_API_URL_BASE = "https://api.exchangerate-api.com/v4/latest"
+
+TIMEOUT_SECONDS = 20
+
+# Configure yfinance session with custom headers
+from requests import Session
+
+# Create a session with custom headers to avoid being blocked
+session = Session()
+session.headers.update({
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1'
+})
 
 
 def get_conversion_rate(
@@ -36,7 +54,7 @@ def get_conversion_rate(
 
     # Get the exchange rates from the API
     url = f"{EXCHANGE_API_URL_BASE}/{from_currency}"
-    response = requests.get(url, timeout=10)
+    response = requests.get(url, timeout=TIMEOUT_SECONDS)
 
     if response.status_code == 200:
         data = response.json()
@@ -51,46 +69,62 @@ def get_conversion_rate(
         raise Exception("Failed to get the conversion rate")
 
 
+def get_ticker_data(symbol):
+    """
+    Get ticker data
+
+    @param symbol: Stock symbol
+    @return: Tuple of (price, currency, website)
+    """
+    # Create ticker with custom session
+    ticker = yf.Ticker(symbol, session=session)
+
+    # Get historical data with fallback
+    hist = None
+    try:
+        hist = ticker.history(period="5d")
+    except:
+        hist = ticker.history(period="1mo")
+
+    if hist is None or hist.empty:
+        raise ValueError(f"No price data available for {symbol}")
+
+    price = hist.iloc[-1]["Close"]
+
+    # Get currency and website with error handling
+    try:
+        info = ticker.info
+        currency = info.get("currency", "USD")
+        website = info.get("website")
+    except:
+        # If info fails, use defaults
+        currency = "USD"
+        website = None
+
+    return price, currency, website
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python get_price.py <symbol1> <symbol2> ... <symbolN>")
         sys.exit(1)
 
     symbols = sys.argv[1:]
-
-    # Get the stock price
-    tickers = yf.Tickers(" ".join(symbols))
-    prices = {
-        symbol: ticker.history(period="5d").iloc[-1]["Close"]
-        for symbol, ticker in tickers.tickers.items()
-    }
-    currencies = {
-        symbol: ticker.info["currency"] for symbol, ticker in tickers.tickers.items()
-    }
-    websites = {
-        symbol: ticker.info.get("website") for symbol, ticker in tickers.tickers.items()
-    }
-
     conversion_rates = {DEFAULT_CURRENCY: 1.0}
-
     result = {}
 
+    # Process symbols one by one
     for symbol in symbols:
         try:
-            if symbol not in prices:
-                raise ValueError(f"Symbol {symbol} not found")
+            price, currency, website = get_ticker_data(symbol)
 
-            currency = currencies[symbol]
-            price = prices[symbol]
-
+            # Get conversion rate if needed
             if currency != DEFAULT_CURRENCY:
                 if currency not in conversion_rates:
                     conversion_rates[currency] = get_conversion_rate(currency)
 
-            result[symbol] = {"price": price * conversion_rates[currency]}
-            
-            # Add website if available
-            website = websites.get(symbol)
+            result[symbol] = {"price": price * conversion_rates.get(currency, 1.0)}
+
             if website:
                 result[symbol]["website"] = website
 

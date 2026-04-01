@@ -14,6 +14,22 @@ from urllib.parse import urlparse
 
 DEFAULT_CURRENCY = "BRL"
 EXCHANGE_API_URL_BASE = "https://api.exchangerate-api.com/v4/latest"
+TIMEOUT_SECONDS = 20
+
+# Configure yfinance session with custom headers
+from requests import Session
+
+# Create a session with custom headers to avoid being blocked
+session = Session()
+session.headers.update({
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1'
+})
 
 
 def get_conversion_rate(from_currency: str, to_currency: str = DEFAULT_CURRENCY) -> float:
@@ -32,7 +48,7 @@ def get_conversion_rate(from_currency: str, to_currency: str = DEFAULT_CURRENCY)
         return base_rate * 100
 
     url = f"{EXCHANGE_API_URL_BASE}/{from_currency}"
-    response = requests.get(url, timeout=10)
+    response = requests.get(url, timeout=TIMEOUT_SECONDS)
 
     if response.status_code == 200:
         data = response.json()
@@ -49,7 +65,7 @@ def get_conversion_rate(from_currency: str, to_currency: str = DEFAULT_CURRENCY)
 def get_month_end_date(year: int, month: int) -> datetime:
     """
     Get the last day of a given month
-    
+
     @param year: Year
     @param month: Month (1-12)
     @return: Last day of the month
@@ -71,7 +87,7 @@ def main():
     symbol = sys.argv[1]
     start_date = sys.argv[2]
     end_date = sys.argv[3] if len(sys.argv) > 3 else datetime.now().strftime("%Y-%m-%d")
-    
+
     # Parse specific dates if provided
     specific_dates = []
     if len(sys.argv) > 4:
@@ -81,34 +97,33 @@ def main():
             specific_dates = []
 
     try:
-        ticker = yf.Ticker(symbol)
-        
+        # Create ticker with custom session
+        ticker = yf.Ticker(symbol, session=session)
+
         # Parse end_date to check if it's today or recent
         end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
         today = datetime.now()
         days_diff = (today.date() - end_date_obj.date()).days
-        
+
         # Get historical data with fallback strategy
         hist = None
-        
+
         # First try: exact dates
         try:
             hist = ticker.history(start=start_date, end=end_date)
             if hist is not None and not hist.empty:
                 pass  # Success, continue
             else:
-                hist = None  # Mark as failed to trigger fallback
+                hist = None
         except Exception as e:
-            hist = None  # Mark as failed to trigger fallback
-        
+            hist = None
+
         # Fallback: if end_date is today or up to 5 days in the past, fetch last 15 days
         if hist is None or hist.empty:
             if days_diff >= 0 and days_diff <= 5:
                 try:
-                    # Don't pass start_date, just use period to get recent data
                     hist = ticker.history(period="15d")
                     if hist is not None and not hist.empty:
-                        # Filter to only include data from start_date onwards
                         start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
                         hist = hist[hist.index.date >= start_date_obj.date()]
                         if hist is not None and not hist.empty:
@@ -119,7 +134,7 @@ def main():
                         hist = None
                 except Exception as e:
                     hist = None
-        
+
         # Second fallback: try with 365 days
         if hist is None or hist.empty:
             try:
@@ -130,7 +145,7 @@ def main():
                     hist = None
             except Exception as e:
                 hist = None
-        
+
         # Third fallback: try with max period
         if hist is None or hist.empty:
             try:
@@ -141,15 +156,19 @@ def main():
                     hist = None
             except Exception as e:
                 hist = None
-        
+
         # If still no data, return error
         if hist is None or hist.empty:
             error_msg = f"No data found for {symbol} in the date range {start_date} to {end_date}"
             print(json.dumps({"error": error_msg}))
             sys.exit(1)
 
-        currency = ticker.info.get("currency", DEFAULT_CURRENCY)
-        
+        # Get currency with error handling
+        try:
+            currency = ticker.info.get("currency", DEFAULT_CURRENCY)
+        except:
+            currency = DEFAULT_CURRENCY
+
         # Get conversion rate if needed
         conversion_rate = 1.0
         if currency != DEFAULT_CURRENCY:
@@ -158,15 +177,15 @@ def main():
         # Parse start and end dates
         start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
         end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-        
+
         # Filter history to requested date range
         hist = hist[(hist.index.date >= start_date_obj.date()) & (hist.index.date <= end_date_obj.date())]
-        
+
         if hist.empty:
             error_msg = f"No data found for {symbol} in the date range {start_date} to {end_date}"
             print(json.dumps({"error": error_msg}))
             sys.exit(1)
-        
+
         result = {
             "symbol": symbol,
             "currency": currency,
@@ -177,11 +196,11 @@ def main():
         # Group by month to identify month-end dates
         hist['YearMonth'] = hist.index.to_period('M')
         month_end_dates = set()
-        
+
         for period, group in hist.groupby('YearMonth'):
             last_date = group.iloc[-1].name.date()
             month_end_dates.add(last_date)
-        
+
         # Convert specific dates to date objects
         specific_dates_set = set()
         for date_str in specific_dates:
@@ -189,18 +208,18 @@ def main():
                 specific_dates_set.add(datetime.strptime(date_str, "%Y-%m-%d").date())
             except:
                 pass
-        
+
         # Store only specific dates + month-end dates
         for index, row in hist.iterrows():
             actual_date = index.date()
             is_month_end = actual_date in month_end_dates
             is_specific_date = actual_date in specific_dates_set
-            
+
             # Only store if it's a month-end OR a specific requested date
             if is_month_end or is_specific_date or not specific_dates:
                 price_date = actual_date.strftime("%Y-%m-%d")
                 closing_price = float(row['Close']) * conversion_rate
-                
+
                 result["prices"].append({
                     "date": price_date,
                     "price": closing_price,
