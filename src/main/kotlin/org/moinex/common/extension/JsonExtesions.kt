@@ -16,6 +16,22 @@ fun JSONObject.decimal(
     }
 }
 
+fun JSONObject.decimalOrNull(
+    name: String,
+    field: String,
+): BigDecimal? =
+    runCatching {
+        if (!has(name)) return null
+        val jsonObj = getJSONObject(name)
+        if (jsonObj.has("error")) return null
+        if (!jsonObj.has(field)) return null
+        when (val value = jsonObj[field]) {
+            is String -> value.toBigDecimal()
+            is Number -> value.toString().toBigDecimal()
+            else -> null
+        }
+    }.getOrNull()
+
 fun JSONObject.field(
     obj: String,
     field: String,

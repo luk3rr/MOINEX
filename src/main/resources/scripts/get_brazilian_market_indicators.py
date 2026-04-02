@@ -4,6 +4,8 @@
 # Created on: January 16, 2025
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
+import sys
+import time
 import requests
 from datetime import datetime, timedelta
 
@@ -19,6 +21,36 @@ SELIC_TARGET_SERIES = 432
 IPCA_SERIES = 433
 CDI_SERIES = 12
 
+TIMEOUT_SECONDS = 20
+
+RETRY_MAX_ATTEMPTS = 3
+RETRY_INITIAL_DELAY = 1.0
+RETRY_MULTIPLIER = 1.5
+RETRY_KEYWORDS = ("429", "rate limit", "too many requests", "503", "service unavailable")
+
+
+def retry_call(fn, label):
+    """
+    Calls fn(), retrying on transient errors with exponential backoff.
+    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    """
+    delay = RETRY_INITIAL_DELAY
+    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+        try:
+            return fn()
+        except Exception as e:
+            error_str = str(e).lower()
+            is_transient = any(k in error_str for k in RETRY_KEYWORDS)
+            if not is_transient or attempt == RETRY_MAX_ATTEMPTS:
+                raise
+            print(
+                f"[RETRY] {label} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
+                f"after {delay:.0f}s delay: {e}",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+            delay *= RETRY_MULTIPLIER
+
 
 def download_data(url: str) -> dict:
     """
@@ -27,7 +59,7 @@ def download_data(url: str) -> dict:
     :param url: URL para download
     :return: Dados obtidos
     """
-    response = requests.get(url, timeout=10)
+    response = requests.get(url, timeout=TIMEOUT_SECONDS)
 
     if response.status_code == 200:
         data = response.json()
@@ -70,15 +102,13 @@ def main():
     today = datetime.today().strftime("%d/%m/%Y")
     two_year_ago = (datetime.today() - timedelta(days=2 * 365)).strftime("%d/%m/%Y")
 
-    selic_series = download_data(
-        BACEN_API_SERIES_WITH_FILTER_URL.format(
-            SELIC_TARGET_SERIES, two_year_ago, today
-        )
+    selic_url = BACEN_API_SERIES_WITH_FILTER_URL.format(
+        SELIC_TARGET_SERIES, two_year_ago, today
     )
+    selic_series = retry_call(lambda: download_data(selic_url), "SELIC")
 
-    ipca_series = download_data(
-        BACEN_API_SERIES_WITH_FILTER_URL.format(IPCA_SERIES, two_year_ago, today)
-    )
+    ipca_url = BACEN_API_SERIES_WITH_FILTER_URL.format(IPCA_SERIES, two_year_ago, today)
+    ipca_series = retry_call(lambda: download_data(ipca_url), "IPCA")
 
     data["selic_target"] = selic_series[-1]
     data["ipca_last_month"] = ipca_series[-1]

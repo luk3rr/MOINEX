@@ -7,6 +7,7 @@
 import sys
 import json
 import os
+import time
 import requests
 from typing import Optional
 from urllib.parse import urlparse
@@ -34,6 +35,34 @@ session.headers.update({
     'Connection': 'keep-alive'
 })
 
+RETRY_MAX_ATTEMPTS = 3
+RETRY_INITIAL_DELAY = 1.0
+RETRY_MULTIPLIER = 1.5
+RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
+
+
+def retry_call(fn, symbol):
+    """
+    Calls fn(), retrying on rate-limit errors with exponential backoff.
+    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    """
+    delay = RETRY_INITIAL_DELAY
+    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+        try:
+            return fn()
+        except Exception as e:
+            error_str = str(e).lower()
+            is_rate_limit = any(k in error_str for k in RETRY_KEYWORDS)
+            if not is_rate_limit or attempt == RETRY_MAX_ATTEMPTS:
+                raise
+            print(
+                f"[RETRY] {symbol} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
+                f"after {delay:.0f}s delay: {e}",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+            delay *= RETRY_MULTIPLIER
+
 
 def extract_domain_from_url(url: str) -> Optional[str]:
     """
@@ -60,20 +89,20 @@ def get_logo_url_from_apistemic(domain: str) -> Optional[str]:
 
     :param domain: Company domain (e.g., "petrobras.com.br" or "apple.com")
     :return: Logo URL or None if not found
+    :raises Exception: On HTTP 429 (rate limiting) to allow retry
     """
-    try:
-        url = f"{APISTEMIC_LOGOS_API_BASE}/domain:{domain}"
-        response = session.head(
-            url,
-            timeout=TIMEOUT_SECONDS,
-            allow_redirects=True
-        )
+    url = f"{APISTEMIC_LOGOS_API_BASE}/domain:{domain}"
+    response = session.head(
+        url,
+        timeout=TIMEOUT_SECONDS,
+        allow_redirects=True
+    )
 
-        if response.status_code == 200:
-            return url
-        else:
-            return None
-    except Exception:
+    if response.status_code == 200:
+        return url
+    elif response.status_code == 429:
+        raise Exception(f"Too many requests (429) for domain {domain}")
+    else:
         return None
 
 
@@ -177,7 +206,7 @@ def main():
 
     for website in websites:
         try:
-            logo_path = get_logo_path(website, download=True)
+            logo_path = retry_call(lambda: get_logo_path(website, download=True), website)
 
             if logo_path:
                 result[website] = {"logo_path": logo_path}

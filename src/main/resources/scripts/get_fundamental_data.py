@@ -8,6 +8,7 @@ import sys
 import json
 import argparse
 import csv
+import time
 import yfinance as yf
 from datetime import datetime
 from pathlib import Path
@@ -29,11 +30,39 @@ session.headers.update({
     'Upgrade-Insecure-Requests': '1'
 })
 
+RETRY_MAX_ATTEMPTS = 5
+RETRY_INITIAL_DELAY = 1.0
+RETRY_MULTIPLIER = 1.5
+RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
+
+
+def retry_call(fn, symbol):
+    """
+    Calls fn(), retrying on rate-limit errors with exponential backoff.
+    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    """
+    delay = RETRY_INITIAL_DELAY
+    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+        try:
+            return fn()
+        except Exception as e:
+            error_str = str(e).lower()
+            is_rate_limit = any(k in error_str for k in RETRY_KEYWORDS)
+            if not is_rate_limit or attempt == RETRY_MAX_ATTEMPTS:
+                raise
+            print(
+                f"[RETRY] {symbol} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
+                f"after {delay:.0f}s delay: {e}",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+            delay *= RETRY_MULTIPLIER
+
 
 def create_percent_object(value, data_temporality="calculated", reference_date=None):
     """
     Create a percent object with value, type, data temporality and optional reference date
-    
+
     :param value: Numeric value (as percentage)
     :param data_temporality: Type of data - "real_time", "historical", or "calculated"
     :param reference_date: Reference date for the data (ISO format string or None)
@@ -55,7 +84,7 @@ def create_currency_object(value, data_temporality="calculated", reference_date=
     """
     Create a currency object with value, type, data temporality and optional reference date
     Currency code is available at root level, no need to duplicate
-    
+
     :param value: Numeric value
     :param data_temporality: Type of data - "real_time", "historical", or "calculated"
     :param reference_date: Reference date for the data (ISO format string or None)
@@ -76,7 +105,7 @@ def create_currency_object(value, data_temporality="calculated", reference_date=
 def create_ratio_object(value, data_temporality="calculated", reference_date=None):
     """
     Create a ratio object with value, type, data temporality and optional reference date
-    
+
     :param value: Numeric value (ratio/multiple)
     :param data_temporality: Type of data - "real_time", "historical", or "calculated"
     :param reference_date: Reference date for the data (ISO format string or None)
@@ -97,7 +126,7 @@ def create_ratio_object(value, data_temporality="calculated", reference_date=Non
 def create_number_object(value, data_temporality="calculated", reference_date=None):
     """
     Create a number object with value, type, data temporality and optional reference date
-    
+
     :param value: Numeric value
     :param data_temporality: Type of data - "real_time", "historical", or "calculated"
     :param reference_date: Reference date for the data (ISO format string or None)
@@ -118,7 +147,7 @@ def create_number_object(value, data_temporality="calculated", reference_date=No
 def safe_get(data, key, default=None):
     """
     Safely get a value from a dictionary
-    
+
     :param data: Dictionary to get value from
     :param key: Key to get
     :param default: Default value if key not found
@@ -136,7 +165,7 @@ def safe_get(data, key, default=None):
 def extract_value(obj):
     """
     Extract value from complex object or return as is
-    
+
     :param obj: Object (can be dict with 'value' key or simple value)
     :return: Extracted value or empty string
     """
@@ -150,7 +179,7 @@ def extract_value(obj):
 def get_unit_from_type(obj_type):
     """
     Get unit string from object type
-    
+
     :param obj_type: Type string (percent, currency, ratio, number)
     :return: Unit string
     """
@@ -186,7 +215,7 @@ def calculate_eps_cagr(eps_values):
 def calculate_roe(net_income, shareholders_equity):
     """
     Calculate ROE (Return on Equity)
-    
+
     :param net_income: Net income
     :param shareholders_equity: Shareholders equity
     :return: ROE as percentage or None
@@ -202,7 +231,7 @@ def calculate_roic(ebit, tax_rate, total_debt, shareholders_equity, cash):
     ROIC = NOPAT / Invested Capital
     NOPAT = EBIT * (1 - Tax Rate)
     Invested Capital = Total Debt + Shareholders Equity - Cash
-    
+
     :param ebit: EBIT (Earnings Before Interest and Taxes)
     :param tax_rate: Tax rate
     :param total_debt: Total debt
@@ -213,7 +242,7 @@ def calculate_roic(ebit, tax_rate, total_debt, shareholders_equity, cash):
     try:
         nopat = ebit * (1 - tax_rate)
         invested_capital = total_debt + shareholders_equity - cash
-        
+
         if invested_capital and invested_capital != 0:
             return (nopat / invested_capital) * 100
     except:
@@ -224,7 +253,7 @@ def calculate_roic(ebit, tax_rate, total_debt, shareholders_equity, cash):
 def calculate_net_margin(net_income, revenue):
     """
     Calculate Net Margin
-    
+
     :param net_income: Net income
     :param revenue: Total revenue
     :return: Net margin as percentage or None
@@ -237,7 +266,7 @@ def calculate_net_margin(net_income, revenue):
 def calculate_ebitda_margin(ebitda, revenue):
     """
     Calculate EBITDA Margin
-    
+
     :param ebitda: EBITDA
     :param revenue: Total revenue
     :return: EBITDA margin as percentage or None
@@ -250,7 +279,7 @@ def calculate_ebitda_margin(ebitda, revenue):
 def calculate_net_debt(total_debt, cash):
     """
     Calculate Net Debt
-    
+
     :param total_debt: Total debt
     :param cash: Cash and cash equivalents
     :return: Net debt or None
@@ -264,7 +293,7 @@ def calculate_net_debt(total_debt, cash):
 def calculate_net_debt_to_ebitda(net_debt, ebitda):
     """
     Calculate Net Debt / EBITDA ratio
-    
+
     :param net_debt: Net debt
     :param ebitda: EBITDA
     :return: Ratio or None
@@ -277,7 +306,7 @@ def calculate_net_debt_to_ebitda(net_debt, ebitda):
 def calculate_current_ratio(current_assets, current_liabilities):
     """
     Calculate Current Ratio (Liquidez Corrente)
-    
+
     :param current_assets: Current assets
     :param current_liabilities: Current liabilities
     :return: Current ratio or None
@@ -290,7 +319,7 @@ def calculate_current_ratio(current_assets, current_liabilities):
 def calculate_pe_ratio(price, earnings_per_share):
     """
     Calculate P/E ratio
-    
+
     :param price: Current stock price
     :param earnings_per_share: Earnings per share
     :return: P/E ratio or None
@@ -303,7 +332,7 @@ def calculate_pe_ratio(price, earnings_per_share):
 def calculate_earnings_yield(earnings_per_share, price):
     """
     Calculate Earnings Yield
-    
+
     :param earnings_per_share: Earnings per share
     :param price: Current stock price
     :return: Earnings yield as percentage or None
@@ -316,7 +345,7 @@ def calculate_earnings_yield(earnings_per_share, price):
 def calculate_fcf_yield(free_cash_flow, market_cap):
     """
     Calculate FCF Yield
-    
+
     :param free_cash_flow: Free cash flow
     :param market_cap: Market capitalization
     :return: FCF yield as percentage or None
@@ -329,7 +358,7 @@ def calculate_fcf_yield(free_cash_flow, market_cap):
 def calculate_dividend_yield(dividend_rate, current_price):
     """
     Calculate Dividend Yield
-    
+
     :param dividend_rate: Annual dividend per share
     :param current_price: Current stock price
     :return: Dividend yield as percentage or None
@@ -342,7 +371,7 @@ def calculate_dividend_yield(dividend_rate, current_price):
 def calculate_payout_ratio(dividends_paid, net_income):
     """
     Calculate Payout Ratio
-    
+
     :param dividends_paid: Total dividends paid
     :param net_income: Net income
     :return: Payout ratio as percentage or None
@@ -355,9 +384,9 @@ def calculate_payout_ratio(dividends_paid, net_income):
 def calculate_graham_number(eps, book_value_per_share):
     """
     Calculate Graham Number (Benjamin Graham's intrinsic value - simplified formula)
-    
+
     Formula: √(22.5 × EPS × Book Value per Share)
-    
+
     :param eps: Earnings per share
     :param book_value_per_share: Book value per share
     :return: Graham number or None
@@ -399,7 +428,7 @@ def calculate_graham_fair_value(eps, growth_rate, bond_yield=0.10):
 def calculate_price_change(current_price, previous_price):
     """
     Calculate price change percentage
-    
+
     :param current_price: Current price
     :param previous_price: Previous price
     :return: Price change as percentage or None
@@ -415,80 +444,80 @@ def calculate_price_change(current_price, previous_price):
 def get_price_performance(ticker):
     """
     Get price performance metrics for different periods
-    
+
     :param ticker: yfinance Ticker object
     :return: Dictionary with price performance metrics
     """
     try:
         from datetime import datetime, timedelta
         import pandas as pd
-        
+
         # Get historical data (1 year + buffer)
         hist = ticker.history(period="1y")
-        
+
         if hist.empty:
             return None
-        
+
         current_price = hist['Close'].iloc[-1]
-        
+
         # Get the reference date (last available historical data date)
         last_date = hist.index[-1].strftime('%Y-%m-%d')
-        
+
         performance = {
             "current_price": create_currency_object(current_price, "real_time"),
             "day_high": create_currency_object(hist['High'].iloc[-1], "real_time"),
             "day_low": create_currency_object(hist['Low'].iloc[-1], "real_time"),
         }
-        
+
         # 1 day change (if we have at least 2 days)
         if len(hist) >= 2:
             prev_close = hist['Close'].iloc[-2]
             performance["change_1d"] = create_percent_object(calculate_price_change(current_price, prev_close), "historical", last_date)
-        
+
         # 5 days (1 week) change
         if len(hist) >= 6:
             price_5d_ago = hist['Close'].iloc[-6]
             performance["change_5d"] = create_percent_object(calculate_price_change(current_price, price_5d_ago), "historical", last_date)
-        
+
         # 1 month change (approximately 21 trading days)
         if len(hist) >= 22:
             price_1m_ago = hist['Close'].iloc[-22]
             performance["change_1m"] = create_percent_object(calculate_price_change(current_price, price_1m_ago), "historical", last_date)
-        
+
         # 3 months change (approximately 63 trading days)
         if len(hist) >= 64:
             price_3m_ago = hist['Close'].iloc[-64]
             performance["change_3m"] = create_percent_object(calculate_price_change(current_price, price_3m_ago), "historical", last_date)
-        
+
         # 6 months change (approximately 126 trading days)
         if len(hist) >= 127:
             price_6m_ago = hist['Close'].iloc[-127]
             performance["change_6m"] = create_percent_object(calculate_price_change(current_price, price_6m_ago), "historical", last_date)
-        
+
         # 52 weeks (1 year) change
         if len(hist) >= 2:
             price_52w_ago = hist['Close'].iloc[0]
             performance["change_52w"] = create_percent_object(calculate_price_change(current_price, price_52w_ago), "historical", last_date)
-        
+
         # Year to Date (YTD) change
         current_year = datetime.now().year
         ytd_data = hist[hist.index.year == current_year]
         if not ytd_data.empty and len(ytd_data) > 1:
             price_ytd_start = ytd_data['Close'].iloc[0]
             performance["change_ytd"] = create_percent_object(calculate_price_change(current_price, price_ytd_start), "historical", last_date)
-        
+
         # 52-week high and low
         week_52_high = hist['High'].max()
         week_52_low = hist['Low'].min()
         performance["week_52_high"] = create_currency_object(week_52_high, "historical", last_date)
         performance["week_52_low"] = create_currency_object(week_52_low, "historical", last_date)
-        
+
         # Distance from 52-week high/low
         performance["distance_from_52w_high"] = create_percent_object(calculate_price_change(current_price, week_52_high), "calculated", last_date)
         performance["distance_from_52w_low"] = create_percent_object(calculate_price_change(current_price, week_52_low), "calculated", last_date)
-        
+
         return performance
-        
+
     except Exception as e:
         return None
 
@@ -496,7 +525,7 @@ def get_price_performance(ticker):
 def calculate_revenue_growth(revenues, reference_date=None):
     """
     Calculate revenue growth (YoY and CAGR)
-    
+
     :param revenues: List of revenues (most recent first)
     :param reference_date: Reference date for the most recent data
     :return: Dictionary with growth metrics or None
@@ -504,17 +533,17 @@ def calculate_revenue_growth(revenues, reference_date=None):
     try:
         if len(revenues) < 2:
             return None
-        
+
         # YoY growth (most recent year)
         yoy_growth = ((revenues[0] - revenues[1]) / revenues[1]) * 100 if revenues[1] != 0 else None
-        
+
         # CAGR (if we have enough data)
         cagr = None
         if len(revenues) >= 3:
             n_years = len(revenues) - 1
             if revenues[-1] != 0:
                 cagr = (((revenues[0] / revenues[-1]) ** (1 / n_years)) - 1) * 100
-        
+
         return {
             "yoy_growth": create_percent_object(yoy_growth, "calculated", reference_date),
             "cagr": create_percent_object(cagr, "calculated", reference_date),
@@ -527,7 +556,7 @@ def calculate_revenue_growth(revenues, reference_date=None):
 def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
     """
     Get fundamental data for a stock symbol
-    
+
     :param symbol: Stock symbol (e.g., PETR4.SA for Petrobras)
     :param period: Period type - 'annual' or 'quarterly'
     :return: Dictionary with fundamental data
@@ -536,7 +565,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
         # Create ticker with custom session
         ticker = yf.Ticker(symbol, session=session)
         info = ticker.info
-        
+
         # Get financial statements based on period
         if period == "quarterly":
             financials = ticker.quarterly_financials
@@ -546,7 +575,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             financials = ticker.financials
             balance_sheet = ticker.balance_sheet
             cashflow = ticker.cashflow
-        
+
         result = {
             "symbol": symbol,
             "company_name": safe_get(info, "longName", symbol),
@@ -556,26 +585,26 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             "period_type": period,
             "last_updated": datetime.now().isoformat(),
         }
-        
+
         # Current price data
         current_price = safe_get(info, "currentPrice")
         market_cap = safe_get(info, "marketCap")
-        
+
         # Get price performance metrics
         price_performance = get_price_performance(ticker)
         if price_performance:
             result["price_performance"] = price_performance
-        
+
         # Get most recent financial data
         if not financials.empty and not balance_sheet.empty:
             latest_financials = financials.iloc[:, 0]
             latest_balance = balance_sheet.iloc[:, 0]
-            
+
             # Get reference dates for transparency
             financials_date = financials.columns[0].strftime("%Y-%m-%d") if not financials.empty else None
             balance_date = balance_sheet.columns[0].strftime("%Y-%m-%d") if not balance_sheet.empty else None
             cashflow_date = cashflow.columns[0].strftime("%Y-%m-%d") if not cashflow.empty else None
-            
+
             result["data_reference"] = {
                 "financials_date": financials_date,
                 "balance_sheet_date": balance_date,
@@ -588,7 +617,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             net_income = safe_get(latest_financials, "Net Income", 0)
             ebit = safe_get(latest_financials, "EBIT", 0)
             ebitda = safe_get(latest_financials, "EBITDA", 0)
-            
+
             # Balance sheet data
             total_assets = safe_get(latest_balance, "Total Assets", 0)
             current_assets = safe_get(latest_balance, "Current Assets", 0)
@@ -596,60 +625,60 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             total_debt = safe_get(latest_balance, "Total Debt", 0)
             shareholders_equity = safe_get(latest_balance, "Stockholders Equity", 0)
             cash = safe_get(latest_balance, "Cash And Cash Equivalents", 0)
-            
+
             # Calculate metrics
-            
+
             # 1. Rentabilidade (Profitability)
             roe = calculate_roe(net_income, shareholders_equity)
             net_margin = calculate_net_margin(net_income, revenue)
             ebitda_margin = calculate_ebitda_margin(ebitda, revenue)
-            
+
             # Tax rate estimation
             tax_rate = 0.34  # Default Brazilian corporate tax rate
             income_tax = safe_get(latest_financials, "Tax Provision")
             if income_tax and ebit and ebit != 0:
                 tax_rate = abs(income_tax / ebit)
-            
+
             roic = calculate_roic(ebit, tax_rate, total_debt, shareholders_equity, cash)
-            
+
             result["profitability"] = {
                 "roe": create_percent_object(roe, "calculated", financials_date),
                 "roic": create_percent_object(roic, "calculated", balance_date),
                 "net_margin": create_percent_object(net_margin, "calculated", financials_date),
                 "ebitda_margin": create_percent_object(ebitda_margin, "calculated", financials_date),
             }
-            
+
             # 2. Crescimento (Growth)
             revenue_growth = None
             if not financials.empty and len(financials.columns) > 1:
-                revenues = [safe_get(financials.iloc[:, i], "Total Revenue", 0) 
+                revenues = [safe_get(financials.iloc[:, i], "Total Revenue", 0)
                            for i in range(min(5, len(financials.columns)))]
                 revenue_growth = calculate_revenue_growth(revenues, financials_date)
-            
+
             result["growth"] = {
                 "revenue_growth": revenue_growth,
             }
-            
+
             # 3. Endividamento (Debt)
             net_debt = calculate_net_debt(total_debt, cash)
             net_debt_to_ebitda = calculate_net_debt_to_ebitda(net_debt, ebitda)
             current_ratio = calculate_current_ratio(current_assets, current_liabilities)
-            
+
             result["debt"] = {
                 "total_debt": create_currency_object(total_debt, "calculated", balance_date),
                 "net_debt": create_currency_object(net_debt, "calculated", balance_date),
                 "net_debt_to_ebitda": create_ratio_object(net_debt_to_ebitda, "calculated", balance_date),
                 "current_ratio": create_ratio_object(current_ratio, "calculated", balance_date),
             }
-            
+
             # 4. Eficiência Operacional (Operational Efficiency)
             asset_turnover = revenue / total_assets if total_assets != 0 else None
-            
+
             result["efficiency"] = {
                 "asset_turnover": create_ratio_object(asset_turnover, "calculated", balance_date),
                 "ebitda": create_currency_object(ebitda, "calculated", financials_date),
             }
-            
+
             # 5. Geração de Caixa (Cash Generation)
             free_cash_flow = None
             if not cashflow.empty:
@@ -657,16 +686,16 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 operating_cash_flow = safe_get(latest_cashflow, "Operating Cash Flow", 0)
                 capex = safe_get(latest_cashflow, "Capital Expenditure", 0)
                 free_cash_flow = operating_cash_flow + capex  # capex is usually negative
-                
+
                 fcf_to_net_income = free_cash_flow / net_income if net_income != 0 else None
-                
+
                 result["cash_generation"] = {
                     "free_cash_flow": create_currency_object(free_cash_flow, "calculated", cashflow_date),
                     "operating_cash_flow": create_currency_object(operating_cash_flow, "calculated", cashflow_date),
                     "capex": create_currency_object(capex, "calculated", cashflow_date),
                     "fcf_to_net_income": create_ratio_object(fcf_to_net_income, "calculated", cashflow_date),
                 }
-            
+
             # 6. Valuation
             eps = safe_get(info, "trailingEps")
             pe_ratio = calculate_pe_ratio(current_price, eps) if current_price and eps else None
@@ -690,11 +719,11 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
             # EV/EBITDA
             enterprise_value = safe_get(info, "enterpriseValue")
             ev_to_ebitda = enterprise_value / ebitda if enterprise_value and ebitda and ebitda != 0 else None
-            
+
             # Dividend metrics
             dividend_rate = safe_get(info, "dividendRate")  # Annual dividend per share
             dividend_yield = calculate_dividend_yield(dividend_rate, current_price) if dividend_rate and current_price else None
-            
+
             # Payout ratio
             payout_ratio = None
             if not cashflow.empty:
@@ -702,11 +731,11 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 dividends_paid = safe_get(latest_cashflow, "Cash Dividends Paid", 0)
                 if dividends_paid and net_income:
                     payout_ratio = calculate_payout_ratio(dividends_paid, net_income)
-            
+
             # Benjamin Graham's Fair Value calculations
             book_value_per_share = safe_get(info, "bookValue")
             graham_number = calculate_graham_number(eps, book_value_per_share) if eps and book_value_per_share else None
-            
+
             # For Graham revised formula, use revenue CAGR as growth estimate
             growth_estimate = None
             graham_fair_value = None
@@ -714,13 +743,13 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 cagr_value = revenue_growth["cagr"]["value"] if isinstance(revenue_growth["cagr"], dict) else revenue_growth["cagr"]
                 growth_estimate = cagr_value / 100  # Convert to decimal
                 graham_fair_value = calculate_graham_fair_value(eps, growth_estimate)
-            
+
             # Calculate margin of safety
             margin_of_safety = None
             fair_value_used = graham_fair_value if graham_fair_value else graham_number
             if fair_value_used and current_price:
                 margin_of_safety = ((fair_value_used - current_price) / fair_value_used) * 100
-            
+
             result["valuation"] = {
                 "current_price": create_currency_object(current_price, "real_time"),
                 "market_cap": create_currency_object(market_cap, "real_time"),
@@ -739,13 +768,16 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
                 "graham_fair_value": create_currency_object(graham_fair_value, "calculated", financials_date),
                 "margin_of_safety": create_percent_object(margin_of_safety, "calculated", financials_date),
             }
-            
+
         else:
             result["error"] = "Financial data not available"
-        
+
         return result
-        
+
     except Exception as e:
+        error_str = str(e).lower()
+        if any(k in error_str for k in RETRY_KEYWORDS):
+            raise
         return {
             "symbol": symbol,
             "error": str(e)
@@ -755,7 +787,7 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
 def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = "annual"):
     """
     Export fundamental data to CSV files (raw data + calculated metrics)
-    
+
     :param symbol: Stock symbol
     :param data: Fundamental data dictionary
     :param output_dir: Output directory for CSV files
@@ -764,10 +796,10 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
     if "error" in data:
         print(f"Error for {symbol}: {data['error']}")
         return
-    
+
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
+
     # Get raw data from yfinance based on period
     ticker = yf.Ticker(symbol, session=session)
     if period == "quarterly":
@@ -778,30 +810,30 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
         financials = ticker.financials
         balance_sheet = ticker.balance_sheet
         cashflow = ticker.cashflow
-    
+
     # Export raw data to CSV
     if not financials.empty:
         financials_file = output_path / f"{symbol.replace('.', '_')}_financials.csv"
         financials.to_csv(financials_file)
         print(f"✓ Saved: {financials_file}")
-    
+
     if not balance_sheet.empty:
         balance_file = output_path / f"{symbol.replace('.', '_')}_balance_sheet.csv"
         balance_sheet.to_csv(balance_file)
         print(f"✓ Saved: {balance_file}")
-    
+
     if not cashflow.empty:
         cashflow_file = output_path / f"{symbol.replace('.', '_')}_cashflow.csv"
         cashflow.to_csv(cashflow_file)
         print(f"✓ Saved: {cashflow_file}")
-    
+
     # Export calculated metrics to CSV
     metrics_file = output_path / f"{symbol.replace('.', '_')}_metrics.csv"
-    
+
     with open(metrics_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(["Category", "Metric", "Value", "Unit"])
-        
+
         # Basic info
         writer.writerow(["Info", "Symbol", data.get("symbol", ""), ""])
         writer.writerow(["Info", "Company Name", data.get("company_name", ""), ""])
@@ -810,14 +842,14 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
         writer.writerow(["Info", "Currency", data.get("currency", ""), ""])
         writer.writerow(["Info", "Period Type", data.get("period_type", ""), ""])
         writer.writerow(["Info", "Last Updated", data.get("last_updated", ""), ""])
-        
+
         # Data reference dates
         if "data_reference" in data:
             ref = data["data_reference"]
             writer.writerow(["Data Reference", "Financials Date", ref.get("financials_date", ""), ""])
             writer.writerow(["Data Reference", "Balance Sheet Date", ref.get("balance_sheet_date", ""), ""])
             writer.writerow(["Data Reference", "Cashflow Date", ref.get("cashflow_date", ""), ""])
-        
+
         # Price Performance
         if "price_performance" in data:
             perf = data["price_performance"]
@@ -835,7 +867,7 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Price Performance", "52 Week Low", extract_value(perf.get("week_52_low")), data.get("currency", "BRL")])
             writer.writerow(["Price Performance", "Distance from 52W High", extract_value(perf.get("distance_from_52w_high")), "%"])
             writer.writerow(["Price Performance", "Distance from 52W Low", extract_value(perf.get("distance_from_52w_low")), "%"])
-        
+
         # Profitability
         if "profitability" in data:
             prof = data["profitability"]
@@ -843,14 +875,14 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Profitability", "ROIC", extract_value(prof.get("roic")), "%"])
             writer.writerow(["Profitability", "Net Margin", extract_value(prof.get("net_margin")), "%"])
             writer.writerow(["Profitability", "EBITDA Margin", extract_value(prof.get("ebitda_margin")), "%"])
-        
+
         # Growth
         if "growth" in data and data["growth"].get("revenue_growth"):
             growth = data["growth"]["revenue_growth"]
             writer.writerow(["Growth", "Revenue YoY Growth", extract_value(growth.get("yoy_growth")), "%"])
             writer.writerow(["Growth", "Revenue CAGR", extract_value(growth.get("cagr")), "%"])
             writer.writerow(["Growth", "Years Analyzed", growth.get("years", ""), "years"])
-        
+
         # Debt
         if "debt" in data:
             debt = data["debt"]
@@ -858,13 +890,13 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Debt", "Net Debt", extract_value(debt.get("net_debt")), data.get("currency", "BRL")])
             writer.writerow(["Debt", "Net Debt to EBITDA", extract_value(debt.get("net_debt_to_ebitda")), "x"])
             writer.writerow(["Debt", "Current Ratio", extract_value(debt.get("current_ratio")), ""])
-        
+
         # Efficiency
         if "efficiency" in data:
             eff = data["efficiency"]
             writer.writerow(["Efficiency", "Asset Turnover", extract_value(eff.get("asset_turnover")), ""])
             writer.writerow(["Efficiency", "EBITDA", extract_value(eff.get("ebitda")), data.get("currency", "BRL")])
-        
+
         # Cash Generation
         if "cash_generation" in data:
             cash = data["cash_generation"]
@@ -872,7 +904,7 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Cash Generation", "Operating Cash Flow", extract_value(cash.get("operating_cash_flow")), data.get("currency", "BRL")])
             writer.writerow(["Cash Generation", "CAPEX", extract_value(cash.get("capex")), data.get("currency", "BRL")])
             writer.writerow(["Cash Generation", "FCF to Net Income", extract_value(cash.get("fcf_to_net_income")), ""])
-        
+
         # Valuation
         if "valuation" in data:
             val = data["valuation"]
@@ -892,7 +924,7 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
             writer.writerow(["Valuation", "Graham Number", extract_value(val.get("graham_number")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "Graham Fair Value", extract_value(val.get("graham_fair_value")), data.get("currency", "BRL")])
             writer.writerow(["Valuation", "Margin of Safety", extract_value(val.get("margin_of_safety")), "%"])
-    
+
     print(f"✓ Saved: {metrics_file}")
     print(f"\nAll files saved to: {output_path.absolute()}")
 
@@ -905,63 +937,69 @@ def main():
 Examples:
   # JSON output with annual data (default)
   python get_fundamental_data.py PETR4.SA VALE3.SA
-  
+
   # JSON output with quarterly data
   python get_fundamental_data.py --period quarterly PETR4.SA
-  
+
   # CSV output with raw data and calculated metrics
   python get_fundamental_data.py --format csv PETR4.SA
-  
+
   # CSV output with quarterly data
   python get_fundamental_data.py --format csv --period quarterly PETR4.SA
-  
+
   # CSV output to specific directory
   python get_fundamental_data.py --format csv --output ./data PETR4.SA VALE3.SA
         """
     )
-    
+
     parser.add_argument(
         "symbols",
         nargs="+",
         help="Stock symbols (e.g., PETR4.SA VALE3.SA ITUB4.SA)"
     )
-    
+
     parser.add_argument(
         "--format",
         choices=["json", "csv"],
         default="json",
         help="Output format: json (default) or csv"
     )
-    
+
     parser.add_argument(
         "--output",
         default=".",
         help="Output directory for CSV files (only used with --format csv)"
     )
-    
+
     parser.add_argument(
         "--period",
         choices=["annual", "quarterly"],
         default="annual",
         help="Period type: annual (default) or quarterly"
     )
-    
+
     args = parser.parse_args()
-    
+
     if args.format == "json":
         results = {}
         for symbol in args.symbols:
-            results[symbol] = get_fundamental_data(symbol, args.period)
+            try:
+                results[symbol] = retry_call(lambda: get_fundamental_data(symbol, args.period), symbol)
+            except Exception as e:
+                results[symbol] = {"symbol": symbol, "error": str(e)}
         print(json.dumps(results, indent=2, ensure_ascii=False))
-    
+
     elif args.format == "csv":
         for symbol in args.symbols:
             print(f"\n{'='*60}")
             print(f"Processing {symbol} ({args.period})...")
             print(f"{'='*60}")
-            data = get_fundamental_data(symbol, args.period)
+            try:
+                data = retry_call(lambda: get_fundamental_data(symbol, args.period), symbol)
+            except Exception as e:
+                data = {"symbol": symbol, "error": str(e)}
             export_to_csv(symbol, data, args.output, args.period)
-        
+
         print(f"\n{'='*60}")
         print(f"✓ Processing complete for {len(args.symbols)} symbol(s)")
         print(f"{'='*60}")

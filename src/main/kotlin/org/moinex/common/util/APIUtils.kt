@@ -43,7 +43,7 @@ object APIUtils {
     @Volatile
     private var shuttingDown = false
 
-    private const val DEFAULT_SCRIPT_TIMEOUT_SECONDS = 10L
+    private const val DEFAULT_SCRIPT_TIMEOUT_SECONDS = 300L
     private const val PROCESS_TERMINATION_TIMEOUT_SECONDS = 5L
 
     suspend fun shutdownExecutor() {
@@ -208,6 +208,13 @@ object APIUtils {
                 }
 
             val exitCode = process.exitValue()
+
+            if (errorOutput.isNotBlank()) {
+                errorOutput
+                    .lines()
+                    .filter { it.isNotBlank() }
+                    .forEach { logger.debug("[{}] {}", scriptName, it) }
+            }
 
             when {
                 exitCode != 0 -> {

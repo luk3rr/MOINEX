@@ -10,10 +10,7 @@ package org.moinex.service.investment
 
 import org.json.JSONObject
 import org.moinex.common.constant.Constants
-import org.moinex.common.retry.RetryException
-import org.moinex.common.retry.retry
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.model.dto.SyncMarketIndicatorResultDTO
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
@@ -164,14 +161,7 @@ class MarketIndicatorService(
                 endDate,
             )
 
-            val result =
-                retry(
-                    config = RetryConfig.BACEN_API,
-                    logger = logger,
-                    operationName = "Sync $indicatorType from $startDate to $endDate",
-                ) {
-                    APIUtils.fetchMarketIndicatorHistory(indicatorType, startDate, endDate)
-                }
+            val result = APIUtils.fetchMarketIndicatorHistory(indicatorType, startDate, endDate)
 
             val dataArray = result.getJSONArray("data")
 
@@ -192,14 +182,7 @@ class MarketIndicatorService(
         }.fold(
             onSuccess = { it },
             onFailure = { e ->
-                when (e) {
-                    is RetryException -> {
-                        logger.error("Failed to sync {} after retries: {}", indicatorType, e.message)
-                    }
-                    else -> {
-                        logger.error("Unexpected exception synchronizing indicator {}: {}", indicatorType, e.message)
-                    }
-                }
+                logger.error("Failed to sync {}: {}", indicatorType, e.message)
                 SyncMarketIndicatorResultDTO(indicatorType, synced = false)
             },
         )

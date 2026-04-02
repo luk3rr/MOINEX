@@ -11,7 +11,6 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.factory.investment.TickerPriceHistoryFactory
 import org.moinex.factory.investment.TickerPurchaseFactory
@@ -42,21 +41,11 @@ class TickerPriceHistoryServiceTest :
             )
 
         beforeSpec {
-            mockkObject(RetryConfig.Companion)
             mockkObject(APIUtils)
         }
 
         afterSpec {
             unmockkAll()
-        }
-
-        beforeContainer {
-            every { RetryConfig.TICKER_PRICE } returns
-                RetryConfig(
-                    maxRetries = 3,
-                    initialDelayMs = 100,
-                    multiplier = 2.0,
-                )
         }
 
         afterContainer { clearAllMocks(answers = true) }

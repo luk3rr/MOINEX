@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import org.moinex.config.RetryConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration.Companion.milliseconds
 
 class RetryException(
     message: String,
@@ -53,7 +54,7 @@ suspend fun <T> retry(
 
             logger.info("Retrying in $delayMs ms")
 
-            delay(delayMs)
+            delay(delayMs.milliseconds)
         }
     }
 

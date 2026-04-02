@@ -11,10 +11,8 @@ package org.moinex.service.investment
 import org.moinex.common.constant.Files
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
-import org.moinex.common.retry.retry
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FileUtils
-import org.moinex.config.RetryConfig
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.WalletTransactionType
@@ -50,7 +48,7 @@ class TickerService(
 
     companion object {
         private const val API_RESPONSE_LOGO_PATH_FIELD = "logo_path"
-        private const val API_RESPONSE_ERROR_FIELD = "exception"
+        private const val API_RESPONSE_ERROR_FIELD = "error"
         private const val API_RESPONSE_PRICE_FIELD = "price"
         private const val API_RESPONSE_WEBSITE_FIELD = "website"
     }
@@ -377,14 +375,7 @@ class TickerService(
 
         logger.info("Fetching prices for {} tickers", symbols.size)
 
-        val jsonObject =
-            retry(
-                config = RetryConfig.TICKER_PRICE,
-                logger = logger,
-                operationName = "Fetch ticker prices",
-            ) {
-                APIUtils.fetchStockPrices(symbols)
-            }
+        val jsonObject = APIUtils.fetchStockPrices(symbols)
 
         val updatedTickers = mutableListOf<Ticker>()
         val failedTickers = mutableListOf<Ticker>()
@@ -497,14 +488,7 @@ class TickerService(
 
         logger.info("Downloading {} missing logos", websitesToDownload.size)
 
-        val jsonObject =
-            retry(
-                config = RetryConfig.TICKER_LOGO,
-                logger = logger,
-                operationName = "Download logos",
-            ) {
-                APIUtils.fetchStockLogos(websitesToDownload)
-            }
+        val jsonObject = APIUtils.fetchStockLogos(websitesToDownload)
 
         val results =
             websitesToDownload.mapNotNull { website ->

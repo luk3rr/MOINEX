@@ -14,9 +14,7 @@ import kotlinx.coroutines.coroutineScope
 import org.json.JSONObject
 import org.moinex.common.extension.throwIfError
 import org.moinex.common.extension.toNoTimeFormat
-import org.moinex.common.retry.retry
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.model.dto.TickerPriceInitializationStatsDTO
 import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPriceHistory
@@ -146,13 +144,7 @@ class TickerPriceHistoryService(
     ) {
         logger.info("Backfilling price history for {} from {}", ticker, referenceDate)
 
-        retry(
-            config = RetryConfig.TICKER_PRICE,
-            logger = logger,
-            operationName = "Fetch historical prices for $ticker from $referenceDate to ${LocalDate.now()}",
-        ) {
-            fetchAndStorePrices(ticker, referenceDate, LocalDate.now())
-        }
+        fetchAndStorePrices(ticker, referenceDate, LocalDate.now())
     }
 
     private suspend fun updateMissingPrices(
@@ -192,13 +184,7 @@ class TickerPriceHistoryService(
                         val startDate = month.atDay(1)
                         val endDate = month.atEndOfMonth()
 
-                        retry(
-                            config = RetryConfig.TICKER_PRICE,
-                            logger = logger,
-                            operationName = "Fetch prices for $ticker on specific dates",
-                        ) {
-                            fetchAndStorePrices(ticker, startDate, endDate, monthDates.toSet())
-                        }
+                        fetchAndStorePrices(ticker, startDate, endDate, monthDates.toSet())
                     }
                 }.awaitAll()
         }

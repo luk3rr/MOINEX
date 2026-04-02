@@ -14,7 +14,6 @@ import org.json.JSONObject
 import org.moinex.common.extension.toRounded
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FileUtils
-import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.Ticker
@@ -49,27 +48,11 @@ class TickerServiceUpdatePricesTest :
 
         beforeSpec {
             mockkObject(APIUtils)
-            mockkObject(RetryConfig.Companion)
             mockkObject(FileUtils)
         }
 
         afterContainer {
             clearAllMocks(answers = true)
-        }
-
-        beforeContainer {
-            every { RetryConfig.TICKER_PRICE } returns
-                RetryConfig(
-                    maxRetries = 3,
-                    initialDelayMs = 100,
-                    multiplier = 2.0,
-                )
-            every { RetryConfig.TICKER_LOGO } returns
-                RetryConfig(
-                    maxRetries = 3,
-                    initialDelayMs = 100,
-                    multiplier = 2.0,
-                )
         }
 
         afterSpec {

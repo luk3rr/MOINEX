@@ -15,9 +15,8 @@ import org.json.JSONObject
 import org.moinex.common.constant.Constants
 import org.moinex.common.extension.bacenDate
 import org.moinex.common.extension.decimal
-import org.moinex.common.retry.retry
+import org.moinex.common.extension.decimalOrNull
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.model.investment.BrazilianMarketIndicators
 import org.moinex.model.investment.MarketQuotesAndCommodities
 import org.moinex.repository.investment.BrazilianMarketIndicatorsRepository
@@ -64,25 +63,13 @@ class MarketService(
     @Transactional
     suspend fun updateBrazilianMarketIndicatorsFromApi(): BrazilianMarketIndicators =
         brazilianMarketIndicatorsMutex.withLock {
-            retry(
-                config = RetryConfig.MARKET_DATA,
-                logger = logger,
-                operationName = "Update Brazilian market indicators",
-            ) {
-                updateBrazilianMarketIndicators()
-            }
+            updateBrazilianMarketIndicators()
         }
 
     @Transactional
     suspend fun updateMarketQuotesAndCommoditiesFromApi(): MarketQuotesAndCommodities =
         marketQuotesAndCommoditiesMutex.withLock {
-            retry(
-                config = RetryConfig.MARKET_DATA,
-                logger = logger,
-                operationName = "Update market quotes and commodities",
-            ) {
-                updateMarketQuotesAndCommodities()
-            }
+            updateMarketQuotesAndCommodities()
         }
 
     @Transactional
@@ -160,16 +147,68 @@ class MarketService(
         marketQuotesAndCommodities: MarketQuotesAndCommodities,
     ): MarketQuotesAndCommodities =
         marketQuotesAndCommodities.apply {
-            dollar = decimal(Constants.DOLLAR_TICKER, PRICE_FIELD)
-            euro = decimal(Constants.EURO_TICKER, PRICE_FIELD)
-            ibovespa = decimal(Constants.IBOVESPA_TICKER, PRICE_FIELD)
-            bitcoin = decimal(Constants.BITCOIN_TICKER, PRICE_FIELD)
-            ethereum = decimal(Constants.ETHEREUM_TICKER, PRICE_FIELD)
-            gold = decimal(Constants.GOLD_TICKER, PRICE_FIELD)
-            soybean = decimal(Constants.SOYBEAN_TICKER, PRICE_FIELD)
-            coffee = decimal(Constants.COFFEE_ARABICA_TICKER, PRICE_FIELD)
-            wheat = decimal(Constants.WHEAT_TICKER, PRICE_FIELD)
-            oilBrent = decimal(Constants.OIL_BRENT_TICKER, PRICE_FIELD)
+            val successfulSymbols = mutableListOf<String>()
+            val failedSymbols = mutableListOf<String>()
+
+            decimalOrNull(Constants.DOLLAR_TICKER, PRICE_FIELD)?.let {
+                dollar = it
+                successfulSymbols.add(Constants.DOLLAR_TICKER)
+            } ?: failedSymbols.add(Constants.DOLLAR_TICKER)
+
+            decimalOrNull(Constants.EURO_TICKER, PRICE_FIELD)?.let {
+                euro = it
+                successfulSymbols.add(Constants.EURO_TICKER)
+            } ?: failedSymbols.add(Constants.EURO_TICKER)
+
+            decimalOrNull(Constants.IBOVESPA_TICKER, PRICE_FIELD)?.let {
+                ibovespa = it
+                successfulSymbols.add(Constants.IBOVESPA_TICKER)
+            } ?: failedSymbols.add(Constants.IBOVESPA_TICKER)
+
+            decimalOrNull(Constants.BITCOIN_TICKER, PRICE_FIELD)?.let {
+                bitcoin = it
+                successfulSymbols.add(Constants.BITCOIN_TICKER)
+            } ?: failedSymbols.add(Constants.BITCOIN_TICKER)
+
+            decimalOrNull(Constants.ETHEREUM_TICKER, PRICE_FIELD)?.let {
+                ethereum = it
+                successfulSymbols.add(Constants.ETHEREUM_TICKER)
+            } ?: failedSymbols.add(Constants.ETHEREUM_TICKER)
+
+            decimalOrNull(Constants.GOLD_TICKER, PRICE_FIELD)?.let {
+                gold = it
+                successfulSymbols.add(Constants.GOLD_TICKER)
+            } ?: failedSymbols.add(Constants.GOLD_TICKER)
+
+            decimalOrNull(Constants.SOYBEAN_TICKER, PRICE_FIELD)?.let {
+                soybean = it
+                successfulSymbols.add(Constants.SOYBEAN_TICKER)
+            } ?: failedSymbols.add(Constants.SOYBEAN_TICKER)
+
+            decimalOrNull(Constants.COFFEE_ARABICA_TICKER, PRICE_FIELD)?.let {
+                coffee = it
+                successfulSymbols.add(Constants.COFFEE_ARABICA_TICKER)
+            } ?: failedSymbols.add(Constants.COFFEE_ARABICA_TICKER)
+
+            decimalOrNull(Constants.WHEAT_TICKER, PRICE_FIELD)?.let {
+                wheat = it
+                successfulSymbols.add(Constants.WHEAT_TICKER)
+            } ?: failedSymbols.add(Constants.WHEAT_TICKER)
+
+            decimalOrNull(Constants.OIL_BRENT_TICKER, PRICE_FIELD)?.let {
+                oilBrent = it
+                successfulSymbols.add(Constants.OIL_BRENT_TICKER)
+            } ?: failedSymbols.add(Constants.OIL_BRENT_TICKER)
+
+            logger.info("Market prices updated: ${successfulSymbols.size} successful, ${failedSymbols.size} failed")
+
+            if (successfulSymbols.isNotEmpty()) {
+                logger.debug("Successfully updated: ${successfulSymbols.joinToString(", ")}")
+            }
+
+            if (failedSymbols.isNotEmpty()) {
+                logger.warn("Failed to fetch prices for: ${failedSymbols.joinToString(", ")}")
+            }
 
             lastUpdate = LocalDateTime.now()
         }

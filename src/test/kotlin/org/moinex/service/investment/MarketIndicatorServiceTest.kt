@@ -14,7 +14,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.retry.RetryException
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.MarketIndicatorHistoryFactory
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.investment.MarketIndicatorHistory
@@ -33,7 +32,6 @@ class MarketIndicatorServiceTest :
 
         beforeSpec {
             mockkObject(APIUtils)
-            mockkObject(RetryConfig.Companion)
         }
 
         afterSpec {
@@ -42,15 +40,6 @@ class MarketIndicatorServiceTest :
 
         afterContainer {
             clearAllMocks(answers = true)
-        }
-
-        beforeContainer {
-            every { RetryConfig.BACEN_API } returns
-                RetryConfig(
-                    maxRetries = 3,
-                    initialDelayMs = 100,
-                    multiplier = 2.0,
-                )
         }
 
         Given("no bonds with interest indices") {
@@ -399,7 +388,6 @@ class MarketIndicatorServiceTest :
             When("determining sync start date with complete data") {
                 val indicator = InterestIndex.CDI
                 val earliestPurchaseDate = LocalDate.of(2025, 1, 1)
-                val endDate = LocalDate.of(2026, 3, 11)
                 val earliestData =
                     MarketIndicatorHistoryFactory.create(
                         id = 1,
@@ -433,7 +421,6 @@ class MarketIndicatorServiceTest :
             When("determining sync start date with gap in data") {
                 val indicator = InterestIndex.SELIC
                 val earliestPurchaseDate = LocalDate.of(2024, 1, 1)
-                val endDate = LocalDate.of(2026, 3, 11)
                 val earliestData =
                     MarketIndicatorHistoryFactory.create(
                         id = 1,
@@ -703,7 +690,6 @@ class MarketIndicatorServiceTest :
             When("saving new indicator that doesn't exist") {
                 val indicator = InterestIndex.CDI
                 val referenceDate = LocalDate.of(2026, 3, 1)
-                val rateValue = BigDecimal("10.50")
 
                 every {
                     marketIndicatorHistoryRepository.existsByIndicatorTypeAndReferenceDate(

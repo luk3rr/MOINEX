@@ -6,6 +6,7 @@
 
 import sys
 import json
+import time
 import requests
 from datetime import datetime
 
@@ -26,6 +27,34 @@ INDICATOR_MAPPING = {
 }
 
 TIMEOUT_SECONDS = 20
+
+RETRY_MAX_ATTEMPTS = 3
+RETRY_INITIAL_DELAY = 1.0
+RETRY_MULTIPLIER = 1.5
+RETRY_KEYWORDS = ("429", "rate limit", "too many requests", "503", "service unavailable")
+
+
+def retry_call(fn, label):
+    """
+    Calls fn(), retrying on transient errors with exponential backoff.
+    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    """
+    delay = RETRY_INITIAL_DELAY
+    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+        try:
+            return fn()
+        except Exception as e:
+            error_str = str(e).lower()
+            is_transient = any(k in error_str for k in RETRY_KEYWORDS)
+            if not is_transient or attempt == RETRY_MAX_ATTEMPTS:
+                raise
+            print(
+                f"[RETRY] {label} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
+                f"after {delay:.0f}s delay: {e}",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+            delay *= RETRY_MULTIPLIER
 
 
 def download_data(url: str) -> list:
@@ -84,7 +113,7 @@ def get_indicator_history(indicator_type: str, start_date: str, end_date: str) -
     series_id = INDICATOR_MAPPING[indicator_type]
     url = BACEN_API_SERIES_WITH_FILTER_URL.format(series_id, start_date, end_date)
 
-    history = download_data(url)
+    history = retry_call(lambda: download_data(url), indicator_type)
 
     return {
         "indicator_type": indicator_type,

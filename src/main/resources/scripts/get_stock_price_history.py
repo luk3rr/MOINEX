@@ -31,6 +31,39 @@ session.headers.update({
     'Upgrade-Insecure-Requests': '1'
 })
 
+RETRY_MAX_ATTEMPTS = 3
+RETRY_INITIAL_DELAY = 1.0
+RETRY_MULTIPLIER = 1.5
+RETRY_KEYWORDS = ("429", "rate limit", "too many requests")
+
+
+def retry_call(fn, symbol):
+    """
+    Calls fn(), retrying on rate-limit errors with exponential backoff.
+    Writes retry status to stderr. Returns the result or raises on exhaustion.
+    """
+    delay = RETRY_INITIAL_DELAY
+    for attempt in range(1, RETRY_MAX_ATTEMPTS + 1):
+        try:
+            return fn()
+        except Exception as e:
+            error_str = str(e).lower()
+            is_rate_limit = any(k in error_str for k in RETRY_KEYWORDS)
+            if not is_rate_limit or attempt == RETRY_MAX_ATTEMPTS:
+                raise
+            print(
+                f"[RETRY] {symbol} attempt {attempt + 1}/{RETRY_MAX_ATTEMPTS} "
+                f"after {delay:.0f}s delay: {e}",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+            delay *= RETRY_MULTIPLIER
+
+
+def history_with_retry(ticker, symbol, **kwargs):
+    """Call ticker.history() with retry on rate limiting."""
+    return retry_call(lambda: ticker.history(**kwargs), symbol)
+
 
 def get_conversion_rate(from_currency: str, to_currency: str = DEFAULT_CURRENCY) -> float:
     """
@@ -110,10 +143,8 @@ def main():
 
         # First try: exact dates
         try:
-            hist = ticker.history(start=start_date, end=end_date)
-            if hist is not None and not hist.empty:
-                pass  # Success, continue
-            else:
+            hist = history_with_retry(ticker, symbol, start=start_date, end=end_date)
+            if hist is None or hist.empty:
                 hist = None
         except Exception as e:
             hist = None
@@ -122,13 +153,11 @@ def main():
         if hist is None or hist.empty:
             if days_diff >= 0 and days_diff <= 5:
                 try:
-                    hist = ticker.history(period="15d")
+                    hist = history_with_retry(ticker, symbol, period="15d")
                     if hist is not None and not hist.empty:
                         start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
                         hist = hist[hist.index.date >= start_date_obj.date()]
-                        if hist is not None and not hist.empty:
-                            pass  # Success
-                        else:
+                        if hist is None or hist.empty:
                             hist = None
                     else:
                         hist = None
@@ -138,10 +167,8 @@ def main():
         # Second fallback: try with 365 days
         if hist is None or hist.empty:
             try:
-                hist = ticker.history(period="365d")
-                if hist is not None and not hist.empty:
-                    pass  # Success
-                else:
+                hist = history_with_retry(ticker, symbol, period="365d")
+                if hist is None or hist.empty:
                     hist = None
             except Exception as e:
                 hist = None
@@ -149,10 +176,8 @@ def main():
         # Third fallback: try with max period
         if hist is None or hist.empty:
             try:
-                hist = ticker.history(period="max")
-                if hist is not None and not hist.empty:
-                    pass  # Success
-                else:
+                hist = history_with_retry(ticker, symbol, period="max")
+                if hist is None or hist.empty:
                     hist = None
             except Exception as e:
                 hist = None
@@ -165,7 +190,7 @@ def main():
 
         # Get currency with error handling
         try:
-            currency = ticker.info.get("currency", DEFAULT_CURRENCY)
+            currency = retry_call(lambda: ticker.info.get("currency", DEFAULT_CURRENCY), symbol)
         except:
             currency = DEFAULT_CURRENCY
 

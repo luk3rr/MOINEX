@@ -1,6 +1,5 @@
 package org.moinex.service.investment
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -13,9 +12,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
-import org.moinex.common.retry.RetryException
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.factory.investment.BrazilianMarketIndicatorsFactory
 import org.moinex.factory.investment.MarketQuotesAndCommoditiesFactory
 import org.moinex.model.investment.BrazilianMarketIndicators
@@ -35,20 +32,10 @@ class MarketServiceTest :
 
         beforeSpec {
             mockkObject(APIUtils)
-            mockkObject(RetryConfig.Companion)
         }
 
         afterContainer {
             clearAllMocks(answers = true)
-        }
-
-        beforeContainer {
-            every { RetryConfig.MARKET_DATA } returns
-                RetryConfig(
-                    maxRetries = 3,
-                    initialDelayMs = 100,
-                    multiplier = 2.0,
-                )
         }
 
         afterSpec {
@@ -354,62 +341,6 @@ class MarketServiceTest :
 
                 Then("should save fetched data") {
                     verify { marketQuotesAndCommoditiesRepository.save(any()) }
-                }
-            }
-        }
-
-        Given("API fails when updating Brazilian market indicators") {
-            When("API throws exception during fetch") {
-                every { brazilianMarketIndicatorsRepository.findAll() } returns emptyList()
-                coEvery { APIUtils.fetchBrazilianMarketIndicators() } throws RuntimeException("API exception")
-
-                Then("should throw RetryException after retries") {
-                    shouldThrow<RetryException> {
-                        service.updateBrazilianMarketIndicatorsFromApi()
-                    }
-                }
-            }
-        }
-
-        Given("API fails when updating market quotes and commodities") {
-            When("API throws exception during fetch") {
-                every { marketQuotesAndCommoditiesRepository.findAll() } returns emptyList()
-                coEvery { APIUtils.fetchStockPrices(any()) } throws RuntimeException("API exception")
-
-                Then("should throw RetryException after retries") {
-                    shouldThrow<RetryException> {
-                        service.updateMarketQuotesAndCommoditiesFromApi()
-                    }
-                }
-            }
-        }
-
-        Given("API returns invalid response for Brazilian market indicators") {
-            When("updating Brazilian market indicators with missing required fields") {
-                val invalidApiResponse = JSONObject(mapOf("invalid_field" to "value"))
-
-                every { brazilianMarketIndicatorsRepository.findAll() } returns emptyList()
-                coEvery { APIUtils.fetchBrazilianMarketIndicators() } returns invalidApiResponse
-
-                Then("should throw RetryException due to missing data") {
-                    shouldThrow<RetryException> {
-                        service.updateBrazilianMarketIndicatorsFromApi()
-                    }
-                }
-            }
-        }
-
-        Given("API returns invalid response for market quotes and commodities") {
-            When("updating market quotes and commodities with missing required fields") {
-                val invalidApiResponse = JSONObject(mapOf("invalid_field" to "value"))
-
-                every { marketQuotesAndCommoditiesRepository.findAll() } returns emptyList()
-                coEvery { APIUtils.fetchStockPrices(any()) } returns invalidApiResponse
-
-                Then("should throw RetryException due to missing data") {
-                    shouldThrow<RetryException> {
-                        service.updateMarketQuotesAndCommoditiesFromApi()
-                    }
                 }
             }
         }

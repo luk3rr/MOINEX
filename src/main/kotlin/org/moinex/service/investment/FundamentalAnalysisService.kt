@@ -12,9 +12,7 @@ import org.json.JSONObject
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isCacheExpired
 import org.moinex.common.extension.isValidForFundamentalAnalysis
-import org.moinex.common.retry.retry
 import org.moinex.common.util.APIUtils
-import org.moinex.config.RetryConfig
 import org.moinex.exception.MoinexException
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.PeriodType
@@ -79,20 +77,9 @@ class FundamentalAnalysisService(
     ): FundamentalAnalysis {
         val symbol = ticker.symbol
 
-        val tickerData =
-            retry(
-                config = RetryConfig.FUNDAMENTAL_ANALYSIS,
-                logger = logger,
-                operationName = "Fetch fundamental analysis for $symbol ($periodType)",
-            ) {
-                val response = APIUtils.fetchFundamentalAnalysis(symbol, periodType)
-
-                val responseData = response.getJSONObject(symbol)
-
-                handleApiResponse(responseData, symbol)
-
-                responseData
-            }
+        val response = APIUtils.fetchFundamentalAnalysis(symbol, periodType)
+        val tickerData = response.getJSONObject(symbol)
+        handleApiResponse(tickerData, symbol)
 
         val analysis =
             fundamentalAnalysisRepository

@@ -31,34 +31,10 @@ data class RetryConfig(
     companion object {
         val API_CALLS = RetryConfig()
 
-        val MARKET_DATA =
-            RetryConfig(
-                maxRetries = 5,
-                initialDelayMs = 2000,
-            )
-
-        val BACEN_API =
-            RetryConfig(
-                maxRetries = 3,
-                initialDelayMs = 1000,
-            )
-
         val FUNDAMENTAL_ANALYSIS =
             RetryConfig(
                 maxRetries = 5,
                 initialDelayMs = 2000,
-            )
-
-        val TICKER_PRICE =
-            RetryConfig(
-                maxRetries = 7,
-                initialDelayMs = 1000,
-            )
-
-        val TICKER_LOGO =
-            RetryConfig(
-                maxRetries = 3,
-                initialDelayMs = 1000,
             )
     }
 }
