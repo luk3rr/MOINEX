@@ -58,6 +58,7 @@ import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @Controller
 class WishlistController(
@@ -94,6 +95,10 @@ class WishlistController(
     private val allItems = FXCollections.observableArrayList<WishlistItem>()
     private val filteredItems = FXCollections.observableArrayList<WishlistItem>()
     private var categories: List<Category> = emptyList()
+
+    companion object {
+        const val WISHLIST_TIMELINE_CHART_STYLE_CLASS: String = "wishlist-timeline-chart"
+    }
 
     @FXML
     fun initialize() {
@@ -683,77 +688,160 @@ class WishlistController(
         timelineChartPane.children.clear()
 
         val pendingWithDate = allItems.filter { it.isPending() && it.targetDate != null }
-        if (pendingWithDate.isEmpty()) return
+        val purchasedWithDate = allItems.filter { it.isPurchased() && it.purchasedAt != null }
 
-        val categoryAxis = CategoryAxis()
-        val numberAxis = NumberAxis()
-        val stackedBarChart = StackedBarChart(categoryAxis, numberAxis)
+        if (pendingWithDate.isEmpty() && purchasedWithDate.isEmpty()) return
 
-        stackedBarChart.verticalGridLinesVisible = false
-        timelineChartPane.children.add(stackedBarChart)
-        stackedBarChart.setAnchorPaneConstraints()
-        stackedBarChart.data.clear()
-
+        val (startMonth, endMonth) = computeChartMonthRange(pendingWithDate, purchasedWithDate)
+        val validMonths = generateMonthRange(startMonth, endMonth).toSet()
         val formatter = UIUtils.getShortMonthYearFormatter(preferencesService.locale)
-        val currentMonth = YearMonth.now()
-        val startMonth = currentMonth.minusMonths(Constants.WISHLIST_XYBAR_CHART_PAST_MONTHS.toLong())
-        val endMonth =
-            pendingWithDate
-                .mapNotNull { it.targetDate }
-                .maxOfOrNull { YearMonth.from(it) } ?: currentMonth
 
+        val pendingTotals = buildMonthlyTotals(pendingWithDate, validMonths) { YearMonth.from(it.targetDate!!) }
+        val purchasedTotals =
+            buildMonthlyTotals(purchasedWithDate, validMonths) { YearMonth.from(it.purchasedAt!!.toLocalDate()) }
+
+        val activeMonths = (pendingTotals.keys + purchasedTotals.keys).toSortedSet().toList()
+        if (activeMonths.isEmpty()) return
+
+        val monthGrandTotals = mergeMonthTotals(pendingTotals, purchasedTotals)
+
+        val chart = buildStackedBarChart()
+        timelineChartPane.children.add(chart)
+        chart.setAnchorPaneConstraints()
+
+        chart.data.add(
+            buildSeries(
+                preferencesService.translate(TranslationKeys.WISHLIST_STATUS_PENDING),
+                pendingTotals,
+                activeMonths,
+                formatter,
+            ),
+        )
+        chart.data.add(
+            buildSeries(
+                preferencesService.translate(TranslationKeys.WISHLIST_STATUS_PURCHASED),
+                purchasedTotals,
+                activeMonths,
+                formatter,
+            ),
+        )
+
+        configureNumberAxis(chart.yAxis as NumberAxis, monthGrandTotals)
+        UIUtils.applyDefaultChartStyle(chart)
+        applyChartTooltipsAndAnimation(chart, monthGrandTotals, formatter)
+    }
+
+    private fun computeChartMonthRange(
+        pendingWithDate: List<WishlistItem>,
+        purchasedWithDate: List<WishlistItem>,
+    ): Pair<YearMonth, YearMonth> {
+        val currentMonth = YearMonth.now()
+
+        val pendingStartMonth = currentMonth.minusMonths(Constants.WISHLIST_XYBAR_CHART_PAST_MONTHS.toLong())
+
+        val purchasedStartMonth =
+            purchasedWithDate
+                .asSequence()
+                .map { YearMonth.from(it.purchasedAt!!.toLocalDate()) }
+                .distinct()
+                .sortedDescending()
+                .take(Constants.WISHLIST_XYBAR_CHART_PAST_PURCHASED_MONTHS)
+                .minOrNull() ?: currentMonth
+
+        val startMonth = minOf(pendingStartMonth, purchasedStartMonth)
+
+        val endMonth =
+            maxOf(
+                pendingWithDate.mapNotNull { it.targetDate }.maxOfOrNull { YearMonth.from(it) } ?: currentMonth,
+                currentMonth,
+            )
+
+        return Pair(startMonth, endMonth)
+    }
+
+    private fun generateMonthRange(
+        start: YearMonth,
+        end: YearMonth,
+    ): List<YearMonth> {
         val months = mutableListOf<YearMonth>()
-        var m = startMonth
-        while (!m.isAfter(endMonth)) {
+        var m = start
+        while (!m.isAfter(end)) {
             months.add(m)
             m = m.plusMonths(1)
         }
+        return months
+    }
 
-        val categories = categoryService.getNonArchivedCategoriesOrderedByName()
-        val monthlyTotals = linkedMapOf<YearMonth, MutableMap<Category, Double>>()
-        months.forEach { month -> monthlyTotals[month] = linkedMapOf() }
+    private fun buildMonthlyTotals(
+        items: List<WishlistItem>,
+        validMonths: Set<YearMonth>,
+        dateSelector: (WishlistItem) -> YearMonth,
+    ): Map<YearMonth, Double> {
+        val totals = mutableMapOf<YearMonth, Double>()
 
-        pendingWithDate.forEach { item ->
-            val month = YearMonth.from(item.targetDate!!)
-            if (month in monthlyTotals) {
-                val catMap = monthlyTotals.getOrPut(month) { linkedMapOf() }
-                catMap[item.category] = (catMap[item.category] ?: 0.0) + item.estimatedPrice.toDouble()
+        items.forEach { item ->
+            val month = dateSelector(item)
+            if (month in validMonths) {
+                totals[month] = (totals[month] ?: 0.0) + item.estimatedPrice.toDouble()
             }
         }
 
-        monthlyTotals.entries.removeIf { it.value.isEmpty() }
-        if (monthlyTotals.isEmpty()) return
+        return totals
+    }
 
-        categories.forEach { category ->
-            val series = XYChart.Series<String, Number>()
-            series.name = category.name
-
-            monthlyTotals.keys.forEach { yearMonth ->
-                val total = monthlyTotals[yearMonth]?.get(category) ?: 0.0
-                series.data.add(XYChart.Data(yearMonth.format(formatter), total))
-            }
-
-            if (series.data.any { it.yValue.toDouble() > 0 }) {
-                stackedBarChart.data.add(series)
+    private fun buildSeries(
+        name: String,
+        monthlyTotals: Map<YearMonth, Double>,
+        activeMonths: List<YearMonth>,
+        formatter: DateTimeFormatter,
+    ): XYChart.Series<String, Number> =
+        XYChart.Series<String, Number>().also { series ->
+            series.name = name
+            activeMonths.forEach { yearMonth ->
+                series.data.add(XYChart.Data(yearMonth.format(formatter), monthlyTotals[yearMonth] ?: 0.0))
             }
         }
 
-        val maxTotal = monthlyTotals.values.maxOfOrNull { it.values.sum() } ?: 0.0
+    private fun mergeMonthTotals(vararg totals: Map<YearMonth, Double>): Map<YearMonth, Double> {
+        val merged = mutableMapOf<YearMonth, Double>()
+        totals.forEach { map ->
+            map.forEach { (month, value) ->
+                merged[month] = (merged[month] ?: 0.0) + value
+            }
+        }
+        return merged
+    }
+
+    private fun buildStackedBarChart(): StackedBarChart<String, Number> =
+        StackedBarChart(CategoryAxis(), NumberAxis()).apply {
+            verticalGridLinesVisible = false
+            data.clear()
+            styleClass.add(WISHLIST_TIMELINE_CHART_STYLE_CLASS)
+        }
+
+    private fun configureNumberAxis(
+        numberAxis: NumberAxis,
+        monthGrandTotals: Map<YearMonth, Double>,
+    ) {
+        val maxTotal = monthGrandTotals.values.maxOrNull() ?: 0.0
         AnimationUtils.setDynamicYAxisBounds(numberAxis, maxTotal)
-
         numberAxis.tickLabelFormatter =
             object : StringConverter<Number>() {
                 override fun toString(value: Number): String = UIUtils.formatCurrency(value)
 
                 override fun fromString(string: String): Number = 0
             }
+    }
 
-        UIUtils.applyDefaultChartStyle(stackedBarChart)
-
-        stackedBarChart.data.forEach { series ->
+    private fun applyChartTooltipsAndAnimation(
+        chart: StackedBarChart<String, Number>,
+        monthGrandTotals: Map<YearMonth, Double>,
+        formatter: DateTimeFormatter,
+    ) {
+        chart.data.forEach { series ->
             series.data.forEach { data ->
                 val yearMonth = YearMonth.parse(data.xValue, formatter)
-                val monthTotal = monthlyTotals[yearMonth]?.values?.sumOf { it } ?: 0.0
+                val monthTotal = monthGrandTotals[yearMonth] ?: 0.0
                 val value = data.yValue.toDouble()
                 val percentage = if (monthTotal > 0) (value / monthTotal) * 100 else 0.0
 

@@ -69,6 +69,14 @@
 .chart-bar.series39 { -fx-bar-fill: #111827; }
 
 /* ============================================================
+   Wishlist Timeline Chart
+   ============================================================ */
+
+/* series0 = Pending, series1 = Purchased */
+.wishlist-timeline-chart .chart-bar.series0 { -fx-bar-fill: #22c55e; }
+.wishlist-timeline-chart .chart-bar.series1 { -fx-bar-fill: #3b82f6; }
+
+/* ============================================================
    Pie Chart (pie, doughnut)
    ============================================================ */
 
