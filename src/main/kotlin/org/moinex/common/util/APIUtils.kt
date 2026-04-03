@@ -46,6 +46,8 @@ object APIUtils {
     private const val DEFAULT_SCRIPT_TIMEOUT_SECONDS = 300L
     private const val PROCESS_TERMINATION_TIMEOUT_SECONDS = 5L
 
+    fun isShuttingDown(): Boolean = shuttingDown
+
     suspend fun shutdownExecutor() {
         processMutex.withLock {
             if (shuttingDown) return

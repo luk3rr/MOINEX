@@ -8,8 +8,10 @@
 
 package org.moinex.app
 
+import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.InvestmentPerformanceService
@@ -34,6 +36,15 @@ class AppStartupRunner(
     private val bondInterestCalculationService: BondInterestCalculationService,
 ) : ApplicationRunner {
     private val logger = LoggerFactory.getLogger(AppStartupRunner::class.java)
+
+    @Volatile
+    private var isShuttingDown = false
+
+    @PreDestroy
+    fun onShutdown() {
+        isShuttingDown = true
+        logger.info("AppStartupRunner shutdown signal received")
+    }
 
     override fun run(args: ApplicationArguments) {
         logger.info("AppStartupRunner started")
@@ -108,14 +119,30 @@ class AppStartupRunner(
     private suspend fun <T> runStep(
         name: String,
         block: suspend () -> T,
-    ): T? =
-        runCatching {
+    ): T? {
+        if (isShuttingDown) {
+            logger.info("{} skipped: Application is shutting down", name)
+            return null
+        }
+
+        return runCatching {
             logger.info("Starting {}", name)
             val result = block()
+
+            if (isShuttingDown || APIUtils.isShuttingDown()) {
+                logger.info("{} completed but application is shutting down", name)
+                return null
+            }
+
             logger.info("{} completed successfully", name)
             result
         }.getOrElse { e ->
-            logger.error("{} failed", name, e)
+            if (isShuttingDown || APIUtils.isShuttingDown()) {
+                logger.info("{} cancelled: Application is shutting down", name)
+            } else {
+                logger.error("{} failed", name, e)
+            }
             null
         }
+    }
 }
