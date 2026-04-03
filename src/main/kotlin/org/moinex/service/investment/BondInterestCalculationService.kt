@@ -99,7 +99,11 @@ class BondInterestCalculationService(
         val startMonth = YearMonth.from(firstBuy.walletTransaction!!.date.toLocalDate())
         val currentMonth = YearMonth.now()
 
-        val context = resolveCalculationContext(bond, startMonth, currentMonth)
+        val context =
+            resolveCalculationContext(bond, startMonth, currentMonth) ?: run {
+                logger.debug("No recalculation needed for {}", bond)
+                return
+            }
 
         generateMonthSequence(context.startMonth, currentMonth)
             .forEach { month ->
@@ -926,7 +930,7 @@ class BondInterestCalculationService(
         bond: Bond,
         startMonth: YearMonth,
         currentMonth: YearMonth,
-    ): BondInterestCalculationContextDTO {
+    ): BondInterestCalculationContextDTO? {
         val lastCalculation =
             bondInterestCalculationRepository
                 .findLastCalculatedMonth(bond) ?: run {
@@ -945,7 +949,33 @@ class BondInterestCalculationService(
 
         val start =
             when {
-                lastMonth == currentMonth -> currentMonth
+                lastMonth == currentMonth -> {
+                    // Check if there's new data available since last calculation
+                    val lastDateWithData = getLastDateWithData(bond, currentMonth.atDay(1), LocalDate.now())
+                    val alreadyCalculatedUntil = lastCalculation.calculatedUntilDate
+
+                    alreadyCalculatedUntil?.let {
+                        if (alreadyCalculatedUntil >= lastDateWithData) {
+                            logger.debug(
+                                "Skipping recalculation for {} month {}: already calculated until {} (latest data: {})",
+                                bond,
+                                currentMonth,
+                                alreadyCalculatedUntil,
+                                lastDateWithData,
+                            )
+                            return null
+                        }
+                    }
+
+                    logger.debug(
+                        "Recalculating {} month {}: calculated until {} but new data available until {}",
+                        bond,
+                        currentMonth,
+                        alreadyCalculatedUntil,
+                        lastDateWithData,
+                    )
+                    currentMonth
+                }
                 else -> lastMonth.plusMonths(1)
             }
 
