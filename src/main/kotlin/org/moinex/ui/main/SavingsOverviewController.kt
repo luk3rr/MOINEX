@@ -258,6 +258,7 @@ class SavingsOverviewController(
                     .onSuccess { bmi ->
                         brazilianMarketIndicators = bmi
                         scheduledUpdatingBrazilianIndicatorsRetries.set(0)
+                        updateBrazilianMarketIndicators()
                     }.onFailure {
                         schedulerRetryForUpdatingBrazilianIndicators()
                     }
@@ -281,6 +282,7 @@ class SavingsOverviewController(
                     .onSuccess { mqc ->
                         marketQuotesAndCommodities = mqc
                         scheduledUpdatingMarketQuotesRetries.set(0)
+                        updateMarketQuotesAndCommodities()
                     }.onFailure {
                         schedulerEntryForUpdatingMarketQuotes()
                     }
