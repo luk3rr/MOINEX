@@ -572,7 +572,7 @@ class WishlistController(
             preferencesService.translate(TranslationKeys.WISHLIST_FILTER_PENDING),
             preferencesService.translate(TranslationKeys.WISHLIST_FILTER_PURCHASED),
         )
-        statusFilterComboBox.value = preferencesService.translate(TranslationKeys.WISHLIST_FILTER_ALL)
+        statusFilterComboBox.value = preferencesService.translate(TranslationKeys.WISHLIST_FILTER_PENDING)
 
         categoryFilterComboBox.items.add(null)
         categoryFilterComboBox.items.addAll(categories)
