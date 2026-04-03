@@ -545,9 +545,21 @@ class WishlistController(
         }
 
     private fun configureFilters() {
-        statusFilterComboBox.setOnAction { applyFilters() }
-        categoryFilterComboBox.setOnAction { applyFilters() }
-        searchField.textProperty().addListener { _, _, _ -> applyFilters() }
+        statusFilterComboBox.setOnAction {
+            applyFilters()
+            updateSummary()
+            updateTableView()
+        }
+        categoryFilterComboBox.setOnAction {
+            applyFilters()
+            updateSummary()
+            updateTableView()
+        }
+        searchField.textProperty().addListener { _, _, _ ->
+            applyFilters()
+            updateSummary()
+            updateTableView()
+        }
     }
 
     private fun loadCategoriesFromDatabase() {
