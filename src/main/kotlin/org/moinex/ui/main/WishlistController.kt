@@ -411,7 +411,7 @@ class WishlistController(
                                 copyable = true,
                             ),
                             UIUtils.createDetailLabel(
-                                TranslationKeys.WISHLIST_DETAILS_DEBT_ID,
+                                TranslationKeys.WISHLIST_DETAILS_TRANSACTION_ID,
                                 debt.id?.toString() ?: "-",
                                 copyable = true,
                             ),

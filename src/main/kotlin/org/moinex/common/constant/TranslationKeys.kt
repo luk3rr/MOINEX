@@ -1734,7 +1734,6 @@ object TranslationKeys {
     const val WISHLIST_DETAILS_PURCHASED_DATE: String = "wishlist.details.purchasedDate"
     const val WISHLIST_DETAILS_PAYMENT_METHOD: String = "wishlist.details.paymentMethod"
     const val WISHLIST_DETAILS_TRANSACTION_ID: String = "wishlist.details.transactionId"
-    const val WISHLIST_DETAILS_DEBT_ID: String = "wishlist.details.debtId"
     const val WISHLIST_PRIORITY_LOW: String = "wishlist.priority.low"
     const val WISHLIST_PRIORITY_MEDIUM: String = "wishlist.priority.medium"
     const val WISHLIST_PRIORITY_HIGH: String = "wishlist.priority.high"
@@ -1796,8 +1795,8 @@ object TranslationKeys {
     const val WISHLIST_COPY_LINK: String = "wishlist.copyLink"
     const val WISHLIST_MARK_AS_PURCHASED_SELECT_PAYMENT_METHOD: String =
         "wishlist.mark_as_purchased.select_payment_method"
-    const val WISHLIST_PAYMENT_METHOD_WALLET: String = "wishlist.payment_method.wallet"
-    const val WISHLIST_PAYMENT_METHOD_CREDIT_CARD: String = "wishlist.payment_method.credit_card"
+    const val WISHLIST_PAYMENT_METHOD_WALLET: String = "wishlist.paymentMethod.wallet"
+    const val WISHLIST_PAYMENT_METHOD_CREDIT_CARD: String = "wishlist.paymentMethod.credit_card"
     const val WISHLIST_CHART_CATEGORY_DISTRIBUTION_TITLE: String = "wishlist.chart.categoryDistribution.title"
     const val WISHLIST_CHART_MONTHLY_TIMELINE_TITLE: String = "wishlist.chart.monthlyTimeline.title"
 }
