@@ -42,6 +42,7 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
+import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.setAnchorPaneConstraints
@@ -937,7 +938,15 @@ class HomeController(
         val expenseNodeName = preferencesService.translate(TranslationKeys.HOME_SANKEY_EXPENSE_NODE)
         val savingsNodeName = preferencesService.translate(TranslationKeys.HOME_SANKEY_SAVINGS_NODE)
 
-        val transactions = walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(yearMonth)
+        val transactions =
+            walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(yearMonth).toMutableList()
+
+        if (yearMonth.isAfterOrEqual(YearMonth.now())) {
+            transactions.addAll(
+                recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(yearMonth, yearMonth),
+            )
+        }
+
         val categories = categoryService.getNonArchivedCategoriesOrderedByName()
 
         val startDate = yearMonth.atDay(1).atStartOfDay()
