@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 @Service
 class BondService(
@@ -341,4 +342,25 @@ class BondService(
     @Transactional(readOnly = true)
     fun getTotalAccumulatedInterestByBondId(bondId: Int): BigDecimal =
         bondInterestCalculationService.getLatestCalculation(bondId)?.accumulatedInterest ?: BigDecimal.ZERO
+
+    @Transactional(readOnly = true)
+    fun getTotalInvestedValueByMonth(yearMonth: YearMonth): BigDecimal {
+        val operations =
+            bondOperationRepository
+                .findAllByOrderByOperationDateDesc()
+                .filter { YearMonth.from(it.walletTransaction!!.date) == yearMonth }
+
+        val purchased =
+            operations
+                .filter { it.isPurchase() }
+                .sumOf { it.unitPrice.multiply(it.quantity) }
+
+        val sold =
+            operations
+                .filter { it.isSale() }
+                .sumOf { it.unitPrice.multiply(it.quantity) }
+
+        val net = purchased.subtract(sold)
+        return if (net > BigDecimal.ZERO) net else BigDecimal.ZERO
+    }
 }

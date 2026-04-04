@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
+import java.time.YearMonth
 
 @Service
 class TickerService(
@@ -455,6 +456,25 @@ class TickerService(
     fun getDividendCountByTicker(tickerId: Int): Int = tickerRepository.getDividendCountByTicker(tickerId)
 
     fun getCryptoExchangeCountByTicker(tickerId: Int): Int = tickerRepository.getCryptoExchangeCountByTicker(tickerId)
+
+    @Transactional(readOnly = true)
+    fun getTotalInvestedValueByMonth(yearMonth: YearMonth): BigDecimal {
+        val purchases = tickerPurchaseRepository.findAll()
+        val sales = tickerSaleRepository.findAll()
+
+        val purchased =
+            purchases
+                .filter { YearMonth.from(it.walletTransaction!!.date) == yearMonth }
+                .sumOf { it.quantity.multiply(it.unitPrice) }
+
+        val sold =
+            sales
+                .filter { YearMonth.from(it.walletTransaction!!.date) == yearMonth }
+                .sumOf { it.quantity.multiply(it.unitPrice) }
+
+        val net = purchased.subtract(sold)
+        return if (net > BigDecimal.ZERO) net else BigDecimal.ZERO
+    }
 
     private fun isLogoPresent(domain: String?): Boolean =
         domain?.takeIf { it.isNotBlank() }?.let {

@@ -42,6 +42,8 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
+import org.moinex.common.extension.isExpense
+import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
@@ -54,6 +56,9 @@ import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.investment.BondService
+import org.moinex.service.investment.InvestmentPerformanceService
+import org.moinex.service.investment.TickerService
 import org.moinex.service.networth.NetWorthCalculationService
 import org.moinex.service.networth.NetWorthService
 import org.moinex.service.wallet.RecurringTransactionService
@@ -82,6 +87,9 @@ class HomeController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
     private val chartFactory: ChartFactory,
+    private val investmentPerformanceService: InvestmentPerformanceService,
+    private val tickerService: TickerService,
+    private val bondService: BondService,
 ) {
     @FXML
     private lateinit var walletPrevButton: JFXButton
@@ -163,6 +171,11 @@ class HomeController(
 
     companion object {
         private val logger = LoggerFactory.getLogger(HomeController::class.java)
+        private const val FIRST_PAGE_INDEX = 0
+        private const val GRAPH_PAGES = 3
+        private const val MONEY_FLOW_PAGE_INDEX = 0
+        private const val SANKEY_PAGE_INDEX = 1
+        private const val NET_WORTH_PAGE_INDEX = 2
     }
 
     @FXML
@@ -270,7 +283,7 @@ class HomeController(
 
     private fun setButtonsActions() {
         walletPrevButton.setOnAction {
-            if (walletPaneCurrentPage > 0) {
+            if (walletPaneCurrentPage > FIRST_PAGE_INDEX) {
                 walletPaneCurrentPage--
                 updateDisplayWallets()
             }
@@ -284,7 +297,7 @@ class HomeController(
         }
 
         creditCardPrevButton.setOnAction {
-            if (creditCardPaneCurrentPage > 0) {
+            if (creditCardPaneCurrentPage > FIRST_PAGE_INDEX) {
                 creditCardPaneCurrentPage--
                 updateDisplayCreditCards()
             }
@@ -298,14 +311,14 @@ class HomeController(
         }
 
         graphPrevButton.setOnAction {
-            if (graphPaneCurrentPage > 0) {
+            if (graphPaneCurrentPage > FIRST_PAGE_INDEX) {
                 graphPaneCurrentPage--
                 updateDisplayGraphs()
             }
         }
 
         graphNextButton.setOnAction {
-            if (graphPaneCurrentPage < 2) {
+            if (graphPaneCurrentPage < GRAPH_PAGES - 1) {
                 graphPaneCurrentPage++
                 updateDisplayGraphs()
             }
@@ -334,22 +347,10 @@ class HomeController(
         for (i in start until end) {
             val wallet = wallets[i]
             val walletHBox = createWalletItemNode(wallet)
-
-            var left = 0.0
-            var right = 0.0
-
-            if (i % 2 == 0) {
-                walletView1.children.add(walletHBox)
-                right = 10.0
-            } else {
-                walletView2.children.add(walletHBox)
-                left = 10.0
-            }
-
-            walletHBox.setAnchorPaneConstraints(left = left, right = right)
+            setupPanes(walletView1, walletHBox, i)
         }
 
-        walletPrevButton.isDisable = walletPaneCurrentPage == 0
+        walletPrevButton.isDisable = walletPaneCurrentPage == FIRST_PAGE_INDEX
         walletNextButton.isDisable = end >= wallets.size
     }
 
@@ -363,23 +364,30 @@ class HomeController(
         for (i in start until end) {
             val creditCard = creditCards[i]
             val crcHbox = createCreditCardItemNode(creditCard)
-
-            var left = 0.0
-            var right = 0.0
-
-            if (i % 2 == 0) {
-                creditCardView1.children.add(crcHbox)
-                right = 10.0
-            } else {
-                creditCardView2.children.add(crcHbox)
-                left = 10.0
-            }
-
-            crcHbox.setAnchorPaneConstraints(left = left, right = right)
+            setupPanes(creditCardView1, crcHbox, i)
         }
 
-        creditCardPrevButton.isDisable = creditCardPaneCurrentPage == 0
+        creditCardPrevButton.isDisable = creditCardPaneCurrentPage == FIRST_PAGE_INDEX
         creditCardNextButton.isDisable = end >= creditCards.size
+    }
+
+    private fun setupPanes(
+        pane: AnchorPane,
+        hbox: HBox,
+        currentIndex: Int,
+    ) {
+        var left = 0.0
+        var right = 0.0
+
+        if (currentIndex % 2 == 0) {
+            pane.children.add(hbox)
+            right = 10.0
+        } else {
+            pane.children.add(hbox)
+            left = 10.0
+        }
+
+        hbox.setAnchorPaneConstraints(left = left, right = right)
     }
 
     private fun updateDisplayLastTransactions() {
@@ -782,14 +790,24 @@ class HomeController(
         graphView.children.clear()
 
         when (graphPaneCurrentPage) {
-            0 -> {
+            MONEY_FLOW_PAGE_INDEX -> {
                 graphTitle.text =
                     preferencesService.translate(TranslationKeys.HOME_MONEY_FLOW_TITLE)
                 updateMoneyFlowBarChart()
                 recalculateNetWorthButton.isVisible = false
                 toggleSankeyComponents(false)
             }
-            1 -> {
+            SANKEY_PAGE_INDEX -> {
+                graphTitle.text =
+                    preferencesService.translate(TranslationKeys.HOME_SANKEY_TITLE)
+                recalculateNetWorthButton.isVisible = false
+                toggleSankeyComponents(true)
+
+                val currentYearMonth = getSankeyCurrentMonthYear()
+
+                updateSankeyChart(currentYearMonth)
+            }
+            NET_WORTH_PAGE_INDEX -> {
                 graphTitle.text =
                     preferencesService.translate(TranslationKeys.HOME_NET_WORTH_TITLE)
                 recalculateNetWorthButton.isVisible = true
@@ -803,20 +821,10 @@ class HomeController(
 
                 updateNetWorthLineChart()
             }
-            2 -> {
-                graphTitle.text =
-                    preferencesService.translate(TranslationKeys.HOME_SANKEY_TITLE)
-                recalculateNetWorthButton.isVisible = false
-                toggleSankeyComponents(true)
-
-                val currentYearMonth = getSankeyCurrentMonthYear()
-
-                updateSankeyChart(currentYearMonth)
-            }
         }
 
-        graphPrevButton.isDisable = graphPaneCurrentPage == 0
-        graphNextButton.isDisable = graphPaneCurrentPage >= 2
+        graphPrevButton.isDisable = graphPaneCurrentPage == FIRST_PAGE_INDEX
+        graphNextButton.isDisable = graphPaneCurrentPage >= GRAPH_PAGES - 1
     }
 
     private fun updateNetWorthLineChart() {
@@ -941,14 +949,14 @@ class HomeController(
         categories.forEach { cat ->
             val income =
                 transactions
-                    .filter { it.type == WalletTransactionType.INCOME && it.category.id == cat.id }
+                    .filter { it.isIncome() && it.category.id!! == cat.id!! }
                     .sumOf { it.amount }
                     .toDouble()
             if (income > 0) incomeByCategory[cat.name] = income
 
             val walletExpense =
                 transactions
-                    .filter { it.type == WalletTransactionType.EXPENSE && it.category.id == cat.id }
+                    .filter { it.isExpense() && it.category.id!! == cat.id!! }
                     .sumOf { it.amount }
             val crcExpense =
                 creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
@@ -962,7 +970,9 @@ class HomeController(
 
         val totalIncome = incomeByCategory.values.sum()
         val totalExpenses = expenseByCategory.values.sum()
-        val savings = totalIncome - totalExpenses
+        val tickerInvested = tickerService.getTotalInvestedValueByMonth(yearMonth).toDouble()
+        val bondInvested = bondService.getTotalInvestedValueByMonth(yearMonth).toDouble()
+        val savings = tickerInvested + bondInvested
 
         val nodes = mutableListOf<SankeyNodeData>()
         val links = mutableListOf<SankeyLinkData>()
