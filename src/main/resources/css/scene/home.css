@@ -73,25 +73,6 @@
   -fx-text-fill: white;
 }
 
-.list-view {
-  -fx-border-color: transparent;
-  -fx-background-color: transparent;
-}
-
-.list-view .list-cell {
-  -fx-background-color: transparent;
-}
-
-.list-view .scroll-bar:vertical {
-  -fx-opacity: 0;
-  -fx-pref-width: 0;
-}
-
-.list-view .scroll-bar:horizontal {
-  -fx-opacity: 0;
-  -fx-pref-height: 0;
-}
-
 .income-item {
   -fx-pref-width: 100%;
 }

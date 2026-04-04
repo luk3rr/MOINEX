@@ -19,6 +19,7 @@ import javafx.scene.chart.BarChart
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
+import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.OverrunStyle
 import javafx.scene.control.TableCell
@@ -33,10 +34,14 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.chart.ChartFactory
+import org.moinex.common.chart.SankeyChart
+import org.moinex.common.chart.SankeyLinkData
+import org.moinex.common.chart.SankeyNodeData
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
@@ -46,6 +51,7 @@ import org.moinex.model.dto.NetWorthDataPointDTO
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
+import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.networth.NetWorthCalculationService
@@ -59,13 +65,18 @@ import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.text.MessageFormat
 import java.time.LocalDateTime
+import java.time.Month
+import java.time.Year
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
+import kotlin.math.absoluteValue
 
 @Controller
 class HomeController(
     private val walletService: WalletService,
     private val recurringTransactionService: RecurringTransactionService,
     private val creditCardService: CreditCardService,
+    private val categoryService: CategoryService,
     private val netWorthService: NetWorthService,
     private val netWorthCalculationService: NetWorthCalculationService,
     private val springContext: ConfigurableApplicationContext,
@@ -112,7 +123,7 @@ class HomeController(
     private lateinit var creditCardNextButton: JFXButton
 
     @FXML
-    private var moneyFlowBarChart: BarChart<String, Number>? = null
+    private lateinit var moneyFlowBarChart: BarChart<String, Number>
 
     @FXML
     private lateinit var monthResumePaneTitle: Label
@@ -125,6 +136,22 @@ class HomeController(
 
     @FXML
     private lateinit var recalculateNetWorthButtonIcon: ImageView
+
+    @FXML
+    private lateinit var sankeyMonthComboBox: ComboBox<Month>
+
+    @FXML
+    private lateinit var sankeyYearComboBox: ComboBox<Year>
+
+    @FXML
+    private lateinit var sankeyNavigator: HBox
+
+    @FXML
+    private lateinit var sankeyMonth: Label
+
+    private val sankeyChart: SankeyChart by lazy { chartFactory.createSankeyChart() }
+
+    private var sankeyPastMonthsCount: Long? = null
 
     private var wallets: List<Wallet> = emptyList()
     private var creditCards: List<CreditCard> = emptyList()
@@ -147,6 +174,8 @@ class HomeController(
         logger.debug("Loaded {} wallets from the database", wallets.size)
         logger.debug("Loaded {} credit cards from the database", creditCards.size)
 
+        setupSankey()
+
         updateDisplayWallets()
         updateDisplayCreditCards()
         updateDisplayLastTransactions()
@@ -154,6 +183,29 @@ class HomeController(
         updateDisplayGraphs()
 
         setButtonsActions()
+        configureListeners()
+    }
+
+    private fun configureListeners() {
+        sankeyMonthComboBox
+            .valueProperty()
+            .addListener { _, _, newMonth ->
+                if (newMonth != null && sankeyYearComboBox.value != null) {
+                    sankeyMonth.text = UIUtils.formatShortMonthYear(getSankeyCurrentMonthYear())
+                }
+
+                updateSankeyChart(getSankeyCurrentMonthYear())
+            }
+
+        sankeyYearComboBox
+            .valueProperty()
+            .addListener { _, _, newYear ->
+                if (newYear != null && sankeyMonthComboBox.value != null) {
+                    sankeyMonth.text = UIUtils.formatShortMonthYear(getSankeyCurrentMonthYear())
+                }
+
+                updateSankeyChart(getSankeyCurrentMonthYear())
+            }
     }
 
     @FXML
@@ -174,6 +226,16 @@ class HomeController(
                 setOnRecalculateButton()
             },
         )
+    }
+
+    @FXML
+    private fun handleSankeyPrevMonth() {
+        updateSankeyCurrentMonthYear(-1)
+    }
+
+    @FXML
+    private fun handleSankeyNextMonth() {
+        updateSankeyCurrentMonthYear(1)
     }
 
     private fun setOffRecalculateButton() {
@@ -243,7 +305,7 @@ class HomeController(
         }
 
         graphNextButton.setOnAction {
-            if (graphPaneCurrentPage < 1) {
+            if (graphPaneCurrentPage < 2) {
                 graphPaneCurrentPage++
                 updateDisplayGraphs()
             }
@@ -422,7 +484,7 @@ class HomeController(
     }
 
     private fun updateMoneyFlowBarChart() {
-        createMoneyFlowBarChart()
+        moneyFlowBarChart = BarChart(CategoryAxis(), NumberAxis())
 
         val monthlyExpenses = linkedMapOf<String, Double>()
         val monthlyIncomes = linkedMapOf<String, Double>()
@@ -496,7 +558,7 @@ class HomeController(
             maxValue = maxOf(maxValue, maxOf(expenseValue, incomeValue))
         }
 
-        (moneyFlowBarChart!!.yAxis as? NumberAxis)?.let { numberAxis ->
+        (moneyFlowBarChart.yAxis as? NumberAxis)?.let { numberAxis ->
             AnimationUtils.setDynamicYAxisBounds(numberAxis, maxValue)
             numberAxis.tickLabelFormatter =
                 object : StringConverter<Number>() {
@@ -506,8 +568,8 @@ class HomeController(
                 }
         }
 
-        moneyFlowBarChart!!.verticalGridLinesVisible = false
-        moneyFlowBarChart!!.data.addAll(expensesSeries, incomesSeries)
+        moneyFlowBarChart.verticalGridLinesVisible = false
+        moneyFlowBarChart.data.addAll(expensesSeries, incomesSeries)
 
         expensesSeries.data.forEachIndexed { i, expenseData ->
             val incomeData = incomesSeries.data[i]
@@ -520,6 +582,9 @@ class HomeController(
             AnimationUtils.xyChartAnimation(expenseData, targetExpenseValue)
             AnimationUtils.xyChartAnimation(incomeData, targetIncomeValue)
         }
+
+        graphView.children.add(moneyFlowBarChart)
+        moneyFlowBarChart.setAnchorPaneConstraints()
     }
 
     private fun updateMonthResume() {
@@ -547,10 +612,7 @@ class HomeController(
 
             resumePaneController.updateResumePane(YearMonth.of(currentDate.year, currentDate.monthValue))
 
-            AnchorPane.setTopAnchor(newContent, 0.0)
-            AnchorPane.setBottomAnchor(newContent, 0.0)
-            AnchorPane.setLeftAnchor(newContent, 0.0)
-            AnchorPane.setRightAnchor(newContent, 0.0)
+            newContent.setAnchorPaneConstraints()
 
             monthResumeView.children.clear()
             monthResumeView.children.add(newContent)
@@ -710,10 +772,10 @@ class HomeController(
         }
     }
 
-    private fun createMoneyFlowBarChart() {
-        val xAxis = CategoryAxis()
-        val yAxis = NumberAxis()
-        moneyFlowBarChart = BarChart(xAxis, yAxis)
+    private fun toggleSankeyComponents(isVisible: Boolean) {
+        sankeyMonthComboBox.isVisible = isVisible
+        sankeyYearComboBox.isVisible = isVisible
+        sankeyNavigator.isVisible = isVisible
     }
 
     private fun updateDisplayGraphs() {
@@ -724,17 +786,14 @@ class HomeController(
                 graphTitle.text =
                     preferencesService.translate(TranslationKeys.HOME_MONEY_FLOW_TITLE)
                 updateMoneyFlowBarChart()
-                graphView.children.add(moneyFlowBarChart!!)
-                AnchorPane.setTopAnchor(moneyFlowBarChart!!, 0.0)
-                AnchorPane.setBottomAnchor(moneyFlowBarChart!!, 0.0)
-                AnchorPane.setLeftAnchor(moneyFlowBarChart!!, 0.0)
-                AnchorPane.setRightAnchor(moneyFlowBarChart!!, 0.0)
                 recalculateNetWorthButton.isVisible = false
+                toggleSankeyComponents(false)
             }
             1 -> {
                 graphTitle.text =
                     preferencesService.translate(TranslationKeys.HOME_NET_WORTH_TITLE)
                 recalculateNetWorthButton.isVisible = true
+                toggleSankeyComponents(false)
 
                 if (netWorthCalculationService.isCalculating) {
                     setOffRecalculateButton()
@@ -744,28 +803,32 @@ class HomeController(
 
                 updateNetWorthLineChart()
             }
+            2 -> {
+                graphTitle.text =
+                    preferencesService.translate(TranslationKeys.HOME_SANKEY_TITLE)
+                recalculateNetWorthButton.isVisible = false
+                toggleSankeyComponents(true)
+
+                val currentYearMonth = getSankeyCurrentMonthYear()
+
+                updateSankeyChart(currentYearMonth)
+            }
         }
 
         graphPrevButton.isDisable = graphPaneCurrentPage == 0
-        graphNextButton.isDisable = graphPaneCurrentPage >= 1
+        graphNextButton.isDisable = graphPaneCurrentPage >= 2
     }
 
     private fun updateNetWorthLineChart() {
         val dataPoints = calculateNetWorthData()
 
-        val netWorthChart =
-            chartFactory.createNetWorthLineChart().apply {
-                updateData(dataPoints)
-            }
+        val netWorthChart = chartFactory.createNetWorthLineChart().apply { updateData(dataPoints) }
 
         UIUtils.applyDefaultChartStyle(netWorthChart)
 
         graphView.children.add(netWorthChart)
 
-        AnchorPane.setTopAnchor(netWorthChart, 0.0)
-        AnchorPane.setBottomAnchor(netWorthChart, 0.0)
-        AnchorPane.setLeftAnchor(netWorthChart, 0.0)
-        AnchorPane.setRightAnchor(netWorthChart, 0.0)
+        netWorthChart.setAnchorPaneConstraints()
     }
 
     private fun calculateNetWorthData(): List<NetWorthDataPointDTO> {
@@ -790,5 +853,144 @@ class HomeController(
         }
 
         return dataPoints
+    }
+
+    private fun setupSankey() {
+        determineSankeyMinMonth()
+        setupSankeyComboBoxes()
+        sankeyMonth.text = UIUtils.formatShortMonthYear(getSankeyCurrentMonthYear())
+    }
+
+    private fun determineSankeyMinMonth() {
+        val minMonth =
+            minOf(
+                walletService.getOldestNonArchivedTransactionDate()?.let { YearMonth.from(it) }
+                    ?: YearMonth.now(),
+                creditCardService.getOldestNonArchivedPaymentDate()?.let { YearMonth.from(it) }
+                    ?: YearMonth.now(),
+            )
+
+        sankeyPastMonthsCount = ChronoUnit.MONTHS.between(YearMonth.now(), minMonth).absoluteValue
+    }
+
+    private fun setupSankeyComboBoxes() {
+        val now = YearMonth.now()
+        val months = (0 until sankeyPastMonthsCount!!).map { YearMonth.now().minusMonths(it) }.reversed()
+        val years = months.map { Year.of(it.year) }.distinct().sortedDescending()
+
+        sankeyYearComboBox.items = FXCollections.observableArrayList(years)
+        sankeyYearComboBox.value = Year.of(now.year)
+
+        sankeyYearComboBox.converter =
+            object : StringConverter<Year>() {
+                private val formatter = UIUtils.getYearFormatter(preferencesService.locale)
+
+                override fun toString(year: Year?): String = year?.format(formatter) ?: ""
+
+                override fun fromString(string: String): Year = Year.parse(string, formatter)
+            }
+
+        val monthList = FXCollections.observableArrayList(Month.entries)
+
+        sankeyMonthComboBox.items = monthList
+        sankeyMonthComboBox.value = now.month
+
+        sankeyMonthComboBox.converter =
+            object : StringConverter<Month>() {
+                override fun toString(month: Month?): String = month?.let { UIUtils.getMonthDisplayName(it) } ?: ""
+
+                override fun fromString(string: String): Month = Month.valueOf(string.uppercase())
+            }
+    }
+
+    private fun getSankeyCurrentMonthYear(): YearMonth =
+        YearMonth.of(sankeyYearComboBox.value.value, sankeyMonthComboBox.value.value)
+
+    private fun updateSankeyCurrentMonthYear(offset: Int) {
+        val nextYearMonth = getSankeyCurrentMonthYear().plusMonths(offset.toLong())
+
+        updateSankeyChart(nextYearMonth)
+
+        sankeyMonthComboBox.value = nextYearMonth.month
+        sankeyYearComboBox.value = Year.of(nextYearMonth.year)
+    }
+
+    private fun updateSankeyChart(yearMonth: YearMonth) {
+        val (nodes, links) = calculateSankeyData(yearMonth)
+
+        graphView.children.clear()
+        graphView.children.add(sankeyChart)
+        sankeyChart.setAnchorPaneConstraints()
+        sankeyChart.updateData(nodes, links)
+    }
+
+    private fun calculateSankeyData(yearMonth: YearMonth): Pair<List<SankeyNodeData>, List<SankeyLinkData>> {
+        val incomeNodeName = preferencesService.translate(TranslationKeys.HOME_SANKEY_INCOME_NODE)
+        val expenseNodeName = preferencesService.translate(TranslationKeys.HOME_SANKEY_EXPENSE_NODE)
+        val savingsNodeName = preferencesService.translate(TranslationKeys.HOME_SANKEY_SAVINGS_NODE)
+
+        val transactions = walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(yearMonth)
+        val categories = categoryService.getNonArchivedCategoriesOrderedByName()
+
+        val startDate = yearMonth.atDay(1).atStartOfDay()
+        val endDate = yearMonth.atEndOfMonth().atEndOfDay()
+
+        val incomeByCategory = mutableMapOf<String, Double>()
+        val expenseByCategory = mutableMapOf<String, Double>()
+
+        categories.forEach { cat ->
+            val income =
+                transactions
+                    .filter { it.type == WalletTransactionType.INCOME && it.category.id == cat.id }
+                    .sumOf { it.amount }
+                    .toDouble()
+            if (income > 0) incomeByCategory[cat.name] = income
+
+            val walletExpense =
+                transactions
+                    .filter { it.type == WalletTransactionType.EXPENSE && it.category.id == cat.id }
+                    .sumOf { it.amount }
+            val crcExpense =
+                creditCardService.getTotalPaymentsByCategoriesAndDateTimeBetween(
+                    listOf(cat.id!!),
+                    startDate,
+                    endDate,
+                )
+            val totalExpense = (walletExpense + crcExpense).toDouble()
+            if (totalExpense > 0) expenseByCategory[cat.name] = totalExpense
+        }
+
+        val totalIncome = incomeByCategory.values.sum()
+        val totalExpenses = expenseByCategory.values.sum()
+        val savings = totalIncome - totalExpenses
+
+        val nodes = mutableListOf<SankeyNodeData>()
+        val links = mutableListOf<SankeyLinkData>()
+
+        nodes.add(SankeyNodeData(incomeNodeName, value = totalIncome))
+        nodes.add(SankeyNodeData(expenseNodeName, value = totalExpenses))
+
+        incomeByCategory.forEach { (name, value) ->
+            val id = "income:$name"
+            nodes.add(SankeyNodeData(name, value = value, id = id))
+            links.add(SankeyLinkData(id, incomeNodeName, value))
+        }
+
+        if (totalExpenses > 0) {
+            links.add(SankeyLinkData(incomeNodeName, expenseNodeName, totalExpenses))
+        }
+
+        expenseByCategory.forEach { (name, value) ->
+            val id = "expense:$name"
+            nodes.add(SankeyNodeData(name, value = value, id = id))
+            links.add(SankeyLinkData(expenseNodeName, id, value))
+        }
+
+        if (savings > 0) {
+            nodes.add(SankeyNodeData(savingsNodeName, value = savings))
+            links.add(SankeyLinkData(incomeNodeName, savingsNodeName, savings))
+        }
+
+        return Pair(nodes, links)
     }
 }

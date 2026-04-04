@@ -2,16 +2,18 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootAnchorPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.HomeController">
+<AnchorPane fx:id="rootAnchorPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.HomeController">
    <children>
       <VBox fx:id="rootVBox" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -90,9 +92,15 @@
                <children>
                   <HBox fx:id="rootHBoxBottom" maxWidth="1.7976931348623157E308" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane fx:id="graphPane" minWidth="800.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="graphPane" minWidth="800.0" prefWidth="800.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="graphTitle" layoutX="32.0" layoutY="10.0" styleClass="title" text="%home.moneyFlow.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <HBox spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                 <children>
+                                    <ComboBox fx:id="sankeyMonthComboBox" minWidth="150.0" stylesheets="@../../css/component/combo-box.css" />
+                                    <ComboBox fx:id="sankeyYearComboBox" minWidth="80.0" stylesheets="@../../css/component/combo-box.css" />
+                                 </children>
+                              </HBox>
                               <JFXButton fx:id="recalculateNetWorthButton" onAction="#handleRecalculateNetWorth" styleClass="button-primary" stylesheets="@../../css/component/buttons.css" text="%home.recalculateNetWorthButton" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <graphic>
                                     <ImageView fx:id="recalculateNetWorthButtonIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -101,6 +109,35 @@
                                        </image></ImageView>
                                  </graphic>
                               </JFXButton>
+                              <HBox fx:id="sankeyNavigator" alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+                                 <children>
+                                    <JFXButton onAction="#handleSankeyPrevMonth">
+                                       <graphic>
+                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../icon/common/arrow_left.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </JFXButton>
+                                    <Region prefWidth="20.0" />
+                                    <Label fx:id="sankeyMonth" alignment="CENTER" prefWidth="60.0" text="MM/YY" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Region prefWidth="20.0" />
+                                    <JFXButton onAction="#handleSankeyNextMonth">
+                                       <graphic>
+                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../icon/common/arrow_right.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </JFXButton>
+                                 </children>
+                              </HBox>
                               <JFXButton fx:id="graphPrevButton" stylesheets="@../../css/component/buttons.css" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="60.0">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -122,7 +159,7 @@
                               <AnchorPane fx:id="graphView" minWidth="300.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
                            </children>
                         </AnchorPane>
-                        <AnchorPane fx:id="lastTransactionsPane" maxWidth="500.0" minWidth="300.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                        <AnchorPane fx:id="lastTransactionsPane" maxWidth="500.0" minWidth="500.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="lastTransactionsPaneTitle" layoutX="10.0" layoutY="17.0" styleClass="title" text="%home.transactions.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
                               <TableView fx:id="transactionsTableView" stylesheets="@../../css/component/table-view.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">

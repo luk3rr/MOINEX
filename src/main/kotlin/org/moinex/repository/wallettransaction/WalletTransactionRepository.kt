@@ -398,6 +398,15 @@ interface WalletTransactionRepository : JpaRepository<WalletTransaction, Int> {
     ): LocalDateTime?
 
     @Query(
+        "SELECT MIN(wt.date) " +
+            "FROM WalletTransaction wt " +
+            "WHERE wt.status = 'CONFIRMED' " +
+            "AND wt.category.isArchived = false " +
+            "AND wt.wallet.isArchived = false",
+    )
+    fun findOldestNonArchivedTransactionDate(): LocalDateTime?
+
+    @Query(
         "SELECT wt " +
             "FROM WalletTransaction wt " +
             "WHERE wt.wallet.id = :walletId " +

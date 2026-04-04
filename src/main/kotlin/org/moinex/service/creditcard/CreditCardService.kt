@@ -494,6 +494,9 @@ class CreditCardService(
         endDateTime,
     )
 
+    fun getOldestNonArchivedPaymentDate(): LocalDateTime? =
+        creditCardPaymentRepository.findOldestNonArchivedPaymentDate()
+
     fun getDebtCountByCategory(categoryId: Int) = creditCardDebtRepository.getDebtCountByCategory(categoryId)
 
     fun getInvoiceAmount(

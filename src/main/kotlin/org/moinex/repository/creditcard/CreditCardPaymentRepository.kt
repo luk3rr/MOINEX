@@ -514,4 +514,13 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
         @Param("walletIds") walletIds: List<Int>,
         @Param("startDate") startDate: LocalDateTime,
     ): List<CreditCardPayment>
+
+    @Query(
+        "SELECT min(ccp.date) " +
+            "FROM CreditCardPayment ccp " +
+            "WHERE ccp.refunded = false " +
+            "AND ccp.wallet.isArchived = false " +
+            "AND ccp.creditCardDebt.creditCard.isArchived = false ",
+    )
+    fun findOldestNonArchivedPaymentDate(): LocalDateTime?
 }

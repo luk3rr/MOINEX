@@ -31,4 +31,9 @@ class ChartFactory(
         NetWorthLineChart().apply {
             this.preferencesService = this@ChartFactory.preferencesService
         }
+
+    fun createSankeyChart(): SankeyChart =
+        SankeyChart().apply {
+            preferencesService = this@ChartFactory.preferencesService
+        }
 }

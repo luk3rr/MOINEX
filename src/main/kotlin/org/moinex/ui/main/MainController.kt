@@ -27,6 +27,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.PreferencesService
 import org.moinex.ui.common.CalculatorController
@@ -218,10 +219,7 @@ class MainController(
                 javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
-            AnchorPane.setTopAnchor(newContent, 0.0)
-            AnchorPane.setRightAnchor(newContent, 0.0)
-            AnchorPane.setBottomAnchor(newContent, 0.0)
-            AnchorPane.setLeftAnchor(newContent, 0.0)
+            newContent.setAnchorPaneConstraints()
 
             contentArea.children.clear()
             contentArea.children.add(newContent)

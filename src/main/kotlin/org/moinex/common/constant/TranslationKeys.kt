@@ -65,6 +65,10 @@ object TranslationKeys {
     const val HOME_RECALCULATE_NET_WORTH_BUTTON: String = "home.recalculateNetWorthButton"
     const val HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING: String =
         "home.recalculateNetWorthButton.recalculating"
+    const val HOME_SANKEY_TITLE: String = "home.sankey.title"
+    const val HOME_SANKEY_INCOME_NODE: String = "home.sankey.incomeNode"
+    const val HOME_SANKEY_EXPENSE_NODE: String = "home.sankey.expenseNode"
+    const val HOME_SANKEY_SAVINGS_NODE: String = "home.sankey.savingsNode"
 
     // Wallet
     const val WALLET_ALL_WALLETS: String = "wallet.allWallets"

@@ -380,6 +380,9 @@ class WalletService(
     fun getFirstWalletTransactionDate(walletId: Int): LocalDateTime? =
         walletTransactionRepository.findFirstTransactionDate(walletId)
 
+    fun getOldestNonArchivedTransactionDate(): LocalDateTime? =
+        walletTransactionRepository.findOldestNonArchivedTransactionDate()
+
     fun getEarliestTransactionDateByWallets(walletIds: List<Int>): LocalDateTime? =
         walletTransactionRepository.findEarliestTransactionDateByWallets(walletIds)
 
