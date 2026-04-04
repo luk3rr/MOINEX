@@ -348,7 +348,7 @@ class HomeController(
         for (i in start until end) {
             val wallet = wallets[i]
             val walletHBox = createWalletItemNode(wallet)
-            setupPanes(walletView1, walletHBox, i)
+            setupPanes(walletView1, walletView2, walletHBox, i)
         }
 
         walletPrevButton.isDisable = walletPaneCurrentPage == FIRST_PAGE_INDEX
@@ -365,7 +365,7 @@ class HomeController(
         for (i in start until end) {
             val creditCard = creditCards[i]
             val crcHbox = createCreditCardItemNode(creditCard)
-            setupPanes(creditCardView1, crcHbox, i)
+            setupPanes(creditCardView1, creditCardView2, crcHbox, i)
         }
 
         creditCardPrevButton.isDisable = creditCardPaneCurrentPage == FIRST_PAGE_INDEX
@@ -373,7 +373,8 @@ class HomeController(
     }
 
     private fun setupPanes(
-        pane: AnchorPane,
+        leftPane: AnchorPane,
+        rightPane: AnchorPane,
         hbox: HBox,
         currentIndex: Int,
     ) {
@@ -381,10 +382,10 @@ class HomeController(
         var right = 0.0
 
         if (currentIndex % 2 == 0) {
-            pane.children.add(hbox)
+            leftPane.children.add(hbox)
             right = 10.0
         } else {
-            pane.children.add(hbox)
+            rightPane.children.add(hbox)
             left = 10.0
         }
 
