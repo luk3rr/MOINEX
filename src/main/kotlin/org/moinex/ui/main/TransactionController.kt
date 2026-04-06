@@ -449,7 +449,7 @@ class TransactionController(
             val yearMonth = YearMonth.of(date.year, date.monthValue)
 
             val transactions =
-                walletService.getAllNonArchivedConfirmedWalletTransactionsByMonth(yearMonth)
+                walletService.getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(yearMonth)
 
             val creditCardPayments =
                 when {

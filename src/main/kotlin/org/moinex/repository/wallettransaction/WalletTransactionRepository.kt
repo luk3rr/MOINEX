@@ -179,21 +179,6 @@ interface WalletTransactionRepository : JpaRepository<WalletTransaction, Int> {
             "FROM WalletTransaction wt " +
             "WHERE strftime('%m', wt.date) = printf('%02d', :month) " +
             "AND strftime('%Y', wt.date) = printf('%04d', :year) " +
-            "AND wt.status = 'CONFIRMED' " +
-            "AND wt.category.isArchived = false " +
-            "AND wt.wallet.isArchived = false " +
-            "ORDER BY wt.date DESC",
-    )
-    fun findNonArchivedConfirmedTransactionsByMonth(
-        @Param("month") month: Int,
-        @Param("year") year: Int,
-    ): List<WalletTransaction>
-
-    @Query(
-        "SELECT wt " +
-            "FROM WalletTransaction wt " +
-            "WHERE strftime('%m', wt.date) = printf('%02d', :month) " +
-            "AND strftime('%Y', wt.date) = printf('%04d', :year) " +
             "AND wt.status = 'PENDING' " +
             "ORDER BY wt.date DESC",
     )
@@ -356,6 +341,22 @@ interface WalletTransactionRepository : JpaRepository<WalletTransaction, Int> {
             "ORDER BY wt.date DESC",
     )
     fun findNonArchivedTransactionsByMonthForAnalysis(
+        @Param("month") month: Int,
+        @Param("year") year: Int,
+    ): List<WalletTransaction>
+
+    @Query(
+        "SELECT wt " +
+            "FROM WalletTransaction wt " +
+            "WHERE strftime('%m', wt.date) = printf('%02d', :month) " +
+            "AND strftime('%Y', wt.date) = printf('%04d', :year) " +
+            "AND wt.status = 'CONFIRMED' " +
+            "AND wt.includeInAnalysis = true " +
+            "AND wt.category.isArchived = false " +
+            "AND wt.wallet.isArchived = false " +
+            "ORDER BY wt.date DESC",
+    )
+    fun findNonArchivedAndConfirmedTransactionsByMonthForAnalysis(
         @Param("month") month: Int,
         @Param("year") year: Int,
     ): List<WalletTransaction>

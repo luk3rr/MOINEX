@@ -347,8 +347,8 @@ class WalletService(
         endDate: LocalDateTime,
     ): List<WalletTransaction> = walletTransactionRepository.findNonArchivedTransactionsBetweenDates(startDate, endDate)
 
-    fun getAllNonArchivedConfirmedWalletTransactionsByMonth(yearMonth: YearMonth): List<WalletTransaction> =
-        walletTransactionRepository.findNonArchivedConfirmedTransactionsByMonth(
+    fun getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(yearMonth: YearMonth): List<WalletTransaction> =
+        walletTransactionRepository.findNonArchivedAndConfirmedTransactionsByMonthForAnalysis(
             yearMonth.monthValue,
             yearMonth.year,
         )
