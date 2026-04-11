@@ -57,7 +57,7 @@ class SankeyChart : Pane() {
         private val logger = LoggerFactory.getLogger(SankeyChart::class.java)
         private const val PADDING = 10.0
         private const val NODE_WIDTH = 10.0
-        private const val NODE_GAP = 5.0
+        private const val NODE_GAP = 7.0
         private const val FLOW_OPACITY = 0.45
         private const val HIGHLIGHT_OPACITY = 0.75
         private const val FONT_SIZE = 11.0
