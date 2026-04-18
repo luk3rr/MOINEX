@@ -521,6 +521,70 @@ class CreditCardServiceCreateDebtTest :
             }
         }
 
+        Given("a debt with amount that causes negative remainder when rounded up (e.g. 935 in 3 installments)") {
+            // 935 / 3 = 311.666...; HALF_UP rounds to 311.67, making sum 935.01 (remainder = -0.01)
+            // FLOOR truncates to 311.66, making remainder = +0.02, which is added to the first installment
+            val operator = CreditCardOperatorFactory.create(id = 1, name = "Visa")
+            val creditCard =
+                CreditCardFactory.create(
+                    id = 1,
+                    name = "Test Card",
+                    billingDueDay = 15,
+                    maxDebt = BigDecimal("10000.00"),
+                    operator = operator,
+                )
+            val category = CategoryFactory.create(id = 1)
+            val debt =
+                CreditCardDebtFactory.create(
+                    creditCard = creditCard,
+                    category = category,
+                    amount = BigDecimal("935.00"),
+                    installments = 3,
+                    description = "935 in 3 installments",
+                )
+            val invoiceMonth = YearMonth.of(2026, 3)
+
+            When("creating the debt") {
+                every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
+                every { creditCardPaymentRepository.getTotalPendingPaymentsByCreditCard(1) } returns BigDecimal("0.00")
+                every { creditCardDebtRepository.save(debt) } returns debt
+                every { creditCardPaymentRepository.saveAll(any<List<CreditCardPayment>>()) } returns emptyList()
+
+                service.createDebt(debt, invoiceMonth)
+
+                Then("first payment should be 311.68 (base 311.66 + remainder 0.02)") {
+                    verify {
+                        creditCardPaymentRepository.saveAll(
+                            match<List<CreditCardPayment>> { payments ->
+                                payments[0].amount == BigDecimal("311.68")
+                            },
+                        )
+                    }
+                }
+
+                Then("remaining payments should be 311.66 each") {
+                    verify {
+                        creditCardPaymentRepository.saveAll(
+                            match<List<CreditCardPayment>> { payments ->
+                                payments[1].amount == BigDecimal("311.66") &&
+                                    payments[2].amount == BigDecimal("311.66")
+                            },
+                        )
+                    }
+                }
+
+                Then("total of all payments should equal 935.00") {
+                    verify {
+                        creditCardPaymentRepository.saveAll(
+                            match<List<CreditCardPayment>> { payments ->
+                                payments.sumOf { it.amount } == BigDecimal("935.00")
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
         Given("multiple debts on same credit card") {
             val operator = CreditCardOperatorFactory.create(id = 1, name = "Visa")
             val creditCard =

@@ -579,7 +579,7 @@ class CreditCardService(
         amount: BigDecimal,
         installments: Int,
     ): CreditCardInstallmentCalculationDTO {
-        val installmentValue = amount.divide(installments.toBigDecimal(), 2, RoundingMode.HALF_UP)
+        val installmentValue = amount.divide(installments.toBigDecimal(), 2, RoundingMode.FLOOR)
         val remainder = amount.minus(installmentValue.multiply(installments.toBigDecimal()))
         return CreditCardInstallmentCalculationDTO(installmentValue, remainder)
     }
