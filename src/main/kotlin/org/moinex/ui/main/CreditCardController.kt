@@ -48,6 +48,7 @@ import org.moinex.ui.dialog.creditcard.AddCreditCardController
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController
 import org.moinex.ui.dialog.creditcard.ArchivedCreditCardsController
 import org.moinex.ui.dialog.creditcard.EditCreditCardDebtController
+import org.moinex.ui.dialog.creditcard.RecurringCreditCardDebtsController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -496,6 +497,21 @@ class CreditCardController(
                 ),
             )
         }
+    }
+
+    @FXML
+    private fun handleRecurringTransactions() {
+        WindowUtils.openModalWindow(
+            Files.RECURRING_CREDIT_CARD_DEBTS_FXML,
+            preferencesService.translate(
+                TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_LIST_TITLE,
+            ),
+            springContext,
+            { _: RecurringCreditCardDebtsController -> },
+            listOf(
+                Runnable { updateDisplay() },
+            ),
+        )
     }
 
     @FXML

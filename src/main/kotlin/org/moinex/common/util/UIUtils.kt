@@ -46,6 +46,7 @@ import org.moinex.model.enums.BondType
 import org.moinex.model.enums.CalendarEventType
 import org.moinex.model.enums.CreditCardCreditType
 import org.moinex.model.enums.CreditCardInvoiceStatus
+import org.moinex.model.enums.CreditCardRecurringFrequency
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.InterestType
 import org.moinex.model.enums.OperationType
@@ -673,6 +674,13 @@ class UIUtils(
                 "closed" to TranslationKeys.COMMON_CREDIT_CARD_CLOSED,
             )[status.name.lowercase()]?.let { preferencesService.translate(it) }
                 ?: status.name
+
+        fun translateCreditCardRecurringFrequency(frequency: CreditCardRecurringFrequency): String =
+            mapOf(
+                "monthly" to TranslationKeys.CREDIT_CARD_RECURRING_FREQUENCY_MONTHLY,
+                "yearly" to TranslationKeys.CREDIT_CARD_RECURRING_FREQUENCY_YEARLY,
+            )[frequency.name.lowercase()]?.let { preferencesService.translate(it) }
+                ?: frequency.name
 
         fun translateCreditCardCreditType(creditType: CreditCardCreditType): String =
             mapOf(

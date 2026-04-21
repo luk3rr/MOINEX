@@ -158,6 +158,56 @@ object TranslationKeys {
     const val CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED: String =
         "creditCard.debtsList.status.paidButRefunded"
 
+    // Recurring Credit Card Debt
+    const val CREDIT_CARD_BUTTON_RECURRING_DEBTS: String = "creditCard.button.recurringDebts"
+    const val CREDIT_CARD_RECURRING_DIALOG_ADD_TITLE: String = "creditCard.recurring.dialog.add.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_EDIT_TITLE: String = "creditCard.recurring.dialog.edit.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_LIST_TITLE: String = "creditCard.recurring.dialog.list.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_EMPTY_FIELDS_TITLE: String =
+        "creditCard.recurring.dialog.emptyFields.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_EMPTY_FIELDS_MESSAGE: String =
+        "creditCard.recurring.dialog.emptyFields.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_CREATED_TITLE: String = "creditCard.recurring.dialog.created.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_CREATED_MESSAGE: String = "creditCard.recurring.dialog.created.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_UPDATED_TITLE: String = "creditCard.recurring.dialog.updated.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_UPDATED_MESSAGE: String = "creditCard.recurring.dialog.updated.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_ERROR_TITLE: String = "creditCard.recurring.dialog.error.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_NO_SELECTION_TITLE: String =
+        "creditCard.recurring.dialog.noSelection.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_NO_SELECTION_EDIT_MESSAGE: String =
+        "creditCard.recurring.dialog.noSelection.edit.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_NO_SELECTION_DELETE_MESSAGE: String =
+        "creditCard.recurring.dialog.noSelection.delete.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_DELETE_CONFIRM_TITLE: String =
+        "creditCard.recurring.dialog.deleteConfirm.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_DELETE_CONFIRM_MESSAGE: String =
+        "creditCard.recurring.dialog.deleteConfirm.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_DELETE_MATERIALIZED_TITLE: String =
+        "creditCard.recurring.dialog.deleteMaterialized.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_DELETE_MATERIALIZED_MESSAGE: String =
+        "creditCard.recurring.dialog.deleteMaterialized.message"
+    const val CREDIT_CARD_RECURRING_DIALOG_DELETED_TITLE: String = "creditCard.recurring.dialog.deleted.title"
+    const val CREDIT_CARD_RECURRING_DIALOG_DELETED_MESSAGE: String = "creditCard.recurring.dialog.deleted.message"
+    const val CREDIT_CARD_RECURRING_TABLE_ID: String = "creditCard.recurring.table.id"
+    const val CREDIT_CARD_RECURRING_TABLE_CREDIT_CARD: String = "creditCard.recurring.table.creditCard"
+    const val CREDIT_CARD_RECURRING_TABLE_DESCRIPTION: String = "creditCard.recurring.table.description"
+    const val CREDIT_CARD_RECURRING_TABLE_AMOUNT: String = "creditCard.recurring.table.amount"
+    const val CREDIT_CARD_RECURRING_TABLE_CATEGORY: String = "creditCard.recurring.table.category"
+    const val CREDIT_CARD_RECURRING_TABLE_FREQUENCY: String = "creditCard.recurring.table.frequency"
+    const val CREDIT_CARD_RECURRING_TABLE_DAY_OF_MONTH: String = "creditCard.recurring.table.dayOfMonth"
+    const val CREDIT_CARD_RECURRING_TABLE_START_DATE: String = "creditCard.recurring.table.startDate"
+    const val CREDIT_CARD_RECURRING_TABLE_END_DATE: String = "creditCard.recurring.table.endDate"
+    const val CREDIT_CARD_RECURRING_TABLE_STATUS: String = "creditCard.recurring.table.status"
+    const val CREDIT_CARD_RECURRING_TABLE_INDEFINITE: String = "creditCard.recurring.table.indefinite"
+    const val CREDIT_CARD_RECURRING_TABLE_NEXT_INVOICE: String = "creditCard.recurring.table.nextInvoice"
+    const val CREDIT_CARD_RECURRING_FREQUENCY_MONTHLY: String = "creditCard.recurring.frequency.monthly"
+    const val CREDIT_CARD_RECURRING_FREQUENCY_YEARLY: String = "creditCard.recurring.frequency.yearly"
+    const val CREDIT_CARD_RECURRING_LABEL_DAY_OF_MONTH: String = "creditCard.recurring.label.dayOfMonth"
+    const val CREDIT_CARD_RECURRING_LABEL_FREQUENCY: String = "creditCard.recurring.label.frequency"
+    const val CREDIT_CARD_RECURRING_LABEL_START_DATE: String = "creditCard.recurring.label.startDate"
+    const val CREDIT_CARD_RECURRING_LABEL_END_DATE: String = "creditCard.recurring.label.endDate"
+    const val CREDIT_CARD_RECURRING_COMBOBOX_ALL: String = "creditCard.recurring.combobox.all"
+
     // Transactions
     const val TRANSACTION_MONTHLY_RESUME_TITLE: String = "transaction.monthlyResume.title"
     const val TRANSACTION_YEARLY_RESUME_TITLE: String = "transaction.yearlyResume.title"

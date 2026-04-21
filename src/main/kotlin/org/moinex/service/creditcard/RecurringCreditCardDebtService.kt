@@ -63,16 +63,10 @@ class RecurringCreditCardDebtService(
             dayOfMonth = updated.dayOfMonth
             frequency = updated.frequency
             endDate = updated.endDate
+            status = updated.status
         }
 
         logger.info("$recurringTransactionFromDatabase updated successfully")
-    }
-
-    @Transactional
-    fun deactivateRecurring(id: Int) {
-        val recurringTransactionFromDatabase = recurringCreditCardDebtRepository.findByIdOrThrow(id)
-        recurringTransactionFromDatabase.status = RecurringTransactionStatus.INACTIVE
-        logger.info("$recurringTransactionFromDatabase deactivated")
     }
 
     @Transactional
@@ -146,6 +140,8 @@ class RecurringCreditCardDebtService(
         val card = creditCardRepository.findByIdOrThrow(creditCardId)
         return recurringCreditCardDebtRepository.findAllByCreditCard(card)
     }
+
+    fun getAllRecurringDebts(): List<RecurringCreditCardDebt> = recurringCreditCardDebtRepository.findAll()
 
     private fun materializeDebtsUpTo(
         recurring: RecurringCreditCardDebt,

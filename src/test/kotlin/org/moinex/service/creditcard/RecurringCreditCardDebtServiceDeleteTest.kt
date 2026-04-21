@@ -2,14 +2,12 @@ package org.moinex.service.creditcard
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.factory.creditcard.RecurringCreditCardDebtFactory
-import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.creditcard.RecurringCreditCardDebtRepository
@@ -75,24 +73,6 @@ class RecurringCreditCardDebtServiceDeleteTest :
                     shouldThrow<EntityNotFoundException> {
                         service.deleteRecurring(99)
                     }
-                }
-            }
-        }
-
-        Given("an active recurring debt") {
-            val recurring =
-                RecurringCreditCardDebtFactory.create(
-                    id = 1,
-                    status = RecurringTransactionStatus.ACTIVE,
-                )
-
-            When("deactivating it") {
-                every { recurringCreditCardDebtRepository.findById(1) } returns Optional.of(recurring)
-
-                service.deactivateRecurring(1)
-
-                Then("should set status to INACTIVE") {
-                    recurring.status shouldBe RecurringTransactionStatus.INACTIVE
                 }
             }
         }

@@ -29,6 +29,12 @@ object Files {
     const val EDIT_CREDIT_CARD_DEBT_FXML: String = UI_DIALOG_CREDITCARD_PATH + "edit_credit_card_debt.fxml"
     const val CREDIT_CARD_INVOICE_PAYMENT_FXML: String =
         UI_DIALOG_CREDITCARD_PATH + "credit_card_invoice_payment.fxml"
+    const val ADD_RECURRING_CREDIT_CARD_DEBT_FXML: String =
+        UI_DIALOG_CREDITCARD_PATH + "add_recurring_credit_card_debt.fxml"
+    const val EDIT_RECURRING_CREDIT_CARD_DEBT_FXML: String =
+        UI_DIALOG_CREDITCARD_PATH + "edit_recurring_credit_card_debt.fxml"
+    const val RECURRING_CREDIT_CARD_DEBTS_FXML: String =
+        UI_DIALOG_CREDITCARD_PATH + "recurring_credit_card_debts.fxml"
     const val UI_DIALOG_GOAL_PATH: String = UI_DIALOG_PATH + "goal/"
 
     // UI goal package
