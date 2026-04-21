@@ -384,10 +384,13 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      * @return The invoice amount of the credit card in the specified month and year
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) FROM CreditCardPayment ccp JOIN ccp.creditCardDebt" +
-            " ccd WHERE ccd.creditCard.id = :creditCardId AND strftime('%m', ccp.date) =" +
-            " printf('%02d', :month) AND strftime('%Y', ccp.date) = printf('%04d', :year) AND" +
-            " (ccp.refunded = false OR (ccp.refunded = true AND ccp.wallet IS NOT NULL))",
+        "SELECT coalesce(sum(ccp.amount), 0) " +
+            "FROM CreditCardPayment ccp " +
+            "JOIN ccp.creditCardDebt ccd " +
+            "WHERE ccd.creditCard.id = :creditCardId " +
+            "AND strftime('%m', ccp.date) = printf('%02d', :month) " +
+            "AND strftime('%Y', ccp.date) = printf('%04d', :year) " +
+            "AND (ccp.refunded = false OR (ccp.refunded = true AND ccp.wallet IS NOT NULL))",
     )
     fun getInvoiceAmount(
         @Param("creditCardId") creditCardId: Int,

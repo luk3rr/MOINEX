@@ -20,6 +20,7 @@ import org.moinex.common.util.UIUtils
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.springframework.context.annotation.Scope
@@ -36,6 +37,7 @@ class ResumePaneController(
     private val walletService: WalletService,
     private val recurringTransactionService: RecurringTransactionService,
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val preferencesService: PreferencesService,
 ) {
     @FXML
@@ -127,8 +129,10 @@ class ResumePaneController(
 
         val allTransactions = allYearTransactions + futureTransactions
 
-        val crcTotalDebtAmount = creditCardService.getTotalDebtAmountByYear(year)
-        val crcPendingPayments = creditCardService.getTotalPendingPaymentsByYear(year)
+        val projectedCrcAmount = recurringCreditCardDebtService.getTotalProjectedAmountForYear(year)
+
+        val crcTotalDebtAmount = creditCardService.getTotalDebtAmountByYear(year) + projectedCrcAmount
+        val crcPendingPayments = creditCardService.getTotalPendingPaymentsByYear(year) + projectedCrcAmount
         val crcPaidPayments = creditCardService.getTotalPaidPaymentsByYear(year)
 
         updateResumePane(allTransactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments)
@@ -146,8 +150,10 @@ class ResumePaneController(
 
         val allTransactions = transactions + futureTransactions
 
-        val crcTotalDebtAmount = creditCardService.getTotalDebtAmountByMonth(yearMonth)
-        val crcPendingPayments = creditCardService.getTotalPendingPaymentsByMonth(yearMonth)
+        val projectedCrcAmount = recurringCreditCardDebtService.getTotalProjectedAmountForMonth(yearMonth)
+
+        val crcTotalDebtAmount = creditCardService.getTotalDebtAmountByMonth(yearMonth) + projectedCrcAmount
+        val crcPendingPayments = creditCardService.getTotalPendingPaymentsByMonth(yearMonth) + projectedCrcAmount
         val crcPaidPayments = creditCardService.getTotalEffectivePaidPaymentsByMonth(yearMonth)
 
         updateResumePane(allTransactions, crcTotalDebtAmount, crcPendingPayments, crcPaidPayments)

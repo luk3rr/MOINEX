@@ -57,6 +57,7 @@ import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondService
 import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.TickerService
@@ -82,6 +83,7 @@ class HomeController(
     private val walletService: WalletService,
     private val recurringTransactionService: RecurringTransactionService,
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val categoryService: CategoryService,
     private val netWorthService: NetWorthService,
     private val netWorthCalculationService: NetWorthCalculationService,
@@ -530,6 +532,7 @@ class HomeController(
 
             val crcPaidPayments = creditCardService.getTotalEffectivePaidPaymentsByMonth(yearMonth)
             val crcPendingPayments = creditCardService.getTotalPendingPaymentsByMonth(yearMonth)
+            val crcProjectedAmount = recurringCreditCardDebtService.getTotalProjectedAmountForMonth(yearMonth)
 
             val totalExpenses =
                 allTransactions
@@ -538,6 +541,7 @@ class HomeController(
                     .fold(BigDecimal.ZERO, BigDecimal::add)
                     .add(crcPaidPayments)
                     .add(crcPendingPayments)
+                    .add(crcProjectedAmount)
 
             val totalIncomes =
                 allTransactions
@@ -953,6 +957,8 @@ class HomeController(
         val startDate = yearMonth.atDay(1).atStartOfDay()
         val endDate = yearMonth.atEndOfMonth().atEndOfDay()
 
+        val projectedOccurrences = recurringCreditCardDebtService.getProjectedOccurrencesForMonth(yearMonth)
+
         val incomeByCategory = mutableMapOf<String, Double>()
         val expenseByCategory = mutableMapOf<String, Double>()
 
@@ -974,7 +980,11 @@ class HomeController(
                     startDate,
                     endDate,
                 )
-            val totalExpense = (walletExpense + crcExpense).toDouble()
+            val projectedCrcExpense =
+                projectedOccurrences
+                    .filter { it.recurringDebt.category.id!! == cat.id!! }
+                    .sumOf { it.amount }
+            val totalExpense = (walletExpense + crcExpense + projectedCrcExpense).toDouble()
             if (totalExpense > 0) expenseByCategory[cat.name] = totalExpense
         }
 

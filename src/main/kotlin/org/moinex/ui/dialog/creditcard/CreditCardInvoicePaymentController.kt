@@ -25,6 +25,7 @@ import org.moinex.model.wallettransaction.Wallet
 import org.moinex.service.CalculatorService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.CalculatorController
 import org.springframework.context.ConfigurableApplicationContext
@@ -36,6 +37,7 @@ import java.time.YearMonth
 class CreditCardInvoicePaymentController(
     private val walletService: WalletService,
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val calculatorService: CalculatorService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
@@ -51,6 +53,9 @@ class CreditCardInvoicePaymentController(
 
     @FXML
     private lateinit var crcAvailableRebateLabel: Label
+
+    @FXML
+    private lateinit var crcProjectedAmountLabel: Label
 
     @FXML
     private lateinit var walletAfterBalanceLabel: Label
@@ -96,6 +101,14 @@ class CreditCardInvoicePaymentController(
         totalToPayLabel.text = UIUtils.formatCurrency(invoiceAmount)
         crcInvoiceMonthLabel.text = UIUtils.formatShortMonthYear(invoiceDate)
         crcAvailableRebateLabel.text = UIUtils.formatCurrency(creditCard!!.availableRebate)
+
+        val projectedAmount =
+            recurringCreditCardDebtService
+                .getProjectedOccurrencesForMonth(invoiceDate)
+                .filter { it.recurringDebt.creditCard.id!! == creditCard!!.id!! }
+                .sumOf { it.amount }
+
+        crcProjectedAmountLabel.text = UIUtils.formatCurrency(projectedAmount)
 
         if (creditCard!!.availableRebate > BigDecimal.ZERO) {
             crcAvailableRebateLabel.style = AVAILABLE_REBATE_STYLE

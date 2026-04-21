@@ -184,10 +184,9 @@ class RecurringCreditCardDebtServiceProjectionTest :
                 RecurringCreditCardDebtFactory.create(id = 2, creditCard = card, nextInvoiceMonth = now)
 
             When("projecting 1 month ahead for the card") {
-                every { creditCardRepository.findById(1) } returns Optional.of(card)
                 every {
                     recurringCreditCardDebtRepository.findAllByCreditCardAndStatus(
-                        card,
+                        card.id!!,
                         RecurringTransactionStatus.ACTIVE,
                     )
                 } returns listOf(recurring1, recurring2)
@@ -206,10 +205,9 @@ class RecurringCreditCardDebtServiceProjectionTest :
             val card = CreditCardFactory.create(id = 1)
 
             When("projecting occurrences for the card") {
-                every { creditCardRepository.findById(1) } returns Optional.of(card)
                 every {
                     recurringCreditCardDebtRepository.findAllByCreditCardAndStatus(
-                        card,
+                        card.id!!,
                         RecurringTransactionStatus.ACTIVE,
                     )
                 } returns emptyList()
@@ -218,18 +216,6 @@ class RecurringCreditCardDebtServiceProjectionTest :
 
                 Then("should return empty list") {
                     result.shouldBeEmpty()
-                }
-            }
-        }
-
-        Given("a non-existent credit card id") {
-            When("projecting occurrences") {
-                every { creditCardRepository.findById(99) } returns Optional.empty()
-
-                Then("should throw EntityNotFoundException") {
-                    shouldThrow<EntityNotFoundException> {
-                        service.getProjectedOccurrencesByCard(99)
-                    }
                 }
             }
         }

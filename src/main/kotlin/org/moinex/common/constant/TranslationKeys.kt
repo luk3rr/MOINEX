@@ -1157,6 +1157,7 @@ object TranslationKeys {
     const val CREDITCARD_LABEL_TOTAL_TO_PAY: String = "creditcard.label.totalToPay"
     const val CREDITCARD_LABEL_SELECT_CREDIT_CARD: String = "creditcard.label.selectCreditCard"
     const val CREDITCARD_LABEL_SELECT_CREDIT_CARD_CREDIT: String = "creditcard.label.selectCreditCardCredit"
+    const val CREDITCARD_LABEL_PROJECTED_AMOUNT: String = "creditcard.label.projectedAmount"
     const val CREDITCARD_PROMPT_TEXT_SEARCH_ID_OR_DESCRIPTION: String =
         "creditcard.promptText.searchIdOrDescription"
 

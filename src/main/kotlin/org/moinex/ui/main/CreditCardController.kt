@@ -653,11 +653,12 @@ class CreditCardController(
     private fun updateTotalDebtsInfo() {
         val selectedYear = totalDebtsYearFilterComboBox.value
 
-        val totalDebts = creditCardService.getTotalDebtAmountByYear(selectedYear)
+        val materializedDebts = creditCardService.getTotalDebtAmountByYear(selectedYear)
+        val futureRecurringDebts = recurringCreditCardDebtService.getTotalProjectedAmountForYear(selectedYear)
         val totalPendingPayments = creditCardService.getTotalPendingPayments()
 
         val totalTotalDebtsLabel =
-            Label(UIUtils.formatCurrency(totalDebts)).apply {
+            Label(UIUtils.formatCurrency(materializedDebts + futureRecurringDebts)).apply {
                 styleClass.add(Styles.TOTAL_BALANCE_VALUE_LABEL_STYLE)
             }
 
@@ -760,6 +761,13 @@ class CreditCardController(
 
             val payments = creditCardService.getPaymentsByMonth(yearMonth)
 
+            val projectedOccurrences =
+                if (yearMonth.isAfter(YearMonth.now())) {
+                    recurringCreditCardDebtService.getProjectedOccurrencesForMonth(yearMonth)
+                } else {
+                    emptyList()
+                }
+
             categories.forEach { category ->
                 val total =
                     payments
@@ -768,7 +776,12 @@ class CreditCardController(
                         .map { it.amount }
                         .fold(BigDecimal.ZERO, BigDecimal::add)
 
-                monthlyTotals.getOrPut(yearMonth) { linkedMapOf() }[category] = total.toDouble()
+                val projectedTotal =
+                    projectedOccurrences
+                        .filter { it.recurringDebt.category.id == category.id }
+                        .sumOf { it.amount }
+
+                monthlyTotals.getOrPut(yearMonth) { linkedMapOf() }[category] = (total + projectedTotal).toDouble()
             }
         }
 

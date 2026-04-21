@@ -25,6 +25,7 @@ import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
 import org.moinex.service.investment.TickerService
@@ -44,6 +45,7 @@ class NetWorthCalculationServiceTest :
         val tickerService = mockk<TickerService>()
         val bondService = mockk<BondService>()
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
+        val recurringCreditCardDebtService = mockk<RecurringCreditCardDebtService>(relaxed = true)
 
         val service =
             NetWorthCalculationService(
@@ -51,6 +53,7 @@ class NetWorthCalculationServiceTest :
                 walletService,
                 recurringTransactionService,
                 creditCardService,
+                recurringCreditCardDebtService,
                 tickerService,
                 bondService,
                 bondInterestCalculationService,

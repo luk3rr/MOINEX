@@ -20,6 +20,9 @@ import org.moinex.repository.creditcard.RecurringCreditCardDebtRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
+import java.time.Month
+import java.time.Year
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
@@ -126,28 +129,68 @@ class RecurringCreditCardDebtService(
     fun getProjectedOccurrencesByCard(
         creditCardId: Int,
         monthsAhead: Int = Constants.DEFAULT_PROJECTED_MONTHS_AHEAD,
-    ): List<RecurringCreditCardDebtOccurrenceDTO> {
-        val creditCardFromDatabase = creditCardRepository.findByIdOrThrow(creditCardId)
-
-        return recurringCreditCardDebtRepository
-            .findAllByCreditCardAndStatus(creditCardFromDatabase, RecurringTransactionStatus.ACTIVE)
+    ): List<RecurringCreditCardDebtOccurrenceDTO> =
+        recurringCreditCardDebtRepository
+            .findAllByCreditCardAndStatus(creditCardId, RecurringTransactionStatus.ACTIVE)
             .flatMap { recurring -> getProjectedOccurrences(recurring.id!!, monthsAhead) }
-    }
 
-    fun getAllRecurringByCreditCard(creditCardId: Int): List<RecurringCreditCardDebt> {
-        val card = creditCardRepository.findByIdOrThrow(creditCardId)
-        return recurringCreditCardDebtRepository.findAllByCreditCard(card)
-    }
+    fun getAllRecurringByCreditCard(creditCardId: Int): List<RecurringCreditCardDebt> =
+        recurringCreditCardDebtRepository.findAllByCreditCard(creditCardId)
 
     fun getAllRecurringDebts(): List<RecurringCreditCardDebt> = recurringCreditCardDebtRepository.findAll()
 
+    fun getTotalProjectedAmountForMonth(month: YearMonth): BigDecimal =
+        getProjectedOccurrencesForMonth(month).sumOf { it.amount }
+
+    fun getTotalProjectedAmountForMonthAndCreditCard(
+        month: YearMonth,
+        creditCardId: Int,
+    ): BigDecimal = getProjectedOccurrencesForMonthAndCreditCard(month, creditCardId).sumOf { it.amount }
+
+    fun getTotalProjectedAmountUntilMonth(targetMonth: YearMonth): BigDecimal {
+        if (targetMonth.isBeforeOrEqual(YearMonth.now())) return BigDecimal.ZERO
+
+        val monthsAhead = YearMonth.now().until(targetMonth, ChronoUnit.MONTHS).toInt() + 1
+
+        return recurringCreditCardDebtRepository
+            .findAllByStatus(RecurringTransactionStatus.ACTIVE)
+            .flatMap { recurring -> getProjectedOccurrences(recurring.id!!, monthsAhead) }
+            .filter { it.invoiceMonth.isAfter(YearMonth.now()) && it.invoiceMonth.isBeforeOrEqual(targetMonth) }
+            .sumOf { it.amount }
+    }
+
+    fun getTotalProjectedAmountForYear(year: Year): BigDecimal =
+        Month.entries
+            .map { month -> year.atMonth(month) }
+            .flatMap { yearMonth -> getProjectedOccurrencesForMonth(yearMonth) }
+            .sumOf { it.amount }
+
+    fun getProjectedOccurrencesForMonthAndCreditCard(
+        month: YearMonth,
+        creditCardId: Int,
+    ): List<RecurringCreditCardDebtOccurrenceDTO> {
+        val recurringDebts =
+            recurringCreditCardDebtRepository.findAllByCreditCardAndStatus(
+                creditCardId,
+                RecurringTransactionStatus.ACTIVE,
+            )
+        return projectOccurrences(month, recurringDebts)
+    }
+
     fun getProjectedOccurrencesForMonth(month: YearMonth): List<RecurringCreditCardDebtOccurrenceDTO> {
+        val recurringDebts = recurringCreditCardDebtRepository.findAllByStatus(RecurringTransactionStatus.ACTIVE)
+        return projectOccurrences(month, recurringDebts)
+    }
+
+    private fun projectOccurrences(
+        month: YearMonth,
+        recurringDebts: List<RecurringCreditCardDebt>,
+    ): List<RecurringCreditCardDebtOccurrenceDTO> {
         if (month.isBeforeOrEqual(YearMonth.now())) return emptyList()
 
         val monthsAhead = YearMonth.now().until(month, ChronoUnit.MONTHS).toInt() + 1
 
-        return recurringCreditCardDebtRepository
-            .findAllByStatus(RecurringTransactionStatus.ACTIVE)
+        return recurringDebts
             .flatMap { recurring -> getProjectedOccurrences(recurring.id!!, monthsAhead) }
             .filter { it.invoiceMonth == month }
     }

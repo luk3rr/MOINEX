@@ -23,6 +23,7 @@ import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.ui.dialog.creditcard.AddCreditCardCreditController
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController
 import org.moinex.ui.dialog.creditcard.CreditCardCreditsController
@@ -41,6 +42,7 @@ import java.time.YearMonth
 @Scope("prototype")
 class CreditCardPaneController(
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val springContext: ConfigurableApplicationContext,
     private val creditCardController: CreditCardController,
     private val preferencesService: PreferencesService,
@@ -304,10 +306,15 @@ class CreditCardPaneController(
     fun updateInvoiceInfo() {
         invoiceMonthNavigatorBarLabel.text = UIUtils.formatShortMonthYear(currentDisplayedMonth)
 
-        val totalDebts =
+        val materializedDebts =
             creditCardService.getInvoiceAmount(creditCard.id!!, currentDisplayedMonth)
+        val futureRecurringDebts =
+            recurringCreditCardDebtService.getTotalProjectedAmountForMonthAndCreditCard(
+                currentDisplayedMonth,
+                creditCard.id!!,
+            )
 
-        invoiceMonthLabel.text = UIUtils.formatCurrency(totalDebts)
+        invoiceMonthLabel.text = UIUtils.formatCurrency(materializedDebts + futureRecurringDebts)
 
         invoiceStatusLabel.text =
             UIUtils.translateCreditCardInvoiceStatus(

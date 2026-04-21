@@ -6,7 +6,6 @@
 
 package org.moinex.repository.creditcard
 
-import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardDebt
 import org.moinex.model.creditcard.RecurringCreditCardDebt
 import org.moinex.model.enums.RecurringTransactionStatus
@@ -20,11 +19,22 @@ import java.time.LocalDateTime
 interface RecurringCreditCardDebtRepository : JpaRepository<RecurringCreditCardDebt, Int> {
     fun findAllByStatus(status: RecurringTransactionStatus): List<RecurringCreditCardDebt>
 
-    fun findAllByCreditCard(creditCard: CreditCard): List<RecurringCreditCardDebt>
+    @Query(
+        "SELECT ccd " +
+            "FROM RecurringCreditCardDebt ccd " +
+            "WHERE ccd.creditCard.id = :creditCardId",
+    )
+    fun findAllByCreditCard(creditCardId: Int): List<RecurringCreditCardDebt>
 
+    @Query(
+        "SELECT ccd " +
+            "FROM RecurringCreditCardDebt ccd " +
+            "WHERE ccd.creditCard.id = :creditCardId " +
+            "AND ccd.status = :status",
+    )
     fun findAllByCreditCardAndStatus(
-        creditCard: CreditCard,
-        status: RecurringTransactionStatus,
+        @Param("creditCardId") creditCardId: Int,
+        @Param("status") status: RecurringTransactionStatus,
     ): List<RecurringCreditCardDebt>
 
     @Query(

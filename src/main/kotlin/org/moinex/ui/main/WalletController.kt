@@ -43,6 +43,7 @@ import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.model.wallettransaction.WalletType
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.WalletPaneController
@@ -64,6 +65,7 @@ import java.time.YearMonth
 class WalletController(
     private val walletService: WalletService,
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val recurringTransactionService: RecurringTransactionService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
@@ -582,7 +584,10 @@ class WalletController(
                         val crcPendingPayments =
                             creditCardService.getTotalPendingPaymentsByMonth(yearMonth)
 
-                        val totalExp = expenses.add(crcPaidPayments).add(crcPendingPayments)
+                        val crcProjectedAmount =
+                            recurringCreditCardDebtService.getTotalProjectedAmountForMonth(yearMonth)
+
+                        val totalExp = expenses.add(crcPaidPayments).add(crcPendingPayments).add(crcProjectedAmount)
 
                         val incomes =
                             allTransactions
@@ -620,7 +625,18 @@ class WalletController(
                                 }.map { it.amount }
                                 .fold(BigDecimal.ZERO, BigDecimal::add)
 
-                        val totalExp = expenses.add(crcPaymentsFiltered)
+                        val crcProjectedFiltered =
+                            recurringCreditCardDebtService
+                                .getProjectedOccurrencesForMonth(yearMonth)
+                                .filter {
+                                    it.recurringDebt.creditCard.defaultBillingWallet
+                                        ?.type
+                                        ?.id!! ==
+                                        selectedWalletType.id!!
+                                }.map { it.amount }
+                                .fold(BigDecimal.ZERO, BigDecimal::add)
+
+                        val totalExp = expenses.add(crcPaymentsFiltered).add(crcProjectedFiltered)
 
                         val incomes =
                             allTransactions

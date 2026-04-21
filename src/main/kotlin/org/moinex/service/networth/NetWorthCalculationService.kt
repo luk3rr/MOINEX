@@ -29,6 +29,7 @@ import org.moinex.model.wallettransaction.RecurringTransaction
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.BondService
 import org.moinex.service.investment.TickerService
@@ -48,6 +49,7 @@ class NetWorthCalculationService(
     private val walletService: WalletService,
     private val recurringTransactionService: RecurringTransactionService,
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val tickerService: TickerService,
     private val bondService: BondService,
     private val bondInterestCalculationService: BondInterestCalculationService,
@@ -330,10 +332,15 @@ class NetWorthCalculationService(
         val dateAtEndOfMonth = targetMonth.atEndOfMonth().atEndOfDay()
 
         val creditCardDebt = creditCardService.getDebtAtDate(dateAtEndOfMonth)
+        val projectedRecurringDebts = recurringCreditCardDebtService.getTotalProjectedAmountUntilMonth(targetMonth)
 
-        logger.debug("Total credit card debt: {}", creditCardDebt)
+        val total = creditCardDebt + projectedRecurringDebts
+
+        logger.debug("Materialized credit card debt: {}", creditCardDebt)
+        logger.debug("Projected recurring debts until {}: {}", targetMonth, projectedRecurringDebts)
+        logger.debug("Total credit card debt: {}", total)
         logger.debug("=== End CREDIT CARD DEBT calculation ===\n")
-        return creditCardDebt
+        return total
     }
 
     private fun calculateRecurringTransactionsAmount(
