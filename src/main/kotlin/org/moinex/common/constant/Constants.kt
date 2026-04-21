@@ -54,6 +54,7 @@ object Constants {
     const val MAX_BILLING_DUE_DAY: Int = 28
     const val INSTALLMENTS_FIELD_MAX_DIGITS: Int = 3
     const val MAX_INSTALLMENTS: Int = 999
+    const val DEFAULT_PROJECTED_MONTHS_AHEAD = 12
 
     // AnimationUtils constant
     const val MENU_COLLAPSED_WIDTH: Double = 80.0

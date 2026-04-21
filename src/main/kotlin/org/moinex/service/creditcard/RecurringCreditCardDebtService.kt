@@ -6,6 +6,7 @@
 
 package org.moinex.service.creditcard
 
+import org.moinex.common.constant.Constants
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isBeforeOrEqual
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 @Service
 class RecurringCreditCardDebtService(
@@ -29,10 +31,6 @@ class RecurringCreditCardDebtService(
     private val creditCardService: CreditCardService,
 ) {
     private val logger = LoggerFactory.getLogger(RecurringCreditCardDebtService::class.java)
-
-    companion object {
-        private const val DEFAULT_PROJECTED_MONTHS_AHEAD = 12
-    }
 
     @Transactional
     fun createRecurring(recurring: RecurringCreditCardDebt): Int {
@@ -95,7 +93,7 @@ class RecurringCreditCardDebtService(
 
     fun getProjectedOccurrences(
         recurringId: Int,
-        monthsAhead: Int = DEFAULT_PROJECTED_MONTHS_AHEAD,
+        monthsAhead: Int = Constants.DEFAULT_PROJECTED_MONTHS_AHEAD,
     ): List<RecurringCreditCardDebtOccurrenceDTO> {
         val recurringTransactionFromDatabase = recurringCreditCardDebtRepository.findByIdOrThrow(recurringId)
 
@@ -127,7 +125,7 @@ class RecurringCreditCardDebtService(
 
     fun getProjectedOccurrencesByCard(
         creditCardId: Int,
-        monthsAhead: Int = DEFAULT_PROJECTED_MONTHS_AHEAD,
+        monthsAhead: Int = Constants.DEFAULT_PROJECTED_MONTHS_AHEAD,
     ): List<RecurringCreditCardDebtOccurrenceDTO> {
         val creditCardFromDatabase = creditCardRepository.findByIdOrThrow(creditCardId)
 
@@ -142,6 +140,17 @@ class RecurringCreditCardDebtService(
     }
 
     fun getAllRecurringDebts(): List<RecurringCreditCardDebt> = recurringCreditCardDebtRepository.findAll()
+
+    fun getProjectedOccurrencesForMonth(month: YearMonth): List<RecurringCreditCardDebtOccurrenceDTO> {
+        if (month.isBeforeOrEqual(YearMonth.now())) return emptyList()
+
+        val monthsAhead = YearMonth.now().until(month, ChronoUnit.MONTHS).toInt() + 1
+
+        return recurringCreditCardDebtRepository
+            .findAllByStatus(RecurringTransactionStatus.ACTIVE)
+            .flatMap { recurring -> getProjectedOccurrences(recurring.id!!, monthsAhead) }
+            .filter { it.invoiceMonth == month }
+    }
 
     private fun materializeDebtsUpTo(
         recurring: RecurringCreditCardDebt,

@@ -9,7 +9,6 @@
 package org.moinex.ui.main
 
 import com.jfoenix.controls.JFXButton
-import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -22,8 +21,8 @@ import javafx.scene.chart.StackedBarChart
 import javafx.scene.chart.XYChart
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
+import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
@@ -33,16 +32,18 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
-import org.moinex.model.creditcard.CreditCardPayment
+import org.moinex.model.dto.CreditCardDebtRowDTO
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.ui.common.CreditCardPaneController
 import org.moinex.ui.dialog.creditcard.AddCreditCardController
 import org.moinex.ui.dialog.creditcard.AddCreditCardDebtController
@@ -63,6 +64,7 @@ import java.time.YearMonth
 @Controller
 class CreditCardController(
     private val creditCardService: CreditCardService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val categoryService: CategoryService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
@@ -80,7 +82,7 @@ class CreditCardController(
     private lateinit var debtsListYearFilterComboBox: ComboBox<Year>
 
     @FXML
-    private lateinit var debtsTableView: TableView<CreditCardPayment>
+    private lateinit var debtsTableView: TableView<CreditCardDebtRowDTO>
 
     @FXML
     private lateinit var debtSearchField: TextField
@@ -105,6 +107,7 @@ class CreditCardController(
 
     companion object {
         private val logger = LoggerFactory.getLogger(CreditCardController::class.java)
+        private const val PROJECTED_DEBT_STYLE = "-fx-opacity: 0.75; -fx-font-style: italic;"
     }
 
     @FXML
@@ -164,9 +167,9 @@ class CreditCardController(
 
     @FXML
     private fun handleEditDebt() {
-        val selectedPayment = debtsTableView.selectionModel.selectedItem
+        val selectedRow = debtsTableView.selectionModel.selectedItem
 
-        if (selectedPayment == null) {
+        if (selectedRow == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
                     TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
@@ -178,6 +181,15 @@ class CreditCardController(
             return
         }
 
+        if (selectedRow is CreditCardDebtRowDTO.Projected) {
+            WindowUtils.showInformationDialog(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_TITLE),
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_MESSAGE),
+            )
+            return
+        }
+
+        val selectedPayment = (selectedRow as CreditCardDebtRowDTO.Materialized).payment
         val debt = selectedPayment.creditCardDebt
         val payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.id!!)
 
@@ -207,9 +219,9 @@ class CreditCardController(
 
     @FXML
     private fun handleRefundDebt() {
-        val selectedPayment = debtsTableView.selectionModel.selectedItem
+        val selectedRow = debtsTableView.selectionModel.selectedItem
 
-        if (selectedPayment == null) {
+        if (selectedRow == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
                     TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
@@ -221,6 +233,15 @@ class CreditCardController(
             return
         }
 
+        if (selectedRow is CreditCardDebtRowDTO.Projected) {
+            WindowUtils.showInformationDialog(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_TITLE),
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_MESSAGE),
+            )
+            return
+        }
+
+        val selectedPayment = (selectedRow as CreditCardDebtRowDTO.Materialized).payment
         val debt = selectedPayment.creditCardDebt
         val payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.id!!)
 
@@ -343,9 +364,9 @@ class CreditCardController(
 
     @FXML
     private fun handleDeleteDebt() {
-        val selectedPayment = debtsTableView.selectionModel.selectedItem
+        val selectedRow = debtsTableView.selectionModel.selectedItem
 
-        if (selectedPayment == null) {
+        if (selectedRow == null) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(
                     TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE,
@@ -357,6 +378,15 @@ class CreditCardController(
             return
         }
 
+        if (selectedRow is CreditCardDebtRowDTO.Projected) {
+            WindowUtils.showInformationDialog(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_TITLE),
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_MESSAGE),
+            )
+            return
+        }
+
+        val selectedPayment = (selectedRow as CreditCardDebtRowDTO.Materialized).payment
         val debt = selectedPayment.creditCardDebt
         val payments = creditCardService.getPaymentsByDebtOrderedByInstallment(debt.id!!)
 
@@ -570,31 +600,53 @@ class CreditCardController(
 
         debtsTableView.items.clear()
 
-        val payments = creditCardService.getPaymentsByMonth(selectedMonth)
+        val materializedRows: List<CreditCardDebtRowDTO> =
+            creditCardService.getPaymentsByMonth(selectedMonth).map { CreditCardDebtRowDTO.Materialized(it) }
 
-        if (similarTextOrId.isEmpty()) {
-            debtsTableView.items.addAll(payments)
-        } else {
-            payments
-                .filter { payment ->
-                    val description = payment.creditCardDebt.description?.lowercase()
-                    val id = payment.creditCardDebt.id.toString()
-                    val category =
-                        payment.creditCardDebt.category.name
-                            .lowercase()
-                    val cardName =
-                        payment.creditCardDebt.creditCard.name
-                            .lowercase()
-                    val value = payment.amount.toString()
+        val projectedRows: List<CreditCardDebtRowDTO> =
+            recurringCreditCardDebtService
+                .getProjectedOccurrencesForMonth(selectedMonth)
+                .map { CreditCardDebtRowDTO.Projected(it) }
 
-                    description?.contains(similarTextOrId) ?: true ||
-                        id.contains(similarTextOrId) ||
-                        category.contains(similarTextOrId) ||
-                        cardName.contains(similarTextOrId) ||
-                        value.contains(similarTextOrId)
-                }.forEach { debtsTableView.items.add(it) }
-        }
+        val allRows = materializedRows + projectedRows
 
+        val filtered =
+            if (similarTextOrId.isEmpty()) {
+                allRows
+            } else {
+                allRows.filter { row ->
+                    when (row) {
+                        is CreditCardDebtRowDTO.Materialized -> {
+                            val debt = row.payment.creditCardDebt
+                            val description = debt.description?.lowercase()
+                            val id = debt.id.toString()
+                            val category = debt.category.name.lowercase()
+                            val cardName = debt.creditCard.name.lowercase()
+                            val value = row.payment.amount.toString()
+                            description?.contains(similarTextOrId) ?: true ||
+                                id.contains(similarTextOrId) ||
+                                category.contains(similarTextOrId) ||
+                                cardName.contains(similarTextOrId) ||
+                                value.contains(similarTextOrId)
+                        }
+                        is CreditCardDebtRowDTO.Projected -> {
+                            val recurring = row.occurrence.recurringDebt
+                            val description = recurring.description?.lowercase()
+                            val id = recurring.id.toString()
+                            val category = recurring.category.name.lowercase()
+                            val cardName = recurring.creditCard.name.lowercase()
+                            val value = row.occurrence.amount.toString()
+                            description?.contains(similarTextOrId) ?: true ||
+                                id.contains(similarTextOrId) ||
+                                category.contains(similarTextOrId) ||
+                                cardName.contains(similarTextOrId) ||
+                                value.contains(similarTextOrId)
+                        }
+                    }
+                }
+            }
+
+        debtsTableView.items.addAll(filtered)
         debtsTableView.refresh()
     }
 
@@ -778,11 +830,15 @@ class CreditCardController(
         val newestDebtDate = creditCardService.getLatestPaymentDate()
 
         val startYearMonth = YearMonth.from(oldestDebtDate)
-        var endYearMonth = YearMonth.from(newestDebtDate)
+        var endYearMonth =
+            maxOf(
+                YearMonth.from(newestDebtDate),
+                YearMonth.now().plusMonths(Constants.DEFAULT_PROJECTED_MONTHS_AHEAD.toLong()),
+            )
 
         val yearMonths = mutableListOf<YearMonth>()
 
-        while (endYearMonth.isAfter(startYearMonth) || endYearMonth == startYearMonth) {
+        while (endYearMonth.isAfterOrEqual(startYearMonth)) {
             yearMonths.add(endYearMonth)
             endYearMonth = endYearMonth.minusMonths(1)
         }
@@ -897,102 +953,163 @@ class CreditCardController(
 
     private fun configureTableView() {
         val idColumn =
-            createCreditCardPaymentIdTableColumn(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID,
-                ),
-            )
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DEBT_ID),
+            ).apply {
+                setCellValueFactory { param ->
+                    val id =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized ->
+                                row.payment.creditCardDebt.id
+                                    ?.toString() ?: "-"
+                            is CreditCardDebtRowDTO.Projected -> "-"
+                        }
+                    SimpleStringProperty(id)
+                }
+                UIUtils.alignTableColumn(this, Pos.CENTER)
+            }
 
         val descriptionColumn =
-            TableColumn<CreditCardPayment, String>(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION,
-                ),
-            )
-        descriptionColumn.setCellValueFactory { param ->
-            SimpleStringProperty(param.value.creditCardDebt.description)
-        }
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_DESCRIPTION),
+            ).apply {
+                setCellValueFactory { param ->
+                    val desc =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized -> row.payment.creditCardDebt.description
+                            is CreditCardDebtRowDTO.Projected -> row.occurrence.recurringDebt.description
+                        }
+                    SimpleStringProperty(desc)
+                }
+            }
 
         val amountColumn =
-            TableColumn<CreditCardPayment, String>(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT,
-                ),
-            )
-        amountColumn.setCellValueFactory { param ->
-            SimpleObjectProperty(UIUtils.formatCurrency(param.value.amount))
-        }
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_AMOUNT),
+            ).apply {
+                setCellValueFactory { param ->
+                    val amount =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized -> UIUtils.formatCurrency(row.payment.amount)
+                            is CreditCardDebtRowDTO.Projected -> UIUtils.formatCurrency(row.occurrence.amount)
+                        }
+                    SimpleStringProperty(amount)
+                }
+            }
 
         val installmentColumn =
-            createCreditCardPaymentInstallmentTableColumn(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT,
-                ),
-            )
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INSTALLMENT),
+            ).apply {
+                setCellValueFactory { param ->
+                    val installment =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized ->
+                                "${row.payment.installment}/${row.payment.creditCardDebt.installments}"
+                            is CreditCardDebtRowDTO.Projected -> "1/1"
+                        }
+                    SimpleStringProperty(installment)
+                }
+                UIUtils.alignTableColumn(this, Pos.CENTER)
+            }
 
         val crcColumn =
-            TableColumn<CreditCardPayment, String>(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD,
-                ),
-            )
-        crcColumn.setCellValueFactory { param ->
-            SimpleStringProperty(param.value.creditCardDebt.creditCard.name)
-        }
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD),
+            ).apply {
+                setCellValueFactory { param ->
+                    val cardName =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized -> row.payment.creditCardDebt.creditCard.name
+                            is CreditCardDebtRowDTO.Projected -> row.occurrence.recurringDebt.creditCard.name
+                        }
+                    SimpleStringProperty(cardName)
+                }
+            }
 
         val categoryColumn =
-            TableColumn<CreditCardPayment, String>(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY,
-                ),
-            )
-        categoryColumn.setCellValueFactory { param ->
-            SimpleStringProperty(param.value.creditCardDebt.category.name)
-        }
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY),
+            ).apply {
+                setCellValueFactory { param ->
+                    val cat =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized -> row.payment.creditCardDebt.category.name
+                            is CreditCardDebtRowDTO.Projected -> row.occurrence.recurringDebt.category.name
+                        }
+                    SimpleStringProperty(cat)
+                }
+            }
 
         val dateColumn =
-            TableColumn<CreditCardPayment, String>(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE,
-                ),
-            )
-        dateColumn.setCellValueFactory { param ->
-            SimpleStringProperty(
-                UIUtils.formatDateForDisplay(param.value.date),
-            )
-        }
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE),
+            ).apply {
+                setCellValueFactory { param ->
+                    val date =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized -> UIUtils.formatDateForDisplay(row.payment.date)
+                            is CreditCardDebtRowDTO.Projected ->
+                                UIUtils.formatDateForDisplay(
+                                    row.occurrence.invoiceMonth.atDay(row.occurrence.recurringDebt.dayOfMonth),
+                                )
+                        }
+                    SimpleStringProperty(date)
+                }
+            }
 
         val statusColumn =
-            TableColumn<CreditCardPayment, String>(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS,
-                ),
-            )
-        statusColumn.setCellValueFactory { param ->
-            val payment = param.value
-            val status =
-                when {
-                    payment.isRefunded() && !payment.isPaid() ->
-                        preferencesService.translate(
-                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED,
-                        )
-
-                    payment.isRefunded() && payment.isPaid() ->
-                        preferencesService.translate(
-                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED,
-                        )
-
-                    !payment.isPaid() ->
-                        preferencesService.translate(
-                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PENDING,
-                        )
-
-                    else ->
-                        preferencesService.translate(
-                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID,
-                        )
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS),
+            ).apply {
+                setCellValueFactory { param ->
+                    val status =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized -> {
+                                val payment = row.payment
+                                when {
+                                    payment.isRefunded() && !payment.isPaid() ->
+                                        preferencesService.translate(
+                                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED,
+                                        )
+                                    payment.isRefunded() && payment.isPaid() ->
+                                        preferencesService.translate(
+                                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED,
+                                        )
+                                    !payment.isPaid() ->
+                                        preferencesService.translate(
+                                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PENDING,
+                                        )
+                                    else ->
+                                        preferencesService.translate(
+                                            TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PAID,
+                                        )
+                                }
+                            }
+                            is CreditCardDebtRowDTO.Projected ->
+                                preferencesService.translate(
+                                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_STATUS_PROJECTED,
+                                )
+                        }
+                    SimpleStringProperty(status)
                 }
-            SimpleStringProperty(status)
+            }
+
+        debtsTableView.setRowFactory {
+            object : TableRow<CreditCardDebtRowDTO>() {
+                override fun updateItem(
+                    item: CreditCardDebtRowDTO?,
+                    empty: Boolean,
+                ) {
+                    super.updateItem(item, empty)
+                    style =
+                        if (!empty && item is CreditCardDebtRowDTO.Projected) {
+                            PROJECTED_DEBT_STYLE
+                        } else {
+                            ""
+                        }
+                }
+            }
         }
 
         debtsTableView.columns.addAll(
@@ -1005,63 +1122,5 @@ class CreditCardController(
             dateColumn,
             statusColumn,
         )
-    }
-
-    private fun createCreditCardPaymentInstallmentTableColumn(header: String): TableColumn<CreditCardPayment, String> {
-        val installmentColumn = TableColumn<CreditCardPayment, String>(header)
-
-        installmentColumn.setCellValueFactory { param ->
-            SimpleObjectProperty(
-                "${param.value.installment}/${param.value.creditCardDebt.installments}",
-            )
-        }
-
-        installmentColumn.setCellFactory {
-            object : TableCell<CreditCardPayment, String>() {
-                override fun updateItem(
-                    item: String?,
-                    empty: Boolean,
-                ) {
-                    super.updateItem(item, empty)
-                    if (item == null || empty) {
-                        text = null
-                    } else {
-                        text = item
-                        alignment = Pos.CENTER
-                        style = "-fx-padding: 0;"
-                    }
-                }
-            }
-        }
-
-        return installmentColumn
-    }
-
-    private fun createCreditCardPaymentIdTableColumn(header: String): TableColumn<CreditCardPayment, Int> {
-        val idColumn = TableColumn<CreditCardPayment, Int>(header)
-
-        idColumn.setCellValueFactory { param ->
-            SimpleObjectProperty(param.value.creditCardDebt.id)
-        }
-
-        idColumn.setCellFactory {
-            object : TableCell<CreditCardPayment, Int>() {
-                override fun updateItem(
-                    item: Int?,
-                    empty: Boolean,
-                ) {
-                    super.updateItem(item, empty)
-                    if (item == null || empty) {
-                        text = null
-                    } else {
-                        text = item.toString()
-                        alignment = Pos.CENTER
-                        style = "-fx-padding: 0;"
-                    }
-                }
-            }
-        }
-
-        return idColumn
     }
 }

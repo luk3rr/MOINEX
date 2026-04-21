@@ -157,6 +157,9 @@ object TranslationKeys {
     const val CREDIT_CARD_DEBTS_LIST_STATUS_ONLY_REFUNDED: String = "creditCard.debtsList.status.onlyRefunded"
     const val CREDIT_CARD_DEBTS_LIST_STATUS_PAID_BUT_REFUNDED: String =
         "creditCard.debtsList.status.paidButRefunded"
+    const val CREDIT_CARD_DEBTS_LIST_STATUS_PROJECTED: String = "creditCard.debtsList.status.projected"
+    const val CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_TITLE: String = "creditCard.debtsList.projected.action.title"
+    const val CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_MESSAGE: String = "creditCard.debtsList.projected.action.message"
 
     // Recurring Credit Card Debt
     const val CREDIT_CARD_BUTTON_RECURRING_DEBTS: String = "creditCard.button.recurringDebts"
