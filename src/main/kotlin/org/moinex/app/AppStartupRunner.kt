@@ -13,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
+import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.MarketIndicatorService
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component
 class AppStartupRunner(
     private val marketService: MarketService,
     private val recurringTransactionService: RecurringTransactionService,
+    private val recurringCreditCardDebtService: RecurringCreditCardDebtService,
     private val tickerPriceHistoryService: TickerPriceHistoryService,
     private val tickerService: TickerService,
     private val investmentPerformanceService: InvestmentPerformanceService,
@@ -50,8 +52,11 @@ class AppStartupRunner(
         logger.info("AppStartupRunner started")
 
         FxUtils.launchOnBackground {
-            logger.info("Processing recurring transactions")
+            logger.info("Processing recurring wallet transactions")
             recurringTransactionService.processRecurringTransactions()
+
+            logger.info("Processing recurring credit card debts")
+            recurringCreditCardDebtService.processRecurringDebts()
 
             logger.info("Startup pipeline beginning")
             startupPipeline()

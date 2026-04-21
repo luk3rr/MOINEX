@@ -69,6 +69,12 @@ interface CreditCardDebtRepository : JpaRepository<CreditCardDebt, Int> {
     fun findSuggestions(): List<CreditCardDebt>
 
     /**
+     * Check if any debt was materialized from the given recurring source.
+     * Used to decide between deactivating or permanently deleting a recurring debt.
+     */
+    fun existsByRecurringSourceId(recurringId: Int): Boolean
+
+    /**
      * Get total amount of debts (purchases) up to a specific date
      * @param endDate The end date (inclusive)
      * @return Total amount of debts up to the date

@@ -33,6 +33,9 @@ class CreditCardDebt(
     var category: Category,
     @Column(name = "installments", nullable = false)
     var installments: Int = 1,
+    @ManyToOne
+    @JoinColumn(name = "recurring_id", referencedColumnName = "id", nullable = true)
+    var recurringSource: RecurringCreditCardDebt? = null,
     creditCard: CreditCard,
     date: LocalDateTime,
     amount: BigDecimal,
