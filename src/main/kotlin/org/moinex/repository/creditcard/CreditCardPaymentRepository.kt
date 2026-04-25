@@ -184,7 +184,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      *     month and year onward
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE strftime('%m', ccp.date) >= printf('%02d', :month) " +
             "AND strftime('%Y', ccp.date) >= printf('%04d', :year) " +
@@ -246,7 +246,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      *   month and year
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE strftime('%m', ccp.date) = printf('%02d', :month) " +
             "AND strftime('%Y', ccp.date) = printf('%04d', :year) " +
@@ -266,7 +266,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      * @return Total amount of pending payments of the credit card in the specified year and month
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE ccp.creditCardDebt.creditCard.id = :creditCardId " +
             "AND strftime('%m', ccp.date) = printf('%02d', :month) " +
@@ -288,7 +288,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      *    year onward
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE strftime('%Y', ccp.date) >= printf('%04d', :year) " +
             "AND ccp.wallet IS NULL " +
@@ -321,7 +321,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      *     year
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE strftime('%Y', ccp.date) = printf('%04d', :year) " +
             "AND ccp.wallet IS NULL " +
@@ -337,7 +337,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      * @return The total of all pending payments of a credit card
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "JOIN ccp.creditCardDebt ccd " +
             "WHERE ccd.creditCard.id = :creditCardId " +
@@ -353,7 +353,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      * @return The total of all pending payments of all credit cards
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE ccp.wallet IS NULL " +
             "AND ccp.refunded = false",
@@ -366,7 +366,7 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      * @return The remaining debt of the purchase
      */
     @Query(
-        "SELECT coalesce(sum(ccp.amount), 0) " +
+        "SELECT coalesce(sum(ccp.amount - ccp.paidAmount), 0) " +
             "FROM CreditCardPayment ccp " +
             "WHERE ccp.creditCardDebt.id = :debtId " +
             "AND ccp.wallet IS NULL " +
@@ -472,6 +472,21 @@ interface CreditCardPaymentRepository : JpaRepository<CreditCardPayment, Int> {
      * Get the date of the earliest payment
      * @return The date of the earliest payment
      */
+    @Query(
+        "SELECT coalesce(sum(ccp.paidAmount), 0) " +
+            "FROM CreditCardPayment ccp " +
+            "WHERE ccp.creditCardDebt.creditCard.id = :creditCardId " +
+            "AND strftime('%m', ccp.date) = printf('%02d', :month) " +
+            "AND strftime('%Y', ccp.date) = printf('%04d', :year) " +
+            "AND ccp.wallet IS NULL " +
+            "AND ccp.refunded = false",
+    )
+    fun getTotalAdvancePaidForInvoice(
+        @Param("creditCardId") creditCardId: Int,
+        @Param("month") month: Int,
+        @Param("year") year: Int,
+    ): BigDecimal
+
     @Query("SELECT min(ccp.date) FROM CreditCardPayment ccp")
     fun findEarliestPaymentDate(): LocalDateTime?
 

@@ -39,6 +39,8 @@ class CreditCardPayment(
     var creditCardDebt: CreditCardDebt,
     @Column(name = "amount", nullable = false, scale = 2)
     var amount: BigDecimal,
+    @Column(name = "paid_amount", nullable = false, scale = 2)
+    var paidAmount: BigDecimal = BigDecimal.ZERO,
     @Column(name = "rebateUsed", nullable = false, scale = 2)
     var rebateUsed: BigDecimal = BigDecimal.ZERO,
     @Column(name = "installment", nullable = false)
@@ -51,9 +53,11 @@ class CreditCardPayment(
 ) {
     init {
         amount = amount.toRounded()
+        paidAmount = paidAmount.toRounded()
         rebateUsed = rebateUsed.toRounded()
 
         require(amount > BigDecimal.ZERO) { "Amount must be greater than zero" }
+        require(paidAmount >= BigDecimal.ZERO) { "Paid amount must be greater than or equal to zero" }
         require(rebateUsed >= BigDecimal.ZERO) { "Rebate used must be greater than or equal to zero" }
         require(installment in 1..Constants.MAX_INSTALLMENTS) {
             "Installment must be between 1 and ${Constants.MAX_INSTALLMENTS}"
@@ -63,6 +67,10 @@ class CreditCardPayment(
     fun isRefunded(): Boolean = refunded
 
     fun isPaid(): Boolean = wallet != null
+
+    fun isPartiallyPaid(): Boolean = paidAmount > BigDecimal.ZERO && wallet == null
+
+    fun remainingAmount(): BigDecimal = amount - paidAmount
 
     fun hasDefaultBillingWallet(): Boolean = creditCardDebt.creditCard.defaultBillingWallet != null
 

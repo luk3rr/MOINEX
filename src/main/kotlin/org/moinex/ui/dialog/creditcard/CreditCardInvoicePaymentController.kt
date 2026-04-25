@@ -21,6 +21,7 @@ import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCard
+import org.moinex.model.dto.CreditCardInvoicePaymentDTO
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.service.CalculatorService
 import org.moinex.service.PreferencesService
@@ -58,6 +59,9 @@ class CreditCardInvoicePaymentController(
     private lateinit var crcProjectedAmountLabel: Label
 
     @FXML
+    private lateinit var alreadyPaidValueLabel: Label
+
+    @FXML
     private lateinit var walletAfterBalanceLabel: Label
 
     @FXML
@@ -71,6 +75,9 @@ class CreditCardInvoicePaymentController(
 
     @FXML
     private lateinit var useRebateValueField: TextField
+
+    @FXML
+    private lateinit var partialAmountField: TextField
 
     private var wallets: List<Wallet> = emptyList()
     private var creditCard: CreditCard? = null
@@ -97,10 +104,22 @@ class CreditCardInvoicePaymentController(
                 invoiceDate,
             )
 
-        crcInvoiceDueLabel.text = UIUtils.formatCurrency(invoiceAmount)
+        val alreadyPaid =
+            creditCardService.getTotalAdvancePaidForInvoice(
+                creditCard!!.id!!,
+                invoiceDate,
+            )
+
+        crcInvoiceDueLabel.text = UIUtils.formatCurrency(invoiceAmount + alreadyPaid)
         totalToPayLabel.text = UIUtils.formatCurrency(invoiceAmount)
         crcInvoiceMonthLabel.text = UIUtils.formatShortMonthYear(invoiceDate)
         crcAvailableRebateLabel.text = UIUtils.formatCurrency(creditCard!!.availableRebate)
+
+        if (alreadyPaid > BigDecimal.ZERO) {
+            alreadyPaidValueLabel.text = UIUtils.formatCurrency(alreadyPaid)
+        } else {
+            alreadyPaidValueLabel.text = "-"
+        }
 
         val projectedAmount =
             recurringCreditCardDebtService
@@ -147,6 +166,14 @@ class CreditCardInvoicePaymentController(
                 walletAfterBalance()
             }
         }
+
+        partialAmountField.textProperty().addListener { _, oldValue, newValue ->
+            if (!newValue.matches(Regex(Constants.MONETARY_VALUE_REGEX))) {
+                partialAmountField.text = oldValue
+            } else {
+                walletAfterBalance()
+            }
+        }
     }
 
     @FXML
@@ -166,48 +193,62 @@ class CreditCardInvoicePaymentController(
             return
         }
 
-        val invoiceAmount =
+        val remainingAmount =
             creditCardService.getTotalPendingPaymentsByCreditCardAndMonth(
                 creditCard!!.id!!,
                 invoiceDate!!,
             )
 
         val rebateValue =
-            if (useRebateValueField.text.isEmpty()) {
-                BigDecimal.ZERO
-            } else {
-                BigDecimal(useRebateValueField.text)
-            }
+            if (useRebateValueField.text.isEmpty()) BigDecimal.ZERO else BigDecimal(useRebateValueField.text)
 
-        if (invoiceAmount.isZero()) {
+        if (remainingAmount.isZero()) {
             WindowUtils.showInformationDialog(
                 preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_TITLE),
                 preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_ALREADY_PAID_MESSAGE),
             )
-        } else {
-            runCatching {
-                creditCardService.payInvoice(
-                    creditCard!!.id!!,
-                    wallet.id!!,
-                    invoiceDate!!,
-                    rebateValue,
-                )
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE),
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE),
-                )
-
-                (crcNameLabel.scene.window as Stage).close()
-            }.onFailure { e ->
-                WindowUtils.showErrorDialog(
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE),
-                    e.message ?: "Unknown error",
-                )
-            }
+            return
         }
 
-        (crcNameLabel.scene.window as Stage).close()
+        val isPartial = partialAmountField.text.isNotEmpty()
+
+        val amountToPay =
+            if (isPartial) BigDecimal(partialAmountField.text) else remainingAmount
+
+        val successTitle =
+            if (isPartial) {
+                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_TITLE)
+            } else {
+                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE)
+            }
+
+        val successMessage =
+            if (isPartial) {
+                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_MESSAGE)
+            } else {
+                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE)
+            }
+
+        runCatching {
+            creditCardService.payInvoice(
+                CreditCardInvoicePaymentDTO(
+                    creditCardId = creditCard!!.id!!,
+                    billingWalletId = wallet.id!!,
+                    invoiceDate = invoiceDate!!,
+                    amount = amountToPay,
+                    rebate = rebateValue,
+                ),
+            )
+
+            WindowUtils.showSuccessDialog(successTitle, successMessage)
+
+            (crcNameLabel.scene.window as Stage).close()
+        }.onFailure { e ->
+            WindowUtils.showErrorDialog(
+                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE),
+                e.message ?: "Unknown error",
+            )
+        }
     }
 
     @FXML
@@ -221,6 +262,17 @@ class CreditCardInvoicePaymentController(
         )
     }
 
+    @FXML
+    private fun handleOpenPartialCalculator() {
+        WindowUtils.openPopupWindow(
+            Files.CALCULATOR_FXML,
+            preferencesService.translate(TranslationKeys.MAIN_CALCULATOR),
+            springContext,
+            { _: CalculatorController -> },
+            listOf(Runnable { calculatorService.updateComponentWithResult(partialAmountField) }),
+        )
+    }
+
     private fun walletAfterBalance() {
         val wallet = walletComboBox.value
 
@@ -230,27 +282,22 @@ class CreditCardInvoicePaymentController(
         }
 
         val rebateValue =
-            if (useRebateValueField.text.isEmpty()) {
-                BigDecimal.ZERO
+            if (useRebateValueField.text.isEmpty()) BigDecimal.ZERO else BigDecimal(useRebateValueField.text)
+
+        val amountToPay =
+            if (partialAmountField.text.isNotEmpty()) {
+                BigDecimal(partialAmountField.text).subtract(rebateValue).coerceAtLeast(BigDecimal.ZERO)
             } else {
-                BigDecimal(useRebateValueField.text)
+                creditCardService
+                    .getTotalPendingPaymentsByCreditCardAndMonth(creditCard!!.id!!, invoiceDate!!)
+                    .subtract(rebateValue)
+                    .coerceAtLeast(BigDecimal.ZERO)
             }
 
-        var invoiceAmount =
-            creditCardService
-                .getTotalPendingPaymentsByCreditCardAndMonth(
-                    creditCard!!.id!!,
-                    invoiceDate!!,
-                ).subtract(rebateValue)
-
-        if (invoiceAmount < BigDecimal.ZERO) {
-            invoiceAmount = BigDecimal.ZERO
-        }
-
-        totalToPayLabel.text = UIUtils.formatCurrency(invoiceAmount)
+        totalToPayLabel.text = UIUtils.formatCurrency(amountToPay)
 
         runCatching {
-            val walletAfterBalanceValue = wallet.balance.subtract(invoiceAmount)
+            val walletAfterBalanceValue = wallet.balance.subtract(amountToPay)
 
             if (walletAfterBalanceValue < BigDecimal.ZERO) {
                 UIUtils.setLabelStyle(walletAfterBalanceLabel, Styles.NEGATIVE_BALANCE_STYLE)

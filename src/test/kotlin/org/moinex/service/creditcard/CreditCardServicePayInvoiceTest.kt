@@ -12,13 +12,13 @@ import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.creditcard.CreditCardOperatorFactory
 import org.moinex.factory.creditcard.CreditCardPaymentFactory
 import org.moinex.factory.wallet.WalletFactory
+import org.moinex.model.dto.CreditCardInvoicePaymentDTO
 import org.moinex.repository.creditcard.CreditCardCreditRepository
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardOperatorRepository
 import org.moinex.repository.creditcard.CreditCardPaymentRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.wallettransaction.WalletRepository
-import org.moinex.service.creditcard.CreditCardService
 import java.math.BigDecimal
 import java.time.YearMonth
 import java.util.Optional
@@ -76,7 +76,15 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(1, 3, 2026)
                 } returns listOf(payment1, payment2)
 
-                service.payInvoice(1, 1, invoiceDate, BigDecimal.ZERO)
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 1,
+                        billingWalletId = 1,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("300.00"),
+                        rebate = BigDecimal.ZERO,
+                    ),
+                )
 
                 Then("should deduct total payment amount from wallet balance") {
                     wallet.balance shouldBe BigDecimal("4700.00")
@@ -89,6 +97,11 @@ class CreditCardServicePayInvoiceTest :
                 Then("should set wallet for all payments") {
                     payment1.wallet shouldBe wallet
                     payment2.wallet shouldBe wallet
+                }
+
+                Then("should set paidAmount equal to amount for all payments") {
+                    payment1.paidAmount shouldBe payment1.amount
+                    payment2.paidAmount shouldBe payment2.amount
                 }
 
                 Then("should set rebateUsed to zero for all payments") {
@@ -130,7 +143,15 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(2, 3, 2026)
                 } returns listOf(payment1, payment2)
 
-                service.payInvoice(2, 2, invoiceDate, BigDecimal("50.00"))
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 2,
+                        billingWalletId = 2,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("200.00"),
+                        rebate = BigDecimal("50.00"),
+                    ),
+                )
 
                 Then("should deduct total payment minus rebate from wallet") {
                     wallet.balance shouldBe BigDecimal("2850.00")
@@ -180,7 +201,15 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(3, 3, 2026)
                 } returns listOf(payment1, payment2)
 
-                service.payInvoice(3, 3, invoiceDate, BigDecimal("300.00"))
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 3,
+                        billingWalletId = 3,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("200.00"),
+                        rebate = BigDecimal("300.00"),
+                    ),
+                )
 
                 Then("should not deduct anything from wallet") {
                     wallet.balance.compareTo(BigDecimal("2000.00")) shouldBe 0
@@ -224,7 +253,15 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(4, 3, 2026)
                 } returns listOf(payment)
 
-                service.payInvoice(4, 4, invoiceDate, BigDecimal("50.00"))
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 4,
+                        billingWalletId = 4,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("250.00"),
+                        rebate = BigDecimal("50.00"),
+                    ),
+                )
 
                 Then("should deduct total payment minus rebate from wallet") {
                     wallet.balance.compareTo(BigDecimal("800.00")) shouldBe 0
@@ -248,7 +285,14 @@ class CreditCardServicePayInvoiceTest :
 
                 Then("should throw EntityNotFoundException") {
                     shouldThrow<Exception> {
-                        service.payInvoice(999, 1, invoiceDate)
+                        service.payInvoice(
+                            CreditCardInvoicePaymentDTO(
+                                creditCardId = 999,
+                                billingWalletId = 1,
+                                invoiceDate = invoiceDate,
+                                amount = BigDecimal("100.00"),
+                            ),
+                        )
                     }
                 }
             }
@@ -271,31 +315,32 @@ class CreditCardServicePayInvoiceTest :
 
                 Then("should throw EntityNotFoundException") {
                     shouldThrow<Exception> {
-                        service.payInvoice(5, 999, invoiceDate)
+                        service.payInvoice(
+                            CreditCardInvoicePaymentDTO(
+                                creditCardId = 5,
+                                billingWalletId = 999,
+                                invoiceDate = invoiceDate,
+                                amount = BigDecimal("100.00"),
+                            ),
+                        )
                     }
                 }
             }
         }
 
         Given("a credit card with negative rebate") {
-            val operator = CreditCardOperatorFactory.create(id = 1, name = "Visa")
-            val creditCard =
-                CreditCardFactory.create(
-                    id = 6,
-                    name = "Test Card 6",
-                    operator = operator,
-                    availableRebate = BigDecimal("100.00"),
-                )
-            val wallet = WalletFactory.create(id = 5, name = "Billing Wallet", balance = BigDecimal("1000.00"))
             val invoiceDate = YearMonth.of(2026, 3)
 
             When("paying invoice with negative rebate") {
-                every { creditCardRepository.findById(6) } returns Optional.of(creditCard)
-                every { walletRepository.findById(5) } returns Optional.of(wallet)
-
-                Then("should throw IllegalStateException") {
-                    shouldThrow<IllegalStateException> {
-                        service.payInvoice(6, 5, invoiceDate, BigDecimal("-50.00"))
+                Then("should throw IllegalArgumentException") {
+                    shouldThrow<IllegalArgumentException> {
+                        CreditCardInvoicePaymentDTO(
+                            creditCardId = 6,
+                            billingWalletId = 5,
+                            invoiceDate = invoiceDate,
+                            amount = BigDecimal("100.00"),
+                            rebate = BigDecimal("-50.00"),
+                        )
                     }
                 }
             }
@@ -319,7 +364,15 @@ class CreditCardServicePayInvoiceTest :
 
                 Then("should throw IllegalStateException") {
                     shouldThrow<IllegalStateException> {
-                        service.payInvoice(7, 6, invoiceDate, BigDecimal("50.00"))
+                        service.payInvoice(
+                            CreditCardInvoicePaymentDTO(
+                                creditCardId = 7,
+                                billingWalletId = 6,
+                                invoiceDate = invoiceDate,
+                                amount = BigDecimal("100.00"),
+                                rebate = BigDecimal("50.00"),
+                            ),
+                        )
                     }
                 }
             }
@@ -357,7 +410,15 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(8, 3, 2026)
                 } returns listOf(payment1, payment2)
 
-                service.payInvoice(8, 7, invoiceDate, BigDecimal("50.00"))
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 8,
+                        billingWalletId = 7,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("500.00"),
+                        rebate = BigDecimal("50.00"),
+                    ),
+                )
 
                 Then("should distribute rebate proportionally") {
                     payment1.rebateUsed.compareTo(BigDecimal("15.00")) shouldBe 0
@@ -413,7 +474,15 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(9, 3, 2026)
                 } returns listOf(payment1, payment2, payment3)
 
-                service.payInvoice(9, 8, invoiceDate, BigDecimal("60.00"))
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 9,
+                        billingWalletId = 8,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("300.00"),
+                        rebate = BigDecimal("60.00"),
+                    ),
+                )
 
                 Then("should distribute rebate to all payments") {
                     payment1.rebateUsed.compareTo(BigDecimal("19.80")) shouldBe 0
@@ -421,8 +490,7 @@ class CreditCardServicePayInvoiceTest :
                     payment3.rebateUsed.compareTo(BigDecimal("20.40")) shouldBe 0
                     (payment1.rebateUsed + payment2.rebateUsed + payment3.rebateUsed).compareTo(
                         BigDecimal("60.00"),
-                    ) shouldBe
-                        0
+                    ) shouldBe 0
                 }
 
                 Then("should set wallet for all payments") {
@@ -456,14 +524,76 @@ class CreditCardServicePayInvoiceTest :
                     creditCardPaymentRepository.getPendingCreditCardPayments(10, 3, 2026)
                 } returns emptyList()
 
-                service.payInvoice(10, 9, invoiceDate, BigDecimal.ZERO)
+                Then("should throw IllegalStateException") {
+                    shouldThrow<IllegalStateException> {
+                        service.payInvoice(
+                            CreditCardInvoicePaymentDTO(
+                                creditCardId = 10,
+                                billingWalletId = 9,
+                                invoiceDate = invoiceDate,
+                                amount = BigDecimal("100.00"),
+                            ),
+                        )
+                    }
+                }
+            }
+        }
 
-                Then("should not change wallet balance") {
-                    wallet.balance.compareTo(BigDecimal("5000.00")) shouldBe 0
+        Given("a credit card with pending payments that have prior partial payments") {
+            val operator = CreditCardOperatorFactory.create(id = 1, name = "Visa")
+            val creditCard =
+                CreditCardFactory.create(
+                    id = 11,
+                    name = "Test Card 11",
+                    operator = operator,
+                    availableRebate = BigDecimal("100.00"),
+                )
+            val wallet = WalletFactory.create(id = 10, name = "Billing Wallet", balance = BigDecimal("5000.00"))
+            val invoiceDate = YearMonth.of(2026, 3)
+
+            val payment1 =
+                CreditCardPaymentFactory.create(
+                    id = 13,
+                    amount = BigDecimal("200.00"),
+                    paidAmount = BigDecimal("50.00"),
+                    rebateUsed = BigDecimal.ZERO,
+                )
+            val payment2 =
+                CreditCardPaymentFactory.create(
+                    id = 14,
+                    amount = BigDecimal("200.00"),
+                    paidAmount = BigDecimal("50.00"),
+                    rebateUsed = BigDecimal.ZERO,
+                )
+
+            When("paying the remaining invoice after prior partial payments") {
+                every { creditCardRepository.findById(11) } returns Optional.of(creditCard)
+                every { walletRepository.findById(10) } returns Optional.of(wallet)
+                every {
+                    creditCardPaymentRepository.getPendingCreditCardPayments(11, 3, 2026)
+                } returns listOf(payment1, payment2)
+
+                service.payInvoice(
+                    CreditCardInvoicePaymentDTO(
+                        creditCardId = 11,
+                        billingWalletId = 10,
+                        invoiceDate = invoiceDate,
+                        amount = BigDecimal("300.00"),
+                    ),
+                )
+
+                Then("should only deduct the remaining amount from wallet") {
+                    wallet.balance.compareTo(BigDecimal("4700.00")) shouldBe 0
                 }
 
-                Then("should not change available rebate") {
-                    creditCard.availableRebate.compareTo(BigDecimal("100.00")) shouldBe 0
+                Then("should set paidAmount equal to amount for all payments") {
+                    payment1.paidAmount.compareTo(BigDecimal("200.00")) shouldBe 0
+                    payment2.paidAmount.compareTo(BigDecimal("200.00")) shouldBe 0
+                }
+
+                Then("should set wallet on all payments") {
+                    payment1.wallet shouldBe wallet
+                    payment2.wallet shouldBe wallet
                 }
             }
         }

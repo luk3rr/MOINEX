@@ -8,8 +8,10 @@ import org.moinex.model.creditcard.CreditCardCredit
 import org.moinex.model.creditcard.CreditCardDebt
 import org.moinex.model.creditcard.CreditCardPayment
 import org.moinex.model.dto.CreditCardInstallmentCalculationDTO
+import org.moinex.model.dto.CreditCardInvoicePaymentDTO
 import org.moinex.model.enums.CreditCardCreditType
 import org.moinex.model.enums.CreditCardInvoiceStatus
+import org.moinex.model.wallettransaction.Wallet
 import org.moinex.repository.creditcard.CreditCardCreditRepository
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardOperatorRepository
@@ -254,13 +256,26 @@ class CreditCardService(
 
         val nextInvoiceDate = getNextInvoiceDate(debtFromDatabase.creditCard)
 
+        val defaultWallet = debtFromDatabase.creditCard.defaultBillingWallet
+
         val totalToRefund =
             payments.fold(BigDecimal.ZERO) { acc, payment ->
                 if (!payment.isPaid()) payment.date = nextInvoiceDate
 
                 payment.refunded = true
 
-                if (payment.isPaid()) acc.plus(payment.amount) else acc
+                when {
+                    payment.isPaid() -> acc.plus(payment.amount)
+                    payment.paidAmount > BigDecimal.ZERO -> {
+                        checkNotNull(defaultWallet) {
+                            "Credit card has no default billing wallet configured."
+                        }
+                        defaultWallet.balance += payment.paidAmount
+                        payment.paidAmount = BigDecimal.ZERO
+                        acc
+                    }
+                    else -> acc
+                }
             }
 
         if (totalToRefund > BigDecimal.ZERO) {
@@ -279,66 +294,107 @@ class CreditCardService(
     }
 
     @Transactional
-    fun payInvoice(
-        creditCardId: Int,
-        billingWalletId: Int,
-        invoiceDate: YearMonth,
-        rebate: BigDecimal = BigDecimal.ZERO,
-    ) {
-        val creditCardFromDatabase = creditCardRepository.findByIdOrThrow(creditCardId)
+    fun payInvoice(payment: CreditCardInvoicePaymentDTO) {
+        val creditCard = creditCardRepository.findByIdOrThrow(payment.creditCardId)
+        val wallet = walletRepository.findByIdOrThrow(payment.billingWalletId)
 
-        val walletFromDatabase = walletRepository.findByIdOrThrow(billingWalletId)
-
-        check(rebate >= BigDecimal.ZERO) {
-            "Rebate cannot be negative"
-        }
-
-        check(creditCardFromDatabase.availableRebate >= rebate) {
-            "Insufficient available rebate"
-        }
+        check(creditCard.availableRebate >= payment.rebate) { "Rebate exceeds available rebate" }
 
         val pendingPayments =
             creditCardPaymentRepository
                 .getPendingCreditCardPayments(
-                    creditCardId,
-                    invoiceDate.monthValue,
-                    invoiceDate.year,
+                    payment.creditCardId,
+                    payment.invoiceDate.monthValue,
+                    payment.invoiceDate.year,
                 ).toList()
 
-        val totalPendingPayments = pendingPayments.sumOf { it.amount }
+        val totalRemaining = pendingPayments.sumOf { it.remainingAmount() }
 
-        var totalToPay = totalPendingPayments.minus(rebate)
+        check(totalRemaining > BigDecimal.ZERO) { "Invoice is already paid" }
 
-        var effectiveRebate = rebate
+        val isPartial = payment.amount < totalRemaining
 
-        if (totalToPay < BigDecimal.ZERO) {
-            totalToPay = BigDecimal.ZERO
-            effectiveRebate = totalPendingPayments
+        val amountToDistribute: BigDecimal
+        val effectiveRebate: BigDecimal
+        val effectiveAmount: BigDecimal
+
+        if (isPartial) {
+            effectiveRebate = payment.rebate
+            amountToDistribute = payment.amount
+            effectiveAmount = payment.amount - effectiveRebate
+            check(effectiveAmount > BigDecimal.ZERO) {
+                "Rebate cannot be greater than or equal to the partial payment amount"
+            }
+        } else {
+            effectiveRebate = payment.rebate.min(totalRemaining)
+            amountToDistribute = totalRemaining
+            effectiveAmount = (totalRemaining - effectiveRebate).coerceAtLeast(BigDecimal.ZERO)
         }
 
-        var totalRebateUsed = BigDecimal.ZERO
+        check(wallet.balance >= effectiveAmount) { "Insufficient wallet balance" }
+
+        distributePayment(
+            pendingPayments = pendingPayments,
+            totalRemaining = totalRemaining,
+            amountToDistribute = amountToDistribute,
+            effectiveRebate = effectiveRebate,
+            billingWallet = if (isPartial) null else wallet,
+        )
+
+        wallet.balance -= effectiveAmount
+        creditCard.availableRebate -= effectiveRebate
+
+        if (isPartial) {
+            logger.info(
+                "Partial payment of {} applied to invoice {} from credit card {}",
+                amountToDistribute,
+                payment.invoiceDate,
+                creditCard,
+            )
+        } else {
+            logger.info("Invoice {} from credit card {} paid successfully", payment.invoiceDate, creditCard)
+        }
+    }
+
+    private fun distributePayment(
+        pendingPayments: List<CreditCardPayment>,
+        totalRemaining: BigDecimal,
+        amountToDistribute: BigDecimal,
+        effectiveRebate: BigDecimal,
+        billingWallet: Wallet?,
+    ) {
+        var remainingToDistribute = amountToDistribute
         var remainingRebate = effectiveRebate
 
-        pendingPayments.forEach { payment ->
-            val rebateForThisPayment =
-                if (payment.id == pendingPayments.last().id) {
-                    remainingRebate
+        pendingPayments.forEach { p ->
+            val remaining = p.remainingAmount()
+            val fraction = remaining.divide(totalRemaining, 2, RoundingMode.HALF_UP)
+
+            val partialForThisPayment =
+                if (p.id == pendingPayments.last().id) {
+                    remainingToDistribute
                 } else {
-                    payment.amount.divide(totalPendingPayments, 2, RoundingMode.HALF_UP).multiply(effectiveRebate)
+                    amountToDistribute.multiply(fraction).setScale(2, RoundingMode.HALF_UP)
                 }
 
-            payment.rebateUsed = rebateForThisPayment
-            payment.wallet = walletFromDatabase
+            val rebateForThisPayment =
+                if (p.id == pendingPayments.last().id) {
+                    remainingRebate
+                } else {
+                    effectiveRebate.multiply(fraction).setScale(2, RoundingMode.HALF_UP)
+                }
 
-            totalRebateUsed += rebateForThisPayment
+            p.paidAmount += partialForThisPayment
+            p.rebateUsed += rebateForThisPayment
+
+            if (billingWallet != null) {
+                p.wallet = billingWallet
+                p.paidAmount = p.amount
+            }
+
+            remainingToDistribute -= partialForThisPayment
             remainingRebate -= rebateForThisPayment
         }
-
-        walletFromDatabase.balance -= totalToPay
-
-        creditCardFromDatabase.availableRebate -= totalRebateUsed
-
-        logger.info("Invoice {} from credit card {} paid successfully", invoiceDate, creditCardFromDatabase)
     }
 
     @Transactional
@@ -504,6 +560,15 @@ class CreditCardService(
         yearMonth: YearMonth,
     ) = creditCardPaymentRepository.getInvoiceAmount(creditCardId, yearMonth.monthValue, yearMonth.year)
 
+    fun getTotalAdvancePaidForInvoice(
+        creditCardId: Int,
+        yearMonth: YearMonth,
+    ) = creditCardPaymentRepository.getTotalAdvancePaidForInvoice(
+        creditCardId,
+        yearMonth.monthValue,
+        yearMonth.year,
+    )
+
     fun getInvoiceStatus(
         creditCardId: Int,
         yearMonth: YearMonth,
@@ -567,11 +632,21 @@ class CreditCardService(
     }
 
     private fun refundPayment(payment: CreditCardPayment) {
-        payment.wallet?.let { wallet ->
-            wallet.balance += payment.amount
-            logger.info("${payment.wallet} balance updated to ${wallet.balance} for payment $payment")
-        } ?: run {
-            logger.info("$payment is not paid")
+        when {
+            payment.wallet != null -> {
+                payment.wallet!!.balance += payment.amount
+                logger.info("${payment.wallet} balance updated to ${payment.wallet!!.balance} for payment $payment")
+            }
+            payment.paidAmount > BigDecimal.ZERO -> {
+                val defaultWallet = payment.creditCardDebt.creditCard.defaultBillingWallet
+                checkNotNull(defaultWallet) {
+                    "Credit card '${payment.creditCardDebt.creditCard.name}' has no default billing wallet configured."
+                }
+                defaultWallet.balance += payment.paidAmount
+                payment.paidAmount = BigDecimal.ZERO
+                logger.info("Partial payment of ${payment.paidAmount} returned to $defaultWallet for $payment")
+            }
+            else -> logger.info("$payment is not paid")
         }
     }
 
@@ -629,17 +704,27 @@ class CreditCardService(
                     else -> installmentValue
                 }
 
-            payment.wallet?.let { wallet ->
-                val diff = currentInstallmentValue.minus(payment.amount)
-                wallet.balance += diff
-
-                logger.info(
-                    "Payment number {} of debt {} on credit card {} updated and added to wallet {}",
-                    payment.installment,
-                    debt.id,
-                    debt.creditCard.id,
-                    wallet.id,
-                )
+            when {
+                payment.wallet != null -> {
+                    val diff = currentInstallmentValue.minus(payment.amount)
+                    payment.wallet!!.balance += diff
+                    logger.info(
+                        "Payment number {} of debt {} on credit card {} updated and added to wallet {}",
+                        payment.installment,
+                        debt.id,
+                        debt.creditCard.id,
+                        payment.wallet!!.id,
+                    )
+                }
+                payment.paidAmount > BigDecimal.ZERO && currentInstallmentValue < payment.paidAmount -> {
+                    val excess = payment.paidAmount - currentInstallmentValue
+                    val defaultWallet = payment.creditCardDebt.creditCard.defaultBillingWallet
+                    checkNotNull(defaultWallet) {
+                        "Credit card has no default billing wallet configured."
+                    }
+                    defaultWallet.balance += excess
+                    payment.paidAmount = currentInstallmentValue
+                }
             }
 
             payment.amount = currentInstallmentValue

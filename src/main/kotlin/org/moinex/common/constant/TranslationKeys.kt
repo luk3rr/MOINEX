@@ -1113,6 +1113,8 @@ object TranslationKeys {
         "creditcard.dialog.invoiceAlreadyPaid.message"
     const val CREDITCARD_DIALOG_INVOICE_PAID_TITLE: String = "creditcard.dialog.invoicePaid.title"
     const val CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE: String = "creditcard.dialog.invoicePaid.message"
+    const val CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_TITLE: String = "creditcard.dialog.partialInvoicePaid.title"
+    const val CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_MESSAGE: String = "creditcard.dialog.partialInvoicePaid.message"
     const val CREDITCARD_DIALOG_ERROR_PAYING_INVOICE_TITLE: String = "creditcard.dialog.errorPayingInvoice.title"
 
     // Credit Card Table Columns
@@ -1155,6 +1157,9 @@ object TranslationKeys {
     const val CREDITCARD_LABEL_AVAILABLE_REBATE: String = "creditcard.label.availableRebate"
     const val CREDITCARD_LABEL_USE_REBATE: String = "creditcard.label.useRebate"
     const val CREDITCARD_LABEL_TOTAL_TO_PAY: String = "creditcard.label.totalToPay"
+    const val CREDITCARD_LABEL_ALREADY_PAID: String = "creditcard.label.alreadyPaid"
+    const val CREDITCARD_LABEL_PARTIAL_PAYMENT: String = "creditcard.label.partialPayment"
+    const val CREDITCARD_LABEL_PARTIAL_AMOUNT: String = "creditcard.label.partialAmount"
     const val CREDITCARD_LABEL_SELECT_CREDIT_CARD: String = "creditcard.label.selectCreditCard"
     const val CREDITCARD_LABEL_SELECT_CREDIT_CARD_CREDIT: String = "creditcard.label.selectCreditCardCredit"
     const val CREDITCARD_LABEL_PROJECTED_AMOUNT: String = "creditcard.label.projectedAmount"
