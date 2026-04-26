@@ -254,7 +254,11 @@ class FIRECalculatorController(
         projectionChart.data.addAll(patrimonySeries, targetSeries)
 
         chartTooltipData = yearlyPoints.mapValues { (_, patrimony) -> patrimony to result.fireTarget }
-        FxUtils.launchOnFxThread { reapplyTooltips() }
+        FxUtils.launchOnFxThread {
+            projectionChart.applyCss()
+            projectionChart.layout()
+            reapplyTooltips()
+        }
     }
 
     private fun reapplyTooltips() {
