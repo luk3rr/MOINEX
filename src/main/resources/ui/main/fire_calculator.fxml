@@ -5,6 +5,7 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -151,7 +152,12 @@
             <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
                <children>
                   <Label styleClass="title" text="%fire.chart.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                  <LineChart fx:id="projectionChart" animated="false" createSymbols="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
+                  <HBox spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                     <children>
+                        <ComboBox fx:id="chartYearsComboBox" stylesheets="@../../css/component/combo-box.css" />
+                     </children>
+                  </HBox>
+                  <LineChart fx:id="projectionChart" animated="false" createSymbols="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="50.0">
                      <xAxis>
                         <CategoryAxis fx:id="xAxis" />
                      </xAxis>

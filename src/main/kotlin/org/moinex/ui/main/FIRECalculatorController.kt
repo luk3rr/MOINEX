@@ -6,6 +6,7 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
+import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import org.moinex.common.constant.Constants
@@ -70,11 +71,18 @@ class FIRECalculatorController(
     @FXML
     private lateinit var yAxis: NumberAxis
 
+    @FXML
+    private lateinit var chartYearsComboBox: ComboBox<Int>
+
+    private var lastResult: FIREProjectionResultDTO? = null
+    private var suppressChartYearsAction = false
+
     // Stores year -> (patrimony, fireTarget) for tooltip reapplication after resize
     private var chartTooltipData: Map<String, Pair<BigDecimal, BigDecimal>> = emptyMap()
 
     companion object {
         private val logger = LoggerFactory.getLogger(FIRECalculatorController::class.java)
+        private val CHART_YEAR_PRESETS = listOf(10, 15, 20, 25, 30, 35, 40, 45, 50)
     }
 
     @FXML
@@ -108,6 +116,7 @@ class FIRECalculatorController(
         runCatching {
             val result = fireCalculatorService.calculate(settings)
             updateResultCards(result)
+            setDefaultChartYears(result)
             updateChart(result)
         }.onFailure { e ->
             logger.error("Error calculating FIRE projection: {}", e.message, e)
@@ -193,10 +202,29 @@ class FIRECalculatorController(
         ageAtFireLabel.text = result.ageAtFire?.toString() ?: "-"
     }
 
+    private fun setDefaultChartYears(result: FIREProjectionResultDTO) {
+        val defaultYears =
+            when (val monthsToFire = result.monthsToFire) {
+                null -> CHART_YEAR_PRESETS.last()
+                0 -> CHART_YEAR_PRESETS.first()
+                else -> {
+                    val yearsNeeded = (monthsToFire + Constants.YEAR_MONTHS - 1) / Constants.YEAR_MONTHS
+                    CHART_YEAR_PRESETS.firstOrNull { it >= yearsNeeded } ?: CHART_YEAR_PRESETS.last()
+                }
+            }
+        suppressChartYearsAction = true
+        chartYearsComboBox.value = defaultYears
+        suppressChartYearsAction = false
+    }
+
     private fun updateChart(result: FIREProjectionResultDTO) {
+        lastResult = result
         projectionChart.data.clear()
 
         if (result.dataPoints.isEmpty()) return
+
+        val yearsLimit = chartYearsComboBox.value ?: CHART_YEAR_PRESETS.last()
+        val monthsLimit = yearsLimit * Constants.YEAR_MONTHS
 
         val patrimonyLabel = preferencesService.translate(TranslationKeys.FIRE_CHART_SERIES_PATRIMONY)
         val targetLabel = preferencesService.translate(TranslationKeys.FIRE_CHART_SERIES_TARGET)
@@ -208,10 +236,12 @@ class FIRECalculatorController(
         targetSeries.name = targetLabel
 
         val today = LocalDate.now()
+        val filteredPoints = result.dataPoints.filter { (month, _) -> month <= monthsLimit }
         val yearlyPoints =
-            result.dataPoints
-                .filter { (month, _) -> month % Constants.YEAR_MONTHS == 0 || month == result.dataPoints.last().first }
-                .associate { (month, value) ->
+            filteredPoints
+                .filter { (month, _) ->
+                    month % Constants.YEAR_MONTHS == 0 || month == filteredPoints.lastOrNull()?.first
+                }.associate { (month, value) ->
                     val year = today.plusMonths(month.toLong()).year
                     year.toString() to value
                 }
@@ -224,16 +254,6 @@ class FIRECalculatorController(
         projectionChart.data.addAll(patrimonySeries, targetSeries)
 
         chartTooltipData = yearlyPoints.mapValues { (_, patrimony) -> patrimony to result.fireTarget }
-        addTooltipsToChart()
-    }
-
-    private fun addTooltipsToChart() {
-        projectionChart.widthProperty().addListener { _, _, _ ->
-            FxUtils.launchOnFxThread { reapplyTooltips() }
-        }
-        projectionChart.heightProperty().addListener { _, _, _ ->
-            FxUtils.launchOnFxThread { reapplyTooltips() }
-        }
         FxUtils.launchOnFxThread { reapplyTooltips() }
     }
 
@@ -256,6 +276,13 @@ class FIRECalculatorController(
         projectionChart.isLegendVisible = true
         projectionChart.animated = false
         projectionChart.createSymbols = false
+
+        projectionChart.widthProperty().addListener { _, _, _ ->
+            FxUtils.launchOnFxThread { reapplyTooltips() }
+        }
+        projectionChart.heightProperty().addListener { _, _, _ ->
+            FxUtils.launchOnFxThread { reapplyTooltips() }
+        }
     }
 
     private fun configureListeners() {
@@ -268,5 +295,18 @@ class FIRECalculatorController(
         }
 
         UIUtils.configureTextFieldListener(currentAgeField, Constants.DIGITS_ONLY_REGEX)
+
+        UIUtils.configureComboBox(chartYearsComboBox) { years ->
+            MessageFormat.format(
+                preferencesService.translate(TranslationKeys.FIRE_CHART_YEARS_OPTION),
+                years,
+            )
+        }
+        chartYearsComboBox.items.setAll(CHART_YEAR_PRESETS)
+        chartYearsComboBox.setOnAction {
+            if (!suppressChartYearsAction) {
+                lastResult?.let { updateChart(it) }
+            }
+        }
     }
 }

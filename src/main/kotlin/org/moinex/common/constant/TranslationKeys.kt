@@ -1883,4 +1883,5 @@ object TranslationKeys {
     const val FIRE_CHART_TITLE: String = "fire.chart.title"
     const val FIRE_CHART_SERIES_PATRIMONY: String = "fire.chart.series.patrimony"
     const val FIRE_CHART_SERIES_TARGET: String = "fire.chart.series.target"
+    const val FIRE_CHART_YEARS_OPTION: String = "fire.chart.yearsOption"
 }
