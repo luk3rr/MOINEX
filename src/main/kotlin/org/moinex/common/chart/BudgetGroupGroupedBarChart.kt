@@ -26,13 +26,14 @@ class BudgetGroupGroupedBarChart : BarChart<String, Number>(CategoryAxis(), Numb
 
     companion object {
         private const val BUDGET_TARGET_MARKER_STYLE = "budget-target-marker"
+        private const val MIN_BAR_WIDTH = 1.0
     }
 
     init {
         isLegendVisible = true
         animated = false
-        barGap = 1.0
-        categoryGap = 15.0
+        barGap = 2.0
+        categoryGap = 20.0
 
         (yAxis as NumberAxis).apply {
             isAutoRanging = true
@@ -52,24 +53,46 @@ class BudgetGroupGroupedBarChart : BarChart<String, Number>(CategoryAxis(), Numb
         plotChildren.removeAll(targetLines.toSet())
         targetLines.clear()
 
+        val catAxis = xAxis as CategoryAxis
         val numAxis = yAxis as NumberAxis
 
-        data.forEach { series ->
-            series.data.forEach { dataPoint ->
-                val barNode = dataPoint.node ?: return@forEach
+        val maxN =
+            catAxis.categories
+                .maxOfOrNull { category ->
+                    data.count { series -> series.data.any { it.xValue == category && it.node != null } }
+                }?.coerceAtLeast(1) ?: 1
 
-                tooltipByDataPoint[dataPoint]?.let { UIUtils.addTooltipToNode(barNode, it) }
+        val availableSpace = catAxis.categorySpacing - categoryGap
+        val uniformBarWidth = ((availableSpace - (maxN - 1) * barGap) / maxN).coerceAtLeast(MIN_BAR_WIDTH)
 
-                val target = targetByDataPoint[dataPoint] ?: return@forEach
-                val bounds = barNode.boundsInParent
-                if (bounds.width <= 0) return@forEach
+        catAxis.categories.forEach { category ->
+            val present =
+                data.mapNotNull { series ->
+                    series.data.firstOrNull { it.xValue == category && it.node != null }
+                }
 
+            if (present.isEmpty()) return@forEach
+
+            val n = present.size
+            val catCenter = catAxis.getDisplayPosition(category)
+            val totalWidth = n * uniformBarWidth + (n - 1) * barGap
+            val startX = catCenter - totalWidth / 2.0
+
+            present.forEachIndexed { i, dataPoint ->
+                val node = dataPoint.node ?: return@forEachIndexed
+
+                val barX = startX + i * (uniformBarWidth + barGap)
+                node.layoutX = barX
+                node.resize(uniformBarWidth, node.layoutBounds.height)
+
+                tooltipByDataPoint[dataPoint]?.let { UIUtils.addTooltipToNode(node, it) }
+
+                val target = targetByDataPoint[dataPoint] ?: return@forEachIndexed
                 val yPos = numAxis.getDisplayPosition(target)
                 val line =
-                    Line(bounds.minX - 1, yPos, bounds.maxX + 1, yPos).apply {
+                    Line(barX - 1, yPos, barX + uniformBarWidth + 1, yPos).apply {
                         styleClass.add(BUDGET_TARGET_MARKER_STYLE)
                     }
-
                 targetLines.add(line)
                 plotChildren.add(line)
             }
