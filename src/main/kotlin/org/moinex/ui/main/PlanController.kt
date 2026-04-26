@@ -86,7 +86,7 @@ class PlanController(
     companion object {
         private val logger = LoggerFactory.getLogger(PlanController::class.java)
         private const val ITEMS_PER_PAGE = 3
-        private const val HISTORICAL_DATA_MONTHS = 12
+        private const val HISTORICAL_DATA_MONTHS = 6
     }
 
     @FXML
@@ -329,20 +329,14 @@ class PlanController(
                 currentPeriod,
             )
 
-        val timelineChart =
-            chartFactory.createBudgetGroupTimelineChart().apply {
-                setXAxisLabel(
-                    this@PlanController.preferencesService.translate(TranslationKeys.PLAN_TIMELINE_X_AXIS),
-                )
-                setYAxisLabel(
-                    this@PlanController.preferencesService.translate(TranslationKeys.PLAN_TIMELINE_Y_AXIS),
-                )
+        val chart =
+            chartFactory.createBudgetGroupGroupedBarChart().apply {
                 updateData(historicalData)
             }
 
-        UIUtils.applyDefaultChartStyle(timelineChart)
+        UIUtils.applyDefaultChartStyle(chart)
 
-        timelineChartAnchorPane.children.setAll(timelineChart)
-        timelineChart.setAnchorPaneConstraints()
+        timelineChartAnchorPane.children.setAll(chart)
+        chart.setAnchorPaneConstraints()
     }
 }

@@ -22,6 +22,11 @@ class ChartFactory(
             this.preferencesService = this@ChartFactory.preferencesService
         }
 
+    fun createBudgetGroupGroupedBarChart(): BudgetGroupGroupedBarChart =
+        BudgetGroupGroupedBarChart().apply {
+            this.preferencesService = this@ChartFactory.preferencesService
+        }
+
     fun createCircularProgressBar(
         radius: Double,
         width: Double,

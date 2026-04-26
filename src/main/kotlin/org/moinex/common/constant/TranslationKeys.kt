@@ -1263,6 +1263,7 @@ object TranslationKeys {
     const val PLAN_TIMELINE_Y_AXIS: String = "plan.timeline.yAxis"
     const val PLAN_TIMELINE_ACTUAL: String = "plan.timeline.actual"
     const val PLAN_TIMELINE_TARGET: String = "plan.timeline.target"
+    const val PLAN_TIMELINE_PCT_OF_TARGET: String = "plan.timeline.pctOfTarget"
 
     // Goal Dialog Messages
     const val GOAL_DIALOG_EMPTY_FIELDS_TITLE: String = "goal.dialog.emptyFields.title"

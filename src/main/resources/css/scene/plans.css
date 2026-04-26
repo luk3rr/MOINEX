@@ -9,3 +9,9 @@
     -fx-font-size: 12px;
     -fx-text-fill: #555;
 }
+
+.budget-target-marker {
+    -fx-stroke: #1e293b;
+    -fx-stroke-width: 2.5;
+    -fx-opacity: 0.75;
+}
