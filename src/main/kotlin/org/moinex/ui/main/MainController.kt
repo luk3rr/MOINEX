@@ -8,18 +8,24 @@
 
 package org.moinex.ui.main
 
+import javafx.animation.FadeTransition
 import javafx.animation.KeyFrame
 import javafx.animation.KeyValue
+import javafx.animation.ParallelTransition
+import javafx.animation.PauseTransition
 import javafx.animation.Timeline
+import javafx.animation.TranslateTransition
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.ContentDisplay
+import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import javafx.util.Pair
@@ -29,9 +35,11 @@ import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.WindowUtils
+import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
+import org.moinex.ui.common.NotificationToastOverlay
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -41,6 +49,7 @@ import java.io.IOException
 class MainController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
+    private val notificationService: NotificationService,
 ) {
     @FXML
     private lateinit var sidebar: VBox
@@ -81,12 +90,25 @@ class MainController(
     @FXML
     private lateinit var toggleMonetaryValuesIcon: ImageView
 
+    @FXML
+    private lateinit var bellIcon: ImageView
+
+    @FXML
+    private lateinit var unreadBadge: Label
+
     private var currentContent: Pair<String, String>? = null
     private var isMenuExpanded = false
+    private var isNotificationPanelOpen = false
     private lateinit var sidebarButtons: Array<Button>
+
+    private lateinit var notificationScrim: Pane
+    private lateinit var notificationPanel: VBox
+    private lateinit var notificationCenterController: NotificationCenterController
+    private lateinit var toastOverlay: NotificationToastOverlay
 
     companion object {
         private val logger = LoggerFactory.getLogger(MainController::class.java)
+        private const val NOTIFICATION_SCRIM_STYLE = "-fx-background-color: rgba(0,0,0,0.45);"
     }
 
     @FXML
@@ -105,6 +127,10 @@ class MainController(
 
         rootPane.stylesheets.add(
             javaClass.getResource(Files.MAIN_STYLE_SHEET)!!.toExternalForm(),
+        )
+
+        rootPane.stylesheets.add(
+            javaClass.getResource(Files.NOTIFICATION_CSS)!!.toExternalForm(),
         )
 
         footbarArea.stylesheets.add(
@@ -147,6 +173,19 @@ class MainController(
             loadContent(Files.SETTINGS_FXML, Files.SETTINGS_STYLE_SHEET)
             updateSelectedButton(settingsButton)
         }
+
+        setupNotificationDrawer()
+
+        // Toast overlay must be added last to stay on top of everything (highest Z-order)
+        toastOverlay = NotificationToastOverlay(rootPane)
+
+        notificationService.registerUiListener { notification ->
+            toastOverlay.show(notification)
+            animateBellIcon()
+            updateUnreadBadge()
+        }
+
+        updateUnreadBadge()
 
         loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
         updateSelectedButton(homeButton)
@@ -196,6 +235,11 @@ class MainController(
             )
 
         currentContent?.let { loadContent(it.key, it.value) }
+    }
+
+    @FXML
+    private fun handleToggleNotifications() {
+        if (isNotificationPanelOpen) closeNotificationPanel() else openNotificationPanel()
     }
 
     fun loadContent(
@@ -249,6 +293,98 @@ class MainController(
                 }
             }
         }
+    }
+
+    private fun setupNotificationDrawer() {
+        notificationScrim =
+            Pane().apply {
+                style = NOTIFICATION_SCRIM_STYLE
+                isVisible = false
+                opacity = 0.0
+                setOnMouseClicked { closeNotificationPanel() }
+            }
+        rootPane.children.add(notificationScrim)
+        notificationScrim.setAnchorPaneConstraints()
+
+        val loader =
+            FXMLLoader(
+                javaClass.getResource(Files.NOTIFICATION_CENTER_FXML),
+                preferencesService.bundle,
+            )
+        loader.setControllerFactory { springContext.getBean(it) }
+        notificationPanel = loader.load()
+        notificationCenterController = loader.getController()
+
+        notificationPanel.isVisible = false
+        notificationPanel.translateX = Constants.NOTIFICATION_PANEL_WIDTH
+
+        rootPane.children.add(notificationPanel)
+        AnchorPane.setTopAnchor(notificationPanel, 0.0)
+        AnchorPane.setBottomAnchor(notificationPanel, 0.0)
+        AnchorPane.setRightAnchor(notificationPanel, 0.0)
+    }
+
+    private fun openNotificationPanel() {
+        notificationCenterController.refresh()
+        notificationService.markAllAsRead()
+
+        notificationPanel.isVisible = true
+        notificationScrim.isVisible = true
+
+        val slideIn =
+            TranslateTransition(Duration.millis(Constants.NOTIFICATION_DRAWER_ANIMATION_MS), notificationPanel).apply {
+                fromX = Constants.NOTIFICATION_PANEL_WIDTH
+                toX = 0.0
+            }
+        val fadeIn =
+            FadeTransition(Duration.millis(Constants.NOTIFICATION_DRAWER_ANIMATION_MS), notificationScrim).apply {
+                fromValue = 0.0
+                toValue = 1.0
+            }
+
+        ParallelTransition(slideIn, fadeIn).play()
+        isNotificationPanelOpen = true
+        updateUnreadBadge()
+    }
+
+    private fun closeNotificationPanel() {
+        val slideOut =
+            TranslateTransition(Duration.millis(Constants.NOTIFICATION_DRAWER_ANIMATION_MS), notificationPanel).apply {
+                fromX = 0.0
+                toX = Constants.NOTIFICATION_PANEL_WIDTH
+            }
+        val fadeOut =
+            FadeTransition(Duration.millis(Constants.NOTIFICATION_DRAWER_ANIMATION_MS), notificationScrim).apply {
+                fromValue = 1.0
+                toValue = 0.0
+            }
+
+        ParallelTransition(slideOut, fadeOut)
+            .apply {
+                setOnFinished {
+                    notificationPanel.isVisible = false
+                    notificationScrim.isVisible = false
+                }
+            }.play()
+
+        isNotificationPanelOpen = false
+    }
+
+    private fun updateUnreadBadge() {
+        val count = notificationService.countUnread()
+        unreadBadge.text = if (count > 9) "9+" else count.toString()
+        unreadBadge.isVisible = count > 0
+    }
+
+    private fun animateBellIcon() {
+        bellIcon.image = Image(Files.BELL_GIF)
+
+        val restore =
+            PauseTransition(Duration.millis(Constants.NOTIFICATION_BELL_GIF_DURATION_MS))
+        restore.setOnFinished {
+            bellIcon.image = Image(Files.BELL_ICON)
+        }
+        restore.play()
     }
 
     private fun updateSelectedButton(selectedButton: Button) {

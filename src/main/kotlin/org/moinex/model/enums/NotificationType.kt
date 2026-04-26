@@ -1,0 +1,11 @@
+package org.moinex.model.enums
+
+enum class NotificationType {
+    BUDGET_GROUP_EXCEEDED,
+    RECURRING_TRANSACTION_PROCESSED,
+    RECURRING_CREDIT_CARD_DEBT_PROCESSED,
+    GOAL_ACHIEVED,
+    GENERIC_INFO,
+    GENERIC_WARNING,
+    GENERIC_ERROR,
+}

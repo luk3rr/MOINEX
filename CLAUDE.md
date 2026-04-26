@@ -71,6 +71,12 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy).
 - `application.yml` — production (INFO logging)
 - `application-local.yml` — local dev (DEBUG logging, `format_sql: true`)
 
+## Internationalization (i18n)
+
+- Translations are in **pt-BR** (`messages_pt_BR.properties`) and `messages_en.properties` under `src/main/resources/i18n/`
+- **Never rewrite or convert the entire properties file.** Only append or edit the specific keys needed for the current task.
+- If editing a properties file fails (encoding issues, tool errors), **ask the user to add the keys manually** rather than attempting a full-file rewrite.
+
 ## CI
 
 `.gitlab-ci.yml` runs: `unit_test → quality → build → deploy`. The test stage command is `./gradlew clean build jacocoTestReport`. SonarQube excludes `app/common/config/exception/model/repository/ui` packages from coverage.

@@ -1,0 +1,193 @@
+/*
+ * Filename: notification.css
+ * Created on: April 26, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.notification-toast {
+    -fx-background-color: #2c2c3e;
+    -fx-background-radius: 8;
+    -fx-padding: 12 14 12 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 12, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.notification-toast-accent {
+    -fx-min-width: 4;
+    -fx-max-width: 4;
+    -fx-background-radius: 8 0 0 8;
+}
+
+.notification-toast-title {
+    -fx-text-fill: #f0f0f0;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.notification-toast-message {
+    -fx-text-fill: #b0b0c0;
+    -fx-font-size: 11px;
+    -fx-wrap-text: true;
+}
+
+.notification-toast-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #888;
+    -fx-font-size: 11px;
+    -fx-cursor: hand;
+    -fx-padding: 0 4 0 8;
+}
+
+.notification-toast-close:hover {
+    -fx-text-fill: #f0f0f0;
+}
+
+/* Accent colors by type */
+.notification-accent-error,
+.notification-accent-budget {
+    -fx-background-color: #f38ba8;
+}
+
+.notification-accent-warning {
+    -fx-background-color: #f9c74f;
+}
+
+.notification-accent-info {
+    -fx-background-color: #89b4fa;
+}
+
+.notification-accent-recurring,
+.notification-accent-recurring-cc {
+    -fx-background-color: #89b4fa;
+}
+
+.notification-accent-goal {
+    -fx-background-color: #a6e3a1;
+}
+
+/* ============================================================
+   NOTIFICATION CENTER DRAWER
+   ============================================================ */
+
+.notification-panel {
+    -fx-background-color: #f5f5f5;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 16, 0, -4, 0);
+}
+
+.notification-panel-header {
+    -fx-background-color: #1abc9c;
+    -fx-padding: 12 14;
+    -fx-spacing: 8;
+}
+
+.notification-panel-title {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.notification-action-btn {
+    -fx-background-color: rgba(255,255,255,0.2);
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-background-radius: 4;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+}
+
+.notification-action-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.35);
+}
+
+.notification-list {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.notification-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.notification-list .list-cell:selected {
+    -fx-background-color: transparent;
+}
+
+.notification-empty-label {
+    -fx-text-fill: #999;
+    -fx-font-size: 13px;
+    -fx-padding: 40 0 0 0;
+    -fx-alignment: center;
+}
+
+/* ============================================================
+   NOTIFICATION LIST CELL
+   ============================================================ */
+
+.notification-cell {
+    -fx-background-color: white;
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 4, 0, 0, 1);
+    -fx-padding: 10 12 10 0;
+    -fx-cursor: hand;
+}
+
+.notification-cell:hover {
+    -fx-background-color: #f0faf8;
+}
+
+.notification-cell-unread {
+    -fx-border-color: transparent transparent transparent #1abc9c;
+    -fx-border-width: 0 0 0 3;
+}
+
+.notification-cell-accent {
+    -fx-min-width: 4;
+    -fx-max-width: 4;
+    -fx-background-radius: 6 0 0 6;
+}
+
+.notification-cell-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222;
+}
+
+.notification-cell-title-read {
+    -fx-font-weight: normal;
+    -fx-text-fill: #555;
+}
+
+.notification-cell-message {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555;
+    -fx-wrap-text: true;
+}
+
+.notification-cell-time {
+    -fx-font-size: 10px;
+    -fx-text-fill: #aaa;
+}
+
+.notification-unread-dot {
+    -fx-fill: #1abc9c;
+}
+
+/* ============================================================
+   BADGE
+   ============================================================ */
+
+.notification-badge {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-size: 7px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 1 3;
+    -fx-min-width: 12;
+    -fx-alignment: center;
+}

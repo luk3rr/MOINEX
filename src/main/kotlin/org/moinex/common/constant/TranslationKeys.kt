@@ -15,6 +15,7 @@ object TranslationKeys {
     const val MAIN_SETTINGS: String = "main.settings"
     const val MAIN_CALENDAR: String = "main.calendar"
     const val MAIN_CALCULATOR: String = "main.calculator"
+    const val MAIN_NOTIFICATIONS: String = "main.notifications"
 
     const val UIUTILS_FORMAT_PERCENTAGE_TOO_MUCH_NEGATIVE: String = "uiutils.formatPercentage.tooMuchNegative"
     const val UIUTILS_COPIED_TO_CLIPBOARD: String = "uiutils.copiedToClipboard"
@@ -1885,4 +1886,23 @@ object TranslationKeys {
     const val FIRE_CHART_SERIES_PATRIMONY: String = "fire.chart.series.patrimony"
     const val FIRE_CHART_SERIES_TARGET: String = "fire.chart.series.target"
     const val FIRE_CHART_YEARS_OPTION: String = "fire.chart.yearsOption"
+
+    // Notifications
+    const val NOTIFICATION_TIME_NOW: String = "notification.time.now"
+    const val NOTIFICATION_TIME_MINUTES: String = "notification.time.minutes"
+    const val NOTIFICATION_TIME_HOURS: String = "notification.time.hours"
+    const val NOTIFICATION_TIME_DAYS: String = "notification.time.days"
+    const val NOTIFICATION_CENTER_MARK_ALL_READ: String = "notification.center.markAllRead"
+    const val NOTIFICATION_CENTER_CLEAR_ALL: String = "notification.center.clearAll"
+    const val NOTIFICATION_CENTER_EMPTY: String = "notification.center.empty"
+    const val NOTIFICATION_WALLET_TRANSACTION_TITLE: String = "notification.walletTransaction.title"
+    const val NOTIFICATION_WALLET_TRANSACTION_MESSAGE: String = "notification.walletTransaction.message"
+    const val NOTIFICATION_CC_DEBT_TITLE: String = "notification.ccDebt.title"
+    const val NOTIFICATION_CC_DEBT_MESSAGE: String = "notification.ccDebt.message"
+    const val NOTIFICATION_BUDGET_EXCEEDED_TITLE: String = "notification.budgetExceeded.title"
+    const val NOTIFICATION_BUDGET_EXCEEDED_MESSAGE: String = "notification.budgetExceeded.message"
+    const val NOTIFICATION_RECURRING_PROCESSED_TITLE: String = "notification.recurringProcessed.title"
+    const val NOTIFICATION_RECURRING_PROCESSED_MESSAGE: String = "notification.recurringProcessed.message"
+    const val NOTIFICATION_RECURRING_CC_PROCESSED_TITLE: String = "notification.recurringCcProcessed.title"
+    const val NOTIFICATION_RECURRING_CC_PROCESSED_MESSAGE: String = "notification.recurringCcProcessed.message"
 }

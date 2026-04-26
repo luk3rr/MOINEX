@@ -197,4 +197,10 @@ object Files {
 
     const val COMMON_STYLE_SHEET: String = CSS_COMMON_PATH + "common-styles.css"
     const val TIMELINE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "timeline-chart.css"
+
+    // Notifications
+    const val NOTIFICATION_CENTER_FXML: String = UI_MAIN_PATH + "notification_center.fxml"
+    const val NOTIFICATION_CSS: String = CSS_COMPONENT_PATH + "notification.css"
+    const val BELL_ICON: String = COMMON_ICONS_PATH + "bell.png"
+    const val BELL_GIF: String = COMMON_ICONS_PATH + "bell.gif"
 }

@@ -2,14 +2,16 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="768.0" minWidth="1450.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.MainController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="768.0" minWidth="1450.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.MainController">
    <children>
       <HBox fx:id="rootHBox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -168,6 +170,21 @@
                                     <Image url="@../../icon/common/calculator.png" />
                                  </image>
                               </ImageView>
+                           </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="notificationsButton" onAction="#handleToggleNotifications" text="%main.notifications">
+                           <font>
+                              <Font size="9.0" />
+                           </font>
+                           <graphic>
+                              <StackPane>
+                                 <ImageView fx:id="bellIcon" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                       <Image url="@../../icon/common/bell.png" />
+                                    </image>
+                                 </ImageView>
+                                 <Label fx:id="unreadBadge" styleClass="notification-badge" text="0" visible="false" StackPane.alignment="TOP_RIGHT" />
+                              </StackPane>
                            </graphic>
                         </JFXButton>
                         <JFXButton onAction="#handleToggleMonetaryValues">
