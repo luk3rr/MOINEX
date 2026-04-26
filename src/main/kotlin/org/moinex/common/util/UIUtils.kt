@@ -26,6 +26,7 @@ import javafx.scene.control.ListCell
 import javafx.scene.control.Tab
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
+import javafx.scene.control.TextField
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
@@ -430,6 +431,17 @@ class UIUtils(
 
                         override fun fromString(string: String?): T? = null
                     }
+            }
+        }
+
+        fun configureTextFieldListener(
+            field: TextField,
+            regex: String,
+        ) {
+            field.textProperty().addListener { _, oldValue, newValue ->
+                if (!newValue.matches(Regex(regex))) {
+                    field.text = oldValue
+                }
             }
         }
 

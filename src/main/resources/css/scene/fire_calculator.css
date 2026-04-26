@@ -1,0 +1,28 @@
+/*
+ * Filename: fire_calculator.css
+ * Created on: April 25, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
+.fire-result-card-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.fire-result-card-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6b7280;
+}
+
+.fire-no-convergence-label {
+    -fx-text-fill: #dc3545;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
+    -fx-text-fill: #555;
+}

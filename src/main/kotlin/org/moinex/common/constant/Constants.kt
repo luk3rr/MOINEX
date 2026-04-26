@@ -132,6 +132,8 @@ object Constants {
 
     val BACEN_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(BACEN_DATE_FORMAT)
 
+    const val YEAR_MONTHS = 12
+
     // Define the pattern for positive and negative currency values
     const val CURRENCY_FORMAT: String = "R$ #,##0.00;- R$ #,##0.00"
 

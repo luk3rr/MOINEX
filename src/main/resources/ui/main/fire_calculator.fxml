@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane stylesheets="@../../css/component/charts.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.FIRECalculatorController">
+   <children>
+      <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+
+            <!-- Title -->
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label styleClass="title" text="%fire.title">
+                     <font><Font name="System Bold" size="18.0" /></font>
+                  </Label>
+                  <Label style="-fx-font-style: italic; -fx-font-size: 12; -fx-text-fill: #6b7280; -fx-padding: 0 0 0 8;" text="%fire.subtitle" />
+               </children>
+            </HBox>
+
+            <!-- Inputs + Result cards -->
+            <HBox spacing="10.0">
+               <children>
+
+                  <!-- Input panel -->
+                  <AnchorPane maxWidth="600.0" minWidth="500.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox spacing="12.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
+                           <children>
+                              <GridPane hgap="15.0" vgap="10.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                 <children>
+                                    <!-- Row 0 -->
+                                    <VBox spacing="2.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                       <children>
+                                          <Label styleClass="custom-table-header" text="%fire.label.currentNetWorth" />
+                                          <TextField fx:id="currentNetWorthField" maxWidth="Infinity" promptText="0.00" />
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                       <children>
+                                          <Label styleClass="custom-table-header" text="%fire.label.monthlyContribution" />
+                                          <TextField fx:id="monthlyContributionField" maxWidth="Infinity" promptText="0.00" />
+                                       </children>
+                                    </VBox>
+                                    <!-- Row 1 -->
+                                    <VBox spacing="2.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label styleClass="custom-table-header" text="%fire.label.annualReturnRate" />
+                                          <TextField fx:id="annualReturnRateField" maxWidth="Infinity" promptText="10.00" />
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label styleClass="custom-table-header" text="%fire.label.monthlyExpense" />
+                                          <TextField fx:id="monthlyExpenseField" maxWidth="Infinity" promptText="0.00" />
+                                       </children>
+                                    </VBox>
+                                    <!-- Row 2 -->
+                                    <VBox spacing="2.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                       <children>
+                                          <Label styleClass="custom-table-header" text="%fire.label.withdrawalRate" />
+                                          <TextField fx:id="withdrawalRateField" maxWidth="Infinity" promptText="4.00" />
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                       <children>
+                                          <Label styleClass="custom-table-header" text="%fire.label.currentAge" />
+                                          <TextField fx:id="currentAgeField" maxWidth="Infinity" promptText="30" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </GridPane>
+
+                              <HBox alignment="CENTER_RIGHT">
+                                 <children>
+                                    <JFXButton fx:id="calculateButton" onAction="#handleCalculate" stylesheets="@../../css/component/buttons.css" text="%fire.button.calculate" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+
+                  <!-- Result cards -->
+                  <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <!-- FIRE Target card -->
+                        <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                           <children>
+                              <VBox alignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
+                                 <children>
+                                    <Label styleClass="fire-result-card-label" text="%fire.result.fireTarget" />
+                                    <Label fx:id="fireTargetLabel" styleClass="fire-result-card-value" text="-" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                        <!-- Time to FIRE card -->
+                        <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                           <children>
+                              <VBox alignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
+                                 <children>
+                                    <Label styleClass="fire-result-card-label" text="%fire.result.timeToFire" />
+                                    <Label fx:id="timeToFireLabel" styleClass="fire-result-card-value" text="-" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                        <!-- Age at FIRE card -->
+                        <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+                           <children>
+                              <VBox alignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
+                                 <children>
+                                    <Label styleClass="fire-result-card-label" text="%fire.result.ageAtFire" />
+                                    <Label fx:id="ageAtFireLabel" styleClass="fire-result-card-value" text="-" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </VBox>
+
+               </children>
+            </HBox>
+
+            <!-- No convergence warning -->
+            <Label fx:id="noConvergenceLabel" managed="false" styleClass="fire-no-convergence-label" text="%fire.result.noConvergence" visible="false" />
+
+            <!-- Projection chart -->
+            <AnchorPane styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label styleClass="title" text="%fire.chart.title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                  <LineChart fx:id="projectionChart" animated="false" createSymbols="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0">
+                     <xAxis>
+                        <CategoryAxis fx:id="xAxis" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="yAxis" forceZeroInRange="false" />
+                     </yAxis>
+                  </LineChart>
+               </children>
+            </AnchorPane>
+
+         </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</AnchorPane>
