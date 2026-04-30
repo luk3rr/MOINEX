@@ -1,9 +1,12 @@
 package org.moinex.service.wallet
 
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isOpenEnded
+import org.moinex.common.util.UIUtils
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.RecurringTransactionFrequency
 import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.enums.WalletTransactionStatus
@@ -11,6 +14,8 @@ import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.RecurringTransaction
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -26,6 +31,8 @@ import kotlin.collections.forEach
 class RecurringTransactionService(
     private val recurringTransactionRepository: RecurringTransactionRepository,
     private val walletService: WalletService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(RecurringTransactionService::class.java)
 
@@ -86,7 +93,21 @@ class RecurringTransactionService(
             )
 
         transactions.forEach { transaction ->
-            walletService.createWalletTransaction(transaction)
+            walletService.createWalletTransaction(transaction, publishNotification = false)
+
+            val bundle = preferencesService.bundle
+            val title = bundle.getString(TranslationKeys.NOTIFICATION_RECURRING_PROCESSED_TITLE)
+            val message =
+                bundle
+                    .getString(TranslationKeys.NOTIFICATION_RECURRING_PROCESSED_MESSAGE)
+                    .replace("{0}", transaction.description ?: "")
+                    .replace("{1}", UIUtils.formatCurrency(transaction.amount))
+            notificationService.createNotification(
+                type = NotificationType.RECURRING_TRANSACTION_PROCESSED,
+                title = title,
+                message = message,
+            )
+
             logger.info("Transaction created with date ${transaction.date} for recurring transaction")
         }
     }

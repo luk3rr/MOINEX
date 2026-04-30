@@ -1,8 +1,10 @@
 package org.moinex.service.wallet
 
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.Transfer
@@ -13,6 +15,8 @@ import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository
 import org.moinex.repository.wallettransaction.WalletTypeRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -28,6 +32,8 @@ class WalletService(
     private val transfersRepository: TransferRepository,
     private val walletTransactionRepository: WalletTransactionRepository,
     private val walletTypeRepository: WalletTypeRepository,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(WalletService::class.java)
 
@@ -150,7 +156,10 @@ class WalletService(
     }
 
     @Transactional
-    fun createWalletTransaction(transaction: WalletTransaction): Int {
+    fun createWalletTransaction(
+        transaction: WalletTransaction,
+        publishNotification: Boolean = false,
+    ): Int {
         val walletFromDatabase = walletRepository.findByIdOrThrow(transaction.wallet.id!!)
 
         val newTransaction = walletTransactionRepository.save(transaction)
@@ -168,6 +177,22 @@ class WalletService(
                     transaction.amount,
                 )} added to wallet with id ${walletFromDatabase.id}",
         )
+
+        if (publishNotification) {
+            val bundle = preferencesService.bundle
+            val title = bundle.getString(TranslationKeys.NOTIFICATION_WALLET_TRANSACTION_TITLE)
+            val message =
+                bundle
+                    .getString(TranslationKeys.NOTIFICATION_WALLET_TRANSACTION_MESSAGE)
+                    .replace("{0}", transaction.description ?: "")
+                    .replace("{1}", UIUtils.formatCurrency(transaction.amount))
+            notificationService.createNotification(
+                type = NotificationType.WALLET_TRANSACTION_CREATED,
+                title = title,
+                message = message,
+                relatedEntityId = newTransaction.id,
+            )
+        }
 
         return newTransaction.id!!
     }

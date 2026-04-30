@@ -10,6 +10,7 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.scene.shape.Circle
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.model.Notification
 import org.moinex.model.enums.NotificationStatus
@@ -42,49 +43,54 @@ class NotificationListCell(
     private fun buildCell(n: Notification): HBox {
         val accentBar =
             Region().apply {
-                styleClass.addAll(STYLE_CELL_ACCENT, accentClass(n.type))
+                styleClass.addAll(Styles.NOTIFICATION_CELL_ACCENT, accentClass(n.type))
                 minHeight = 0.0
                 maxHeight = Double.MAX_VALUE
+                if (n.status == NotificationStatus.UNREAD) {
+                    HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 4.0))
+                }
             }
 
         val title =
             Label(n.title).apply {
-                styleClass.add(STYLE_CELL_TITLE)
+                styleClass.add(Styles.NOTIFICATION_CELL_TITLE)
                 if (n.status == NotificationStatus.READ) {
-                    styleClass.add(STYLE_CELL_TITLE_READ)
+                    styleClass.add(Styles.NOTIFICATION_CELL_TITLE_READ)
                 }
                 isWrapText = true
+                maxWidth = Double.MAX_VALUE
             }
 
         val message =
             Label(n.message).apply {
-                styleClass.add(STYLE_CELL_MESSAGE)
+                styleClass.add(Styles.NOTIFICATION_CELL_MESSAGE)
                 isWrapText = true
+                maxWidth = Double.MAX_VALUE
             }
 
         val time =
             Label(relativeTime(n.createdAt)).apply {
-                styleClass.add(STYLE_CELL_TIME)
+                styleClass.add(Styles.NOTIFICATION_CELL_TIME)
             }
 
         val textBox =
             VBox(3.0, title, message, time).apply {
                 HBox.setHgrow(this, Priority.ALWAYS)
-                VBox.setMargin(this, Insets(0.0, 8.0, 0.0, 10.0))
+                HBox.setMargin(this, Insets(0.0, 8.0, 0.0, 14.0))
             }
 
         val unreadDot =
             Circle(4.0).apply {
-                styleClass.add(STYLE_UNREAD_DOT)
+                styleClass.add(Styles.NOTIFICATION_UNREAD_DOT)
                 isVisible = n.status == NotificationStatus.UNREAD
                 HBox.setMargin(this, Insets(0.0, 6.0, 0.0, 0.0))
             }
 
         val cell =
             HBox(accentBar, textBox, unreadDot).apply {
-                styleClass.add(STYLE_CELL)
+                styleClass.add(Styles.NOTIFICATION_CELL)
                 if (n.status == NotificationStatus.UNREAD) {
-                    styleClass.add(STYLE_CELL_UNREAD)
+                    styleClass.add(Styles.NOTIFICATION_CELL_UNREAD)
                 }
                 alignment = Pos.CENTER_LEFT
                 HBox.setMargin(this, Insets(4.0, 8.0, 4.0, 8.0))
@@ -114,13 +120,15 @@ class NotificationListCell(
 
     private fun accentClass(type: NotificationType): String =
         when (type) {
-            NotificationType.BUDGET_GROUP_EXCEEDED -> ACCENT_BUDGET
-            NotificationType.RECURRING_TRANSACTION_PROCESSED -> ACCENT_RECURRING
-            NotificationType.RECURRING_CREDIT_CARD_DEBT_PROCESSED -> ACCENT_RECURRING_CC
-            NotificationType.GOAL_ACHIEVED -> ACCENT_GOAL
-            NotificationType.GENERIC_INFO -> ACCENT_INFO
-            NotificationType.GENERIC_WARNING -> ACCENT_WARNING
-            NotificationType.GENERIC_ERROR -> ACCENT_ERROR
+            NotificationType.BUDGET_GROUP_EXCEEDED -> Styles.NOTIFICATION_ACCENT_BUDGET
+            NotificationType.RECURRING_TRANSACTION_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING
+            NotificationType.RECURRING_CREDIT_CARD_DEBT_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING_CC
+            NotificationType.WALLET_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_WALLET_TRANSACTION
+            NotificationType.CREDIT_CARD_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_CC_TRANSACTION
+            NotificationType.GOAL_ACHIEVED -> Styles.NOTIFICATION_ACCENT_GOAL
+            NotificationType.GENERIC_INFO -> Styles.NOTIFICATION_ACCENT_INFO
+            NotificationType.GENERIC_WARNING -> Styles.NOTIFICATION_ACCENT_WARNING
+            NotificationType.GENERIC_ERROR -> Styles.NOTIFICATION_ACCENT_ERROR
         }
 
     companion object {
@@ -129,22 +137,5 @@ class NotificationListCell(
         const val NOTIFICATION_TIME_NOW_THRESHOLD_MINUTES = 1L
         const val NOTIFICATION_TIME_MINUTES_THRESHOLD_MINUTES = 60L
         const val NOTIFICATION_TIME_HOURS_THRESHOLD_MINUTES = 1440L
-
-        const val STYLE_CELL = "notification-cell"
-        const val STYLE_CELL_UNREAD = "notification-cell-unread"
-        const val STYLE_CELL_ACCENT = "notification-cell-accent"
-        const val STYLE_CELL_TITLE = "notification-cell-title"
-        const val STYLE_CELL_TITLE_READ = "notification-cell-title-read"
-        const val STYLE_CELL_MESSAGE = "notification-cell-message"
-        const val STYLE_CELL_TIME = "notification-cell-time"
-        const val STYLE_UNREAD_DOT = "notification-unread-dot"
-
-        const val ACCENT_BUDGET = "notification-accent-budget"
-        const val ACCENT_RECURRING = "notification-accent-recurring"
-        const val ACCENT_RECURRING_CC = "notification-accent-recurring-cc"
-        const val ACCENT_GOAL = "notification-accent-goal"
-        const val ACCENT_INFO = "notification-accent-info"
-        const val ACCENT_WARNING = "notification-accent-warning"
-        const val ACCENT_ERROR = "notification-accent-error"
     }
 }

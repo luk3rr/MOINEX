@@ -69,6 +69,14 @@
     -fx-background-color: #a6e3a1;
 }
 
+.notification-accent-wallet-transaction {
+    -fx-background-color: #1abc9c;
+}
+
+.notification-accent-cc-transaction {
+    -fx-background-color: #cba6f7;
+}
+
 /* ============================================================
    NOTIFICATION CENTER DRAWER
    ============================================================ */

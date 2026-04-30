@@ -2,15 +2,14 @@ package org.moinex.service
 
 import org.moinex.common.util.FxUtils
 import org.moinex.model.Notification
-import org.moinex.model.dto.NotificationEvent
 import org.moinex.model.enums.NotificationStatus
+import org.moinex.model.enums.NotificationType
 import org.moinex.repository.NotificationRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.event.TransactionPhase
-import org.springframework.transaction.event.TransactionalEventListener
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Service
 class NotificationService(
@@ -19,27 +18,55 @@ class NotificationService(
     private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
     private val uiListeners = mutableListOf<(Notification) -> Unit>()
+    private val pendingToasts = mutableListOf<Notification>()
 
     fun registerUiListener(listener: (Notification) -> Unit) {
         uiListeners.add(listener)
+        if (pendingToasts.isNotEmpty()) {
+            val pending = pendingToasts.toList()
+            pendingToasts.clear()
+            FxUtils.launchOnFxThread { pending.forEach { listener(it) } }
+        }
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun onNotificationEvent(event: NotificationEvent) {
+    @Transactional
+    fun createNotification(
+        type: NotificationType,
+        title: String,
+        message: String,
+        relatedEntityId: Int? = null,
+    ) {
         val notification =
             Notification(
-                type = event.type,
-                title = event.title,
-                message = event.message,
-                relatedEntityId = event.relatedEntityId,
+                type = type,
+                title = title,
+                message = message,
+                relatedEntityId = relatedEntityId,
             )
 
         notificationRepository.save(notification)
         logger.debug("Notification saved: [{}] {}", notification.type, notification.title)
 
-        FxUtils.launchOnFxThread {
-            uiListeners.forEach { it(notification) }
+        val notifyUi = {
+            FxUtils.launchOnFxThread {
+                if (uiListeners.isEmpty()) {
+                    pendingToasts.add(notification)
+                } else {
+                    uiListeners.forEach { it(notification) }
+                }
+            }
+        }
+
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(
+                object : TransactionSynchronization {
+                    override fun afterCommit() {
+                        notifyUi()
+                    }
+                },
+            )
+        } else {
+            notifyUi()
         }
     }
 

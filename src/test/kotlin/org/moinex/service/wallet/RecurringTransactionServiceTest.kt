@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.common.constant.Constants
+import org.moinex.common.util.UIUtils
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.wallet.RecurringTransactionFactory
 import org.moinex.factory.wallet.WalletFactory
@@ -17,6 +18,8 @@ import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Year
@@ -26,9 +29,19 @@ import java.util.Optional
 class RecurringTransactionServiceTest :
     BehaviorSpec({
         val recurringTransactionRepository = mockk<RecurringTransactionRepository>()
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val notificationService = mockk<NotificationService>(relaxed = true)
         val walletService = mockk<WalletService>()
 
-        val service = RecurringTransactionService(recurringTransactionRepository, walletService)
+        UIUtils(preferencesService)
+
+        val service =
+            RecurringTransactionService(
+                recurringTransactionRepository,
+                walletService,
+                notificationService,
+                preferencesService,
+            )
 
         afterContainer { clearAllMocks(answers = true) }
 
@@ -193,12 +206,12 @@ class RecurringTransactionServiceTest :
 
                     every { recurringTransactionRepository.findByStatus(RecurringTransactionStatus.ACTIVE) } returns
                         listOf(recurringTransaction)
-                    every { walletService.createWalletTransaction(any()) } returns 1
+                    every { walletService.createWalletTransaction(any(), any()) } returns 1
 
                     service.processRecurringTransactions()
 
                     Then("should create wallet transactions") {
-                        verify(atLeast = 1) { walletService.createWalletTransaction(any()) }
+                        verify(atLeast = 1) { walletService.createWalletTransaction(any(), any()) }
                     }
 
                     Then("should update next due date") {
@@ -215,7 +228,7 @@ class RecurringTransactionServiceTest :
                     service.processRecurringTransactions()
 
                     Then("should not create any wallet transactions") {
-                        verify(exactly = 0) { walletService.createWalletTransaction(any()) }
+                        verify(exactly = 0) { walletService.createWalletTransaction(any(), any()) }
                     }
                 }
             }
@@ -596,7 +609,7 @@ class RecurringTransactionServiceTest :
 
                 every { recurringTransactionRepository.findByStatus(RecurringTransactionStatus.ACTIVE) } returns
                     listOf(recurringTransaction)
-                every { walletService.createWalletTransaction(any()) } returns 1
+                every { walletService.createWalletTransaction(any(), any()) } returns 1
 
                 service.processRecurringTransactions()
 

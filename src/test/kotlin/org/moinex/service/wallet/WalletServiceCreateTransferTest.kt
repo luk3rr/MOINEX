@@ -17,6 +17,8 @@ import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
 import org.moinex.repository.wallettransaction.WalletTransactionRepository
 import org.moinex.repository.wallettransaction.WalletTypeRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.util.Optional
@@ -27,6 +29,8 @@ class WalletServiceCreateTransferTest :
         val transfersRepository = mockk<TransferRepository>()
         val walletTransactionRepository = mockk<WalletTransactionRepository>()
         val walletTypeRepository = mockk<WalletTypeRepository>()
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val notificationService = mockk<NotificationService>(relaxed = true)
 
         val service =
             WalletService(
@@ -34,6 +38,8 @@ class WalletServiceCreateTransferTest :
                 transfersRepository,
                 walletTransactionRepository,
                 walletTypeRepository,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }

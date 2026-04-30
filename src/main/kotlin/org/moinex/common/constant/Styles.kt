@@ -82,4 +82,32 @@ object Styles {
             "-fx-padding: 5 10; " +
             "-fx-background-radius: 5; " +
             "-fx-font-size: 11px;"
+
+    // Notification toast styles
+    const val NOTIFICATION_TOAST = "notification-toast"
+    const val NOTIFICATION_TOAST_ACCENT = "notification-toast-accent"
+    const val NOTIFICATION_TOAST_TITLE = "notification-toast-title"
+    const val NOTIFICATION_TOAST_MESSAGE = "notification-toast-message"
+    const val NOTIFICATION_TOAST_CLOSE = "notification-toast-close"
+
+    // Notification list cell styles
+    const val NOTIFICATION_CELL = "notification-cell"
+    const val NOTIFICATION_CELL_UNREAD = "notification-cell-unread"
+    const val NOTIFICATION_CELL_ACCENT = "notification-cell-accent"
+    const val NOTIFICATION_CELL_TITLE = "notification-cell-title"
+    const val NOTIFICATION_CELL_TITLE_READ = "notification-cell-title-read"
+    const val NOTIFICATION_CELL_MESSAGE = "notification-cell-message"
+    const val NOTIFICATION_CELL_TIME = "notification-cell-time"
+    const val NOTIFICATION_UNREAD_DOT = "notification-unread-dot"
+
+    // Notification accent colors by type
+    const val NOTIFICATION_ACCENT_BUDGET = "notification-accent-budget"
+    const val NOTIFICATION_ACCENT_RECURRING = "notification-accent-recurring"
+    const val NOTIFICATION_ACCENT_RECURRING_CC = "notification-accent-recurring-cc"
+    const val NOTIFICATION_ACCENT_WALLET_TRANSACTION = "notification-accent-wallet-transaction"
+    const val NOTIFICATION_ACCENT_CC_TRANSACTION = "notification-accent-cc-transaction"
+    const val NOTIFICATION_ACCENT_GOAL = "notification-accent-goal"
+    const val NOTIFICATION_ACCENT_INFO = "notification-accent-info"
+    const val NOTIFICATION_ACCENT_WARNING = "notification-accent-warning"
+    const val NOTIFICATION_ACCENT_ERROR = "notification-accent-error"
 }

@@ -1,8 +1,10 @@
 package org.moinex.service.creditcard
 
 import org.moinex.common.ClockProvider
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.findByIdOrThrow
+import org.moinex.common.util.UIUtils
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.creditcard.CreditCardCredit
 import org.moinex.model.creditcard.CreditCardDebt
@@ -11,6 +13,7 @@ import org.moinex.model.dto.CreditCardInstallmentCalculationDTO
 import org.moinex.model.dto.CreditCardInvoicePaymentDTO
 import org.moinex.model.enums.CreditCardCreditType
 import org.moinex.model.enums.CreditCardInvoiceStatus
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.repository.creditcard.CreditCardCreditRepository
 import org.moinex.repository.creditcard.CreditCardDebtRepository
@@ -18,6 +21,8 @@ import org.moinex.repository.creditcard.CreditCardOperatorRepository
 import org.moinex.repository.creditcard.CreditCardPaymentRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.wallettransaction.WalletRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,6 +40,8 @@ class CreditCardService(
     private val creditCardOperatorRepository: CreditCardOperatorRepository,
     private val walletRepository: WalletRepository,
     private val creditCardCreditRepository: CreditCardCreditRepository,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
     private val clockProvider: ClockProvider = ClockProvider(),
 ) {
     private val logger = LoggerFactory.getLogger(CreditCardService::class.java)
@@ -146,6 +153,7 @@ class CreditCardService(
     fun createDebt(
         debt: CreditCardDebt,
         invoiceMonth: YearMonth,
+        publishNotification: Boolean = false,
     ): Int {
         check(debt.amount <= getAvailableCredit(debt.creditCard.id!!)) {
             "${debt.creditCard} does not have enough credit"
@@ -185,6 +193,22 @@ class CreditCardService(
             debt.amount,
             debt.description,
         )
+
+        if (publishNotification) {
+            val bundle = preferencesService.bundle
+            val title = bundle.getString(TranslationKeys.NOTIFICATION_CC_DEBT_TITLE)
+            val message =
+                bundle
+                    .getString(TranslationKeys.NOTIFICATION_CC_DEBT_MESSAGE)
+                    .replace("{0}", debt.description ?: debt.creditCard.name)
+                    .replace("{1}", UIUtils.formatCurrency(debt.amount))
+            notificationService.createNotification(
+                type = NotificationType.CREDIT_CARD_TRANSACTION_CREATED,
+                title = title,
+                message = message,
+                relatedEntityId = newDebt.id,
+            )
+        }
 
         return newDebt.id!!
     }

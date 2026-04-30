@@ -15,6 +15,7 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import javafx.util.Duration
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.Styles
 import org.moinex.model.Notification
 import org.moinex.model.enums.NotificationType
 
@@ -65,21 +66,21 @@ class NotificationToastOverlay(
     private fun buildCard(n: Notification): HBox {
         val accentBar =
             Region().apply {
-                styleClass.addAll(STYLE_TOAST_ACCENT, accentClass(n.type))
+                styleClass.addAll(Styles.NOTIFICATION_TOAST_ACCENT, accentClass(n.type))
                 minHeight = 0.0
                 maxHeight = Double.MAX_VALUE
             }
 
         val title =
             Label(n.title).apply {
-                styleClass.add(STYLE_TOAST_TITLE)
+                styleClass.add(Styles.NOTIFICATION_TOAST_TITLE)
                 isWrapText = true
                 maxWidth = TOAST_WIDTH - TOAST_TITLE_AND_MESSAGE_WIDTH_OFFSET
             }
 
         val message =
             Label(n.message).apply {
-                styleClass.add(STYLE_TOAST_MESSAGE)
+                styleClass.add(Styles.NOTIFICATION_TOAST_MESSAGE)
                 isWrapText = true
                 maxWidth = TOAST_WIDTH - TOAST_TITLE_AND_MESSAGE_WIDTH_OFFSET
             }
@@ -87,17 +88,17 @@ class NotificationToastOverlay(
         val textBox =
             VBox(3.0, title, message).apply {
                 HBox.setHgrow(this, Priority.ALWAYS)
-                VBox.setMargin(this, Insets(0.0, 0.0, 0.0, 10.0))
+                HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 14.0))
             }
 
         val closeButton =
             Button("✕").apply {
-                styleClass.add(STYLE_TOAST_CLOSE)
+                styleClass.add(Styles.NOTIFICATION_TOAST_CLOSE)
             }
 
         val card =
             HBox(accentBar, textBox, closeButton).apply {
-                styleClass.add(STYLE_TOAST)
+                styleClass.add(Styles.NOTIFICATION_TOAST)
                 minWidth = TOAST_WIDTH
                 maxWidth = TOAST_WIDTH
                 alignment = Pos.CENTER_LEFT
@@ -159,13 +160,15 @@ class NotificationToastOverlay(
 
     private fun accentClass(type: NotificationType): String =
         when (type) {
-            NotificationType.BUDGET_GROUP_EXCEEDED -> ACCENT_BUDGET
-            NotificationType.RECURRING_TRANSACTION_PROCESSED -> ACCENT_RECURRING
-            NotificationType.RECURRING_CREDIT_CARD_DEBT_PROCESSED -> ACCENT_RECURRING_CC
-            NotificationType.GOAL_ACHIEVED -> ACCENT_GOAL
-            NotificationType.GENERIC_INFO -> ACCENT_INFO
-            NotificationType.GENERIC_WARNING -> ACCENT_WARNING
-            NotificationType.GENERIC_ERROR -> ACCENT_ERROR
+            NotificationType.BUDGET_GROUP_EXCEEDED -> Styles.NOTIFICATION_ACCENT_BUDGET
+            NotificationType.RECURRING_TRANSACTION_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING
+            NotificationType.RECURRING_CREDIT_CARD_DEBT_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING_CC
+            NotificationType.WALLET_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_WALLET_TRANSACTION
+            NotificationType.CREDIT_CARD_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_CC_TRANSACTION
+            NotificationType.GOAL_ACHIEVED -> Styles.NOTIFICATION_ACCENT_GOAL
+            NotificationType.GENERIC_INFO -> Styles.NOTIFICATION_ACCENT_INFO
+            NotificationType.GENERIC_WARNING -> Styles.NOTIFICATION_ACCENT_WARNING
+            NotificationType.GENERIC_ERROR -> Styles.NOTIFICATION_ACCENT_ERROR
         }
 
     companion object {
@@ -177,20 +180,6 @@ class NotificationToastOverlay(
         private const val STACK_RIGHT_OFFSET = 16.0
         private const val SLIDE_MS = 220.0
         private const val FADE_MS = 180.0
-        private const val DISPLAY_MS = 5000.0
-
-        const val STYLE_TOAST = "notification-toast"
-        const val STYLE_TOAST_ACCENT = "notification-toast-accent"
-        const val STYLE_TOAST_TITLE = "notification-toast-title"
-        const val STYLE_TOAST_MESSAGE = "notification-toast-message"
-        const val STYLE_TOAST_CLOSE = "notification-toast-close"
-
-        const val ACCENT_BUDGET = "notification-accent-budget"
-        const val ACCENT_RECURRING = "notification-accent-recurring"
-        const val ACCENT_RECURRING_CC = "notification-accent-recurring-cc"
-        const val ACCENT_GOAL = "notification-accent-goal"
-        const val ACCENT_INFO = "notification-accent-info"
-        const val ACCENT_WARNING = "notification-accent-warning"
-        const val ACCENT_ERROR = "notification-accent-error"
+        private const val DISPLAY_MS = 10000.0
     }
 }

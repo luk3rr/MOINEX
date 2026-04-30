@@ -17,6 +17,8 @@ import org.moinex.repository.creditcard.CreditCardOperatorRepository
 import org.moinex.repository.creditcard.CreditCardPaymentRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.wallettransaction.WalletRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.YearMonth
 import java.util.Optional
@@ -29,6 +31,8 @@ class CreditCardServicePayInvoicePartiallyTest :
         val creditCardDebtRepository = mockk<CreditCardDebtRepository>()
         val creditCardPaymentRepository = mockk<CreditCardPaymentRepository>()
         val creditCardCreditRepository = mockk<CreditCardCreditRepository>()
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val notificationService = mockk<NotificationService>(relaxed = true)
 
         val service =
             CreditCardService(
@@ -38,6 +42,8 @@ class CreditCardServicePayInvoicePartiallyTest :
                 creditCardOperatorRepository,
                 walletRepository,
                 creditCardCreditRepository,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }
