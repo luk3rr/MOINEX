@@ -19,6 +19,8 @@ import org.moinex.model.investment.BondInterestCalculation
 import org.moinex.repository.investment.BondInterestCalculationRepository
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
@@ -30,6 +32,8 @@ class BondInterestCalculationServiceResetToAutomaticCalculationTest :
         val bondOperationRepository = mockk<BondOperationRepository>()
         val bondInterestCalculationRepository = mockk<BondInterestCalculationRepository>()
         val marketIndicatorService = mockk<MarketIndicatorService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             BondInterestCalculationService(
@@ -37,6 +41,8 @@ class BondInterestCalculationServiceResetToAutomaticCalculationTest :
                 bondOperationRepository,
                 bondInterestCalculationRepository,
                 marketIndicatorService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }

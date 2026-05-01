@@ -7,16 +7,20 @@
 package org.moinex.service.creditcard
 
 import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.model.creditcard.CreditCardDebt
 import org.moinex.model.creditcard.RecurringCreditCardDebt
 import org.moinex.model.dto.RecurringCreditCardDebtOccurrenceDTO
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.creditcard.RecurringCreditCardDebtRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,6 +36,8 @@ class RecurringCreditCardDebtService(
     private val creditCardDebtRepository: CreditCardDebtRepository,
     private val creditCardRepository: CreditCardRepository,
     private val creditCardService: CreditCardService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(RecurringCreditCardDebtService::class.java)
 
@@ -44,6 +50,19 @@ class RecurringCreditCardDebtService(
         val newRecurringTransaction = recurringCreditCardDebtRepository.save(recurring)
 
         logger.info("$newRecurringTransaction created successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_CREATED_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_CREATED_MESSAGE,
+                ),
+            relatedEntityId = newRecurringTransaction.id!!,
+        )
 
         return newRecurringTransaction.id!!
     }
@@ -68,6 +87,19 @@ class RecurringCreditCardDebtService(
         }
 
         logger.info("$recurringTransactionFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_UPDATED_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_UPDATED_MESSAGE,
+                ),
+            relatedEntityId = recurringTransactionFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -80,6 +112,15 @@ class RecurringCreditCardDebtService(
 
         recurringCreditCardDebtRepository.delete(recurringTransactionFromDatabase)
         logger.info("$recurringTransactionFromDatabase deleted permanently")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_DELETED_MESSAGE),
+            relatedEntityId = recurringTransactionFromDatabase.id!!,
+        )
     }
 
     @Transactional

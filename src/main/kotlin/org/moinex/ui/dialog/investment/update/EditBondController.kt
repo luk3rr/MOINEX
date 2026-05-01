@@ -177,11 +177,6 @@ class EditBondController(
                 }
             }
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE),
-            )
-
             (saveButton.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

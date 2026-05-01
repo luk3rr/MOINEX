@@ -111,7 +111,7 @@ class CreditCardServiceRefundDebtTest :
                 every { creditCardPaymentRepository.getNextInvoiceDate(1) } returns
                     LocalDateTime.of(2026, 6, 15, 23, 59)
                 every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
-                every { creditCardCreditRepository.save(any()) } returns mockk()
+                every { creditCardCreditRepository.save(any()) } returns mockk { every { id } returns 1 }
 
                 service.refundDebt(1)
 
@@ -184,7 +184,7 @@ class CreditCardServiceRefundDebtTest :
                 every { creditCardPaymentRepository.getNextInvoiceDate(1) } returns
                     LocalDateTime.of(2026, 5, 15, 23, 59)
                 every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
-                every { creditCardCreditRepository.save(any()) } returns mockk()
+                every { creditCardCreditRepository.save(any()) } returns mockk { every { id } returns 1 }
 
                 service.refundDebt(1)
 
@@ -385,7 +385,7 @@ class CreditCardServiceRefundDebtTest :
                 every { creditCardPaymentRepository.getNextInvoiceDate(1) } returns
                     LocalDateTime.of(2026, 7, 15, 23, 59)
                 every { creditCardRepository.findById(1) } returns Optional.of(creditCard)
-                every { creditCardCreditRepository.save(any()) } returns mockk()
+                every { creditCardCreditRepository.save(any()) } returns mockk { every { id } returns 1 }
 
                 service.refundDebt(1)
 

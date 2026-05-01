@@ -113,11 +113,6 @@ class AddPlanController(
                 )
             financialPlanningService.createPlan(plan)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_CREATED_MESSAGE),
-            )
-
             planNameField.scene.window.hide()
         }.onFailure { e ->
             when (e) {

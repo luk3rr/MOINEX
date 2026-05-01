@@ -14,6 +14,8 @@ import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.InterestType
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -25,6 +27,8 @@ class BondServiceCRUDBondTest :
         val bondOperationRepository = mockk<BondOperationRepository>()
         val walletService = mockk<WalletService>()
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             BondService(
@@ -32,6 +36,8 @@ class BondServiceCRUDBondTest :
                 bondOperationRepository,
                 walletService,
                 bondInterestCalculationService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }
@@ -40,6 +46,7 @@ class BondServiceCRUDBondTest :
             When("creating the bond") {
                 val bond =
                     BondFactory.create(
+                        id = 1,
                         name = "Test Bond",
                         symbol = "BOND001",
                         type = BondType.CDB,
@@ -60,6 +67,7 @@ class BondServiceCRUDBondTest :
             When("creating the bond") {
                 val bond =
                     BondFactory.create(
+                        id = 1,
                         name = "Bond Without Symbol",
                         symbol = null,
                         type = BondType.LCI,

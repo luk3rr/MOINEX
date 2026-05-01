@@ -1,10 +1,14 @@
 package org.moinex.service.financialplanning
 
 import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
 import org.moinex.model.dto.FIREProjectionResultDTO
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.financialplanning.FIRECalculatorSettings
 import org.moinex.repository.financialplanning.FIRECalculatorSettingsRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,6 +21,8 @@ import kotlin.math.pow
 @Service
 class FIRECalculatorService(
     private val fireCalculatorSettingsRepository: FIRECalculatorSettingsRepository,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(FIRECalculatorService::class.java)
@@ -35,9 +41,23 @@ class FIRECalculatorService(
     @Transactional
     fun saveSettings(settings: FIRECalculatorSettings): FIRECalculatorSettings {
         validate(settings)
-        val saved = fireCalculatorSettingsRepository.save(settings)
+        val savedSettings = fireCalculatorSettingsRepository.save(settings)
         logger.info("FIRE calculator settings saved")
-        return saved
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.FIRE_DIALOG_SETTINGS_SAVED_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.FIRE_DIALOG_SETTINGS_SAVED_MESSAGE,
+                ),
+            relatedEntityId = savedSettings.id,
+        )
+
+        return savedSettings
     }
 
     fun calculate(settings: FIRECalculatorSettings): FIREProjectionResultDTO {

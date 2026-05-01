@@ -82,11 +82,6 @@ class ChangeWalletTypeController(
         runCatching {
             wt.type = walletNewType
             walletService.changeWalletType(wt)
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE),
-            )
         }.onFailure { e ->
             when (e) {
                 is EntityNotFoundException, is MoinexException.AttributeAlreadySetException -> {

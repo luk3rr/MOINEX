@@ -138,15 +138,6 @@ class EditRecurringCreditCardDebtController(
 
             recurringCreditCardDebtService.updateRecurring(updated)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_UPDATED_TITLE,
-                ),
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_UPDATED_MESSAGE,
-                ),
-            )
-
             (crcComboBox.scene.window as Stage).close()
         }.onFailure { e ->
             WindowUtils.showErrorDialog(

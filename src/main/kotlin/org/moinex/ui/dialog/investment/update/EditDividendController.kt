@@ -108,11 +108,6 @@ class EditDividendController(
                 dividend.walletTransaction!!.includeInAnalysis = includeInAnalysisCheckBox.isSelected
 
                 tickerService.updateDividend(dividend)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE),
-                )
             }
 
             (descriptionField.scene.window as Stage).close()

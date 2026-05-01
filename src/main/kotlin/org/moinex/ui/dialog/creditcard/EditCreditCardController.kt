@@ -86,11 +86,6 @@ class EditCreditCardController(
                 creditCard!!.defaultBillingWallet = formData.defaultBillingWallet
 
                 creditCardService.updateCreditCard(creditCard!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_UPDATED_MESSAGE),
-                )
             }
 
             (nameField.scene.window as Stage).close()

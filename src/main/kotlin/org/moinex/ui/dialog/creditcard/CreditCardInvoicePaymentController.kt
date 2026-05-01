@@ -215,20 +215,6 @@ class CreditCardInvoicePaymentController(
         val amountToPay =
             if (isPartial) BigDecimal(partialAmountField.text) else remainingAmount
 
-        val successTitle =
-            if (isPartial) {
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_TITLE)
-            } else {
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE)
-            }
-
-        val successMessage =
-            if (isPartial) {
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_MESSAGE)
-            } else {
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE)
-            }
-
         runCatching {
             creditCardService.payInvoice(
                 CreditCardInvoicePaymentDTO(
@@ -239,8 +225,6 @@ class CreditCardInvoicePaymentController(
                     rebate = rebateValue,
                 ),
             )
-
-            WindowUtils.showSuccessDialog(successTitle, successMessage)
 
             (crcNameLabel.scene.window as Stage).close()
         }.onFailure { e ->

@@ -11,10 +11,12 @@ package org.moinex.service.investment
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.getEffectiveEndDate
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isNotZero
 import org.moinex.model.dto.InvestmentPerformanceDTO
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondOperation
@@ -24,6 +26,8 @@ import org.moinex.model.investment.Ticker
 import org.moinex.model.investment.TickerPurchase
 import org.moinex.model.investment.TickerSale
 import org.moinex.repository.investment.InvestmentPerformanceSnapshotRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,6 +43,8 @@ class InvestmentPerformanceService(
     private val bondService: BondService,
     private val tickerPriceHistoryService: TickerPriceHistoryService,
     private val bondInterestCalculationService: BondInterestCalculationService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(InvestmentPerformanceService::class.java)
 
@@ -65,6 +71,14 @@ class InvestmentPerformanceService(
             savePerformanceSnapshots(allMonths, investmentPerformanceDTO)
 
             logger.info("Investment performance recalculation completed successfully")
+
+            notificationService.send(
+                type = NotificationType.SUCCESS,
+                title =
+                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_TITLE),
+                message =
+                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_MESSAGE),
+            )
         }
 
     @Transactional

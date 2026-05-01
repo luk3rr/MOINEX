@@ -88,11 +88,6 @@ class AddWalletController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_CREATED_MESSAGE),
-            )
-
             (walletNameField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

@@ -8,10 +8,12 @@
 
 package org.moinex.service.investment
 
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.toRounded
 import org.moinex.model.dto.WalletTransactionContextDTO
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.investment.Bond
@@ -20,11 +22,14 @@ import org.moinex.model.investment.BondOperation
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.text.MessageFormat
 import java.time.LocalDateTime
 import java.time.YearMonth
 
@@ -34,6 +39,8 @@ class BondService(
     private val bondOperationRepository: BondOperationRepository,
     private val walletService: WalletService,
     private val bondInterestCalculationService: BondInterestCalculationService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(BondService::class.java)
 
@@ -46,6 +53,15 @@ class BondService(
         }
 
         val newBond = bondRepository.save(bond)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_ADDED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_ADDED_MESSAGE),
+            relatedEntityId = newBond.id!!,
+        )
 
         logger.info("$newBond created successfully")
     }
@@ -88,6 +104,18 @@ class BondService(
         bondRepository.delete(bondFromDatabase)
 
         logger.info("$bondFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_DELETED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_DELETED_MESSAGE),
+                    bondFromDatabase.name,
+                ),
+            relatedEntityId = bondFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -97,6 +125,15 @@ class BondService(
         bondFromDatabase.archived = true
 
         logger.info("$bondFromDatabase archived successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_UPDATED_MESSAGE),
+            relatedEntityId = bondFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -106,6 +143,18 @@ class BondService(
         bondFromDatabase.archived = false
 
         logger.info("$bondFromDatabase unarchived successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_MESSAGE),
+                    bondFromDatabase.name,
+                ),
+            relatedEntityId = bondFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -147,7 +196,16 @@ class BondService(
 
         bondOperation.apply { this.walletTransaction = walletTransaction }
 
-        bondOperationRepository.save(bondOperation)
+        val newBondOperation = bondOperationRepository.save(bondOperation)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_PURCHASE_ADDED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_PURCHASE_ADDED_MESSAGE),
+            relatedEntityId = newBondOperation.id!!,
+        )
 
         logger.info("$bondOperation created successfully")
     }
@@ -202,6 +260,23 @@ class BondService(
             }
 
         logger.info("$bondOperationFromDatabase updated successfully")
+
+        val (titleKey, messageKey) =
+            when (updatedBondOperation.operationType) {
+                OperationType.BUY ->
+                    TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_TITLE to
+                        TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_MESSAGE
+                OperationType.SELL ->
+                    TranslationKeys.BOND_DIALOG_SALE_UPDATED_TITLE to
+                        TranslationKeys.BOND_DIALOG_SALE_UPDATED_MESSAGE
+            }
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(titleKey),
+            message = preferencesService.translate(messageKey),
+            relatedEntityId = bondOperationFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -215,6 +290,15 @@ class BondService(
         walletService.deleteWalletTransaction(walletTransaction.id!!)
 
         logger.info("$bondOperationFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_OPERATION_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.BOND_DIALOG_OPERATION_DELETED_MESSAGE),
+            relatedEntityId = bondOperationFromDatabase.id!!,
+        )
     }
 
     @Transactional(readOnly = true)

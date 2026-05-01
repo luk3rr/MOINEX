@@ -83,15 +83,6 @@ class AddRecurringTransactionController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(
-                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_TITLE,
-                ),
-                preferencesService.translate(
-                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_MESSAGE,
-                ),
-            )
-
             (descriptionField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

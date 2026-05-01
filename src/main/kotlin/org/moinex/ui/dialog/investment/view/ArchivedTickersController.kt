@@ -75,15 +75,6 @@ class ArchivedTickersController(
         ) {
             runCatching {
                 tickerService.unarchiveTicker(selectedTicker.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UNARCHIVED_TITLE),
-                    MessageFormat.format(
-                        preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UNARCHIVED_MESSAGE),
-                        "${selectedTicker.name} (${selectedTicker.symbol})",
-                    ),
-                )
-
                 archivedTickers.remove(selectedTicker)
                 updateTickerTableView()
             }.onFailure { e ->
@@ -130,15 +121,6 @@ class ArchivedTickersController(
         ) {
             runCatching {
                 tickerService.deleteTicker(selectedTicker.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_DELETED_TITLE),
-                    MessageFormat.format(
-                        preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_DELETED_MESSAGE),
-                        "${selectedTicker.name} (${selectedTicker.symbol})",
-                    ),
-                )
-
                 archivedTickers.remove(selectedTicker)
                 updateTickerTableView()
             }.onFailure { e ->

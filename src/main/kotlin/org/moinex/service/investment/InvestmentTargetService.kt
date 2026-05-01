@@ -9,11 +9,15 @@
 package org.moinex.service.investment
 
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isBetween
 import org.moinex.common.extension.isNotEqual
 import org.moinex.model.enums.AssetType
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.investment.InvestmentTarget
 import org.moinex.repository.investment.InvestmentTargetRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +26,8 @@ import java.math.BigDecimal
 @Service
 class InvestmentTargetService(
     private val investmentTargetRepository: InvestmentTargetRepository,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -62,6 +68,14 @@ class InvestmentTargetService(
         }
 
         logger.info("Investment targets saved successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE),
+        )
     }
 
     fun getAllActiveTargets(): List<InvestmentTarget> =

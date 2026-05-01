@@ -12,6 +12,8 @@ import jakarta.persistence.EntityNotFoundException
 import org.moinex.factory.goal.GoalFactory
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.repository.goal.GoalRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.goal.GoalService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
@@ -22,8 +24,10 @@ class GoalServiceUpdateGoalTest :
     BehaviorSpec({
         val goalRepository = mockk<GoalRepository>()
         val walletService = mockk<WalletService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
-        val service = GoalService(goalRepository, walletService)
+        val service = GoalService(goalRepository, walletService, notificationService, preferencesService)
 
         afterContainer { clearAllMocks(answers = true) }
 

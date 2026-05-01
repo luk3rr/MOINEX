@@ -130,15 +130,6 @@ class AddRecurringCreditCardDebtController(
 
             recurringCreditCardDebtService.createRecurring(recurring)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_CREATED_TITLE,
-                ),
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_CREATED_MESSAGE,
-                ),
-            )
-
             (crcComboBox.scene.window as Stage).close()
         }.onFailure { e ->
             WindowUtils.showErrorDialog(

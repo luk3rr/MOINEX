@@ -47,34 +47,20 @@
 }
 
 /* Accent colors by type — semantic, theme-independent */
-.notification-accent-error,
-.notification-accent-budget {
-    -fx-background-color: #f38ba8;
+.notification-accent-info {
+    -fx-background-color: #89b4fa;
+}
+
+.notification-accent-success {
+    -fx-background-color: #a6e3a1;
 }
 
 .notification-accent-warning {
     -fx-background-color: #f9c74f;
 }
 
-.notification-accent-info {
-    -fx-background-color: #89b4fa;
-}
-
-.notification-accent-recurring,
-.notification-accent-recurring-cc {
-    -fx-background-color: #89b4fa;
-}
-
-.notification-accent-goal {
-    -fx-background-color: #a6e3a1;
-}
-
-.notification-accent-wallet-transaction {
-    -fx-background-color: #1abc9c;
-}
-
-.notification-accent-cc-transaction {
-    -fx-background-color: #cba6f7;
+.notification-accent-error {
+    -fx-background-color: #f38ba8;
 }
 
 /* ============================================================

@@ -87,14 +87,10 @@ class AddCreditCardDebtController(
                         description = formData.description,
                     ),
                     invoiceDateYearMonth,
+                    publishNotification = true,
                 )
 
             onDebtCreatedCallback?.invoke(debtId)
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DEBT_CREATED_MESSAGE),
-            )
 
             (crcComboBox.scene.window as Stage).close()
         }.onFailure { e ->

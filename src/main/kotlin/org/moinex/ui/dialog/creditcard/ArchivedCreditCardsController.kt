@@ -67,14 +67,6 @@ class ArchivedCreditCardsController(
         ) {
             runCatching {
                 creditCardService.unarchiveCreditCard(selectedCrc.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_TITLE),
-                    preferencesService
-                        .translate(TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_MESSAGE)
-                        .replace("{0}", selectedCrc.name),
-                )
-
                 archivedCreditCards.remove(selectedCrc)
                 updateCreditCardTableView()
             }.onFailure { e ->
@@ -115,14 +107,6 @@ class ArchivedCreditCardsController(
         ) {
             runCatching {
                 creditCardService.deleteCreditCard(selectedCrc.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DELETED_TITLE),
-                    preferencesService
-                        .translate(TranslationKeys.CREDITCARD_DIALOG_DELETED_MESSAGE)
-                        .replace("{0}", selectedCrc.name),
-                )
-
                 archivedCreditCards.remove(selectedCrc)
                 updateCreditCardTableView()
             }.onFailure { e ->

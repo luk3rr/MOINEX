@@ -31,8 +31,10 @@ import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.AssetType
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.investment.Dividend
 import org.moinex.model.investment.Ticker
+import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.service.investment.TickerService
 import org.moinex.ui.dialog.investment.create.AddCryptoExchangeController
@@ -54,6 +56,7 @@ class SavingsStocksFundsController(
     private val tickerService: TickerService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
+    private val notificationService: NotificationService,
 ) {
     @FXML
     private lateinit var stocksFundsNetCapitalLabel: Text
@@ -258,13 +261,16 @@ class SavingsStocksFundsController(
                     .onSuccess { failed ->
                         when {
                             failed.isEmpty() -> {
-                                WindowUtils.showSuccessDialog(
-                                    preferencesService.translate(
-                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE,
-                                    ),
-                                    preferencesService.translate(
-                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE,
-                                    ),
+                                notificationService.send(
+                                    type = NotificationType.SUCCESS,
+                                    title =
+                                        preferencesService.translate(
+                                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_TITLE,
+                                        ),
+                                    message =
+                                        preferencesService.translate(
+                                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_SUCCESS_MESSAGE,
+                                        ),
                                 )
                             }
 

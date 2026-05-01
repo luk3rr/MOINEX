@@ -101,13 +101,8 @@ object Styles {
     const val NOTIFICATION_UNREAD_DOT = "notification-unread-dot"
 
     // Notification accent colors by type
-    const val NOTIFICATION_ACCENT_BUDGET = "notification-accent-budget"
-    const val NOTIFICATION_ACCENT_RECURRING = "notification-accent-recurring"
-    const val NOTIFICATION_ACCENT_RECURRING_CC = "notification-accent-recurring-cc"
-    const val NOTIFICATION_ACCENT_WALLET_TRANSACTION = "notification-accent-wallet-transaction"
-    const val NOTIFICATION_ACCENT_CC_TRANSACTION = "notification-accent-cc-transaction"
-    const val NOTIFICATION_ACCENT_GOAL = "notification-accent-goal"
     const val NOTIFICATION_ACCENT_INFO = "notification-accent-info"
+    const val NOTIFICATION_ACCENT_SUCCESS = "notification-accent-success"
     const val NOTIFICATION_ACCENT_WARNING = "notification-accent-warning"
     const val NOTIFICATION_ACCENT_ERROR = "notification-accent-error"
 

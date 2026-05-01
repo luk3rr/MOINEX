@@ -19,12 +19,16 @@ import org.moinex.factory.investment.InvestmentTargetFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.investment.InvestmentTarget
 import org.moinex.repository.investment.InvestmentTargetRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 
 class InvestmentTargetServiceTest :
     BehaviorSpec({
         val investmentTargetRepository = mockk<InvestmentTargetRepository>()
-        val service = InvestmentTargetService(investmentTargetRepository)
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val service = InvestmentTargetService(investmentTargetRepository, notificationService, preferencesService)
 
         afterContainer { clearAllMocks(answers = true) }
 

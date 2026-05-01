@@ -12,9 +12,9 @@ import javafx.scene.shape.Circle
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.util.UIUtils
 import org.moinex.model.Notification
 import org.moinex.model.enums.NotificationStatus
-import org.moinex.model.enums.NotificationType
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.ResourceBundle
@@ -43,7 +43,7 @@ class NotificationListCell(
     private fun buildCell(n: Notification): HBox {
         val accentBar =
             Region().apply {
-                styleClass.addAll(Styles.NOTIFICATION_CELL_ACCENT, accentClass(n.type))
+                styleClass.addAll(Styles.NOTIFICATION_CELL_ACCENT, UIUtils.getNotificationAccentClass(n.type))
                 minHeight = 0.0
                 maxHeight = Double.MAX_VALUE
                 if (n.status == NotificationStatus.UNREAD) {
@@ -117,19 +117,6 @@ class NotificationListCell(
                     .replace("{0}", (minutes / MINUTES_IN_DAY).toString())
         }
     }
-
-    private fun accentClass(type: NotificationType): String =
-        when (type) {
-            NotificationType.BUDGET_GROUP_EXCEEDED -> Styles.NOTIFICATION_ACCENT_BUDGET
-            NotificationType.RECURRING_TRANSACTION_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING
-            NotificationType.RECURRING_CREDIT_CARD_DEBT_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING_CC
-            NotificationType.WALLET_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_WALLET_TRANSACTION
-            NotificationType.CREDIT_CARD_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_CC_TRANSACTION
-            NotificationType.GOAL_ACHIEVED -> Styles.NOTIFICATION_ACCENT_GOAL
-            NotificationType.GENERIC_INFO -> Styles.NOTIFICATION_ACCENT_INFO
-            NotificationType.GENERIC_WARNING -> Styles.NOTIFICATION_ACCENT_WARNING
-            NotificationType.GENERIC_ERROR -> Styles.NOTIFICATION_ACCENT_ERROR
-        }
 
     companion object {
         const val HOURS_IN_MINUTE = 60

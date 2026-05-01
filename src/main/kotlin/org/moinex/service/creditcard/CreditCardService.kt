@@ -83,6 +83,17 @@ class CreditCardService(
 
         logger.info("Credit card {} has created successfully", newCreditCard)
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREATED_TITLE),
+            message =
+                preferencesService
+                    .translate(
+                        TranslationKeys.CREDITCARD_DIALOG_CREATED_MESSAGE,
+                    ).replace("{0}", newCreditCard.name),
+            relatedEntityId = newCreditCard.id!!,
+        )
+
         return newCreditCard.id!!
     }
 
@@ -123,6 +134,16 @@ class CreditCardService(
         }
 
         logger.info("{} updated successfully", updatedCreditCard)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_UPDATED_TITLE),
+            message =
+                preferencesService
+                    .translate(TranslationKeys.CREDITCARD_DIALOG_UPDATED_MESSAGE)
+                    .replace("{0}", creditCardFromDatabase.name),
+            relatedEntityId = creditCardFromDatabase.id!!,
+        )
     }
 
     /**
@@ -141,6 +162,16 @@ class CreditCardService(
         creditCardRepository.delete(creditCardFromDatabase)
 
         logger.info("Credit card with id {} was permanently deleted", creditCardId)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_DELETED_TITLE),
+            message =
+                preferencesService
+                    .translate(TranslationKeys.CREDITCARD_DIALOG_DELETED_MESSAGE)
+                    .replace("{0}", creditCardFromDatabase.name),
+            relatedEntityId = creditCardFromDatabase.id!!,
+        )
     }
 
     /**
@@ -195,18 +226,15 @@ class CreditCardService(
         )
 
         if (publishNotification) {
-            val bundle = preferencesService.bundle
-            val title = bundle.getString(TranslationKeys.NOTIFICATION_CC_DEBT_TITLE)
-            val message =
-                bundle
-                    .getString(TranslationKeys.NOTIFICATION_CC_DEBT_MESSAGE)
-                    .replace("{0}", debt.description ?: debt.creditCard.name)
-                    .replace("{1}", UIUtils.formatCurrency(debt.amount))
-            notificationService.createNotification(
-                type = NotificationType.CREDIT_CARD_TRANSACTION_CREATED,
-                title = title,
-                message = message,
-                relatedEntityId = newDebt.id,
+            notificationService.send(
+                type = NotificationType.SUCCESS,
+                title = preferencesService.translate(TranslationKeys.NOTIFICATION_CREATED_CREDIT_CARD_DEBT_TITLE),
+                message =
+                    preferencesService
+                        .translate(TranslationKeys.NOTIFICATION_CREATED_CREDIT_CARD_DEBT_MESSAGE)
+                        .replace("{0}", debt.description ?: debt.creditCard.name)
+                        .replace("{1}", UIUtils.formatCurrency(debt.amount)),
+                relatedEntityId = newDebt.id!!,
             )
         }
 
@@ -245,6 +273,15 @@ class CreditCardService(
         }
 
         logger.info("$debtFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_TRANSACTION_UPDATED_TITLE),
+            message =
+                preferencesService
+                    .translate(TranslationKeys.CREDITCARD_DIALOG_TRANSACTION_UPDATED_MESSAGE),
+            relatedEntityId = debtFromDatabase.id!!,
+        )
     }
 
     /**
@@ -263,6 +300,19 @@ class CreditCardService(
         creditCardDebtRepository.delete(debtFromDatabase)
 
         logger.info("$debtFromDatabase was permanently deleted")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE,
+                ),
+            relatedEntityId = debtFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -315,14 +365,27 @@ class CreditCardService(
         } else {
             logger.info("No payments to refund for $debtFromDatabase")
         }
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE,
+                ),
+            relatedEntityId = debtFromDatabase.id!!,
+        )
     }
 
     @Transactional
     fun payInvoice(payment: CreditCardInvoicePaymentDTO) {
-        val creditCard = creditCardRepository.findByIdOrThrow(payment.creditCardId)
-        val wallet = walletRepository.findByIdOrThrow(payment.billingWalletId)
+        val creditCardFromDatabase = creditCardRepository.findByIdOrThrow(payment.creditCardId)
+        val walletFromDatabase = walletRepository.findByIdOrThrow(payment.billingWalletId)
 
-        check(creditCard.availableRebate >= payment.rebate) { "Rebate exceeds available rebate" }
+        check(creditCardFromDatabase.availableRebate >= payment.rebate) { "Rebate exceeds available rebate" }
 
         val pendingPayments =
             creditCardPaymentRepository
@@ -355,29 +418,50 @@ class CreditCardService(
             effectiveAmount = (totalRemaining - effectiveRebate).coerceAtLeast(BigDecimal.ZERO)
         }
 
-        check(wallet.balance >= effectiveAmount) { "Insufficient wallet balance" }
+        check(walletFromDatabase.balance >= effectiveAmount) { "Insufficient wallet balance" }
 
         distributePayment(
             pendingPayments = pendingPayments,
             totalRemaining = totalRemaining,
             amountToDistribute = amountToDistribute,
             effectiveRebate = effectiveRebate,
-            billingWallet = if (isPartial) null else wallet,
+            billingWallet = if (isPartial) null else walletFromDatabase,
         )
 
-        wallet.balance -= effectiveAmount
-        creditCard.availableRebate -= effectiveRebate
+        walletFromDatabase.balance -= effectiveAmount
+        creditCardFromDatabase.availableRebate -= effectiveRebate
 
-        if (isPartial) {
-            logger.info(
-                "Partial payment of {} applied to invoice {} from credit card {}",
-                amountToDistribute,
-                payment.invoiceDate,
-                creditCard,
-            )
-        } else {
-            logger.info("Invoice {} from credit card {} paid successfully", payment.invoiceDate, creditCard)
-        }
+        val (titleKey, messageKey) =
+            if (isPartial) {
+                logger.info(
+                    "Partial payment of {} applied to invoice {} from credit card {}",
+                    amountToDistribute,
+                    payment.invoiceDate,
+                    creditCardFromDatabase,
+                )
+
+                TranslationKeys.CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_TITLE to
+                    TranslationKeys.CREDITCARD_DIALOG_PARTIAL_INVOICE_PAID_MESSAGE
+            } else {
+                logger.info(
+                    "Invoice {} from credit card {} paid successfully",
+                    payment.invoiceDate,
+                    creditCardFromDatabase,
+                )
+
+                TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_TITLE to
+                    TranslationKeys.CREDITCARD_DIALOG_INVOICE_PAID_MESSAGE
+            }
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(titleKey),
+            message =
+                preferencesService
+                    .translate(messageKey)
+                    .replace("{0}", creditCardFromDatabase.name),
+            relatedEntityId = creditCardFromDatabase.id!!,
+        )
     }
 
     private fun distributePayment(
@@ -441,6 +525,16 @@ class CreditCardService(
         creditCardFromDatabase.isArchived = false
 
         logger.info("$creditCardFromDatabase unarchived successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_TITLE),
+            message =
+                preferencesService
+                    .translate(TranslationKeys.CREDITCARD_DIALOG_UNARCHIVED_MESSAGE)
+                    .replace("{0}", creditCardFromDatabase.name),
+            relatedEntityId = creditCardFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -449,9 +543,16 @@ class CreditCardService(
 
         creditCardFromDatabase.availableRebate += creditCardCredit.amount
 
-        creditCardCreditRepository.save(creditCardCredit)
+        val created = creditCardCreditRepository.save(creditCardCredit)
 
         logger.info("$creditCardCredit added successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_TITLE),
+            message = preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE),
+            relatedEntityId = created.id!!,
+        )
     }
 
     fun getAvailableCredit(creditCardId: Int): BigDecimal {

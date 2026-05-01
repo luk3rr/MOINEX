@@ -76,11 +76,6 @@ class EditWishlistItemController(
 
             wishlistService.updateItem(item, formData.links)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_UPDATED_TITLE),
-                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_UPDATED_MESSAGE),
-            )
-
             (titleField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

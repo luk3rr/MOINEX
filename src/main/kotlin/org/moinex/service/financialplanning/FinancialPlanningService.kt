@@ -1,16 +1,20 @@
 package org.moinex.service.financialplanning
 
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.toRounded
 import org.moinex.model.dto.BudgetGroupHistoricalDataDTO
 import org.moinex.model.dto.PlanStatusDTO
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.financialplanning.BudgetGroup
 import org.moinex.model.financialplanning.FinancialPlan
 import org.moinex.repository.financialplanning.FinancialPlanRepository
 import org.moinex.service.CategoryService
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
@@ -26,6 +30,8 @@ class FinancialPlanningService(
     private val creditCardService: CreditCardService,
     private val categoryService: CategoryService,
     private val walletService: WalletService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(FinancialPlanningService::class.java)
 
@@ -48,6 +54,15 @@ class FinancialPlanningService(
         val newPlan = financialPlanRepository.save(plan)
 
         logger.info("$newPlan created successfully with startDate=${newPlan.startDate}")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_CREATED_MESSAGE),
+            relatedEntityId = newPlan.id!!,
+        )
 
         return newPlan.id!!
     }
@@ -85,6 +100,15 @@ class FinancialPlanningService(
             newGroup.plan = planFromDatabase
             planFromDatabase.budgetGroups.add(newGroup)
         }
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE),
+            relatedEntityId = planFromDatabase.id!!,
+        )
 
         logger.info("$planFromDatabase updated successfully")
     }

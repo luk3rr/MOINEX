@@ -36,14 +36,7 @@ class AddCategoryController(
         val name = categoryNameField.text
 
         runCatching {
-            categoryService.createCategory(Category(null, name, false))
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
-                preferencesService
-                    .translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE)
-                    .replace("{0}", name),
-            )
+            categoryService.createCategory(Category(name = name, isArchived = false))
 
             (categoryNameField.scene.window as Stage).close()
         }.onFailure { e ->

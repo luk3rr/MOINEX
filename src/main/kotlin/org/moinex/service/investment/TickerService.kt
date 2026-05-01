@@ -9,12 +9,14 @@
 package org.moinex.service.investment
 
 import org.moinex.common.constant.Files
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FileUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.enums.AssetType
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.investment.CryptoExchange
 import org.moinex.model.investment.Dividend
@@ -27,12 +29,15 @@ import org.moinex.repository.investment.DividendRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.MessageFormat
 import java.time.LocalDateTime
 import java.time.YearMonth
 
@@ -44,6 +49,8 @@ class TickerService(
     private val dividendRepository: DividendRepository,
     private val cryptoExchangeRepository: CryptoExchangeRepository,
     private val walletService: WalletService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -64,6 +71,15 @@ class TickerService(
 
         logger.info("$newTicker created successfully")
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_ADDED_MESSAGE),
+            relatedEntityId = newTicker.id!!,
+        )
+
         return newTicker.id!!
     }
 
@@ -81,31 +97,64 @@ class TickerService(
         }
 
         logger.info("$tickerFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UPDATED_MESSAGE),
+            relatedEntityId = tickerFromDatabase.id!!,
+        )
     }
 
     @Transactional
     fun deleteTicker(id: Int) {
-        val ticker = tickerRepository.findByIdOrThrow(id)
+        val tickerFromDatabase = tickerRepository.findByIdOrThrow(id)
 
         check(getTransactionCountByTicker(id) == 0) {
             "Ticker with id $id has transactions associated with it and cannot be deleted. " +
                 "Remove the transactions first or archive the ticker"
         }
 
-        tickerRepository.delete(ticker)
+        tickerRepository.delete(tickerFromDatabase)
 
-        logger.info("$ticker deleted successfully")
+        logger.info("$tickerFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_DELETED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_DELETED_MESSAGE),
+                    "${tickerFromDatabase.name} (${tickerFromDatabase.symbol})",
+                ),
+            relatedEntityId = tickerFromDatabase.id!!,
+        )
     }
 
     @Transactional
     fun unarchiveTicker(id: Int) {
-        val ticker = tickerRepository.findByIdOrThrow(id)
+        val tickerFromDatabase = tickerRepository.findByIdOrThrow(id)
 
-        ticker.apply {
+        tickerFromDatabase.apply {
             isArchived = false
         }
 
-        logger.info("$ticker unarchived successfully")
+        logger.info("$tickerFromDatabase unarchived successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UNARCHIVED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UNARCHIVED_MESSAGE),
+                    "${tickerFromDatabase.name} (${tickerFromDatabase.symbol})",
+                ),
+            relatedEntityId = tickerFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -130,6 +179,15 @@ class TickerService(
 
         val newPurchase = tickerPurchaseRepository.save(tickerPurchase)
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_ADDED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_ADDED_MESSAGE),
+            relatedEntityId = newPurchase.id!!,
+        )
+
         logger.info("$newPurchase created successfully")
     }
 
@@ -152,6 +210,15 @@ class TickerService(
         walletService.updateWalletTransaction(walletTransaction)
 
         logger.info("$tickerPurchaseFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_UPDATED_MESSAGE),
+            relatedEntityId = tickerPurchaseFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -162,6 +229,15 @@ class TickerService(
         walletService.deleteWalletTransaction(purchaseFromDatabase.walletTransaction!!.id!!)
 
         logger.info("$purchaseFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_DELETED_MESSAGE),
+            relatedEntityId = purchaseFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -186,11 +262,20 @@ class TickerService(
 
         tickerSale.apply { this.walletTransaction = walletTransaction }
 
-        tickerSaleRepository.save(tickerSale)
+        val newTickerSale = tickerSaleRepository.save(tickerSale)
 
         tickerFromDatabase.currentQuantity = tickerFromDatabase.currentQuantity.subtract(tickerSale.quantity)
 
-        logger.info("$tickerSale created successfully")
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_SALE_ADDED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_SALE_ADDED_MESSAGE),
+            relatedEntityId = newTickerSale.id!!,
+        )
+
+        logger.info("$newTickerSale created successfully")
     }
 
     @Transactional
@@ -213,6 +298,15 @@ class TickerService(
         walletService.updateWalletTransaction(walletTransaction)
 
         logger.info("$tickerSaleFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_SALE_UPDATED_MESSAGE),
+            relatedEntityId = tickerSaleFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -223,6 +317,15 @@ class TickerService(
         walletService.deleteWalletTransaction(saleFromDatabase.walletTransaction!!.id!!)
 
         logger.info("$saleFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_SALE_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_SALE_DELETED_MESSAGE),
+            relatedEntityId = saleFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -250,6 +353,15 @@ class TickerService(
 
         val newDividend = dividendRepository.save(dividend)
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE),
+            relatedEntityId = newDividend.id!!,
+        )
+
         logger.info("$newDividend created successfully")
     }
 
@@ -268,6 +380,15 @@ class TickerService(
         walletService.updateWalletTransaction(updatedDividend.walletTransaction!!)
 
         logger.info("$dividendFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE),
+            relatedEntityId = dividendFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -278,6 +399,15 @@ class TickerService(
         walletService.deleteWalletTransaction(dividendFromDatabase.walletTransaction!!.id!!)
 
         logger.info("$dividendFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_DELETED_MESSAGE),
+            relatedEntityId = dividendFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -295,6 +425,15 @@ class TickerService(
             targetTickerFromDatabase.currentQuantity.add(cryptoExchange.receivedQuantity)
 
         val newCryptoExchange = cryptoExchangeRepository.save(cryptoExchange)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE),
+            relatedEntityId = newCryptoExchange.id!!,
+        )
 
         logger.info("$newCryptoExchange created successfully")
     }
@@ -320,6 +459,15 @@ class TickerService(
         cryptoExchangeFromDatabase.description = updatedCryptoExchange.description
 
         logger.info("$cryptoExchangeFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE),
+            relatedEntityId = cryptoExchangeFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -340,6 +488,15 @@ class TickerService(
         cryptoExchangeRepository.delete(cryptoExchangeFromDatabase)
 
         logger.info("$cryptoExchangeFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_DELETED_MESSAGE),
+            relatedEntityId = cryptoExchangeFromDatabase.id!!,
+        )
     }
 
     @Transactional

@@ -57,11 +57,6 @@ class AddCreditCardController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREATED_MESSAGE),
-            )
-
             (nameField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

@@ -8,6 +8,8 @@
 
 package org.moinex.service.investment
 
+import org.moinex.common.ClockProvider
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.buyOperationsUntil
 import org.moinex.common.extension.calculateOperationStateUntil
 import org.moinex.common.extension.calculateQuantityUntil
@@ -22,6 +24,7 @@ import org.moinex.model.dto.BondPeriodInterestResultDTO
 import org.moinex.model.dto.BondPeriodStateDTO
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.InterestType
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondInterestCalculation
 import org.moinex.model.investment.BondOperation
@@ -29,12 +32,13 @@ import org.moinex.model.investment.MarketIndicatorHistory
 import org.moinex.repository.investment.BondInterestCalculationRepository
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 import kotlin.math.pow
 
@@ -44,6 +48,9 @@ class BondInterestCalculationService(
     private val bondOperationRepository: BondOperationRepository,
     private val bondInterestCalculationRepository: BondInterestCalculationRepository,
     private val marketIndicatorService: MarketIndicatorService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider = ClockProvider(),
 ) {
     private val logger = LoggerFactory.getLogger(BondInterestCalculationService::class.java)
 
@@ -97,7 +104,7 @@ class BondInterestCalculationService(
                 }
 
         val startMonth = YearMonth.from(firstBuy.walletTransaction!!.date.toLocalDate())
-        val currentMonth = YearMonth.now()
+        val currentMonth = YearMonth.from(clockProvider.now())
 
         val context =
             resolveCalculationContext(bond, startMonth, currentMonth) ?: run {
@@ -140,17 +147,17 @@ class BondInterestCalculationService(
         month: YearMonth,
         newMonthlyInterest: BigDecimal,
     ) {
-        val bond = bondRepository.findByIdOrThrow(bondId)
-        requireBondConfiguration(bond)
+        val bondFromDatabase = bondRepository.findByIdOrThrow(bondId)
+        requireBondConfiguration(bondFromDatabase)
 
         val calculation =
             requireNotNull(
-                bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month),
+                bondInterestCalculationRepository.findByBondAndReferenceMonth(bondFromDatabase, month),
             ) {
-                "No interest calculation found for $bond in month $month"
+                "No interest calculation found for $bondFromDatabase in month $month"
             }
 
-        val calculatedUntil = resolveCalculatedUntilDate(bond, month)
+        val calculatedUntil = resolveCalculatedUntilDate(bondFromDatabase, month)
 
         val delta =
             updateMonthCalculation(
@@ -162,17 +169,26 @@ class BondInterestCalculationService(
 
         logger.info(
             "Adjusted monthly interest for {} month {}: delta={}",
-            bond,
+            bondFromDatabase,
             month,
             delta,
         )
 
-        propagateDeltaToFutureMonths(bond, month, delta)
+        propagateDeltaToFutureMonths(bondFromDatabase, month, delta)
 
         logger.info(
             "Completed adjustment propagation for {} starting from month {}",
-            bond,
+            bondFromDatabase,
             month,
+        )
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_MESSAGE),
+            relatedEntityId = bondFromDatabase.id!!,
         )
     }
 
@@ -181,27 +197,27 @@ class BondInterestCalculationService(
         bondId: Int,
         month: YearMonth,
     ) {
-        val bond = bondRepository.findByIdOrThrow(bondId)
+        val bondFromDatabase = bondRepository.findByIdOrThrow(bondId)
 
         val calculation =
             requireNotNull(
-                bondInterestCalculationRepository.findByBondAndReferenceMonth(bond, month),
+                bondInterestCalculationRepository.findByBondAndReferenceMonth(bondFromDatabase, month),
             ) {
-                "No interest calculation found for $bond in month $month"
+                "No interest calculation found for $bondFromDatabase in month $month"
             }
 
         if (!calculation.manuallyAdjusted) {
             logger.warn(
                 "Month {} for {} was not manually adjusted, skipping reset",
                 month,
-                bond,
+                bondFromDatabase,
             )
             return
         }
 
-        val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bond)
-        val recalculatedInterest = calculateMonthlyInterest(bond, month, operations)
-        val calculatedUntil = resolveCalculatedUntilDate(bond, month)
+        val operations = bondOperationRepository.findByBondOrderByOperationDateAsc(bondFromDatabase)
+        val recalculatedInterest = calculateMonthlyInterest(bondFromDatabase, month, operations)
+        val calculatedUntil = resolveCalculatedUntilDate(bondFromDatabase, month)
 
         val delta =
             updateMonthCalculation(
@@ -213,12 +229,21 @@ class BondInterestCalculationService(
 
         logger.info(
             "Reset monthly interest for {} month {} to automatic: delta={}",
-            bond,
+            bondFromDatabase,
             month,
             delta,
         )
 
-        propagateDeltaToFutureMonths(bond, month, delta)
+        propagateDeltaToFutureMonths(bondFromDatabase, month, delta)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_MESSAGE),
+            relatedEntityId = bondFromDatabase.id!!,
+        )
     }
 
     @Transactional(readOnly = true)
@@ -226,7 +251,7 @@ class BondInterestCalculationService(
         val bond = bondRepository.findByIdOrThrow(bondId)
 
         return bondInterestCalculationRepository
-            .findByBondAndReferenceMonth(bond, YearMonth.now())
+            .findByBondAndReferenceMonth(bond, YearMonth.from(clockProvider.now()))
             ?.monthlyInterest
     }
 
@@ -742,7 +767,7 @@ class BondInterestCalculationService(
     ) {
         val calculatedUntil = calculation.calculatedUntilDate ?: return
 
-        val today = LocalDate.now()
+        val today = clockProvider.now().toLocalDate()
         val monthEnd = month.atEndOfMonth()
 
         if (today.isBeforeOrEqual(calculatedUntil) || calculatedUntil.isAfter(monthEnd)) {
@@ -791,7 +816,7 @@ class BondInterestCalculationService(
         val newAccumulated = previousAccumulated.add(newMonthlyInterest)
 
         calculation.apply {
-            calculationDate = LocalDate.now()
+            calculationDate = clockProvider.now().toLocalDate()
             calculatedUntilDate = result.lastDateWithData
             this.quantity = quantity
             this.investedAmount = investedAmount
@@ -831,7 +856,7 @@ class BondInterestCalculationService(
             BondInterestCalculation(
                 bond = bond,
                 referenceMonth = month,
-                calculationDate = LocalDate.now(),
+                calculationDate = clockProvider.now().toLocalDate(),
                 calculatedUntilDate = resolveCalculatedUntilDate(bond, month),
                 quantity = quantity,
                 investedAmount = investedAmount,
@@ -839,7 +864,7 @@ class BondInterestCalculationService(
                 accumulatedInterest = accumulated,
                 finalValue = investedAmount.add(accumulated),
                 calculationMethod = getCalculationMethod(bond),
-                createdAt = LocalDateTime.now(),
+                createdAt = clockProvider.now(),
                 manuallyAdjusted = false,
             )
 
@@ -853,7 +878,7 @@ class BondInterestCalculationService(
         month: YearMonth,
     ): LocalDate {
         val monthEnd = month.atEndOfMonth()
-        val lastDate = getLastDateWithData(bond, month.atDay(1), LocalDate.now())
+        val lastDate = getLastDateWithData(bond, month.atDay(1), clockProvider.now().toLocalDate())
 
         return minOf(lastDate, monthEnd)
     }
@@ -951,7 +976,8 @@ class BondInterestCalculationService(
             when {
                 lastMonth == currentMonth -> {
                     // Check if there's new data available since last calculation
-                    val lastDateWithData = getLastDateWithData(bond, currentMonth.atDay(1), LocalDate.now())
+                    val lastDateWithData =
+                        getLastDateWithData(bond, currentMonth.atDay(1), clockProvider.now().toLocalDate())
                     val alreadyCalculatedUntil = lastCalculation.calculatedUntilDate
 
                     alreadyCalculatedUntil?.let {
@@ -1022,7 +1048,7 @@ class BondInterestCalculationService(
         val newAccumulated = context.accumulatedInterest.add(monthlyInterest)
 
         calculation.apply {
-            calculationDate = LocalDate.now()
+            calculationDate = clockProvider.now().toLocalDate()
             calculatedUntilDate = resolveCalculatedUntilDate(bond, month)
             this.quantity = quantity
             this.investedAmount = investedAmount

@@ -26,6 +26,8 @@ import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.enums.AssetType
 import org.moinex.model.enums.OperationType
 import org.moinex.repository.investment.InvestmentPerformanceSnapshotRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -37,6 +39,8 @@ class InvestmentPerformanceServiceTest :
         val bondService = mockk<BondService>()
         val tickerPriceHistoryService = mockk<TickerPriceHistoryService>()
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             InvestmentPerformanceService(
@@ -45,6 +49,8 @@ class InvestmentPerformanceServiceTest :
                 bondService,
                 tickerPriceHistoryService,
                 bondInterestCalculationService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }

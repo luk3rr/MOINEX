@@ -141,12 +141,6 @@ class RecurringCreditCardDebtsController(
 
         runCatching {
             recurringCreditCardDebtService.deleteRecurring(selected.id!!)
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_DELETED_TITLE),
-                preferencesService.translate(TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_DELETED_MESSAGE),
-            )
-
             loadData()
             updateTableView()
         }.onFailure { e ->

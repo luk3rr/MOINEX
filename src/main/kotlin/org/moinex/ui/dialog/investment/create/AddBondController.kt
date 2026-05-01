@@ -119,11 +119,6 @@ open class AddBondController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_ADDED_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_ADDED_MESSAGE),
-            )
-
             (saveButton.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

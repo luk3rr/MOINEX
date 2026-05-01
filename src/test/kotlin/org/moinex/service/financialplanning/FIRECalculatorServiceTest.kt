@@ -11,6 +11,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.moinex.factory.financialplanning.FIRECalculatorSettingsFactory
 import org.moinex.repository.financialplanning.FIRECalculatorSettingsRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.Optional
@@ -18,7 +20,9 @@ import java.util.Optional
 class FIRECalculatorServiceTest :
     BehaviorSpec({
         val repository = mockk<FIRECalculatorSettingsRepository>()
-        val service = FIRECalculatorService(repository)
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val service = FIRECalculatorService(repository, notificationService, preferencesService)
 
         afterContainer { clearAllMocks(answers = true) }
 

@@ -56,14 +56,10 @@ class EditCategoryController(
         val newName = categoryNewNameField.text
         val archived = archivedCheckBox.isSelected
 
-        var nameChanged = false
-        var archivedChanged = false
-
         if (newName != null && newName.isNotBlank() && newName != selectedCategory.name) {
             runCatching {
                 selectedCategory.name = newName
                 categoryService.renameCategory(selectedCategory)
-                nameChanged = true
             }.onFailure { e ->
                 WindowUtils.showErrorDialog(
                     preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_NAME_TITLE),
@@ -77,7 +73,6 @@ class EditCategoryController(
             archived && !selectedCategory.isArchived -> {
                 runCatching {
                     categoryService.archiveCategory(selectedCategory.id!!)
-                    archivedChanged = true
                 }.onFailure { e ->
                     WindowUtils.showErrorDialog(
                         preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
@@ -89,7 +84,6 @@ class EditCategoryController(
             !archived && selectedCategory.isArchived -> {
                 runCatching {
                     categoryService.unarchiveCategory(selectedCategory.id!!)
-                    archivedChanged = true
                 }.onFailure { e ->
                     WindowUtils.showErrorDialog(
                         preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_ERROR_UPDATING_CATEGORY_TITLE),
@@ -98,29 +92,6 @@ class EditCategoryController(
                     return
                 }
             }
-        }
-
-        if (nameChanged || archivedChanged) {
-            val msg =
-                when {
-                    nameChanged && archivedChanged ->
-                        preferencesService.translate(
-                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_NAME_AND_ARCHIVED_UPDATED_MESSAGE,
-                        )
-                    archivedChanged ->
-                        preferencesService.translate(
-                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE,
-                        )
-                    else ->
-                        preferencesService.translate(
-                            TranslationKeys.CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE,
-                        )
-                }
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
-                msg,
-            )
         }
 
         (categoryNewNameField.scene.window as Stage).close()

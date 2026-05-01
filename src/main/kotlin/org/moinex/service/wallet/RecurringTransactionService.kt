@@ -16,11 +16,11 @@ import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.repository.wallettransaction.RecurringTransactionRepository
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
-import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.text.MessageFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -42,6 +42,19 @@ class RecurringTransactionService(
 
         logger.info("$newRecurringTransaction created successfully")
 
+        notificationService.send(
+            type = NotificationType.INFO,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_CREATED_MESSAGE,
+                ),
+            relatedEntityId = newRecurringTransaction.id!!,
+        )
+
         return newRecurringTransaction.id!!
     }
 
@@ -52,6 +65,19 @@ class RecurringTransactionService(
         recurringTransactionRepository.delete(recurringTransactionFromDatabase)
 
         logger.info("$recurringTransactionFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_DELETED_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_DELETED_MESSAGE,
+                ),
+            relatedEntityId = recurringTransactionFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -76,6 +102,19 @@ class RecurringTransactionService(
         }
 
         logger.info("$recurringTransactionFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_TITLE,
+                ),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_MESSAGE,
+                ),
+            relatedEntityId = recurringTransactionFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -95,17 +134,15 @@ class RecurringTransactionService(
         transactions.forEach { transaction ->
             walletService.createWalletTransaction(transaction, publishNotification = false)
 
-            val bundle = preferencesService.bundle
-            val title = bundle.getString(TranslationKeys.NOTIFICATION_RECURRING_PROCESSED_TITLE)
-            val message =
-                bundle
-                    .getString(TranslationKeys.NOTIFICATION_RECURRING_PROCESSED_MESSAGE)
-                    .replace("{0}", transaction.description ?: "")
-                    .replace("{1}", UIUtils.formatCurrency(transaction.amount))
-            notificationService.createNotification(
-                type = NotificationType.RECURRING_TRANSACTION_PROCESSED,
-                title = title,
-                message = message,
+            notificationService.send(
+                type = NotificationType.INFO,
+                title = preferencesService.translate(TranslationKeys.NOTIFICATION_RECURRING_PROCESSED_TITLE),
+                message =
+                    MessageFormat.format(
+                        preferencesService.translate(TranslationKeys.NOTIFICATION_RECURRING_PROCESSED_MESSAGE),
+                        transaction.description ?: "",
+                        UIUtils.formatCurrency(transaction.amount),
+                    ),
             )
 
             logger.info("Transaction created with date ${transaction.date} for recurring transaction")

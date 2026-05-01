@@ -1,13 +1,17 @@
 package org.moinex.service.goal
 
 import org.moinex.common.constant.Constants
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isNotZero
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.model.enums.GoalFundingStrategy
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.goal.Goal
 import org.moinex.repository.goal.GoalRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,6 +23,8 @@ import java.time.LocalDate
 class GoalService(
     private val goalRepository: GoalRepository,
     private val walletService: WalletService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(GoalService::class.java)
 
@@ -50,6 +56,15 @@ class GoalService(
         val newGoal = goalRepository.save(goal)
 
         logger.info("$newGoal was created")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE),
+            relatedEntityId = newGoal.id!!,
+        )
 
         return newGoal.id!!
     }
@@ -90,6 +105,15 @@ class GoalService(
             }
         }
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_MESSAGE),
+            relatedEntityId = goalFromDatabase.id!!,
+        )
+
         logger.info("$goalFromDatabase updated successfully")
     }
 
@@ -109,6 +133,15 @@ class GoalService(
         goalRepository.delete(goalFromDatabase)
 
         logger.info("$goalFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.GOAL_DIALOG_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.GOAL_DIALOG_DELETED_MESSAGE),
+            relatedEntityId = goalFromDatabase.id!!,
+        )
     }
 
     @Transactional

@@ -378,6 +378,8 @@ object TranslationKeys {
         "goal.dialog.confirmationDelete.currentAmount"
     const val GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_AMOUNT: String = "goal.dialog.confirmationDelete.targetAmount"
     const val GOAL_DIALOG_CONFIRMATION_DELETE_TARGET_DATE: String = "goal.dialog.confirmationDelete.targetDate"
+    const val GOAL_DIALOG_DELETED_TITLE: String = "goal.dialog.deleted.title"
+    const val GOAL_DIALOG_DELETED_MESSAGE: String = "goal.dialog.deleted.message"
     const val GOAL_TABLE_HEADER_ID: String = "goal.table.header.id"
     const val GOAL_TABLE_HEADER_NAME: String = "goal.table.header.name"
     const val GOAL_TABLE_HEADER_INITIAL_AMOUNT: String = "goal.table.header.initialAmount"
@@ -561,6 +563,11 @@ object TranslationKeys {
         "investment.dialog.totalPercentageValidation.title"
     const val INVESTMENT_DIALOG_TOTAL_PERCENTAGE_VALIDATION: String =
         "investment.dialog.totalPercentageValidation.message"
+
+    const val INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_TITLE: String =
+        "investment.dialog.performanceCalculation.title"
+    const val INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_MESSAGE: String =
+        "investment.dialog.performanceCalculation.message"
 
     // Savings - Bonds
     const val SAVINGS_BONDS_DIALOG_ADD_BOND_TITLE: String = "savings.bonds.dialog.addBond.title"
@@ -1315,6 +1322,8 @@ object TranslationKeys {
     const val INVESTMENT_DIALOG_PURCHASE_ADDED_MESSAGE: String = "investment.dialog.purchaseAdded.message"
     const val INVESTMENT_DIALOG_PURCHASE_UPDATED_TITLE: String = "investment.dialog.purchaseUpdated.title"
     const val INVESTMENT_DIALOG_PURCHASE_UPDATED_MESSAGE: String = "investment.dialog.purchaseUpdated.message"
+    const val INVESTMENT_DIALOG_PURCHASE_DELETED_TITLE: String = "investment.dialog.purchaseDeleted.title"
+    const val INVESTMENT_DIALOG_PURCHASE_DELETED_MESSAGE: String = "investment.dialog.purchaseDeleted.message"
     const val INVESTMENT_DIALOG_ERROR_BUYING_TICKER_TITLE: String = "investment.dialog.errorBuyingTicker.title"
     const val INVESTMENT_DIALOG_ERROR_UPDATING_PURCHASE_TITLE: String =
         "investment.dialog.errorUpdatingPurchase.title"
@@ -1322,12 +1331,16 @@ object TranslationKeys {
     const val INVESTMENT_DIALOG_SALE_ADDED_MESSAGE: String = "investment.dialog.saleAdded.message"
     const val INVESTMENT_DIALOG_SALE_UPDATED_TITLE: String = "investment.dialog.saleUpdated.title"
     const val INVESTMENT_DIALOG_SALE_UPDATED_MESSAGE: String = "investment.dialog.saleUpdated.message"
+    const val INVESTMENT_DIALOG_SALE_DELETED_TITLE: String = "investment.dialog.saleDeleted.title"
+    const val INVESTMENT_DIALOG_SALE_DELETED_MESSAGE: String = "investment.dialog.saleDeleted.message"
     const val INVESTMENT_DIALOG_ERROR_SELLING_TICKER_TITLE: String = "investment.dialog.errorSellingTicker.title"
     const val INVESTMENT_DIALOG_ERROR_UPDATING_SALE_TITLE: String = "investment.dialog.errorUpdatingSale.title"
     const val INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE: String = "investment.dialog.dividendCreated.title"
     const val INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE: String = "investment.dialog.dividendCreated.message"
     const val INVESTMENT_DIALOG_DIVIDEND_UPDATED_TITLE: String = "investment.dialog.dividendUpdated.title"
     const val INVESTMENT_DIALOG_DIVIDEND_UPDATED_MESSAGE: String = "investment.dialog.dividendUpdated.message"
+    const val INVESTMENT_DIALOG_DIVIDEND_DELETED_TITLE: String = "investment.dialog.dividendDeleted.title"
+    const val INVESTMENT_DIALOG_DIVIDEND_DELETED_MESSAGE: String = "investment.dialog.dividendDeleted.message"
     const val INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_TITLE: String =
         "investment.dialog.invalidDividendValue.title"
     const val INVESTMENT_DIALOG_INVALID_DIVIDEND_VALUE_MESSAGE: String =
@@ -1340,6 +1353,8 @@ object TranslationKeys {
     const val INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE: String = "investment.dialog.exchangeCreated.message"
     const val INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE: String = "investment.dialog.exchangeUpdated.title"
     const val INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE: String = "investment.dialog.exchangeUpdated.message"
+    const val INVESTMENT_DIALOG_EXCHANGE_DELETED_TITLE: String = "investment.dialog.exchangeDeleted.title"
+    const val INVESTMENT_DIALOG_EXCHANGE_DELETED_MESSAGE: String = "investment.dialog.exchangeDeleted.message"
     const val INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_TITLE: String =
         "investment.dialog.invalidExchangeQuantity.title"
     const val INVESTMENT_DIALOG_INVALID_EXCHANGE_QUANTITY_MESSAGE: String =
@@ -1590,6 +1605,10 @@ object TranslationKeys {
         "wallettransaction.dialog.transactionUpdated.title"
     const val WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_MESSAGE: String =
         "wallettransaction.dialog.transactionUpdated.message"
+    const val WALLETTRANSACTION_DIALOG_TRANSACTION_DELETED_TITLE: String =
+        "wallettransaction.dialog.transactionDeleted.title"
+    const val WALLETTRANSACTION_DIALOG_TRANSACTION_DELETED_MESSAGE: String =
+        "wallettransaction.dialog.transactionDeleted.message"
     const val WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_TITLE: String =
         "wallettransaction.dialog.invalidTransactionValue.title"
     const val WALLETTRANSACTION_DIALOG_INVALID_TRANSACTION_VALUE_MESSAGE: String =
@@ -1641,6 +1660,10 @@ object TranslationKeys {
         "wallettransaction.dialog.walletTypeChanged.title"
     const val WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE: String =
         "wallettransaction.dialog.walletTypeChanged.message"
+    const val WALLETTRANSACTION_DIALOG_WALLET_NAME_CHANGED_TITLE: String =
+        "wallettransaction.dialog.walletNameChanged.title"
+    const val WALLETTRANSACTION_DIALOG_WALLET_NAME_CHANGED_MESSAGE: String =
+        "wallettransaction.dialog.walletNameChanged.message"
     const val WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_TITLE: String =
         "wallettransaction.dialog.noWalletSelected.title"
     const val WALLETTRANSACTION_DIALOG_NO_WALLET_SELECTED_UNARCHIVE_MESSAGE: String =
@@ -1731,6 +1754,10 @@ object TranslationKeys {
         "wallettransaction.dialog.recurringTransactionUpdated.title"
     const val WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_MESSAGE: String =
         "wallettransaction.dialog.recurringTransactionUpdated.message"
+    const val WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_DELETED_TITLE: String =
+        "wallettransaction.dialog.recurringTransactionDeleted.title"
+    const val WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_DELETED_MESSAGE: String =
+        "wallettransaction.dialog.recurringTransactionDeleted.message"
     const val WALLETTRANSACTION_DIALOG_ERROR_EDITING_RECURRING_TITLE: String =
         "wallettransaction.dialog.errorEditingRecurring.title"
     const val WALLETTRANSACTION_INFO_RECURRING_INACTIVE: String = "wallettransaction.info.recurringInactive"
@@ -1759,6 +1786,8 @@ object TranslationKeys {
         "category.dialog.categoryNameAndArchivedUpdated.message"
     const val CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE: String =
         "category.dialog.categoryArchivedUpdated.message"
+    const val CATEGORY_DIALOG_CATEGORY_UNARCHIVED_UPDATED_MESSAGE: String =
+        "category.dialog.categoryUnarchivedUpdated.message"
     const val CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE: String = "category.dialog.categoryNameUpdated.message"
     const val CATEGORY_DIALOG_NO_CATEGORY_SELECTED_TITLE: String = "category.dialog.noCategorySelected.title"
     const val CATEGORY_DIALOG_NO_CATEGORY_SELECTED_EDIT_MESSAGE: String =
@@ -1771,6 +1800,8 @@ object TranslationKeys {
         "category.dialog.categoryHasTransactions.message"
     const val CATEGORY_DIALOG_REMOVE_CATEGORY_TITLE: String = "category.dialog.removeCategory.title"
     const val CATEGORY_DIALOG_REMOVE_CATEGORY_MESSAGE: String = "category.dialog.removeCategory.message"
+    const val CATEGORY_DIALOG_DELETE_CATEGORY_TITLE: String = "category.dialog.deleteCategory.title"
+    const val CATEGORY_DIALOG_DELETE_CATEGORY_MESSAGE: String = "category.dialog.deleteCategory.message"
     const val CATEGORY_DIALOG_ERROR_REMOVING_CATEGORY_TITLE: String = "category.dialog.errorRemovingCategory.title"
     const val CATEGORY_DIALOG_ADD_CATEGORY_TITLE: String = "category.dialog.addCategory.title"
     const val CATEGORY_DIALOG_EDIT_CATEGORY_TITLE: String = "category.dialog.editCategory.title"
@@ -1889,6 +1920,8 @@ object TranslationKeys {
     const val FIRE_CHART_SERIES_PATRIMONY: String = "fire.chart.series.patrimony"
     const val FIRE_CHART_SERIES_TARGET: String = "fire.chart.series.target"
     const val FIRE_CHART_YEARS_OPTION: String = "fire.chart.yearsOption"
+    const val FIRE_DIALOG_SETTINGS_SAVED_TITLE: String = "fire.dialog.settingsSaved.title"
+    const val FIRE_DIALOG_SETTINGS_SAVED_MESSAGE: String = "fire.dialog.settingsSaved.message"
 
     // Notifications
     const val NOTIFICATION_TIME_NOW: String = "notification.time.now"
@@ -1900,8 +1933,8 @@ object TranslationKeys {
     const val NOTIFICATION_CENTER_EMPTY: String = "notification.center.empty"
     const val NOTIFICATION_WALLET_TRANSACTION_TITLE: String = "notification.walletTransaction.title"
     const val NOTIFICATION_WALLET_TRANSACTION_MESSAGE: String = "notification.walletTransaction.message"
-    const val NOTIFICATION_CC_DEBT_TITLE: String = "notification.ccDebt.title"
-    const val NOTIFICATION_CC_DEBT_MESSAGE: String = "notification.ccDebt.message"
+    const val NOTIFICATION_CREATED_CREDIT_CARD_DEBT_TITLE: String = "notification.ccDebt.title"
+    const val NOTIFICATION_CREATED_CREDIT_CARD_DEBT_MESSAGE: String = "notification.ccDebt.message"
     const val NOTIFICATION_BUDGET_EXCEEDED_TITLE: String = "notification.budgetExceeded.title"
     const val NOTIFICATION_BUDGET_EXCEEDED_MESSAGE: String = "notification.budgetExceeded.message"
     const val NOTIFICATION_RECURRING_PROCESSED_TITLE: String = "notification.recurringProcessed.title"

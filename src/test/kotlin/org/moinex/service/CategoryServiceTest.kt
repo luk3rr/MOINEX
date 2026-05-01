@@ -16,6 +16,8 @@ import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
 import org.moinex.factory.CategoryFactory
 import org.moinex.repository.CategoryRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import org.moinex.service.wishlist.WishlistService
@@ -27,8 +29,18 @@ class CategoryServiceTest :
         val creditCardService = mockk<CreditCardService>()
         val wishListService = mockk<WishlistService>(relaxed = true)
         val walletService = mockk<WalletService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
-        val service = CategoryService(categoryRepository, creditCardService, walletService, wishListService)
+        val service =
+            CategoryService(
+                categoryRepository,
+                creditCardService,
+                walletService,
+                wishListService,
+                notificationService,
+                preferencesService,
+            )
 
         afterContainer { clearAllMocks(answers = true) }
 

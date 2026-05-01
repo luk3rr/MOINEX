@@ -24,7 +24,6 @@ import org.moinex.model.wallettransaction.Wallet
 import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import org.springframework.stereotype.Controller
-import java.text.MessageFormat
 
 @Controller
 class ArchivedWalletsController(
@@ -73,17 +72,6 @@ class ArchivedWalletsController(
         ) {
             runCatching {
                 walletService.unarchiveWallet(selectedWallet.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_TITLE),
-                    MessageFormat.format(
-                        preferencesService.translate(
-                            TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_MESSAGE,
-                        ),
-                        selectedWallet.name,
-                    ),
-                )
-
                 archivedWallets = archivedWallets.filter { it != selectedWallet }
                 updateWalletTableView()
             }.onFailure { e ->
@@ -134,17 +122,6 @@ class ArchivedWalletsController(
         ) {
             runCatching {
                 walletService.deleteWallet(selectedWallet.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_DELETED_TITLE),
-                    MessageFormat.format(
-                        preferencesService.translate(
-                            TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_DELETED_MESSAGE,
-                        ),
-                        selectedWallet.name,
-                    ),
-                )
-
                 archivedWallets = archivedWallets.filter { it != selectedWallet }
                 updateWalletTableView()
             }.onFailure { e ->

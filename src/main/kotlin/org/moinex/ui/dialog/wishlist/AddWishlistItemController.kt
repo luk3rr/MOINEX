@@ -59,11 +59,6 @@ class AddWishlistItemController(
 
             wishlistService.createItem(newItem, formData.links)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_CREATED_MESSAGE),
-            )
-
             (titleField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

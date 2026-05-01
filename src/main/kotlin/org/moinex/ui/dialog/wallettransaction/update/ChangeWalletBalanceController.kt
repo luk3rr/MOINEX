@@ -89,13 +89,6 @@ class ChangeWalletBalanceController(
             wt.balance = newBalance
             walletService.updateWalletBalance(wt)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE),
-                preferencesService.translate(
-                    TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_BALANCE_UPDATED_MESSAGE,
-                ),
-            )
-
             (balanceField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

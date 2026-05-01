@@ -82,11 +82,7 @@ class AddIncomeController(
                     type = walletTransactionType,
                     amount = incomeValue,
                 ),
-            )
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_INCOME_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_INCOME_CREATED_MESSAGE),
+                publishNotification = true,
             )
 
             (descriptionField.scene.window as Stage).close()

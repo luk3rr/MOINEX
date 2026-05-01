@@ -16,6 +16,8 @@ import org.moinex.model.enums.BudgetGroupTransactionFilter
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.repository.financialplanning.FinancialPlanRepository
 import org.moinex.service.CategoryService
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
@@ -29,6 +31,8 @@ class FinancialPlanningServiceTest :
         val creditCardService = mockk<CreditCardService>()
         val categoryService = mockk<CategoryService>()
         val walletService = mockk<WalletService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             FinancialPlanningService(
@@ -36,6 +40,8 @@ class FinancialPlanningServiceTest :
                 creditCardService,
                 categoryService,
                 walletService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }

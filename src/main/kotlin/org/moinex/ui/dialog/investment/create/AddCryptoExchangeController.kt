@@ -69,11 +69,6 @@ class AddCryptoExchangeController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_CREATED_MESSAGE),
-            )
-
             (cryptoReceivedQuantityField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

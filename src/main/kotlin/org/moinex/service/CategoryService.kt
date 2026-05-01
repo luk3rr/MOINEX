@@ -8,8 +8,10 @@
 
 package org.moinex.service
 
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.model.Category
+import org.moinex.model.enums.NotificationType
 import org.moinex.repository.CategoryRepository
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
@@ -17,6 +19,7 @@ import org.moinex.service.wishlist.WishlistService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.text.MessageFormat
 
 @Service
 class CategoryService(
@@ -24,6 +27,8 @@ class CategoryService(
     private val creditCardService: CreditCardService,
     private val walletService: WalletService,
     private val wishlistService: WishlistService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(CategoryService::class.java)
 
@@ -36,6 +41,19 @@ class CategoryService(
         val newCategory = categoryRepository.save(category)
 
         logger.info("$newCategory added successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService
+                        .translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_ADDED_MESSAGE),
+                    newCategory.name,
+                ),
+            relatedEntityId = newCategory.id!!,
+        )
 
         return newCategory.id!!
     }
@@ -51,6 +69,19 @@ class CategoryService(
         categoryRepository.delete(categoryFromDatabase)
 
         logger.info("$categoryFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_DELETE_CATEGORY_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService
+                        .translate(TranslationKeys.CATEGORY_DIALOG_DELETE_CATEGORY_MESSAGE),
+                    categoryFromDatabase.name,
+                ),
+            relatedEntityId = categoryFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -71,6 +102,17 @@ class CategoryService(
         }
 
         logger.info("$categoryFromDatabase renamed successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CATEGORY_DIALOG_CATEGORY_NAME_UPDATED_MESSAGE,
+                ),
+            relatedEntityId = categoryFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -87,6 +129,17 @@ class CategoryService(
         }
 
         logger.info("$categoryFromDatabase was archived")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CATEGORY_DIALOG_CATEGORY_ARCHIVED_UPDATED_MESSAGE,
+                ),
+            relatedEntityId = categoryFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -103,6 +156,17 @@ class CategoryService(
         }
 
         logger.info("$categoryFromDatabase was unarchived")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CATEGORY_DIALOG_CATEGORY_UPDATED_TITLE),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.CATEGORY_DIALOG_CATEGORY_UNARCHIVED_UPDATED_MESSAGE,
+                ),
+            relatedEntityId = categoryFromDatabase.id!!,
+        )
     }
 
     fun existsById(id: Int): Boolean = categoryRepository.existsById(id)

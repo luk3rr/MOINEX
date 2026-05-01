@@ -117,11 +117,6 @@ class EditTickerPurchaseController(
                 purchase.walletTransaction!!.includeInAnalysis = includeInAnalysisCheckBox.isSelected
 
                 tickerService.updateTickerPurchase(purchase)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_UPDATED_MESSAGE),
-                )
             }
 
             (tickerNameLabel.scene.window as Stage).close()

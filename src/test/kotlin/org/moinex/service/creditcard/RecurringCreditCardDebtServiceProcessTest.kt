@@ -13,6 +13,8 @@ import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.creditcard.RecurringCreditCardDebtRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.time.YearMonth
 
 class RecurringCreditCardDebtServiceProcessTest :
@@ -21,6 +23,8 @@ class RecurringCreditCardDebtServiceProcessTest :
         val creditCardDebtRepository = mockk<CreditCardDebtRepository>()
         val creditCardRepository = mockk<CreditCardRepository>()
         val creditCardService = mockk<CreditCardService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             RecurringCreditCardDebtService(
@@ -28,6 +32,8 @@ class RecurringCreditCardDebtServiceProcessTest :
                 creditCardDebtRepository,
                 creditCardRepository,
                 creditCardService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }
@@ -47,12 +53,12 @@ class RecurringCreditCardDebtServiceProcessTest :
                 every {
                     recurringCreditCardDebtRepository.findMaterializedDebtForMonth(1, any(), any())
                 } returns emptyList()
-                every { creditCardService.createDebt(any(), any()) } returns 10
+                every { creditCardService.createDebt(any(), any(), any()) } returns 10
 
                 service.processRecurringDebts()
 
                 Then("should materialize exactly one debt") {
-                    verify(exactly = 1) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 1) { creditCardService.createDebt(any(), any(), any()) }
                 }
 
                 Then("should advance nextInvoiceMonth by one month") {
@@ -76,12 +82,12 @@ class RecurringCreditCardDebtServiceProcessTest :
                 every {
                     recurringCreditCardDebtRepository.findMaterializedDebtForMonth(1, any(), any())
                 } returns emptyList()
-                every { creditCardService.createDebt(any(), any()) } returns 10
+                every { creditCardService.createDebt(any(), any(), any()) } returns 10
 
                 service.processRecurringDebts()
 
                 Then("should materialize three debts (overdue months + current)") {
-                    verify(exactly = 3) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 3) { creditCardService.createDebt(any(), any(), any()) }
                 }
 
                 Then("should advance nextInvoiceMonth past the current month") {
@@ -110,7 +116,7 @@ class RecurringCreditCardDebtServiceProcessTest :
                 service.processRecurringDebts()
 
                 Then("should not create any new debt") {
-                    verify(exactly = 0) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 0) { creditCardService.createDebt(any(), any(), any()) }
                 }
 
                 Then("should still advance nextInvoiceMonth") {
@@ -140,7 +146,7 @@ class RecurringCreditCardDebtServiceProcessTest :
                 service.processRecurringDebts()
 
                 Then("should not materialize any debt") {
-                    verify(exactly = 0) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 0) { creditCardService.createDebt(any(), any(), any()) }
                 }
 
                 Then("should deactivate the recurring") {
@@ -165,12 +171,12 @@ class RecurringCreditCardDebtServiceProcessTest :
                 every {
                     recurringCreditCardDebtRepository.findMaterializedDebtForMonth(1, any(), any())
                 } returns emptyList()
-                every { creditCardService.createDebt(any(), any()) } returns 10
+                every { creditCardService.createDebt(any(), any(), any()) } returns 10
 
                 service.processRecurringDebts()
 
                 Then("should materialize exactly one debt") {
-                    verify(exactly = 1) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 1) { creditCardService.createDebt(any(), any(), any()) }
                 }
 
                 Then("should advance nextInvoiceMonth by one year") {
@@ -188,7 +194,7 @@ class RecurringCreditCardDebtServiceProcessTest :
                 service.processRecurringDebts()
 
                 Then("should not call createDebt") {
-                    verify(exactly = 0) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 0) { creditCardService.createDebt(any(), any(), any()) }
                 }
             }
         }
@@ -209,7 +215,7 @@ class RecurringCreditCardDebtServiceProcessTest :
                     recurringCreditCardDebtRepository.findMaterializedDebtForMonth(1, any(), any())
                 } returns emptyList()
                 every {
-                    creditCardService.createDebt(any(), any())
+                    creditCardService.createDebt(any(), any(), any())
                 } throws IllegalStateException("Not enough credit")
 
                 service.processRecurringDebts()
@@ -234,12 +240,12 @@ class RecurringCreditCardDebtServiceProcessTest :
                 every {
                     recurringCreditCardDebtRepository.findMaterializedDebtForMonth(any(), any(), any())
                 } returns emptyList()
-                every { creditCardService.createDebt(any(), any()) } returns 10
+                every { creditCardService.createDebt(any(), any(), any()) } returns 10
 
                 service.processRecurringDebts()
 
                 Then("should materialize one debt per recurring") {
-                    verify(exactly = 2) { creditCardService.createDebt(any(), any()) }
+                    verify(exactly = 2) { creditCardService.createDebt(any(), any(), any()) }
                 }
             }
         }

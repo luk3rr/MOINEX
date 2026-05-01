@@ -88,14 +88,10 @@ class AddExpenseController(
                         type = walletTransactionType,
                         amount = expenseValue,
                     ),
+                    publishNotification = true,
                 )
 
             onTransactionCreatedCallback?.invoke(transactionId)
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EXPENSE_CREATED_MESSAGE),
-            )
 
             (descriptionField.scene.window as Stage).close()
         }.onFailure { e ->

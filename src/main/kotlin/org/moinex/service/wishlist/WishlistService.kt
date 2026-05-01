@@ -7,14 +7,18 @@
 package org.moinex.service.wishlist
 
 import org.moinex.common.ClockProvider
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isPending
 import org.moinex.common.extension.isPurchased
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.WishlistItemStatus
 import org.moinex.model.wishlist.WishlistItem
 import org.moinex.model.wishlist.WishlistItemLink
 import org.moinex.repository.wishlist.WishlistItemLinkRepository
 import org.moinex.repository.wishlist.WishlistItemRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import org.slf4j.LoggerFactory
@@ -27,6 +31,8 @@ class WishlistService(
     private val wishlistItemLinkRepository: WishlistItemLinkRepository,
     private val walletService: WalletService,
     private val creditCardService: CreditCardService,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
     private val clockProvider: ClockProvider = ClockProvider(),
 ) {
     private val logger = LoggerFactory.getLogger(WishlistService::class.java)
@@ -44,6 +50,15 @@ class WishlistService(
         }
 
         logger.info("$newItem created successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_CREATED_MESSAGE),
+            relatedEntityId = newItem.id!!,
+        )
 
         return newItem.id!!
     }
@@ -86,6 +101,15 @@ class WishlistService(
         }
 
         logger.info("$itemFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_UPDATED_MESSAGE),
+            relatedEntityId = itemFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -105,6 +129,15 @@ class WishlistService(
         wishlistItemRepository.delete(itemFromDatabase)
 
         logger.info("$itemFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WISHLIST_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WISHLIST_DELETED_MESSAGE),
+            relatedEntityId = itemFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -183,6 +216,15 @@ class WishlistService(
         }
 
         logger.info("$itemFromDatabase marked as pending successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WISHLIST_MARKED_PENDING_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WISHLIST_MARKED_PENDING_MESSAGE),
+            relatedEntityId = itemFromDatabase.id!!,
+        )
     }
 
     fun getAllItems(): List<WishlistItem> = wishlistItemRepository.findAllByOrderByStatusAscPriorityDescTargetDateAsc()

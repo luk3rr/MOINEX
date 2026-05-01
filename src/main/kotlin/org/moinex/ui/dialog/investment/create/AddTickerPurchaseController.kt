@@ -88,11 +88,6 @@ class AddTickerPurchaseController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_ADDED_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PURCHASE_ADDED_MESSAGE),
-            )
-
             (tickerNameLabel.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

@@ -74,11 +74,6 @@ class EditPlanController(
 
             financialPlanningService.updatePlan(financialPlan)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_TITLE),
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_PLAN_UPDATED_MESSAGE),
-            )
-
             planNameField.scene.window.hide()
         }.onFailure { e ->
             when (e) {

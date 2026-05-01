@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.text.MessageFormat
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.YearMonth
@@ -47,6 +48,15 @@ class WalletService(
 
         logger.info("$newWallet created successfully")
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_CREATED_MESSAGE),
+            relatedEntityId = newWallet.id!!,
+        )
+
         return newWallet.id!!
     }
 
@@ -66,6 +76,20 @@ class WalletService(
         walletRepository.delete(walletFromDatabase)
 
         logger.info("Wallet with id {} was permanently deleted", id)
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_DELETED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService.translate(
+                        TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_DELETED_MESSAGE,
+                    ),
+                    walletFromDatabase.name,
+                ),
+            relatedEntityId = walletFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -96,6 +120,20 @@ class WalletService(
         }
 
         logger.info("$walletFromDatabase unarchived successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_TITLE),
+            message =
+                MessageFormat.format(
+                    preferencesService.translate(
+                        TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UNARCHIVED_MESSAGE,
+                    ),
+                    walletFromDatabase.name,
+                ),
+            relatedEntityId = walletFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -111,6 +149,15 @@ class WalletService(
         }
 
         logger.info("$walletFromDatabase renamed successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_NAME_CHANGED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_NAME_CHANGED_MESSAGE),
+            relatedEntityId = walletFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -126,6 +173,15 @@ class WalletService(
         }
 
         logger.info("$walletFromDatabase type changed successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_TYPE_CHANGED_MESSAGE),
+            relatedEntityId = walletFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -139,6 +195,17 @@ class WalletService(
             diff < BigDecimal.ZERO -> decrementWalletBalance(walletFromDatabase, diff.abs())
             else -> logger.info("$walletFromDatabase balance remains unchanged")
         }
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_UPDATED_TITLE),
+            message =
+                preferencesService.translate(
+                    TranslationKeys.WALLETTRANSACTION_DIALOG_WALLET_BALANCE_UPDATED_MESSAGE,
+                ),
+            relatedEntityId = walletFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -179,18 +246,17 @@ class WalletService(
         )
 
         if (publishNotification) {
-            val bundle = preferencesService.bundle
-            val title = bundle.getString(TranslationKeys.NOTIFICATION_WALLET_TRANSACTION_TITLE)
-            val message =
-                bundle
-                    .getString(TranslationKeys.NOTIFICATION_WALLET_TRANSACTION_MESSAGE)
-                    .replace("{0}", transaction.description ?: "")
-                    .replace("{1}", UIUtils.formatCurrency(transaction.amount))
-            notificationService.createNotification(
-                type = NotificationType.WALLET_TRANSACTION_CREATED,
-                title = title,
-                message = message,
-                relatedEntityId = newTransaction.id,
+            notificationService.send(
+                type = NotificationType.SUCCESS,
+                title = preferencesService.translate(TranslationKeys.NOTIFICATION_WALLET_TRANSACTION_TITLE),
+                message =
+                    MessageFormat.format(
+                        preferencesService
+                            .translate(TranslationKeys.NOTIFICATION_WALLET_TRANSACTION_MESSAGE),
+                        transaction.description ?: "",
+                        UIUtils.formatCurrency(transaction.amount),
+                    ),
+                relatedEntityId = newTransaction.id!!,
             )
         }
 
@@ -214,6 +280,15 @@ class WalletService(
         }
 
         logger.info("$transactionFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_MESSAGE),
+            relatedEntityId = transactionFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -238,6 +313,15 @@ class WalletService(
         walletTransactionRepository.delete(transactionFromDatabase)
 
         logger.info("$transactionFromDatabase deleted from ${transactionFromDatabase.wallet}")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_DELETED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_DELETED_MESSAGE),
+            relatedEntityId = transactionFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -260,6 +344,15 @@ class WalletService(
 
         logger.info("$newTransfer was created")
 
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_CREATED_MESSAGE),
+            relatedEntityId = newTransfer.id!!,
+        )
+
         return newTransfer.id!!
     }
 
@@ -279,6 +372,15 @@ class WalletService(
         }
 
         logger.info("$transferFromDatabase updated successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_MESSAGE),
+            relatedEntityId = transferFromDatabase.id!!,
+        )
     }
 
     @Transactional
@@ -297,6 +399,15 @@ class WalletService(
         transfersRepository.delete(transferFromDatabase)
 
         logger.info("$transferFromDatabase deleted successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_SUCCESS_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_DELETED_MESSAGE),
+            relatedEntityId = transferFromDatabase.id!!,
+        )
     }
 
     fun getWalletById(id: Int): Wallet = walletRepository.findByIdOrThrow(id)

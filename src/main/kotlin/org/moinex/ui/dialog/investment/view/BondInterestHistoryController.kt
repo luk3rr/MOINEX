@@ -236,11 +236,6 @@ class BondInterestHistoryController(
                 newValue,
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_ADJUSTED_MESSAGE),
-            )
-
             loadHistoryData()
             logger.info(
                 "Interest adjusted for bond {} month {}: {}",
@@ -298,11 +293,6 @@ class BondInterestHistoryController(
             bondInterestCalculationService.resetToAutomaticCalculation(
                 bond.id!!,
                 selected.referenceMonth,
-            )
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_INTEREST_RESET_MESSAGE),
             )
 
             loadHistoryData()

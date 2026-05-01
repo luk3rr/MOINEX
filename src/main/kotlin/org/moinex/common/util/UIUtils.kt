@@ -50,6 +50,7 @@ import org.moinex.model.enums.CreditCardInvoiceStatus
 import org.moinex.model.enums.CreditCardRecurringFrequency
 import org.moinex.model.enums.InterestIndex
 import org.moinex.model.enums.InterestType
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.PeriodType
 import org.moinex.model.enums.RecurringTransactionFrequency
@@ -833,5 +834,13 @@ class UIUtils(
                 }
             }.getOrNull()
         }
+
+        fun getNotificationAccentClass(type: NotificationType): String =
+            when (type) {
+                NotificationType.INFO -> Styles.NOTIFICATION_ACCENT_INFO
+                NotificationType.SUCCESS -> Styles.NOTIFICATION_ACCENT_SUCCESS
+                NotificationType.WARNING -> Styles.NOTIFICATION_ACCENT_WARNING
+                NotificationType.ERROR -> Styles.NOTIFICATION_ACCENT_ERROR
+            }
     }
 }

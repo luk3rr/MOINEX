@@ -17,6 +17,8 @@ import org.moinex.model.enums.BondType
 import org.moinex.model.enums.OperationType
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -28,6 +30,8 @@ class BondServiceCRUDBondOperationTest :
         val bondOperationRepository = mockk<BondOperationRepository>()
         val walletService = mockk<WalletService>()
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             BondService(
@@ -35,6 +39,8 @@ class BondServiceCRUDBondOperationTest :
                 bondOperationRepository,
                 walletService,
                 bondInterestCalculationService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }
@@ -46,7 +52,7 @@ class BondServiceCRUDBondOperationTest :
                 val walletTransaction = WalletTransactionFactory.create(id = 1)
                 val bondOperation =
                     BondOperationFactory.create(
-                        id = null,
+                        id = 1,
                         bond = bond,
                         operationType = OperationType.BUY,
                         quantity = BigDecimal("100"),
@@ -88,7 +94,7 @@ class BondServiceCRUDBondOperationTest :
                 val walletTransaction = WalletTransactionFactory.create(id = 2)
                 val bondOperation =
                     BondOperationFactory.create(
-                        id = null,
+                        id = 1,
                         bond = bond,
                         operationType = OperationType.SELL,
                         quantity = BigDecimal("50"),
@@ -311,6 +317,16 @@ class BondServiceCRUDBondOperationTest :
                     }
                 }
             }
+
+            When("trying to delete the bond operation") {
+                every { bondOperationRepository.findById(999) } returns Optional.empty()
+
+                Then("should throw EntityNotFoundException") {
+                    shouldThrow<EntityNotFoundException> {
+                        service.deleteBondOperation(999)
+                    }
+                }
+            }
         }
 
         Given("a valid bond operation to delete") {
@@ -341,18 +357,6 @@ class BondServiceCRUDBondOperationTest :
             }
         }
 
-        Given("a bond operation that does not exist") {
-            When("trying to delete the bond operation") {
-                every { bondOperationRepository.findById(999) } returns Optional.empty()
-
-                Then("should throw EntityNotFoundException") {
-                    shouldThrow<EntityNotFoundException> {
-                        service.deleteBondOperation(999)
-                    }
-                }
-            }
-        }
-
         Given("multiple bond operations with BUY and SELL") {
             When("creating multiple operations") {
                 val bond = BondFactory.create(id = 7, name = "Test Bond", type = BondType.CDB)
@@ -362,7 +366,7 @@ class BondServiceCRUDBondOperationTest :
 
                 val buyOperation =
                     BondOperationFactory.create(
-                        id = null,
+                        id = 1,
                         bond = bond,
                         operationType = OperationType.BUY,
                         quantity = BigDecimal("100"),
@@ -370,7 +374,7 @@ class BondServiceCRUDBondOperationTest :
                     )
                 val sellOperation =
                     BondOperationFactory.create(
-                        id = null,
+                        id = 1,
                         bond = bond,
                         operationType = OperationType.SELL,
                         quantity = BigDecimal("50"),
@@ -419,7 +423,7 @@ class BondServiceCRUDBondOperationTest :
                 val walletTransaction = WalletTransactionFactory.create(id = 8)
                 val bondOperation =
                     BondOperationFactory.create(
-                        id = null,
+                        id = 1,
                         bond = bond,
                         operationType = OperationType.BUY,
                         quantity = BigDecimal("100"),
@@ -458,7 +462,7 @@ class BondServiceCRUDBondOperationTest :
                 val walletTransaction = WalletTransactionFactory.create(id = 9)
                 val bondOperation =
                     BondOperationFactory.create(
-                        id = null,
+                        id = 1,
                         bond = bond,
                         operationType = OperationType.SELL,
                         quantity = BigDecimal("100"),

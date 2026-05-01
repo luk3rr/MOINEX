@@ -16,11 +16,11 @@ import javafx.scene.layout.VBox
 import javafx.util.Duration
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
+import org.moinex.common.util.UIUtils
 import org.moinex.model.Notification
-import org.moinex.model.enums.NotificationType
 
 class NotificationToastOverlay(
-    private val rootPane: AnchorPane,
+    rootPane: AnchorPane,
 ) {
     private val stack =
         VBox(8.0).apply {
@@ -66,7 +66,7 @@ class NotificationToastOverlay(
     private fun buildCard(n: Notification): HBox {
         val accentBar =
             Region().apply {
-                styleClass.addAll(Styles.NOTIFICATION_TOAST_ACCENT, accentClass(n.type))
+                styleClass.addAll(Styles.NOTIFICATION_TOAST_ACCENT, UIUtils.getNotificationAccentClass(n.type))
                 minHeight = 0.0
                 maxHeight = Double.MAX_VALUE
             }
@@ -157,19 +157,6 @@ class NotificationToastOverlay(
         seq.setOnFinished { onDone() }
         seq.play()
     }
-
-    private fun accentClass(type: NotificationType): String =
-        when (type) {
-            NotificationType.BUDGET_GROUP_EXCEEDED -> Styles.NOTIFICATION_ACCENT_BUDGET
-            NotificationType.RECURRING_TRANSACTION_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING
-            NotificationType.RECURRING_CREDIT_CARD_DEBT_PROCESSED -> Styles.NOTIFICATION_ACCENT_RECURRING_CC
-            NotificationType.WALLET_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_WALLET_TRANSACTION
-            NotificationType.CREDIT_CARD_TRANSACTION_CREATED -> Styles.NOTIFICATION_ACCENT_CC_TRANSACTION
-            NotificationType.GOAL_ACHIEVED -> Styles.NOTIFICATION_ACCENT_GOAL
-            NotificationType.GENERIC_INFO -> Styles.NOTIFICATION_ACCENT_INFO
-            NotificationType.GENERIC_WARNING -> Styles.NOTIFICATION_ACCENT_WARNING
-            NotificationType.GENERIC_ERROR -> Styles.NOTIFICATION_ACCENT_ERROR
-        }
 
     companion object {
         private const val MAX_VISIBLE = 4

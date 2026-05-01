@@ -111,11 +111,6 @@ class EditGoalController(
                     }
 
                 goalService.updateGoal(goal)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_UPDATED_MESSAGE),
-                )
             }
 
             (nameField.scene.window as Stage).close()

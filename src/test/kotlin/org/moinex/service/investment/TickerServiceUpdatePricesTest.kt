@@ -22,6 +22,8 @@ import org.moinex.repository.investment.DividendRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.nio.file.Path
@@ -35,6 +37,8 @@ class TickerServiceUpdatePricesTest :
         val dividendRepository = mockk<DividendRepository>()
         val cryptoExchangeRepository = mockk<CryptoExchangeRepository>()
         val walletService = mockk<WalletService>(relaxed = true)
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             TickerService(
@@ -44,6 +48,8 @@ class TickerServiceUpdatePricesTest :
                 dividendRepository,
                 cryptoExchangeRepository,
                 walletService,
+                notificationService,
+                preferencesService,
             )
 
         beforeSpec {

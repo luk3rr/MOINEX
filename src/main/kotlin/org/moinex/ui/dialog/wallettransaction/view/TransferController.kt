@@ -128,11 +128,6 @@ class TransferController(
         ) {
             runCatching {
                 walletService.deleteTransfer(selectedTransfer.id!!)
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_SUCCESS_TITLE),
-                    preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_DELETED_MESSAGE),
-                )
-
                 loadTransfersFromDatabase()
                 updateTableView()
             }.onFailure { e ->

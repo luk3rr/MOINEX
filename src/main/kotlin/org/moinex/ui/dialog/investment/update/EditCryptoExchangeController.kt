@@ -98,11 +98,6 @@ class EditCryptoExchangeController(
                 cryptoExchange.date = dateTimeWithCurrentHour
 
                 tickerService.updateCryptoExchange(cryptoExchange)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EXCHANGE_UPDATED_MESSAGE),
-                )
             }
 
             (cryptoReceivedQuantityField.scene.window as Stage).close()

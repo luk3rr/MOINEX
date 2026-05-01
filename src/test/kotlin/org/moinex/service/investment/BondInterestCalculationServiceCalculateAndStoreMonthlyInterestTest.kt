@@ -6,6 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.factory.investment.BondFactory
 import org.moinex.factory.investment.BondInterestCalculationFactory
 import org.moinex.factory.investment.BondOperationFactory
@@ -17,8 +18,11 @@ import org.moinex.model.enums.OperationType
 import org.moinex.repository.investment.BondInterestCalculationRepository
 import org.moinex.repository.investment.BondOperationRepository
 import org.moinex.repository.investment.BondRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 
 class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
@@ -27,6 +31,12 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
         val bondOperationRepository = mockk<BondOperationRepository>()
         val bondInterestCalculationRepository = mockk<BondInterestCalculationRepository>()
         val marketIndicatorService = mockk<MarketIndicatorService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = mockk<ClockProvider>()
+
+        val fixedNow = LocalDateTime.of(2026, 3, 20, 12, 0, 0)
+        every { clockProvider.now() } returns fixedNow
 
         val service =
             BondInterestCalculationService(
@@ -34,9 +44,15 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                 bondOperationRepository,
                 bondInterestCalculationRepository,
                 marketIndicatorService,
+                notificationService,
+                preferencesService,
+                clockProvider,
             )
 
-        afterContainer { clearAllMocks(answers = true) }
+        afterContainer {
+            clearAllMocks(answers = true)
+            every { clockProvider.now() } returns fixedNow
+        }
 
         Given("a bond without operations") {
             When("calculating interest") {
@@ -515,8 +531,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("10.00"),
                     )
 
-                val month = YearMonth.now()
-                val yesterday = LocalDate.now().minusDays(1)
+                val month = YearMonth.of(2026, 3)
+                val yesterday = LocalDate.of(2026, 3, 19)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(
@@ -546,7 +562,7 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                     )
 
                 val marketData =
-                    (1..LocalDate.now().dayOfMonth).map { day ->
+                    (1..20).map { day ->
                         MarketIndicatorHistoryFactory.create(
                             indicatorType = InterestIndex.CDI,
                             referenceDate = month.atDay(day),
@@ -586,8 +602,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("10.00"),
                     )
 
-                val month = YearMonth.now()
-                val today = LocalDate.now()
+                val month = YearMonth.of(2026, 3)
+                val today = LocalDate.of(2026, 3, 20)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(
@@ -833,8 +849,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("2.00"),
                     )
 
-                val month = YearMonth.now()
-                val calculatedUntil = LocalDate.now().minusDays(10)
+                val month = YearMonth.of(2026, 3)
+                val calculatedUntil = LocalDate.of(2026, 3, 10)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(
@@ -882,7 +898,7 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                     )
 
                 val marketData =
-                    (1..LocalDate.now().dayOfMonth).map { day ->
+                    (1..20).map { day ->
                         MarketIndicatorHistoryFactory.create(
                             indicatorType = InterestIndex.CDI,
                             referenceDate = month.atDay(day),
@@ -923,8 +939,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("10.00"),
                     )
 
-                val month = YearMonth.now()
-                val calculatedUntil = LocalDate.now().minusDays(1)
+                val month = YearMonth.of(2026, 3)
+                val calculatedUntil = LocalDate.of(2026, 3, 19)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(
@@ -993,8 +1009,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("2.00"),
                     )
 
-                val month = YearMonth.now()
-                val calculatedUntil = LocalDate.now().minusDays(5)
+                val month = YearMonth.of(2026, 3)
+                val calculatedUntil = LocalDate.of(2026, 3, 15)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(
@@ -1055,8 +1071,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("10.00"),
                     )
 
-                val month = YearMonth.now()
-                val calculatedUntil = LocalDate.now().minusDays(10)
+                val month = YearMonth.of(2026, 3)
+                val calculatedUntil = LocalDate.of(2026, 3, 10)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(
@@ -1102,7 +1118,7 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                     )
 
                 val marketData =
-                    (1..LocalDate.now().dayOfMonth).map { day ->
+                    (1..20).map { day ->
                         MarketIndicatorHistoryFactory.create(
                             indicatorType = InterestIndex.CDI,
                             referenceDate = month.atDay(day),
@@ -1143,8 +1159,8 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         interestRate = BigDecimal("2.00"),
                     )
 
-                val month = YearMonth.now()
-                val calculatedUntil = LocalDate.now().minusDays(5)
+                val month = YearMonth.of(2026, 3)
+                val calculatedUntil = LocalDate.of(2026, 3, 15)
 
                 val existingCalculation =
                     BondInterestCalculationFactory.create(

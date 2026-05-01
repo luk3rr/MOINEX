@@ -59,7 +59,6 @@ import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondService
-import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.investment.TickerService
 import org.moinex.service.networth.NetWorthCalculationService
 import org.moinex.service.networth.NetWorthService
@@ -90,7 +89,6 @@ class HomeController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
     private val chartFactory: ChartFactory,
-    private val investmentPerformanceService: InvestmentPerformanceService,
     private val tickerService: TickerService,
     private val bondService: BondService,
 ) {

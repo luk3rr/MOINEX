@@ -30,7 +30,7 @@ class NotificationService(
     }
 
     @Transactional
-    fun createNotification(
+    fun send(
         type: NotificationType,
         title: String,
         message: String,

@@ -73,15 +73,6 @@ class ArchivedBondsController(
         ) {
             runCatching {
                 bondService.unarchiveBond(selectedBond.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_TITLE),
-                    MessageFormat.format(
-                        preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_UNARCHIVED_MESSAGE),
-                        selectedBond.name,
-                    ),
-                )
-
                 archivedBonds.remove(selectedBond)
                 updateBondTableView()
             }.onFailure { e ->
@@ -128,15 +119,6 @@ class ArchivedBondsController(
         ) {
             runCatching {
                 bondService.deleteBond(selectedBond.id!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_DELETED_TITLE),
-                    MessageFormat.format(
-                        preferencesService.translate(TranslationKeys.BOND_DIALOG_BOND_DELETED_MESSAGE),
-                        selectedBond.name,
-                    ),
-                )
-
                 archivedBonds.remove(selectedBond)
                 updateBondTableView()
             }.onFailure { e ->

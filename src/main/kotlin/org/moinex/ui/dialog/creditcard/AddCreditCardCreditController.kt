@@ -115,11 +115,6 @@ class AddCreditCardCreditController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_CREDIT_CREATED_MESSAGE),
-            )
-
             (crcComboBox.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {
@@ -148,7 +143,7 @@ class AddCreditCardCreditController(
     private fun handleOpenCalculator() {
         WindowUtils.openPopupWindow(
             Files.CALCULATOR_FXML,
-            "Calculator",
+            preferencesService.translate(TranslationKeys.MAIN_CALCULATOR),
             springContext,
             { _: CalculatorController -> },
             listOf(Runnable { calculatorService.updateComponentWithResult(valueField) }),

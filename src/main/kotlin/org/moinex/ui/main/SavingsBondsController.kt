@@ -177,11 +177,6 @@ class SavingsBondsController(
             runCatching {
                 bondService.deleteBond(selectedBond.id!!)
 
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_TITLE),
-                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_DIALOG_BOND_DELETED_MESSAGE),
-                )
-
                 updateBondTableView()
                 updateBondTabFields()
             }.onFailure { e ->

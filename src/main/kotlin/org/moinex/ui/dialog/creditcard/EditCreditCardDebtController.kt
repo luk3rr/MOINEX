@@ -114,11 +114,6 @@ class EditCreditCardDebtController(
                 crcDebt!!.installments = installments
 
                 creditCardService.updateDebt(crcDebt!!, invoiceDateYearMonth)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_TRANSACTION_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_TRANSACTION_UPDATED_MESSAGE),
-                )
             }
 
             (crcComboBox.scene.window as Stage).close()

@@ -157,11 +157,6 @@ class AddBondSaleController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_SALE_ADDED_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_SALE_ADDED_MESSAGE),
-            )
-
             (bondNameLabel.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

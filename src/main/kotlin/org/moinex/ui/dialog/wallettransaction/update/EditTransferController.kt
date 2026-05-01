@@ -132,11 +132,6 @@ class EditTransferController(
             oldTransfer!!.category = category
             oldTransfer!!.date = dateTimeWithCurrentHour
             walletService.updateTransfer(oldTransfer!!)
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSFER_UPDATED_MESSAGE),
-            )
         }.onFailure { e ->
             when (e) {
                 is NumberFormatException -> {

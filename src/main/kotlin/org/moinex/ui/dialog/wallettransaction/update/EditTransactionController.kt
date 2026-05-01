@@ -148,11 +148,6 @@ class EditTransactionController(
                 walletTransaction!!.includeInAnalysis = includeInAnalysisCheckBox.isSelected
 
                 walletService.updateWalletTransaction(walletTransaction!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_TRANSACTION_UPDATED_MESSAGE),
-                )
             }
 
             (descriptionField.scene.window as Stage).close()

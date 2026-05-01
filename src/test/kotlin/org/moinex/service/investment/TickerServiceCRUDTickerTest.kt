@@ -14,6 +14,8 @@ import org.moinex.repository.investment.DividendRepository
 import org.moinex.repository.investment.TickerPurchaseRepository
 import org.moinex.repository.investment.TickerRepository
 import org.moinex.repository.investment.TickerSaleRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.wallet.WalletService
 import java.util.Optional
 
@@ -25,6 +27,8 @@ class TickerServiceCRUDTickerTest :
         val dividendRepository = mockk<DividendRepository>()
         val cryptoExchangeRepository = mockk<CryptoExchangeRepository>()
         val walletService = mockk<WalletService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             TickerService(
@@ -34,6 +38,8 @@ class TickerServiceCRUDTickerTest :
                 dividendRepository,
                 cryptoExchangeRepository,
                 walletService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }

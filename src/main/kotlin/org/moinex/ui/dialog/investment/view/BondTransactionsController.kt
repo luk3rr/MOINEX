@@ -140,11 +140,6 @@ class BondTransactionsController(
                 bondService.deleteBondOperation(selectedOperation.id!!)
                 loadOperationsFromDatabase()
                 updateOperationTableView()
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.BOND_DIALOG_OPERATION_DELETED_TITLE),
-                    preferencesService.translate(TranslationKeys.BOND_DIALOG_OPERATION_DELETED_MESSAGE),
-                )
             }.onFailure { e ->
                 WindowUtils.showErrorDialog(
                     preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),

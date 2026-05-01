@@ -17,6 +17,8 @@ import org.moinex.factory.wishlist.WishlistItemLinkFactory
 import org.moinex.model.enums.WishlistItemPriority
 import org.moinex.repository.wishlist.WishlistItemLinkRepository
 import org.moinex.repository.wishlist.WishlistItemRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
@@ -29,6 +31,8 @@ class WishlistServiceUpdateItemTest :
         val wishlistItemLinkRepository = mockk<WishlistItemLinkRepository>()
         val walletService = mockk<WalletService>()
         val creditCardService = mockk<CreditCardService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
         val clockProvider = mockk<ClockProvider>()
 
         val service =
@@ -37,6 +41,8 @@ class WishlistServiceUpdateItemTest :
                 wishlistItemLinkRepository,
                 walletService,
                 creditCardService,
+                notificationService,
+                preferencesService,
                 clockProvider,
             )
 

@@ -106,11 +106,6 @@ class EditTickerController(
 
             tickerService.updateTicker(ticker)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UPDATED_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TICKER_UPDATED_MESSAGE),
-            )
-
             (nameField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

@@ -102,11 +102,6 @@ class AddGoalController(
                 strategy,
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.GOAL_DIALOG_GOAL_CREATED_MESSAGE),
-            )
-
             (nameField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

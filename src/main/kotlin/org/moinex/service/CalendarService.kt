@@ -8,8 +8,10 @@
 
 package org.moinex.service
 
+import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.model.CalendarEvent
+import org.moinex.model.enums.NotificationType
 import org.moinex.repository.CalendarEventRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CalendarService(
     private val calendarEventRepository: CalendarEventRepository,
+    private val notificationService: NotificationService,
+    private val preferencesService: PreferencesService,
 ) {
     private val logger = LoggerFactory.getLogger(CalendarService::class.java)
 
@@ -26,6 +30,15 @@ class CalendarService(
         val newEvent = calendarEventRepository.save(event)
 
         logger.info("$newEvent created successfully")
+
+        notificationService.send(
+            type = NotificationType.SUCCESS,
+            title =
+                preferencesService.translate(TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
+            message =
+                preferencesService.translate(TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_MESSAGE),
+            relatedEntityId = newEvent.id!!,
+        )
     }
 
     @Transactional

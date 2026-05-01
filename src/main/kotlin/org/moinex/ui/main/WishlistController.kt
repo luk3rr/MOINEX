@@ -177,11 +177,6 @@ class WishlistController(
                 wishlistService.deleteItem(selectedItem.id!!)
                 loadItemsFromDatabase()
                 updateScreen()
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.WISHLIST_DELETED_TITLE),
-                    preferencesService.translate(TranslationKeys.WISHLIST_DELETED_MESSAGE),
-                )
             }.onFailure { e ->
                 WindowUtils.showErrorDialog(
                     preferencesService.translate(TranslationKeys.WISHLIST_ERROR_DELETING_TITLE),
@@ -315,11 +310,6 @@ class WishlistController(
                 wishlistService.markAsPending(selectedItem.id!!)
                 loadItemsFromDatabase()
                 updateScreen()
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.WISHLIST_MARKED_PENDING_TITLE),
-                    preferencesService.translate(TranslationKeys.WISHLIST_MARKED_PENDING_MESSAGE),
-                )
             }.onFailure { e ->
                 WindowUtils.showErrorDialog(
                     preferencesService.translate(TranslationKeys.WISHLIST_ERROR_TITLE),

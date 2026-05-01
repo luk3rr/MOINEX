@@ -83,11 +83,6 @@ class AddDividendController(
                 ),
             )
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_DIVIDEND_CREATED_MESSAGE),
-            )
-
             (descriptionField.scene.window as Stage).close()
         }.onFailure { e ->
             when (e) {

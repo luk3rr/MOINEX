@@ -134,11 +134,6 @@ class EditBondPurchaseController(
                         includeInAnalysisCheckBox.isSelected,
                     ),
                 )
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_TITLE),
-                    preferencesService.translate(TranslationKeys.BOND_DIALOG_PURCHASE_UPDATED_MESSAGE),
-                )
             }
 
             (bondNameLabel.scene.window as Stage).close()

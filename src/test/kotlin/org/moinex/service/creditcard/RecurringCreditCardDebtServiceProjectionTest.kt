@@ -17,6 +17,8 @@ import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.repository.creditcard.CreditCardDebtRepository
 import org.moinex.repository.creditcard.CreditCardRepository
 import org.moinex.repository.creditcard.RecurringCreditCardDebtRepository
+import org.moinex.service.NotificationService
+import org.moinex.service.PreferencesService
 import java.time.YearMonth
 import java.util.Optional
 
@@ -26,6 +28,8 @@ class RecurringCreditCardDebtServiceProjectionTest :
         val creditCardDebtRepository = mockk<CreditCardDebtRepository>()
         val creditCardRepository = mockk<CreditCardRepository>()
         val creditCardService = mockk<CreditCardService>()
+        val notificationService = mockk<NotificationService>(relaxed = true)
+        val preferencesService = mockk<PreferencesService>(relaxed = true)
 
         val service =
             RecurringCreditCardDebtService(
@@ -33,6 +37,8 @@ class RecurringCreditCardDebtServiceProjectionTest :
                 creditCardDebtRepository,
                 creditCardRepository,
                 creditCardService,
+                notificationService,
+                preferencesService,
             )
 
         afterContainer { clearAllMocks(answers = true) }

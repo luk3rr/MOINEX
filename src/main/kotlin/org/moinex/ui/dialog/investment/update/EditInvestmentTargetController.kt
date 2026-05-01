@@ -178,11 +178,6 @@ class EditInvestmentTargetController(
         runCatching {
             investmentTargetService.saveTargets(targets)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_TARGET_UPDATED_MESSAGE),
-            )
-
             targetsContainer.scene.window.hide()
         }.onFailure { e ->
             when (e) {

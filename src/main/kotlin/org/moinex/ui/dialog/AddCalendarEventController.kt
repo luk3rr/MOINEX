@@ -69,12 +69,7 @@ class AddCalendarEventController(
 
         runCatching {
             calendarService.createEvent(
-                CalendarEvent(null, eventDate, eventTitle, description, eventType),
-            )
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_TITLE),
-                preferencesService.translate(TranslationKeys.CALENDAR_DIALOG_EVENT_CREATED_MESSAGE),
+                CalendarEvent(date = eventDate, title = eventTitle, description = description, eventType = eventType),
             )
 
             (titleField.scene.window as Stage).close()

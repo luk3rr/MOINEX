@@ -151,15 +151,6 @@ class EditRecurringTransactionController(
                 rt!!.includeInNetWorth = includeInNetWorthCheckBox.isSelected
 
                 recurringTransactionService.updateRecurringTransaction(rt!!)
-
-                WindowUtils.showSuccessDialog(
-                    preferencesService.translate(
-                        TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_TITLE,
-                    ),
-                    preferencesService.translate(
-                        TranslationKeys.WALLETTRANSACTION_DIALOG_RECURRING_TRANSACTION_UPDATED_MESSAGE,
-                    ),
-                )
             }
 
             (descriptionField.scene.window as Stage).close()

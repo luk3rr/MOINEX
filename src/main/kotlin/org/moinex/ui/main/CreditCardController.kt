@@ -350,15 +350,6 @@ class CreditCardController(
         ) {
             creditCardService.refundDebt(debt.id!!, null)
             updateDisplay()
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_TITLE,
-                ),
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DIALOG_REFUND_SUCCESS_MESSAGE,
-                ),
-            )
         }
     }
 
@@ -517,15 +508,6 @@ class CreditCardController(
         ) {
             creditCardService.deleteDebt(debt.id!!)
             updateDisplay()
-
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_TITLE,
-                ),
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_DIALOG_DELETE_SUCCESS_MESSAGE,
-                ),
-            )
         }
     }
 
