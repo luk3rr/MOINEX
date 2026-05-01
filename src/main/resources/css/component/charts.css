@@ -140,3 +140,20 @@
     -fx-fill:   theme-chart-bg;
     -fx-stroke: theme-chart-bg;
 }
+
+
+/* ============================================================
+   Money flow
+   ============================================================ */
+
+/* Seletor específico para o gráfico de Money Flow */
+.money-flow-chart .series0.chart-bar {
+    -fx-bar-fill: #ef4444;
+}
+
+.money-flow-chart .series1.chart-bar {
+    -fx-bar-fill: #22c55e;
+}
+
+.money-flow-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #ef4444; }
+.money-flow-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #22c55e; }

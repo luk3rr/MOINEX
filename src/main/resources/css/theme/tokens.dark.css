@@ -15,7 +15,7 @@
     -fx-faint-focus-color:        rgba(189, 147, 249, 0.2);
 
     /* ── Backgrounds ─────────────────────────────────────── */
-    theme-bg-base:          #282A36;
+    theme-bg-base:          #363948;
     theme-bg-card:          #282A36;
     theme-bg-card-alt:      #21222c;
     theme-bg-input:         #282A36;
@@ -55,8 +55,8 @@
 
     /* ── Charts ──────────────────────────────────────────── */
     theme-chart-bg:         #282A36;
-    theme-chart-axis:       #F8F8F2; /*#6272A4;*/
-    theme-chart-grid:       #F8F8F2; /*#44475A;*/
+    theme-chart-axis:       #F8F8F2;
+    theme-chart-grid:       #F8F8F2;
     theme-chart-legend:     #F8F8F2;
     theme-chart-axis-label: #F8F8F2;
 

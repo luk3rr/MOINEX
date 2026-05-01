@@ -110,4 +110,7 @@ object Styles {
     const val NOTIFICATION_ACCENT_INFO = "notification-accent-info"
     const val NOTIFICATION_ACCENT_WARNING = "notification-accent-warning"
     const val NOTIFICATION_ACCENT_ERROR = "notification-accent-error"
+
+    // Money flow
+    const val MONEY_FLOW_CHART_STYLE_CLASS = "money-flow-chart"
 }

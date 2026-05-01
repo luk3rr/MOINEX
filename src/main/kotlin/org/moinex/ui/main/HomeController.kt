@@ -597,6 +597,7 @@ class HomeController(
             AnimationUtils.xyChartAnimation(incomeData, targetIncomeValue)
         }
 
+        UIUtils.applyDefaultChartStyle(moneyFlowBarChart, Styles.MONEY_FLOW_CHART_STYLE_CLASS)
         graphView.children.add(moneyFlowBarChart)
         moneyFlowBarChart.setAnchorPaneConstraints()
     }

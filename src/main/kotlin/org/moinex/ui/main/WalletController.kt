@@ -728,9 +728,7 @@ class WalletController(
         moneyFlowBarChartAnchorPane.children.clear()
         moneyFlowBarChartAnchorPane.children.add(moneyFlowBarChart!!)
 
-        AnchorPane.setTopAnchor(moneyFlowBarChart!!, 0.0)
-        AnchorPane.setBottomAnchor(moneyFlowBarChart!!, 0.0)
-        AnchorPane.setLeftAnchor(moneyFlowBarChart!!, 0.0)
-        AnchorPane.setRightAnchor(moneyFlowBarChart!!, 0.0)
+        UIUtils.applyDefaultChartStyle(moneyFlowBarChart!!, Styles.MONEY_FLOW_CHART_STYLE_CLASS)
+        moneyFlowBarChart!!.setAnchorPaneConstraints()
     }
 }

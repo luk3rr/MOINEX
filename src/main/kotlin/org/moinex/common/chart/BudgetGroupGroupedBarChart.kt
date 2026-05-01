@@ -31,6 +31,7 @@ class BudgetGroupGroupedBarChart : BarChart<String, Number>(CategoryAxis(), Numb
 
     init {
         isLegendVisible = true
+        verticalGridLinesVisible = false
         animated = false
         barGap = 2.0
         categoryGap = 20.0

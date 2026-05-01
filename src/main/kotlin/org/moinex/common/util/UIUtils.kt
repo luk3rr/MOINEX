@@ -558,7 +558,12 @@ class UIUtils(
             columns.forEach { alignTableColumn(it, alignment, style) }
         }
 
-        fun applyDefaultChartStyle(chart: Chart) {
+        fun applyDefaultChartStyle(
+            chart: Chart,
+            styleClass: String? = null,
+        ) {
+            styleClass?.let { chart.styleClass.add(it) }
+
             chart.stylesheets.add(
                 UIUtils::class.java
                     .getResource(FilesConstant.CHARTS_COLORS_STYLE_SHEET)
