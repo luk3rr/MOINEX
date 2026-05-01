@@ -228,7 +228,7 @@ class RecurringCreditCardDebtService(
                 )
 
             runCatching {
-                creditCardService.createDebt(debt, current)
+                creditCardService.createDebt(debt, current, publishNotification = true)
                 logger.info("Materialized debt for $recurring on invoice month $current")
             }.onFailure { e ->
                 logger.error("Failed to materialize debt for $recurring on $current: ${e.message}")

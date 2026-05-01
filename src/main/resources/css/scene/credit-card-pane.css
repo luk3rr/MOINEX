@@ -7,10 +7,10 @@
 .description-label {
   -fx-font-size: 13px;
   -fx-font-weight: bold;
-  -fx-text-fill: #333;
+  -fx-text-fill: theme-text-primary;
 }
 
 .foreseen-label {
   -fx-font-size: 10px;
-  -fx-text-fill: #333;
+  -fx-text-fill: theme-text-primary;
 }

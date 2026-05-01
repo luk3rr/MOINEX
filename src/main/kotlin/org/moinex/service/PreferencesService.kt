@@ -21,6 +21,9 @@ class PreferencesService {
         const val BUNDLE_BASE_NAME = "i18n.messages"
         const val PREF_KEY_LOCALE = "ui.locale"
         const val PREF_KEY_HIDE_MONETARY_VALUES = "ui.hideMonetaryValues"
+        const val PREF_KEY_THEME = "ui.theme"
+        const val THEME_LIGHT = "light"
+        const val THEME_DARK = "dark"
         const val BRAZILIAN_PORTUGUESE_TAG = "pt-BR"
         val SUPPORTED_LOCALES: Map<Locale, String> =
             linkedMapOf(
@@ -42,6 +45,18 @@ class PreferencesService {
             field = value
             preferences.putBoolean(PREF_KEY_HIDE_MONETARY_VALUES, value)
         }
+
+    var theme: String = preferences[PREF_KEY_THEME, THEME_LIGHT]
+        set(value) {
+            field = value
+            preferences.put(PREF_KEY_THEME, value)
+        }
+
+    fun isDarkMode(): Boolean = theme == THEME_DARK
+
+    fun toggleTheme() {
+        theme = if (isDarkMode()) THEME_LIGHT else THEME_DARK
+    }
 
     var bundle: ResourceBundle = resolveBundle()
 

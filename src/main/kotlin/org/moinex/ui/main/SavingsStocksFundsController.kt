@@ -21,6 +21,7 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
@@ -55,13 +56,25 @@ class SavingsStocksFundsController(
     private val preferencesService: PreferencesService,
 ) {
     @FXML
+    private lateinit var stocksFundsNetCapitalLabel: Text
+
+    @FXML
     private lateinit var stocksFundsTabNetCapitalInvestedField: Text
+
+    @FXML
+    private lateinit var stocksFundsCurrentValueLabel: Text
 
     @FXML
     private lateinit var stocksFundsTabCurrentValueField: Text
 
     @FXML
+    private lateinit var stocksFundsProfitLossLabel: Text
+
+    @FXML
     private lateinit var stocksFundsTabProfitLossField: Text
+
+    @FXML
+    private lateinit var stocksFundsDividendsLabel: Text
 
     @FXML
     private lateinit var stocksFundsTabDividendsReceivedField: Text
@@ -100,6 +113,21 @@ class SavingsStocksFundsController(
         }
 
         configureListeners()
+        applyThemeColors()
+    }
+
+    private fun applyThemeColors() {
+        val color = if (preferencesService.isDarkMode()) Color.web("#F8F8F2") else Color.BLACK
+        listOf(
+            stocksFundsNetCapitalLabel,
+            stocksFundsTabNetCapitalInvestedField,
+            stocksFundsCurrentValueLabel,
+            stocksFundsTabCurrentValueField,
+            stocksFundsProfitLossLabel,
+            stocksFundsTabProfitLossField,
+            stocksFundsDividendsLabel,
+            stocksFundsTabDividendsReceivedField,
+        ).forEach { it.fill = color }
     }
 
     @FXML

@@ -25,7 +25,7 @@
                      <children>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.totalInvested" textAlignment="CENTER">
+                              <Text fx:id="bondsTotalInvestedLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.totalInvested" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -39,7 +39,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.currentValue" textAlignment="CENTER">
+                              <Text fx:id="bondsCurrentValueLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.currentValue" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -53,7 +53,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.profitLoss" textAlignment="CENTER">
+                              <Text fx:id="bondsProfitLossLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.profitLoss" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -67,7 +67,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.interestReceived" textAlignment="CENTER">
+                              <Text fx:id="bondsInterestReceivedLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.bonds.interestReceived" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>

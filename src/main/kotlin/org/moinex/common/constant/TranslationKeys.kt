@@ -41,6 +41,9 @@ object TranslationKeys {
 
     // Settings
     const val SETTINGS_LANGUAGE: String = "settings.language"
+    const val SETTINGS_THEME: String = "settings.theme"
+    const val SETTINGS_THEME_DARK: String = "settings.theme.dark"
+    const val SETTINGS_THEME_LIGHT: String = "settings.theme.light"
 
     // Home
     const val HOME_WALLET_TITLE: String = "home.wallet.title"

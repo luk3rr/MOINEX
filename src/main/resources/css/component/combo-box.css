@@ -2,15 +2,14 @@
  * Filename: combobox.css
  * Created on: October  2, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
- *
- * How to set prompt text color in JavaFX ComboBox?
  */
 
+/* ── Closed combo-box ────────────────────────────────────── */
 .combo-box {
-    -fx-background-color: white;
+    -fx-background-color: theme-bg-input;
     -fx-background-radius: 20;
     -fx-padding: 5;
-    -fx-border-color: #ccc;
+    -fx-border-color: theme-border;
     -fx-border-radius: 20;
     -fx-border-width: 2;
     -fx-font-size: 14px;
@@ -22,20 +21,36 @@
 }
 
 .combo-box .arrow {
-    -fx-background-color: #999;
+    -fx-background-color: theme-arrow;
     -fx-background-radius: 20;
 }
 
-.combo-box .list-cell:selected {
+/* selected item displayed in the closed box */
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: theme-text-primary;
+    -fx-padding: 3 6 3 6;
+}
+
+/* ── Dropdown popup ──────────────────────────────────────── */
+.combo-box-popup .list-view {
+    -fx-background-color: theme-bg-input;
+    -fx-border-color: theme-border;
+    -fx-border-width: 1;
 }
 
 .combo-box-popup .list-view .list-cell {
-    -fx-background-color: white;
+    -fx-background-color: theme-bg-input;
     -fx-background-radius: 20;
-    -fx-text-fill: #333;
+    -fx-text-fill: theme-text-primary;
 }
 
 .combo-box-popup .list-view .list-cell:hover {
-    -fx-background-color: #e6e6e6;
+    -fx-background-color: theme-bg-hover;
     -fx-background-radius: 20;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: theme-table-selection;
+    -fx-text-fill: theme-text-on-dark;
 }

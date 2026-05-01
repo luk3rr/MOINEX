@@ -7,28 +7,28 @@
 .positive-value {
   -fx-font-size: 13px;
   -fx-font-weight: bold;
-  -fx-text-fill: #28a745;
+  -fx-text-fill: theme-positive;
 }
 
 .negative-value {
   -fx-font-size: 13px;
   -fx-font-weight: bold;
-  -fx-text-fill: #dc3545;
+  -fx-text-fill: theme-negative;
 }
 
 .zero-value {
   -fx-font-size: 13px;
   -fx-font-weight: bold;
-  -fx-text-fill: #333;
+  -fx-text-fill: theme-text-primary;
 }
 
 .current-label {
   -fx-font-size: 13px;
-  -fx-text-fill: black;
+  -fx-text-fill: theme-text-primary;
   -fx-font-weight: bold;
 }
 
 .foreseen-label {
   -fx-font-size: 10px;
-  -fx-text-fill: #333;
+  -fx-text-fill: theme-text-primary;
 }

@@ -4,58 +4,61 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
+/* ── Balance labels ──────────────────────────────────────── */
 .positive-balance {
-  -fx-text-fill: #28a745;
+  -fx-text-fill: theme-positive;
   -fx-font-weight: bold;
 }
 
 .neutral-balance {
-  -fx-text-fill: black;
+  -fx-text-fill: theme-text-primary;
   -fx-font-weight: bold;
 }
 
 .negative-balance {
-  -fx-text-fill: red;
+  -fx-text-fill: theme-negative;
   -fx-font-weight: bold;
 }
 
 .total-balance-value-label {
   -fx-font-size: 50px;
-  -fx-font-color: black;
+  -fx-text-fill: theme-text-primary;
   -fx-padding: 5px;
 }
 
 .total-balance-foreseen-label {
   -fx-font-size: 11px;
   -fx-font-style: normal;
-  -fx-text-fill: grey;
+  -fx-text-fill: theme-text-muted;
   -fx-padding: 5px;
 }
 
+/* ── Info labels ─────────────────────────────────────────── */
 .info-label-red {
-  -fx-text-fill: #dc3545;
+  -fx-text-fill: theme-negative;
   -fx-font-weight: bold;
   -fx-font-size: 13px;
 }
 
 .info-label-yellow {
-  -fx-text-fill: #F5B427;
+  -fx-text-fill: theme-warning;
   -fx-font-weight: bold;
   -fx-font-size: 13px;
 }
 
 .info-label-green {
-  -fx-text-fill: #28a745;
+  -fx-text-fill: theme-positive;
   -fx-font-weight: bold;
   -fx-font-size: 13px;
 }
 
 .info-label-neutral {
-  -fx-text-fill: black;
+  -fx-text-fill: theme-text-primary;
   -fx-font-weight: bold;
   -fx-font-size: 13px;
 }
 
+/* ── Custom table labels ─────────────────────────────────── */
 .custom-table-title {
   -fx-font-size: 13px;
   -fx-font-weight: bold;
@@ -64,9 +67,41 @@
 .custom-table-header {
   -fx-font-size: 11px;
   -fx-font-weight: bold;
-  -fx-text-fill: #6b7280;
+  -fx-text-fill: theme-text-secondary;
 }
 
 .custom-table-cell {
   -fx-font-size: 12px;
+}
+
+/* ── TextField / SearchField ─────────────────────────────── */
+.text-field {
+  -fx-background-color: theme-bg-input;
+  -fx-text-fill: theme-text-primary;
+  -fx-prompt-text-fill: theme-text-muted;
+  -fx-border-color: theme-border;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+  -fx-padding: 5;
+  -fx-font-size: 14px;
+}
+
+.text-field:focused {
+  -fx-border-color: theme-bg-sidebar;
+  -fx-background-color: theme-bg-input;
+}
+
+/* ── Charts (common across all scenes) ───────────────────── */
+.axis {
+  -fx-tick-label-fill: theme-chart-axis;
+}
+
+/* .axis-label — in JavaFX this is a Text Shape, needs -fx-fill */
+.axis-label {
+  -fx-fill: theme-chart-axis-label;
+  -fx-text-fill: theme-chart-axis-label;
+}
+
+.chart-legend .label {
+  -fx-text-fill: theme-chart-legend;
 }

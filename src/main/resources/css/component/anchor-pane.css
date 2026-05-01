@@ -5,8 +5,8 @@
  */
 
 .anchor-pane {
-  -fx-background-color: white;
-  -fx-border-color: #ccc;
+  -fx-background-color: theme-bg-card;
+  -fx-border-color: theme-border;
   -fx-border-radius: 4px;
   -fx-background-radius: 10px;
   -fx-padding: 10px;
@@ -17,6 +17,16 @@
 .anchor-pane .title {
   -fx-font-size: 15px;
   -fx-font-weight: bold;
-  -fx-text-fill: #333;
+  -fx-text-fill: theme-text-primary;
   -fx-padding: 5px;
+}
+
+/*
+ * Target standalone <Text> FXML nodes that are direct children of VBox/HBox.
+ * The child combinator (>) does NOT reach inside Label/Button internal text nodes,
+ * so this rule won't break programmatic green/red colors on Label controls.
+ */
+VBox > .text,
+HBox > .text {
+  -fx-fill: theme-text-primary;
 }

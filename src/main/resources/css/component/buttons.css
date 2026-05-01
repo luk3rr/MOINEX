@@ -5,57 +5,57 @@
  */
 
 .jfx-button {
-    -fx-background-color: white;
+    -fx-background-color: theme-bg-input;
     -fx-background-radius: 20;
     -fx-padding: 5 15;
-    -fx-border-color: #ccc;
+    -fx-border-color: theme-border;
     -fx-border-radius: 20;
     -fx-border-width: 2;
     -fx-font-size: 14px;
-    -fx-text-fill: #333;
+    -fx-text-fill: theme-text-primary;
     -fx-cursor: hand;
 }
 
 .jfx-button:hover {
-    -fx-background-color: #e6e6e6;
+    -fx-background-color: theme-bg-hover;
 }
 
 .jfx-button:pressed {
-    -fx-background-color: #ccc;
-    -fx-text-fill: #fff;
+    -fx-background-color: theme-bg-pressed;
+    -fx-text-fill: theme-text-on-dark;
 }
 
 .jfx-button:disabled {
-    -fx-background-color: #f5f5f5;
-    -fx-border-color: #ddd;
-    -fx-text-fill: #999;
+    -fx-background-color: theme-bg-disabled;
+    -fx-border-color: theme-border-disabled;
+    -fx-text-fill: theme-text-disabled;
 }
 
 .menu-button {
-    -fx-background-color: white;
+    -fx-background-color: theme-bg-input;
     -fx-background-radius: 20;
     -fx-padding: 0 0;
-    -fx-border-color: #ccc;
+    -fx-border-color: theme-border;
     -fx-border-radius: 20;
     -fx-border-width: 2;
     -fx-font-size: 14px;
-    -fx-text-fill: #333;
+    -fx-text-fill: theme-text-primary;
     -fx-cursor: hand;
 }
 
 .menu-button:hover {
-    -fx-background-color: #e6e6e6;
+    -fx-background-color: theme-bg-hover;
 }
 
 .menu-button:pressed {
-    -fx-background-color: #ccc;
-    -fx-text-fill: #fff;
+    -fx-background-color: theme-bg-pressed;
+    -fx-text-fill: theme-text-on-dark;
 }
 
 .menu-button:disabled {
-    -fx-background-color: #f5f5f5;
-    -fx-border-color: #ddd;
-    -fx-text-fill: #999;
+    -fx-background-color: theme-bg-disabled;
+    -fx-border-color: theme-border-disabled;
+    -fx-text-fill: theme-text-disabled;
 }
 
 .menu-item {
@@ -64,10 +64,10 @@
 }
 
 .menu-item .label{
-    -fx-text-fill: black;
+    -fx-text-fill: theme-text-primary;
 }
 
 .menu-item:hover {
-    -fx-background-color: #e6e6e6;
+    -fx-background-color: theme-bg-hover;
     -fx-background-radius: 20;
 }

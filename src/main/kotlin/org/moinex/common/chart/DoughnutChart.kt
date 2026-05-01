@@ -15,7 +15,6 @@ import javafx.scene.chart.PieChart
 import javafx.scene.control.Label
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
-import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.util.Duration
 import org.moinex.common.util.UIUtils
@@ -30,10 +29,7 @@ class DoughnutChart(
     private var showCenterLabel = true
 
     init {
-        innerCircle.apply {
-            fill = Color.WHITE
-            stroke = Color.WHITE
-        }
+        innerCircle.styleClass.add("doughnut-inner-circle")
 
         pieData.forEach { data ->
             if (data.pieValue < 0) {

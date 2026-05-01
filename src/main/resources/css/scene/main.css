@@ -15,30 +15,30 @@
 }
 
 #homeButton:hover {
-  -fx-background-color: #48c9b0;
+  -fx-background-color: theme-bg-sidebar-hover;
 }
 
 #contentArea {
-  -fx-background-color: #f9f9f9;
+  -fx-background-color: theme-bg-base;
   -fx-padding: 0;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
 }
 
 #footbarArea {
-  -fx-background-color: #f9f9f9;
+  -fx-background-color: theme-bg-base;
   -fx-padding: 0;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
 }
 
 #sidebar {
-  -fx-background-color: #1abc9c;
+  -fx-background-color: theme-bg-sidebar;
   -fx-padding: 10px;
   -fx-spacing: 20px;
 }
 
 #sidebar JFXButton {
   -fx-background-color: transparent;
-  -fx-text-fill: white;
+  -fx-text-fill: theme-text-on-dark;
   -fx-font-size: 14px;
   -fx-font-weight: bold;
   -fx-padding: 10px 15px;
@@ -50,7 +50,7 @@
 }
 
 #sidebar JFXButton:hover {
-  -fx-background-color: #48c9b0;
+  -fx-background-color: theme-bg-sidebar-hover;
 }
 
 /*
@@ -62,8 +62,8 @@
 */
 
 #sidebar .sidebar-button-selected {
-  -fx-background-color: #48c9b0;
-  -fx-text-fill: white;
+  -fx-background-color: theme-bg-sidebar-hover;
+  -fx-text-fill: theme-text-on-dark;
 }
 
 #sidebar JFXButton .VBox {
@@ -71,7 +71,7 @@
 }
 
 .tooltip {
-  -fx-background-color: #34495e;
+  -fx-background-color: theme-tooltip-bg;
   -fx-font-size: 11px;
   -fx-font-weight: bold;
 }

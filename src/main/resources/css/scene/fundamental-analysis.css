@@ -9,20 +9,20 @@
 
 /* Status Label - Expired (Warning) */
 .cache-status-label-expired {
-    -fx-background-color: #fff3cd;
-    -fx-text-fill: #856404;
+    -fx-background-color: theme-badge-warning-bg;
+    -fx-text-fill: theme-badge-warning-text;
 }
 
 /* Status Label - Valid (Success) */
 .cache-status-label-valid {
-    -fx-background-color: #d4edda;
-    -fx-text-fill: #155724;
+    -fx-background-color: theme-badge-success-bg;
+    -fx-text-fill: theme-badge-success-text;
 }
 
 /* Status Label - Not Available (Neutral) */
 .cache-status-label-unavailable {
-    -fx-background-color: #e2e3e5;
-    -fx-text-fill: #383d41;
+    -fx-background-color: theme-badge-neutral-bg;
+    -fx-text-fill: theme-badge-neutral-text;
 }
 
 /* Transparent ScrollPane */

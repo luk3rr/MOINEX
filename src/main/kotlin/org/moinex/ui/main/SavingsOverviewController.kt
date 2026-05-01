@@ -27,6 +27,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -77,13 +78,25 @@ class SavingsOverviewController(
     private val chartFactory: ChartFactory,
 ) {
     @FXML
+    private lateinit var overviewTotalInvestedLabel: Text
+
+    @FXML
     private lateinit var overviewTotalInvestedField: Text
+
+    @FXML
+    private lateinit var overviewGainsLabel: Text
 
     @FXML
     private lateinit var overviewTabGainsField: Text
 
     @FXML
+    private lateinit var overviewLossesLabel: Text
+
+    @FXML
     private lateinit var overviewTabLossesField: Text
+
+    @FXML
+    private lateinit var overviewTotalValueLabel: Text
 
     @FXML
     private lateinit var overviewTabTotalValueField: Text
@@ -207,6 +220,21 @@ class SavingsOverviewController(
         updateDisplayGraphs()
 
         setGraphButtonsActions()
+        applyThemeColors()
+    }
+
+    private fun applyThemeColors() {
+        val color = if (preferencesService.isDarkMode()) Color.web("#F8F8F2") else Color.BLACK
+        listOf(
+            overviewTotalInvestedLabel,
+            overviewTotalInvestedField,
+            overviewGainsLabel,
+            overviewTabGainsField,
+            overviewLossesLabel,
+            overviewTabLossesField,
+            overviewTotalValueLabel,
+            overviewTabTotalValueField,
+        ).forEach { it.fill = color }
     }
 
     @FXML

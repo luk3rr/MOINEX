@@ -10,7 +10,7 @@
 }
 
 .allocation-progress-bar {
-  -fx-background-color: #e5e7eb;
+  -fx-background-color: theme-alloc-track;
   -fx-background-radius: 5;
 }
 
@@ -71,5 +71,13 @@
 .chart-legend {
   -fx-background-color: transparent;
   -fx-font-size: 12px;
-  -fx-text-fill: #555;
+  -fx-text-fill: theme-chart-legend;
+}
+
+.chart-legend .label {
+  -fx-text-fill: theme-chart-legend;
+}
+
+.axis {
+  -fx-tick-label-fill: theme-chart-axis;
 }

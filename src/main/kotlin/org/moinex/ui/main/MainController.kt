@@ -37,6 +37,7 @@ import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
 import org.moinex.ui.common.NotificationToastOverlay
@@ -50,6 +51,7 @@ class MainController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
     private val notificationService: NotificationService,
+    private val themeService: ThemeService,
 ) {
     @FXML
     private lateinit var sidebar: VBox
@@ -124,6 +126,8 @@ class MainController(
                 savingsButton,
                 settingsButton,
             )
+
+        themeService.registerMainRoot(rootPane)
 
         rootPane.stylesheets.add(
             javaClass.getResource(Files.MAIN_STYLE_SHEET)!!.toExternalForm(),

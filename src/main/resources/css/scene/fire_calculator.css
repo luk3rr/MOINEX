@@ -7,16 +7,16 @@
 .fire-result-card-value {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: theme-fire-value;
 }
 
 .fire-result-card-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #6b7280;
+    -fx-text-fill: theme-text-secondary;
 }
 
 .fire-no-convergence-label {
-    -fx-text-fill: #dc3545;
+    -fx-text-fill: theme-negative;
     -fx-font-size: 12px;
     -fx-font-style: italic;
 }
@@ -24,7 +24,7 @@
 .chart-legend {
     -fx-background-color: transparent;
     -fx-font-size: 12px;
-    -fx-text-fill: #555;
+    -fx-text-fill: theme-chart-legend;
 }
 
 /* Legend symbols as lines */
@@ -67,6 +67,15 @@
     -fx-stroke: #ef4444;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
+}
+
+/* Axis labels */
+.axis {
+    -fx-tick-label-fill: theme-chart-axis;
+}
+
+.axis-label {
+    -fx-text-fill: theme-chart-axis-label;
 }
 
 /* Hide data point symbols */

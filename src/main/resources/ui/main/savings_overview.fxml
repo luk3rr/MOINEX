@@ -22,7 +22,7 @@
                      <children>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.totalInvested" textAlignment="CENTER">
+                              <Text fx:id="overviewTotalInvestedLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.totalInvested" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -36,7 +36,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.gainsWithInterest" textAlignment="CENTER">
+                              <Text fx:id="overviewGainsLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.gainsWithInterest" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -50,7 +50,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.lossesWithDepreciation" textAlignment="CENTER">
+                              <Text fx:id="overviewLossesLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.lossesWithDepreciation" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>
@@ -64,7 +64,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
                            <children>
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.totalValue" textAlignment="CENTER">
+                              <Text fx:id="overviewTotalValueLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="%savings.overview.totalValue" textAlignment="CENTER">
                                  <font>
                                     <Font size="20.0" />
                                  </font>

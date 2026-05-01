@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.SettingsController">
    <children>
-      <VBox layoutX="40.0" layoutY="40.0" spacing="10.0">
+      <VBox layoutX="40.0" layoutY="40.0" spacing="20.0">
          <children>
             <Label text="%settings.language" />
             <ComboBox fx:id="languageComboBox" prefWidth="240.0" />
+            <Separator prefWidth="520.0" />
+            <Label text="%settings.theme" />
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <children>
+                  <JFXButton fx:id="themeToggleButton" onAction="#handleToggleTheme" prefWidth="160.0" styleClass="jfx-button" />
+               </children>
+            </HBox>
          </children>
       </VBox>
    </children>

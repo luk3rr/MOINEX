@@ -7,9 +7,39 @@
     -fx-background-color: transparent;
 }
 
-/* Remove background from chart legend */
+/* ── Legend ──────────────────────────────────────────────── */
 .chart-legend {
     -fx-background-color: transparent;
+}
+
+.chart-legend .label {
+    -fx-text-fill: theme-chart-legend;
+}
+
+/* ── Axis tick labels ────────────────────────────────────── */
+.axis {
+    -fx-tick-label-fill: theme-chart-axis;
+}
+
+/* ── Axis title (Text Shape in JavaFX) ───────────────────── */
+.axis-label {
+    -fx-fill:      theme-chart-axis-label;
+    -fx-text-fill: theme-chart-axis-label;
+}
+
+/* ── Grid lines (all chart types) ───────────────────────── */
+.chart-vertical-grid-lines {
+    -fx-stroke:       theme-chart-grid;
+    -fx-stroke-width: 0.15;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke:       theme-chart-grid;
+    -fx-stroke-width: 0.15;
+}
+
+.chart-alternative-row-fill {
+    -fx-stroke: transparent;
 }
 
 /* GRUPO 1 – Azul → Verde (frio, base) */
@@ -102,3 +132,11 @@
 .legend-color.data7  { -fx-fill: #16a34a; }
 .legend-color.data8  { -fx-fill: #ca8a04; }
 .legend-color.data9  { -fx-fill: #b91c1c; }
+
+/* ============================================================
+   Doughnut Chart — inner circle hole
+   ============================================================ */
+.doughnut-inner-circle {
+    -fx-fill:   theme-chart-bg;
+    -fx-stroke: theme-chart-bg;
+}

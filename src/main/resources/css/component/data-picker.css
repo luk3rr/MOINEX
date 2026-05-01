@@ -5,10 +5,10 @@
  */
 
 .date-picker {
-  -fx-background-color: white;
+  -fx-background-color: theme-bg-input;
   -fx-background-radius: 20;
   -fx-padding: 5;
-  -fx-border-color: #ccc;
+  -fx-border-color: theme-border;
   -fx-border-radius: 20;
   -fx-border-width: 2;
   -fx-font-size: 14px;
@@ -25,21 +25,21 @@
 }
 
 .date-picker .arrow {
-  -fx-background-color: #999;
+  -fx-background-color: theme-arrow;
   -fx-background-radius: 20;
 }
 
 .date-picker-popup .list-view .list-cell {
-  -fx-background-color: white;
+  -fx-background-color: theme-bg-input;
   -fx-background-radius: 20;
-  -fx-text-fill: #333;
+  -fx-text-fill: theme-text-primary;
 }
 
 .date-picker-popup .list-view .list-cell:hover {
-  -fx-background-color: #e6e6e6;
+  -fx-background-color: theme-bg-hover;
   -fx-background-radius: 20;
 }
 
 .date-picker .popup {
-  -fx-background-color: white;
+  -fx-background-color: theme-bg-input;
 }

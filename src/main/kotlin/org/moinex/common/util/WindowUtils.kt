@@ -23,6 +23,7 @@ import org.moinex.app.JavaFXApp
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
@@ -167,10 +168,13 @@ object WindowUtils {
 
             val root = loader.load<Parent>()
 
+            val themeService = springContext.getBean<ThemeService>()
+
             Stage().apply {
                 initModality(Modality.APPLICATION_MODAL)
                 scene =
                     Scene(root).apply {
+                        themeService.applyTo(this)
                         stylesheets.add(
                             WindowUtils::class.java
                                 .getResource(Files.COMMON_STYLE_SHEET)
@@ -210,9 +214,12 @@ object WindowUtils {
 
             val root = loader.load<Parent>()
 
+            val themeService = springContext.getBean<ThemeService>()
+
             Stage().apply {
                 scene =
                     Scene(root).apply {
+                        themeService.applyTo(this)
                         stylesheets.add(
                             WindowUtils::class.java
                                 .getResource(Files.COMMON_STYLE_SHEET)

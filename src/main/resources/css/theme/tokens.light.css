@@ -1,0 +1,81 @@
+/*
+ * Filename: tokens.light.css
+ * Light theme color tokens for MOINEX.
+ * Defines all looked-up colors referenced by component/scene CSS files.
+ */
+
+.root {
+    /* ── Backgrounds ─────────────────────────────────────── */
+    theme-bg-base:          #f9f9f9;
+    theme-bg-card:          white;
+    theme-bg-card-alt:      #f5f5f5;
+    theme-bg-input:         white;
+    theme-bg-hover:         #e6e6e6;
+    theme-bg-pressed:       #cccccc;
+    theme-bg-disabled:      #f5f5f5;
+    theme-bg-header:        #f2f3f4;
+    theme-bg-row-alt:       #f2f2f2;
+    theme-bg-table:         #f8f8f8;
+    theme-bg-sidebar:       #1abc9c;
+    theme-bg-sidebar-hover: #48c9b0;
+    theme-bg-pane:          #E6E7E8;
+
+    /* ── Text ────────────────────────────────────────────── */
+    theme-text-primary:   #333333;
+    theme-text-secondary: #555555;
+    theme-text-muted:     grey;
+    theme-text-dim:       #777777;
+    theme-text-faint:     #999999;
+    theme-text-on-dark:   white;
+    theme-text-disabled:  #999999;
+    theme-text-title:     #222222;
+
+    /* ── Borders ─────────────────────────────────────────── */
+    theme-border:          #cccccc;
+    theme-border-disabled: #dddddd;
+    theme-border-light:    #e5e7eb;
+
+    /* ── Grid / Separators ───────────────────────────────── */
+    theme-separator: #e0e0e0;
+
+    /* ── Controls ────────────────────────────────────────── */
+    theme-arrow:          #999999;
+    theme-check-box-hover: #e0e0e0;
+    theme-tooltip-bg:     #34495e;
+    theme-table-selection: #2196F3;
+
+    /* ── Charts ──────────────────────────────────────────── */
+    theme-chart-bg:         white;
+    theme-chart-axis:       #666666;
+    theme-chart-grid:       #e0e0e0;
+    theme-chart-legend:     #555555;
+    theme-chart-axis-label: #333333;
+
+    /* ── Semantic ────────────────────────────────────────── */
+    theme-positive: #28a745;
+    theme-negative: #dc3545;
+    theme-warning:  #F5B427;
+
+    /* ── Allocation bars ─────────────────────────────────── */
+    theme-alloc-track: #e5e7eb;
+
+    /* ── Notification panel ──────────────────────────────── */
+    theme-notif-panel-bg:   #f5f5f5;
+    theme-notif-cell-bg:    white;
+    theme-notif-cell-hover: #f0faf8;
+    theme-notif-cell-title: #222222;
+    theme-notif-cell-read:  #555555;
+    theme-notif-cell-time:  #aaaaaa;
+    theme-notif-empty:      #999999;
+
+    /* ── Badge ───────────────────────────────────────────── */
+    theme-badge-warning-bg:   #fff3cd;
+    theme-badge-warning-text: #856404;
+    theme-badge-success-bg:   #d4edda;
+    theme-badge-success-text: #155724;
+    theme-badge-neutral-bg:   #e2e3e5;
+    theme-badge-neutral-text: #383d41;
+
+    /* ── Fire calculator ─────────────────────────────────── */
+    theme-fire-value: #2c3e50;
+}

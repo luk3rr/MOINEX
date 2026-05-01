@@ -8,6 +8,7 @@
 
 package org.moinex.ui.main
 
+import com.jfoenix.controls.JFXButton
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -18,6 +19,7 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -26,10 +28,14 @@ import java.util.Locale
 @Controller
 class SettingsController(
     private val preferencesService: PreferencesService,
+    private val themeService: ThemeService,
     private val springContext: ConfigurableApplicationContext,
 ) {
     @FXML
     private lateinit var languageComboBox: ComboBox<Locale>
+
+    @FXML
+    private lateinit var themeToggleButton: JFXButton
 
     companion object {
         private val logger = LoggerFactory.getLogger(SettingsController::class.java)
@@ -86,5 +92,22 @@ class SettingsController(
                 }
             }
         }
+
+        updateThemeButton()
+    }
+
+    @FXML
+    private fun handleToggleTheme() {
+        themeService.toggleAndApply()
+        updateThemeButton()
+    }
+
+    private fun updateThemeButton() {
+        themeToggleButton.text =
+            if (preferencesService.isDarkMode()) {
+                preferencesService.translate(TranslationKeys.SETTINGS_THEME_LIGHT)
+            } else {
+                preferencesService.translate(TranslationKeys.SETTINGS_THEME_DARK)
+            }
     }
 }

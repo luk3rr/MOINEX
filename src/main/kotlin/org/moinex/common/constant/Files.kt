@@ -122,6 +122,7 @@ object Files {
     const val CSS_SCENE_PATH: String = "/css/scene/"
     const val CSS_COMMON_PATH: String = "/css/common/"
     const val CSS_COMPONENT_PATH: String = "/css/component/"
+    const val CSS_THEME_PATH: String = "/css/theme/"
 
     // UI main package
     const val MAIN_FXML: String = UI_MAIN_PATH + "main.fxml"
@@ -175,6 +176,10 @@ object Files {
     const val LOADING_GIF: String = GIF_PATH + "loading.gif"
     const val SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON: String = COMMON_ICONS_PATH + "synchronize.png"
     const val RELOAD_ICON: String = COMMON_ICONS_PATH + "reload.png"
+
+    // CSS – theme tokens
+    const val LIGHT_TOKENS_CSS: String = CSS_THEME_PATH + "tokens.light.css"
+    const val DARK_TOKENS_CSS: String = CSS_THEME_PATH + "tokens.dark.css"
 
     // CSS
     const val MAIN_STYLE_SHEET: String = CSS_SCENE_PATH + "main.css"

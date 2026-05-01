@@ -7,11 +7,11 @@
 .chart-legend {
     -fx-background-color: transparent;
     -fx-font-size: 12px;
-    -fx-text-fill: #555;
+    -fx-text-fill: theme-chart-legend;
 }
 
 .budget-target-marker {
-    -fx-stroke: #1e293b;
+    -fx-stroke: theme-text-primary;
     -fx-stroke-width: 2.5;
     -fx-opacity: 0.75;
 }

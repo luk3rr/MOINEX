@@ -21,10 +21,10 @@
 }
 
 .menu-item .label{
-    -fx-text-fill: black;
+    -fx-text-fill: theme-text-primary;
 }
 
 .menu-item:hover {
-    -fx-background-color: #e6e6e6;
+    -fx-background-color: theme-bg-hover;
     -fx-background-radius: 20;
 }

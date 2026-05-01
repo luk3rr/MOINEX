@@ -1,15 +1,15 @@
 /* Timeline Chart Styling */
 
 .chart {
-    -fx-background-color: white;
+    -fx-background-color: theme-chart-bg;
 }
 
 .chart-content {
-    -fx-background-color: white;
+    -fx-background-color: theme-chart-bg;
 }
 
 .chart-plot-background {
-    -fx-background-color: white;
+    -fx-background-color: theme-chart-bg;
 }
 
 /* Legend symbols customization */
@@ -105,24 +105,25 @@
 
 /* Axis styling */
 .axis {
-    -fx-tick-label-fill: #666666;
+    -fx-tick-label-fill: theme-chart-axis;
     -fx-font-size: 11px;
 }
 
 .axis-label {
-    -fx-text-fill: #333333;
+    -fx-fill:      theme-chart-axis-label;
+    -fx-text-fill: theme-chart-axis-label;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
 
 /* Grid lines */
 .chart-vertical-grid-lines {
-    -fx-stroke: #e0e0e0;
+    -fx-stroke: theme-chart-grid;
     -fx-stroke-width: 0.5;
 }
 
 .chart-horizontal-grid-lines {
-    -fx-stroke: #e0e0e0;
+    -fx-stroke: theme-chart-grid;
     -fx-stroke-width: 0.5;
 }
 
@@ -264,21 +265,21 @@
 
 /* Net Worth Chart - Data point symbols */
 .chart-line-symbol.series0 {
-    -fx-background-color: #2563eb, white;
+    -fx-background-color: #2563eb, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;
 }
 
 .chart-line-symbol.series1 {
-    -fx-background-color: #ef4444, white;
+    -fx-background-color: #ef4444, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;
 }
 
 .chart-line-symbol.series2 {
-    -fx-background-color: #22c55e, white;
+    -fx-background-color: #22c55e, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;

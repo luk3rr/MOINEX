@@ -4,33 +4,70 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
+/* ── Container ───────────────────────────────────────────── */
 .table-view {
-    -fx-background-color: #f8f8f8;
-    -fx-border-color: #cccccc;
+    -fx-background-color: theme-bg-table;
+    -fx-border-color: theme-border;
     -fx-border-width: 1px;
 }
 
+/* ── Column headers ──────────────────────────────────────── */
+.table-view .column-header-background {
+    -fx-background-color: theme-bg-header;
+}
+
 .table-view .column-header {
-    -fx-background-color: #f2f3f4;
-    -fx-text-fill: white;
+    -fx-background-color: theme-bg-header;
+    -fx-border-width: 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: theme-text-primary;
     -fx-font-weight: bold;
     -fx-padding: 10px;
+    -fx-alignment: center-left;
 }
 
+.table-view .column-header:last-visible {
+    -fx-background-color: theme-bg-header;
+}
+
+.table-view .corner {
+    -fx-background-color: theme-bg-header;
+}
+
+/* ── Rows ────────────────────────────────────────────────── */
+.table-view .table-row-cell {
+    -fx-background-color: theme-bg-card;
+    -fx-border-width: 0;
+    -fx-table-cell-border-color: theme-border;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: theme-bg-row-alt;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: theme-bg-hover;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: theme-table-selection;
+}
+
+/* ── Cells ───────────────────────────────────────────────── */
 .table-view .table-cell {
+    -fx-text-fill: theme-text-primary;
     -fx-padding: 10px;
     -fx-font-size: 14px;
+    -fx-table-cell-border-color: theme-border;
 }
 
-.table-view .table-row:selected {
-    -fx-background-color: #2196F3;
-    -fx-text-fill: white;
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: theme-text-on-dark;
 }
 
-.table-view .table-row {
-    -fx-background-color: #ffffff;
-}
-
-.table-view .table-row:nth-child(even) {
-    -fx-background-color: #f2f2f2;
+/* ── Empty table placeholder ─────────────────────────────── */
+.table-view .placeholder .label {
+    -fx-text-fill: theme-text-muted;
 }

@@ -14,6 +14,7 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
+import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
@@ -43,13 +44,25 @@ class SavingsBondsController(
     private val preferencesService: PreferencesService,
 ) {
     @FXML
+    private lateinit var bondsTotalInvestedLabel: Text
+
+    @FXML
     private lateinit var bondsTabTotalInvestedField: Text
+
+    @FXML
+    private lateinit var bondsCurrentValueLabel: Text
 
     @FXML
     private lateinit var bondsTabCurrentValueField: Text
 
     @FXML
+    private lateinit var bondsProfitLossLabel: Text
+
+    @FXML
     private lateinit var bondsTabProfitLossField: Text
+
+    @FXML
+    private lateinit var bondsInterestReceivedLabel: Text
 
     @FXML
     private lateinit var bondsTabInterestReceivedField: Text
@@ -72,6 +85,21 @@ class SavingsBondsController(
         updateBondTableView()
         updateBondTabFields()
         configureBondListeners()
+        applyThemeColors()
+    }
+
+    private fun applyThemeColors() {
+        val color = if (preferencesService.isDarkMode()) Color.web("#F8F8F2") else Color.BLACK
+        listOf(
+            bondsTotalInvestedLabel,
+            bondsTabTotalInvestedField,
+            bondsCurrentValueLabel,
+            bondsTabCurrentValueField,
+            bondsProfitLossLabel,
+            bondsTabProfitLossField,
+            bondsInterestReceivedLabel,
+            bondsTabInterestReceivedField,
+        ).forEach { it.fill = color }
     }
 
     @FXML

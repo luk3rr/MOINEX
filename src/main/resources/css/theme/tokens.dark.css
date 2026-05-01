@@ -1,0 +1,90 @@
+/*
+ * Filename: tokens.dark.css
+ * Dark theme — Dracula palette.
+ * Defines all looked-up colors referenced by component/scene CSS files.
+ */
+
+.root {
+    /* ── Modena meta-colors (cascade into all default JavaFX controls) ── */
+    -fx-base:                     #44475A;   /* Selection — drives control gradients */
+    -fx-background:               #282A36;   /* Background — drives ladder() text derivation */
+    -fx-control-inner-background: #282A36;   /* Inner bg of text fields, lists, etc.        */
+    -fx-text-background-color:    #F8F8F2;   /* Foreground — direct override for .label      */
+    -fx-accent:                   #BD93F9;   /* Purple — selection highlights                */
+    -fx-focus-color:              #BD93F9;
+    -fx-faint-focus-color:        rgba(189, 147, 249, 0.2);
+
+    /* ── Backgrounds ─────────────────────────────────────── */
+    theme-bg-base:          #282A36;
+    theme-bg-card:          #282A36;
+    theme-bg-card-alt:      #21222c;
+    theme-bg-input:         #282A36;
+    theme-bg-hover:         #44475A;
+    theme-bg-pressed:       #6272A4;
+    theme-bg-disabled:      #44475A;
+    theme-bg-header:        #44475A;
+    theme-bg-row-alt:       #373945;
+    theme-bg-table:         #282A36;
+    theme-bg-sidebar:       #0d7a63;
+    theme-bg-sidebar-hover: #1a9e83;
+    theme-bg-pane:          #383a52;   /* pane cards — visually distinct from base  */
+
+    /* ── Text ────────────────────────────────────────────── */
+    theme-text-primary:   #F8F8F2;
+    theme-text-secondary: #6272A4;
+    theme-text-muted:     #6272A4;
+    theme-text-dim:       #6272A4;
+    theme-text-faint:     #6272A4;
+    theme-text-on-dark:   #F8F8F2;
+    theme-text-disabled:  #6272A4;
+    theme-text-title:     #F8F8F2;
+
+    /* ── Borders ─────────────────────────────────────────── */
+    theme-border:          #44475A;
+    theme-border-disabled: #6272A4;
+    theme-border-light:    #44475A;
+
+    /* ── Grid / Separators ───────────────────────────────── */
+    theme-separator: #44475A;
+
+    /* ── Controls ────────────────────────────────────────── */
+    theme-arrow:           #6272A4;
+    theme-check-box-hover: #44475A;
+    theme-tooltip-bg:      #44475A;
+    theme-table-selection: #6272A4;
+
+    /* ── Charts ──────────────────────────────────────────── */
+    theme-chart-bg:         #282A36;
+    theme-chart-axis:       #F8F8F2; /*#6272A4;*/
+    theme-chart-grid:       #F8F8F2; /*#44475A;*/
+    theme-chart-legend:     #F8F8F2;
+    theme-chart-axis-label: #F8F8F2;
+
+    /* ── Semantic ────────────────────────────────────────── */
+    theme-positive: #50FA7B;
+    theme-negative: #FF5555;
+    theme-warning:  #FFB86C;
+
+    /* ── Allocation bars ─────────────────────────────────── */
+    theme-alloc-track: #44475A;
+
+    /* ── Notification panel ──────────────────────────────── */
+    theme-notif-panel-bg:   #282A36;
+    theme-notif-cell-bg:    #282A36;
+    theme-notif-cell-hover: #44475A;
+    theme-notif-cell-title: #F8F8F2;
+    theme-notif-cell-read:  #6272A4;
+    theme-notif-cell-time:  #6272A4;
+    theme-notif-empty:      #6272A4;
+
+    /* ── Badge ───────────────────────────────────────────── */
+    theme-badge-warning-bg:   #282A36;
+    theme-badge-warning-text: #FFB86C;
+    theme-badge-success-bg:   #282A36;
+    theme-badge-success-text: #50FA7B;
+    theme-badge-neutral-bg:   #44475A;
+    theme-badge-neutral-text: #F8F8F2;
+
+    /* ── Fire calculator ─────────────────────────────────── */
+    theme-fire-value: #F8F8F2;
+}

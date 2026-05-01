@@ -12,10 +12,11 @@
   -fx-border-color: transparent;
   -fx-tick-mark-visible: false;
   -fx-minor-tick-visible: false;
+  -fx-tick-label-fill: theme-chart-axis;
 }
 
 .chart-legend {
   -fx-background-color: transparent;
   -fx-font-size: 12px;
-  -fx-text-fill: #555;
+  -fx-text-fill: theme-chart-legend;
 }

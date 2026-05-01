@@ -61,7 +61,8 @@ class SankeyChart : Pane() {
         private const val FLOW_OPACITY = 0.45
         private const val HIGHLIGHT_OPACITY = 0.75
         private const val FONT_SIZE = 11.0
-        private val TEXT_COLOR = Color.BLACK
+        private val TEXT_COLOR_LIGHT = Color.BLACK
+        private val TEXT_COLOR_DARK = Color.web("#F8F8F2")
         private const val RIGHT_ARROW = "\u2794"
         private const val LEFT_CONTROL_PROPORTION = 0.4
         private const val RIGHT_CONTROL_PROPORTION = 0.6
@@ -296,10 +297,12 @@ class SankeyChart : Pane() {
     ) {
         for ((_, layout) in layouts) {
             val level = levels[layout.id] ?: 0
+            val labelColor =
+                if (preferencesService?.isDarkMode() == true) TEXT_COLOR_DARK else TEXT_COLOR_LIGHT
             val text =
                 Text(layout.name).apply {
                     this.font = font
-                    fill = TEXT_COLOR
+                    fill = labelColor
                     textOrigin = VPos.CENTER
                 }
 

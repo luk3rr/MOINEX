@@ -5,8 +5,8 @@
  */
 
 #totalBalancePane {
-  -fx-background-color: white;
-  -fx-border-color: #ccc;
+  -fx-background-color: theme-bg-card;
+  -fx-border-color: theme-border;
   -fx-border-radius: 4px;
   -fx-background-radius: 10px;
   -fx-padding: 10px;
@@ -23,7 +23,7 @@
 .total-balance-wallets-label {
   -fx-font-size: 11px;
   -fx-font-style: italic;
-  -fx-text-fill: grey;
+  -fx-text-fill: theme-text-muted;
   -fx-padding: 5px;
 }
 
@@ -43,24 +43,25 @@
   -fx-border-color: transparent;
   -fx-tick-mark-visible: false;
   -fx-minor-tick-visible: false;
+  -fx-tick-label-fill: theme-chart-axis;
 }
 
 .chart-legend {
   -fx-background-color: transparent;
   -fx-font-size: 12px;
-  -fx-text-fill: #555;
+  -fx-text-fill: theme-chart-legend;
 }
 
 .check-box {
-    -fx-font-size: 12px; /* Tamanho da fonte */
-    -fx-padding: 5px; /* Espaçamento interno */
-    -fx-text-fill: black; /* Cor do texto */
+    -fx-font-size: 12px;
+    -fx-padding: 5px;
+    -fx-text-fill: theme-text-primary;
 }
 
 .check-box:selected {
-    -fx-text-fill: black; /* Cor do texto ao selecionar */
+    -fx-text-fill: theme-text-primary;
 }
 
 .check-box:hover {
-    -fx-background-color: #e0e0e0; /* Cor ao passar o mouse */
+    -fx-background-color: theme-check-box-hover;
 }
