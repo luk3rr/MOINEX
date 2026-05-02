@@ -278,34 +278,39 @@ class SavingsStocksFundsController(
                                         ),
                                 )
                             }
-
                             failed.size == stocksFundsTabTickerTable.items.size -> {
-                                WindowUtils.showInformationDialog(
-                                    preferencesService.translate(
-                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
-                                    ),
-                                    preferencesService.translate(
-                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED,
-                                    ),
+                                notificationService.send(
+                                    type = NotificationType.ERROR,
+                                    title =
+                                        preferencesService.translate(
+                                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
+                                        ),
+                                    message =
+                                        preferencesService.translate(
+                                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_ALL_FAILED,
+                                        ),
                                 )
                             }
-
                             else -> {
                                 val failedSymbols = failed.joinToString(", ") { it.symbol }
-                                WindowUtils.showInformationDialog(
-                                    preferencesService.translate(
-                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
-                                    ),
-                                    preferencesService.translate(
-                                        TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED,
-                                    ) + "\n$failedSymbols",
+                                notificationService.send(
+                                    type = NotificationType.INFO,
+                                    title =
+                                        preferencesService.translate(
+                                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_TITLE,
+                                        ),
+                                    message =
+                                        preferencesService.translate(
+                                            TranslationKeys.SAVINGS_STOCKS_FUNDS_DIALOG_UPDATE_PRICES_ERROR_SOME_FAILED,
+                                        ) + "\n$failedSymbols",
                                 )
                             }
                         }
                     }.onFailure { e ->
-                        WindowUtils.showErrorDialog(
-                            preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
-                            e.message ?: "",
+                        notificationService.send(
+                            type = NotificationType.ERROR,
+                            title = preferencesService.translate(TranslationKeys.DIALOG_ERROR_TITLE),
+                            message = e.message ?: "",
                         )
                     }
 

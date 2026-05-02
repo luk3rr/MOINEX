@@ -51,7 +51,7 @@ class InvestmentPerformanceService(
     private val calculationMutex = Mutex()
 
     @Transactional
-    suspend fun recalculateAllSnapshots() =
+    suspend fun recalculateAllSnapshots(publishNotification: Boolean = false) =
         calculationMutex.withLock {
             logger.info("Starting investment performance recalculation...")
 
@@ -72,13 +72,15 @@ class InvestmentPerformanceService(
 
             logger.info("Investment performance recalculation completed successfully")
 
-            notificationService.send(
-                type = NotificationType.INFO,
-                title =
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_TITLE),
-                message =
-                    preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_MESSAGE),
-            )
+            if (publishNotification) {
+                notificationService.send(
+                    type = NotificationType.INFO,
+                    title =
+                        preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_TITLE),
+                    message =
+                        preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_MESSAGE),
+                )
+            }
         }
 
     @Transactional

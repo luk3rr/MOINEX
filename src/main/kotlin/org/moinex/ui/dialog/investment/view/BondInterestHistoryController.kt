@@ -19,8 +19,10 @@ import javafx.scene.control.TextInputDialog
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.investment.Bond
 import org.moinex.model.investment.BondInterestCalculation
+import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.service.investment.BondInterestCalculationService
 import org.slf4j.LoggerFactory
@@ -32,6 +34,7 @@ import java.text.MessageFormat
 class BondInterestHistoryController(
     private val bondInterestCalculationService: BondInterestCalculationService,
     private val preferencesService: PreferencesService,
+    private val notificationService: NotificationService,
 ) {
     @FXML
     private lateinit var bondNameLabel: Label
@@ -323,9 +326,16 @@ class BondInterestHistoryController(
         runCatching {
             bondInterestCalculationService.recalculateAllMonthlyInterest(bond.id!!)
 
-            WindowUtils.showSuccessDialog(
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_MESSAGE),
+            notificationService.send(
+                type = NotificationType.SUCCESS,
+                title =
+                    preferencesService.translate(
+                        TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_TITLE,
+                    ),
+                message =
+                    preferencesService.translate(
+                        TranslationKeys.BOND_INTEREST_HISTORY_DIALOG_HISTORY_RECALCULATED_MESSAGE,
+                    ),
             )
 
             loadHistoryData()

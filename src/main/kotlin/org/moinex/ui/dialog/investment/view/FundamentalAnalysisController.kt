@@ -25,9 +25,11 @@ import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.config.RetryConfig
+import org.moinex.model.enums.NotificationType
 import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis
 import org.moinex.model.investment.Ticker
+import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.service.ThemeService
 import org.moinex.service.investment.FundamentalAnalysisService
@@ -44,6 +46,7 @@ class FundamentalAnalysisController(
     private val fundamentalAnalysisService: FundamentalAnalysisService,
     private val preferencesService: PreferencesService,
     private val springContext: ConfigurableApplicationContext,
+    private val notificationService: NotificationService,
 ) {
     @FXML
     private lateinit var companyNameValueLabel: Label
@@ -712,13 +715,12 @@ class FundamentalAnalysisController(
                     ),
                     RetryConfig.FUNDAMENTAL_ANALYSIS.maxRetries,
                 )
-        } else {
-            errorMessage =
-                "${preferencesService.translate(
-                    TranslationKeys.FUNDAMENTAL_ANALYSIS_ERROR_TITLE,
-                )}:\n\n$errorMessage"
         }
 
-        WindowUtils.showErrorDialog(title, errorMessage)
+        notificationService.send(
+            type = NotificationType.ERROR,
+            title = title,
+            message = errorMessage ?: "",
+        )
     }
 }
