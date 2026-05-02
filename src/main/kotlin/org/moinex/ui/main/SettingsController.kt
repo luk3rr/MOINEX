@@ -8,7 +8,6 @@
 
 package org.moinex.ui.main
 
-import com.jfoenix.controls.JFXButton
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -35,7 +34,7 @@ class SettingsController(
     private lateinit var languageComboBox: ComboBox<Locale>
 
     @FXML
-    private lateinit var themeToggleButton: JFXButton
+    private lateinit var themeComboBox: ComboBox<String>
 
     companion object {
         private val logger = LoggerFactory.getLogger(SettingsController::class.java)
@@ -93,21 +92,29 @@ class SettingsController(
             }
         }
 
-        updateThemeButton()
-    }
+        val themeLabels =
+            mapOf(
+                PreferencesService.THEME_LIGHT to preferencesService.translate(TranslationKeys.SETTINGS_THEME_LIGHT),
+                PreferencesService.THEME_DARK to preferencesService.translate(TranslationKeys.SETTINGS_THEME_DARK),
+            )
 
-    @FXML
-    private fun handleToggleTheme() {
-        themeService.toggleAndApply()
-        updateThemeButton()
-    }
+        themeComboBox.items.setAll(themeLabels.keys.toList())
 
-    private fun updateThemeButton() {
-        themeToggleButton.text =
-            if (preferencesService.isDarkMode()) {
-                preferencesService.translate(TranslationKeys.SETTINGS_THEME_LIGHT)
-            } else {
-                preferencesService.translate(TranslationKeys.SETTINGS_THEME_DARK)
+        themeComboBox.converter =
+            object : StringConverter<String>() {
+                override fun toString(theme: String?): String = themeLabels[theme] ?: theme ?: ""
+
+                override fun fromString(string: String?): String? = null
             }
+
+        themeComboBox.selectionModel.select(preferencesService.theme)
+
+        themeComboBox.valueProperty().addListener { _, oldVal, newVal ->
+            if (newVal == null || newVal == oldVal) {
+                return@addListener
+            }
+            preferencesService.theme = newVal
+            themeService.applyCurrentTheme()
+        }
     }
 }

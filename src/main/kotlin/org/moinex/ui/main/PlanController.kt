@@ -27,11 +27,13 @@ import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.PlanStatusDTO
 import org.moinex.model.financialplanning.FinancialPlan
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.financialplanning.FinancialPlanningService
 import org.moinex.ui.common.BudgetGroupPaneController
 import org.moinex.ui.dialog.financialplanning.AddPlanController
 import org.moinex.ui.dialog.financialplanning.EditPlanController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -295,6 +297,7 @@ class PlanController(
                 status.spentAmount,
                 currentPlan!!.baseIncome,
             )
+            springContext.getBean<ThemeService>().applyIconsTo(content)
 
             parent.children.setAll(content)
             content.setAnchorPaneConstraints()

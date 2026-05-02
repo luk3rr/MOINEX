@@ -10,6 +10,8 @@ package org.moinex.ui.main
 
 import com.jfoenix.controls.JFXButton
 import jakarta.persistence.EntityNotFoundException
+import javafx.animation.Interpolator
+import javafx.animation.RotateTransition
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
@@ -23,9 +25,11 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
+import javafx.util.Duration
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isValidForFundamentalAnalysis
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
@@ -100,6 +104,7 @@ class SavingsStocksFundsController(
     private lateinit var tickers: List<Ticker>
     private lateinit var dividends: List<Dividend>
     private var isUpdatingPortfolioPrices = false
+    private var updatePricesRotation: RotateTransition? = null
 
     @FXML
     fun initialize() {
@@ -602,10 +607,14 @@ class SavingsStocksFundsController(
         }
 
     private fun setOffUpdatePortfolioPricesButton() {
-        updatePricesButtonIcon.image =
-            Image(
-                javaClass.getResource(Files.LOADING_GIF)!!.toExternalForm(),
-            )
+        updatePricesRotation?.stop()
+        updatePricesRotation =
+            RotateTransition(Duration.seconds(1.0), updatePricesButtonIcon).apply {
+                byAngle = 360.0
+                cycleCount = RotateTransition.INDEFINITE
+                interpolator = Interpolator.LINEAR
+                play()
+            }
         updatePortfolioPricesButton.isDisable = true
         updatePortfolioPricesButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATING)
@@ -614,11 +623,15 @@ class SavingsStocksFundsController(
     }
 
     private fun setOnUpdatePortfolioPricesButton() {
+        updatePricesRotation?.stop()
+        updatePricesRotation = null
+        updatePricesButtonIcon.rotate = 0.0
         updatePortfolioPricesButton.isDisable = false
         updatePricesButtonIcon.image =
             Image(
-                javaClass.getResource(Files.SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON)!!.toExternalForm(),
+                javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm(),
             )
+        updatePricesButtonIcon.applyIconTheme(preferencesService.isDarkMode())
         updatePortfolioPricesButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES)
 

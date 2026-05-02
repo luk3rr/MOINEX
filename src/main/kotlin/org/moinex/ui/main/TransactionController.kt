@@ -43,6 +43,7 @@ import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ResumePaneController
@@ -52,6 +53,7 @@ import org.moinex.ui.dialog.wallettransaction.create.AddIncomeController
 import org.moinex.ui.dialog.wallettransaction.update.EditTransactionController
 import org.moinex.ui.dialog.wallettransaction.view.RecurringTransactionController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -557,6 +559,7 @@ class TransactionController(
 
             val resumePaneController = loader.getController<ResumePaneController>()
             resumePaneController.updateResumePane(selectedYear)
+            springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
             newContent.setAnchorPaneConstraints(left = 10.0, right = 10.0)
 
@@ -597,6 +600,7 @@ class TransactionController(
 
             val resumePaneController = loader.getController<ResumePaneController>()
             resumePaneController.updateResumePane(selectedYearMonth)
+            springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
             newContent.setAnchorPaneConstraints(left = 10.0, right = 10.0)
 

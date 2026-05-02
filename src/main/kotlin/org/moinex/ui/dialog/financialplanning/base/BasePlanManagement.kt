@@ -32,11 +32,13 @@ import org.moinex.model.Category
 import org.moinex.model.dto.form.PlanFormDTO
 import org.moinex.model.financialplanning.BudgetGroup
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.financialplanning.FinancialPlanningService
 import org.moinex.ui.common.BudgetGroupPreviewController
 import org.moinex.ui.dialog.financialplanning.AddBudgetGroupController
 import org.moinex.ui.dialog.financialplanning.EditBudgetGroupController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import java.math.BigDecimal
 import java.text.MessageFormat
@@ -145,6 +147,7 @@ abstract class BasePlanManagement(
 
                 val previewController = loader.getController<BudgetGroupPreviewController>()
                 previewController.populate(budgetGroup, planTotal)
+                springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
                 addContextMenu(newContent, budgetGroup)
 

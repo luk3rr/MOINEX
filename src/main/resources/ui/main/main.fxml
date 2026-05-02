@@ -22,7 +22,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                      <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/menu.png" />
                            </image>
@@ -37,7 +37,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/home.png" />
                            </image>
@@ -49,7 +49,7 @@
                   </JFXButton>
                   <JFXButton fx:id="walletButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.wallet" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/wallet.png" />
                            </image>
@@ -67,7 +67,7 @@
                         <Insets />
                      </opaqueInsets>
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/credit-card.png" />
                            </image>
@@ -82,7 +82,7 @@
                   </JFXButton>
                   <JFXButton fx:id="transactionButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.transaction" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/transaction.png" />
                            </image>
@@ -97,7 +97,7 @@
                   </JFXButton>
                   <JFXButton fx:id="goalsAndPlanButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.goalsAndPlans" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/goal.png" />
                            </image>
@@ -109,7 +109,7 @@
                   </JFXButton>
                   <JFXButton fx:id="savingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.savings" wrapText="true">
                      <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                            <image>
                               <Image url="@../../icon/sidebar/savings.png" />
                            </image>
@@ -126,7 +126,7 @@
                      <children>
                         <JFXButton fx:id="settingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" onAction="#handleOpenSettings" text="%main.settings" wrapText="true">
                            <graphic>
-                              <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
                                  <image>
                                     <Image url="@../../icon/sidebar/settings.png" />
                                  </image>
@@ -180,7 +180,7 @@
                               <StackPane>
                                  <ImageView fx:id="bellIcon" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                       <Image url="@../../icon/common/bell.png" />
+                                       <Image url="@../../icon/common/notification.png" />
                                     </image>
                                  </ImageView>
                                  <Label fx:id="unreadBadge" styleClass="notification-badge" text="0" visible="false" StackPane.alignment="TOP_RIGHT" />

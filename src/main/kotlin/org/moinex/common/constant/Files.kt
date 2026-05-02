@@ -13,7 +13,6 @@ object Files {
     const val SIDEBAR_ICONS_PATH: String = "/icon/sidebar/"
     const val CRC_OPERATOR_ICONS_PATH: String = "/icon/crc_operator/"
     const val COMMON_ICONS_PATH: String = "/icon/common/"
-    const val GIF_PATH: String = "/icon/gif/"
 
     const val UI_MAIN_PATH: String = "/ui/main/"
     const val UI_DIALOG_PATH: String = "/ui/dialog/"
@@ -172,9 +171,6 @@ object Files {
     const val HIDE_ICON: String = COMMON_ICONS_PATH + "hide.png"
     const val SHOW_ICON: String = COMMON_ICONS_PATH + "show.png"
 
-    // GIFs
-    const val LOADING_GIF: String = GIF_PATH + "loading.gif"
-    const val SAVINGS_SCREEN_SYNC_PRICES_BUTTON_DEFAULT_ICON: String = COMMON_ICONS_PATH + "synchronize.png"
     const val RELOAD_ICON: String = COMMON_ICONS_PATH + "reload.png"
 
     // CSS – theme tokens
@@ -206,6 +202,4 @@ object Files {
     // Notifications
     const val NOTIFICATION_CENTER_FXML: String = UI_MAIN_PATH + "notification_center.fxml"
     const val NOTIFICATION_CSS: String = CSS_COMPONENT_PATH + "notification.css"
-    const val BELL_ICON: String = COMMON_ICONS_PATH + "bell.png"
-    const val BELL_GIF: String = COMMON_ICONS_PATH + "bell.gif"
 }

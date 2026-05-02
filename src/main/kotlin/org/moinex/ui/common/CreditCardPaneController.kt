@@ -98,11 +98,6 @@ class CreditCardPaneController(
     private var currentDisplayedMonth = YearMonth.now()
     private lateinit var creditCard: CreditCard
 
-    companion object {
-        private const val GREEN_LABEL_STYLE = "-fx-text-fill: green"
-        private const val BLACK_LABEL_STYLE = "-fx-text-fill: black"
-    }
-
     @FXML
     private fun initialize() {
         currentDisplayedMonth = YearMonth.now()
@@ -275,12 +270,6 @@ class CreditCardPaneController(
 
         limitLabel.text = UIUtils.formatCurrency(limit)
         availableRebateLabel.text = UIUtils.formatCurrency(rebate)
-
-        availableRebateLabel.style =
-            when {
-                rebate > BigDecimal.ZERO -> GREEN_LABEL_STYLE
-                else -> BLACK_LABEL_STYLE
-            }
 
         pendingPaymentsLabel.text = UIUtils.formatCurrency(pendingPayments)
         availableLimitLabel.text = UIUtils.formatCurrency(limitAvailable)

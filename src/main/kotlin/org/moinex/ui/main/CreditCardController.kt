@@ -42,6 +42,7 @@ import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.dto.CreditCardDebtRowDTO
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.ui.common.CreditCardPaneController
@@ -51,6 +52,7 @@ import org.moinex.ui.dialog.creditcard.ArchivedCreditCardsController
 import org.moinex.ui.dialog.creditcard.EditCreditCardDebtController
 import org.moinex.ui.dialog.creditcard.RecurringCreditCardDebtsController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -687,6 +689,7 @@ class CreditCardController(
 
                 val crcPaneController = loader.getController<CreditCardPaneController>()
                 crcPaneController.updateCreditCardPane(crc, defaultMonth)
+                springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
                 AnchorPane.setTopAnchor(newContent, 0.0)
                 AnchorPane.setBottomAnchor(newContent, 0.0)

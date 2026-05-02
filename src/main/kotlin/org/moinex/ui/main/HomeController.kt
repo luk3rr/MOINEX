@@ -9,6 +9,8 @@
 package org.moinex.ui.main
 
 import com.jfoenix.controls.JFXButton
+import javafx.animation.Interpolator
+import javafx.animation.RotateTransition
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
@@ -32,6 +34,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
+import javafx.util.Duration
 import javafx.util.StringConverter
 import org.moinex.common.chart.ChartFactory
 import org.moinex.common.chart.SankeyChart
@@ -41,6 +44,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isExpense
@@ -56,6 +60,7 @@ import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.investment.BondService
@@ -66,6 +71,7 @@ import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.ResumePaneController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -169,6 +175,8 @@ class HomeController(
     private var walletPaneCurrentPage = 0
     private var creditCardPaneCurrentPage = 0
     private var graphPaneCurrentPage = 0
+    private var recalculateRotation: RotateTransition? = null
+    private var isRecalculating = false
 
     companion object {
         private val logger = LoggerFactory.getLogger(HomeController::class.java)
@@ -198,6 +206,8 @@ class HomeController(
 
         setButtonsActions()
         configureListeners()
+
+        if (isRecalculating) setOffRecalculateButton() else setOnRecalculateButton()
     }
 
     private fun configureListeners() {
@@ -253,13 +263,33 @@ class HomeController(
     }
 
     private fun setOffRecalculateButton() {
-        recalculateNetWorthButtonIcon.image =
-            Image(javaClass.getResource(Files.LOADING_GIF)!!.toExternalForm())
+        isRecalculating = true
+        recalculateRotation?.stop()
+        recalculateRotation =
+            RotateTransition(Duration.seconds(1.0), recalculateNetWorthButtonIcon).apply {
+                byAngle = 360.0
+                cycleCount = RotateTransition.INDEFINITE
+                interpolator = Interpolator.LINEAR
+                play()
+            }
         recalculateNetWorthButton.isDisable = true
         recalculateNetWorthButton.text =
             preferencesService.translate(
                 TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
             )
+    }
+
+    private fun setOnRecalculateButton() {
+        isRecalculating = false
+        recalculateRotation?.stop()
+        recalculateRotation = null
+        recalculateNetWorthButtonIcon.rotate = 0.0
+        recalculateNetWorthButton.isDisable = false
+        recalculateNetWorthButtonIcon.image =
+            Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
+        recalculateNetWorthButtonIcon.applyIconTheme(preferencesService.isDarkMode())
+        recalculateNetWorthButton.text =
+            preferencesService.translate(TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON)
     }
 
     private fun updateRecalculateButtonProgress(
@@ -272,14 +302,6 @@ class HomeController(
                 TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON_RECALCULATING,
             )
         recalculateNetWorthButton.text = "$baseText ($current/$total - $percentage%)"
-    }
-
-    private fun setOnRecalculateButton() {
-        recalculateNetWorthButton.isDisable = false
-        recalculateNetWorthButtonIcon.image =
-            Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
-        recalculateNetWorthButton.text =
-            preferencesService.translate(TranslationKeys.HOME_RECALCULATE_NET_WORTH_BUTTON)
     }
 
     private fun setButtonsActions() {
@@ -624,6 +646,7 @@ class HomeController(
                 )
 
             resumePaneController.updateResumePane(YearMonth.of(currentDate.year, currentDate.monthValue))
+            springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
             newContent.setAnchorPaneConstraints()
 
@@ -769,6 +792,7 @@ class HomeController(
             ImageView(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon).apply {
                 fitHeight = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
                 fitWidth = Constants.WALLET_TYPE_ICONS_SIZE.toDouble()
+                applyIconTheme(preferencesService.isDarkMode())
             }
 
         val iconVBox =

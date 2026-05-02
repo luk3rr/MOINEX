@@ -42,6 +42,7 @@ import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.model.wallettransaction.WalletType
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.creditcard.RecurringCreditCardDebtService
 import org.moinex.service.wallet.RecurringTransactionService
@@ -52,6 +53,7 @@ import org.moinex.ui.dialog.wallettransaction.create.AddWalletController
 import org.moinex.ui.dialog.wallettransaction.view.ArchivedWalletsController
 import org.moinex.ui.dialog.wallettransaction.view.TransferController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -440,6 +442,7 @@ class WalletController(
 
                 val walletPaneController = loader.getController<WalletPaneController>()
                 walletPaneController.updateWalletPane(wallet)
+                springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
                 newContent.setAnchorPaneConstraints()
 

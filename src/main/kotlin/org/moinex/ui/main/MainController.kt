@@ -12,7 +12,6 @@ import javafx.animation.FadeTransition
 import javafx.animation.KeyFrame
 import javafx.animation.KeyValue
 import javafx.animation.ParallelTransition
-import javafx.animation.PauseTransition
 import javafx.animation.Timeline
 import javafx.animation.TranslateTransition
 import javafx.fxml.FXML
@@ -33,6 +32,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.NotificationService
@@ -185,11 +185,14 @@ class MainController(
 
         notificationService.registerUiListener { notification ->
             toastOverlay.show(notification)
-            animateBellIcon()
             updateUnreadBadge()
         }
 
         updateUnreadBadge()
+
+        val darkMode = preferencesService.isDarkMode()
+        toggleMonetaryValuesIcon.applyIconTheme(darkMode)
+        bellIcon.applyIconTheme(darkMode)
 
         loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
         updateSelectedButton(homeButton)
@@ -237,6 +240,7 @@ class MainController(
                     Files.HIDE_ICON
                 },
             )
+        toggleMonetaryValuesIcon.applyIconTheme(preferencesService.isDarkMode())
 
         currentContent?.let { loadContent(it.key, it.value) }
     }
@@ -267,6 +271,7 @@ class MainController(
                 javaClass.getResource(Files.COMMON_STYLE_SHEET)!!.toExternalForm(),
             )
 
+            themeService.applyTo(newContent)
             newContent.setAnchorPaneConstraints()
 
             contentArea.children.clear()
@@ -378,17 +383,6 @@ class MainController(
         val count = notificationService.countUnread()
         unreadBadge.text = if (count > 9) "9+" else count.toString()
         unreadBadge.isVisible = count > 0
-    }
-
-    private fun animateBellIcon() {
-        bellIcon.image = Image(Files.BELL_GIF)
-
-        val restore =
-            PauseTransition(Duration.millis(Constants.NOTIFICATION_BELL_GIF_DURATION_MS))
-        restore.setOnFinished {
-            bellIcon.image = Image(Files.BELL_ICON)
-        }
-        restore.play()
     }
 
     private fun updateSelectedButton(selectedButton: Button) {

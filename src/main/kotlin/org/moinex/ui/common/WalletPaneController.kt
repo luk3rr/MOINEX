@@ -20,6 +20,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
@@ -180,6 +181,7 @@ class WalletPaneController(
         walletName.text = wallet.name
         walletType.text = UIUtils.translateWalletType(wallet.type)
         walletIcon.image = Image(Files.WALLET_TYPE_ICONS_PATH + wallet.type.icon)
+        walletIcon.applyIconTheme(preferencesService.isDarkMode())
 
         val confirmedIncomesSum =
             transactions

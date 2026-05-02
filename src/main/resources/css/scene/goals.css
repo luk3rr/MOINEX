@@ -3,3 +3,7 @@
  * Created on: December  6, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
+
+.text-footnote {
+    -fx-fill: theme-text-secondary;
+}

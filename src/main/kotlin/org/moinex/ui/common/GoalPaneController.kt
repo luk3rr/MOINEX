@@ -21,6 +21,7 @@ import org.moinex.common.chart.ChartFactory
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.isZero
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -130,6 +131,7 @@ class GoalPaneController(
                     Files.WALLET_TYPE_ICONS_PATH + currentGoal.type.icon
                 },
             )
+        goalIcon.applyIconTheme(preferencesService.isDarkMode())
 
         goalTargetAmount.text = UIUtils.formatCurrency(currentGoal.targetBalance)
         goalTargetDate.text = UIUtils.formatDateForDisplay(currentGoal.targetDate)

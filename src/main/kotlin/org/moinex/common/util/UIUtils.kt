@@ -61,6 +61,8 @@ import org.moinex.model.investment.Ticker
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletType
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Component
 import java.io.IOException
@@ -481,6 +483,7 @@ class UIUtils(
                     ?: throw IllegalStateException("CSS not found: $cssPath"),
             )
 
+            springContext.getBean<ThemeService>().applyIconsTo(content)
             tab.content = content
         }
 

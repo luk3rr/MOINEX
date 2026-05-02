@@ -8,6 +8,8 @@
 
 package org.moinex.ui.main
 
+import javafx.animation.Interpolator
+import javafx.animation.RotateTransition
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.geometry.Pos
@@ -37,6 +39,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.applyIconTheme
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.FxUtils
@@ -190,6 +193,8 @@ class SavingsOverviewController(
     private var scheduledUpdatingBrazilianIndicatorsJob: Job? = null
 
     private var graphPaneCurrentPage = 0
+    private var recalculateRotation: RotateTransition? = null
+    private var isRecalculating = false
 
     companion object {
         private val logger = LoggerFactory.getLogger(SavingsOverviewController::class.java)
@@ -221,6 +226,12 @@ class SavingsOverviewController(
 
         setGraphButtonsActions()
         applyThemeColors()
+
+        if (isRecalculating) {
+            setOffRecalculateInvestmentPerformanceButton()
+        } else {
+            setOnRecalculateInvestmentPerformanceButton()
+        }
     }
 
     private fun applyThemeColors() {
@@ -519,17 +530,29 @@ class SavingsOverviewController(
     }
 
     private fun setOffRecalculateInvestmentPerformanceButton() {
-        recalculateInvestmentPerformanceButtonIcon.image =
-            Image(javaClass.getResource(Files.LOADING_GIF)!!.toExternalForm())
+        isRecalculating = true
+        recalculateRotation?.stop()
+        recalculateRotation =
+            RotateTransition(javafx.util.Duration.seconds(1.0), recalculateInvestmentPerformanceButtonIcon).apply {
+                byAngle = 360.0
+                cycleCount = RotateTransition.INDEFINITE
+                interpolator = Interpolator.LINEAR
+                play()
+            }
         recalculateInvestmentPerformanceButton.isDisable = true
         recalculateInvestmentPerformanceButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATING)
     }
 
     private fun setOnRecalculateInvestmentPerformanceButton() {
+        isRecalculating = false
+        recalculateRotation?.stop()
+        recalculateRotation = null
+        recalculateInvestmentPerformanceButtonIcon.rotate = 0.0
         recalculateInvestmentPerformanceButton.isDisable = false
         recalculateInvestmentPerformanceButtonIcon.image =
             Image(javaClass.getResource(Files.RELOAD_ICON)!!.toExternalForm())
+        recalculateInvestmentPerformanceButtonIcon.applyIconTheme(preferencesService.isDarkMode())
         recalculateInvestmentPerformanceButton.text =
             preferencesService.translate(TranslationKeys.SAVINGS_BUTTON_RECALCULATE)
     }

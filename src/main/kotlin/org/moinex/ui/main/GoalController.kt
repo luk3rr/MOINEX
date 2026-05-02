@@ -31,6 +31,7 @@ import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.goal.Goal
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.goal.GoalService
 import org.moinex.service.wallet.WalletService
 import org.moinex.ui.common.GoalPaneController
@@ -38,6 +39,7 @@ import org.moinex.ui.dialog.goal.AddGoalController
 import org.moinex.ui.dialog.goal.EditGoalController
 import org.moinex.ui.dialog.wallettransaction.create.AddTransferController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -377,6 +379,7 @@ class GoalController(
 
             val goalPaneController = loader.getController<GoalPaneController>()
             goalPaneController.updateGoalPane(goal)
+            springContext.getBean<ThemeService>().applyIconsTo(newContent)
 
             newContent.setAnchorPaneConstraints()
 

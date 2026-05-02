@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 
@@ -14,14 +12,10 @@
       <VBox layoutX="40.0" layoutY="40.0" spacing="20.0">
          <children>
             <Label text="%settings.language" />
-            <ComboBox fx:id="languageComboBox" prefWidth="240.0" />
+            <ComboBox fx:id="languageComboBox" prefWidth="240.0" stylesheets="@../../css/component/combo-box.css" />
             <Separator prefWidth="520.0" />
             <Label text="%settings.theme" />
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-               <children>
-                  <JFXButton fx:id="themeToggleButton" onAction="#handleToggleTheme" prefWidth="160.0" styleClass="jfx-button" />
-               </children>
-            </HBox>
+            <ComboBox fx:id="themeComboBox" prefWidth="240.0" stylesheets="@../../css/component/combo-box.css" />
          </children>
       </VBox>
    </children>

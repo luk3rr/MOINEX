@@ -29,9 +29,11 @@ import org.moinex.model.enums.PeriodType
 import org.moinex.model.investment.FundamentalAnalysis
 import org.moinex.model.investment.Ticker
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.moinex.service.investment.FundamentalAnalysisService
 import org.moinex.ui.common.FundamentalMetricPaneController
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.text.MessageFormat
@@ -669,6 +671,7 @@ class FundamentalAnalysisController(
             val lastUpdateDate =
                 currentAnalysis?.lastUpdate?.toLocalDate()?.toString()
             controller.updateMetricPane(label, metricObj, lastUpdateDate)
+            springContext.getBean<ThemeService>().applyIconsTo(metricPane)
 
             container.children.add(metricPane)
             logger.debug("Added metric pane to container. Container children count: {}", container.children.size)

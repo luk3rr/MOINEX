@@ -73,7 +73,7 @@ class InvestmentPerformanceService(
             logger.info("Investment performance recalculation completed successfully")
 
             notificationService.send(
-                type = NotificationType.SUCCESS,
+                type = NotificationType.INFO,
                 title =
                     preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_PERFORMANCE_CALCULATION_TITLE),
                 message =

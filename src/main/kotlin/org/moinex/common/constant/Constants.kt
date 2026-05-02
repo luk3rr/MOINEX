@@ -78,7 +78,7 @@ object Constants {
     const val MENU_ANIMATION_DURATION: Double = 200.0 // ms
     const val NOTIFICATION_PANEL_WIDTH: Double = 380.0
     const val NOTIFICATION_DRAWER_ANIMATION_MS: Double = 280.0
-    const val NOTIFICATION_BELL_GIF_DURATION_MS: Double = 3000.0
+
     const val XYBAR_CHART_ANIMATION_FRAMES: Int = 30
     const val XYBAR_CHART_ANIMATION_DURATION: Double = 0.3 // s
     const val TOOLTIP_ANIMATION_DURATION: Double = 0.5 // s
