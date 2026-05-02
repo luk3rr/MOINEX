@@ -9,6 +9,7 @@
 package org.moinex.service.investment
 
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.util.APIUtils
 import org.moinex.model.dto.SyncMarketIndicatorResultDTO
@@ -21,12 +22,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Service
 class MarketIndicatorService(
     private val marketIndicatorHistoryRepository: MarketIndicatorHistoryRepository,
     private val bondOperationRepository: BondOperationRepository,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(MarketIndicatorService::class.java)
 
@@ -43,7 +44,7 @@ class MarketIndicatorService(
 
         logger.info("Found {} indicators used by bonds: {}", usedIndicators.size, usedIndicators)
 
-        val endDate = LocalDate.now()
+        val endDate = clockProvider.today()
         val results =
             usedIndicators
                 .map { indicator -> processIndicatorSync(indicator, endDate) }
@@ -210,7 +211,7 @@ class MarketIndicatorService(
                 indicatorType = indicatorType,
                 referenceDate = referenceDate,
                 rateValue = rateValue,
-                createdAt = LocalDateTime.now(),
+                createdAt = clockProvider.now(),
             ),
         )
 

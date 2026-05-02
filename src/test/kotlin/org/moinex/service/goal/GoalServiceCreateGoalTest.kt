@@ -7,6 +7,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.common.util.UIUtils
 import org.moinex.factory.goal.GoalFactory
 import org.moinex.factory.wallet.WalletFactory
@@ -24,10 +25,11 @@ class GoalServiceCreateGoalTest :
         val walletService = mockk<WalletService>()
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         UIUtils(preferencesService)
 
-        val service = GoalService(goalRepository, walletService, notificationService, preferencesService)
+        val service = GoalService(goalRepository, walletService, notificationService, preferencesService, clockProvider)
 
         afterContainer { clearAllMocks(answers = true) }
 

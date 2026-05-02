@@ -6,6 +6,7 @@
 
 package org.moinex.service.creditcard
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
@@ -38,6 +39,7 @@ class RecurringCreditCardDebtService(
     private val creditCardService: CreditCardService,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(RecurringCreditCardDebtService::class.java)
 
@@ -131,7 +133,7 @@ class RecurringCreditCardDebtService(
             )
 
         activeRecurringTransactions.forEach { recurring ->
-            materializeDebtsUpTo(recurring, YearMonth.now())
+            materializeDebtsUpTo(recurring, clockProvider.currentMonth())
         }
     }
 
@@ -143,8 +145,8 @@ class RecurringCreditCardDebtService(
 
         if (recurringTransactionFromDatabase.isInactive()) return emptyList()
 
-        val startMonth = maxOf(recurringTransactionFromDatabase.nextInvoiceMonth, YearMonth.now())
-        val endMonth = YearMonth.now().plusMonths(monthsAhead.toLong())
+        val startMonth = maxOf(recurringTransactionFromDatabase.nextInvoiceMonth, clockProvider.currentMonth())
+        val endMonth = clockProvider.currentMonth().plusMonths(monthsAhead.toLong())
 
         return buildList {
             var current = startMonth
@@ -189,15 +191,17 @@ class RecurringCreditCardDebtService(
     ): BigDecimal = getProjectedOccurrencesForMonthAndCreditCard(month, creditCardId).sumOf { it.amount }
 
     fun getTotalProjectedAmountUntilMonth(targetMonth: YearMonth): BigDecimal {
-        if (targetMonth.isBeforeOrEqual(YearMonth.now())) return BigDecimal.ZERO
+        if (targetMonth.isBeforeOrEqual(clockProvider.currentMonth())) return BigDecimal.ZERO
 
-        val monthsAhead = YearMonth.now().until(targetMonth, ChronoUnit.MONTHS).toInt() + 1
+        val monthsAhead = clockProvider.currentMonth().until(targetMonth, ChronoUnit.MONTHS).toInt() + 1
 
         return recurringCreditCardDebtRepository
             .findAllByStatus(RecurringTransactionStatus.ACTIVE)
             .flatMap { recurring -> getProjectedOccurrences(recurring.id!!, monthsAhead) }
-            .filter { it.invoiceMonth.isAfter(YearMonth.now()) && it.invoiceMonth.isBeforeOrEqual(targetMonth) }
-            .sumOf { it.amount }
+            .filter {
+                it.invoiceMonth.isAfter(clockProvider.currentMonth()) &&
+                    it.invoiceMonth.isBeforeOrEqual(targetMonth)
+            }.sumOf { it.amount }
     }
 
     fun getTotalProjectedAmountForYear(year: Year): BigDecimal =
@@ -227,9 +231,9 @@ class RecurringCreditCardDebtService(
         month: YearMonth,
         recurringDebts: List<RecurringCreditCardDebt>,
     ): List<RecurringCreditCardDebtOccurrenceDTO> {
-        if (month.isBeforeOrEqual(YearMonth.now())) return emptyList()
+        if (month.isBeforeOrEqual(clockProvider.currentMonth())) return emptyList()
 
-        val monthsAhead = YearMonth.now().until(month, ChronoUnit.MONTHS).toInt() + 1
+        val monthsAhead = clockProvider.currentMonth().until(month, ChronoUnit.MONTHS).toInt() + 1
 
         return recurringDebts
             .flatMap { recurring -> getProjectedOccurrences(recurring.id!!, monthsAhead) }

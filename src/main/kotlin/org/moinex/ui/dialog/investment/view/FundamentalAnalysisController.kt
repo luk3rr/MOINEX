@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
@@ -47,6 +48,7 @@ class FundamentalAnalysisController(
     private val preferencesService: PreferencesService,
     private val springContext: ConfigurableApplicationContext,
     private val notificationService: NotificationService,
+    private val clockProvider: ClockProvider,
 ) {
     @FXML
     private lateinit var companyNameValueLabel: Label
@@ -438,7 +440,7 @@ class FundamentalAnalysisController(
 
             if (analysis != null) {
                 val lastUpdate = UIUtils.formatDateTimeForDisplay(analysis.lastUpdate)
-                val recommendedUpdate = analysis.isUpdateRecommended()
+                val recommendedUpdate = analysis.isUpdateRecommended(clockProvider.now())
 
                 statusLabel.text = "${UIUtils.translatePeriodType(periodType)}: $lastUpdate"
 

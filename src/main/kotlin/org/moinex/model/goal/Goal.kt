@@ -53,10 +53,6 @@ class Goal(
         initialBalance = initialBalance.toRounded()
         targetBalance = targetBalance.toRounded()
 
-        require(targetDate.isAfter(LocalDate.now())) {
-            "Target date must be in the future"
-        }
-
         require(initialBalance >= BigDecimal.ZERO) {
             "Initial balance must be greater than or equal to zero"
         }

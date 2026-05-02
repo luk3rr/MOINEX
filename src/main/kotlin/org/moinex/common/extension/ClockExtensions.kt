@@ -25,7 +25,14 @@ fun YearMonth.isBeforeOrEqual(other: YearMonth): Boolean = !this.isAfter(other)
 
 fun YearMonth.isAfterOrEqual(other: YearMonth): Boolean = !this.isBefore(other)
 
-fun YearMonth.getEffectiveEndDate(): LocalDate = if (this == YearMonth.now()) LocalDate.now() else this.atEndOfMonth()
+fun YearMonth.getEffectiveEndDate(today: LocalDate): LocalDate =
+    if (this ==
+        YearMonth.from(today)
+    ) {
+        today
+    } else {
+        this.atEndOfMonth()
+    }
 
 fun Year.isBeforeOrEqual(other: Year): Boolean = !this.isAfter(other)
 

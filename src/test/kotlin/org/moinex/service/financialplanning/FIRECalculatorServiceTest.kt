@@ -9,6 +9,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.factory.financialplanning.FIRECalculatorSettingsFactory
 import org.moinex.repository.financialplanning.FIRECalculatorSettingsRepository
 import org.moinex.service.NotificationService
@@ -22,7 +23,8 @@ class FIRECalculatorServiceTest :
         val repository = mockk<FIRECalculatorSettingsRepository>()
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
-        val service = FIRECalculatorService(repository, notificationService, preferencesService)
+        val clockProvider = ClockProvider()
+        val service = FIRECalculatorService(repository, notificationService, preferencesService, clockProvider)
 
         afterContainer { clearAllMocks(answers = true) }
 

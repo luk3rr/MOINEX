@@ -12,6 +12,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.extension.isEqual
 import org.moinex.factory.investment.BondFactory
@@ -41,6 +42,7 @@ class InvestmentPerformanceServiceTest :
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             InvestmentPerformanceService(
@@ -51,6 +53,7 @@ class InvestmentPerformanceServiceTest :
                 bondInterestCalculationService,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

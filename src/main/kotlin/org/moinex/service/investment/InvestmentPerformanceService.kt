@@ -10,6 +10,7 @@ package org.moinex.service.investment
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.getEffectiveEndDate
@@ -45,6 +46,7 @@ class InvestmentPerformanceService(
     private val bondInterestCalculationService: BondInterestCalculationService,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(InvestmentPerformanceService::class.java)
 
@@ -65,7 +67,7 @@ class InvestmentPerformanceService(
                     monthlyGains = calculateMonthlyCapitalGains(),
                 )
 
-            val currentMonth = YearMonth.now()
+            val currentMonth = clockProvider.currentMonth()
             val allMonths = (Constants.XYBAR_CHART_MONTHS downTo 0).map { currentMonth.minusMonths(it.toLong()) }
 
             savePerformanceSnapshots(allMonths, investmentPerformanceDTO)
@@ -85,7 +87,7 @@ class InvestmentPerformanceService(
 
     @Transactional
     fun getPerformanceData(): InvestmentPerformanceDTO {
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
         val allMonths = (Constants.XYBAR_CHART_MONTHS downTo 0).map { currentMonth.minusMonths(it.toLong()) }
 
         val monthlyInvested = mutableMapOf<YearMonth, BigDecimal>()
@@ -136,7 +138,7 @@ class InvestmentPerformanceService(
                             portfolioValue = portfolio,
                             accumulatedCapitalGains = accGains,
                             monthlyCapitalGains = monthGains,
-                            calculatedAt = LocalDateTime.now(),
+                            calculatedAt = clockProvider.now(),
                         ),
                     )
                 }
@@ -254,7 +256,7 @@ class InvestmentPerformanceService(
                 bond.id!! to bondService.getMonthlyInterestHistory(bond.id!!)
             }
 
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
         var month = determineFirstMonth(allTickers, allDividends, allBonds)
 
         while (month.isBeforeOrEqual(currentMonth)) {
@@ -264,7 +266,7 @@ class InvestmentPerformanceService(
                 val purchases = purchasesByTicker[ticker.id!!] ?: emptyList()
                 val sales = salesByTicker[ticker.id!!] ?: emptyList()
 
-                val monthEnd = month.getEffectiveEndDate()
+                val monthEnd = month.getEffectiveEndDate(clockProvider.today())
                 val quantityAtMonthEnd = calculateQuantityAtDate(ticker, purchases, sales, monthEnd)
 
                 if (quantityAtMonthEnd > BigDecimal.ZERO) {
@@ -317,7 +319,7 @@ class InvestmentPerformanceService(
 
             quantityAtMonthEnd.forEach { (month, quantity) ->
                 if (quantity > BigDecimal.ZERO) {
-                    val endDate = month.getEffectiveEndDate()
+                    val endDate = month.getEffectiveEndDate(clockProvider.today())
                     val price = tickerPriceHistoryService.getClosestPriceBeforeDate(ticker, endDate)
 
                     if (price != null) {
@@ -353,7 +355,7 @@ class InvestmentPerformanceService(
         processTickersWithTransactions { ticker, purchases, sales ->
             val referenceDate = determineTickerReferenceDate(ticker, purchases) ?: return@processTickersWithTransactions
             val firstMonth = YearMonth.from(referenceDate)
-            val currentMonth = YearMonth.now()
+            val currentMonth = clockProvider.currentMonth()
 
             var month = firstMonth
             while (month.isBeforeOrEqual(currentMonth)) {
@@ -390,7 +392,7 @@ class InvestmentPerformanceService(
                         .map { it.walletTransaction!!.date.toLocalDate() }
                         .filter { YearMonth.from(it) == month },
                 )
-                add(month.getEffectiveEndDate())
+                add(month.getEffectiveEndDate(clockProvider.today()))
             }
 
         val sortedDates = transactionDatesInMonth.distinct().sorted()
@@ -476,7 +478,7 @@ class InvestmentPerformanceService(
             }
         }
 
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
         var month = firstMonth
         var lastQuantity = initialQuantity
 
@@ -516,7 +518,7 @@ class InvestmentPerformanceService(
                 }
             }
 
-        return (tickerMonths + dividendMonths + bondMonths).minOrNull() ?: YearMonth.now()
+        return (tickerMonths + dividendMonths + bondMonths).minOrNull() ?: clockProvider.currentMonth()
     }
 
     private fun calculateBondCumulativeValueByMonth(operations: List<BondOperation>): Map<YearMonth, BigDecimal> {
@@ -528,7 +530,7 @@ class InvestmentPerformanceService(
                 ?: return result
 
         val firstMonth = YearMonth.from(firstOperationDate)
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
 
         var cumulativeValue = BigDecimal.ZERO
         var month = firstMonth
@@ -573,7 +575,7 @@ class InvestmentPerformanceService(
                     portfolioValue = portfolio,
                     accumulatedCapitalGains = accGains,
                     monthlyCapitalGains = monthGains,
-                    calculatedAt = LocalDateTime.now(),
+                    calculatedAt = clockProvider.now(),
                 ),
             )
 
@@ -598,7 +600,7 @@ class InvestmentPerformanceService(
                 portfolioValue = snapshot.portfolioValue
                 accumulatedCapitalGains = snapshot.accumulatedCapitalGains
                 monthlyCapitalGains = snapshot.monthlyCapitalGains
-                calculatedAt = LocalDateTime.now()
+                calculatedAt = clockProvider.now()
             } ?: snapshot
 
         return snapshotRepository.save(entity)

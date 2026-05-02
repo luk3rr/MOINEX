@@ -12,6 +12,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.BrazilianMarketIndicatorsFactory
 import org.moinex.factory.investment.MarketQuotesAndCommoditiesFactory
@@ -27,8 +28,10 @@ class MarketServiceTest :
     BehaviorSpec({
         val brazilianMarketIndicatorsRepository = mockk<BrazilianMarketIndicatorsRepository>()
         val marketQuotesAndCommoditiesRepository = mockk<MarketQuotesAndCommoditiesRepository>()
+        val clockProvider = ClockProvider()
 
-        val service = MarketService(brazilianMarketIndicatorsRepository, marketQuotesAndCommoditiesRepository)
+        val service =
+            MarketService(brazilianMarketIndicatorsRepository, marketQuotesAndCommoditiesRepository, clockProvider)
 
         beforeSpec {
             mockkObject(APIUtils)

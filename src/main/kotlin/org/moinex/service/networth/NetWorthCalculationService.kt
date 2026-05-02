@@ -10,6 +10,7 @@ package org.moinex.service.networth
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isAfterOrEqual
@@ -53,6 +54,7 @@ class NetWorthCalculationService(
     private val tickerService: TickerService,
     private val bondService: BondService,
     private val bondInterestCalculationService: BondInterestCalculationService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(NetWorthCalculationService::class.java)
 
@@ -67,9 +69,9 @@ class NetWorthCalculationService(
 
             val wallets = walletService.getAllWalletsOrderedByName()
 
-            val earliestDate = findEarliestTransactionDate(wallets) ?: LocalDateTime.now()
+            val earliestDate = findEarliestTransactionDate(wallets) ?: clockProvider.now()
             val startMonth = YearMonth.from(earliestDate)
-            val currentMonth = YearMonth.now()
+            val currentMonth = clockProvider.currentMonth()
             val endMonth = currentMonth.plusMonths(Constants.PL_CHART_FUTURE_MONTHS.toLong())
 
             logger.info(
@@ -153,7 +155,7 @@ class NetWorthCalculationService(
             investments = investments,
             creditCardDebt = creditCardDebt,
             negativeWalletBalances = negativeWalletBalances,
-            calculatedAt = LocalDateTime.now(),
+            calculatedAt = clockProvider.now(),
         )
     }
 
@@ -168,7 +170,7 @@ class NetWorthCalculationService(
         wallets: List<Wallet>,
         config: BalanceCalculationConfig,
     ): BigDecimal {
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
 
         logger.debug("=== Calculating {} for {}/{} ===", config.logPrefix, targetMonth.month, targetMonth.year)
         logger.debug("Target month: {} | Current month: {}", targetMonth, currentMonth)

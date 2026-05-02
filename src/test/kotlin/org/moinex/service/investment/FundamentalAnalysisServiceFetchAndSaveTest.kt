@@ -10,6 +10,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.FundamentalAnalysisFactory
 import org.moinex.factory.investment.TickerFactory
@@ -24,8 +25,9 @@ class FundamentalAnalysisServiceFetchAndSaveTest :
     BehaviorSpec({
         val fundamentalAnalysisRepository = mockk<FundamentalAnalysisRepository>()
         val tickerRepository = mockk<TickerRepository>()
+        val clockProvider = ClockProvider()
 
-        val service = FundamentalAnalysisService(fundamentalAnalysisRepository, tickerRepository)
+        val service = FundamentalAnalysisService(fundamentalAnalysisRepository, tickerRepository, clockProvider)
 
         beforeSpec {
             mockkObject(APIUtils)

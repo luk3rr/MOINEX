@@ -8,6 +8,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.repository.wallettransaction.TransferRepository
 import org.moinex.repository.wallettransaction.WalletRepository
@@ -26,6 +27,7 @@ class WalletServiceCreateWalletTest :
         val walletTypeRepository = mockk<WalletTypeRepository>()
         val preferencesService = mockk<PreferencesService>(relaxed = true)
         val notificationService = mockk<NotificationService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             WalletService(
@@ -35,6 +37,7 @@ class WalletServiceCreateWalletTest :
                 walletTypeRepository,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

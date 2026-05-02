@@ -7,6 +7,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.common.extension.isZero
 import org.moinex.factory.creditcard.CreditCardDebtFactory
 import org.moinex.factory.creditcard.CreditCardFactory
@@ -46,6 +47,7 @@ class NetWorthCalculationServiceTest :
         val bondService = mockk<BondService>()
         val bondInterestCalculationService = mockk<BondInterestCalculationService>()
         val recurringCreditCardDebtService = mockk<RecurringCreditCardDebtService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             NetWorthCalculationService(
@@ -57,6 +59,7 @@ class NetWorthCalculationServiceTest :
                 tickerService,
                 bondService,
                 bondInterestCalculationService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

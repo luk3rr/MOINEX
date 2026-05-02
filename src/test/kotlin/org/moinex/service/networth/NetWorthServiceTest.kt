@@ -6,6 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.factory.NetWorthSnapshotFactory
 import org.moinex.repository.NetWorthSnapshotRepository
 import java.math.BigDecimal
@@ -15,7 +16,8 @@ import java.time.YearMonth
 class NetWorthServiceTest :
     BehaviorSpec({
         val netWorthSnapshotRepository = mockk<NetWorthSnapshotRepository>()
-        val service = NetWorthService(netWorthSnapshotRepository)
+        val clockProvider = ClockProvider()
+        val service = NetWorthService(netWorthSnapshotRepository, clockProvider)
 
         afterContainer { clearAllMocks(answers = true) }
 

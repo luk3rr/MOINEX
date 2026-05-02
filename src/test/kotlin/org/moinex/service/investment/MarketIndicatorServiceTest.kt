@@ -12,6 +12,7 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONArray
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.retry.RetryException
 import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.MarketIndicatorHistoryFactory
@@ -27,8 +28,9 @@ class MarketIndicatorServiceTest :
     BehaviorSpec({
         val marketIndicatorHistoryRepository = mockk<MarketIndicatorHistoryRepository>()
         val bondOperationRepository = mockk<BondOperationRepository>()
+        val clockProvider = ClockProvider()
 
-        val service = MarketIndicatorService(marketIndicatorHistoryRepository, bondOperationRepository)
+        val service = MarketIndicatorService(marketIndicatorHistoryRepository, bondOperationRepository, clockProvider)
 
         beforeSpec {
             mockkObject(APIUtils)

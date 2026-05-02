@@ -7,6 +7,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.ClockProvider
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.factory.wallet.WalletTypeFactory
 import org.moinex.repository.wallettransaction.TransferRepository
@@ -26,6 +27,7 @@ class WalletServiceGeneralTest :
         val walletTypeRepository = mockk<WalletTypeRepository>()
         val preferencesService = mockk<PreferencesService>(relaxed = true)
         val notificationService = mockk<NotificationService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             WalletService(
@@ -35,6 +37,7 @@ class WalletServiceGeneralTest :
                 walletTypeRepository,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

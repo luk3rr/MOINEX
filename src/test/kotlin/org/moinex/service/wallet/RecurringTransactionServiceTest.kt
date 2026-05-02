@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.util.UIUtils
 import org.moinex.factory.CategoryFactory
@@ -32,6 +33,7 @@ class RecurringTransactionServiceTest :
         val preferencesService = mockk<PreferencesService>(relaxed = true)
         val notificationService = mockk<NotificationService>(relaxed = true)
         val walletService = mockk<WalletService>()
+        val clockProvider = ClockProvider()
 
         UIUtils(preferencesService)
 
@@ -41,6 +43,7 @@ class RecurringTransactionServiceTest :
                 walletService,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

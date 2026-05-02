@@ -1,5 +1,6 @@
 package org.moinex.service.wallet
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isAfterOrEqual
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.text.MessageFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.Year
 import java.time.YearMonth
 import kotlin.collections.forEach
@@ -33,6 +33,7 @@ class RecurringTransactionService(
     private val walletService: WalletService,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(RecurringTransactionService::class.java)
 
@@ -119,7 +120,7 @@ class RecurringTransactionService(
 
     @Transactional
     fun processRecurringTransactions() {
-        val now = LocalDateTime.now()
+        val now = clockProvider.now()
         val activeRecurringTransactions = recurringTransactionRepository.findByStatus(RecurringTransactionStatus.ACTIVE)
         val earliestDueDate = activeRecurringTransactions.minOfOrNull { it.nextDueDate } ?: now.toLocalDate()
 
@@ -156,7 +157,7 @@ class RecurringTransactionService(
             return null
         }
 
-        if (recurringTransactionFromDatabase.endDate.isBefore(LocalDate.now())) {
+        if (recurringTransactionFromDatabase.endDate.isBefore(clockProvider.today())) {
             return BigDecimal.ZERO
         }
 

@@ -1,5 +1,6 @@
 package org.moinex.service.wallet
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isZero
@@ -35,6 +36,7 @@ class WalletService(
     private val walletTypeRepository: WalletTypeRepository,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(WalletService::class.java)
 
@@ -495,7 +497,7 @@ class WalletService(
         )
 
     fun getOldestWalletTransactionDate(): LocalDateTime =
-        walletTransactionRepository.findOldestTransactionDate() ?: LocalDateTime.now()
+        walletTransactionRepository.findOldestTransactionDate() ?: clockProvider.now()
 
     fun getWalletTransactionAndTransferCountByWallet(walletId: Int): Int =
         walletTransactionRepository.getTransactionCountByWallet(walletId) +

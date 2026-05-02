@@ -1,5 +1,6 @@
 package org.moinex.service
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.util.FxUtils
 import org.moinex.model.Notification
 import org.moinex.model.enums.NotificationStatus
@@ -14,6 +15,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Service
 class NotificationService(
     private val notificationRepository: NotificationRepository,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(NotificationService::class.java)
 
@@ -41,6 +43,7 @@ class NotificationService(
                 type = type,
                 title = title,
                 message = message,
+                createdAt = clockProvider.now(),
                 relatedEntityId = relatedEntityId,
             )
 

@@ -12,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.extension.throwIfError
 import org.moinex.common.extension.toNoTimeFormat
 import org.moinex.common.util.APIUtils
@@ -35,6 +36,7 @@ class TickerPriceHistoryService(
     private val tickerRepository: TickerRepository,
     private val tickerPurchaseRepository: TickerPurchaseRepository,
     private val tickerSaleRepository: TickerSaleRepository,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -78,7 +80,7 @@ class TickerPriceHistoryService(
         date: LocalDate,
     ): BigDecimal? =
         when {
-            date == LocalDate.now() -> ticker.currentUnitValue
+            date == clockProvider.today() -> ticker.currentUnitValue
             else -> getPriceOnDate(ticker.id!!, date)
         }
 
@@ -144,7 +146,7 @@ class TickerPriceHistoryService(
     ) {
         logger.info("Backfilling price history for {} from {}", ticker, referenceDate)
 
-        fetchAndStorePrices(ticker, referenceDate, LocalDate.now())
+        fetchAndStorePrices(ticker, referenceDate, clockProvider.today())
     }
 
     private suspend fun updateMissingPrices(
@@ -216,7 +218,7 @@ class TickerPriceHistoryService(
                 ).throwIfError("Fetch price history for $ticker")
 
         val prices = jsonObject.getJSONArray("prices")
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
 
         val storedCount =
             prices
@@ -257,7 +259,7 @@ class TickerPriceHistoryService(
         isMonthEnd: Boolean,
     ) {
         val priceMonth = YearMonth.from(priceDate)
-        val currentMonth = YearMonth.now()
+        val currentMonth = clockProvider.currentMonth()
 
         val existing = priceHistoryRepository.findByTickerIdAndDate(ticker.id!!, priceDate)
 

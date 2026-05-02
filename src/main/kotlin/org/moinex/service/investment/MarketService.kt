@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.extension.bacenDate
 import org.moinex.common.extension.decimal
@@ -24,13 +25,13 @@ import org.moinex.repository.investment.MarketQuotesAndCommoditiesRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Service
 class MarketService(
     private val brazilianMarketIndicatorsRepository: BrazilianMarketIndicatorsRepository,
     private val marketQuotesAndCommoditiesRepository: MarketQuotesAndCommoditiesRepository,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(MarketService::class.java)
 
@@ -140,7 +141,7 @@ class MarketService(
             val localDate = bacenDate(IPCA_LAST_MONTH_FIELD, DATA_FIELD)
 
             ipcaLastMonthReference = YearMonth.from(localDate)
-            lastUpdate = LocalDateTime.now()
+            lastUpdate = clockProvider.now()
         }
 
     private fun JSONObject.parseMarketQuotesAndCommodities(
@@ -210,6 +211,6 @@ class MarketService(
                 logger.warn("Failed to fetch prices for: ${failedSymbols.joinToString(", ")}")
             }
 
-            lastUpdate = LocalDateTime.now()
+            lastUpdate = clockProvider.now()
         }
 }

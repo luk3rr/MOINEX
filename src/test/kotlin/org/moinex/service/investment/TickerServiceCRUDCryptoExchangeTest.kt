@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.ClockProvider
 import org.moinex.factory.investment.CryptoExchangeFactory
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.model.enums.AssetType
@@ -32,6 +33,7 @@ class TickerServiceCRUDCryptoExchangeTest :
         val walletService = mockk<WalletService>(relaxed = true)
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             TickerService(
@@ -43,6 +45,7 @@ class TickerServiceCRUDCryptoExchangeTest :
                 walletService,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

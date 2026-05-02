@@ -1,5 +1,6 @@
 package org.moinex.service.financialplanning
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
-import java.time.LocalDate
 import kotlin.math.pow
 
 @Service
@@ -23,6 +23,7 @@ class FIRECalculatorService(
     private val fireCalculatorSettingsRepository: FIRECalculatorSettingsRepository,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(FIRECalculatorService::class.java)
@@ -74,7 +75,7 @@ class FIRECalculatorService(
             dataPoints.add(0 to settings.currentNetWorth)
             return FIREProjectionResultDTO(
                 monthsToFire = 0,
-                fireDate = LocalDate.now(),
+                fireDate = clockProvider.today(),
                 ageAtFire = settings.currentAge,
                 fireTarget = fireTarget,
                 projectedNetWorthAtFire = settings.currentNetWorth,
@@ -113,7 +114,7 @@ class FIRECalculatorService(
         }
 
         return if (monthsToFire != null) {
-            val fireDate = LocalDate.now().plusMonths(monthsToFire.toLong())
+            val fireDate = clockProvider.today().plusMonths(monthsToFire.toLong())
             FIREProjectionResultDTO(
                 monthsToFire = monthsToFire,
                 fireDate = fireDate,

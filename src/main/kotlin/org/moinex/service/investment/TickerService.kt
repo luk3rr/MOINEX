@@ -8,6 +8,7 @@
 
 package org.moinex.service.investment
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
@@ -38,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.MessageFormat
-import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Service
@@ -51,6 +51,7 @@ class TickerService(
     private val walletService: WalletService,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -551,7 +552,7 @@ class TickerService(
                 ticker.currentUnitValue =
                     tickerData.getBigDecimal(API_RESPONSE_PRICE_FIELD)
 
-                ticker.lastUpdate = LocalDateTime.now()
+                ticker.lastUpdate = clockProvider.now()
 
                 if (tickerData.has(API_RESPONSE_WEBSITE_FIELD)) {
                     ticker.domain = tickerData.getString(API_RESPONSE_WEBSITE_FIELD)

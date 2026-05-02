@@ -56,12 +56,12 @@ fun Ticker.isCryptocurrency(): Boolean = this.type == AssetType.CRYPTOCURRENCY
 
 fun Ticker.isValidForFundamentalAnalysis(): Boolean = type in VALID_TICKER_TYPES
 
-fun FundamentalAnalysis?.isCacheExpired(): Boolean {
+fun FundamentalAnalysis?.isCacheExpired(now: LocalDateTime): Boolean {
     if (this == null) return true
-    return lastUpdate.plusHours(CACHE_VALIDITY_HOURS.toLong()).isBefore(LocalDateTime.now())
+    return lastUpdate.plusHours(CACHE_VALIDITY_HOURS.toLong()).isBefore(now)
 }
 
-fun FundamentalAnalysis?.isUpdateRecommended(): Boolean {
+fun FundamentalAnalysis?.isUpdateRecommended(now: LocalDateTime): Boolean {
     if (this == null) return true
-    return lastUpdate.plusHours(RECOMMENDED_UPDATE_HOURS.toLong()).isBefore(LocalDateTime.now())
+    return lastUpdate.plusHours(RECOMMENDED_UPDATE_HOURS.toLong()).isBefore(now)
 }

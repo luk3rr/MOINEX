@@ -9,6 +9,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.ClockProvider
 import org.moinex.factory.goal.GoalFactory
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.repository.goal.GoalRepository
@@ -26,8 +27,9 @@ class GoalServiceUpdateGoalTest :
         val walletService = mockk<WalletService>()
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
-        val service = GoalService(goalRepository, walletService, notificationService, preferencesService)
+        val service = GoalService(goalRepository, walletService, notificationService, preferencesService, clockProvider)
 
         afterContainer { clearAllMocks(answers = true) }
 

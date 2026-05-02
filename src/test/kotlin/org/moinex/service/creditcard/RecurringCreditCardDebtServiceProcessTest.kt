@@ -6,6 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.moinex.common.ClockProvider
 import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.creditcard.RecurringCreditCardDebtFactory
 import org.moinex.model.enums.CreditCardRecurringFrequency
@@ -25,6 +26,7 @@ class RecurringCreditCardDebtServiceProcessTest :
         val creditCardService = mockk<CreditCardService>()
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             RecurringCreditCardDebtService(
@@ -34,6 +36,7 @@ class RecurringCreditCardDebtServiceProcessTest :
                 creditCardService,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

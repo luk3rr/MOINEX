@@ -33,7 +33,7 @@ class Notification(
     var status: NotificationStatus = NotificationStatus.UNREAD,
     @Convert(converter = LocalDateTimeStringConverter::class)
     @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: LocalDateTime,
     @Column(name = "related_entity_id")
     var relatedEntityId: Int? = null,
 ) {

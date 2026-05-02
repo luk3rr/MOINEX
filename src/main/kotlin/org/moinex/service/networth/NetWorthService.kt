@@ -9,17 +9,18 @@
 
 package org.moinex.service.networth
 
+import org.moinex.common.ClockProvider
 import org.moinex.model.NetWorthSnapshot
 import org.moinex.repository.NetWorthSnapshotRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 import java.time.YearMonth
 
 @Service
 class NetWorthService(
     private val netWorthSnapshotRepository: NetWorthSnapshotRepository,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(NetWorthService::class.java)
 
@@ -54,7 +55,7 @@ class NetWorthService(
                 investments = snapshot.investments
                 creditCardDebt = snapshot.creditCardDebt
                 negativeWalletBalances = snapshot.negativeWalletBalances
-                calculatedAt = LocalDateTime.now()
+                calculatedAt = clockProvider.now()
             } ?: snapshot
 
         return netWorthSnapshotRepository.save(entity)

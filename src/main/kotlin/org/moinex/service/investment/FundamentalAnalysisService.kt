@@ -9,6 +9,7 @@
 package org.moinex.service.investment
 
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.extension.findByIdOrThrow
 import org.moinex.common.extension.isCacheExpired
 import org.moinex.common.extension.isValidForFundamentalAnalysis
@@ -23,12 +24,12 @@ import org.moinex.repository.investment.TickerRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class FundamentalAnalysisService(
     private val fundamentalAnalysisRepository: FundamentalAnalysisRepository,
     private val tickerRepository: TickerRepository,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(FundamentalAnalysisService::class.java)
 
@@ -58,7 +59,7 @@ class FundamentalAnalysisService(
         if (!forceRefresh) {
             fundamentalAnalysisRepository
                 .findByTickerAndPeriodType(tickerFromDatabase, periodType)
-                .takeIf { !it.isCacheExpired() }
+                .takeIf { !it.isCacheExpired(clockProvider.now()) }
                 ?.let { analysis ->
                     logger.info("Returning cached analysis for {} ({})", tickerFromDatabase.symbol, periodType)
                     return analysis
@@ -93,7 +94,7 @@ class FundamentalAnalysisService(
             currency = tickerData.optString("currency", "BRL")
             this.periodType = periodType
             dataJson = tickerData.toString()
-            lastUpdate = LocalDateTime.now()
+            lastUpdate = clockProvider.now()
         }
 
         return fundamentalAnalysisRepository.save(analysis)
@@ -142,7 +143,7 @@ class FundamentalAnalysisService(
         currency = "BRL",
         periodType = periodType,
         dataJson = "{}",
-        createdAt = LocalDateTime.now(),
-        lastUpdate = LocalDateTime.now(),
+        createdAt = clockProvider.now(),
+        lastUpdate = clockProvider.now(),
     )
 }

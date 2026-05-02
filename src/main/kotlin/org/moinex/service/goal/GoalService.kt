@@ -1,5 +1,6 @@
 package org.moinex.service.goal
 
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.findByIdOrThrow
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
-import java.time.LocalDate
 
 @Service
 class GoalService(
@@ -25,6 +25,7 @@ class GoalService(
     private val walletService: WalletService,
     private val notificationService: NotificationService,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     private val logger = LoggerFactory.getLogger(GoalService::class.java)
 
@@ -33,6 +34,10 @@ class GoalService(
         goal: Goal,
         strategy: GoalFundingStrategy? = null,
     ): Int {
+        require(goal.targetDate.isAfter(clockProvider.today())) {
+            "Target date must be in the future"
+        }
+
         check(!goalRepository.existsByName(goal.name)) {
             "A goal with name '${goal.name} already exists"
         }
@@ -177,7 +182,7 @@ class GoalService(
         }
 
         goalFromDatabase.apply {
-            completionDate = LocalDate.now()
+            completionDate = clockProvider.today()
             targetBalance = balance
             masterWallet = null
         }

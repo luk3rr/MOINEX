@@ -11,6 +11,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.extension.toRounded
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FileUtils
@@ -39,6 +40,7 @@ class TickerServiceUpdatePricesTest :
         val walletService = mockk<WalletService>(relaxed = true)
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             TickerService(
@@ -50,6 +52,7 @@ class TickerServiceUpdatePricesTest :
                 walletService,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         beforeSpec {

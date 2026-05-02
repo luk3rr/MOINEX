@@ -9,6 +9,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import jakarta.persistence.EntityNotFoundException
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.Constants
 import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.creditcard.RecurringCreditCardDebtFactory
@@ -30,6 +31,7 @@ class RecurringCreditCardDebtServiceProjectionTest :
         val creditCardService = mockk<CreditCardService>()
         val notificationService = mockk<NotificationService>(relaxed = true)
         val preferencesService = mockk<PreferencesService>(relaxed = true)
+        val clockProvider = ClockProvider()
 
         val service =
             RecurringCreditCardDebtService(
@@ -39,6 +41,7 @@ class RecurringCreditCardDebtServiceProjectionTest :
                 creditCardService,
                 notificationService,
                 preferencesService,
+                clockProvider,
             )
 
         afterContainer { clearAllMocks(answers = true) }

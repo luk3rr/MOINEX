@@ -10,6 +10,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import io.mockk.verify
 import org.json.JSONObject
+import org.moinex.common.ClockProvider
 import org.moinex.common.util.APIUtils
 import org.moinex.factory.investment.TickerFactory
 import org.moinex.factory.investment.TickerPriceHistoryFactory
@@ -31,6 +32,7 @@ class TickerPriceHistoryServiceTest :
         val tickerRepository = mockk<TickerRepository>()
         val tickerPurchaseRepository = mockk<TickerPurchaseRepository>()
         val tickerSaleRepository = mockk<TickerSaleRepository>()
+        val clockProvider = ClockProvider()
 
         val service =
             TickerPriceHistoryService(
@@ -38,6 +40,7 @@ class TickerPriceHistoryServiceTest :
                 tickerRepository,
                 tickerPurchaseRepository,
                 tickerSaleRepository,
+                clockProvider,
             )
 
         beforeSpec {
