@@ -422,7 +422,7 @@ class RecurringTransactionServiceTest :
                             id = 1,
                             startDate = today.minusMonths(1),
                             endDate = today.plusMonths(3),
-                            nextDueDate = today.plusDays(1),
+                            nextDueDate = today.plusMonths(1),
                             frequency = RecurringTransactionFrequency.MONTHLY,
                             amount = BigDecimal("100.00"),
                         )

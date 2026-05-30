@@ -164,6 +164,15 @@ object TranslationKeys {
     const val CREDIT_CARD_DEBTS_LIST_STATUS_PROJECTED: String = "creditCard.debtsList.status.projected"
     const val CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_TITLE: String = "creditCard.debtsList.projected.action.title"
     const val CREDIT_CARD_DEBTS_LIST_PROJECTED_ACTION_MESSAGE: String = "creditCard.debtsList.projected.action.message"
+    const val CREDIT_CARD_DEBTS_LIST_BUTTON_MATERIALIZE: String = "creditCard.debtsList.button.materialize"
+    const val CREDIT_CARD_DEBTS_LIST_MATERIALIZE_CONFIRM_TITLE: String =
+        "creditCard.debtsList.materialize.confirm.title"
+    const val CREDIT_CARD_DEBTS_LIST_MATERIALIZE_CONFIRM_MESSAGE: String =
+        "creditCard.debtsList.materialize.confirm.message"
+    const val CREDIT_CARD_DEBTS_LIST_MATERIALIZE_NOT_PROJECTED_TITLE: String =
+        "creditCard.debtsList.materialize.notProjected.title"
+    const val CREDIT_CARD_DEBTS_LIST_MATERIALIZE_NOT_PROJECTED_MESSAGE: String =
+        "creditCard.debtsList.materialize.notProjected.message"
 
     // Recurring Credit Card Debt
     const val CREDIT_CARD_BUTTON_RECURRING_DEBTS: String = "creditCard.button.recurringDebts"

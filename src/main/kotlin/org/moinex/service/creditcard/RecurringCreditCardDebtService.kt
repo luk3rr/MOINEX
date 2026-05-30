@@ -240,6 +240,45 @@ class RecurringCreditCardDebtService(
             .filter { it.invoiceMonth == month }
     }
 
+    @Transactional
+    fun materializeForMonth(
+        recurringId: Int,
+        targetMonth: YearMonth,
+    ) {
+        val recurring = recurringCreditCardDebtRepository.findByIdOrThrow(recurringId)
+
+        check(recurring.isActive()) { "$recurring is inactive and cannot be materialized" }
+        check(targetMonth == recurring.nextInvoiceMonth) {
+            "Can only materialize the next scheduled month (${recurring.nextInvoiceMonth}), not $targetMonth"
+        }
+
+        val occurrenceDate = targetMonth.atDay(recurring.dayOfMonth)
+        check(!occurrenceDate.isAfter(recurring.endDate)) {
+            "Target date $occurrenceDate exceeds end date ${recurring.endDate} for $recurring"
+        }
+
+        if (isAlreadyMaterialized(recurring, targetMonth)) {
+            logger.info("$recurring already materialized for $targetMonth — skipping")
+            return
+        }
+
+        val debt =
+            CreditCardDebt(
+                creditCard = recurring.creditCard,
+                category = recurring.category,
+                amount = recurring.amount,
+                description = recurring.description,
+                date = occurrenceDate.atEndOfDay(),
+                installments = 1,
+                recurringSource = recurring,
+            )
+
+        creditCardService.createDebt(debt, targetMonth, publishNotification = true)
+        recurring.nextInvoiceMonth = targetMonth.plus(1, recurring.frequency.chronoUnit)
+
+        logger.info("Early materialization of $recurring for $targetMonth completed")
+    }
+
     private fun materializeDebtsUpTo(
         recurring: RecurringCreditCardDebt,
         upTo: YearMonth,

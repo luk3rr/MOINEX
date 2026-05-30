@@ -140,6 +140,15 @@
                                                                   </ImageView>
                                                                </graphic>
                                                             </JFXButton>
+                                                            <JFXButton onAction="#handleMaterializeDebt" stylesheets="@../../css/component/buttons.css" text="%creditCard.debtsList.button.materialize">
+                                                               <graphic>
+                                                                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                     <image>
+                                                                        <Image url="@../../icon/common/check.png" />
+                                                                     </image>
+                                                                  </ImageView>
+                                                               </graphic>
+                                                            </JFXButton>
                                                          </children>
                                                       </HBox>
                                                    </children>

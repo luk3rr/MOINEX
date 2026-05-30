@@ -514,6 +514,64 @@ class CreditCardController(
     }
 
     @FXML
+    private fun handleMaterializeDebt() {
+        val selectedRow = debtsTableView.selectionModel.selectedItem
+
+        if (selectedRow == null) {
+            WindowUtils.showInformationDialog(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_TITLE),
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DIALOG_NO_SELECTION_EDIT_MESSAGE),
+            )
+            return
+        }
+
+        if (selectedRow !is CreditCardDebtRowDTO.Projected) {
+            WindowUtils.showInformationDialog(
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_MATERIALIZE_NOT_PROJECTED_TITLE,
+                ),
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_MATERIALIZE_NOT_PROJECTED_MESSAGE,
+                ),
+            )
+            return
+        }
+
+        val occurrence = selectedRow.occurrence
+
+        if (
+            !WindowUtils.showConfirmationDialog(
+                preferencesService.translate(
+                    TranslationKeys.CREDIT_CARD_DEBTS_LIST_MATERIALIZE_CONFIRM_TITLE,
+                ),
+                MessageFormat.format(
+                    preferencesService.translate(
+                        TranslationKeys.CREDIT_CARD_DEBTS_LIST_MATERIALIZE_CONFIRM_MESSAGE,
+                    ),
+                    occurrence.recurringDebt.description ?: occurrence.recurringDebt.creditCard.name,
+                    UIUtils.formatFullMonthYear(occurrence.invoiceMonth),
+                ),
+                preferencesService.bundle,
+            )
+        ) {
+            return
+        }
+
+        runCatching {
+            recurringCreditCardDebtService.materializeForMonth(
+                occurrence.recurringDebt.id!!,
+                occurrence.invoiceMonth,
+            )
+            updateDisplay()
+        }.onFailure { e ->
+            WindowUtils.showErrorDialog(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_ERROR_TITLE),
+                e.message ?: "Unknown error",
+            )
+        }
+    }
+
+    @FXML
     private fun handleRecurringTransactions() {
         WindowUtils.openModalWindow(
             Files.RECURRING_CREDIT_CARD_DEBTS_FXML,
