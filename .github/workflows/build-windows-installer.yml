@@ -36,6 +36,12 @@ jobs:
           .\scripts\setup-python-embedded.bat
         shell: cmd
       
+      - name: Verify Java version
+        run: |
+          & "$env:JAVA_HOME\bin\java.exe" -version
+          & "$env:JAVA_HOME\bin\jpackage.exe" --version
+        shell: pwsh
+
       - name: Build Windows installer
         run: |
           .\scripts\build-windows-installer.bat

@@ -11,10 +11,23 @@ setlocal enabledelayedexpansion
 
 echo [INFO] Verificando requisitos...
 
-REM Check Java version
-for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
-    set JAVA_VERSION_STRING=%%g
+REM Pin binary paths to JAVA_HOME so the CI-configured JDK is used, not whatever java is on PATH
+if defined JAVA_HOME (
+    set "JAVA_BIN=%JAVA_HOME%\bin\java.exe"
+    set "JPACKAGE_BIN=%JAVA_HOME%\bin\jpackage.exe"
+    echo [INFO] JAVA_HOME=%JAVA_HOME%
+) else (
+    echo [WARN] JAVA_HOME nao definido. Usando binarios do PATH - versao incorreta pode ser selecionada.
+    set "JAVA_BIN=java"
+    set "JPACKAGE_BIN=jpackage"
 )
+
+REM Check Java version via temp file to avoid double-quote-inside-single-quote parsing issues in for /f
+"!JAVA_BIN!" -version > "%TEMP%\moinex_java_ver.txt" 2>&1
+for /f "usebackq tokens=1-3" %%a in ("%TEMP%\moinex_java_ver.txt") do (
+    if "%%b"=="version" if not defined JAVA_VERSION_STRING set "JAVA_VERSION_STRING=%%c"
+)
+del "%TEMP%\moinex_java_ver.txt" 2>nul
 set JAVA_VERSION_STRING=!JAVA_VERSION_STRING:"=!
 
 for /f "tokens=1 delims=." %%a in ("!JAVA_VERSION_STRING!") do set JAVA_MAJOR=%%a
@@ -30,13 +43,20 @@ if !JAVA_MAJOR! LSS 21 (
 echo [SUCCESS] Java !JAVA_MAJOR! detectado
 
 REM Check if jpackage exists
-where jpackage >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] jpackage nao encontrado. Certifique-se de que esta usando Java 21+.
-    exit /b 1
+if defined JAVA_HOME (
+    if not exist "!JPACKAGE_BIN!" (
+        echo [ERROR] jpackage nao encontrado em !JPACKAGE_BIN!. Verifique JAVA_HOME.
+        exit /b 1
+    )
+) else (
+    where jpackage >nul 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        echo [ERROR] jpackage nao encontrado. Certifique-se de que esta usando Java 21+.
+        exit /b 1
+    )
 )
 
-echo [SUCCESS] jpackage encontrado
+echo [SUCCESS] jpackage encontrado: !JPACKAGE_BIN!
 
 REM Setup embedded Python
 echo [INFO] Configurando Python embarcado...
@@ -60,6 +80,17 @@ if not exist "build\libs\moinex.jar" (
 )
 
 echo [SUCCESS] JAR compilado com sucesso
+
+REM Stage only moinex.jar so jpackage --input sees a single JAR and produces one app.classpath entry
+echo [INFO] Preparando diretorio de staging para jpackage...
+if exist "build\jpackage-input" rmdir /S /Q "build\jpackage-input"
+mkdir "build\jpackage-input"
+copy "build\libs\moinex.jar" "build\jpackage-input\moinex.jar"
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Falha ao copiar moinex.jar para diretorio de staging.
+    exit /b 1
+)
+echo [SUCCESS] JAR copiado para diretorio de staging
 
 REM Create output directory
 set OUTPUT_DIR=installer-output
@@ -93,8 +124,8 @@ echo [INFO]   Versao: %VERSION%
 echo [INFO]   Isso pode levar alguns minutos...
 
 REM Run jpackage to create Windows installer
-jpackage ^
-    --input build\libs ^
+"!JPACKAGE_BIN!" ^
+    --input build\jpackage-input ^
     --name Moinex ^
     --main-jar moinex.jar ^
     --main-class org.springframework.boot.loader.launch.JarLauncher ^
