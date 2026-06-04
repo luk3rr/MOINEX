@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:sqlite:${user.home}/.moinex/data/moinex.db?journal_mode=WAL
+    url: jdbc:sqlite:${moinex.db.path}?journal_mode=WAL
     username:
     password:
     driver-class-name: org.sqlite.JDBC

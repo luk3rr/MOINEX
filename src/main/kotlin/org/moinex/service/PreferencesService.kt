@@ -22,6 +22,7 @@ class PreferencesService {
         const val PREF_KEY_LOCALE = "ui.locale"
         const val PREF_KEY_HIDE_MONETARY_VALUES = "ui.hideMonetaryValues"
         const val PREF_KEY_THEME = "ui.theme"
+        const val PREF_KEY_DB_DIR = "db.directory"
         const val THEME_LIGHT = "light"
         const val THEME_DARK = "dark"
         const val BRAZILIAN_PORTUGUESE_TAG = "pt-BR"
@@ -51,6 +52,10 @@ class PreferencesService {
             field = value
             preferences.put(PREF_KEY_THEME, value)
         }
+
+    var dbDirectory: String
+        get() = preferences[PREF_KEY_DB_DIR, "${System.getProperty("user.home")}/.moinex/data"]
+        set(value) = preferences.put(PREF_KEY_DB_DIR, value)
 
     fun isDarkMode(): Boolean = theme == THEME_DARK
 

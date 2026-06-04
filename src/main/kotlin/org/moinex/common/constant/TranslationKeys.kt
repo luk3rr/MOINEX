@@ -44,6 +44,15 @@ object TranslationKeys {
     const val SETTINGS_THEME: String = "settings.theme"
     const val SETTINGS_THEME_DARK: String = "settings.theme.dark"
     const val SETTINGS_THEME_LIGHT: String = "settings.theme.light"
+    const val SETTINGS_DATABASE_LOCATION: String = "settings.database.location"
+    const val SETTINGS_DATABASE_CHANGE: String = "settings.database.change"
+    const val SETTINGS_DATABASE_RESTART_REQUIRED: String = "settings.database.restartRequired"
+    const val SETTINGS_DATABASE_COPY_TITLE: String = "settings.database.copy.title"
+    const val SETTINGS_DATABASE_COPY_MESSAGE: String = "settings.database.copy.message"
+    const val SETTINGS_DATABASE_COPY_WARN_OVERWRITE: String = "settings.database.copy.warnOverwrite"
+    const val SETTINGS_DATABASE_SAME_DIR: String = "settings.database.sameDir"
+    const val SETTINGS_DATABASE_NOT_WRITABLE: String = "settings.database.notWritable"
+    const val SETTINGS_DATABASE_COPY_FAILED: String = "settings.database.copyFailed"
 
     // Home
     const val HOME_WALLET_TITLE: String = "home.wallet.title"
