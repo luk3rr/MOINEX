@@ -14,6 +14,7 @@ import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import kotlinx.coroutines.delay
@@ -78,6 +79,13 @@ class JavaFXApp : Application() {
                 onUI = { (preferencesService, mainRoot) ->
                     primaryStage.apply {
                         title = preferencesService.translate(TranslationKeys.APP_TITLE)
+                        icons.addAll(
+                            listOf("256", "128", "64", "32").mapNotNull { size ->
+                                javaClass
+                                    .getResourceAsStream("${Files.APP_ICONS_PATH}moinex-icon-$size.png")
+                                    ?.let { Image(it) }
+                            },
+                        )
                         scene = Scene(mainRoot)
                         show()
                     }

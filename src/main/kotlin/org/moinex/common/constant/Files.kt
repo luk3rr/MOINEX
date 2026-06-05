@@ -13,6 +13,7 @@ object Files {
     const val SIDEBAR_ICONS_PATH: String = "/icon/sidebar/"
     const val CRC_OPERATOR_ICONS_PATH: String = "/icon/crc_operator/"
     const val COMMON_ICONS_PATH: String = "/icon/common/"
+    const val APP_ICONS_PATH: String = "/icon/app/"
 
     const val UI_MAIN_PATH: String = "/ui/main/"
     const val UI_DIALOG_PATH: String = "/ui/dialog/"
