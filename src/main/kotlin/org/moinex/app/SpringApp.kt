@@ -14,11 +14,15 @@ import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ConfigurableApplicationContext
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.prefs.Preferences
 
 object SpringApp {
     private val logger = LoggerFactory.getLogger(SpringApp::class.java)
+
+    const val DB_FALLBACK_PROPERTY = "moinex.db.path.fallback"
 
     fun start(args: Array<String>): ConfigurableApplicationContext {
         val dbPath = resolveDbPath()
@@ -30,9 +34,27 @@ object SpringApp {
     fun resolveDbPath(): String {
         val prefs = Preferences.userRoot().node("org.moinex")
         val storedDir = prefs[PreferencesService.PREF_KEY_DB_DIR, null]
-        val dir = storedDir ?: "${System.getProperty("user.home")}/.moinex/data"
-        return "$dir/moinex.db"
+        val defaultDir = "${System.getProperty("user.home")}/.moinex/data"
+
+        if (storedDir != null) {
+            if (isDirectoryAccessible(Paths.get(storedDir))) {
+                return "$storedDir/moinex.db"
+            }
+            logger.warn("Configured database directory '{}' is not accessible. Falling back to default.", storedDir)
+            System.setProperty(DB_FALLBACK_PROPERTY, storedDir)
+        }
+
+        return "$defaultDir/moinex.db"
     }
+
+    private fun isDirectoryAccessible(path: Path): Boolean =
+        runCatching {
+            if (!Files.exists(path)) Files.createDirectories(path)
+            val testFile = path.resolve(".moinex_write_test")
+            Files.write(testFile, ByteArray(0))
+            Files.deleteIfExists(testFile)
+            true
+        }.getOrElse { false }
 
     private fun createApplicationDirectories(dbPath: String) {
         val userHome = System.getProperty("user.home")

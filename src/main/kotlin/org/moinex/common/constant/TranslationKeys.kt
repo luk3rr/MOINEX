@@ -54,6 +54,10 @@ object TranslationKeys {
     const val SETTINGS_DATABASE_NOT_WRITABLE: String = "settings.database.notWritable"
     const val SETTINGS_DATABASE_COPY_FAILED: String = "settings.database.copyFailed"
 
+    // Startup
+    const val STARTUP_DB_INACCESSIBLE_HEADER: String = "startup.db.inaccessible.header"
+    const val STARTUP_DB_INACCESSIBLE_MESSAGE: String = "startup.db.inaccessible.message"
+
     // Home
     const val HOME_WALLET_TITLE: String = "home.wallet.title"
     const val HOME_CREDIT_CARD_TITLE: String = "home.creditCard.title"

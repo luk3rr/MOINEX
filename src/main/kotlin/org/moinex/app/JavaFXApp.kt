@@ -23,6 +23,7 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
+import org.moinex.common.util.WindowUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
@@ -90,6 +91,15 @@ class JavaFXApp : Application() {
                         show()
                     }
                     splashStage.close()
+
+                    val fallbackPath = System.getProperty(SpringApp.DB_FALLBACK_PROPERTY)
+                    if (fallbackPath != null) {
+                        WindowUtils.showErrorDialog(
+                            preferencesService.translate(TranslationKeys.STARTUP_DB_INACCESSIBLE_HEADER),
+                            preferencesService.translate(TranslationKeys.STARTUP_DB_INACCESSIBLE_MESSAGE) +
+                                "\n$fallbackPath",
+                        )
+                    }
                 },
             )
         }.onFailure { e ->
