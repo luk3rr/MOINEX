@@ -235,17 +235,20 @@ class BondService(
 
         val walletTransaction = bondOperationFromDatabase.walletTransaction!!
 
-        walletTransaction.apply {
-            wallet = walletTransactionContextDTO.wallet
-            category = walletTransactionContextDTO.category
-            date = walletTransactionContextDTO.date
-            amount = operationAmount
-            description = walletTransactionContextDTO.description
-            status = walletTransactionContextDTO.status
-            includeInAnalysis = walletTransactionContextDTO.includeInAnalysis
-        }
+        val updatedWalletTransaction =
+            WalletTransaction(
+                id = walletTransaction.id,
+                date = walletTransactionContextDTO.date,
+                status = walletTransactionContextDTO.status,
+                description = walletTransactionContextDTO.description,
+                includeInAnalysis = walletTransactionContextDTO.includeInAnalysis,
+                wallet = walletTransactionContextDTO.wallet,
+                category = walletTransactionContextDTO.category,
+                type = walletTransaction.type,
+                amount = operationAmount,
+            )
 
-        walletService.updateWalletTransaction(walletTransaction)
+        walletService.updateWalletTransaction(updatedWalletTransaction)
 
         bondOperationFromDatabase
             .apply {
