@@ -16,21 +16,6 @@ DEFAULT_CURRENCY = "BRL"
 EXCHANGE_API_URL_BASE = "https://api.exchangerate-api.com/v4/latest"
 TIMEOUT_SECONDS = 20
 
-# Configure yfinance session with custom headers
-from requests import Session
-
-# Create a session with custom headers to avoid being blocked
-session = Session()
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.5',
-    'Accept-Encoding': 'gzip, deflate',
-    'DNT': '1',
-    'Connection': 'keep-alive',
-    'Upgrade-Insecure-Requests': '1'
-})
-
 RETRY_MAX_ATTEMPTS = 3
 RETRY_INITIAL_DELAY = 1.0
 RETRY_MULTIPLIER = 1.5
@@ -130,8 +115,8 @@ def main():
             specific_dates = []
 
     try:
-        # Create ticker with custom session
-        ticker = yf.Ticker(symbol, session=session)
+        # Create ticker
+        ticker = yf.Ticker(symbol)
 
         # Parse end_date to check if it's today or recent
         end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")

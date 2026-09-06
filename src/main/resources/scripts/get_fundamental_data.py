@@ -15,21 +15,6 @@ from pathlib import Path
 
 DEFAULT_CURRENCY = "BRL"
 
-# Configure yfinance session with custom headers
-from requests import Session
-
-# Create a session with custom headers to avoid being blocked
-session = Session()
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.5',
-    'Accept-Encoding': 'gzip, deflate',
-    'DNT': '1',
-    'Connection': 'keep-alive',
-    'Upgrade-Insecure-Requests': '1'
-})
-
 RETRY_MAX_ATTEMPTS = 5
 RETRY_INITIAL_DELAY = 1.0
 RETRY_MULTIPLIER = 1.5
@@ -562,8 +547,8 @@ def get_fundamental_data(symbol: str, period: str = "annual") -> dict:
     :return: Dictionary with fundamental data
     """
     try:
-        # Create ticker with custom session
-        ticker = yf.Ticker(symbol, session=session)
+        # Create ticker
+        ticker = yf.Ticker(symbol)
         info = ticker.info
 
         # Get financial statements based on period
@@ -801,7 +786,7 @@ def export_to_csv(symbol: str, data: dict, output_dir: str = ".", period: str = 
     output_path.mkdir(parents=True, exist_ok=True)
 
     # Get raw data from yfinance based on period
-    ticker = yf.Ticker(symbol, session=session)
+    ticker = yf.Ticker(symbol)
     if period == "quarterly":
         financials = ticker.quarterly_financials
         balance_sheet = ticker.quarterly_balance_sheet
