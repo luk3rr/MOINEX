@@ -19,7 +19,7 @@ TESTS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help run jar build test coverage lint format clean pre-commit install-hooks
+.PHONY: help run jar build test coverage lint format clean pre-commit install-hooks install uninstall
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -51,6 +51,12 @@ clean: ## Remove build artifacts
 
 pre-commit: ## Run lint + tests (invoked by the git pre-commit hook)
 	$(GRADLE) ktlintCheck test $(GRADLE_FLAGS)
+
+install: ## Install/update Moinex system-wide (bash scripts/install.sh)
+	JAVA_HOME=$(JAVA_HOME) bash scripts/install.sh
+
+uninstall: ## Remove Moinex system-wide (bash scripts/uninstall.sh)
+	bash scripts/uninstall.sh
 
 install-hooks: ## Point git at the tracked hooks in .githooks/
 	git config core.hooksPath .githooks

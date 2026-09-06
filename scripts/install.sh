@@ -5,15 +5,15 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 print_success() {
-    echo "\033[0;32m$1\033[0m"
+    printf '\033[0;32m%s\033[0m\n' "$1"
 }
 
 print_error() {
-    echo "\033[0;31m$1\033[0m"
+    printf '\033[0;31m%s\033[0m\n' "$1"
 }
 
 print_info() {
-    echo "\033[0;34m$1\033[0m"
+    printf '\033[0;34m%s\033[0m\n' "$1"
 }
 
 print_info "A obter a lista de versões disponíveis..."
@@ -24,56 +24,74 @@ if [ -z "$TAG_LIST" ]; then
     print_info "Nenhuma versão estável (tag) encontrada. Apenas a versão de desenvolvimento está disponível."
 fi
 
-print_info "Por favor, selecione a versão que deseja instalar:"
+DEV_LABEL="main -- Instalar a versão de desenvolvimento (pode ser instável)"
 
-TMP_TAGS_FILE=$(mktemp)
-echo "$TAG_LIST" > "$TMP_TAGS_FILE"
+if command -v fzf >/dev/null 2>&1; then
+    print_info "Selecione a versão que deseja instalar (digite para filtrar, ESC para cancelar):"
 
-EXIT_OPTION=0
-MAIN_BRANCH_OPTION=1
+    CHOSEN_LINE=$(printf '%s\n%s\n' "$DEV_LABEL" "$TAG_LIST" | \
+        fzf --prompt="Versão > " --height=~20 --border --reverse \
+            --header="ENTER para selecionar | ESC para cancelar")
 
-echo "  $EXIT_OPTION) Sair"
-echo "  $MAIN_BRANCH_OPTION) Instalar a versão de desenvolvimento (branch main, pode ser instável)"
-
-COUNT=2
-while IFS= read -r TAG; do
-    echo "  $COUNT) $TAG"
-    COUNT=$((COUNT + 1))
-done < "$TMP_TAGS_FILE"
-
-TOTAL_OPTIONS=$((COUNT - 1))
-
-while true; do
-    printf "Digite o número da sua escolha (%d-%d): " "$EXIT_OPTION" "$TOTAL_OPTIONS"
-    read -r CHOICE
-
-    case $CHOICE in
-        ''|*[!0-9]*)
-            print_error "Seleção inválida. Por favor, digite um número."
-            continue
-            ;;
-    esac
-
-    if [ "$CHOICE" -ge "$EXIT_OPTION" ] && [ "$CHOICE" -le "$TOTAL_OPTIONS" ]; then
-        if [ "$CHOICE" -eq "$EXIT_OPTION" ]; then
-            print_error "Instalação cancelada."
-            rm -f "$TMP_TAGS_FILE"
-            exit 0
-        elif [ "$CHOICE" -eq "$MAIN_BRANCH_OPTION" ]; then
-            VERSION="main"
-            break
-        else
-            TAG_INDEX=$((CHOICE - 1))
-            CHOSEN_LINE=$(sed -n "${TAG_INDEX}p" "$TMP_TAGS_FILE")
-            VERSION=$(echo "$CHOSEN_LINE" | cut -d ' ' -f 1)
-            break
-        fi
-    else
-        print_error "Seleção inválida. Por favor, digite um número entre $EXIT_OPTION e $TOTAL_OPTIONS."
+    if [ -z "$CHOSEN_LINE" ]; then
+        print_error "Instalação cancelada."
+        exit 0
     fi
-done
 
-rm -f "$TMP_TAGS_FILE"
+    VERSION=$(echo "$CHOSEN_LINE" | cut -d ' ' -f 1)
+else
+    print_info "Dica: instale o 'fzf' para uma seleção de versão mais fácil (com busca)."
+    print_info "Por favor, selecione a versão que deseja instalar:"
+
+    TMP_TAGS_FILE=$(mktemp)
+    echo "$TAG_LIST" > "$TMP_TAGS_FILE"
+
+    EXIT_OPTION=0
+    MAIN_BRANCH_OPTION=1
+
+    echo "  $EXIT_OPTION) Sair"
+    echo "  $MAIN_BRANCH_OPTION) Instalar a versão de desenvolvimento (branch main, pode ser instável)"
+
+    COUNT=2
+    while IFS= read -r TAG; do
+        echo "  $COUNT) $TAG"
+        COUNT=$((COUNT + 1))
+    done < "$TMP_TAGS_FILE"
+
+    TOTAL_OPTIONS=$((COUNT - 1))
+
+    while true; do
+        printf "Digite o número da sua escolha (%d-%d): " "$EXIT_OPTION" "$TOTAL_OPTIONS"
+        read -r CHOICE
+
+        case $CHOICE in
+            ''|*[!0-9]*)
+                print_error "Seleção inválida. Por favor, digite um número."
+                continue
+                ;;
+        esac
+
+        if [ "$CHOICE" -ge "$EXIT_OPTION" ] && [ "$CHOICE" -le "$TOTAL_OPTIONS" ]; then
+            if [ "$CHOICE" -eq "$EXIT_OPTION" ]; then
+                print_error "Instalação cancelada."
+                rm -f "$TMP_TAGS_FILE"
+                exit 0
+            elif [ "$CHOICE" -eq "$MAIN_BRANCH_OPTION" ]; then
+                VERSION="main"
+                break
+            else
+                TAG_INDEX=$((CHOICE - 1))
+                CHOSEN_LINE=$(sed -n "${TAG_INDEX}p" "$TMP_TAGS_FILE")
+                VERSION=$(echo "$CHOSEN_LINE" | cut -d ' ' -f 1)
+                break
+            fi
+        else
+            print_error "Seleção inválida. Por favor, digite um número entre $EXIT_OPTION e $TOTAL_OPTIONS."
+        fi
+    done
+
+    rm -f "$TMP_TAGS_FILE"
+fi
 
 if [ "$VERSION" = "main" ]; then
     print_success ">> A fazer checkout para a branch 'main' e a obter as últimas alterações..."
