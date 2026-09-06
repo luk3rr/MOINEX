@@ -50,6 +50,32 @@ class FinancialInsightGeneratorTest :
             return MonthlyFlowDTO(YearMonth.of(2026, month), incomeValue, incomeValue - netValue, netValue, savingsRate)
         }
 
+        fun currentMonthFlow(
+            month: Int,
+            projectedIncome: String,
+            projectedNet: String,
+        ): MonthlyFlowDTO {
+            val incomeValue = BigDecimal(projectedIncome)
+            val netValue = BigDecimal(projectedNet)
+            val rate =
+                netValue
+                    .divide(incomeValue, 6, java.math.RoundingMode.HALF_UP)
+                    .multiply(BigDecimal(100))
+                    .setScale(2, java.math.RoundingMode.HALF_UP)
+            return MonthlyFlowDTO(
+                period = YearMonth.of(2026, month),
+                income = incomeValue,
+                expense = incomeValue - netValue,
+                net = netValue,
+                savingsRatePercentage = rate,
+                isCurrentMonth = true,
+                projectedIncome = incomeValue,
+                projectedExpense = incomeValue - netValue,
+                projectedNet = netValue,
+                projectedSavingsRatePercentage = rate,
+            )
+        }
+
         fun summary(
             savingsRate: String = "10.00",
             monthlyFlows: List<MonthlyFlowDTO> = emptyList(),
@@ -172,6 +198,27 @@ class FinancialInsightGeneratorTest :
                     generator.generate(summary(incomeByCategory = listOf(category("Salário", "90.00"))))
                 Then("an income-concentration warning is produced") {
                     insights.any { it.type == FinancialInsightType.INCOME_CONCENTRATION } shouldBe true
+                }
+            }
+        }
+
+        Given("the current month is still in progress") {
+            When("the projected savings rate meets the target") {
+                val flows = listOf(currentMonthFlow(1, "1000.00", "250.00"))
+                val insights = generator.generate(summary(monthlyFlows = flows))
+                Then("a neutral current-month-projection insight is produced") {
+                    val insight = insights.firstOrNull { it.type == FinancialInsightType.CURRENT_MONTH_PROJECTION }
+                    insight.shouldNotBeNull()
+                    insight.severity shouldBe FinancialInsightSeverity.NEUTRAL
+                }
+            }
+            When("the projected savings rate stays below the target") {
+                val flows = listOf(currentMonthFlow(1, "1000.00", "50.00"))
+                val insights = generator.generate(summary(monthlyFlows = flows))
+                Then("a warning current-month-projection insight is produced") {
+                    val insight = insights.firstOrNull { it.type == FinancialInsightType.CURRENT_MONTH_PROJECTION }
+                    insight.shouldNotBeNull()
+                    insight.severity shouldBe FinancialInsightSeverity.WARNING
                 }
             }
         }

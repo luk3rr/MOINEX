@@ -11,6 +11,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import org.moinex.common.ClockProvider
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.creditcard.CreditCardDebtFactory
 import org.moinex.factory.creditcard.CreditCardPaymentFactory
@@ -21,6 +22,7 @@ import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.wallet.RecurringTransactionService
 import org.moinex.service.wallet.WalletService
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -31,12 +33,27 @@ class AnnualSummaryServiceTest :
     BehaviorSpec({
         val walletService = mockk<WalletService>()
         val creditCardService = mockk<CreditCardService>()
+        val recurringTransactionService = mockk<RecurringTransactionService>()
         val insightGenerator = mockk<FinancialInsightGenerator>(relaxed = true)
         val preferencesService = mockk<PreferencesService>()
+        val clockProvider = mockk<ClockProvider>()
 
-        val service = AnnualSummaryService(walletService, creditCardService, insightGenerator, preferencesService)
+        val service =
+            AnnualSummaryService(
+                walletService,
+                creditCardService,
+                recurringTransactionService,
+                insightGenerator,
+                preferencesService,
+                clockProvider,
+            )
 
-        beforeContainer { every { preferencesService.savingsRateTarget } returns BigDecimal("20") }
+        beforeContainer {
+            every { preferencesService.savingsRateTarget } returns BigDecimal("20")
+            // Defaults to a month outside the fixtures below, so existing scenarios are unaffected
+            // unless a test explicitly overrides it to exercise the current-month projection.
+            every { clockProvider.currentMonth() } returns YearMonth.of(2099, 1)
+        }
         afterContainer { clearAllMocks(answers = true) }
 
         val salary = CategoryFactory.create(id = 1, name = "Salário")
@@ -172,6 +189,116 @@ class AnnualSummaryServiceTest :
 
                 Then("uses paidAmount and excludes refunded payments") {
                     summary.totalExpense shouldBe BigDecimal("300.00")
+                }
+            }
+        }
+
+        Given("the queried range includes the current month with pending transactions") {
+            every {
+                walletService.getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(YearMonth.of(2026, 1))
+            } returns
+                listOf(
+                    income(LocalDateTime.of(2026, 1, 5, 10, 0), "1000.00"),
+                    expense(LocalDateTime.of(2026, 1, 6, 10, 0), "200.00"),
+                )
+            every {
+                walletService.getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(YearMonth.of(2026, 2))
+            } returns
+                listOf(
+                    income(LocalDateTime.of(2026, 2, 3, 10, 0), "600.00"),
+                    expense(LocalDateTime.of(2026, 2, 6, 10, 0), "100.00"),
+                )
+            every {
+                walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(2026, 2))
+            } returns
+                listOf(
+                    income(LocalDateTime.of(2026, 2, 3, 10, 0), "600.00"),
+                    income(LocalDateTime.of(2026, 2, 25, 10, 0), "400.00"),
+                    expense(LocalDateTime.of(2026, 2, 6, 10, 0), "100.00"),
+                )
+            every {
+                recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                    YearMonth.of(2026, 2),
+                    YearMonth.of(2026, 2),
+                )
+            } returns listOf(expense(LocalDateTime.of(2026, 2, 28, 0, 0), "50.00"))
+            every { creditCardService.getDebtsBetweenForAnalysis(any(), any()) } returns emptyList()
+
+            When("building the summary") {
+                every { clockProvider.currentMonth() } returns YearMonth.of(2026, 2)
+
+                val summary =
+                    service.buildSummary(
+                        LocalDate.of(2026, 1, 1),
+                        LocalDate.of(2026, 2, 28),
+                        SpendAccountingMode.ACCRUAL,
+                    )
+
+                Then(
+                    "the current month is flagged and the projection combines pending and not-yet-" +
+                        "materialized recurring transactions",
+                ) {
+                    val currentMonthFlow = summary.monthlyFlows.first { it.period == YearMonth.of(2026, 2) }
+                    currentMonthFlow.isCurrentMonth shouldBe true
+                    currentMonthFlow.income shouldBe BigDecimal("600.00")
+                    currentMonthFlow.net shouldBe BigDecimal("500.00")
+                    currentMonthFlow.projectedIncome shouldBe BigDecimal("1000.00")
+                    currentMonthFlow.projectedExpense shouldBe BigDecimal("150.00")
+                    currentMonthFlow.projectedNet shouldBe BigDecimal("850.00")
+                    currentMonthFlow.projectedSavingsRatePercentage shouldBe BigDecimal("85.00")
+                }
+
+                Then("a past month is not flagged and has no projection") {
+                    val pastMonthFlow = summary.monthlyFlows.first { it.period == YearMonth.of(2026, 1) }
+                    pastMonthFlow.isCurrentMonth shouldBe false
+                    pastMonthFlow.projectedIncome shouldBe null
+                }
+            }
+        }
+
+        Given("the current month in CASH_FLOW mode has an already-paid bill and a pending remainder") {
+            every {
+                walletService.getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(YearMonth.of(2026, 2))
+            } returns emptyList()
+            every {
+                walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(YearMonth.of(2026, 2))
+            } returns emptyList()
+            every {
+                recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                    YearMonth.of(2026, 2),
+                    YearMonth.of(2026, 2),
+                )
+            } returns emptyList()
+            every { creditCardService.getAllPaidPaymentsByMonth(YearMonth.of(2026, 2)) } returns
+                listOf(
+                    CreditCardPaymentFactory.create(
+                        wallet = wallet,
+                        creditCardDebt = CreditCardDebtFactory.create(category = electronics),
+                        paidAmount = BigDecimal("200.00"),
+                        date = LocalDateTime.of(2026, 2, 10, 0, 0),
+                    ),
+                )
+            every { creditCardService.getTotalPendingPaymentsByMonth(YearMonth.of(2026, 2)) } returns
+                BigDecimal("150.00")
+
+            When("building the summary") {
+                every { clockProvider.currentMonth() } returns YearMonth.of(2026, 2)
+
+                val summary =
+                    service.buildSummary(
+                        LocalDate.of(2026, 2, 1),
+                        LocalDate.of(2026, 2, 28),
+                        SpendAccountingMode.CASH_FLOW,
+                    )
+
+                Then("the realized figure only counts what was already paid this month") {
+                    val currentMonthFlow = summary.monthlyFlows.first { it.period == YearMonth.of(2026, 2) }
+                    currentMonthFlow.expense shouldBe BigDecimal("200.00")
+                }
+
+                Then("the projection adds the still-unpaid, already-billed remainder on top of it") {
+                    val currentMonthFlow = summary.monthlyFlows.first { it.period == YearMonth.of(2026, 2) }
+                    currentMonthFlow.projectedExpense shouldBe BigDecimal("350.00")
                 }
             }
         }

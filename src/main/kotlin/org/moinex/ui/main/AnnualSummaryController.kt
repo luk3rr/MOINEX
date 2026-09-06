@@ -116,7 +116,7 @@ class AnnualSummaryController(
                 preferencesService.translate(TranslationKeys.ANNUAL_SUMMARY_MODE_ACCRUAL),
                 preferencesService.translate(TranslationKeys.ANNUAL_SUMMARY_MODE_CASH_FLOW),
             )
-        modeComboBox.selectionModel.selectFirst()
+        modeComboBox.selectionModel.select(1)
         UIUtils.addTooltipToNode(modeComboBox, translate(TranslationKeys.ANNUAL_SUMMARY_MODE_TOOLTIP))
 
         setupCategoryTable(expenseCategoryTable)
@@ -136,7 +136,7 @@ class AnnualSummaryController(
 
     private fun showChart(index: Int) {
         val pageCount = chartPages.size
-        currentChartIndex = ((index % pageCount) + pageCount) % pageCount
+        currentChartIndex = index.coerceIn(0, pageCount - 1)
 
         chartPages.forEachIndexed { i, (titleKey, view) ->
             val isSelected = i == currentChartIndex
@@ -144,6 +144,9 @@ class AnnualSummaryController(
             view().isManaged = isSelected
             if (isSelected) chartTitleLabel.text = translate(titleKey)
         }
+
+        chartPrevButton.isDisable = currentChartIndex == 0
+        chartNextButton.isDisable = currentChartIndex >= pageCount - 1
     }
 
     private fun updateView() {
@@ -240,11 +243,13 @@ class AnnualSummaryController(
         var maxValue = 0.0
 
         summary.monthlyFlows.forEach { flow ->
-            val label = UIUtils.formatShortMonthYear(flow.period)
+            val label = monthLabel(flow)
             flowByLabel[label] = flow
-            incomeSeries.data.add(XYChart.Data(label, flow.income))
-            expenseSeries.data.add(XYChart.Data(label, flow.expense))
-            maxValue = maxOf(maxValue, flow.income.toDouble(), flow.expense.toDouble())
+            val plottedIncome = flow.projectedIncome ?: flow.income
+            val plottedExpense = flow.projectedExpense ?: flow.expense
+            incomeSeries.data.add(XYChart.Data(label, plottedIncome))
+            expenseSeries.data.add(XYChart.Data(label, plottedExpense))
+            maxValue = maxOf(maxValue, plottedIncome.toDouble(), plottedExpense.toDouble())
         }
 
         AnimationUtils.setDynamicYAxisBounds(numberAxis, maxValue)
@@ -256,20 +261,47 @@ class AnnualSummaryController(
 
         chart.data.forEach { series ->
             series.data.forEach { data ->
+                val flow = flowByLabel[data.xValue]
                 val value = (data.yValue as Number).toDouble()
-                val net =
-                    flowByLabel[data.xValue]?.let {
-                        "\n${translate(TranslationKeys.ANNUAL_SUMMARY_NET_BALANCE)}: ${UIUtils.formatCurrency(it.net)}"
-                    } ?: ""
+
+                if (flow?.isCurrentMonth == true) {
+                    data.node.styleClass.add(Styles.CURRENT_MONTH_BAR_STYLE_CLASS)
+                }
 
                 UIUtils.addTooltipToXYChartNode(
                     data.node,
-                    "${series.name}: ${UIUtils.formatCurrency(value)}$net",
+                    flowTooltip(series.name, flow, isExpenseSeries = series === expenseSeries),
                 )
 
                 AnimationUtils.xyChartAnimation(data, value)
             }
         }
+    }
+
+    private fun monthLabel(flow: MonthlyFlowDTO): String = UIUtils.formatShortMonthYear(flow.period)
+
+    private fun flowTooltip(
+        seriesName: String,
+        flow: MonthlyFlowDTO?,
+        isExpenseSeries: Boolean,
+    ): String {
+        if (flow == null) return seriesName
+
+        val realizedValue = if (isExpenseSeries) flow.expense else flow.income
+        val projectedValue = if (isExpenseSeries) flow.projectedExpense else flow.projectedIncome
+        val netLabel = translate(TranslationKeys.ANNUAL_SUMMARY_NET_BALANCE)
+
+        if (!flow.isCurrentMonth || projectedValue == null) {
+            return "$seriesName: ${UIUtils.formatCurrency(
+                realizedValue,
+            )}\n$netLabel: ${UIUtils.formatCurrency(flow.net)}"
+        }
+
+        val projectedLabel = translate(TranslationKeys.ANNUAL_SUMMARY_PROJECTED)
+        val realizedLabel = translate(TranslationKeys.ANNUAL_SUMMARY_REALIZED)
+        return "$seriesName ($projectedLabel): ${UIUtils.formatCurrency(projectedValue)}\n" +
+            "$seriesName ($realizedLabel): ${UIUtils.formatCurrency(realizedValue)}\n" +
+            "$netLabel ($projectedLabel): ${UIUtils.formatCurrency(flow.projectedNet ?: flow.net)}"
     }
 
     private fun updateSavingsRateChart(summary: AnnualSummaryDTO) {
@@ -292,28 +324,45 @@ class AnnualSummaryController(
         rateSeries.name = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_SERIES)
         val targetSeries = XYChart.Series<String, Number>()
         targetSeries.name = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TARGET)
+        val projectedSeries = XYChart.Series<String, Number>()
+        projectedSeries.name = translate(TranslationKeys.ANNUAL_SUMMARY_PROJECTED)
 
         val target = preferencesService.savingsRateTarget
         val flowByLabel = linkedMapOf<String, MonthlyFlowDTO>()
 
         summary.monthlyFlows.forEach { flow ->
-            val label = UIUtils.formatShortMonthYear(flow.period)
+            val label = monthLabel(flow)
             flowByLabel[label] = flow
             rateSeries.data.add(XYChart.Data(label, flow.savingsRatePercentage))
             targetSeries.data.add(XYChart.Data(label, target))
+
+            flow.projectedSavingsRatePercentage?.let {
+                projectedSeries.data.add(XYChart.Data(label, it))
+            }
         }
 
-        chart.data.setAll(rateSeries, targetSeries)
+        val seriesToShow = mutableListOf(rateSeries, targetSeries)
+        if (projectedSeries.data.isNotEmpty()) seriesToShow.add(projectedSeries)
+        chart.data.setAll(seriesToShow)
+
         UIUtils.applyDefaultChartStyle(chart, Styles.SAVINGS_RATE_CHART_STYLE_CLASS)
         chart.setAnchorPaneConstraints()
         savingsRateChartView.children.setAll(chart)
 
+        targetSeries.data.forEach { data -> data.node.styleClass.add(Styles.HIDDEN_CHART_SYMBOL_STYLE_CLASS) }
+
+        val periodLabel = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_TOOLTIP_PERIOD)
+        val incomeLabel = translate(TranslationKeys.ANNUAL_SUMMARY_TOTAL_INCOME)
+        val savedLabel = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_TOOLTIP_SAVED)
+        val rateLabel = rateSeries.name
+        val projectedLabel = projectedSeries.name
+
         rateSeries.data.forEach { data ->
             val flow = flowByLabel[data.xValue] ?: return@forEach
-            val periodLabel = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_TOOLTIP_PERIOD)
-            val incomeLabel = translate(TranslationKeys.ANNUAL_SUMMARY_TOTAL_INCOME)
-            val savedLabel = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_TOOLTIP_SAVED)
-            val rateLabel = rateSeries.name
+
+            if (flow.isCurrentMonth) {
+                data.node.styleClass.add(Styles.CURRENT_MONTH_POINT_STYLE_CLASS)
+            }
 
             UIUtils.addTooltipToXYChartNode(
                 data.node,
@@ -321,6 +370,21 @@ class AnnualSummaryController(
                     "$incomeLabel: ${UIUtils.formatCurrency(flow.income)}\n" +
                     "$savedLabel: ${UIUtils.formatCurrency(flow.net)}\n" +
                     "$rateLabel: ${flow.savingsRatePercentage.toPlainString()}%",
+            )
+        }
+
+        projectedSeries.data.forEach { data ->
+            val flow = flowByLabel[data.xValue] ?: return@forEach
+            val projectedIncome = flow.projectedIncome ?: return@forEach
+            val projectedNet = flow.projectedNet ?: return@forEach
+            val projectedRate = flow.projectedSavingsRatePercentage ?: return@forEach
+
+            UIUtils.addTooltipToXYChartNode(
+                data.node,
+                "$periodLabel: ${UIUtils.formatFullMonthYear(flow.period)}\n" +
+                    "$incomeLabel ($projectedLabel): ${UIUtils.formatCurrency(projectedIncome)}\n" +
+                    "$savedLabel ($projectedLabel): ${UIUtils.formatCurrency(projectedNet)}\n" +
+                    "$rateLabel ($projectedLabel): ${projectedRate.toPlainString()}%",
             )
         }
     }

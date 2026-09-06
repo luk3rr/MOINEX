@@ -158,6 +158,14 @@
 .money-flow-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #ef4444; }
 .money-flow-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #22c55e; }
 
+/* Current month bars - still in progress, not final */
+.money-flow-chart .chart-bar.current-month-bar {
+    -fx-opacity: 0.55;
+    -fx-border-color: #6b7280;
+    -fx-border-width: 2;
+    -fx-border-style: segments(4, 3);
+}
+
 /* ============================================================
    Savings rate trend
    ============================================================ */
@@ -181,7 +189,13 @@
     -fx-padding: 5px;
 }
 
-.savings-rate-chart .chart-line-symbol.series1 {
+/*
+ * NOTE: the target line's data-point symbols are hidden via the "hidden-chart-symbol" class
+ * applied in code to each point's node (AnnualSummaryController), not via ".chart-line-symbol.series1"
+ * — JavaFX's LineChart reuses "chart-line-symbol" for the legend swatch too, so a class-based
+ * selector on "series1" would zero out the legend icon along with the on-chart points.
+ */
+.savings-rate-chart .hidden-chart-symbol {
     -fx-background-color: transparent;
     -fx-padding: 0;
     -fx-pref-width: 0;
@@ -190,3 +204,29 @@
 
 .savings-rate-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #3b82f6; }
 .savings-rate-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #9ca3af; }
+
+/* series2 = current-month projection (single point, no connecting line) */
+.savings-rate-chart .chart-series-line.series2 {
+    -fx-stroke: transparent;
+}
+
+.savings-rate-chart .chart-line-symbol.series2 {
+    -fx-background-color: #f59e0b, theme-chart-bg;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.savings-rate-chart .default-color2.chart-legend-item-symbol { -fx-background-color: #f59e0b; }
+
+/* Current month's actual point - still in progress, not final */
+.savings-rate-chart .chart-line-symbol.current-month-point {
+    -fx-background-color: theme-chart-bg;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5px;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+    -fx-border-style: segments(2, 2);
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+}

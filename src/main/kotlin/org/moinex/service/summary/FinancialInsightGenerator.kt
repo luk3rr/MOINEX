@@ -24,6 +24,7 @@ class FinancialInsightGenerator {
     ): List<FinancialInsightDTO> =
         listOfNotNull(
             savingsRateInsight(summary, savingsRateTarget),
+            currentMonthProjectionInsight(summary, savingsRateTarget),
             lifestyleInflationInsight(summary),
             spendingConcentrationInsight(summary),
             incomeConcentrationInsight(summary),
@@ -45,6 +46,30 @@ class FinancialInsightGenerator {
                     FinancialInsightSeverity.NEUTRAL to TranslationKeys.ANNUAL_SUMMARY_INSIGHT_SAVINGS_RATE_MODERATE
             }
         return FinancialInsightDTO(FinancialInsightType.SAVINGS_RATE, severity, key, listOf(rate))
+    }
+
+    private fun currentMonthProjectionInsight(
+        summary: AnnualSummaryDTO,
+        target: BigDecimal,
+    ): FinancialInsightDTO? {
+        val currentMonth = summary.monthlyFlows.firstOrNull { it.isCurrentMonth } ?: return null
+        val projectedRate = currentMonth.projectedSavingsRatePercentage ?: return null
+
+        return if (projectedRate >= target) {
+            FinancialInsightDTO(
+                FinancialInsightType.CURRENT_MONTH_PROJECTION,
+                FinancialInsightSeverity.NEUTRAL,
+                TranslationKeys.ANNUAL_SUMMARY_INSIGHT_CURRENT_MONTH_ON_TRACK,
+                listOf(currentMonth.period, projectedRate),
+            )
+        } else {
+            FinancialInsightDTO(
+                FinancialInsightType.CURRENT_MONTH_PROJECTION,
+                FinancialInsightSeverity.WARNING,
+                TranslationKeys.ANNUAL_SUMMARY_INSIGHT_CURRENT_MONTH_ALERT,
+                listOf(currentMonth.period, projectedRate, target),
+            )
+        }
     }
 
     private fun lifestyleInflationInsight(summary: AnnualSummaryDTO): FinancialInsightDTO? {

@@ -111,4 +111,9 @@ object Styles {
 
     // Savings rate trend
     const val SAVINGS_RATE_CHART_STYLE_CLASS = "savings-rate-chart"
+
+    // Current month in-progress markers
+    const val CURRENT_MONTH_BAR_STYLE_CLASS = "current-month-bar"
+    const val CURRENT_MONTH_POINT_STYLE_CLASS = "current-month-point"
+    const val HIDDEN_CHART_SYMBOL_STYLE_CLASS = "hidden-chart-symbol"
 }

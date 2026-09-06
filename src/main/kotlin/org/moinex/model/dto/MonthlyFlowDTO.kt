@@ -15,4 +15,9 @@ data class MonthlyFlowDTO(
     val expense: BigDecimal,
     val net: BigDecimal,
     val savingsRatePercentage: BigDecimal,
+    val isCurrentMonth: Boolean = false,
+    val projectedIncome: BigDecimal? = null,
+    val projectedExpense: BigDecimal? = null,
+    val projectedNet: BigDecimal? = null,
+    val projectedSavingsRatePercentage: BigDecimal? = null,
 )
