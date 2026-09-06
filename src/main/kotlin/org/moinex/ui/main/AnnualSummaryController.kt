@@ -6,11 +6,13 @@
 
 package org.moinex.ui.main
 
+import com.jfoenix.controls.JFXButton
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.scene.chart.BarChart
 import javafx.scene.chart.CategoryAxis
+import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.scene.control.ComboBox
@@ -21,6 +23,7 @@ import javafx.scene.control.TableView
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.VBox
 import javafx.util.Callback
+import javafx.util.StringConverter
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
@@ -69,7 +72,19 @@ class AnnualSummaryController(
     private lateinit var savingsRateLabel: Label
 
     @FXML
+    private lateinit var chartTitleLabel: Label
+
+    @FXML
+    private lateinit var chartPrevButton: JFXButton
+
+    @FXML
+    private lateinit var chartNextButton: JFXButton
+
+    @FXML
     private lateinit var monthlyFlowView: AnchorPane
+
+    @FXML
+    private lateinit var savingsRateChartView: AnchorPane
 
     @FXML
     private lateinit var expenseCategoryTable: TableView<CategoryBreakdownDTO>
@@ -82,6 +97,14 @@ class AnnualSummaryController(
 
     @FXML
     private lateinit var insightsBox: VBox
+
+    private var currentChartIndex = 0
+    private val chartPages: List<Pair<String, () -> AnchorPane>> by lazy {
+        listOf(
+            TranslationKeys.ANNUAL_SUMMARY_MONTHLY_FLOW to { monthlyFlowView },
+            TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND to { savingsRateChartView },
+        )
+    }
 
     @FXML
     fun initialize() {
@@ -104,7 +127,23 @@ class AnnualSummaryController(
         endDatePicker.valueProperty().addListener { _, _, _ -> updateView() }
         modeComboBox.selectionModel.selectedIndexProperty().addListener { _, _, _ -> updateView() }
 
+        chartPrevButton.setOnAction { showChart(currentChartIndex - 1) }
+        chartNextButton.setOnAction { showChart(currentChartIndex + 1) }
+        showChart(currentChartIndex)
+
         updateView()
+    }
+
+    private fun showChart(index: Int) {
+        val pageCount = chartPages.size
+        currentChartIndex = ((index % pageCount) + pageCount) % pageCount
+
+        chartPages.forEachIndexed { i, (titleKey, view) ->
+            val isSelected = i == currentChartIndex
+            view().isVisible = isSelected
+            view().isManaged = isSelected
+            if (isSelected) chartTitleLabel.text = translate(titleKey)
+        }
     }
 
     private fun updateView() {
@@ -131,6 +170,7 @@ class AnnualSummaryController(
         topExpensesTable.items = FXCollections.observableArrayList(summary.topExpenses)
 
         updateMonthlyFlowChart(summary)
+        updateSavingsRateChart(summary)
         updateInsights(summary.insights)
     }
 
@@ -229,6 +269,59 @@ class AnnualSummaryController(
 
                 AnimationUtils.xyChartAnimation(data, value)
             }
+        }
+    }
+
+    private fun updateSavingsRateChart(summary: AnnualSummaryDTO) {
+        val numberAxis = NumberAxis()
+        numberAxis.isForceZeroInRange = false
+        numberAxis.tickLabelFormatter =
+            object : StringConverter<Number>() {
+                override fun toString(value: Number?): String = value?.let { "${it.toDouble().toInt()}%" } ?: ""
+
+                override fun fromString(string: String?): Number = 0
+            }
+
+        val chart = LineChart(CategoryAxis(), numberAxis)
+        chart.title = null
+        chart.animated = false
+        chart.createSymbols = true
+        chart.verticalGridLinesVisible = false
+
+        val rateSeries = XYChart.Series<String, Number>()
+        rateSeries.name = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_SERIES)
+        val targetSeries = XYChart.Series<String, Number>()
+        targetSeries.name = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TARGET)
+
+        val target = preferencesService.savingsRateTarget
+        val flowByLabel = linkedMapOf<String, MonthlyFlowDTO>()
+
+        summary.monthlyFlows.forEach { flow ->
+            val label = UIUtils.formatShortMonthYear(flow.period)
+            flowByLabel[label] = flow
+            rateSeries.data.add(XYChart.Data(label, flow.savingsRatePercentage))
+            targetSeries.data.add(XYChart.Data(label, target))
+        }
+
+        chart.data.setAll(rateSeries, targetSeries)
+        UIUtils.applyDefaultChartStyle(chart, Styles.SAVINGS_RATE_CHART_STYLE_CLASS)
+        chart.setAnchorPaneConstraints()
+        savingsRateChartView.children.setAll(chart)
+
+        rateSeries.data.forEach { data ->
+            val flow = flowByLabel[data.xValue] ?: return@forEach
+            val periodLabel = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_TOOLTIP_PERIOD)
+            val incomeLabel = translate(TranslationKeys.ANNUAL_SUMMARY_TOTAL_INCOME)
+            val savedLabel = translate(TranslationKeys.ANNUAL_SUMMARY_SAVINGS_RATE_TREND_TOOLTIP_SAVED)
+            val rateLabel = rateSeries.name
+
+            UIUtils.addTooltipToXYChartNode(
+                data.node,
+                "$periodLabel: ${UIUtils.formatFullMonthYear(flow.period)}\n" +
+                    "$incomeLabel: ${UIUtils.formatCurrency(flow.income)}\n" +
+                    "$savedLabel: ${UIUtils.formatCurrency(flow.net)}\n" +
+                    "$rateLabel: ${flow.savingsRatePercentage.toPlainString()}%",
+            )
         }
     }
 

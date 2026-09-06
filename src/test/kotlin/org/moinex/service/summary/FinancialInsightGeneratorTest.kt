@@ -38,7 +38,16 @@ class FinancialInsightGeneratorTest :
         ): MonthlyFlowDTO {
             val incomeValue = BigDecimal(income)
             val netValue = BigDecimal(net)
-            return MonthlyFlowDTO(YearMonth.of(2026, month), incomeValue, incomeValue - netValue, netValue)
+            val savingsRate =
+                if (incomeValue.signum() == 0) {
+                    BigDecimal.ZERO.setScale(2)
+                } else {
+                    netValue
+                        .divide(incomeValue, 6, java.math.RoundingMode.HALF_UP)
+                        .multiply(BigDecimal(100))
+                        .setScale(2, java.math.RoundingMode.HALF_UP)
+                }
+            return MonthlyFlowDTO(YearMonth.of(2026, month), incomeValue, incomeValue - netValue, netValue, savingsRate)
         }
 
         fun summary(

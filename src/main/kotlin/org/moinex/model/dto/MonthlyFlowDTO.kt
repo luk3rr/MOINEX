@@ -14,4 +14,5 @@ data class MonthlyFlowDTO(
     val income: BigDecimal,
     val expense: BigDecimal,
     val net: BigDecimal,
+    val savingsRatePercentage: BigDecimal,
 )

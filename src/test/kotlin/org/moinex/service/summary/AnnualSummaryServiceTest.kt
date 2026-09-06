@@ -130,6 +130,11 @@ class AnnualSummaryServiceTest :
                     summary.monthlyFlows[1].net shouldBe BigDecimal("750.00")
                 }
 
+                Then("monthly savings rate is net over income for that month") {
+                    summary.monthlyFlows[0].savingsRatePercentage shouldBe BigDecimal("50.00")
+                    summary.monthlyFlows[1].savingsRatePercentage shouldBe BigDecimal("75.00")
+                }
+
                 Then("top expenses are ordered by amount descending") {
                     summary.topExpenses.first().amount shouldBe BigDecimal("300.00")
                 }

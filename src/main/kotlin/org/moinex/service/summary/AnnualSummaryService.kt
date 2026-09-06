@@ -170,6 +170,7 @@ class AnnualSummaryService(
                 income = income.setScale(2, RoundingMode.HALF_UP),
                 expense = expense.setScale(2, RoundingMode.HALF_UP),
                 net = (income - expense).setScale(2, RoundingMode.HALF_UP),
+                savingsRatePercentage = percentage(income - expense, income),
             )
         }
 

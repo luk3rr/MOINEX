@@ -157,3 +157,36 @@
 
 .money-flow-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #ef4444; }
 .money-flow-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #22c55e; }
+
+/* ============================================================
+   Savings rate trend
+   ============================================================ */
+
+/* series0 = actual savings rate, series1 = target */
+.savings-rate-chart .chart-series-line.series0 {
+    -fx-stroke: #3b82f6;
+    -fx-stroke-width: 2;
+}
+
+.savings-rate-chart .chart-series-line.series1 {
+    -fx-stroke: #9ca3af;
+    -fx-stroke-width: 2;
+    -fx-stroke-dash-array: 5 5;
+}
+
+.savings-rate-chart .chart-line-symbol.series0 {
+    -fx-background-color: #3b82f6, theme-chart-bg;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.savings-rate-chart .chart-line-symbol.series1 {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
+.savings-rate-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #3b82f6; }
+.savings-rate-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #9ca3af; }

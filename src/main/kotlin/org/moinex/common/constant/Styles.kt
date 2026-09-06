@@ -108,4 +108,7 @@ object Styles {
 
     // Money flow
     const val MONEY_FLOW_CHART_STYLE_CLASS = "money-flow-chart"
+
+    // Savings rate trend
+    const val SAVINGS_RATE_CHART_STYLE_CLASS = "savings-rate-chart"
 }
