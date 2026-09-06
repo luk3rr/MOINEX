@@ -69,6 +69,9 @@ class MainController(
     private lateinit var homeButton: Button
 
     @FXML
+    private lateinit var annualSummaryButton: Button
+
+    @FXML
     private lateinit var walletButton: Button
 
     @FXML
@@ -124,6 +127,7 @@ class MainController(
                 transactionButton,
                 goalsAndPlanButton,
                 savingsButton,
+                annualSummaryButton,
                 settingsButton,
             )
 
@@ -146,6 +150,11 @@ class MainController(
         homeButton.setOnAction {
             loadContent(Files.HOME_FXML, Files.HOME_STYLE_SHEET)
             updateSelectedButton(homeButton)
+        }
+
+        annualSummaryButton.setOnAction {
+            loadContent(Files.ANNUAL_SUMMARY_FXML, Files.ANNUAL_SUMMARY_STYLE_SHEET)
+            updateSelectedButton(annualSummaryButton)
         }
 
         walletButton.setOnAction {

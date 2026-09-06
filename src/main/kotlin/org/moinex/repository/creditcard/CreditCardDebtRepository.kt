@@ -102,4 +102,16 @@ interface CreditCardDebtRepository : JpaRepository<CreditCardDebt, Int> {
     fun findAllCreatedUpToDate(
         @Param("endDate") endDate: LocalDateTime,
     ): List<CreditCardDebt>
+
+    @Query(
+        "SELECT ccd " +
+            "FROM CreditCardDebt ccd " +
+            "WHERE ccd.date BETWEEN :startDate AND :endDate " +
+            "AND ccd.category.isArchived = false " +
+            "ORDER BY ccd.date ASC",
+    )
+    fun findAllByDateBetweenForAnalysis(
+        @Param("startDate") startDate: LocalDateTime,
+        @Param("endDate") endDate: LocalDateTime,
+    ): List<CreditCardDebt>
 }

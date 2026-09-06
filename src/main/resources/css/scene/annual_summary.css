@@ -1,0 +1,33 @@
+.summary-value {
+    -fx-font-weight: bold;
+}
+
+.insight {
+    -fx-padding: 8 10 8 10;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+.insight-positive {
+    -fx-background-color: rgba(76, 175, 80, 0.12);
+    -fx-border-color: rgba(76, 175, 80, 0.5);
+}
+
+.insight-warning {
+    -fx-background-color: rgba(244, 67, 54, 0.12);
+    -fx-border-color: rgba(244, 67, 54, 0.5);
+}
+
+.insight-neutral {
+    -fx-background-color: rgba(158, 158, 158, 0.12);
+    -fx-border-color: rgba(158, 158, 158, 0.5);
+}
+
+.insights-scroll {
+    -fx-background-color: transparent;
+}
+
+.insights-scroll > .viewport {
+    -fx-background-color: transparent;
+}

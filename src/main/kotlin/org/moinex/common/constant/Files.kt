@@ -127,6 +127,7 @@ object Files {
     // UI main package
     const val MAIN_FXML: String = UI_MAIN_PATH + "main.fxml"
     const val HOME_FXML: String = UI_MAIN_PATH + "home.fxml"
+    const val ANNUAL_SUMMARY_FXML: String = UI_MAIN_PATH + "annual_summary.fxml"
     const val WALLET_FXML: String = UI_MAIN_PATH + "wallet.fxml"
     const val CREDIT_CARD_FXML: String = UI_MAIN_PATH + "credit_card.fxml"
     const val TRANSACTION_FXML: String = UI_MAIN_PATH + "transaction.fxml"
@@ -181,6 +182,7 @@ object Files {
     // CSS
     const val MAIN_STYLE_SHEET: String = CSS_SCENE_PATH + "main.css"
     const val HOME_STYLE_SHEET: String = CSS_SCENE_PATH + "home.css"
+    const val ANNUAL_SUMMARY_STYLE_SHEET: String = CSS_SCENE_PATH + "annual_summary.css"
     const val WALLET_STYLE_SHEET: String = CSS_SCENE_PATH + "wallet.css"
     const val CREDIT_CARD_STYLE_SHEET: String = CSS_SCENE_PATH + "credit-card.css"
     const val TRANSACTION_STYLE_SHEET: String = CSS_SCENE_PATH + "transaction.css"

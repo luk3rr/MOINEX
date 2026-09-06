@@ -10,6 +10,7 @@
 package org.moinex.service
 
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.util.Locale
 import java.util.MissingResourceException
 import java.util.ResourceBundle
@@ -23,6 +24,8 @@ class PreferencesService {
         const val PREF_KEY_HIDE_MONETARY_VALUES = "ui.hideMonetaryValues"
         const val PREF_KEY_THEME = "ui.theme"
         const val PREF_KEY_DB_DIR = "db.directory"
+        const val PREF_KEY_SAVINGS_RATE_TARGET = "insights.savingsRateTarget"
+        const val DEFAULT_SAVINGS_RATE_TARGET = 20.0
         const val THEME_LIGHT = "light"
         const val THEME_DARK = "dark"
         const val BRAZILIAN_PORTUGUESE_TAG = "pt-BR"
@@ -56,6 +59,10 @@ class PreferencesService {
     var dbDirectory: String
         get() = preferences[PREF_KEY_DB_DIR, "${System.getProperty("user.home")}/.moinex/data"]
         set(value) = preferences.put(PREF_KEY_DB_DIR, value)
+
+    var savingsRateTarget: BigDecimal
+        get() = BigDecimal.valueOf(preferences.getDouble(PREF_KEY_SAVINGS_RATE_TARGET, DEFAULT_SAVINGS_RATE_TARGET))
+        set(value) = preferences.putDouble(PREF_KEY_SAVINGS_RATE_TARGET, value.toDouble())
 
     fun isDarkMode(): Boolean = theme == THEME_DARK
 

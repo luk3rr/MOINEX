@@ -122,6 +122,21 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </JFXButton>
+                  <JFXButton fx:id="annualSummaryButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" text="%main.annualSummary" wrapText="true">
+                     <graphic>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="colored-icon">
+                           <image>
+                              <Image url="@../../icon/sidebar/summary.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </JFXButton>
                   <VBox alignment="BOTTOM_LEFT" spacing="20.0" VBox.vgrow="ALWAYS">
                      <children>
                         <JFXButton fx:id="settingsButton" alignment="BASELINE_LEFT" contentDisplay="GRAPHIC_ONLY" graphicTextGap="15.0" onAction="#handleOpenSettings" text="%main.settings" wrapText="true">

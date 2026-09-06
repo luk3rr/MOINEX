@@ -612,6 +612,11 @@ class CreditCardService(
     fun getAllPaidPaymentsByMonth(yearMonth: YearMonth) =
         creditCardPaymentRepository.getAllPaidPaymentsByMonth(yearMonth.monthValue, yearMonth.year)
 
+    fun getDebtsBetweenForAnalysis(
+        startDate: LocalDateTime,
+        endDate: LocalDateTime,
+    ) = creditCardDebtRepository.findAllByDateBetweenForAnalysis(startDate, endDate)
+
     fun getAllCreditCardOperatorsOrderedByName() = creditCardOperatorRepository.findAllByOrderByNameAsc()
 
     fun getCreditCardCreditSuggestions() = creditCardCreditRepository.findSuggestions()

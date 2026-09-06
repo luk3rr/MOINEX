@@ -28,6 +28,14 @@
                </children>
             </HBox>
             <Label fx:id="restartRequiredLabel" text="%settings.database.restartRequired" visible="false" managed="false" style="-fx-text-fill: #e67e22;" />
+            <Separator prefWidth="520.0" />
+            <Label text="%settings.savingsRateTarget" />
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <children>
+                  <TextField fx:id="savingsRateTargetField" prefWidth="120.0" />
+                  <Label text="%settings.savingsRateTarget.hint" style="-fx-text-fill: #888888;" />
+               </children>
+            </HBox>
          </children>
       </VBox>
    </children>

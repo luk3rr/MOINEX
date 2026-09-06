@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.io.File
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.nio.file.StandardCopyOption
 import java.util.Locale
 import java.nio.file.Files as NioFiles
@@ -50,8 +52,13 @@ class SettingsController(
     @FXML
     private lateinit var restartRequiredLabel: Label
 
+    @FXML
+    private lateinit var savingsRateTargetField: TextField
+
     companion object {
         private val logger = LoggerFactory.getLogger(SettingsController::class.java)
+        private val MIN_SAVINGS_RATE_TARGET = BigDecimal.ZERO
+        private val MAX_SAVINGS_RATE_TARGET = BigDecimal(100)
     }
 
     @FXML
@@ -132,6 +139,27 @@ class SettingsController(
         }
 
         dbPathField.text = SpringApp.resolveDbPath()
+
+        savingsRateTargetField.text = preferencesService.savingsRateTarget.stripTrailingZeros().toPlainString()
+        savingsRateTargetField.setOnAction { commitSavingsRateTarget() }
+        savingsRateTargetField.focusedProperty().addListener { _, _, focused ->
+            if (!focused) commitSavingsRateTarget()
+        }
+    }
+
+    private fun commitSavingsRateTarget() {
+        val parsed =
+            savingsRateTargetField.text
+                .trim()
+                .replace(',', '.')
+                .toBigDecimalOrNull()
+        val target =
+            parsed
+                ?.setScale(2, RoundingMode.HALF_UP)
+                ?.coerceIn(MIN_SAVINGS_RATE_TARGET, MAX_SAVINGS_RATE_TARGET)
+                ?: preferencesService.savingsRateTarget
+        preferencesService.savingsRateTarget = target
+        savingsRateTargetField.text = target.stripTrailingZeros().toPlainString()
     }
 
     @FXML
