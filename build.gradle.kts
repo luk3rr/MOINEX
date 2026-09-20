@@ -50,6 +50,7 @@ dependencies {
 	// JavaFX
 	implementation(libs.org.openjfx.javafx.controls)
 	implementation(libs.org.openjfx.javafx.fxml)
+	implementation(libs.org.openjfx.javafx.web)
 	implementation(libs.com.jfoenix.jfoenix)
 
 	// Utilities
@@ -60,6 +61,8 @@ dependencies {
 	implementation(libs.net.objecthunter.exp4j)
 	implementation(libs.org.json.json)
 	implementation(libs.net.minidev.json.smart)
+	implementation(libs.org.commonmark.commonmark)
+	implementation(libs.org.commonmark.commonmark.ext.gfm.tables)
 
 	// Logging
 	implementation(libs.org.slf4j.slf4j.api)
@@ -91,7 +94,7 @@ dependencies {
 }
 
 group = "org.moinex.app"
-version = "2.14.0"
+version = "2.15.0"
 description = "Moinex"
 
 java {
@@ -103,7 +106,7 @@ javafx {
 	version =
 		libs.versions.org.openjfx.javafx.controls
 			.get()
-	modules = listOf("javafx.controls", "javafx.fxml")
+	modules = listOf("javafx.controls", "javafx.fxml", "javafx.web")
 }
 
 springBoot {

@@ -7,31 +7,33 @@
 package org.moinex.ui.main
 
 import com.jfoenix.controls.JFXButton
+import javafx.concurrent.Worker
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
-import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.scene.text.Font
-import javafx.scene.text.Text
+import javafx.scene.shape.Rectangle
+import javafx.scene.web.WebEngine
+import javafx.scene.web.WebView
 import org.moinex.ai.chat.AiChatService
 import org.moinex.ai.chat.ChatMessage
 import org.moinex.ai.chat.ChatRole
 import org.moinex.ai.chat.ChatTurnResult
+import org.moinex.ai.chat.EmojiRenderer
+import org.moinex.ai.chat.MarkdownRenderer
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
+import java.awt.Desktop
+import java.net.URI
 import java.text.MessageFormat
+import java.util.Base64
 
-/**
- * Read-only chat screen: the assistant can only answer analytical questions via
- * [org.moinex.ai.tools.QueryFinanceTool] - there is no action here that writes to the database.
- */
 @Controller
 class AiChatController(
     private val aiChatService: AiChatService,
@@ -57,17 +59,28 @@ class AiChatController(
     companion object {
         private val logger = LoggerFactory.getLogger(AiChatController::class.java)
         private const val BUBBLE_MAX_WIDTH = 480.0
-        private val BUBBLE_FONT: Font = Font.font(13.0)
-
-        // Approximate horizontal/vertical space TextArea's own padding/border takes beyond the
-        // wrapped text itself - used to size the control to fit its content without a scrollbar.
-        private const val BUBBLE_H_PADDING = 30.0
-        private const val BUBBLE_V_PADDING = 24.0
+        private const val MIN_BUBBLE_HEIGHT = 30.0
+        private const val MAX_BUBBLE_HEIGHT = 2000.0
+        private const val BUBBLE_CORNER_RADIUS = 28.0
 
         private const val STYLE_BUBBLE = "ai-chat-bubble"
         private const val STYLE_BUBBLE_USER = "ai-chat-bubble-user"
         private const val STYLE_BUBBLE_ASSISTANT = "ai-chat-bubble-assistant"
         private const val STYLE_BUBBLE_NOTICE = "ai-chat-bubble-notice"
+
+        private const val LIGHT_SIDEBAR_BG = "#1abc9c"
+        private const val LIGHT_TEXT_ON_DARK = "#ffffff"
+        private const val LIGHT_CARD_ALT_BG = "#f5f5f5"
+        private const val LIGHT_TEXT_PRIMARY = "#333333"
+        private const val LIGHT_WARNING_BG = "#fff3cd"
+        private const val LIGHT_WARNING_TEXT = "#856404"
+
+        private const val DARK_SIDEBAR_BG = "#0a614e"
+        private const val DARK_TEXT_ON_DARK = "#F8F8F2"
+        private const val DARK_CARD_ALT_BG = "#21222c"
+        private const val DARK_TEXT_PRIMARY = "#F8F8F2"
+        private const val DARK_WARNING_BG = "#282A36"
+        private const val DARK_WARNING_TEXT = "#FFB86C"
     }
 
     @FXML
@@ -124,7 +137,8 @@ class AiChatController(
         text: String,
     ) {
         val bubbleStyle = if (role == ChatRole.USER) STYLE_BUBBLE_USER else STYLE_BUBBLE_ASSISTANT
-        val bubble = createSelectableBubble(text, bubbleStyle)
+        val (background, textColor) = bubbleColors(bubbleStyle)
+        val bubble = createMarkdownBubble(text, background, textColor)
         val row =
             HBox(bubble).apply {
                 alignment = if (role == ChatRole.USER) Pos.CENTER_RIGHT else Pos.CENTER_LEFT
@@ -134,39 +148,176 @@ class AiChatController(
     }
 
     private fun appendNotice(text: String) {
-        val bubble = createSelectableBubble(text, STYLE_BUBBLE_NOTICE)
+        val (background, textColor) = bubbleColors(STYLE_BUBBLE_NOTICE)
+        val bubble = createMarkdownBubble(text, background, textColor)
         messagesContainer.children.add(HBox(bubble).apply { alignment = Pos.CENTER })
         scrollToBottom()
     }
 
-    /**
-     * A read-only, non-editable [TextArea] instead of a [Label] - JavaFX labels don't support
-     * text selection/copy, which chat messages need (e.g. to copy a figure the assistant quoted).
-     * Height is computed from a same-font/same-width [Text] measurement so the bubble hugs its
-     * content instead of showing an internal scrollbar.
-     */
-    private fun createSelectableBubble(
-        text: String,
-        styleClass: String,
-    ): TextArea {
-        val measured =
-            Text(text).apply {
-                font = BUBBLE_FONT
-                wrappingWidth = BUBBLE_MAX_WIDTH - BUBBLE_H_PADDING
-            }
-        val height = measured.layoutBounds.height + BUBBLE_V_PADDING
-
-        return TextArea(text).apply {
-            isEditable = false
-            isWrapText = true
-            font = BUBBLE_FONT
-            prefWidth = BUBBLE_MAX_WIDTH
-            maxWidth = BUBBLE_MAX_WIDTH
-            prefHeight = height
-            minHeight = height
-            maxHeight = height
-            this.styleClass.addAll(STYLE_BUBBLE, styleClass)
+    private fun bubbleColors(styleClass: String): Pair<String, String> {
+        val isDark = preferencesService.isDarkMode()
+        return when (styleClass) {
+            STYLE_BUBBLE_USER ->
+                if (isDark) {
+                    DARK_SIDEBAR_BG to DARK_TEXT_ON_DARK
+                } else {
+                    LIGHT_SIDEBAR_BG to
+                        LIGHT_TEXT_ON_DARK
+                }
+            STYLE_BUBBLE_NOTICE ->
+                if (isDark) {
+                    DARK_WARNING_BG to DARK_WARNING_TEXT
+                } else {
+                    LIGHT_WARNING_BG to
+                        LIGHT_WARNING_TEXT
+                }
+            else -> if (isDark) DARK_CARD_ALT_BG to DARK_TEXT_PRIMARY else LIGHT_CARD_ALT_BG to LIGHT_TEXT_PRIMARY
         }
+    }
+
+    private fun createMarkdownBubble(
+        markdown: String,
+        background: String,
+        textColor: String,
+    ): WebView {
+        val html = buildBubbleHtml(markdown, background, textColor)
+
+        val webView =
+            WebView().apply {
+                prefWidth = BUBBLE_MAX_WIDTH
+                maxWidth = BUBBLE_MAX_WIDTH
+                minHeight = MIN_BUBBLE_HEIGHT
+                prefHeight = MIN_BUBBLE_HEIGHT
+                styleClass.add(STYLE_BUBBLE)
+            }
+
+        var linkHandlingAttached = false
+
+        webView.engine.loadWorker.stateProperty().addListener { _, oldState, newState ->
+            logger.info("Chat bubble WebView load state: {} -> {}", oldState, newState)
+
+            when (newState) {
+                Worker.State.SUCCEEDED -> {
+                    resizeToContent(webView)
+                    if (!linkHandlingAttached) {
+                        linkHandlingAttached = true
+                        configureLinkHandling(webView.engine, html)
+                    }
+                }
+                Worker.State.FAILED ->
+                    logger.warn("Chat bubble WebView failed to load", webView.engine.loadWorker.exception)
+                else -> Unit
+            }
+        }
+        loadHtml(webView.engine, html)
+
+        return webView
+    }
+
+    private fun loadHtml(
+        engine: WebEngine,
+        html: String,
+    ) {
+        val base64 = Base64.getEncoder().encodeToString(html.toByteArray(Charsets.UTF_8))
+        engine.load("data:text/html;charset=utf-8;base64,$base64")
+    }
+
+    private fun resizeToContent(webView: WebView) {
+        val measured = runCatching { webView.engine.executeScript("document.documentElement.scrollHeight") }
+        measured.onFailure { logger.warn("Failed to measure chat bubble content height: {}", it.message) }
+        val rawHeight = (measured.getOrNull() as? Number)?.toDouble() ?: MIN_BUBBLE_HEIGHT
+        val height = rawHeight.coerceIn(MIN_BUBBLE_HEIGHT, MAX_BUBBLE_HEIGHT)
+        logger.info("Chat bubble measured height: raw={}, clamped={}", rawHeight, height)
+
+        webView.prefHeight = height
+        webView.minHeight = height
+        webView.maxHeight = height
+        webView.clip =
+            Rectangle(BUBBLE_MAX_WIDTH, height).apply {
+                arcWidth = BUBBLE_CORNER_RADIUS
+                arcHeight = BUBBLE_CORNER_RADIUS
+            }
+        scrollToBottom()
+    }
+
+    private fun configureLinkHandling(
+        engine: WebEngine,
+        originalHtml: String,
+    ) {
+        engine.locationProperty().addListener { _, _, newLocation ->
+            if (newLocation.isNullOrBlank() || newLocation.startsWith("data:")) return@addListener
+
+            if (newLocation.startsWith("http://") || newLocation.startsWith("https://")) {
+                runCatching { Desktop.getDesktop().browse(URI(newLocation)) }
+                    .onFailure { logger.warn("Failed to open link in the system browser: {}", it.message) }
+            }
+
+            FxUtils.launchOnFxThread { loadHtml(engine, originalHtml) }
+        }
+    }
+
+    private fun buildBubbleHtml(
+        markdown: String,
+        background: String,
+        textColor: String,
+    ): String {
+        val bodyHtml = EmojiRenderer.replaceEmojiWithImages(MarkdownRenderer.toHtmlFragment(markdown))
+
+        return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <style>
+              html, body {
+                margin: 0;
+                padding: 0;
+                background: $background;
+                color: $textColor;
+                font-family:
+                  -apple-system, "Segoe UI", Roboto, "Noto Sans",
+                  "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Noto Emoji",
+                  sans-serif;
+                font-size: 13px;
+                line-height: 1.45;
+                word-wrap: break-word;
+              }
+              body {
+                box-sizing: border-box;
+                width: ${BUBBLE_MAX_WIDTH.toInt()}px;
+                padding: 10px 14px;
+              }
+              p { margin: 0 0 8px 0; }
+              p:last-child { margin-bottom: 0; }
+              h1, h2, h3 { margin: 8px 0 6px 0; font-size: 1.15em; }
+              ul, ol { margin: 4px 0 8px 20px; padding: 0; }
+              table {
+                border-collapse: collapse;
+                margin: 4px 0 8px 0;
+                font-size: 0.95em;
+                max-width: 100%;
+              }
+              th, td {
+                border: 1px solid rgba(127, 127, 127, 0.35);
+                padding: 4px 8px;
+                text-align: left;
+              }
+              th { background: rgba(127, 127, 127, 0.18); font-weight: 700; }
+              code {
+                font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+                background: rgba(127, 127, 127, 0.18);
+                padding: 1px 4px;
+                border-radius: 3px;
+              }
+              pre { background: rgba(127, 127, 127, 0.18); padding: 8px; border-radius: 6px; overflow-x: auto; }
+              pre code { background: none; padding: 0; }
+              a { color: inherit; }
+              strong { font-weight: 700; }
+            </style>
+            </head>
+            <body>$bodyHtml</body>
+            </html>
+            """.trimIndent()
     }
 
     private fun scrollToBottom() {

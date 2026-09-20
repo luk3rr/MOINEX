@@ -1,0 +1,12 @@
+MOINEX bundles the following third-party assets:
+
+Twemoji
+-------
+Location: src/main/resources/emoji/
+Source: https://github.com/jdecked/twemoji
+Copyright 2020 Twitter, Inc and other contributors
+Licensed under CC-BY 4.0: https://creativecommons.org/licenses/by/4.0/
+
+The full Twemoji SVG set is included (assets/svg from the upstream repository,
+~4000 icons, ~19MB), used by the AI chat assistant to render emoji as images
+since JavaFX WebView does not support color emoji font glyphs.
