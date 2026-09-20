@@ -141,6 +141,7 @@ object Files {
     const val SAVINGS_BONDS_FXML: String = UI_MAIN_PATH + "savings_bonds.fxml"
     const val WISHLIST_FXML: String = UI_MAIN_PATH + "wishlist.fxml"
     const val CSV_IMPORT_FXML: String = UI_MAIN_PATH + "csv_import.fxml"
+    const val AI_CHAT_FXML: String = UI_MAIN_PATH + "ai_chat.fxml"
     const val SETTINGS_FXML: String = UI_MAIN_PATH + "settings.fxml"
     const val SPLASH_SCREEN_FXML: String = UI_MAIN_PATH + ("splash_screen." + "fxml")
 
@@ -196,6 +197,7 @@ object Files {
     const val SAVINGS_BONDS_STYLE_SHEET: String = CSS_SCENE_PATH + "savings.css"
     const val WISHLIST_STYLE_SHEET: String = CSS_SCENE_PATH + "wishlist.css"
     const val CSV_IMPORT_STYLE_SHEET: String = CSS_SCENE_PATH + "csv_import.css"
+    const val AI_CHAT_STYLE_SHEET: String = CSS_SCENE_PATH + "ai_chat.css"
     const val SETTINGS_STYLE_SHEET: String = CSS_SCENE_PATH + "settings.css"
     const val CHARTS_COLORS_STYLE_SHEET: String = CSS_COMPONENT_PATH + "charts.css"
 

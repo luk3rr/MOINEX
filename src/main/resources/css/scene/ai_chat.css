@@ -1,0 +1,93 @@
+/*
+ * Filename: ai_chat.css
+ * Created on: September 20, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
+.ai-chat-title {
+  -fx-font-size: 20px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-title;
+}
+
+.ai-chat-disclaimer {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-badge-warning-text;
+  -fx-background-color: theme-badge-warning-bg;
+  -fx-background-radius: 8px;
+  -fx-padding: 6px 10px;
+}
+
+.ai-chat-scroll {
+  -fx-background-color: transparent;
+  -fx-background: transparent;
+}
+
+.ai-chat-messages {
+  -fx-background-color: transparent;
+}
+
+/*
+ * Chat bubbles are TextAreas (read-only, non-editable), not Labels, so message text can be
+ * selected and copied. These rules strip away the default TextArea chrome (border, scrollbar,
+ * inner scroll-pane background) so it still reads as a plain bubble.
+ */
+.ai-chat-bubble {
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-font-size: 13px;
+}
+
+.ai-chat-bubble .content {
+  -fx-background-radius: 14px;
+  -fx-background-insets: 0;
+  -fx-padding: 10px 14px;
+}
+
+.ai-chat-bubble .scroll-pane,
+.ai-chat-bubble .scroll-pane .viewport {
+  -fx-background-color: transparent;
+}
+
+.ai-chat-bubble .scroll-bar:vertical,
+.ai-chat-bubble .scroll-bar:horizontal {
+  -fx-opacity: 0;
+  -fx-pref-width: 0;
+  -fx-pref-height: 0;
+}
+
+.ai-chat-bubble-user {
+  -fx-text-fill: theme-text-on-dark;
+  -fx-highlight-fill: theme-bg-sidebar-hover;
+}
+
+.ai-chat-bubble-user .content {
+  -fx-background-color: theme-bg-sidebar;
+}
+
+.ai-chat-bubble-assistant {
+  -fx-text-fill: theme-text-primary;
+}
+
+.ai-chat-bubble-assistant .content {
+  -fx-background-color: theme-bg-card-alt;
+}
+
+.ai-chat-bubble-notice {
+  -fx-text-fill: theme-badge-warning-text;
+}
+
+.ai-chat-bubble-notice .content {
+  -fx-background-color: theme-badge-warning-bg;
+}
+
+.ai-chat-thinking {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-text-faint;
+}
+
+.ai-chat-send-button {
+  -fx-background-color: theme-bg-sidebar;
+  -fx-text-fill: theme-text-on-dark;
+  -fx-font-weight: bold;
+}

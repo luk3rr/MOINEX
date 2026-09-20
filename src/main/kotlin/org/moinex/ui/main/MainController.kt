@@ -72,6 +72,9 @@ class MainController(
     private lateinit var annualSummaryButton: Button
 
     @FXML
+    private lateinit var aiChatButton: Button
+
+    @FXML
     private lateinit var walletButton: Button
 
     @FXML
@@ -128,6 +131,7 @@ class MainController(
                 goalsAndPlanButton,
                 savingsButton,
                 annualSummaryButton,
+                aiChatButton,
                 settingsButton,
             )
 
@@ -180,6 +184,11 @@ class MainController(
         savingsButton.setOnAction {
             loadContent(Files.SAVINGS_FXML, Files.SAVINGS_STYLE_SHEET)
             updateSelectedButton(savingsButton)
+        }
+
+        aiChatButton.setOnAction {
+            loadContent(Files.AI_CHAT_FXML, Files.AI_CHAT_STYLE_SHEET)
+            updateSelectedButton(aiChatButton)
         }
 
         settingsButton.setOnAction {

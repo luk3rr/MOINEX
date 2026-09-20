@@ -3,3 +3,27 @@
  * Created on: October 24, 2024
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
+
+.ai-disclaimer {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-badge-warning-text;
+  -fx-background-color: theme-badge-warning-bg;
+  -fx-background-radius: 8px;
+  -fx-padding: 6px 10px;
+}
+
+.ai-key-status {
+  -fx-font-weight: bold;
+  -fx-padding: 2px 8px;
+  -fx-background-radius: 10px;
+}
+
+.ai-key-status-configured {
+  -fx-text-fill: theme-positive;
+  -fx-background-color: theme-badge-success-bg;
+}
+
+.ai-key-status-missing {
+  -fx-text-fill: theme-negative;
+  -fx-background-color: theme-badge-warning-bg;
+}

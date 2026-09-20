@@ -17,6 +17,7 @@ object TranslationKeys {
     const val MAIN_CALCULATOR: String = "main.calculator"
     const val MAIN_NOTIFICATIONS: String = "main.notifications"
     const val MAIN_ANNUAL_SUMMARY: String = "main.annualSummary"
+    const val MAIN_AI_CHAT: String = "main.aiChat"
 
     // Annual Summary screen
     const val ANNUAL_SUMMARY_TITLE: String = "annualSummary.title"
@@ -96,6 +97,22 @@ object TranslationKeys {
     const val SETTINGS_DATABASE_COPY_FAILED: String = "settings.database.copyFailed"
     const val SETTINGS_SAVINGS_RATE_TARGET: String = "settings.savingsRateTarget"
     const val SETTINGS_SAVINGS_RATE_TARGET_HINT: String = "settings.savingsRateTarget.hint"
+
+    // Settings - AI assistant (BYOK)
+    const val SETTINGS_AI_SECTION_TITLE: String = "settings.ai.sectionTitle"
+    const val SETTINGS_AI_PROVIDER: String = "settings.ai.provider"
+    const val SETTINGS_AI_API_KEY: String = "settings.ai.apiKey"
+    const val SETTINGS_AI_MODEL: String = "settings.ai.model"
+    const val SETTINGS_AI_MODEL_HINT: String = "settings.ai.model.hint"
+    const val SETTINGS_AI_TEST_CONNECTION: String = "settings.ai.testConnection"
+    const val SETTINGS_AI_TEST_CONNECTION_SUCCESS: String = "settings.ai.testConnection.success"
+    const val SETTINGS_AI_TEST_CONNECTION_ERROR: String = "settings.ai.testConnection.error"
+    const val SETTINGS_AI_SAVE: String = "settings.ai.save"
+    const val SETTINGS_AI_SAVE_SUCCESS: String = "settings.ai.save.success"
+    const val SETTINGS_AI_CLEAR: String = "settings.ai.clear"
+    const val SETTINGS_AI_DISCLAIMER: String = "settings.ai.disclaimer"
+    const val SETTINGS_AI_NO_KEY_CONFIGURED: String = "settings.ai.noKeyConfigured"
+    const val SETTINGS_AI_KEY_CONFIGURED: String = "settings.ai.keyConfigured"
 
     // Startup
     const val STARTUP_DB_INACCESSIBLE_HEADER: String = "startup.db.inaccessible.header"
@@ -2006,4 +2023,23 @@ object TranslationKeys {
     const val NOTIFICATION_RECURRING_PROCESSED_MESSAGE: String = "notification.recurringProcessed.message"
     const val NOTIFICATION_RECURRING_CC_PROCESSED_TITLE: String = "notification.recurringCcProcessed.title"
     const val NOTIFICATION_RECURRING_CC_PROCESSED_MESSAGE: String = "notification.recurringCcProcessed.message"
+
+    // AI chat
+    const val AI_CHAT_TITLE: String = "aichat.title"
+    const val AI_CHAT_INPUT_PLACEHOLDER: String = "aichat.input.placeholder"
+    const val AI_CHAT_SEND: String = "aichat.send"
+    const val AI_CHAT_DISCLAIMER: String = "aichat.disclaimer"
+    const val AI_CHAT_NO_PROVIDER_CONFIGURED: String = "aichat.noProviderConfigured"
+    const val AI_CHAT_THINKING: String = "aichat.thinking"
+    const val AI_CHAT_ERROR: String = "aichat.error"
+    const val AI_CHAT_YOU: String = "aichat.you"
+    const val AI_CHAT_ASSISTANT: String = "aichat.assistant"
+    const val AI_CHAT_SERVICE_UNKNOWN_ERROR: String = "aichat.service.unknownError"
+    const val AI_CHAT_SERVICE_TOOL_LIMIT_EXCEEDED: String = "aichat.service.toolLimitExceeded"
+
+    // AI tools (sent to the LLM as function descriptions - must follow the app's UI language too)
+    const val AI_TOOL_NET_WORTH_DESCRIPTION: String = "aitool.netWorth.description"
+    const val AI_TOOL_NET_WORTH_MONTH_PARAM: String = "aitool.netWorth.monthParam"
+    const val AI_TOOL_SPENDING_DESCRIPTION: String = "aitool.spendingByCategory.description"
+    const val AI_TOOL_SPENDING_MONTH_PARAM: String = "aitool.spendingByCategory.monthParam"
 }

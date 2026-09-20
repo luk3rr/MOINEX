@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.main.AiChatController">
+   <children>
+      <VBox spacing="10.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <padding>
+            <Insets top="20.0" right="30.0" bottom="20.0" left="30.0" />
+         </padding>
+         <children>
+            <Label text="%aichat.title" styleClass="ai-chat-title" />
+            <Label text="%aichat.disclaimer" wrapText="true" styleClass="ai-chat-disclaimer" />
+            <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="ai-chat-scroll">
+               <content>
+                  <VBox fx:id="messagesContainer" spacing="12.0" styleClass="ai-chat-messages">
+                     <padding>
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </ScrollPane>
+            <Label fx:id="thinkingLabel" text="%aichat.thinking" styleClass="ai-chat-thinking" />
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <children>
+                  <TextField fx:id="inputField" promptText="%aichat.input.placeholder" HBox.hgrow="ALWAYS" />
+                  <JFXButton fx:id="sendButton" text="%aichat.send" onAction="#handleSend" styleClass="ai-chat-send-button" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
