@@ -63,6 +63,7 @@ dependencies {
 	implementation(libs.net.minidev.json.smart)
 	implementation(libs.org.commonmark.commonmark)
 	implementation(libs.org.commonmark.commonmark.ext.gfm.tables)
+	implementation(libs.org.apache.pdfbox.pdfbox)
 
 	// Logging
 	implementation(libs.org.slf4j.slf4j.api)
@@ -94,7 +95,7 @@ dependencies {
 }
 
 group = "org.moinex.app"
-version = "2.15.0"
+version = "2.14.0"
 description = "Moinex"
 
 java {

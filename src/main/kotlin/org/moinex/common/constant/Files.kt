@@ -18,6 +18,10 @@ object Files {
     const val UI_MAIN_PATH: String = "/ui/main/"
     const val UI_DIALOG_PATH: String = "/ui/dialog/"
     const val UI_DIALOG_CREDITCARD_PATH: String = UI_DIALOG_PATH + "creditcard/"
+    const val UI_DIALOG_AI_PATH: String = UI_DIALOG_PATH + "ai/"
+
+    // UI ai package
+    const val TRANSACTION_REVIEW_FXML: String = UI_DIALOG_AI_PATH + "transaction_review.fxml"
 
     // UI creditcard package
     const val ADD_CREDIT_CARD_DEBT_FXML: String = UI_DIALOG_CREDITCARD_PATH + "add_credit_card_debt.fxml"

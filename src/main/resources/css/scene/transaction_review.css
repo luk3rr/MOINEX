@@ -1,0 +1,19 @@
+/*
+ * Filename: transaction_review.css
+ * Created on: September 20, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ */
+
+.ai-review-title {
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-text-fill: theme-text-title;
+}
+
+.ai-review-row-duplicate {
+  -fx-background-color: theme-badge-warning-bg;
+}
+
+.ai-review-row-low-confidence {
+  -fx-background-color: theme-badge-neutral-bg;
+}

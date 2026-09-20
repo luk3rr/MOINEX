@@ -723,6 +723,16 @@ class CreditCardService(
         }
     }
 
+    fun isInvoicePaid(
+        creditCardId: Int,
+        yearMonth: YearMonth,
+    ): Boolean {
+        val pendingPayments =
+            creditCardPaymentRepository.getPendingCreditCardPayments(creditCardId, yearMonth.monthValue, yearMonth.year)
+
+        return pendingPayments.sumOf { it.remainingAmount() } <= BigDecimal.ZERO
+    }
+
     fun getEarliestPaymentDate(): LocalDateTime =
         creditCardPaymentRepository.findEarliestPaymentDate() ?: clockProvider.now()
 

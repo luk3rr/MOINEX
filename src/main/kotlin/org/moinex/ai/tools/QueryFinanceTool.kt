@@ -6,6 +6,7 @@
 
 package org.moinex.ai.tools
 
+import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
@@ -16,6 +17,7 @@ import org.moinex.service.networth.NetWorthService
 import org.moinex.service.wallet.WalletService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.YearMonth
 
 /**
@@ -28,7 +30,13 @@ class QueryFinanceTool(
     private val netWorthService: NetWorthService,
     private val preferencesService: PreferencesService,
 ) {
-    fun availableTools(): List<LlmTool> = listOf(GetNetWorthTool(), GetSpendingByCategoryTool())
+    fun availableTools(): List<LlmTool> =
+        listOf(
+            GetNetWorthTool(),
+            GetSpendingByCategoryTool(),
+            GetTransactionsInPeriodTool(),
+            GetCreditCardInvoicePaymentStatusTool(),
+        )
 
     private fun monthParamSchema(monthDescriptionKey: String): String =
         JSONObject()
@@ -108,6 +116,128 @@ class QueryFinanceTool(
                     )
                     put("total", byCategory.values.fold(BigDecimal.ZERO, BigDecimal::add))
                 }.toString()
+        }
+    }
+
+    private inner class GetTransactionsInPeriodTool : LlmTool {
+        override val name = "get_transactions_in_period"
+        override val description =
+            preferencesService.translate(TranslationKeys.AI_TOOL_TRANSACTIONS_IN_PERIOD_DESCRIPTION)
+        override val jsonSchema =
+            JSONObject()
+                .put("type", "object")
+                .put(
+                    "properties",
+                    JSONObject()
+                        .put(
+                            "startDate",
+                            JSONObject()
+                                .put("type", "string")
+                                .put(
+                                    "description",
+                                    preferencesService.translate(TranslationKeys.AI_TOOL_TRANSACTIONS_START_PARAM),
+                                ),
+                        ).put(
+                            "endDate",
+                            JSONObject()
+                                .put("type", "string")
+                                .put(
+                                    "description",
+                                    preferencesService.translate(TranslationKeys.AI_TOOL_TRANSACTIONS_END_PARAM),
+                                ),
+                        ),
+                ).put("required", JSONArray(listOf("startDate", "endDate")))
+                .toString()
+
+        override fun execute(argumentsJson: String): String {
+            val json = JSONObject(argumentsJson)
+            val start =
+                runCatching { LocalDate.parse(json.getString("startDate")) }.getOrNull()
+                    ?: return errorResult("invalid_period")
+            val end =
+                runCatching { LocalDate.parse(json.getString("endDate")) }.getOrNull()
+                    ?: return errorResult("invalid_period")
+
+            val walletTransactions =
+                walletService.getAllNonArchivedWalletTransactionsBetweenDates(start.atStartOfDay(), end.atEndOfDay())
+            val creditCardDebts = creditCardService.getDebtsBetweenForAnalysis(start.atStartOfDay(), end.atEndOfDay())
+
+            val walletJson =
+                JSONArray(
+                    walletTransactions.map { t ->
+                        JSONObject()
+                            .put("date", t.date.toLocalDate().toString())
+                            .put("amount", t.amount)
+                            .put("description", t.description.orEmpty())
+                            .put("category", t.category.name)
+                            .put("type", t.type.name.lowercase())
+                    },
+                )
+            val creditCardJson =
+                JSONArray(
+                    creditCardDebts.map { d ->
+                        JSONObject()
+                            .put("date", d.date.toLocalDate().toString())
+                            .put("amount", d.amount)
+                            .put("description", d.description.orEmpty())
+                            .put("category", d.category.name)
+                            .put("creditCard", d.creditCard.name)
+                    },
+                )
+
+            return JSONObject()
+                .put("walletTransactions", walletJson)
+                .put("creditCardDebts", creditCardJson)
+                .toString()
+        }
+    }
+
+    private inner class GetCreditCardInvoicePaymentStatusTool : LlmTool {
+        override val name = "get_credit_card_invoice_payment_status"
+        override val description = preferencesService.translate(TranslationKeys.AI_TOOL_INVOICE_STATUS_DESCRIPTION)
+        override val jsonSchema =
+            JSONObject()
+                .put("type", "object")
+                .put(
+                    "properties",
+                    JSONObject()
+                        .put(
+                            "creditCardName",
+                            JSONObject()
+                                .put("type", "string")
+                                .put(
+                                    "description",
+                                    preferencesService.translate(TranslationKeys.AI_TOOL_INVOICE_STATUS_CARD_PARAM),
+                                ),
+                        ).put(
+                            "month",
+                            JSONObject()
+                                .put("type", "string")
+                                .put(
+                                    "description",
+                                    preferencesService.translate(TranslationKeys.AI_TOOL_INVOICE_STATUS_MONTH_PARAM),
+                                ),
+                        ),
+                ).put("required", JSONArray(listOf("creditCardName", "month")))
+                .toString()
+
+        override fun execute(argumentsJson: String): String {
+            val json = JSONObject(argumentsJson)
+            val cardName = json.optString("creditCardName", "")
+            val month =
+                runCatching { YearMonth.parse(json.optString("month", "")) }.getOrNull()
+                    ?: return errorResult("invalid_month")
+            val card =
+                creditCardService
+                    .getAllNonArchivedCreditCardsOrderedByName()
+                    .firstOrNull { it.name.equals(cardName, ignoreCase = true) }
+                    ?: return errorResult("credit_card_not_found")
+
+            return JSONObject()
+                .put("creditCardName", card.name)
+                .put("month", month.toString())
+                .put("paid", creditCardService.isInvoicePaid(card.id!!, month))
+                .toString()
         }
     }
 

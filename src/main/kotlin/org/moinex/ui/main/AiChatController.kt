@@ -18,16 +18,23 @@ import javafx.scene.layout.VBox
 import javafx.scene.shape.Rectangle
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
+import javafx.stage.FileChooser
 import org.moinex.ai.chat.AiChatService
 import org.moinex.ai.chat.ChatMessage
 import org.moinex.ai.chat.ChatRole
 import org.moinex.ai.chat.ChatTurnResult
 import org.moinex.ai.chat.EmojiRenderer
 import org.moinex.ai.chat.MarkdownRenderer
+import org.moinex.ai.ingest.StatementIngestService
+import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
+import org.moinex.common.util.WindowUtils
+import org.moinex.model.dto.ai.ExtractedTransactionDTO
 import org.moinex.service.PreferencesService
+import org.moinex.ui.dialog.ai.TransactionReviewController
 import org.slf4j.LoggerFactory
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.awt.Desktop
 import java.net.URI
@@ -37,7 +44,9 @@ import java.util.Base64
 @Controller
 class AiChatController(
     private val aiChatService: AiChatService,
+    private val statementIngestService: StatementIngestService,
     private val preferencesService: PreferencesService,
+    private val springContext: ConfigurableApplicationContext,
 ) {
     @FXML
     private lateinit var messagesScrollPane: ScrollPane
@@ -52,9 +61,25 @@ class AiChatController(
     private lateinit var sendButton: JFXButton
 
     @FXML
+    private lateinit var attachButton: JFXButton
+
+    @FXML
+    private lateinit var attachmentChip: HBox
+
+    @FXML
+    private lateinit var attachmentLabel: Label
+
+    @FXML
     private lateinit var thinkingLabel: Label
 
     private val history = mutableListOf<ChatMessage>()
+    private val pendingReviews = mutableListOf<List<ExtractedTransactionDTO>>()
+    private var pendingAttachment: PendingAttachment? = null
+
+    private data class PendingAttachment(
+        val fileName: String,
+        val extractedText: String,
+    )
 
     companion object {
         private val logger = LoggerFactory.getLogger(AiChatController::class.java)
@@ -67,6 +92,7 @@ class AiChatController(
         private const val STYLE_BUBBLE_USER = "ai-chat-bubble-user"
         private const val STYLE_BUBBLE_ASSISTANT = "ai-chat-bubble-assistant"
         private const val STYLE_BUBBLE_NOTICE = "ai-chat-bubble-notice"
+        private const val STYLE_ATTACH_BUTTON = "ai-chat-attach-button"
 
         private const val LIGHT_SIDEBAR_BG = "#1abc9c"
         private const val LIGHT_TEXT_ON_DARK = "#ffffff"
@@ -87,23 +113,103 @@ class AiChatController(
     fun initialize() {
         setBusy(false)
         inputField.setOnAction { handleSend() }
-        history.forEach { message -> appendBubble(message.role, message.content) }
+        history.forEach { message -> appendBubble(message.role, message.displayText ?: message.content) }
+        pendingReviews.forEach { renderReviewButton(it) }
+        pendingAttachment?.let { setAttachment(it.fileName, it.extractedText) }
     }
 
     @FXML
     fun handleSend() {
         val text = inputField.text?.trim().orEmpty()
-        if (text.isBlank()) return
+        val attachment = pendingAttachment
+        if (text.isBlank() && attachment == null) return
 
-        appendBubble(ChatRole.USER, text)
-        history.add(ChatMessage(role = ChatRole.USER, content = text))
+        val messageContent =
+            if (attachment != null) {
+                aiChatService.buildAttachmentMessage(
+                    attachment.fileName,
+                    attachment.extractedText,
+                    text.ifBlank { null },
+                )
+            } else {
+                text
+            }
+        val bubbleText =
+            when {
+                attachment != null && text.isNotBlank() -> "$text\n\n📎 ${attachment.fileName}"
+                attachment != null -> "📎 ${attachment.fileName}"
+                else -> text
+            }
+
+        appendBubble(ChatRole.USER, bubbleText)
+        history.add(ChatMessage(role = ChatRole.USER, content = messageContent, displayText = bubbleText))
         inputField.clear()
+        clearAttachment()
         setBusy(true)
 
         FxUtils.launchBackgroundThenUI(
             background = { aiChatService.sendMessage(history.toList()) },
             onUI = { result -> handleResult(result) },
         )
+    }
+
+    @FXML
+    fun handleAttach() {
+        val chooser =
+            FileChooser().apply {
+                extensionFilters.add(
+                    FileChooser.ExtensionFilter(
+                        preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_FILE_FILTER),
+                        listOf("*.csv", "*.pdf"),
+                    ),
+                )
+            }
+        val file = chooser.showOpenDialog(attachButton.scene.window) ?: return
+
+        setAttaching(true)
+
+        FxUtils.launchBackgroundThenUI(
+            background = { runCatching { statementIngestService.extractText(file.toPath()) } },
+            onUI = { result ->
+                setAttaching(false)
+                result.fold(
+                    onSuccess = { extractedText -> setAttachment(file.name, extractedText) },
+                    onFailure = { e ->
+                        appendNotice(
+                            MessageFormat.format(
+                                preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_ERROR),
+                                e.message,
+                            ),
+                        )
+                    },
+                )
+            },
+        )
+    }
+
+    @FXML
+    fun handleRemoveAttachment() {
+        clearAttachment()
+    }
+
+    private fun setAttachment(
+        fileName: String,
+        extractedText: String,
+    ) {
+        pendingAttachment = PendingAttachment(fileName, extractedText)
+        attachmentLabel.text = "📎 $fileName"
+        attachmentChip.isVisible = true
+        attachmentChip.isManaged = true
+    }
+
+    private fun clearAttachment() {
+        pendingAttachment = null
+        attachmentChip.isVisible = false
+        attachmentChip.isManaged = false
+    }
+
+    private fun setAttaching(attaching: Boolean) {
+        attachButton.isDisable = attaching
     }
 
     private fun handleResult(result: ChatTurnResult) {
@@ -114,6 +220,11 @@ class AiChatController(
                 history.add(ChatMessage(role = ChatRole.ASSISTANT, content = result.reply))
                 appendBubble(ChatRole.ASSISTANT, result.reply)
             }
+            is ChatTurnResult.TransactionsProposed -> {
+                history.add(ChatMessage(role = ChatRole.ASSISTANT, content = result.reply))
+                if (result.reply.isNotBlank()) appendBubble(ChatRole.ASSISTANT, result.reply)
+                appendReviewButton(result.transactions)
+            }
             is ChatTurnResult.NoProviderConfigured ->
                 appendNotice(preferencesService.translate(TranslationKeys.AI_CHAT_NO_PROVIDER_CONFIGURED))
             is ChatTurnResult.Error -> {
@@ -123,6 +234,37 @@ class AiChatController(
                 )
             }
         }
+    }
+
+    private fun appendReviewButton(transactions: List<ExtractedTransactionDTO>) {
+        pendingReviews.add(transactions)
+        renderReviewButton(transactions)
+    }
+
+    private fun renderReviewButton(transactions: List<ExtractedTransactionDTO>) {
+        val button =
+            JFXButton(
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.AI_CHAT_REVIEW_BUTTON),
+                    transactions.size,
+                ),
+            ).apply {
+                styleClass.add(STYLE_ATTACH_BUTTON)
+                setOnAction { openTransactionReview(transactions) }
+            }
+        messagesContainer.children.add(HBox(button).apply { alignment = Pos.CENTER_LEFT })
+        scrollToBottom()
+    }
+
+    private fun openTransactionReview(transactions: List<ExtractedTransactionDTO>) {
+        WindowUtils.openModalWindow(
+            Files.TRANSACTION_REVIEW_FXML,
+            preferencesService.translate(TranslationKeys.AI_REVIEW_TITLE),
+            springContext,
+            { controller: TransactionReviewController -> controller.setProposedTransactions(transactions) },
+            emptyList(),
+            preferencesService.bundle,
+        )
     }
 
     private fun setBusy(busy: Boolean) {

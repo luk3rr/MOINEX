@@ -9,6 +9,7 @@ import org.json.JSONObject
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.NetWorthSnapshotFactory
 import org.moinex.factory.creditcard.CreditCardDebtFactory
+import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.service.PreferencesService
@@ -33,8 +34,14 @@ class QueryFinanceToolTest :
             When("listing the exposed tools") {
                 val tools = queryFinanceTool.availableTools()
 
-                Then("it exposes get_net_worth and get_spending_by_category") {
-                    tools.map { it.name }.toSet() shouldBe setOf("get_net_worth", "get_spending_by_category")
+                Then("it exposes the read-only finance query tools") {
+                    tools.map { it.name }.toSet() shouldBe
+                        setOf(
+                            "get_net_worth",
+                            "get_spending_by_category",
+                            "get_transactions_in_period",
+                            "get_credit_card_invoice_payment_status",
+                        )
                 }
             }
         }
@@ -121,6 +128,66 @@ class QueryFinanceToolTest :
                 Then("income is excluded from the spending breakdown") {
                     result.getJSONObject("byCategory").keySet().contains("Salário") shouldBe false
                     result.getBigDecimal("total") shouldBe BigDecimal.ZERO
+                }
+            }
+        }
+
+        Given("existing wallet transactions and credit card debts within a date range") {
+            val foodCategory = CategoryFactory.create(id = 1, name = "Alimentação")
+
+            every { walletService.getAllNonArchivedWalletTransactionsBetweenDates(any(), any()) } returns
+                listOf(
+                    WalletTransactionFactory.create(
+                        type = WalletTransactionType.EXPENSE,
+                        category = foodCategory,
+                        amount = BigDecimal("42.00"),
+                    ),
+                )
+            every { creditCardService.getDebtsBetweenForAnalysis(any(), any()) } returns
+                listOf(CreditCardDebtFactory.create(category = foodCategory, amount = BigDecimal("99.00")))
+
+            When("calling get_transactions_in_period") {
+                val tool = queryFinanceTool.availableTools().first { it.name == "get_transactions_in_period" }
+                val result = JSONObject(tool.execute("""{"startDate":"2026-09-01","endDate":"2026-09-30"}"""))
+
+                Then("it lists both wallet transactions and credit card debts") {
+                    result.getJSONArray("walletTransactions").length() shouldBe 1
+                    result.getJSONArray("creditCardDebts").length() shouldBe 1
+                }
+            }
+        }
+
+        Given("a credit card whose invoice for a month is fully paid") {
+            val card = CreditCardFactory.create(id = 5, name = "Nubank Mastercard")
+            every { creditCardService.getAllNonArchivedCreditCardsOrderedByName() } returns listOf(card)
+            every { creditCardService.isInvoicePaid(5, YearMonth.of(2026, 9)) } returns true
+
+            When("calling get_credit_card_invoice_payment_status, matching the card name case-insensitively") {
+                val tool =
+                    queryFinanceTool.availableTools().first {
+                        it.name == "get_credit_card_invoice_payment_status"
+                    }
+                val result =
+                    JSONObject(tool.execute("""{"creditCardName":"nubank mastercard","month":"2026-09"}"""))
+
+                Then("it reports the invoice as paid") {
+                    result.getBoolean("paid") shouldBe true
+                }
+            }
+        }
+
+        Given("a credit card name that doesn't match any registered card") {
+            every { creditCardService.getAllNonArchivedCreditCardsOrderedByName() } returns emptyList()
+
+            When("calling get_credit_card_invoice_payment_status") {
+                val tool =
+                    queryFinanceTool.availableTools().first {
+                        it.name == "get_credit_card_invoice_payment_status"
+                    }
+                val result = JSONObject(tool.execute("""{"creditCardName":"Unknown Card","month":"2026-09"}"""))
+
+                Then("it returns an error instead of throwing") {
+                    result.has("error") shouldBe true
                 }
             }
         }

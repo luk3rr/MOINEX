@@ -11,6 +11,7 @@ import io.mockk.mockk
 import org.moinex.ai.provider.LlmProvider
 import org.moinex.ai.provider.LlmProviderFactory
 import org.moinex.ai.tools.LlmTool
+import org.moinex.ai.tools.ProposeTransactionTool
 import org.moinex.ai.tools.QueryFinanceTool
 import org.moinex.config.AiPromptProperties
 import org.moinex.service.PreferencesService
@@ -20,9 +21,14 @@ class AiChatServiceTest :
     BehaviorSpec({
         val llmProviderFactory = mockk<LlmProviderFactory>()
         val queryFinanceTool = mockk<QueryFinanceTool>()
+        val proposeTransactionTool = mockk<ProposeTransactionTool>()
         val provider = mockk<LlmProvider>()
         val preferencesService = mockk<PreferencesService>(relaxed = true)
-        val aiPromptProperties = AiPromptProperties(systemPrompt = mapOf("en" to "You are a test assistant."))
+        val aiPromptProperties =
+            AiPromptProperties(
+                systemPrompt = mapOf("en" to "You are a test assistant."),
+                attachmentInstructionTemplate = "File \"{0}\" | context: {1} | content: {2}",
+            )
 
         val fakeTool =
             object : LlmTool {
@@ -33,6 +39,8 @@ class AiChatServiceTest :
                 override fun execute(argumentsJson: String): String = """{"netWorth":1000}"""
             }
 
+        every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
+
         val multiLocalePrompts =
             AiPromptProperties(
                 systemPrompt =
@@ -42,9 +50,22 @@ class AiChatServiceTest :
                     ),
             )
         val serviceWithMultiLocalePrompts =
-            AiChatService(llmProviderFactory, queryFinanceTool, multiLocalePrompts, preferencesService)
+            AiChatService(
+                llmProviderFactory,
+                queryFinanceTool,
+                proposeTransactionTool,
+                multiLocalePrompts,
+                preferencesService,
+            )
 
-        val service = AiChatService(llmProviderFactory, queryFinanceTool, aiPromptProperties, preferencesService)
+        val service =
+            AiChatService(
+                llmProviderFactory,
+                queryFinanceTool,
+                proposeTransactionTool,
+                aiPromptProperties,
+                preferencesService,
+            )
 
         afterContainer { clearAllMocks() }
 
@@ -161,6 +182,71 @@ class AiChatServiceTest :
                 Then("it returns an Error result carrying the failure message, instead of throwing") {
                     result.shouldBeInstanceOf<ChatTurnResult.Error>()
                     (result as ChatTurnResult.Error).message shouldBe "network unreachable"
+                }
+            }
+        }
+
+        Given("a configured provider that calls propose_transactions before answering") {
+            every { llmProviderFactory.currentProvider() } returns provider
+            every { preferencesService.locale } returns Locale.ENGLISH
+            every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
+            every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
+
+            val toolCall = ToolCall(id = "call_1", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
+            val proposedJson =
+                """
+                [{"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
+                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
+                  "suggestedCategoryName":"Groceries","confidence":0.8}]
+                """.trimIndent()
+            every { proposeTransactionTool.execute(any()) } returns proposedJson
+
+            coEvery { provider.chat(any(), any()) } returnsMany
+                listOf(
+                    LlmResponse(text = null, toolCalls = listOf(toolCall)),
+                    LlmResponse(text = "Found 1 transaction, please review."),
+                )
+
+            When("sending a message") {
+                val result =
+                    service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
+
+                Then("it returns TransactionsProposed with the parsed list instead of Success") {
+                    result.shouldBeInstanceOf<ChatTurnResult.TransactionsProposed>()
+                    val proposed = result as ChatTurnResult.TransactionsProposed
+                    proposed.transactions.size shouldBe 1
+                    proposed.transactions[0].suggestedCategoryName shouldBe "Groceries"
+                    proposed.reply shouldBe "Found 1 transaction, please review."
+                }
+            }
+        }
+
+        Given("an attached file's extracted text") {
+            When("building the attachment message with no user note") {
+                every { proposeTransactionTool.describeAvailableContext() } returns "Existing categories: Groceries"
+                val message = service.buildAttachmentMessage("extrato.csv", "date,amount\n2026-09-05,150.30")
+
+                Then("the configured template is filled in with the file name, context and content") {
+                    message shouldBe
+                        "File \"extrato.csv\" | context: Existing categories: Groceries | " +
+                        "content: date,amount\n2026-09-05,150.30"
+                }
+            }
+
+            When("building the attachment message with a user note") {
+                every { proposeTransactionTool.describeAvailableContext() } returns "Existing categories: Groceries"
+                val message =
+                    service.buildAttachmentMessage(
+                        "extrato.csv",
+                        "date,amount\n2026-09-05,150.30",
+                        userNote = "These are my September expenses",
+                    )
+
+                Then("the note is prepended before the instruction template") {
+                    message shouldBe
+                        "These are my September expenses\n\n" +
+                        "File \"extrato.csv\" | context: Existing categories: Groceries | " +
+                        "content: date,amount\n2026-09-05,150.30"
                 }
             }
         }

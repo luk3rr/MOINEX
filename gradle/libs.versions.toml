@@ -22,6 +22,7 @@ org-openjfx-javafx-fxml = "23.0.1"
 org-openjfx-javafx-web = "23.0.1"
 org-commonmark-commonmark = "0.30.0"
 org-commonmark-commonmark-ext-gfm-tables = "0.30.0"
+org-apache-pdfbox-pdfbox = "3.0.3"
 org-projectlombok-lombok = "1.18.36"
 org-reflections-reflections = "0.10.2"
 org-slf4j-slf4j-api = "2.0.16"
@@ -63,6 +64,7 @@ org-openjfx-javafx-fxml = { module = "org.openjfx:javafx-fxml", version.ref = "o
 org-openjfx-javafx-web = { module = "org.openjfx:javafx-web", version.ref = "org-openjfx-javafx-web" }
 org-commonmark-commonmark = { module = "org.commonmark:commonmark", version.ref = "org-commonmark-commonmark" }
 org-commonmark-commonmark-ext-gfm-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "org-commonmark-commonmark-ext-gfm-tables" }
+org-apache-pdfbox-pdfbox = { module = "org.apache.pdfbox:pdfbox", version.ref = "org-apache-pdfbox-pdfbox" }
 org-projectlombok-lombok = { module = "org.projectlombok:lombok", version.ref = "org-projectlombok-lombok" }
 org-reflections-reflections = { module = "org.reflections:reflections", version.ref = "org-reflections-reflections" }
 org-slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "org-slf4j-slf4j-api" }

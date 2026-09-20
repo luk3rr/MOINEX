@@ -41,3 +41,29 @@
   -fx-text-fill: theme-text-on-dark;
   -fx-font-weight: bold;
 }
+
+.ai-chat-attach-button {
+  -fx-background-color: theme-bg-card-alt;
+  -fx-text-fill: theme-text-primary;
+  -fx-border-color: theme-border;
+  -fx-border-radius: 4px;
+}
+
+.ai-chat-attachment-chip {
+  -fx-background-color: theme-bg-card-alt;
+  -fx-background-radius: 14px;
+  -fx-padding: 4px 10px;
+}
+
+.ai-chat-attachment-label {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-text-primary;
+}
+
+.ai-chat-attachment-remove {
+  -fx-background-color: transparent;
+  -fx-text-fill: theme-text-faint;
+  -fx-font-size: 10px;
+  -fx-padding: 0 2px;
+  -fx-cursor: hand;
+}

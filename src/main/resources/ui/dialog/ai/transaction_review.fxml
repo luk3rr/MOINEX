@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10.0" prefWidth="900.0" prefHeight="500.0" minWidth="480.0" minHeight="320.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.moinex.ui.dialog.ai.TransactionReviewController" stylesheets="@../../../css/scene/transaction_review.css">
+   <padding>
+      <Insets top="15.0" right="15.0" bottom="15.0" left="15.0" />
+   </padding>
+   <children>
+      <Label text="%aireview.title" styleClass="ai-review-title" />
+      <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS" />
+      <HBox spacing="10.0" alignment="CENTER_RIGHT">
+         <children>
+            <JFXButton onAction="#handleCancel" text="%aireview.cancel" />
+            <JFXButton onAction="#handleConfirm" text="%aireview.confirm.selected" />
+         </children>
+      </HBox>
+   </children>
+</VBox>
