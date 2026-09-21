@@ -7,9 +7,12 @@
 package org.moinex.ui.main
 
 import com.jfoenix.controls.JFXButton
+import javafx.animation.KeyFrame
+import javafx.animation.Timeline
 import javafx.concurrent.Worker
 import javafx.fxml.FXML
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TextField
@@ -19,6 +22,7 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
+import javafx.util.Duration
 import org.moinex.ai.chat.AiChatService
 import org.moinex.ai.chat.ChatMessage
 import org.moinex.ai.chat.ChatRole
@@ -75,6 +79,9 @@ class AiChatController(
     private val history = mutableListOf<ChatMessage>()
     private val pendingReviews = mutableListOf<List<ExtractedTransactionDTO>>()
     private var pendingAttachment: PendingAttachment? = null
+    private var busy = false
+    private var requestStartNanos = 0L
+    private var thinkingTimeline: Timeline? = null
 
     private data class PendingAttachment(
         val fileName: String,
@@ -93,6 +100,14 @@ class AiChatController(
         private const val STYLE_BUBBLE_ASSISTANT = "ai-chat-bubble-assistant"
         private const val STYLE_BUBBLE_NOTICE = "ai-chat-bubble-notice"
         private const val STYLE_ATTACH_BUTTON = "ai-chat-attach-button"
+        private const val STYLE_BUBBLE_META = "ai-chat-bubble-meta"
+
+        private const val THINKING_TICK_MILLIS = 1000.0
+        private const val THINKING_MAX_DOTS = 3
+        private const val TICKS_PER_WORD = 4
+        private const val NANOS_PER_MILLI = 1_000_000L
+        private const val MILLIS_PER_SECOND = 1000L
+        private const val SECONDS_PER_MINUTE = 60L
 
         private const val LIGHT_SIDEBAR_BG = "#1abc9c"
         private const val LIGHT_TEXT_ON_DARK = "#ffffff"
@@ -111,9 +126,11 @@ class AiChatController(
 
     @FXML
     fun initialize() {
-        setBusy(false)
+        setBusy(busy)
         inputField.setOnAction { handleSend() }
-        history.forEach { message -> appendBubble(message.role, message.displayText ?: message.content) }
+        history.forEach { message ->
+            appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
+        }
         pendingReviews.forEach { renderReviewButton(it) }
         pendingAttachment?.let { setAttachment(it.fileName, it.extractedText) }
     }
@@ -145,6 +162,7 @@ class AiChatController(
         history.add(ChatMessage(role = ChatRole.USER, content = messageContent, displayText = bubbleText))
         inputField.clear()
         clearAttachment()
+        requestStartNanos = System.nanoTime()
         setBusy(true)
 
         FxUtils.launchBackgroundThenUI(
@@ -213,16 +231,21 @@ class AiChatController(
     }
 
     private fun handleResult(result: ChatTurnResult) {
+        val elapsedMillis = (System.nanoTime() - requestStartNanos) / NANOS_PER_MILLI
         setBusy(false)
 
         when (result) {
             is ChatTurnResult.Success -> {
-                history.add(ChatMessage(role = ChatRole.ASSISTANT, content = result.reply))
-                appendBubble(ChatRole.ASSISTANT, result.reply)
+                history.add(
+                    ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
+                )
+                appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
             }
             is ChatTurnResult.TransactionsProposed -> {
-                history.add(ChatMessage(role = ChatRole.ASSISTANT, content = result.reply))
-                if (result.reply.isNotBlank()) appendBubble(ChatRole.ASSISTANT, result.reply)
+                history.add(
+                    ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
+                )
+                if (result.reply.isNotBlank()) appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
                 appendReviewButton(result.transactions)
             }
             is ChatTurnResult.NoProviderConfigured ->
@@ -267,22 +290,87 @@ class AiChatController(
         )
     }
 
-    private fun setBusy(busy: Boolean) {
-        inputField.isDisable = busy
-        sendButton.isDisable = busy
-        thinkingLabel.isVisible = busy
-        thinkingLabel.isManaged = busy
+    private fun setBusy(isBusy: Boolean) {
+        busy = isBusy
+        inputField.isDisable = isBusy
+        sendButton.isDisable = isBusy
+        thinkingLabel.isVisible = isBusy
+        thinkingLabel.isManaged = isBusy
+
+        thinkingTimeline?.stop()
+        thinkingTimeline = null
+        if (isBusy) startThinkingAnimation()
     }
+
+    private fun startThinkingAnimation() {
+        val words =
+            preferencesService
+                .translate(TranslationKeys.AI_CHAT_THINKING_WORDS)
+                .split("|")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .ifEmpty { listOf(preferencesService.translate(TranslationKeys.AI_CHAT_THINKING)) }
+        var tick = 0
+
+        fun render() {
+            val word = words[(tick / TICKS_PER_WORD) % words.size]
+            val dots = ".".repeat(tick % (THINKING_MAX_DOTS + 1))
+            val elapsed = formatElapsed((System.nanoTime() - requestStartNanos) / NANOS_PER_MILLI)
+            thinkingLabel.text = "$word$dots  ·  $elapsed"
+        }
+
+        render()
+        thinkingTimeline =
+            Timeline(
+                KeyFrame(
+                    Duration.millis(THINKING_TICK_MILLIS),
+                    {
+                        tick++
+                        render()
+                    },
+                ),
+            ).apply {
+                cycleCount = Timeline.INDEFINITE
+                play()
+            }
+    }
+
+    private fun formatElapsed(millis: Long): String {
+        val totalSeconds = millis / MILLIS_PER_SECOND
+        return if (totalSeconds < SECONDS_PER_MINUTE) {
+            "${totalSeconds}s"
+        } else {
+            "${totalSeconds / SECONDS_PER_MINUTE}m ${totalSeconds % SECONDS_PER_MINUTE}s"
+        }
+    }
+
+    private fun formatResponseTime(millis: Long): String =
+        if (millis < SECONDS_PER_MINUTE * MILLIS_PER_SECOND) {
+            String.format(java.util.Locale.ROOT, "%.1fs", millis / MILLIS_PER_SECOND.toDouble())
+        } else {
+            formatElapsed(millis)
+        }
 
     private fun appendBubble(
         role: ChatRole,
         text: String,
+        responseTimeMillis: Long? = null,
     ) {
         val bubbleStyle = if (role == ChatRole.USER) STYLE_BUBBLE_USER else STYLE_BUBBLE_ASSISTANT
         val (background, textColor) = bubbleColors(bubbleStyle)
         val bubble = createMarkdownBubble(text, background, textColor)
+        val content: Node =
+            if (responseTimeMillis != null && role == ChatRole.ASSISTANT) {
+                val meta =
+                    Label("⏱ ${formatResponseTime(responseTimeMillis)}").apply {
+                        styleClass.add(STYLE_BUBBLE_META)
+                    }
+                VBox(2.0, bubble, meta)
+            } else {
+                bubble
+            }
         val row =
-            HBox(bubble).apply {
+            HBox(content).apply {
                 alignment = if (role == ChatRole.USER) Pos.CENTER_RIGHT else Pos.CENTER_LEFT
             }
         messagesContainer.children.add(row)

@@ -32,6 +32,7 @@ data class ChatMessage(
     val toolCalls: List<ToolCall> = emptyList(),
     val toolCallId: String? = null,
     val toolName: String? = null,
+    val responseTimeMillis: Long? = null,
 )
 
 data class ToolCall(

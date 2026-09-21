@@ -36,6 +36,12 @@
   -fx-text-fill: theme-text-faint;
 }
 
+.ai-chat-bubble-meta {
+  -fx-font-size: 10px;
+  -fx-text-fill: theme-text-faint;
+  -fx-padding: 0 0 0 8px;
+}
+
 .ai-chat-send-button {
   -fx-background-color: theme-bg-sidebar;
   -fx-text-fill: theme-text-on-dark;

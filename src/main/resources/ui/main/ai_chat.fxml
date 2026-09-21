@@ -18,7 +18,7 @@
          </padding>
          <children>
             <Label text="%aichat.title" styleClass="ai-chat-title" />
-            <Label text="%aichat.disclaimer" wrapText="true" maxWidth="Infinity" styleClass="ai-chat-disclaimer" />
+            <Label text="%aichat.disclaimer" wrapText="true" prefWidth="0.0" minHeight="-Infinity" maxWidth="Infinity" styleClass="ai-chat-disclaimer" />
             <ScrollPane fx:id="messagesScrollPane" fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="ai-chat-scroll">
                <content>
                   <VBox fx:id="messagesContainer" spacing="12.0" styleClass="ai-chat-messages">

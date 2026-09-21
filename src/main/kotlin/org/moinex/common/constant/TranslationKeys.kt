@@ -2031,6 +2031,7 @@ object TranslationKeys {
     const val AI_CHAT_DISCLAIMER: String = "aichat.disclaimer"
     const val AI_CHAT_NO_PROVIDER_CONFIGURED: String = "aichat.noProviderConfigured"
     const val AI_CHAT_THINKING: String = "aichat.thinking"
+    const val AI_CHAT_THINKING_WORDS: String = "aichat.thinking.words"
     const val AI_CHAT_ERROR: String = "aichat.error"
     const val AI_CHAT_YOU: String = "aichat.you"
     const val AI_CHAT_ASSISTANT: String = "aichat.assistant"
