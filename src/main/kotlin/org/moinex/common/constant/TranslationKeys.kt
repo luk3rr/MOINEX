@@ -2081,6 +2081,7 @@ object TranslationKeys {
     const val AI_REVIEW_COLUMN_CONFIRM: String = "aireview.column.confirm"
     const val AI_REVIEW_NEW_CATEGORY: String = "aireview.newCategory"
     const val AI_REVIEW_POSSIBLE_DUPLICATE: String = "aireview.possibleDuplicate"
+    const val AI_REVIEW_CONFIRMS_PENDING: String = "aireview.confirmsPending"
     const val AI_REVIEW_LOW_CONFIDENCE: String = "aireview.lowConfidence"
     const val AI_REVIEW_CONFIRM_SELECTED: String = "aireview.confirm.selected"
     const val AI_REVIEW_CANCEL: String = "aireview.cancel"

@@ -13,6 +13,7 @@ import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.model.dto.ai.ExtractedTransactionDTO
 import org.moinex.model.dto.ai.TransactionKind
+import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.service.CategoryService
@@ -46,6 +47,7 @@ class ProposeTransactionTool(
                 kind = parseKind(json.getString("kind")),
                 movementType = parseMovementType(json.optString("movementType")),
                 invoiceMonth = json.optYearMonthOrNull("invoiceMonth"),
+                existingTransactionId = json.optIntOrNull("existingTransactionId"),
                 suggestedWalletId = json.optIntOrNull("suggestedWalletId"),
                 suggestedCreditCardId = json.optIntOrNull("suggestedCreditCardId"),
                 suggestedCategoryId = json.optIntOrNull("suggestedCategoryId"),
@@ -113,6 +115,18 @@ class ProposeTransactionTool(
                         "Leave unset if unknown; defaults to the payment date's own month.",
                 )
 
+        val existingTransactionIdProperty =
+            JSONObject()
+                .put("type", "integer")
+                .put(
+                    "description",
+                    "Only for kind wallet. The id (from get_transactions_in_period) of an already-recorded " +
+                        "PENDING wallet transaction that this proposal confirms/updates - e.g. the user asked to " +
+                        "confirm a pending entry, or this line plausibly matches one already listed as pending " +
+                        "(similar date/amount/description). Leave unset to create a new transaction instead. " +
+                        "Never set this for a transaction that is already confirmed.",
+                )
+
         val itemProperties =
             JSONObject()
                 .put("date", JSONObject().put("type", "string").put("format", "date"))
@@ -121,6 +135,7 @@ class ProposeTransactionTool(
                 .put("kind", kindProperty)
                 .put("movementType", movementTypeProperty)
                 .put("invoiceMonth", invoiceMonthProperty)
+                .put("existingTransactionId", existingTransactionIdProperty)
                 .put("walletName", JSONObject().put("type", "string"))
                 .put("creditCardName", JSONObject().put("type", "string"))
                 .put("categoryName", JSONObject().put("type", "string"))
@@ -179,6 +194,19 @@ class ProposeTransactionTool(
         val matchedCreditCard =
             creditCards.firstOrNull { it.name.equals(candidate.optString("creditCardName"), ignoreCase = true) }
 
+        // Only honored for an id that actually exists, still PENDING and on a wallet transaction -
+        // never trust the model's id blindly, since confirming the wrong transaction (or one
+        // that's already confirmed) would silently corrupt real data instead of just duplicating it.
+        val existingTransactionId =
+            candidate
+                .optIntOrNull("existingTransactionId")
+                ?.takeIf { id ->
+                    kind == TransactionKind.WALLET &&
+                        runCatching { walletService.getWalletTransactionById(id) }
+                            .getOrNull()
+                            ?.status == WalletTransactionStatus.PENDING
+                }
+
         return ExtractedTransactionDTO(
             date = LocalDate.parse(candidate.getString("date")),
             description = candidate.optString("description"),
@@ -186,6 +214,7 @@ class ProposeTransactionTool(
             kind = kind,
             movementType = parseMovementType(candidate.optString("movementType")),
             invoiceMonth = candidate.optYearMonthOrNull("invoiceMonth"),
+            existingTransactionId = existingTransactionId,
             suggestedWalletId = matchedWallet?.id,
             suggestedCreditCardId = matchedCreditCard?.id,
             suggestedCategoryId = matchedCategory?.id,
@@ -202,6 +231,7 @@ class ProposeTransactionTool(
             .put("kind", dto.kind.name.lowercase())
             .put("movementType", dto.movementType.name.lowercase())
             .put("invoiceMonth", dto.invoiceMonth?.toString() ?: JSONObject.NULL)
+            .put("existingTransactionId", dto.existingTransactionId ?: JSONObject.NULL)
             .put("suggestedWalletId", dto.suggestedWalletId ?: JSONObject.NULL)
             .put("suggestedCreditCardId", dto.suggestedCreditCardId ?: JSONObject.NULL)
             .put("suggestedCategoryId", dto.suggestedCategoryId ?: JSONObject.NULL)

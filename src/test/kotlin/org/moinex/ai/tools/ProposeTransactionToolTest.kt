@@ -8,7 +8,9 @@ import io.mockk.verify
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.creditcard.CreditCardFactory
 import org.moinex.factory.wallet.WalletFactory
+import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.dto.ai.TransactionKind
+import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
@@ -135,6 +137,88 @@ class ProposeTransactionToolTest :
 
                 Then("it defaults to expense") {
                     result[0].movementType shouldBe WalletTransactionType.EXPENSE
+                }
+            }
+        }
+
+        Given("a candidate whose existingTransactionId points to a still-pending wallet transaction") {
+            val pending = WalletTransactionFactory.create(id = 99, status = WalletTransactionStatus.PENDING)
+            every { walletService.getWalletTransactionById(99) } returns pending
+
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
+                     "existingTransactionId":99,"walletName":"nubank","categoryName":"groceries","confidence":0.9}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then(
+                    "existingTransactionId is carried through so the review screen updates it instead of creating one",
+                ) {
+                    result[0].existingTransactionId shouldBe 99
+                }
+            }
+        }
+
+        Given("a candidate whose existingTransactionId points to an already-confirmed transaction") {
+            val confirmed = WalletTransactionFactory.create(id = 98, status = WalletTransactionStatus.CONFIRMED)
+            every { walletService.getWalletTransactionById(98) } returns confirmed
+
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
+                     "existingTransactionId":98,"walletName":"nubank","categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("the id is discarded - never overwrite a transaction that is not pending") {
+                    result[0].existingTransactionId shouldBe null
+                }
+            }
+        }
+
+        Given("a candidate whose existingTransactionId doesn't exist") {
+            every { walletService.getWalletTransactionById(97) } throws NoSuchElementException("not found")
+
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
+                     "existingTransactionId":97,"walletName":"nubank","categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("the id is discarded instead of failing the whole candidate") {
+                    result[0].existingTransactionId shouldBe null
+                }
+            }
+        }
+
+        Given("a candidate with existingTransactionId set but kind credit_card") {
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Market","amount":50.00,"kind":"credit_card",
+                     "existingTransactionId":99,"creditCardName":"Nubank Mastercard","categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("the id is discarded - only a wallet transaction can be confirmed this way") {
+                    result[0].existingTransactionId shouldBe null
                 }
             }
         }

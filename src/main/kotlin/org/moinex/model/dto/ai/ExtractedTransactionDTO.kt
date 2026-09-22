@@ -22,6 +22,9 @@ enum class TransactionKind {
  * [kind] is [TransactionKind.WALLET] - a credit card entry is always a purchase/debt).
  * [invoiceMonth] is only meaningful when [kind] is [TransactionKind.CREDIT_CARD_PAYMENT]; falls
  * back to [date]'s month when the model can't determine the billing period.
+ * [existingTransactionId], when set (only meaningful for [TransactionKind.WALLET]), identifies an
+ * already-recorded PENDING wallet transaction that this proposal confirms/updates instead of
+ * creating a new one - the model sets it after spotting a match via `get_transactions_in_period`.
  */
 data class ExtractedTransactionDTO(
     val date: LocalDate,
@@ -30,6 +33,7 @@ data class ExtractedTransactionDTO(
     val kind: TransactionKind,
     val movementType: WalletTransactionType = WalletTransactionType.EXPENSE,
     val invoiceMonth: YearMonth? = null,
+    val existingTransactionId: Int? = null,
     val suggestedWalletId: Int?,
     val suggestedCreditCardId: Int?,
     val suggestedCategoryId: Int?,

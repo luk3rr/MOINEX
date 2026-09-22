@@ -59,6 +59,7 @@ class TransactionReviewRow(
     val possibleDuplicate: Boolean,
     val lowConfidence: Boolean,
     val invoiceMonth: YearMonth?,
+    val existingTransactionId: Int?,
 )
 
 @Controller
@@ -121,6 +122,7 @@ class TransactionReviewController(
                 kind = row.kind,
                 movementType = row.movementType.value,
                 invoiceMonth = row.invoiceMonth,
+                existingTransactionId = row.existingTransactionId,
                 suggestedWalletId = wallet?.id,
                 suggestedCreditCardId = creditCard?.id,
                 suggestedCategoryId = category?.id,
@@ -153,10 +155,15 @@ class TransactionReviewController(
             possibleDuplicate = detectPossibleDuplicate(dto),
             lowConfidence = dto.confidence < LOW_CONFIDENCE_THRESHOLD,
             invoiceMonth = dto.invoiceMonth,
+            existingTransactionId = dto.existingTransactionId,
         )
     }
 
     private fun detectPossibleDuplicate(dto: ExtractedTransactionDTO): Boolean {
+        // Already explicitly identified as confirming a specific pending transaction - not a guess,
+        // so the "possible duplicate" heuristic (which would likely just match itself) doesn't apply.
+        if (dto.existingTransactionId != null) return false
+
         val start = dto.date.minusDays(DUPLICATE_WINDOW_DAYS).atStartOfDay()
         val end = dto.date.plusDays(DUPLICATE_WINDOW_DAYS).atEndOfDay()
 
@@ -277,6 +284,9 @@ class TransactionReviewController(
 
     private fun buildNotes(row: TransactionReviewRow): String {
         val notes = mutableListOf<String>()
+        if (row.existingTransactionId != null) {
+            notes.add(preferencesService.translate(TranslationKeys.AI_REVIEW_CONFIRMS_PENDING))
+        }
         if (row.possibleDuplicate) notes.add(preferencesService.translate(TranslationKeys.AI_REVIEW_POSSIBLE_DUPLICATE))
         if (row.lowConfidence) notes.add(preferencesService.translate(TranslationKeys.AI_REVIEW_LOW_CONFIDENCE))
         if (row.kind != TransactionKind.CREDIT_CARD_PAYMENT &&
@@ -359,9 +369,9 @@ class TransactionReviewController(
                 val wallet =
                     resolveWallet(row.walletOrCardLabel.value)
                         ?: error(preferencesService.translate(TranslationKeys.AI_REVIEW_NO_WALLET_SELECTED))
-
-                walletService.createWalletTransaction(
+                val transaction =
                     WalletTransaction(
+                        id = row.existingTransactionId,
                         date = date,
                         status = WalletTransactionStatus.CONFIRMED,
                         description = row.description.value,
@@ -370,9 +380,15 @@ class TransactionReviewController(
                         category = resolveCategory(row.categoryName.value),
                         type = row.movementType.value,
                         amount = row.amount.value,
-                    ),
-                    publishNotification = true,
-                )
+                    )
+
+                if (row.existingTransactionId != null) {
+                    // Confirms/updates the already-recorded pending transaction instead of creating
+                    // a duplicate - see ExtractedTransactionDTO.existingTransactionId.
+                    walletService.updateWalletTransaction(transaction)
+                } else {
+                    walletService.createWalletTransaction(transaction, publishNotification = true)
+                }
             }
             TransactionKind.CREDIT_CARD -> {
                 val creditCard =

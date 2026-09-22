@@ -191,11 +191,13 @@ class QueryFinanceTool(
                 JSONArray(
                     walletTransactions.map { t ->
                         JSONObject()
+                            .put("id", t.id)
                             .put("date", t.date.toLocalDate().toString())
                             .put("amount", t.amount)
                             .put("description", t.description.orEmpty())
                             .put("category", t.category.name)
                             .put("type", t.type.name.lowercase())
+                            .put("status", t.status.name.lowercase())
                     },
                 )
             val creditCardJson =

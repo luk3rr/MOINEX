@@ -16,6 +16,7 @@ import org.moinex.factory.goal.GoalFactory
 import org.moinex.factory.wallet.WalletTransactionFactory
 import org.moinex.model.dto.InvestmentPerformanceDTO
 import org.moinex.model.dto.PlanStatusDTO
+import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
@@ -163,7 +164,9 @@ class QueryFinanceToolTest :
             every { walletService.getAllNonArchivedWalletTransactionsBetweenDates(any(), any()) } returns
                 listOf(
                     WalletTransactionFactory.create(
+                        id = 55,
                         type = WalletTransactionType.EXPENSE,
+                        status = WalletTransactionStatus.PENDING,
                         category = foodCategory,
                         amount = BigDecimal("42.00"),
                     ),
@@ -178,6 +181,12 @@ class QueryFinanceToolTest :
                 Then("it lists both wallet transactions and credit card debts") {
                     result.getJSONArray("walletTransactions").length() shouldBe 1
                     result.getJSONArray("creditCardDebts").length() shouldBe 1
+                }
+
+                Then("each wallet transaction carries its id and status, so a pending one can be confirmed later") {
+                    val walletTransactionJson = result.getJSONArray("walletTransactions").getJSONObject(0)
+                    walletTransactionJson.getInt("id") shouldBe 55
+                    walletTransactionJson.getString("status") shouldBe "pending"
                 }
             }
         }
