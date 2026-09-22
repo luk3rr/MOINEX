@@ -1,10 +1,12 @@
 package org.moinex.ai.tools
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.json.JSONObject
 import org.moinex.factory.CategoryFactory
 import org.moinex.factory.investment.BondFactory
 import org.moinex.factory.investment.TickerFactory
@@ -69,6 +71,33 @@ class ProposeInvestmentOperationToolTest :
                     result[0].suggestedWalletId shouldBe nubank.id
                     result[0].suggestedCategoryId shouldBe investments.id
                     result[0].kind shouldBe InvestmentOperationKind.STOCK_PURCHASE
+                }
+            }
+        }
+
+        Given("a ticker stored with a yfinance exchange suffix (e.g. .SA for B3-listed stocks)") {
+            val vale3 =
+                TickerFactory.create(
+                    id = 21,
+                    symbol = "VALE3.SA",
+                    name = "Vale",
+                    averageUnitValue = "60.00".toBigDecimal(),
+                )
+            every { tickerService.getAllNonArchivedTickers() } returns listOf(petr4, vale3)
+
+            val arguments =
+                """
+                {"operations":[
+                    {"date":"2026-09-05","kind":"stock_purchase","assetName":"VALE3","description":"Compra VALE3",
+                     "quantity":10,"unitPrice":60.00,"walletName":"nubank","categoryName":"investimentos"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool with assetName reported without the suffix, as printed on a statement") {
+                val result = ProposeInvestmentOperationTool.parseResultJson(tool.execute(arguments))
+
+                Then("it still matches the ticker by its base symbol") {
+                    result[0].suggestedTickerId shouldBe vale3.id
                 }
             }
         }
@@ -166,6 +195,24 @@ class ProposeInvestmentOperationToolTest :
 
                 Then("the malformed entry is skipped instead of failing the whole batch") {
                     result.size shouldBe 0
+                }
+            }
+        }
+
+        Given("the tool's JSON schema sent to the provider") {
+            When("inspecting the required fields for an operation candidate") {
+                val schema = JSONObject(tool.jsonSchema)
+                val requiredFields =
+                    schema
+                        .getJSONObject("properties")
+                        .getJSONObject("operations")
+                        .getJSONObject("items")
+                        .getJSONArray("required")
+                        .let { array -> (0 until array.length()).map { array.getString(it) } }
+
+                Then("quantity and unitPrice are required, so the model can't omit them for a CDB/stock operation") {
+                    requiredFields shouldContain "quantity"
+                    requiredFields shouldContain "unitPrice"
                 }
             }
         }

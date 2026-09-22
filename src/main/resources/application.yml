@@ -60,7 +60,9 @@ moinex:
         está prestes a propor corresponder a uma transação de carteira já registrada como pendente
         (use get_transactions_in_period para checar), proponha-a com existingTransactionId igual ao
         id dessa transação em vez de deixar em branco - isso confirma e atualiza o lançamento
-        pendente existente, em vez de criar um lançamento novo e duplicado.
+        pendente existente, em vez de criar um lançamento novo e duplicado. Nesse caso, o app mantém
+        automaticamente a descrição já cadastrada na transação pendente (não a que você propuser) -
+        não diga ao usuário que vai renomear o lançamento ao confirmá-lo.
         Para uma compra parcelada no cartão de crédito (seja de um extrato ou digitada, ex. "comprei
         parcelado em 5x"), sempre preencha installments e installmentNumber no propose_transactions -
         amount é sempre o valor de uma única parcela, nunca um total já calculado; o app agenda o
@@ -86,7 +88,9 @@ moinex:
         matches an already-recorded PENDING wallet transaction (use get_transactions_in_period to
         check), propose it with existingTransactionId set to that transaction's id instead of
         leaving it unset - that confirms and updates the existing pending entry instead of creating
-        a new, duplicate one.
+        a new, duplicate one. In that case, the app automatically keeps the description already on
+        the pending transaction (not whatever you propose for it) - don't tell the user it'll be
+        renamed when confirmed.
     attachment-instruction-template: >
       The user attached the following file(s): {0}. Extract every transaction and investment
       operation you can find across all of them. Call propose_transactions with one entry per

@@ -25,6 +25,10 @@ enum class TransactionKind {
  * [existingTransactionId], when set (only meaningful for [TransactionKind.WALLET]), identifies an
  * already-recorded PENDING wallet transaction that this proposal confirms/updates instead of
  * creating a new one - the model sets it after spotting a match via `get_transactions_in_period`.
+ * When set, [description] is already overridden by [org.moinex.ai.tools.ProposeTransactionTool]
+ * back to the existing transaction's own description (rather than whatever the model proposed for
+ * the line), so confirming a pending entry never silently renames it - still editable by the user
+ * in the review screen.
  * [installments]/[installmentNumber] are only meaningful for [TransactionKind.CREDIT_CARD].
  * [installments] is how many installments will actually be scheduled from here on - already
  * adjusted by [org.moinex.ai.tools.ProposeTransactionTool] to the *remaining* count when

@@ -133,7 +133,8 @@ class ProposeTransactionTool(
                         "PENDING wallet transaction that this proposal confirms/updates - e.g. the user asked to " +
                         "confirm a pending entry, or this line plausibly matches one already listed as pending " +
                         "(similar date/amount/description). Leave unset to create a new transaction instead. " +
-                        "Never set this for a transaction that is already confirmed.",
+                        "Never set this for a transaction that is already confirmed. When set, the app keeps the " +
+                        "existing transaction's own description regardless of what description you send.",
                 )
 
         val installmentsProperty =
@@ -228,15 +229,14 @@ class ProposeTransactionTool(
         val matchedCreditCard =
             creditCards.firstOrNull { it.name.equals(candidate.optString("creditCardName"), ignoreCase = true) }
 
-        val existingTransactionId =
+        val existingTransaction =
             candidate
                 .optIntOrNull("existingTransactionId")
-                ?.takeIf { id ->
-                    kind == TransactionKind.WALLET &&
-                        runCatching { walletService.getWalletTransactionById(id) }
-                            .getOrNull()
-                            ?.status == WalletTransactionStatus.PENDING
-                }
+                ?.let { id -> runCatching { walletService.getWalletTransactionById(id) }.getOrNull() }
+                ?.takeIf { kind == TransactionKind.WALLET && it.status == WalletTransactionStatus.PENDING }
+        val existingTransactionId = existingTransaction?.id
+        val description =
+            existingTransaction?.description?.takeIf { it.isNotBlank() } ?: candidate.optString("description")
 
         val lineAmount = candidate.getBigDecimal("amount").abs()
         val (installments, installmentNumber, amount) =
@@ -253,7 +253,7 @@ class ProposeTransactionTool(
 
         return ExtractedTransactionDTO(
             date = LocalDate.parse(candidate.getString("date")),
-            description = candidate.optString("description"),
+            description = description,
             amount = amount,
             kind = kind,
             movementType = parseMovementType(candidate.optString("movementType")),

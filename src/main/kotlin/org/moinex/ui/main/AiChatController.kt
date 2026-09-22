@@ -53,10 +53,12 @@ import java.util.Base64
 
 private class PendingTransactionReview(
     var transactions: List<ExtractedTransactionDTO>,
+    val historyIndex: Int,
 )
 
 private class PendingInvestmentReview(
     var operations: List<ExtractedInvestmentOperationDTO>,
+    val historyIndex: Int,
 )
 
 @Controller
@@ -142,11 +144,11 @@ class AiChatController(
         inputField.text = draftInput
         inputField.textProperty().addListener { _, _, newValue -> draftInput = newValue }
         inputField.setOnAction { handleSend() }
-        history.forEach { message ->
+        history.forEachIndexed { index, message ->
             appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
+            pendingReviews.filter { it.historyIndex == index }.forEach { renderReviewButton(it) }
+            pendingInvestmentReviews.filter { it.historyIndex == index }.forEach { renderInvestmentReviewButton(it) }
         }
-        pendingReviews.forEach { renderReviewButton(it) }
-        pendingInvestmentReviews.forEach { renderInvestmentReviewButton(it) }
         refreshAttachmentsUI()
     }
 
@@ -277,14 +279,17 @@ class AiChatController(
                 history.add(
                     ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
                 )
+                val messageIndex = history.lastIndex
                 val hasProposals =
                     result.proposedTransactions.isNotEmpty() || result.proposedInvestmentOperations.isNotEmpty()
                 if (result.reply.isNotBlank() || !hasProposals) {
                     appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
                 }
-                if (result.proposedTransactions.isNotEmpty()) appendReviewButton(result.proposedTransactions)
+                if (result.proposedTransactions.isNotEmpty()) {
+                    appendReviewButton(result.proposedTransactions, messageIndex)
+                }
                 if (result.proposedInvestmentOperations.isNotEmpty()) {
-                    appendInvestmentReviewButton(result.proposedInvestmentOperations)
+                    appendInvestmentReviewButton(result.proposedInvestmentOperations, messageIndex)
                 }
             }
             is ChatTurnResult.NoProviderConfigured ->
@@ -298,8 +303,11 @@ class AiChatController(
         }
     }
 
-    private fun appendReviewButton(transactions: List<ExtractedTransactionDTO>) {
-        val pending = PendingTransactionReview(transactions)
+    private fun appendReviewButton(
+        transactions: List<ExtractedTransactionDTO>,
+        historyIndex: Int,
+    ) {
+        val pending = PendingTransactionReview(transactions, historyIndex)
         pendingReviews.add(pending)
         renderReviewButton(pending)
     }
@@ -348,8 +356,11 @@ class AiChatController(
         )
     }
 
-    private fun appendInvestmentReviewButton(operations: List<ExtractedInvestmentOperationDTO>) {
-        val pending = PendingInvestmentReview(operations)
+    private fun appendInvestmentReviewButton(
+        operations: List<ExtractedInvestmentOperationDTO>,
+        historyIndex: Int,
+    ) {
+        val pending = PendingInvestmentReview(operations, historyIndex)
         pendingInvestmentReviews.add(pending)
         renderInvestmentReviewButton(pending)
     }

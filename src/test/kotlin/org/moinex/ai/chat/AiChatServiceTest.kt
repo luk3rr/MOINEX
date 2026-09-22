@@ -346,6 +346,49 @@ class AiChatServiceTest :
             }
         }
 
+        Given("a configured provider that calls propose_transactions twice before answering") {
+            every { llmProviderFactory.currentProvider() } returns provider
+            every { preferencesService.locale } returns Locale.ENGLISH
+            every { queryFinanceTool.availableTools() } returns listOf(fakeTool)
+            every { proposeTransactionTool.name } returns ProposeTransactionTool.NAME
+            stubTurnContext()
+
+            val firstCall = ToolCall(id = "call_1", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
+            val secondCall = ToolCall(id = "call_2", toolName = ProposeTransactionTool.NAME, argumentsJson = "{}")
+            val firstBatchJson =
+                """
+                [{"date":"2026-09-01","description":"Market","amount":50.00,"kind":"wallet",
+                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
+                  "suggestedCategoryName":"Groceries","confidence":0.8}]
+                """.trimIndent()
+            val secondBatchJson =
+                """
+                [{"date":"2026-09-10","description":"Pharmacy","amount":30.00,"kind":"wallet",
+                  "suggestedWalletId":null,"suggestedCreditCardId":null,"suggestedCategoryId":null,
+                  "suggestedCategoryName":"Health","confidence":0.8}]
+                """.trimIndent()
+            every { proposeTransactionTool.execute(any()) } returnsMany listOf(firstBatchJson, secondBatchJson)
+
+            coEvery { provider.chat(any(), any()) } returnsMany
+                listOf(
+                    LlmResponse(text = null, toolCalls = listOf(firstCall)),
+                    LlmResponse(text = null, toolCalls = listOf(secondCall)),
+                    LlmResponse(text = "Found 2 transactions across two batches, please review."),
+                )
+
+            When("sending a message") {
+                val result =
+                    service.sendMessage(listOf(ChatMessage(role = ChatRole.USER, content = "Here's my statement")))
+
+                Then("both batches are accumulated instead of the second call overwriting the first") {
+                    result.shouldBeInstanceOf<ChatTurnResult.Success>()
+                    val success = result as ChatTurnResult.Success
+                    success.proposedTransactions.size shouldBe 2
+                    success.proposedTransactions.map { it.description } shouldBe listOf("Market", "Pharmacy")
+                }
+            }
+        }
+
         Given("a single attached file's extracted text") {
             When("building the attachment message with no user note") {
                 val message =

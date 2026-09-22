@@ -12,6 +12,8 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
@@ -22,6 +24,7 @@ import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
 import javafx.util.converter.IntegerStringConverter
+import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isEqual
@@ -65,6 +68,11 @@ class TransactionReviewRow(
     val installmentNumber: Int,
 )
 
+/**
+ * Wallet and credit card transactions each get their own tab/table - a credit card row needs
+ * installments and no movement type, a wallet row needs movement type and no installments, so one
+ * shared table would always carry columns that don't apply to half its rows.
+ */
 @Controller
 class TransactionReviewController(
     private val categoryService: CategoryService,
@@ -73,13 +81,14 @@ class TransactionReviewController(
     private val preferencesService: PreferencesService,
 ) {
     @FXML
-    private lateinit var transactionsTable: TableView<TransactionReviewRow>
+    private lateinit var transactionsTabPane: TabPane
+
+    private lateinit var walletTable: TableView<TransactionReviewRow>
+    private lateinit var creditCardTable: TableView<TransactionReviewRow>
 
     private var categories: MutableList<Category> = mutableListOf()
     private var wallets: List<Wallet> = emptyList()
     private var creditCards: List<CreditCard> = emptyList()
-    private val walletPrefix = preferencesService.translate(TranslationKeys.AI_REVIEW_WALLET_PREFIX) + " "
-    private val creditCardPrefix = preferencesService.translate(TranslationKeys.AI_REVIEW_CREDIT_CARD_PREFIX) + " "
 
     companion object {
         private const val LOW_CONFIDENCE_THRESHOLD = 0.6
@@ -89,6 +98,7 @@ class TransactionReviewController(
 
         private const val COLUMN_WIDTH_CONFIRM = 70.0
         private const val COLUMN_WIDTH_DATE = 100.0
+        private const val COLUMN_WIDTH_KIND = 130.0
         private const val COLUMN_WIDTH_DESCRIPTION = 200.0
         private const val COLUMN_WIDTH_AMOUNT = 100.0
         private const val COLUMN_WIDTH_INSTALLMENTS = 90.0
@@ -96,6 +106,8 @@ class TransactionReviewController(
         private const val COLUMN_WIDTH_CATEGORY = 150.0
         private const val COLUMN_WIDTH_WALLET = 160.0
         private const val COLUMN_WIDTH_NOTES = 240.0
+
+        private val CREDIT_CARD_KINDS = setOf(TransactionKind.CREDIT_CARD, TransactionKind.CREDIT_CARD_PAYMENT)
     }
 
     @FXML
@@ -104,16 +116,33 @@ class TransactionReviewController(
         wallets = walletService.getAllNonArchivedWalletsOrderedByName()
         creditCards = creditCardService.getAllNonArchivedCreditCardsOrderedByName()
 
-        transactionsTable.isEditable = true
-        configureColumns()
+        walletTable = buildWalletTable()
+        creditCardTable = buildCreditCardTable()
     }
 
     fun setProposedTransactions(transactions: List<ExtractedTransactionDTO>) {
-        transactionsTable.items.setAll(transactions.map(::toRow))
+        val rows = transactions.map(::toRow)
+
+        walletTable.items.setAll(rows.filter { it.kind == TransactionKind.WALLET })
+        creditCardTable.items.setAll(rows.filter { it.kind in CREDIT_CARD_KINDS })
+
+        refreshTabs()
+    }
+
+    /** Only shows a tab for a kind group that actually has rows to review. */
+    private fun refreshTabs() {
+        val tabs = mutableListOf<Tab>()
+        if (walletTable.items.isNotEmpty()) {
+            tabs.add(Tab(preferencesService.translate(TranslationKeys.AI_REVIEW_TAB_WALLET), walletTable))
+        }
+        if (creditCardTable.items.isNotEmpty()) {
+            tabs.add(Tab(preferencesService.translate(TranslationKeys.AI_REVIEW_TAB_CREDIT_CARD), creditCardTable))
+        }
+        transactionsTabPane.tabs.setAll(tabs)
     }
 
     fun getRemainingTransactions(): List<ExtractedTransactionDTO> =
-        transactionsTable.items.map { row ->
+        (walletTable.items + creditCardTable.items).map { row ->
             val wallet = if (row.kind == TransactionKind.WALLET) resolveWallet(row.walletOrCardLabel.value) else null
             val creditCard =
                 if (row.kind != TransactionKind.WALLET) resolveCreditCard(row.walletOrCardLabel.value) else null
@@ -139,14 +168,12 @@ class TransactionReviewController(
         }
 
     private fun toRow(dto: ExtractedTransactionDTO): TransactionReviewRow {
-        val walletLabel =
+        val walletOrCardLabel =
             when (dto.kind) {
                 TransactionKind.WALLET ->
-                    (wallets.firstOrNull { it.id == dto.suggestedWalletId } ?: wallets.firstOrNull())
-                        ?.let { walletPrefix + it.name }
+                    (wallets.firstOrNull { it.id == dto.suggestedWalletId } ?: wallets.firstOrNull())?.name
                 TransactionKind.CREDIT_CARD, TransactionKind.CREDIT_CARD_PAYMENT ->
-                    (creditCards.firstOrNull { it.id == dto.suggestedCreditCardId } ?: creditCards.firstOrNull())
-                        ?.let { creditCardPrefix + it.name }
+                    (creditCards.firstOrNull { it.id == dto.suggestedCreditCardId } ?: creditCards.firstOrNull())?.name
             }.orEmpty()
 
         return TransactionReviewRow(
@@ -156,7 +183,7 @@ class TransactionReviewController(
             amount = SimpleObjectProperty(dto.amount),
             movementType = SimpleObjectProperty(dto.movementType),
             categoryName = SimpleStringProperty(dto.suggestedCategoryName),
-            walletOrCardLabel = SimpleStringProperty(walletLabel),
+            walletOrCardLabel = SimpleStringProperty(walletOrCardLabel),
             confirm = SimpleBooleanProperty(true),
             possibleDuplicate = detectPossibleDuplicate(dto),
             lowConfidence = dto.confidence < LOW_CONFIDENCE_THRESHOLD,
@@ -195,115 +222,195 @@ class TransactionReviewController(
         }
     }
 
-    private fun configureColumns() {
-        val confirmColumn =
+    private fun buildWalletTable(): TableView<TransactionReviewRow> {
+        val table = newTableView()
+        table.columns.setAll(
+            listOf(
+                confirmColumn(),
+                dateColumn(),
+                descriptionColumn(),
+                amountColumn(),
+                movementTypeColumn(),
+                categoryColumn(),
+                walletColumn(),
+                notesColumn(),
+            ),
+        )
+        return table
+    }
+
+    private fun buildCreditCardTable(): TableView<TransactionReviewRow> {
+        val table = newTableView()
+        table.columns.setAll(
+            listOf(
+                confirmColumn(),
+                dateColumn(),
+                kindColumn(),
+                descriptionColumn(),
+                amountColumn(),
+                installmentsColumn(),
+                categoryColumn(),
+                creditCardColumn(),
+                notesColumn(),
+            ),
+        )
+        return table
+    }
+
+    private fun newTableView(): TableView<TransactionReviewRow> =
+        TableView<TransactionReviewRow>().apply {
+            isEditable = true
+            stylesheets.add(
+                TransactionReviewController::class.java.getResource(Files.TABLE_VIEW_STYLE_SHEET)!!.toExternalForm(),
+            )
+            setRowFactory {
+                TableRow<TransactionReviewRow>().apply {
+                    itemProperty().addListener { _, _, row ->
+                        styleClass.removeAll(STYLE_ROW_DUPLICATE, STYLE_ROW_LOW_CONFIDENCE)
+                        if (row?.possibleDuplicate == true) styleClass.add(STYLE_ROW_DUPLICATE)
+                        if (row?.lowConfidence == true) styleClass.add(STYLE_ROW_LOW_CONFIDENCE)
+                    }
+                }
+            }
+        }
+
+    private fun confirmColumn(): TableColumn<TransactionReviewRow, Boolean> {
+        val column =
             TableColumn<TransactionReviewRow, Boolean>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_CONFIRM),
             )
-        confirmColumn.cellValueFactory = Callback { it.value.confirm }
-        confirmColumn.cellFactory = CheckBoxTableCell.forTableColumn(confirmColumn)
-        confirmColumn.prefWidth = COLUMN_WIDTH_CONFIRM
+        column.cellValueFactory = Callback { it.value.confirm }
+        column.cellFactory = CheckBoxTableCell.forTableColumn(column)
+        column.prefWidth = COLUMN_WIDTH_CONFIRM
+        return column
+    }
 
-        val dateColumn =
+    private fun dateColumn(): TableColumn<TransactionReviewRow, LocalDate> {
+        val column =
             TableColumn<TransactionReviewRow, LocalDate>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_DATE),
             )
-        dateColumn.cellValueFactory = Callback { it.value.date }
-        dateColumn.cellFactory = Callback { DatePickerTableCell() }
-        dateColumn.prefWidth = COLUMN_WIDTH_DATE
+        column.cellValueFactory = Callback { it.value.date }
+        column.cellFactory = Callback { DatePickerTableCell() }
+        column.prefWidth = COLUMN_WIDTH_DATE
+        return column
+    }
 
-        val descriptionColumn =
+    private fun kindColumn(): TableColumn<TransactionReviewRow, String> {
+        val column =
+            TableColumn<TransactionReviewRow, String>(
+                preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_KIND),
+            )
+        column.cellValueFactory = Callback { SimpleStringProperty(creditCardKindLabel(it.value.kind)) }
+        column.prefWidth = COLUMN_WIDTH_KIND
+        return column
+    }
+
+    private fun creditCardKindLabel(kind: TransactionKind): String =
+        preferencesService.translate(
+            when (kind) {
+                TransactionKind.CREDIT_CARD_PAYMENT -> TranslationKeys.AI_REVIEW_KIND_CREDIT_CARD_PAYMENT
+                else -> TranslationKeys.AI_REVIEW_KIND_CREDIT_CARD_PURCHASE
+            },
+        )
+
+    private fun descriptionColumn(): TableColumn<TransactionReviewRow, String> {
+        val column =
             TableColumn<TransactionReviewRow, String>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_DESCRIPTION),
             )
-        descriptionColumn.cellValueFactory = Callback { it.value.description }
-        descriptionColumn.cellFactory = TextFieldTableCell.forTableColumn()
-        descriptionColumn.prefWidth = COLUMN_WIDTH_DESCRIPTION
+        column.cellValueFactory = Callback { it.value.description }
+        column.cellFactory = TextFieldTableCell.forTableColumn()
+        column.prefWidth = COLUMN_WIDTH_DESCRIPTION
+        return column
+    }
 
-        val amountColumn =
+    private fun amountColumn(): TableColumn<TransactionReviewRow, BigDecimal> {
+        val column =
             TableColumn<TransactionReviewRow, BigDecimal>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_AMOUNT),
             )
-        amountColumn.cellValueFactory = Callback { it.value.amount }
-        amountColumn.cellFactory = TextFieldTableCell.forTableColumn(bigDecimalTableConverter())
-        amountColumn.prefWidth = COLUMN_WIDTH_AMOUNT
+        column.cellValueFactory = Callback { it.value.amount }
+        column.cellFactory = TextFieldTableCell.forTableColumn(bigDecimalTableConverter())
+        column.prefWidth = COLUMN_WIDTH_AMOUNT
+        return column
+    }
 
-        val installmentsColumn =
+    private fun installmentsColumn(): TableColumn<TransactionReviewRow, Int> {
+        val column =
             TableColumn<TransactionReviewRow, Int>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_INSTALLMENTS),
             )
-        installmentsColumn.cellValueFactory = Callback { it.value.installments }
-        installmentsColumn.cellFactory = TextFieldTableCell.forTableColumn(IntegerStringConverter())
-        installmentsColumn.prefWidth = COLUMN_WIDTH_INSTALLMENTS
+        column.cellValueFactory = Callback { it.value.installments }
+        column.cellFactory = TextFieldTableCell.forTableColumn(IntegerStringConverter())
+        column.prefWidth = COLUMN_WIDTH_INSTALLMENTS
+        return column
+    }
 
+    private fun movementTypeColumn(): TableColumn<TransactionReviewRow, WalletTransactionType> {
         val movementTypes =
             FXCollections.observableArrayList(
                 WalletTransactionType.INCOME,
                 WalletTransactionType.EXPENSE,
             )
-        val movementTypeColumn =
+        val column =
             TableColumn<TransactionReviewRow, WalletTransactionType>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_MOVEMENT_TYPE),
             )
-        movementTypeColumn.cellValueFactory = Callback { it.value.movementType }
-        movementTypeColumn.cellFactory = ComboBoxTableCell.forTableColumn(movementTypeConverter(), movementTypes)
-        movementTypeColumn.prefWidth = COLUMN_WIDTH_MOVEMENT_TYPE
+        column.cellValueFactory = Callback { it.value.movementType }
+        column.cellFactory = ComboBoxTableCell.forTableColumn(movementTypeConverter(), movementTypes)
+        column.prefWidth = COLUMN_WIDTH_MOVEMENT_TYPE
+        return column
+    }
 
+    private fun categoryColumn(): TableColumn<TransactionReviewRow, String> {
         val categoryNames = FXCollections.observableArrayList(categories.map { it.name })
-        val categoryColumn =
+        val column =
             TableColumn<TransactionReviewRow, String>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_CATEGORY),
             )
-        categoryColumn.cellValueFactory = Callback { it.value.categoryName }
-        categoryColumn.cellFactory =
+        column.cellValueFactory = Callback { it.value.categoryName }
+        column.cellFactory =
             Callback { _: TableColumn<TransactionReviewRow, String> ->
                 ComboBoxTableCell<TransactionReviewRow, String>(categoryNames).apply { isComboBoxEditable = true }
             }
-        categoryColumn.prefWidth = COLUMN_WIDTH_CATEGORY
+        column.prefWidth = COLUMN_WIDTH_CATEGORY
+        return column
+    }
 
-        val walletLabels =
-            FXCollections.observableArrayList(
-                wallets.map { walletPrefix + it.name } + creditCards.map { creditCardPrefix + it.name },
-            )
-        val walletColumn =
+    private fun walletColumn(): TableColumn<TransactionReviewRow, String> {
+        val walletNames = FXCollections.observableArrayList(wallets.map { it.name })
+        val column =
             TableColumn<TransactionReviewRow, String>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_WALLET),
             )
-        walletColumn.cellValueFactory = Callback { it.value.walletOrCardLabel }
-        walletColumn.cellFactory = ComboBoxTableCell.forTableColumn(walletLabels)
-        walletColumn.prefWidth = COLUMN_WIDTH_WALLET
+        column.cellValueFactory = Callback { it.value.walletOrCardLabel }
+        column.cellFactory = ComboBoxTableCell.forTableColumn(walletNames)
+        column.prefWidth = COLUMN_WIDTH_WALLET
+        return column
+    }
 
-        val notesColumn =
+    private fun creditCardColumn(): TableColumn<TransactionReviewRow, String> {
+        val creditCardNames = FXCollections.observableArrayList(creditCards.map { it.name })
+        val column =
+            TableColumn<TransactionReviewRow, String>(
+                preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_CREDIT_CARD),
+            )
+        column.cellValueFactory = Callback { it.value.walletOrCardLabel }
+        column.cellFactory = ComboBoxTableCell.forTableColumn(creditCardNames)
+        column.prefWidth = COLUMN_WIDTH_WALLET
+        return column
+    }
+
+    private fun notesColumn(): TableColumn<TransactionReviewRow, String> {
+        val column =
             TableColumn<TransactionReviewRow, String>(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_NOTES),
             )
-        notesColumn.cellValueFactory =
+        column.cellValueFactory =
             Callback { data -> Bindings.createStringBinding({ buildNotes(data.value) }, data.value.categoryName) }
-        notesColumn.prefWidth = COLUMN_WIDTH_NOTES
-
-        transactionsTable.columns.setAll(
-            listOf(
-                confirmColumn,
-                dateColumn,
-                descriptionColumn,
-                amountColumn,
-                installmentsColumn,
-                movementTypeColumn,
-                categoryColumn,
-                walletColumn,
-                notesColumn,
-            ),
-        )
-
-        transactionsTable.setRowFactory {
-            TableRow<TransactionReviewRow>().apply {
-                itemProperty().addListener { _, _, row ->
-                    styleClass.removeAll(STYLE_ROW_DUPLICATE, STYLE_ROW_LOW_CONFIDENCE)
-                    if (row?.possibleDuplicate == true) styleClass.add(STYLE_ROW_DUPLICATE)
-                    if (row?.lowConfidence == true) styleClass.add(STYLE_ROW_LOW_CONFIDENCE)
-                }
-            }
-        }
+        column.prefWidth = COLUMN_WIDTH_NOTES
+        return column
     }
 
     private fun buildNotes(row: TransactionReviewRow): String {
@@ -357,7 +464,8 @@ class TransactionReviewController(
 
     @FXML
     private fun handleConfirm() {
-        val rowsToConfirm = transactionsTable.items.filter { it.confirm.value }
+        val allTables = listOf(walletTable, creditCardTable)
+        val rowsToConfirm = allTables.flatMap { table -> table.items.filter { it.confirm.value } }
         if (rowsToConfirm.isEmpty()) {
             closeWindow()
             return
@@ -372,7 +480,8 @@ class TransactionReviewController(
                 .onFailure { e -> errors.add("${describeRow(row)}: ${e.message ?: "unknown error"}") }
         }
 
-        transactionsTable.items.removeAll(succeeded)
+        allTables.forEach { table -> table.items.removeAll(succeeded) }
+        refreshTabs()
 
         if (errors.isEmpty()) {
             WindowUtils.showSuccessDialog(
@@ -475,16 +584,12 @@ class TransactionReviewController(
         return created
     }
 
-    private fun resolveWallet(label: String): Wallet? = wallets.firstOrNull { walletPrefix + it.name == label }
+    private fun resolveWallet(name: String): Wallet? = wallets.firstOrNull { it.name == name }
 
-    private fun resolveCreditCard(label: String): CreditCard? =
-        creditCards.firstOrNull {
-            creditCardPrefix + it.name ==
-                label
-        }
+    private fun resolveCreditCard(name: String): CreditCard? = creditCards.firstOrNull { it.name == name }
 
     private fun closeWindow() {
-        val stage = transactionsTable.scene.window as Stage
+        val stage = transactionsTabPane.scene.window as Stage
         stage.close()
     }
 

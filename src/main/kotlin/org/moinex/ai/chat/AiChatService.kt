@@ -46,8 +46,8 @@ class AiChatService(
 
         var conversation = listOf(systemMessage()) + history
         var iterations = 0
-        var proposedTransactions: List<ExtractedTransactionDTO>? = null
-        var proposedInvestmentOperations: List<ExtractedInvestmentOperationDTO>? = null
+        val proposedTransactions = mutableListOf<ExtractedTransactionDTO>()
+        val proposedInvestmentOperations = mutableListOf<ExtractedInvestmentOperationDTO>()
 
         while (true) {
             val response =
@@ -61,8 +61,8 @@ class AiChatService(
             if (response.toolCalls.isEmpty()) {
                 return ChatTurnResult.Success(
                     reply = response.text.orEmpty(),
-                    proposedTransactions = proposedTransactions.orEmpty(),
-                    proposedInvestmentOperations = proposedInvestmentOperations.orEmpty(),
+                    proposedTransactions = proposedTransactions,
+                    proposedInvestmentOperations = proposedInvestmentOperations,
                 )
             }
 
@@ -84,11 +84,13 @@ class AiChatService(
                     val result = executeTool(tools, call.toolName, call.argumentsJson)
                     when (call.toolName) {
                         ProposeTransactionTool.NAME ->
-                            proposedTransactions =
-                                runCatching { ProposeTransactionTool.parseResultJson(result) }.getOrNull()
+                            runCatching { ProposeTransactionTool.parseResultJson(result) }
+                                .getOrNull()
+                                ?.let { proposedTransactions.addAll(it) }
                         ProposeInvestmentOperationTool.NAME ->
-                            proposedInvestmentOperations =
-                                runCatching { ProposeInvestmentOperationTool.parseResultJson(result) }.getOrNull()
+                            runCatching { ProposeInvestmentOperationTool.parseResultJson(result) }
+                                .getOrNull()
+                                ?.let { proposedInvestmentOperations.addAll(it) }
                     }
 
                     ChatMessage(

@@ -143,7 +143,12 @@ class ProposeTransactionToolTest :
         }
 
         Given("a candidate whose existingTransactionId points to a still-pending wallet transaction") {
-            val pending = WalletTransactionFactory.create(id = 99, status = WalletTransactionStatus.PENDING)
+            val pending =
+                WalletTransactionFactory.create(
+                    id = 99,
+                    status = WalletTransactionStatus.PENDING,
+                    description = "Mercado - já cadastrado",
+                )
             every { walletService.getWalletTransactionById(99) } returns pending
 
             val arguments =
@@ -161,6 +166,32 @@ class ProposeTransactionToolTest :
                     "existingTransactionId is carried through so the review screen updates it instead of creating one",
                 ) {
                     result[0].existingTransactionId shouldBe 99
+                }
+
+                Then("the existing transaction's own description is kept instead of the model's proposed one") {
+                    result[0].description shouldBe "Mercado - já cadastrado"
+                }
+            }
+        }
+
+        Given("a candidate confirming a pending transaction that has no description of its own") {
+            val pending =
+                WalletTransactionFactory.create(id = 96, status = WalletTransactionStatus.PENDING, description = null)
+            every { walletService.getWalletTransactionById(96) } returns pending
+
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Market","amount":150.30,"kind":"wallet",
+                     "existingTransactionId":96,"walletName":"nubank","categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("it falls back to the model's proposed description") {
+                    result[0].description shouldBe "Market"
                 }
             }
         }

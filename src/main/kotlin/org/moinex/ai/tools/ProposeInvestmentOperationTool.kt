@@ -79,6 +79,20 @@ class ProposeInvestmentOperationTool(
         private fun usesBond(kind: InvestmentOperationKind) =
             kind == InvestmentOperationKind.BOND_APPLICATION || kind == InvestmentOperationKind.BOND_REDEMPTION
 
+        /**
+         * Matches by symbol, name, or the symbol's base part before an exchange suffix (e.g. a
+         * ticker stored as "PETR4.SA" - the yfinance form needed for its price to update -
+         * matches assetName "PETR4", which is how the model naturally reads it off a statement or
+         * types it; nobody writes the ".SA" suffix outside of yfinance itself).
+         */
+        private fun matchesTicker(
+            ticker: Ticker,
+            assetName: String,
+        ): Boolean =
+            ticker.symbol.equals(assetName, ignoreCase = true) ||
+                ticker.name.equals(assetName, ignoreCase = true) ||
+                ticker.symbol.substringBefore(".").equals(assetName, ignoreCase = true)
+
         private fun JSONObject.optIntOrNull(key: String): Int? = if (isNull(key) || !has(key)) null else getInt(key)
 
         private fun JSONObject.optBigDecimalOrZero(key: String): BigDecimal =
@@ -122,12 +136,22 @@ class ProposeInvestmentOperationTool(
         val quantityProperty =
             JSONObject()
                 .put("type", "number")
-                .put("description", "Number of units traded. Leave at 0 for kind dividend.")
+                .put(
+                    "description",
+                    "REQUIRED and must be greater than 0 for stock_purchase, stock_sale, bond_application and " +
+                        "bond_redemption - never omit or leave at 0 for those. Only 0 for kind dividend, which has " +
+                        "no quantity/unit price breakdown.",
+                )
 
         val unitPriceProperty =
             JSONObject()
                 .put("type", "number")
-                .put("description", "Price per unit. Leave at 0 for kind dividend.")
+                .put(
+                    "description",
+                    "REQUIRED and must be greater than 0 for stock_purchase, stock_sale, bond_application and " +
+                        "bond_redemption - never omit or leave at 0 for those. Only 0 for kind dividend, which has " +
+                        "no quantity/unit price breakdown.",
+                )
 
         val feesProperty =
             JSONObject()
@@ -160,7 +184,18 @@ class ProposeInvestmentOperationTool(
                 .put("confidence", JSONObject().put("type", "number"))
 
         val requiredFields =
-            JSONArray(listOf("date", "kind", "assetName", "description", "walletName", "categoryName"))
+            JSONArray(
+                listOf(
+                    "date",
+                    "kind",
+                    "assetName",
+                    "description",
+                    "quantity",
+                    "unitPrice",
+                    "walletName",
+                    "categoryName",
+                ),
+            )
 
         val item =
             JSONObject()
@@ -217,14 +252,7 @@ class ProposeInvestmentOperationTool(
         val matchedWallet =
             wallets.firstOrNull { it.name.equals(candidate.optString("walletName"), ignoreCase = true) }
 
-        val matchedTicker =
-            if (!usesBond(kind)) {
-                tickers.firstOrNull {
-                    it.symbol.equals(assetName, ignoreCase = true) || it.name.equals(assetName, ignoreCase = true)
-                }
-            } else {
-                null
-            }
+        val matchedTicker = if (!usesBond(kind)) tickers.firstOrNull { matchesTicker(it, assetName) } else null
         val matchedBond =
             if (usesBond(kind)) {
                 bonds.firstOrNull {
