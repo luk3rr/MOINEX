@@ -17,3 +17,7 @@
 .ai-review-row-low-confidence {
   -fx-background-color: theme-badge-neutral-bg;
 }
+
+.ai-review-row-unmatched {
+  -fx-background-color: theme-badge-warning-bg;
+}

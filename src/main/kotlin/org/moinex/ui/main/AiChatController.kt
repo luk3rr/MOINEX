@@ -37,8 +37,10 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.model.dto.ai.ExtractedInvestmentOperationDTO
 import org.moinex.model.dto.ai.ExtractedTransactionDTO
 import org.moinex.service.PreferencesService
+import org.moinex.ui.dialog.ai.InvestmentOperationReviewController
 import org.moinex.ui.dialog.ai.TransactionReviewController
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
@@ -48,6 +50,14 @@ import java.io.File
 import java.net.URI
 import java.text.MessageFormat
 import java.util.Base64
+
+private class PendingTransactionReview(
+    var transactions: List<ExtractedTransactionDTO>,
+)
+
+private class PendingInvestmentReview(
+    var operations: List<ExtractedInvestmentOperationDTO>,
+)
 
 @Controller
 class AiChatController(
@@ -78,7 +88,8 @@ class AiChatController(
     private lateinit var thinkingLabel: Label
 
     private val history = mutableListOf<ChatMessage>()
-    private val pendingReviews = mutableListOf<List<ExtractedTransactionDTO>>()
+    private val pendingReviews = mutableListOf<PendingTransactionReview>()
+    private val pendingInvestmentReviews = mutableListOf<PendingInvestmentReview>()
     private val pendingAttachments = mutableListOf<ChatAttachment>()
     private var busy = false
     private var requestStartNanos = 0L
@@ -135,6 +146,7 @@ class AiChatController(
             appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
         }
         pendingReviews.forEach { renderReviewButton(it) }
+        pendingInvestmentReviews.forEach { renderInvestmentReviewButton(it) }
         refreshAttachmentsUI()
     }
 
@@ -265,14 +277,15 @@ class AiChatController(
                 history.add(
                     ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
                 )
-                appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
-            }
-            is ChatTurnResult.TransactionsProposed -> {
-                history.add(
-                    ChatMessage(role = ChatRole.ASSISTANT, content = result.reply, responseTimeMillis = elapsedMillis),
-                )
-                if (result.reply.isNotBlank()) appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
-                appendReviewButton(result.transactions)
+                val hasProposals =
+                    result.proposedTransactions.isNotEmpty() || result.proposedInvestmentOperations.isNotEmpty()
+                if (result.reply.isNotBlank() || !hasProposals) {
+                    appendBubble(ChatRole.ASSISTANT, result.reply, elapsedMillis)
+                }
+                if (result.proposedTransactions.isNotEmpty()) appendReviewButton(result.proposedTransactions)
+                if (result.proposedInvestmentOperations.isNotEmpty()) {
+                    appendInvestmentReviewButton(result.proposedInvestmentOperations)
+                }
             }
             is ChatTurnResult.NoProviderConfigured ->
                 appendNotice(preferencesService.translate(TranslationKeys.AI_CHAT_NO_PROVIDER_CONFIGURED))
@@ -286,32 +299,101 @@ class AiChatController(
     }
 
     private fun appendReviewButton(transactions: List<ExtractedTransactionDTO>) {
-        pendingReviews.add(transactions)
-        renderReviewButton(transactions)
+        val pending = PendingTransactionReview(transactions)
+        pendingReviews.add(pending)
+        renderReviewButton(pending)
     }
 
-    private fun renderReviewButton(transactions: List<ExtractedTransactionDTO>) {
+    private fun renderReviewButton(pending: PendingTransactionReview) {
         val button =
-            JFXButton(
-                MessageFormat.format(
-                    preferencesService.translate(TranslationKeys.AI_CHAT_REVIEW_BUTTON),
-                    transactions.size,
-                ),
-            ).apply {
+            JFXButton(reviewButtonText(pending.transactions.size)).apply {
                 styleClass.add(STYLE_ATTACH_BUTTON)
-                setOnAction { openTransactionReview(transactions) }
             }
-        messagesContainer.children.add(HBox(button).apply { alignment = Pos.CENTER_LEFT })
+        val row = HBox(button).apply { alignment = Pos.CENTER_LEFT }
+        button.setOnAction { openTransactionReview(pending, button, row) }
+        messagesContainer.children.add(row)
         scrollToBottom()
     }
 
-    private fun openTransactionReview(transactions: List<ExtractedTransactionDTO>) {
+    private fun reviewButtonText(count: Int): String =
+        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_REVIEW_BUTTON), count)
+
+    private fun openTransactionReview(
+        pending: PendingTransactionReview,
+        button: JFXButton,
+        row: HBox,
+    ) {
+        var controllerRef: TransactionReviewController? = null
         WindowUtils.openModalWindow(
             Files.TRANSACTION_REVIEW_FXML,
             preferencesService.translate(TranslationKeys.AI_REVIEW_TITLE),
             springContext,
-            { controller: TransactionReviewController -> controller.setProposedTransactions(transactions) },
-            emptyList(),
+            { controller: TransactionReviewController ->
+                controllerRef = controller
+                controller.setProposedTransactions(pending.transactions)
+            },
+            listOf(
+                Runnable {
+                    val remaining = controllerRef?.getRemainingTransactions() ?: return@Runnable
+                    pending.transactions = remaining
+                    if (remaining.isEmpty()) {
+                        pendingReviews.remove(pending)
+                        messagesContainer.children.remove(row)
+                    } else {
+                        button.text = reviewButtonText(remaining.size)
+                    }
+                },
+            ),
+            preferencesService.bundle,
+        )
+    }
+
+    private fun appendInvestmentReviewButton(operations: List<ExtractedInvestmentOperationDTO>) {
+        val pending = PendingInvestmentReview(operations)
+        pendingInvestmentReviews.add(pending)
+        renderInvestmentReviewButton(pending)
+    }
+
+    private fun renderInvestmentReviewButton(pending: PendingInvestmentReview) {
+        val button =
+            JFXButton(investmentReviewButtonText(pending.operations.size)).apply {
+                styleClass.add(STYLE_ATTACH_BUTTON)
+            }
+        val row = HBox(button).apply { alignment = Pos.CENTER_LEFT }
+        button.setOnAction { openInvestmentOperationReview(pending, button, row) }
+        messagesContainer.children.add(row)
+        scrollToBottom()
+    }
+
+    private fun investmentReviewButtonText(count: Int): String =
+        MessageFormat.format(preferencesService.translate(TranslationKeys.AI_CHAT_REVIEW_INVESTMENT_BUTTON), count)
+
+    private fun openInvestmentOperationReview(
+        pending: PendingInvestmentReview,
+        button: JFXButton,
+        row: HBox,
+    ) {
+        var controllerRef: InvestmentOperationReviewController? = null
+        WindowUtils.openModalWindow(
+            Files.INVESTMENT_OPERATION_REVIEW_FXML,
+            preferencesService.translate(TranslationKeys.AI_REVIEW_INV_TITLE),
+            springContext,
+            { controller: InvestmentOperationReviewController ->
+                controllerRef = controller
+                controller.setProposedOperations(pending.operations)
+            },
+            listOf(
+                Runnable {
+                    val remaining = controllerRef?.getRemainingOperations() ?: return@Runnable
+                    pending.operations = remaining
+                    if (remaining.isEmpty()) {
+                        pendingInvestmentReviews.remove(pending)
+                        messagesContainer.children.remove(row)
+                    } else {
+                        button.text = investmentReviewButtonText(remaining.size)
+                    }
+                },
+            ),
             preferencesService.bundle,
         )
     }

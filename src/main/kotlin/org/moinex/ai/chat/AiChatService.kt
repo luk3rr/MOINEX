@@ -9,10 +9,13 @@ package org.moinex.ai.chat
 import org.json.JSONObject
 import org.moinex.ai.provider.LlmProviderFactory
 import org.moinex.ai.tools.LlmTool
+import org.moinex.ai.tools.ProposeInvestmentOperationTool
 import org.moinex.ai.tools.ProposeTransactionTool
 import org.moinex.ai.tools.QueryFinanceTool
+import org.moinex.common.ClockProvider
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.config.AiPromptProperties
+import org.moinex.model.dto.ai.ExtractedInvestmentOperationDTO
 import org.moinex.model.dto.ai.ExtractedTransactionDTO
 import org.moinex.service.PreferencesService
 import org.springframework.stereotype.Service
@@ -27,8 +30,10 @@ class AiChatService(
     private val llmProviderFactory: LlmProviderFactory,
     private val queryFinanceTool: QueryFinanceTool,
     private val proposeTransactionTool: ProposeTransactionTool,
+    private val proposeInvestmentOperationTool: ProposeInvestmentOperationTool,
     private val aiPromptProperties: AiPromptProperties,
     private val preferencesService: PreferencesService,
+    private val clockProvider: ClockProvider,
 ) {
     companion object {
         private const val MAX_TOOL_ITERATIONS = 5
@@ -37,11 +42,12 @@ class AiChatService(
 
     suspend fun sendMessage(history: List<ChatMessage>): ChatTurnResult {
         val provider = llmProviderFactory.currentProvider() ?: return ChatTurnResult.NoProviderConfigured
-        val tools = queryFinanceTool.availableTools() + proposeTransactionTool
+        val tools = queryFinanceTool.availableTools() + proposeTransactionTool + proposeInvestmentOperationTool
 
         var conversation = listOf(systemMessage()) + history
         var iterations = 0
         var proposedTransactions: List<ExtractedTransactionDTO>? = null
+        var proposedInvestmentOperations: List<ExtractedInvestmentOperationDTO>? = null
 
         while (true) {
             val response =
@@ -53,12 +59,11 @@ class AiChatService(
                     }
 
             if (response.toolCalls.isEmpty()) {
-                val proposed = proposedTransactions
-                return if (proposed != null) {
-                    ChatTurnResult.TransactionsProposed(proposed, response.text.orEmpty())
-                } else {
-                    ChatTurnResult.Success(response.text.orEmpty())
-                }
+                return ChatTurnResult.Success(
+                    reply = response.text.orEmpty(),
+                    proposedTransactions = proposedTransactions.orEmpty(),
+                    proposedInvestmentOperations = proposedInvestmentOperations.orEmpty(),
+                )
             }
 
             if (iterations >= MAX_TOOL_ITERATIONS) {
@@ -77,9 +82,13 @@ class AiChatService(
             val toolResultMessages =
                 response.toolCalls.map { call ->
                     val result = executeTool(tools, call.toolName, call.argumentsJson)
-                    if (call.toolName == ProposeTransactionTool.NAME) {
-                        proposedTransactions =
-                            runCatching { ProposeTransactionTool.parseResultJson(result) }.getOrNull()
+                    when (call.toolName) {
+                        ProposeTransactionTool.NAME ->
+                            proposedTransactions =
+                                runCatching { ProposeTransactionTool.parseResultJson(result) }.getOrNull()
+                        ProposeInvestmentOperationTool.NAME ->
+                            proposedInvestmentOperations =
+                                runCatching { ProposeInvestmentOperationTool.parseResultJson(result) }.getOrNull()
                     }
 
                     ChatMessage(
@@ -104,25 +113,23 @@ class AiChatService(
             attachments.joinToString("\n\n\n") { attachment ->
                 "File \"${attachment.fileName}\":\n\n${attachment.extractedText}"
             }
-        val instruction =
-            MessageFormat.format(
-                aiPromptProperties.attachmentInstructionTemplate,
-                fileNames,
-                proposeTransactionTool.describeAvailableContext(),
-                filesBlock,
-            )
+        val instruction = MessageFormat.format(aiPromptProperties.attachmentInstructionTemplate, fileNames, filesBlock)
         return if (userNote.isNullOrBlank()) instruction else "$userNote\n\n$instruction"
     }
 
-    /** Picks the system prompt matching the app's current UI language, falling back to English. */
     private fun systemMessage(): ChatMessage {
         val localeKey = preferencesService.locale.toLanguageTag().lowercase()
-        val text =
+        val basePrompt =
             aiPromptProperties.systemPrompt[localeKey]
                 ?: aiPromptProperties.systemPrompt[FALLBACK_PROMPT_LOCALE]
                 ?: ""
 
-        return ChatMessage(role = ChatRole.SYSTEM, content = text)
+        val context =
+            "Today's date: ${clockProvider.today()}\n" +
+                "${proposeTransactionTool.describeAvailableContext()}\n" +
+                proposeInvestmentOperationTool.describeAvailableContext()
+
+        return ChatMessage(role = ChatRole.SYSTEM, content = "$basePrompt\n\n$context")
     }
 
     private fun executeTool(

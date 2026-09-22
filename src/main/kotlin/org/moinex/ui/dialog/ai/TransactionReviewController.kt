@@ -12,9 +12,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.fxml.FXML
-import javafx.scene.control.ContentDisplay
-import javafx.scene.control.DatePicker
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
@@ -42,6 +39,8 @@ import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
+import org.moinex.ui.common.DatePickerTableCell
+import org.moinex.ui.common.bigDecimalTableConverter
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
 import java.text.MessageFormat
@@ -61,52 +60,6 @@ class TransactionReviewRow(
     val lowConfidence: Boolean,
     val invoiceMonth: YearMonth?,
 )
-
-/** Edits a [LocalDate] cell with a real [DatePicker] instead of free text. */
-private class DatePickerTableCell<S> : TableCell<S, LocalDate>() {
-    private val datePicker =
-        DatePicker().apply {
-            setOnAction { commitEdit(value) }
-            focusedProperty().addListener { _, _, focused -> if (!focused && isEditing) commitEdit(value) }
-        }
-
-    override fun startEdit() {
-        super.startEdit()
-        datePicker.value = item
-        contentDisplay = ContentDisplay.GRAPHIC_ONLY
-        graphic = datePicker
-    }
-
-    override fun cancelEdit() {
-        super.cancelEdit()
-        contentDisplay = ContentDisplay.TEXT_ONLY
-        text = item?.toString()
-        graphic = null
-    }
-
-    override fun updateItem(
-        item: LocalDate?,
-        empty: Boolean,
-    ) {
-        super.updateItem(item, empty)
-        when {
-            empty -> {
-                text = null
-                graphic = null
-            }
-            isEditing -> {
-                datePicker.value = item
-                contentDisplay = ContentDisplay.GRAPHIC_ONLY
-                graphic = datePicker
-            }
-            else -> {
-                contentDisplay = ContentDisplay.TEXT_ONLY
-                text = item?.toString()
-                graphic = null
-            }
-        }
-    }
-}
 
 @Controller
 class TransactionReviewController(
@@ -153,6 +106,29 @@ class TransactionReviewController(
     fun setProposedTransactions(transactions: List<ExtractedTransactionDTO>) {
         transactionsTable.items.setAll(transactions.map(::toRow))
     }
+
+    fun getRemainingTransactions(): List<ExtractedTransactionDTO> =
+        transactionsTable.items.map { row ->
+            val wallet = if (row.kind == TransactionKind.WALLET) resolveWallet(row.walletOrCardLabel.value) else null
+            val creditCard =
+                if (row.kind != TransactionKind.WALLET) resolveCreditCard(row.walletOrCardLabel.value) else null
+            val category = categories.firstOrNull { it.name.equals(row.categoryName.value, ignoreCase = true) }
+
+            ExtractedTransactionDTO(
+                date = row.date.value,
+                description = row.description.value,
+                amount = row.amount.value,
+                kind = row.kind,
+                movementType = row.movementType.value,
+                invoiceMonth = row.invoiceMonth,
+                suggestedWalletId = wallet?.id,
+                suggestedCreditCardId = creditCard?.id,
+                suggestedCategoryId = category?.id,
+                suggestedCategoryName = row.categoryName.value,
+                confidence = if (row.lowConfidence) 0.0 else 1.0,
+                possibleDuplicate = row.possibleDuplicate,
+            )
+        }
 
     private fun toRow(dto: ExtractedTransactionDTO): TransactionReviewRow {
         val walletLabel =
@@ -227,7 +203,7 @@ class TransactionReviewController(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_AMOUNT),
             )
         amountColumn.cellValueFactory = Callback { it.value.amount }
-        amountColumn.cellFactory = TextFieldTableCell.forTableColumn(bigDecimalConverter())
+        amountColumn.cellFactory = TextFieldTableCell.forTableColumn(bigDecimalTableConverter())
         amountColumn.prefWidth = COLUMN_WIDTH_AMOUNT
 
         val movementTypes =
@@ -335,14 +311,6 @@ class TransactionReviewController(
                 }
         }
 
-    private fun bigDecimalConverter() =
-        object : StringConverter<BigDecimal>() {
-            override fun toString(value: BigDecimal?): String = value?.toPlainString().orEmpty()
-
-            override fun fromString(text: String?): BigDecimal =
-                runCatching { BigDecimal(text) }.getOrDefault(BigDecimal.ZERO)
-        }
-
     @FXML
     private fun handleConfirm() {
         val rowsToConfirm = transactionsTable.items.filter { it.confirm.value }
@@ -351,21 +319,23 @@ class TransactionReviewController(
             return
         }
 
-        var confirmedCount = 0
+        val succeeded = mutableListOf<TransactionReviewRow>()
         val errors = mutableListOf<String>()
 
         rowsToConfirm.forEach { row ->
             runCatching { persist(row) }
-                .onSuccess { confirmedCount++ }
-                .onFailure { e -> errors.add(e.message ?: "unknown error") }
+                .onSuccess { succeeded.add(row) }
+                .onFailure { e -> errors.add("${describeRow(row)}: ${e.message ?: "unknown error"}") }
         }
+
+        transactionsTable.items.removeAll(succeeded)
 
         if (errors.isEmpty()) {
             WindowUtils.showSuccessDialog(
                 preferencesService.translate(TranslationKeys.AI_REVIEW_TITLE),
                 MessageFormat.format(
                     preferencesService.translate(TranslationKeys.AI_REVIEW_CONFIRMED_COUNT),
-                    confirmedCount,
+                    succeeded.size,
                 ),
                 preferencesService.bundle,
             )
@@ -378,6 +348,8 @@ class TransactionReviewController(
             )
         }
     }
+
+    private fun describeRow(row: TransactionReviewRow): String = "${row.date.value} - ${row.description.value}"
 
     private fun persist(row: TransactionReviewRow) {
         val date = row.date.value.atStartOfDay()

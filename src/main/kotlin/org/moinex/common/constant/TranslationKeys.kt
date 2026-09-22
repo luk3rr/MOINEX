@@ -2041,6 +2041,7 @@ object TranslationKeys {
     const val AI_CHAT_ATTACH_FILE_FILTER: String = "aichat.attach.fileFilter"
     const val AI_CHAT_ATTACH_ERROR: String = "aichat.attach.error"
     const val AI_CHAT_REVIEW_BUTTON: String = "aichat.review.button"
+    const val AI_CHAT_REVIEW_INVESTMENT_BUTTON: String = "aichat.review.investment.button"
 
     // AI tools (sent to the LLM as function descriptions - must follow the app's UI language too)
     const val AI_TOOL_NET_WORTH_DESCRIPTION: String = "aitool.netWorth.description"
@@ -2063,6 +2064,8 @@ object TranslationKeys {
     const val AI_TOOL_BUDGET_VS_ACTUAL_DESCRIPTION: String = "aitool.budgetVsActual.description"
     const val AI_TOOL_BUDGET_VS_ACTUAL_MONTH_PARAM: String = "aitool.budgetVsActual.monthParam"
     const val AI_TOOL_PORTFOLIO_SUMMARY_DESCRIPTION: String = "aitool.portfolioSummary.description"
+    const val AI_TOOL_PROPOSE_INVESTMENT_OPERATIONS_DESCRIPTION: String =
+        "aitool.proposeInvestmentOperations.description"
 
     // AI transaction review
     const val AI_REVIEW_TITLE: String = "aireview.title"
@@ -2084,4 +2087,29 @@ object TranslationKeys {
     const val AI_REVIEW_NO_WALLET_SELECTED: String = "aireview.error.noWalletSelected"
     const val AI_REVIEW_NO_BILLING_WALLET: String = "aireview.error.noBillingWallet"
     const val AI_REVIEW_CONFIRMED_COUNT: String = "aireview.confirmedCount"
+
+    // AI investment operation review
+    const val AI_REVIEW_INV_TITLE: String = "aireviewinv.title"
+    const val AI_REVIEW_INV_COLUMN_KIND: String = "aireviewinv.column.kind"
+    const val AI_REVIEW_INV_COLUMN_ASSET: String = "aireviewinv.column.asset"
+    const val AI_REVIEW_INV_COLUMN_QUANTITY: String = "aireviewinv.column.quantity"
+    const val AI_REVIEW_INV_COLUMN_UNIT_PRICE: String = "aireviewinv.column.unitPrice"
+    const val AI_REVIEW_INV_COLUMN_FEES: String = "aireviewinv.column.fees"
+    const val AI_REVIEW_INV_COLUMN_TAXES: String = "aireviewinv.column.taxes"
+    const val AI_REVIEW_INV_COLUMN_DIVIDEND_AMOUNT: String = "aireviewinv.column.dividendAmount"
+    const val AI_REVIEW_INV_COLUMN_WALLET: String = "aireviewinv.column.wallet"
+    const val AI_REVIEW_INV_ASSET_PREFIX_TICKER: String = "aireviewinv.assetPrefix.ticker"
+    const val AI_REVIEW_INV_ASSET_PREFIX_BOND: String = "aireviewinv.assetPrefix.bond"
+    const val AI_REVIEW_INV_UNMATCHED_ASSET: String = "aireviewinv.unmatchedAsset"
+    const val AI_REVIEW_INV_NO_ASSET_SELECTED: String = "aireviewinv.error.noAssetSelected"
+    const val AI_REVIEW_INV_NO_WALLET_SELECTED: String = "aireviewinv.error.noWalletSelected"
+    const val AI_REVIEW_INV_KIND_STOCK_PURCHASE: String = "aireviewinv.kind.stockPurchase"
+    const val AI_REVIEW_INV_KIND_STOCK_SALE: String = "aireviewinv.kind.stockSale"
+    const val AI_REVIEW_INV_KIND_DIVIDEND: String = "aireviewinv.kind.dividend"
+    const val AI_REVIEW_INV_KIND_BOND_APPLICATION: String = "aireviewinv.kind.bondApplication"
+    const val AI_REVIEW_INV_KIND_BOND_REDEMPTION: String = "aireviewinv.kind.bondRedemption"
+    const val AI_REVIEW_INV_CONFIRMED_COUNT: String = "aireviewinv.confirmedCount"
+    const val AI_REVIEW_INV_TAB_STOCKS: String = "aireviewinv.tab.stocks"
+    const val AI_REVIEW_INV_TAB_BONDS: String = "aireviewinv.tab.bonds"
+    const val AI_REVIEW_INV_TAB_DIVIDENDS: String = "aireviewinv.tab.dividends"
 }

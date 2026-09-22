@@ -22,6 +22,7 @@ object Files {
 
     // UI ai package
     const val TRANSACTION_REVIEW_FXML: String = UI_DIALOG_AI_PATH + "transaction_review.fxml"
+    const val INVESTMENT_OPERATION_REVIEW_FXML: String = UI_DIALOG_AI_PATH + "investment_operation_review.fxml"
 
     // UI creditcard package
     const val ADD_CREDIT_CARD_DEBT_FXML: String = UI_DIALOG_CREDITCARD_PATH + "add_credit_card_debt.fxml"
@@ -204,6 +205,7 @@ object Files {
     const val AI_CHAT_STYLE_SHEET: String = CSS_SCENE_PATH + "ai_chat.css"
     const val SETTINGS_STYLE_SHEET: String = CSS_SCENE_PATH + "settings.css"
     const val CHARTS_COLORS_STYLE_SHEET: String = CSS_COMPONENT_PATH + "charts.css"
+    const val TABLE_VIEW_STYLE_SHEET: String = CSS_COMPONENT_PATH + "table-view.css"
 
     const val COMMON_STYLE_SHEET: String = CSS_COMMON_PATH + "common-styles.css"
     const val TIMELINE_CHART_STYLE_SHEET: String = CSS_COMPONENT_PATH + "timeline-chart.css"
