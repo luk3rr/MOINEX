@@ -8,6 +8,7 @@ package org.moinex.ai.tools
 
 import org.json.JSONArray
 import org.json.JSONObject
+import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCard
@@ -48,6 +49,8 @@ class ProposeTransactionTool(
                 movementType = parseMovementType(json.optString("movementType")),
                 invoiceMonth = json.optYearMonthOrNull("invoiceMonth"),
                 existingTransactionId = json.optIntOrNull("existingTransactionId"),
+                installments = json.optIntOrNull("installments") ?: 1,
+                installmentNumber = json.optIntOrNull("installmentNumber") ?: 1,
                 suggestedWalletId = json.optIntOrNull("suggestedWalletId"),
                 suggestedCreditCardId = json.optIntOrNull("suggestedCreditCardId"),
                 suggestedCategoryId = json.optIntOrNull("suggestedCategoryId"),
@@ -80,7 +83,13 @@ class ProposeTransactionTool(
         val amountProperty =
             JSONObject()
                 .put("type", "number")
-                .put("description", "Always positive - never negative, regardless of direction")
+                .put(
+                    "description",
+                    "Always positive - never negative, regardless of direction. For kind credit_card with " +
+                        "installments greater than 1, this is the value of THIS installment/line as printed " +
+                        "(e.g. the R$50 next to \"3/10\"), never a computed total - the app multiplies it by the " +
+                        "installment count itself.",
+                )
 
         val kindProperty =
             JSONObject()
@@ -127,6 +136,29 @@ class ProposeTransactionTool(
                         "Never set this for a transaction that is already confirmed.",
                 )
 
+        val installmentsProperty =
+            JSONObject()
+                .put("type", "integer")
+                .put(
+                    "description",
+                    "Only for kind credit_card. The TOTAL number of installments in the purchase, as printed on " +
+                        "the statement (e.g. \"1/10\" or \"3/10\" both mean installments=10). 1 for a single/" +
+                        "à-vista purchase.",
+                )
+
+        val installmentNumberProperty =
+            JSONObject()
+                .put("type", "integer")
+                .put(
+                    "description",
+                    "Only for kind credit_card. Which installment this specific statement line is, as printed " +
+                        "(e.g. \"3/10\" means installmentNumber=3, installments=10). 1 when the line has no " +
+                        "installment marker, or shows \"1/N\" - i.e. this is the purchase's first appearance. A " +
+                        "number greater than 1 means this purchase was already made before this statement and is " +
+                        "just continuing to show up - date should still be the ORIGINAL purchase date as printed, " +
+                        "not today.",
+                )
+
         val itemProperties =
             JSONObject()
                 .put("date", JSONObject().put("type", "string").put("format", "date"))
@@ -136,6 +168,8 @@ class ProposeTransactionTool(
                 .put("movementType", movementTypeProperty)
                 .put("invoiceMonth", invoiceMonthProperty)
                 .put("existingTransactionId", existingTransactionIdProperty)
+                .put("installments", installmentsProperty)
+                .put("installmentNumber", installmentNumberProperty)
                 .put("walletName", JSONObject().put("type", "string"))
                 .put("creditCardName", JSONObject().put("type", "string"))
                 .put("categoryName", JSONObject().put("type", "string"))
@@ -194,9 +228,6 @@ class ProposeTransactionTool(
         val matchedCreditCard =
             creditCards.firstOrNull { it.name.equals(candidate.optString("creditCardName"), ignoreCase = true) }
 
-        // Only honored for an id that actually exists, still PENDING and on a wallet transaction -
-        // never trust the model's id blindly, since confirming the wrong transaction (or one
-        // that's already confirmed) would silently corrupt real data instead of just duplicating it.
         val existingTransactionId =
             candidate
                 .optIntOrNull("existingTransactionId")
@@ -207,14 +238,29 @@ class ProposeTransactionTool(
                             ?.status == WalletTransactionStatus.PENDING
                 }
 
+        val lineAmount = candidate.getBigDecimal("amount").abs()
+        val (installments, installmentNumber, amount) =
+            if (kind == TransactionKind.CREDIT_CARD) {
+                val totalInstallments =
+                    (candidate.optIntOrNull("installments") ?: 1).coerceIn(1, Constants.MAX_INSTALLMENTS)
+                val reportedInstallmentNumber = (candidate.optIntOrNull("installmentNumber") ?: 1).coerceAtLeast(1)
+                val remaining =
+                    (totalInstallments - reportedInstallmentNumber + 1).coerceIn(1, Constants.MAX_INSTALLMENTS)
+                Triple(remaining, reportedInstallmentNumber, lineAmount.multiply(remaining.toBigDecimal()))
+            } else {
+                Triple(1, 1, lineAmount)
+            }
+
         return ExtractedTransactionDTO(
             date = LocalDate.parse(candidate.getString("date")),
             description = candidate.optString("description"),
-            amount = candidate.getBigDecimal("amount").abs(),
+            amount = amount,
             kind = kind,
             movementType = parseMovementType(candidate.optString("movementType")),
             invoiceMonth = candidate.optYearMonthOrNull("invoiceMonth"),
             existingTransactionId = existingTransactionId,
+            installments = installments,
+            installmentNumber = installmentNumber,
             suggestedWalletId = matchedWallet?.id,
             suggestedCreditCardId = matchedCreditCard?.id,
             suggestedCategoryId = matchedCategory?.id,
@@ -232,6 +278,8 @@ class ProposeTransactionTool(
             .put("movementType", dto.movementType.name.lowercase())
             .put("invoiceMonth", dto.invoiceMonth?.toString() ?: JSONObject.NULL)
             .put("existingTransactionId", dto.existingTransactionId ?: JSONObject.NULL)
+            .put("installments", dto.installments)
+            .put("installmentNumber", dto.installmentNumber)
             .put("suggestedWalletId", dto.suggestedWalletId ?: JSONObject.NULL)
             .put("suggestedCreditCardId", dto.suggestedCreditCardId ?: JSONObject.NULL)
             .put("suggestedCategoryId", dto.suggestedCategoryId ?: JSONObject.NULL)

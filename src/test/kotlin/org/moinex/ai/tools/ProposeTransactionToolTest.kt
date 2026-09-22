@@ -16,6 +16,7 @@ import org.moinex.service.CategoryService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import org.moinex.service.wallet.WalletService
+import java.math.BigDecimal
 
 class ProposeTransactionToolTest :
     BehaviorSpec({
@@ -219,6 +220,89 @@ class ProposeTransactionToolTest :
 
                 Then("the id is discarded - only a wallet transaction can be confirmed this way") {
                     result[0].existingTransactionId shouldBe null
+                }
+            }
+        }
+
+        Given("a credit card purchase seen for the first time, split into installments") {
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Fogão","amount":50.00,"kind":"credit_card",
+                     "installments":10,"installmentNumber":1,"creditCardName":"Nubank Mastercard",
+                     "categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("all 10 installments are scheduled and amount is scaled to the full purchase total") {
+                    result[0].installments shouldBe 10
+                    result[0].installmentNumber shouldBe 1
+                    result[0].amount.compareTo(BigDecimal("500.00")) shouldBe 0
+                }
+            }
+        }
+
+        Given("a statement line continuing an installment plan from a prior invoice") {
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-07-05","description":"Fogão","amount":50.00,"kind":"credit_card",
+                     "installments":10,"installmentNumber":3,"creditCardName":"Nubank Mastercard",
+                     "categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("only the remaining installments are scheduled, with amount scaled to match") {
+                    result[0].installments shouldBe 8
+                    result[0].installmentNumber shouldBe 3
+                    result[0].amount.compareTo(BigDecimal("400.00")) shouldBe 0
+                }
+            }
+        }
+
+        Given("a credit card purchase with no installment fields at all") {
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Market","amount":50.00,"kind":"credit_card",
+                     "creditCardName":"Nubank Mastercard","categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("it defaults to a single installment and the amount is unchanged") {
+                    result[0].installments shouldBe 1
+                    result[0].installmentNumber shouldBe 1
+                    result[0].amount.compareTo(BigDecimal("50.00")) shouldBe 0
+                }
+            }
+        }
+
+        Given("a wallet candidate with installment fields set") {
+            val arguments =
+                """
+                {"transactions":[
+                    {"date":"2026-09-05","description":"Salary","amount":3000.00,"kind":"wallet",
+                     "movementType":"income","installments":5,"installmentNumber":2,
+                     "categoryName":"groceries"}
+                ]}
+                """.trimIndent()
+
+            When("executing the tool") {
+                val result = ProposeTransactionTool.parseResultJson(tool.execute(arguments))
+
+                Then("installments only apply to credit_card - they're ignored here") {
+                    result[0].installments shouldBe 1
+                    result[0].installmentNumber shouldBe 1
+                    result[0].amount.compareTo(BigDecimal("3000.00")) shouldBe 0
                 }
             }
         }

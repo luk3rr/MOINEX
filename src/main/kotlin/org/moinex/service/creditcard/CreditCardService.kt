@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.YearMonth
@@ -568,6 +569,30 @@ class CreditCardService(
 
         return nextInvoiceDate ?: calculateNextInvoiceDate(creditCard)
     }
+
+    /**
+     * Which invoice a purchase made on [purchaseDate] falls into, based on [creditCard]'s closing
+     * day - a purchase made after the closing day always rolls into next month's invoice, same
+     * rule [calculateNextInvoiceDate] applies for "now". Used instead of naively assuming a
+     * purchase's calendar month is its invoice month, which is wrong whenever the purchase date is
+     * after the closing day.
+     */
+    fun invoiceMonthForPurchaseDate(
+        creditCard: CreditCard,
+        purchaseDate: LocalDate,
+    ): YearMonth {
+        val purchaseMonth = YearMonth.from(purchaseDate)
+
+        return if (purchaseDate.dayOfMonth > creditCard.closingDay) {
+            purchaseMonth.plusMonths(1)
+        } else {
+            purchaseMonth
+        }
+    }
+
+    /** The invoice a purchase made today would fall into - i.e. the currently open invoice. */
+    fun currentInvoiceMonth(creditCard: CreditCard): YearMonth =
+        invoiceMonthForPurchaseDate(creditCard, clockProvider.today())
 
     fun getDebtAtDate(date: LocalDateTime): BigDecimal {
         val now = clockProvider.now()

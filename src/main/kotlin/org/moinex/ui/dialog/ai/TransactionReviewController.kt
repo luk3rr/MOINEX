@@ -21,6 +21,7 @@ import javafx.scene.control.cell.TextFieldTableCell
 import javafx.stage.Stage
 import javafx.util.Callback
 import javafx.util.StringConverter
+import javafx.util.converter.IntegerStringConverter
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isEqual
@@ -60,6 +61,8 @@ class TransactionReviewRow(
     val lowConfidence: Boolean,
     val invoiceMonth: YearMonth?,
     val existingTransactionId: Int?,
+    val installments: SimpleObjectProperty<Int>,
+    val installmentNumber: Int,
 )
 
 @Controller
@@ -88,6 +91,7 @@ class TransactionReviewController(
         private const val COLUMN_WIDTH_DATE = 100.0
         private const val COLUMN_WIDTH_DESCRIPTION = 200.0
         private const val COLUMN_WIDTH_AMOUNT = 100.0
+        private const val COLUMN_WIDTH_INSTALLMENTS = 90.0
         private const val COLUMN_WIDTH_MOVEMENT_TYPE = 90.0
         private const val COLUMN_WIDTH_CATEGORY = 150.0
         private const val COLUMN_WIDTH_WALLET = 160.0
@@ -123,6 +127,8 @@ class TransactionReviewController(
                 movementType = row.movementType.value,
                 invoiceMonth = row.invoiceMonth,
                 existingTransactionId = row.existingTransactionId,
+                installments = row.installments.value,
+                installmentNumber = row.installmentNumber,
                 suggestedWalletId = wallet?.id,
                 suggestedCreditCardId = creditCard?.id,
                 suggestedCategoryId = category?.id,
@@ -156,13 +162,22 @@ class TransactionReviewController(
             lowConfidence = dto.confidence < LOW_CONFIDENCE_THRESHOLD,
             invoiceMonth = dto.invoiceMonth,
             existingTransactionId = dto.existingTransactionId,
+            installments = SimpleObjectProperty(dto.installments),
+            installmentNumber = dto.installmentNumber,
         )
     }
 
     private fun detectPossibleDuplicate(dto: ExtractedTransactionDTO): Boolean {
-        // Already explicitly identified as confirming a specific pending transaction - not a guess,
-        // so the "possible duplicate" heuristic (which would likely just match itself) doesn't apply.
         if (dto.existingTransactionId != null) return false
+
+        if (dto.installmentNumber > 1) {
+            return dto.kind == TransactionKind.CREDIT_CARD &&
+                creditCardService
+                    .getDebtsBetweenForAnalysis(
+                        dto.date.minusDays(DUPLICATE_WINDOW_DAYS).atStartOfDay(),
+                        dto.date.plusDays(DUPLICATE_WINDOW_DAYS).atEndOfDay(),
+                    ).any { it.creditCard.id == dto.suggestedCreditCardId && it.installments > 1 }
+        }
 
         val start = dto.date.minusDays(DUPLICATE_WINDOW_DAYS).atStartOfDay()
         val end = dto.date.plusDays(DUPLICATE_WINDOW_DAYS).atEndOfDay()
@@ -212,6 +227,14 @@ class TransactionReviewController(
         amountColumn.cellValueFactory = Callback { it.value.amount }
         amountColumn.cellFactory = TextFieldTableCell.forTableColumn(bigDecimalTableConverter())
         amountColumn.prefWidth = COLUMN_WIDTH_AMOUNT
+
+        val installmentsColumn =
+            TableColumn<TransactionReviewRow, Int>(
+                preferencesService.translate(TranslationKeys.AI_REVIEW_COLUMN_INSTALLMENTS),
+            )
+        installmentsColumn.cellValueFactory = Callback { it.value.installments }
+        installmentsColumn.cellFactory = TextFieldTableCell.forTableColumn(IntegerStringConverter())
+        installmentsColumn.prefWidth = COLUMN_WIDTH_INSTALLMENTS
 
         val movementTypes =
             FXCollections.observableArrayList(
@@ -264,6 +287,7 @@ class TransactionReviewController(
                 dateColumn,
                 descriptionColumn,
                 amountColumn,
+                installmentsColumn,
                 movementTypeColumn,
                 categoryColumn,
                 walletColumn,
@@ -286,6 +310,16 @@ class TransactionReviewController(
         val notes = mutableListOf<String>()
         if (row.existingTransactionId != null) {
             notes.add(preferencesService.translate(TranslationKeys.AI_REVIEW_CONFIRMS_PENDING))
+        }
+        if (row.installmentNumber > 1) {
+            val totalInstallments = row.installmentNumber - 1 + row.installments.value
+            notes.add(
+                MessageFormat.format(
+                    preferencesService.translate(TranslationKeys.AI_REVIEW_INSTALLMENT_CONTINUATION),
+                    row.installmentNumber,
+                    totalInstallments,
+                ),
+            )
         }
         if (row.possibleDuplicate) notes.add(preferencesService.translate(TranslationKeys.AI_REVIEW_POSSIBLE_DUPLICATE))
         if (row.lowConfidence) notes.add(preferencesService.translate(TranslationKeys.AI_REVIEW_LOW_CONFIDENCE))
@@ -383,8 +417,6 @@ class TransactionReviewController(
                     )
 
                 if (row.existingTransactionId != null) {
-                    // Confirms/updates the already-recorded pending transaction instead of creating
-                    // a duplicate - see ExtractedTransactionDTO.existingTransactionId.
                     walletService.updateWalletTransaction(transaction)
                 } else {
                     walletService.createWalletTransaction(transaction, publishNotification = true)
@@ -394,17 +426,23 @@ class TransactionReviewController(
                 val creditCard =
                     resolveCreditCard(row.walletOrCardLabel.value)
                         ?: error(preferencesService.translate(TranslationKeys.AI_REVIEW_NO_WALLET_SELECTED))
+                val invoiceMonth =
+                    if (row.installmentNumber > 1) {
+                        creditCardService.currentInvoiceMonth(creditCard)
+                    } else {
+                        creditCardService.invoiceMonthForPurchaseDate(creditCard, row.date.value)
+                    }
 
                 creditCardService.createDebt(
                     CreditCardDebt(
                         category = resolveCategory(row.categoryName.value),
-                        installments = 1,
+                        installments = row.installments.value,
                         creditCard = creditCard,
                         date = date,
                         amount = row.amount.value,
                         description = row.description.value,
                     ),
-                    invoiceMonth = YearMonth.from(row.date.value),
+                    invoiceMonth = invoiceMonth,
                     publishNotification = true,
                 )
             }

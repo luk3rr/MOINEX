@@ -23,6 +23,7 @@ import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.Optional
@@ -684,6 +685,36 @@ class CreditCardServiceGeneralTest :
 
                 Then("should return CLOSED status") {
                     result shouldBe CreditCardInvoiceStatus.CLOSED
+                }
+            }
+        }
+
+        Given("a credit card with closing day 5") {
+            val creditCard = CreditCardFactory.create(closingDay = 5)
+
+            When("a purchase is made on or before the closing day") {
+                val invoiceMonth = service.invoiceMonthForPurchaseDate(creditCard, LocalDate.of(2026, 3, 5))
+
+                Then("it falls into that same month's invoice") {
+                    invoiceMonth shouldBe YearMonth.of(2026, 3)
+                }
+            }
+
+            When("a purchase is made after the closing day") {
+                val invoiceMonth = service.invoiceMonthForPurchaseDate(creditCard, LocalDate.of(2026, 3, 6))
+
+                Then("it rolls into next month's invoice instead of its own calendar month") {
+                    invoiceMonth shouldBe YearMonth.of(2026, 4)
+                }
+            }
+
+            When("asking for the currently open invoice month") {
+                every { clockProvider.today() } returns LocalDate.of(2026, 3, 6)
+
+                val invoiceMonth = service.currentInvoiceMonth(creditCard)
+
+                Then("it applies the same closing-day rule to today's date") {
+                    invoiceMonth shouldBe YearMonth.of(2026, 4)
                 }
             }
         }
