@@ -2054,6 +2054,15 @@ object TranslationKeys {
     const val AI_TOOL_INVOICE_STATUS_DESCRIPTION: String = "aitool.invoiceStatus.description"
     const val AI_TOOL_INVOICE_STATUS_CARD_PARAM: String = "aitool.invoiceStatus.cardParam"
     const val AI_TOOL_INVOICE_STATUS_MONTH_PARAM: String = "aitool.invoiceStatus.monthParam"
+    const val AI_TOOL_INCOME_VS_EXPENSES_DESCRIPTION: String = "aitool.incomeVsExpenses.description"
+    const val AI_TOOL_INCOME_VS_EXPENSES_MONTH_PARAM: String = "aitool.incomeVsExpenses.monthParam"
+    const val AI_TOOL_COMPARE_PERIODS_DESCRIPTION: String = "aitool.comparePeriods.description"
+    const val AI_TOOL_COMPARE_PERIODS_MONTH1_PARAM: String = "aitool.comparePeriods.month1Param"
+    const val AI_TOOL_COMPARE_PERIODS_MONTH2_PARAM: String = "aitool.comparePeriods.month2Param"
+    const val AI_TOOL_GOALS_PROGRESS_DESCRIPTION: String = "aitool.goalsProgress.description"
+    const val AI_TOOL_BUDGET_VS_ACTUAL_DESCRIPTION: String = "aitool.budgetVsActual.description"
+    const val AI_TOOL_BUDGET_VS_ACTUAL_MONTH_PARAM: String = "aitool.budgetVsActual.monthParam"
+    const val AI_TOOL_PORTFOLIO_SUMMARY_DESCRIPTION: String = "aitool.portfolioSummary.description"
 
     // AI transaction review
     const val AI_REVIEW_TITLE: String = "aireview.title"

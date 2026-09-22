@@ -10,13 +10,20 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.atEndOfDay
-import org.moinex.model.enums.WalletTransactionType
+import org.moinex.common.extension.isExpense
+import org.moinex.common.extension.isIncome
+import org.moinex.common.extension.isNotZero
+import org.moinex.common.extension.toRounded
 import org.moinex.service.PreferencesService
 import org.moinex.service.creditcard.CreditCardService
+import org.moinex.service.financialplanning.FinancialPlanningService
+import org.moinex.service.goal.GoalService
+import org.moinex.service.investment.InvestmentPerformanceService
 import org.moinex.service.networth.NetWorthService
 import org.moinex.service.wallet.WalletService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -28,6 +35,9 @@ class QueryFinanceTool(
     private val walletService: WalletService,
     private val creditCardService: CreditCardService,
     private val netWorthService: NetWorthService,
+    private val goalService: GoalService,
+    private val financialPlanningService: FinancialPlanningService,
+    private val investmentPerformanceService: InvestmentPerformanceService,
     private val preferencesService: PreferencesService,
 ) {
     fun availableTools(): List<LlmTool> =
@@ -36,6 +46,11 @@ class QueryFinanceTool(
             GetSpendingByCategoryTool(),
             GetTransactionsInPeriodTool(),
             GetCreditCardInvoicePaymentStatusTool(),
+            GetIncomeVsExpensesTool(),
+            ComparePeriodsTool(),
+            GetGoalsProgressTool(),
+            GetBudgetVsActualTool(),
+            GetPortfolioSummaryTool(),
         )
 
     private fun monthParamSchema(monthDescriptionKey: String): String =
@@ -50,6 +65,37 @@ class QueryFinanceTool(
                         .put("description", preferencesService.translate(monthDescriptionKey)),
                 ),
             ).toString()
+
+    /** Wallet expenses + credit card purchases for the month, grouped by category (accrual view). */
+    private fun expensesByCategory(month: YearMonth): Map<String, BigDecimal> {
+        val walletTotals =
+            walletService
+                .getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(month)
+                .filter { it.isExpense() }
+                .groupBy { it.category.name }
+                .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
+
+        val startOfMonth = month.atDay(1).atStartOfDay()
+        val endOfMonth = month.atEndOfMonth().atEndOfDay()
+
+        val creditCardTotals =
+            creditCardService
+                .getDebtsBetweenForAnalysis(startOfMonth, endOfMonth)
+                .groupBy { it.category.name }
+                .mapValues { (_, debts) -> debts.sumOf { it.amount } }
+
+        val categories = walletTotals.keys + creditCardTotals.keys
+        return categories.associateWith { category ->
+            (walletTotals[category] ?: BigDecimal.ZERO) + (creditCardTotals[category] ?: BigDecimal.ZERO)
+        }
+    }
+
+    /** Wallet income confirmed in the month. */
+    private fun totalIncome(month: YearMonth): BigDecimal =
+        walletService
+            .getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(month)
+            .filter { it.isIncome() }
+            .sumOf { it.amount }
 
     private inner class GetNetWorthTool : LlmTool {
         override val name = "get_net_worth"
@@ -82,28 +128,7 @@ class QueryFinanceTool(
 
         override fun execute(argumentsJson: String): String {
             val month = parseMonthArgument(argumentsJson) ?: return errorResult("invalid_month")
-
-            val walletTotals =
-                walletService
-                    .getAllNonArchivedConfirmedWalletTransactionsByMonthForAnalysis(month)
-                    .filter { it.type == WalletTransactionType.EXPENSE }
-                    .groupBy { it.category.name }
-                    .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
-
-            val startOfMonth = month.atDay(1).atStartOfDay()
-            val endOfMonth = month.atEndOfMonth().atEndOfDay()
-
-            val creditCardTotals =
-                creditCardService
-                    .getDebtsBetweenForAnalysis(startOfMonth, endOfMonth)
-                    .groupBy { it.category.name }
-                    .mapValues { (_, debts) -> debts.sumOf { it.amount } }
-
-            val categories = walletTotals.keys + creditCardTotals.keys
-            val byCategory =
-                categories.associateWith { category ->
-                    (walletTotals[category] ?: BigDecimal.ZERO) + (creditCardTotals[category] ?: BigDecimal.ZERO)
-                }
+            val byCategory = expensesByCategory(month)
 
             return JSONObject()
                 .apply {
@@ -238,6 +263,210 @@ class QueryFinanceTool(
                 .put("month", month.toString())
                 .put("paid", creditCardService.isInvoicePaid(card.id!!, month))
                 .toString()
+        }
+    }
+
+    private inner class GetIncomeVsExpensesTool : LlmTool {
+        override val name = "get_income_vs_expenses"
+        override val description =
+            preferencesService.translate(TranslationKeys.AI_TOOL_INCOME_VS_EXPENSES_DESCRIPTION)
+        override val jsonSchema = monthParamSchema(TranslationKeys.AI_TOOL_INCOME_VS_EXPENSES_MONTH_PARAM)
+
+        override fun execute(argumentsJson: String): String {
+            val month = parseMonthArgument(argumentsJson) ?: return errorResult("invalid_month")
+            val income = totalIncome(month)
+            val expenses = expensesByCategory(month).values.fold(BigDecimal.ZERO, BigDecimal::add)
+            val savings = income.subtract(expenses)
+            val savingsRatePercent =
+                if (income.isNotZero()) {
+                    savings.divide(income, 4, RoundingMode.HALF_UP).multiply(BigDecimal(100)).toRounded(1)
+                } else {
+                    null
+                }
+
+            return JSONObject()
+                .apply {
+                    put("month", month.toString())
+                    put("income", income)
+                    put("expenses", expenses)
+                    put("savings", savings)
+                    put("savingsRatePercent", savingsRatePercent ?: JSONObject.NULL)
+                }.toString()
+        }
+    }
+
+    private inner class ComparePeriodsTool : LlmTool {
+        override val name = "compare_periods"
+        override val description = preferencesService.translate(TranslationKeys.AI_TOOL_COMPARE_PERIODS_DESCRIPTION)
+        override val jsonSchema =
+            JSONObject()
+                .put("type", "object")
+                .put(
+                    "properties",
+                    JSONObject()
+                        .put(
+                            "month1",
+                            JSONObject()
+                                .put("type", "string")
+                                .put(
+                                    "description",
+                                    preferencesService.translate(TranslationKeys.AI_TOOL_COMPARE_PERIODS_MONTH1_PARAM),
+                                ),
+                        ).put(
+                            "month2",
+                            JSONObject()
+                                .put("type", "string")
+                                .put(
+                                    "description",
+                                    preferencesService.translate(TranslationKeys.AI_TOOL_COMPARE_PERIODS_MONTH2_PARAM),
+                                ),
+                        ),
+                ).put("required", JSONArray(listOf("month1", "month2")))
+                .toString()
+
+        override fun execute(argumentsJson: String): String {
+            val json = JSONObject(argumentsJson)
+            val month1 =
+                runCatching { YearMonth.parse(json.getString("month1")) }.getOrNull()
+                    ?: return errorResult("invalid_month")
+            val month2 =
+                runCatching { YearMonth.parse(json.getString("month2")) }.getOrNull()
+                    ?: return errorResult("invalid_month")
+
+            val income1 = totalIncome(month1)
+            val income2 = totalIncome(month2)
+            val byCategory1 = expensesByCategory(month1)
+            val byCategory2 = expensesByCategory(month2)
+            val expenses1 = byCategory1.values.fold(BigDecimal.ZERO, BigDecimal::add)
+            val expenses2 = byCategory2.values.fold(BigDecimal.ZERO, BigDecimal::add)
+
+            val categories = byCategory1.keys + byCategory2.keys
+            val byCategoryDelta =
+                categories.associateWith { category ->
+                    (byCategory2[category] ?: BigDecimal.ZERO).subtract(byCategory1[category] ?: BigDecimal.ZERO)
+                }
+
+            return JSONObject()
+                .apply {
+                    put("month1", month1.toString())
+                    put("month2", month2.toString())
+                    put("income1", income1)
+                    put("income2", income2)
+                    put("incomeDelta", income2.subtract(income1))
+                    put("expenses1", expenses1)
+                    put("expenses2", expenses2)
+                    put("expensesDelta", expenses2.subtract(expenses1))
+                    put(
+                        "byCategoryDelta",
+                        JSONObject().apply {
+                            byCategoryDelta.forEach { (category, delta) -> put(category, delta) }
+                        },
+                    )
+                }.toString()
+        }
+    }
+
+    private inner class GetGoalsProgressTool : LlmTool {
+        override val name = "get_goals_progress"
+        override val description = preferencesService.translate(TranslationKeys.AI_TOOL_GOALS_PROGRESS_DESCRIPTION)
+        override val jsonSchema =
+            JSONObject().put("type", "object").put("properties", JSONObject()).toString()
+
+        override fun execute(argumentsJson: String): String {
+            val goals =
+                goalService
+                    .getAllGoals()
+                    .filter { !it.isArchived }
+                    .map { goal ->
+                        val denominator = goal.targetBalance.subtract(goal.initialBalance)
+                        val progressPercentage =
+                            if (denominator.isNotZero()) {
+                                goal.balance
+                                    .subtract(goal.initialBalance)
+                                    .divide(denominator, 4, RoundingMode.HALF_UP)
+                                    .multiply(BigDecimal(100))
+                                    .toRounded(1)
+                                    .coerceIn(BigDecimal.ZERO, BigDecimal(100))
+                            } else if (goal.balance >= goal.targetBalance) {
+                                BigDecimal(100)
+                            } else {
+                                BigDecimal.ZERO
+                            }
+
+                        JSONObject()
+                            .put("name", goal.name)
+                            .put("initialBalance", goal.initialBalance)
+                            .put("targetBalance", goal.targetBalance)
+                            .put("currentBalance", goal.balance)
+                            .put("targetDate", goal.targetDate.toString())
+                            .put("completionDate", goal.completionDate?.toString() ?: JSONObject.NULL)
+                            .put("progressPercentage", progressPercentage)
+                    }
+
+            return JSONObject().put("goals", JSONArray(goals)).toString()
+        }
+    }
+
+    private inner class GetBudgetVsActualTool : LlmTool {
+        override val name = "get_budget_vs_actual"
+        override val description = preferencesService.translate(TranslationKeys.AI_TOOL_BUDGET_VS_ACTUAL_DESCRIPTION)
+        override val jsonSchema = monthParamSchema(TranslationKeys.AI_TOOL_BUDGET_VS_ACTUAL_MONTH_PARAM)
+
+        override fun execute(argumentsJson: String): String {
+            val month = parseMonthArgument(argumentsJson) ?: return errorResult("invalid_month")
+            val plan =
+                financialPlanningService.getActivePlan()
+                    ?: return JSONObject().put("available", false).toString()
+
+            val groups =
+                financialPlanningService.getPlanStatus(plan.id!!, month).map { status ->
+                    val targetAmount =
+                        plan.baseIncome
+                            .multiply(status.group.targetPercentage)
+                            .divide(BigDecimal(100))
+                            .toRounded()
+
+                    JSONObject()
+                        .put("name", status.group.name)
+                        .put("targetPercentage", status.group.targetPercentage)
+                        .put("targetAmount", targetAmount)
+                        .put("spentAmount", status.spentAmount)
+                        .put("remaining", targetAmount.subtract(status.spentAmount))
+                        .put("overBudget", status.spentAmount > targetAmount)
+                }
+
+            return JSONObject()
+                .apply {
+                    put("available", true)
+                    put("planName", plan.name)
+                    put("month", month.toString())
+                    put("baseIncome", plan.baseIncome)
+                    put("groups", JSONArray(groups))
+                }.toString()
+        }
+    }
+
+    private inner class GetPortfolioSummaryTool : LlmTool {
+        override val name = "get_portfolio_summary"
+        override val description =
+            preferencesService.translate(TranslationKeys.AI_TOOL_PORTFOLIO_SUMMARY_DESCRIPTION)
+        override val jsonSchema =
+            JSONObject().put("type", "object").put("properties", JSONObject()).toString()
+
+        override fun execute(argumentsJson: String): String {
+            val data = investmentPerformanceService.getPerformanceData()
+            val latestMonth =
+                data.portfolioValues.keys.maxOrNull() ?: return JSONObject().put("available", false).toString()
+
+            return JSONObject()
+                .apply {
+                    put("available", true)
+                    put("month", latestMonth.toString())
+                    put("portfolioValue", data.portfolioValues[latestMonth] ?: BigDecimal.ZERO)
+                    put("investedThisMonth", data.monthlyInvested[latestMonth] ?: BigDecimal.ZERO)
+                    put("monthlyGains", data.monthlyGains[latestMonth] ?: BigDecimal.ZERO)
+                    put("accumulatedGains", data.accumulatedGains[latestMonth] ?: BigDecimal.ZERO)
+                }.toString()
         }
     }
 
