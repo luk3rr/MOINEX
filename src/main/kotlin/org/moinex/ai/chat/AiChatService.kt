@@ -96,16 +96,20 @@ class AiChatService(
     }
 
     fun buildAttachmentMessage(
-        fileName: String,
-        extractedText: String,
+        attachments: List<ChatAttachment>,
         userNote: String? = null,
     ): String {
+        val fileNames = attachments.joinToString(", ") { it.fileName }
+        val filesBlock =
+            attachments.joinToString("\n\n\n") { attachment ->
+                "File \"${attachment.fileName}\":\n\n${attachment.extractedText}"
+            }
         val instruction =
             MessageFormat.format(
                 aiPromptProperties.attachmentInstructionTemplate,
-                fileName,
+                fileNames,
                 proposeTransactionTool.describeAvailableContext(),
-                extractedText,
+                filesBlock,
             )
         return if (userNote.isNullOrBlank()) instruction else "$userNote\n\n$instruction"
     }

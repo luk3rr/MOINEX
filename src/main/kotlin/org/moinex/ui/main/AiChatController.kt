@@ -16,6 +16,8 @@ import javafx.scene.Node
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TextField
+import javafx.scene.control.Tooltip
+import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.shape.Rectangle
@@ -24,6 +26,7 @@ import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.util.Duration
 import org.moinex.ai.chat.AiChatService
+import org.moinex.ai.chat.ChatAttachment
 import org.moinex.ai.chat.ChatMessage
 import org.moinex.ai.chat.ChatRole
 import org.moinex.ai.chat.ChatTurnResult
@@ -41,6 +44,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.awt.Desktop
+import java.io.File
 import java.net.URI
 import java.text.MessageFormat
 import java.util.Base64
@@ -68,25 +72,19 @@ class AiChatController(
     private lateinit var attachButton: JFXButton
 
     @FXML
-    private lateinit var attachmentChip: HBox
-
-    @FXML
-    private lateinit var attachmentLabel: Label
+    private lateinit var attachmentsContainer: FlowPane
 
     @FXML
     private lateinit var thinkingLabel: Label
 
     private val history = mutableListOf<ChatMessage>()
     private val pendingReviews = mutableListOf<List<ExtractedTransactionDTO>>()
-    private var pendingAttachment: PendingAttachment? = null
+    private val pendingAttachments = mutableListOf<ChatAttachment>()
     private var busy = false
     private var requestStartNanos = 0L
     private var thinkingTimeline: Timeline? = null
 
-    private data class PendingAttachment(
-        val fileName: String,
-        val extractedText: String,
-    )
+    private var draftInput: String = ""
 
     companion object {
         private val logger = LoggerFactory.getLogger(AiChatController::class.java)
@@ -101,6 +99,9 @@ class AiChatController(
         private const val STYLE_BUBBLE_NOTICE = "ai-chat-bubble-notice"
         private const val STYLE_ATTACH_BUTTON = "ai-chat-attach-button"
         private const val STYLE_BUBBLE_META = "ai-chat-bubble-meta"
+        private const val STYLE_ATTACHMENT_CHIP = "ai-chat-attachment-chip"
+        private const val STYLE_ATTACHMENT_LABEL = "ai-chat-attachment-label"
+        private const val STYLE_ATTACHMENT_REMOVE = "ai-chat-attachment-remove"
 
         private const val THINKING_TICK_MILLIS = 1000.0
         private const val THINKING_MAX_DOTS = 3
@@ -127,41 +128,40 @@ class AiChatController(
     @FXML
     fun initialize() {
         setBusy(busy)
+        inputField.text = draftInput
+        inputField.textProperty().addListener { _, _, newValue -> draftInput = newValue }
         inputField.setOnAction { handleSend() }
         history.forEach { message ->
             appendBubble(message.role, message.displayText ?: message.content, message.responseTimeMillis)
         }
         pendingReviews.forEach { renderReviewButton(it) }
-        pendingAttachment?.let { setAttachment(it.fileName, it.extractedText) }
+        refreshAttachmentsUI()
     }
 
     @FXML
     fun handleSend() {
         val text = inputField.text?.trim().orEmpty()
-        val attachment = pendingAttachment
-        if (text.isBlank() && attachment == null) return
+        val attachments = pendingAttachments.toList()
+        if (text.isBlank() && attachments.isEmpty()) return
 
         val messageContent =
-            if (attachment != null) {
-                aiChatService.buildAttachmentMessage(
-                    attachment.fileName,
-                    attachment.extractedText,
-                    text.ifBlank { null },
-                )
+            if (attachments.isNotEmpty()) {
+                aiChatService.buildAttachmentMessage(attachments, text.ifBlank { null })
             } else {
                 text
             }
+        val attachmentsSummary = attachments.joinToString(", ") { it.fileName }
         val bubbleText =
             when {
-                attachment != null && text.isNotBlank() -> "$text\n\n📎 ${attachment.fileName}"
-                attachment != null -> "📎 ${attachment.fileName}"
+                attachments.isNotEmpty() && text.isNotBlank() -> "$text\n\n📎 $attachmentsSummary"
+                attachments.isNotEmpty() -> "📎 $attachmentsSummary"
                 else -> text
             }
 
         appendBubble(ChatRole.USER, bubbleText)
         history.add(ChatMessage(role = ChatRole.USER, content = messageContent, displayText = bubbleText))
         inputField.clear()
-        clearAttachment()
+        clearAttachments()
         requestStartNanos = System.nanoTime()
         setBusy(true)
 
@@ -182,48 +182,74 @@ class AiChatController(
                     ),
                 )
             }
-        val file = chooser.showOpenDialog(attachButton.scene.window) ?: return
+        val files: List<File>? = chooser.showOpenMultipleDialog(attachButton.scene.window)
+        if (files.isNullOrEmpty()) return
 
         setAttaching(true)
 
         FxUtils.launchBackgroundThenUI(
-            background = { runCatching { statementIngestService.extractText(file.toPath()) } },
-            onUI = { result ->
+            background = {
+                files.map { file -> file to runCatching { statementIngestService.extractText(file.toPath()) } }
+            },
+            onUI = { results ->
                 setAttaching(false)
-                result.fold(
-                    onSuccess = { extractedText -> setAttachment(file.name, extractedText) },
-                    onFailure = { e ->
-                        appendNotice(
-                            MessageFormat.format(
-                                preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_ERROR),
-                                e.message,
-                            ),
-                        )
-                    },
-                )
+                results.forEach { (file, result) ->
+                    result.fold(
+                        onSuccess = { extractedText -> addAttachment(file.name, extractedText) },
+                        onFailure = { e ->
+                            appendNotice(
+                                MessageFormat.format(
+                                    preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_ERROR),
+                                    "${file.name}: ${e.message}",
+                                ),
+                            )
+                        },
+                    )
+                }
             },
         )
     }
 
-    @FXML
-    fun handleRemoveAttachment() {
-        clearAttachment()
-    }
-
-    private fun setAttachment(
+    private fun addAttachment(
         fileName: String,
         extractedText: String,
     ) {
-        pendingAttachment = PendingAttachment(fileName, extractedText)
-        attachmentLabel.text = "📎 $fileName"
-        attachmentChip.isVisible = true
-        attachmentChip.isManaged = true
+        pendingAttachments.add(ChatAttachment(fileName, extractedText))
+        refreshAttachmentsUI()
     }
 
-    private fun clearAttachment() {
-        pendingAttachment = null
-        attachmentChip.isVisible = false
-        attachmentChip.isManaged = false
+    private fun removeAttachment(attachment: ChatAttachment) {
+        pendingAttachments.remove(attachment)
+        refreshAttachmentsUI()
+    }
+
+    private fun clearAttachments() {
+        pendingAttachments.clear()
+        refreshAttachmentsUI()
+    }
+
+    private fun refreshAttachmentsUI() {
+        attachmentsContainer.children.setAll(pendingAttachments.map { attachmentChip(it) })
+        val hasAttachments = pendingAttachments.isNotEmpty()
+        attachmentsContainer.isVisible = hasAttachments
+        attachmentsContainer.isManaged = hasAttachments
+    }
+
+    private fun attachmentChip(attachment: ChatAttachment): HBox {
+        val label =
+            Label("📎 ${attachment.fileName}").apply {
+                styleClass.add(STYLE_ATTACHMENT_LABEL)
+                tooltip = Tooltip(attachment.fileName)
+            }
+        val removeButton =
+            JFXButton("✕").apply {
+                styleClass.add(STYLE_ATTACHMENT_REMOVE)
+                setOnAction { removeAttachment(attachment) }
+            }
+        return HBox(6.0, label, removeButton).apply {
+            alignment = Pos.CENTER_LEFT
+            styleClass.add(STYLE_ATTACHMENT_CHIP)
+        }
     }
 
     private fun setAttaching(attaching: Boolean) {

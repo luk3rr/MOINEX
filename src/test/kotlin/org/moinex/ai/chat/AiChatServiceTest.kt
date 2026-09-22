@@ -221,15 +221,18 @@ class AiChatServiceTest :
             }
         }
 
-        Given("an attached file's extracted text") {
+        Given("a single attached file's extracted text") {
             When("building the attachment message with no user note") {
                 every { proposeTransactionTool.describeAvailableContext() } returns "Existing categories: Groceries"
-                val message = service.buildAttachmentMessage("extrato.csv", "date,amount\n2026-09-05,150.30")
+                val message =
+                    service.buildAttachmentMessage(
+                        listOf(ChatAttachment("extrato.csv", "date,amount\n2026-09-05,150.30")),
+                    )
 
                 Then("the configured template is filled in with the file name, context and content") {
                     message shouldBe
                         "File \"extrato.csv\" | context: Existing categories: Groceries | " +
-                        "content: date,amount\n2026-09-05,150.30"
+                        "content: File \"extrato.csv\":\n\ndate,amount\n2026-09-05,150.30"
                 }
             }
 
@@ -237,8 +240,7 @@ class AiChatServiceTest :
                 every { proposeTransactionTool.describeAvailableContext() } returns "Existing categories: Groceries"
                 val message =
                     service.buildAttachmentMessage(
-                        "extrato.csv",
-                        "date,amount\n2026-09-05,150.30",
+                        listOf(ChatAttachment("extrato.csv", "date,amount\n2026-09-05,150.30")),
                         userNote = "These are my September expenses",
                     )
 
@@ -246,7 +248,27 @@ class AiChatServiceTest :
                     message shouldBe
                         "These are my September expenses\n\n" +
                         "File \"extrato.csv\" | context: Existing categories: Groceries | " +
-                        "content: date,amount\n2026-09-05,150.30"
+                        "content: File \"extrato.csv\":\n\ndate,amount\n2026-09-05,150.30"
+                }
+            }
+        }
+
+        Given("multiple attached files' extracted text") {
+            When("building the attachment message") {
+                every { proposeTransactionTool.describeAvailableContext() } returns "Existing categories: Groceries"
+                val message =
+                    service.buildAttachmentMessage(
+                        listOf(
+                            ChatAttachment("extrato.csv", "date,amount\n2026-09-05,150.30"),
+                            ChatAttachment("fatura.pdf", "Nubank invoice - September"),
+                        ),
+                    )
+
+                Then("all file names are listed and each file's content keeps its own header") {
+                    message shouldBe
+                        "File \"extrato.csv, fatura.pdf\" | context: Existing categories: Groceries | " +
+                        "content: File \"extrato.csv\":\n\ndate,amount\n2026-09-05,150.30\n\n\n" +
+                        "File \"fatura.pdf\":\n\nNubank invoice - September"
                 }
             }
         }

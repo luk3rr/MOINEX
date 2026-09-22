@@ -13,11 +13,11 @@
    </padding>
    <children>
       <Label text="%aireview.title" styleClass="ai-review-title" />
-      <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS" />
+      <TableView fx:id="transactionsTable" VBox.vgrow="ALWAYS" stylesheets="@../../../css/component/table-view.css" />
       <HBox spacing="10.0" alignment="CENTER_RIGHT">
          <children>
-            <JFXButton onAction="#handleCancel" text="%aireview.cancel" />
-            <JFXButton onAction="#handleConfirm" text="%aireview.confirm.selected" />
+            <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleCancel" stylesheets="@../../../css/component/buttons.css" text="%aireview.cancel" />
+            <JFXButton contentDisplay="CENTER" minWidth="80.0" onAction="#handleConfirm" stylesheets="@../../../css/component/buttons.css" text="%aireview.confirm.selected" />
          </children>
       </HBox>
    </children>

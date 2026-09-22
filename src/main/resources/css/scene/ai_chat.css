@@ -44,15 +44,47 @@
 
 .ai-chat-send-button {
   -fx-background-color: theme-bg-sidebar;
+  -fx-background-radius: 20;
+  -fx-border-color: theme-bg-sidebar;
+  -fx-border-radius: 20;
+  -fx-border-width: 2;
+  -fx-padding: 5 15;
+  -fx-font-size: 14px;
   -fx-text-fill: theme-text-on-dark;
   -fx-font-weight: bold;
+  -fx-cursor: hand;
+}
+
+.ai-chat-send-button:hover {
+  -fx-background-color: theme-bg-pressed;
+}
+
+.ai-chat-send-button:disabled {
+  -fx-background-color: theme-bg-disabled;
+  -fx-border-color: theme-border-disabled;
+  -fx-text-fill: theme-text-disabled;
 }
 
 .ai-chat-attach-button {
   -fx-background-color: theme-bg-card-alt;
+  -fx-background-radius: 20;
   -fx-text-fill: theme-text-primary;
   -fx-border-color: theme-border;
-  -fx-border-radius: 4px;
+  -fx-border-radius: 20;
+  -fx-border-width: 2;
+  -fx-padding: 5 15;
+  -fx-font-size: 14px;
+  -fx-cursor: hand;
+}
+
+.ai-chat-attach-button:hover {
+  -fx-background-color: theme-bg-hover;
+}
+
+.ai-chat-attach-button:disabled {
+  -fx-background-color: theme-bg-disabled;
+  -fx-border-color: theme-border-disabled;
+  -fx-text-fill: theme-text-disabled;
 }
 
 .ai-chat-attachment-chip {
@@ -64,6 +96,7 @@
 .ai-chat-attachment-label {
   -fx-font-size: 11px;
   -fx-text-fill: theme-text-primary;
+  -fx-max-width: 180px;
 }
 
 .ai-chat-attachment-remove {

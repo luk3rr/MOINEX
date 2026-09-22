@@ -57,21 +57,22 @@ moinex:
         you may propose transactions extracted from it, but nothing is saved until the user reviews
         and confirms each one manually in a dedicated screen.
     attachment-instruction-template: >
-      The user attached a bank statement/CSV file named "{0}". Extract every transaction you can
-      find and call propose_transactions with one entry per transaction. Match categories, wallets
-      and credit cards against the existing ones listed below when they fit; otherwise propose a
-      new category name. Amounts must always be positive, even for statement lines shown with a
-      minus sign - use movementType ("income" or "expense") to convey direction for wallet entries
-      instead of a signed amount. Before proposing, use get_transactions_in_period to check whether
-      a line is already recorded under a different description, and skip it if so. For any line
-      that looks like paying a credit card bill in full, use get_credit_card_invoice_payment_status
-      first and only propose it (as kind credit_card_payment, never as a wallet expense) if that
-      invoice is not already fully paid.
+      The user attached the following bank statement/CSV file(s): {0}. Extract every transaction
+      you can find across all of them and call propose_transactions with one entry per
+      transaction. Match categories, wallets and credit cards against the existing ones listed
+      below when they fit; otherwise propose a new category name. Amounts must always be
+      positive, even for statement lines shown with a minus sign - use movementType ("income" or
+      "expense") to convey direction for wallet entries instead of a signed amount. Before
+      proposing, use get_transactions_in_period to check whether a line is already recorded under
+      a different description, and skip it if so. For any line that looks like paying a credit
+      card bill in full, use get_credit_card_invoice_payment_status first and only propose it (as
+      kind credit_card_payment, never as a wallet expense) if that invoice is not already fully
+      paid.
 
 
       {1}
 
 
-      --- File content ---
+      --- Files ---
 
       {2}

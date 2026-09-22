@@ -41,6 +41,12 @@ data class ToolCall(
     val argumentsJson: String,
 )
 
+/** A single file attached to the chat, with its text already extracted, pending a user message. */
+data class ChatAttachment(
+    val fileName: String,
+    val extractedText: String,
+)
+
 data class LlmResponse(
     val text: String?,
     val toolCalls: List<ToolCall> = emptyList(),
