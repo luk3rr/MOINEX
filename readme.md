@@ -46,7 +46,12 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 - **Metas de Poupança:** Crie objetivos financeiros e acompanhe o seu progresso.
 - **Relatórios e Gráficos:** Visualize a sua saúde financeira com gráficos intuitivos de balanço, despesas por categoria,
   etc.
-- **Privacidade:** Todos os seus dados são armazenados localmente no seu computador.
+- **Assistente de IA (BYOK):** Converse com um assistente financeiro usando a sua própria chave de API (OpenAI,
+  Anthropic, Gemini ou OpenRouter). Pergunte sobre as suas finanças, lance transações por linguagem natural ou
+  importe extratos (CSV/PDF) para revisão, incluindo operações de investimento (ações, dividendos, CDB).
+- **Privacidade:** Os seus dados financeiros são armazenados localmente no seu computador. O assistente de IA é
+  opcional - quando configurado, mensagens e arquivos anexados são enviados ao provedor de IA escolhido, mas a IA
+  nunca grava nada sozinha: toda transação proposta só é salva depois da sua revisão e confirmação manual.
 - **Software Livre:** Código aberto e transparente.
 
 ## Tecnologias Utilizadas
@@ -106,14 +111,23 @@ sh scripts/install.sh
 
 #### Instalação Manual
 
-1. Clone e compile:
+1. Clone o repositório:
 ```bash
 git clone https://github.com/luk3rr/MOINEX.git
 cd MOINEX
+```
+
+2. Instale as dependências Python (necessárias para cotação de ações e outros dados financeiros):
+```bash
+python3 -m pip install --user --break-system-packages -r requirements.txt
+```
+
+3. Compile:
+```bash
 ./gradlew build
 ```
 
-2. Execute a aplicação:
+4. Execute a aplicação:
 ```bash
 ./gradlew bootRun
 ```
