@@ -529,6 +529,11 @@ class WalletService(
         date: LocalDateTime,
     ) = walletTransactionRepository.findTransactionsByWalletsAfterDate(walletIds, date)
 
+    fun getAllTransfersByWalletsFromDate(
+        walletIds: List<Int>,
+        date: LocalDateTime,
+    ): List<Transfer> = transfersRepository.findTransfersByWalletsFromDate(walletIds, date)
+
     fun getAllTransfers(): List<Transfer> = transfersRepository.findAll()
 
     fun getTransfersByWalletAndMonth(

@@ -363,6 +363,17 @@ class BondInterestCalculationServiceCalculateAndStoreMonthlyInterestTest :
                         )
                     }
                 }
+
+                Then("should reduce invested amount by the average cost of the units sold") {
+                    verify {
+                        bondInterestCalculationRepository.save(
+                            match {
+                                it.investedAmount.compareTo(BigDecimal("700.00")) == 0 &&
+                                    it.finalValue.compareTo(it.investedAmount.add(it.accumulatedInterest)) == 0
+                            },
+                        )
+                    }
+                }
             }
         }
 

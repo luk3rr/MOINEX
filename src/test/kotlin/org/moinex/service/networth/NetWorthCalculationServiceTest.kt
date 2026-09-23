@@ -1,6 +1,7 @@
 package org.moinex.service.networth
 
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -20,8 +21,10 @@ import org.moinex.factory.investment.TickerFactory
 import org.moinex.factory.investment.TickerPurchaseFactory
 import org.moinex.factory.investment.TickerSaleFactory
 import org.moinex.factory.wallet.RecurringTransactionFactory
+import org.moinex.factory.wallet.TransferFactory
 import org.moinex.factory.wallet.WalletFactory
 import org.moinex.factory.wallet.WalletTransactionFactory
+import org.moinex.model.NetWorthSnapshot
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionStatus
 import org.moinex.model.enums.WalletTransactionType
@@ -76,6 +79,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns transactionDate
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -118,6 +122,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns null
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -177,6 +182,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns earliestDate
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns
                     listOf(transaction1, transaction2)
                 coEvery {
@@ -223,6 +229,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -282,6 +289,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -341,6 +349,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -396,6 +405,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -462,6 +472,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -523,6 +534,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -572,6 +584,7 @@ class NetWorthCalculationServiceTest :
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns
                     listOf(pendingTransaction)
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -630,6 +643,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -694,6 +708,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -746,6 +761,7 @@ class NetWorthCalculationServiceTest :
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns
                     LocalDateTime.of(2025, 1, 15, 10, 0)
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -780,6 +796,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -835,6 +852,7 @@ class NetWorthCalculationServiceTest :
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns
                     LocalDateTime.of(2025, 1, 1, 0, 0)
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -941,6 +959,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -991,6 +1010,7 @@ class NetWorthCalculationServiceTest :
                 every { netWorthService.findByReferenceMonth(any()) } returns null
                 every { walletService.getEarliestTransactionDateByWallets(any()) } returns LocalDateTime.now()
                 every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
                 every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
                 coEvery {
                     recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
@@ -1044,6 +1064,151 @@ class NetWorthCalculationServiceTest :
                             },
                         )
                     }
+                }
+            }
+        }
+        Given("a past month with one positive and one negative wallet") {
+            val positiveWallet = WalletFactory.create(id = 1, name = "Positive", balance = BigDecimal("3000.00"))
+            val negativeWallet = WalletFactory.create(id = 2, name = "Negative", balance = BigDecimal("-500.00"))
+            val savedBatches = mutableListOf<List<NetWorthSnapshot>>()
+            val previousMonth = clockProvider.currentMonth().minusMonths(1)
+
+            When("recalculating snapshots") {
+                coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(positiveWallet, negativeWallet)
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
+                coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns
+                    emptyList()
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
+                every { walletService.getEarliestTransactionDateByWallets(any()) } returns
+                    LocalDateTime.of(2025, 1, 15, 10, 0)
+                every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
+                coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
+                coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
+                coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
+                every { netWorthService.saveBatch(capture(savedBatches)) } returns Unit
+
+                service.recalculateAllSnapshots()
+
+                val snapshot = savedBatches.flatten().first { it.referenceMonth == previousMonth }
+
+                Then("should count only positive balances as assets and only negative balances as liabilities") {
+                    snapshot.walletBalances shouldBe BigDecimal("3000.00")
+                    snapshot.negativeWalletBalances shouldBe BigDecimal("500.00")
+                }
+            }
+        }
+
+        Given("a past month followed by a transfer between wallets") {
+            val receiverWallet = WalletFactory.create(id = 1, name = "Receiver", balance = BigDecimal("1000.00"))
+            val senderWallet = WalletFactory.create(id = 2, name = "Sender", balance = BigDecimal("-200.00"))
+            val savedBatches = mutableListOf<List<NetWorthSnapshot>>()
+            val previousMonth = clockProvider.currentMonth().minusMonths(1)
+            val transfer =
+                TransferFactory.create(
+                    id = 1,
+                    senderWallet = senderWallet,
+                    receiverWallet = receiverWallet,
+                    date = clockProvider.currentMonth().atDay(1).atStartOfDay(),
+                    amount = BigDecimal("1000.00"),
+                )
+
+            When("recalculating snapshots") {
+                coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(receiverWallet, senderWallet)
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns listOf(transfer)
+                coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns
+                    emptyList()
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
+                every { walletService.getEarliestTransactionDateByWallets(any()) } returns
+                    LocalDateTime.of(2025, 1, 15, 10, 0)
+                every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
+                coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
+                coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
+                coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
+                every { netWorthService.saveBatch(capture(savedBatches)) } returns Unit
+
+                service.recalculateAllSnapshots()
+
+                val snapshot = savedBatches.flatten().first { it.referenceMonth == previousMonth }
+
+                Then("should revert the transfer on both wallets") {
+                    snapshot.walletBalances shouldBe BigDecimal("800.00")
+                    snapshot.negativeWalletBalances.isZero() shouldBe true
+                }
+            }
+        }
+
+        Given("a past month followed by a credit card payment") {
+            val wallet = WalletFactory.create(id = 1, name = "Wallet", balance = BigDecimal("5000.00"))
+            val savedBatches = mutableListOf<List<NetWorthSnapshot>>()
+            val previousMonth = clockProvider.currentMonth().minusMonths(1)
+            val payment =
+                CreditCardPaymentFactory.create(
+                    id = 1,
+                    amount = BigDecimal("500.00"),
+                    rebateUsed = BigDecimal("50.00"),
+                    wallet = wallet,
+                    date = clockProvider.currentMonth().atDay(1).atStartOfDay(),
+                )
+
+            When("recalculating snapshots") {
+                coEvery { walletService.getAllWalletsOrderedByName() } returns listOf(wallet)
+                every { walletService.getAllTransfersByWalletsFromDate(any(), any()) } returns emptyList()
+                coEvery { creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(any(), any()) } returns
+                    emptyList()
+                coEvery {
+                    creditCardService.getAllPaidPaymentsByWalletsFromDateOnward(
+                        any(),
+                        previousMonth.plusMonths(1).atDay(1).atStartOfDay(),
+                    )
+                } returns listOf(payment)
+                every { netWorthService.deleteSnapshotsOutsideRange(any(), any()) } returns Unit
+                every { netWorthService.findByReferenceMonth(any()) } returns null
+                every { walletService.getEarliestTransactionDateByWallets(any()) } returns
+                    LocalDateTime.of(2025, 1, 15, 10, 0)
+                every { walletService.getAllNonArchivedWalletTransactionsByMonthForAnalysis(any()) } returns emptyList()
+                every { walletService.getAllWalletTransactionsByWalletsAfterDate(any(), any()) } returns emptyList()
+                coEvery {
+                    recurringTransactionService.getFutureRecurringTransactionsByMonthForAnalysis(
+                        any(),
+                        any(),
+                    )
+                } returns emptyList()
+                coEvery { recurringTransactionService.getAllRecurringTransactionsByType(any()) } returns emptyList()
+                coEvery { creditCardService.getDebtAtDate(any()) } returns BigDecimal.ZERO
+                every { tickerService.getAllPurchases() } returns emptyList()
+                every { tickerService.getAllSales() } returns emptyList()
+                every { tickerService.getAllTickers() } returns emptyList()
+                coEvery { bondService.getOperationsByDateBefore(any()) } returns emptyList()
+                every { netWorthService.saveBatch(capture(savedBatches)) } returns Unit
+
+                service.recalculateAllSnapshots()
+
+                val snapshot = savedBatches.flatten().first { it.referenceMonth == previousMonth }
+
+                Then("should add back only the effective amount of payments made after the month") {
+                    snapshot.walletBalances shouldBe BigDecimal("5450.00")
                 }
             }
         }

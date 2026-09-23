@@ -10,7 +10,7 @@ package org.moinex.service.investment
 
 import org.moinex.common.ClockProvider
 import org.moinex.common.constant.TranslationKeys
-import org.moinex.common.extension.buyOperationsUntil
+import org.moinex.common.extension.calculateInvestedAmountUntil
 import org.moinex.common.extension.calculateOperationStateUntil
 import org.moinex.common.extension.calculateQuantityUntil
 import org.moinex.common.extension.findByIdOrThrow
@@ -748,15 +748,7 @@ class BondInterestCalculationService(
     private fun calculateInvestedAmountForMonth(
         month: YearMonth,
         operations: List<BondOperation>,
-    ): BigDecimal {
-        val monthEnd = month.atEndOfMonth()
-
-        return operations
-            .buyOperationsUntil(monthEnd)
-            .fold(BigDecimal.ZERO) { acc, operation ->
-                acc.add(operation.totalValue)
-            }
-    }
+    ): BigDecimal = operations.calculateInvestedAmountUntil(month.atEndOfMonth())
 
     private fun processIncrementalCalculation(
         bond: Bond,

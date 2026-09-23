@@ -15,7 +15,6 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.extension.atEndOfDay
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual
-import org.moinex.common.extension.isNotZero
 import org.moinex.common.extension.isOpenEnded
 import org.moinex.common.extension.isPending
 import org.moinex.common.extension.nextFrom
@@ -27,6 +26,7 @@ import org.moinex.model.enums.BalanceType
 import org.moinex.model.enums.OperationType
 import org.moinex.model.enums.WalletTransactionType
 import org.moinex.model.wallettransaction.RecurringTransaction
+import org.moinex.model.wallettransaction.Transfer
 import org.moinex.model.wallettransaction.Wallet
 import org.moinex.model.wallettransaction.WalletTransaction
 import org.moinex.service.creditcard.CreditCardService
@@ -272,13 +272,18 @@ class NetWorthCalculationService(
 
         return projectedBalances
             .entries
-            .filter { (_, balance) ->
-                when (config.balanceType) {
-                    BalanceType.POSITIVE -> balance > BigDecimal.ZERO
-                    BalanceType.NEGATIVE -> balance < BigDecimal.ZERO
-                }
-            }.sumOf { (_, balance) -> balance.abs() }
+            .filter { (_, balance) -> matchesBalanceType(balance, config) }
+            .sumOf { (_, balance) -> balance.abs() }
     }
+
+    private fun matchesBalanceType(
+        balance: BigDecimal,
+        config: BalanceCalculationConfig,
+    ): Boolean =
+        when (config.balanceType) {
+            BalanceType.POSITIVE -> balance > BigDecimal.ZERO
+            BalanceType.NEGATIVE -> balance < BigDecimal.ZERO
+        }
 
     private fun calculateHistoricalWalletBalances(
         targetMonth: YearMonth,
@@ -289,7 +294,6 @@ class NetWorthCalculationService(
         var totalBalance = BigDecimal.ZERO
 
         val startOfNextMonth = targetMonth.plusMonths(1).atDay(1).atStartOfDay()
-        val startOfTargetMonth = targetMonth.atDay(1).atStartOfDay()
 
         val allTransactionsByWallet =
             walletService
@@ -305,8 +309,13 @@ class NetWorthCalculationService(
                     wallets.map {
                         it.id!!
                     },
-                    startOfTargetMonth,
+                    startOfNextMonth,
                 ).groupBy { it.wallet!!.id!! }
+        val transfersAfter =
+            walletService.getAllTransfersByWalletsFromDate(
+                wallets.map { it.id!! },
+                startOfNextMonth,
+            )
 
         wallets.forEach { wallet ->
             var walletBalance = wallet.balance
@@ -316,11 +325,12 @@ class NetWorthCalculationService(
             val payments = allPaymentsByWallet[wallet.id!!] ?: emptyList()
 
             walletBalance = revertWalletTransactionsAfterMonth(wallet, transactions)
-            walletBalance = revertCreditCardPaymentsAfterMonth(walletBalance, payments, startOfNextMonth)
+            walletBalance = revertCreditCardPaymentsAfterMonth(walletBalance, payments)
+            walletBalance = revertTransfersAfterMonth(wallet, walletBalance, transfersAfter)
 
             logger.debug("    Final balance for '{}': {}", wallet, walletBalance)
 
-            if (walletBalance.isNotZero()) {
+            if (matchesBalanceType(walletBalance, config)) {
                 totalBalance += walletBalance.abs()
                 logger.debug("      -> Added to {}", config.logPrefix.lowercase())
             }
@@ -522,21 +532,19 @@ class NetWorthCalculationService(
 
     private fun revertCreditCardPaymentsAfterMonth(
         walletBalance: BigDecimal,
-        allPayments: List<CreditCardPayment>,
-        startOfNextMonth: LocalDateTime,
-    ): BigDecimal {
-        val paymentsInMonth =
-            allPayments
-                .asSequence()
-                .filter { it.date.isBefore(startOfNextMonth) }
-                .sumOf { it.amount.minus(it.rebateUsed) }
+        paymentsAfter: List<CreditCardPayment>,
+    ): BigDecimal = walletBalance.add(paymentsAfter.sumOf { it.amount.minus(it.rebateUsed) })
 
-        val futurePayments =
-            allPayments
-                .asSequence()
-                .filter { it.date.isAfterOrEqual(startOfNextMonth) }
-                .sumOf { it.amount.minus(it.rebateUsed) }
-
-        return walletBalance.add(futurePayments).minus(paymentsInMonth)
-    }
+    private fun revertTransfersAfterMonth(
+        wallet: Wallet,
+        walletBalance: BigDecimal,
+        transfersAfter: List<Transfer>,
+    ): BigDecimal =
+        transfersAfter.fold(walletBalance) { acc, transfer ->
+            when (wallet.id) {
+                transfer.senderWallet.id -> acc.add(transfer.amount)
+                transfer.receiverWallet.id -> acc.subtract(transfer.amount)
+                else -> acc
+            }
+        }
 }

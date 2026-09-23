@@ -112,4 +112,16 @@ interface TransferRepository : JpaRepository<Transfer, Int> {
         @Param("walletId") walletId: Int,
         @Param("date") date: LocalDateTime,
     ): List<Transfer>
+
+    @Query(
+        "SELECT t " +
+            "FROM Transfer t " +
+            "WHERE (t.senderWallet.id IN :walletIds OR t.receiverWallet.id IN :walletIds) " +
+            "AND t.date >= :date " +
+            "ORDER BY t.date ASC",
+    )
+    fun findTransfersByWalletsFromDate(
+        @Param("walletIds") walletIds: List<Int>,
+        @Param("date") date: LocalDateTime,
+    ): List<Transfer>
 }
