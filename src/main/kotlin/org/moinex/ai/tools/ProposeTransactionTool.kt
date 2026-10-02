@@ -156,8 +156,10 @@ class ProposeTransactionTool(
                         "(e.g. \"3/10\" means installmentNumber=3, installments=10). 1 when the line has no " +
                         "installment marker, or shows \"1/N\" - i.e. this is the purchase's first appearance. A " +
                         "number greater than 1 means this purchase was already made before this statement and is " +
-                        "just continuing to show up - date should still be the ORIGINAL purchase date as printed, " +
-                        "not today.",
+                        "just continuing to show up - the app already posted all of its installments when it " +
+                        "was first recorded, so do NOT propose the line if get_transactions_in_period shows " +
+                        "the original purchase in creditCardDebts. Only propose it when the purchase is not " +
+                        "recorded yet; date should still be the ORIGINAL purchase date as printed, not today.",
                 )
 
         val itemProperties =

@@ -206,6 +206,7 @@ class QueryFinanceTool(
                         JSONObject()
                             .put("date", d.date.toLocalDate().toString())
                             .put("amount", d.amount)
+                            .put("installments", d.installments)
                             .put("description", d.description.orEmpty())
                             .put("category", d.category.name)
                             .put("creditCard", d.creditCard.name)
