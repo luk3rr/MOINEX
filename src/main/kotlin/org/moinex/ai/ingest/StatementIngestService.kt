@@ -13,12 +13,15 @@ import java.nio.file.Path
 class StatementIngestService(
     private val parsers: List<StatementParser>,
 ) {
-    fun extractText(file: Path): String {
+    fun extractText(
+        file: Path,
+        password: String? = null,
+    ): String {
         val fileName = file.fileName.toString()
         val parser =
             parsers.firstOrNull { it.supports(fileName) }
                 ?: throw IllegalArgumentException("Unsupported file type: $fileName")
 
-        return parser.extractText(file)
+        return parser.extractText(file, password)
     }
 }

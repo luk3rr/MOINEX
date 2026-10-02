@@ -15,7 +15,10 @@ import java.nio.file.Path
 class CsvStatementParser : StatementParser {
     override fun supports(fileName: String): Boolean = fileName.endsWith(".csv", ignoreCase = true)
 
-    override fun extractText(file: Path): String =
+    override fun extractText(
+        file: Path,
+        password: String?,
+    ): String =
         CSVReader(FileReader(file.toFile())).use { reader ->
             reader.readAll().joinToString("\n") { row -> row.joinToString("\t") }
         }

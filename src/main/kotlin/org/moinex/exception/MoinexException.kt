@@ -41,6 +41,11 @@ sealed class MoinexException(
         message: String,
     ) : MoinexException(message)
 
+    /** Exception thrown when a file is password protected and no (or a wrong) password was given */
+    class PasswordProtectedFileException(
+        message: String,
+    ) : MoinexException(message)
+
     /** Exception thrown when the source and destination are the same */
     class SameSourceDestinationException(
         message: String,

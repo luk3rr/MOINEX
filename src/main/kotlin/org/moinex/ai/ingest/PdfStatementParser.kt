@@ -7,7 +7,9 @@
 package org.moinex.ai.ingest
 
 import org.apache.pdfbox.Loader
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException
 import org.apache.pdfbox.text.PDFTextStripper
+import org.moinex.exception.MoinexException
 import org.springframework.stereotype.Component
 import java.nio.file.Path
 
@@ -15,6 +17,13 @@ import java.nio.file.Path
 class PdfStatementParser : StatementParser {
     override fun supports(fileName: String): Boolean = fileName.endsWith(".pdf", ignoreCase = true)
 
-    override fun extractText(file: Path): String =
-        Loader.loadPDF(file.toFile()).use { document -> PDFTextStripper().getText(document) }
+    override fun extractText(
+        file: Path,
+        password: String?,
+    ): String =
+        try {
+            Loader.loadPDF(file.toFile(), password.orEmpty()).use { document -> PDFTextStripper().getText(document) }
+        } catch (e: InvalidPasswordException) {
+            throw MoinexException.PasswordProtectedFileException("Password protected file: ${file.fileName}")
+        }
 }

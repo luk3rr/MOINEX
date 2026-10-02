@@ -2040,6 +2040,10 @@ object TranslationKeys {
     const val AI_CHAT_ATTACH_BUTTON: String = "aichat.attach.button"
     const val AI_CHAT_ATTACH_FILE_FILTER: String = "aichat.attach.fileFilter"
     const val AI_CHAT_ATTACH_ERROR: String = "aichat.attach.error"
+    const val AI_CHAT_ATTACH_PASSWORD_TITLE: String = "aichat.attach.password.title"
+    const val AI_CHAT_ATTACH_PASSWORD_HEADER: String = "aichat.attach.password.header"
+    const val AI_CHAT_ATTACH_PASSWORD_WRONG_HEADER: String = "aichat.attach.password.wrongHeader"
+    const val AI_CHAT_ATTACH_PASSWORD_PROMPT: String = "aichat.attach.password.prompt"
     const val AI_CHAT_REVIEW_BUTTON: String = "aichat.review.button"
     const val AI_CHAT_REVIEW_INVESTMENT_BUTTON: String = "aichat.review.investment.button"
 

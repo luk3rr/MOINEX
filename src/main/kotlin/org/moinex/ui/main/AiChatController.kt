@@ -37,9 +37,11 @@ import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
+import org.moinex.exception.MoinexException
 import org.moinex.model.dto.ai.ExtractedInvestmentOperationDTO
 import org.moinex.model.dto.ai.ExtractedTransactionDTO
 import org.moinex.service.PreferencesService
+import org.moinex.ui.dialog.ai.FilePasswordController
 import org.moinex.ui.dialog.ai.InvestmentOperationReviewController
 import org.moinex.ui.dialog.ai.TransactionReviewController
 import org.slf4j.LoggerFactory
@@ -201,27 +203,67 @@ class AiChatController(
 
         setAttaching(true)
 
-        FxUtils.launchBackgroundThenUI(
-            background = {
-                files.map { file -> file to runCatching { statementIngestService.extractText(file.toPath()) } }
-            },
-            onUI = { results ->
+        FxUtils.launchOnFxThread {
+            try {
+                files.forEach { file -> attachFile(file) }
+            } finally {
                 setAttaching(false)
-                results.forEach { (file, result) ->
-                    result.fold(
-                        onSuccess = { extractedText -> addAttachment(file.name, extractedText) },
-                        onFailure = { e ->
-                            appendNotice(
-                                MessageFormat.format(
-                                    preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_ERROR),
-                                    "${file.name}: ${e.message}",
-                                ),
-                            )
-                        },
-                    )
-                }
+            }
+        }
+    }
+
+    private suspend fun attachFile(file: File) {
+        var password: String? = null
+        var result = extractText(file, password)
+
+        while (result.exceptionOrNull() is MoinexException.PasswordProtectedFileException) {
+            password = promptPassword(file.name, wrongPassword = password != null) ?: return
+            result = extractText(file, password)
+        }
+
+        result.fold(
+            onSuccess = { extractedText -> addAttachment(file.name, extractedText) },
+            onFailure = { e ->
+                appendNotice(
+                    MessageFormat.format(
+                        preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_ERROR),
+                        "${file.name}: ${e.message}",
+                    ),
+                )
             },
         )
+    }
+
+    private suspend fun extractText(
+        file: File,
+        password: String?,
+    ): Result<String> =
+        FxUtils.withBackground { runCatching { statementIngestService.extractText(file.toPath(), password) } }
+
+    private fun promptPassword(
+        fileName: String,
+        wrongPassword: Boolean,
+    ): String? {
+        val headerKey =
+            if (wrongPassword) {
+                TranslationKeys.AI_CHAT_ATTACH_PASSWORD_WRONG_HEADER
+            } else {
+                TranslationKeys.AI_CHAT_ATTACH_PASSWORD_HEADER
+            }
+
+        var dialog: FilePasswordController? = null
+
+        WindowUtils.openModalWindow(
+            Files.FILE_PASSWORD_FXML,
+            preferencesService.translate(TranslationKeys.AI_CHAT_ATTACH_PASSWORD_TITLE),
+            springContext,
+            { controller: FilePasswordController ->
+                controller.setMessage(MessageFormat.format(preferencesService.translate(headerKey), fileName))
+                dialog = controller
+            },
+        )
+
+        return dialog?.password
     }
 
     private fun addAttachment(
