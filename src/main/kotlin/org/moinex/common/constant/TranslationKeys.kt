@@ -228,6 +228,7 @@ object TranslationKeys {
     const val CREDIT_CARD_DEBTS_LIST_HEADER_CREDIT_CARD: String = "creditCard.debtsList.header.creditCard"
     const val CREDIT_CARD_DEBTS_LIST_HEADER_CATEGORY: String = "creditCard.debtsList.header.category"
     const val CREDIT_CARD_DEBTS_LIST_HEADER_INVOICE_DATE: String = "creditCard.debtsList.header.invoiceDate"
+    const val CREDIT_CARD_DEBTS_LIST_HEADER_PURCHASE_DATE: String = "creditCard.debtsList.header.purchaseDate"
     const val CREDIT_CARD_DEBTS_LIST_HEADER_STATUS: String = "creditCard.debtsList.header.status"
     const val CREDIT_CARD_DEBTS_LIST_STATUS_PENDING: String = "creditCard.debtsList.status.pending"
     const val CREDIT_CARD_DEBTS_LIST_STATUS_PAID: String = "creditCard.debtsList.status.paid"

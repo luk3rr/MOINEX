@@ -1114,6 +1114,21 @@ class CreditCardController(
                 }
             }
 
+        val purchaseDateColumn =
+            TableColumn<CreditCardDebtRowDTO, String>(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_PURCHASE_DATE),
+            ).apply {
+                setCellValueFactory { param ->
+                    val date =
+                        when (val row = param.value) {
+                            is CreditCardDebtRowDTO.Materialized ->
+                                UIUtils.formatDateForDisplay(row.payment.creditCardDebt.date)
+                            is CreditCardDebtRowDTO.Projected -> "-"
+                        }
+                    SimpleStringProperty(date)
+                }
+            }
+
         val statusColumn =
             TableColumn<CreditCardDebtRowDTO, String>(
                 preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_HEADER_STATUS),
@@ -1175,6 +1190,7 @@ class CreditCardController(
             installmentColumn,
             crcColumn,
             categoryColumn,
+            purchaseDateColumn,
             dateColumn,
             statusColumn,
         )
