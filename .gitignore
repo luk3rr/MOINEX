@@ -26,6 +26,7 @@ buildNumber.properties
 *.zip
 *.json
 *.md
+!.claude/commands/*.md
 
 # VSCode
 .vscode/

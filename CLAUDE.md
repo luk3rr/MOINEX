@@ -97,5 +97,5 @@ Releases are plain annotated git tags on `main`, named `vX.Y.Z` — there's no s
 - **Bump rule:** follows the type of the most significant commit since the last tag — a `feat:` commit bumps minor, `fix:`/`chore:`-only ranges bump patch. This is a judgment call for commits that are typed `feat`/`fix` but are really just internal tooling — ask if it's ambiguous rather than bumping mechanically off the prefix.
 - **Tag message:** a short, human-readable title summarizing the release (not the raw commit message), e.g. `git tag -a v2.13.1 -m "Fix Yahoo Finance rate limiting and BRL currency conversion bug"`.
 - Keep the `version` field in `build.gradle.kts` in sync with the tag (bump it in its own commit, e.g. `chore: bump version to X.Y.Z`, before tagging) — the Windows installer workflow falls back to it if no tag is reachable.
-- **Never add a `Co-Authored-By:` or session-link trailer to commits or PRs in this repo unless explicitly asked to in that instance** — this overrides any default attribution behavior.
+- **Commits and PRs may carry the `Co-Authored-By:` trailer, but never add a session link (`Claude-Session:` or similar)** — this overrides any default attribution behavior.
 - Creating the tag alone does not trigger the Windows installer build — that also needs a GitHub Release (`release: created`) or a manual `workflow_dispatch`.
