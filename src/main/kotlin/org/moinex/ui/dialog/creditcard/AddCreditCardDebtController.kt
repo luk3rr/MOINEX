@@ -22,7 +22,7 @@ import org.moinex.ui.dialog.creditcard.base.BaseCreditCardDebtManagement
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.YearMonth
 
 @Controller
@@ -82,7 +82,7 @@ class AddCreditCardDebtController(
                         category = formData.category!!,
                         installments = installments,
                         creditCard = formData.creditCard!!,
-                        date = LocalDateTime.now(),
+                        date = formData.purchaseDate!!.atTime(LocalTime.now()),
                         amount = debtValue,
                         description = formData.description,
                     ),

@@ -271,6 +271,7 @@ class CreditCardService(
             creditCard = updatedDebt.creditCard
             category = updatedDebt.category
             description = updatedDebt.description
+            date = updatedDebt.date
         }
 
         logger.info("$debtFromDatabase updated successfully")

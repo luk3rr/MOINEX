@@ -268,7 +268,7 @@ class RecurringCreditCardDebtService(
                 category = recurring.category,
                 amount = recurring.amount,
                 description = recurring.description,
-                date = occurrenceDate.atEndOfDay(),
+                date = clockProvider.now(),
                 installments = 1,
                 recurringSource = recurring,
             )
@@ -306,7 +306,7 @@ class RecurringCreditCardDebtService(
                     category = recurring.category,
                     amount = recurring.amount,
                     description = recurring.description,
-                    date = occurrenceDate.atEndOfDay(),
+                    date = clockProvider.now(),
                     installments = 1,
                     recurringSource = recurring,
                 )

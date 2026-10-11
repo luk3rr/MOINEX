@@ -38,10 +38,11 @@ interface RecurringCreditCardDebtRepository : JpaRepository<RecurringCreditCardD
     ): List<RecurringCreditCardDebt>
 
     @Query(
-        "SELECT ccd FROM CreditCardDebt ccd " +
+        "SELECT ccd FROM CreditCardPayment p JOIN p.creditCardDebt ccd " +
             "WHERE ccd.recurringSource.id = :recurringId " +
-            "AND ccd.date >= :monthStart " +
-            "AND ccd.date <= :monthEnd",
+            "AND p.installment = 1 " +
+            "AND p.date >= :monthStart " +
+            "AND p.date <= :monthEnd",
     )
     fun findMaterializedDebtForMonth(
         @Param("recurringId") recurringId: Int,

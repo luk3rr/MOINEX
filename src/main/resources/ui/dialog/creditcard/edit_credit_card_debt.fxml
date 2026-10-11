@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -155,6 +156,16 @@
             </VBox>
          </children>
       </HBox>
+      <VBox alignment="CENTER">
+         <children>
+            <Label text="%creditcard.label.purchaseDate">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="purchaseDatePicker" prefWidth="150.0" showWeekNumbers="true" stylesheets="@../../../css/component/data-picker.css" />
+         </children>
+      </VBox>
       <VBox alignment="CENTER">
          <children>
             <Label text="%creditcard.label.invoice">

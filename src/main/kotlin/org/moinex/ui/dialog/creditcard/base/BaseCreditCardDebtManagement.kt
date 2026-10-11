@@ -10,6 +10,7 @@ package org.moinex.ui.dialog.creditcard.base
 
 import javafx.fxml.FXML
 import javafx.scene.control.ComboBox
+import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.stage.Stage
@@ -34,6 +35,7 @@ import org.moinex.ui.common.CalculatorController
 import org.springframework.context.ConfigurableApplicationContext
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 
@@ -55,6 +57,9 @@ abstract class BaseCreditCardDebtManagement(
 
     @FXML
     protected lateinit var invoiceYearComboBox: ComboBox<Int>
+
+    @FXML
+    protected lateinit var purchaseDatePicker: DatePicker
 
     @FXML
     protected lateinit var crcLimitLabel: Label
@@ -101,6 +106,9 @@ abstract class BaseCreditCardDebtManagement(
         loadSuggestionsFromDatabase()
 
         populateComboBoxes()
+
+        UIUtils.setDatePickerFormat(purchaseDatePicker)
+        purchaseDatePicker.value = LocalDate.now()
 
         UIUtils.resetLabel(crcLimitLabel)
         UIUtils.resetLabel(crcAvailableLimitLabel)
@@ -339,6 +347,7 @@ abstract class BaseCreditCardDebtManagement(
             category = categoryComboBox.value,
             invoiceMonth = invoiceMonthComboBox.value,
             invoiceYear = invoiceYearComboBox.value,
+            purchaseDate = purchaseDatePicker.value,
             description = descriptionField.text.trim(),
             valueStr = valueField.text,
             installmentsStr = installmentsField.text,

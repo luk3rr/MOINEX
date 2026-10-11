@@ -62,6 +62,8 @@ class EditCreditCardDebtController(
         val firstPayment =
             creditCardService.getPaymentsByDebtOrderedByInstallment(crcDebt.id!!).first()
 
+        purchaseDatePicker.value = crcDebt.date.toLocalDate()
+
         invoiceMonthComboBox.value = firstPayment.date.monthValue
         invoiceYearComboBox.value = firstPayment.date.year
     }
@@ -100,7 +102,8 @@ class EditCreditCardDebtController(
                 debtValue.compareTo(crcDebt!!.amount) == 0 &&
                 crcDebt!!.installments == installments &&
                 crcDebt!!.description == formData.description &&
-                invoice == invoiceDateYearMonth
+                invoice == invoiceDateYearMonth &&
+                crcDebt!!.date.toLocalDate() == formData.purchaseDate
             ) {
                 WindowUtils.showInformationDialog(
                     preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_NO_CHANGES_DEBT_TITLE),
@@ -112,6 +115,7 @@ class EditCreditCardDebtController(
                 crcDebt!!.description = formData.description
                 crcDebt!!.amount = debtValue
                 crcDebt!!.installments = installments
+                crcDebt!!.date = formData.purchaseDate!!.atTime(crcDebt!!.date.toLocalTime())
 
                 creditCardService.updateDebt(crcDebt!!, invoiceDateYearMonth)
             }
