@@ -162,9 +162,19 @@ class ProposeTransactionTool(
                         "recorded yet; date should still be the ORIGINAL purchase date as printed, not today.",
                 )
 
+        val dateProperty =
+            JSONObject()
+                .put("type", "string")
+                .put("format", "date")
+                .put(
+                    "description",
+                    "Transaction date. For kind credit_card this is the date the purchase was made, not " +
+                        "the date it was posted to the statement nor the invoice due date.",
+                )
+
         val itemProperties =
             JSONObject()
-                .put("date", JSONObject().put("type", "string").put("format", "date"))
+                .put("date", dateProperty)
                 .put("description", JSONObject().put("type", "string"))
                 .put("amount", amountProperty)
                 .put("kind", kindProperty)
