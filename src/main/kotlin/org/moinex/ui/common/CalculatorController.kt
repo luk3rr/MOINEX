@@ -16,12 +16,15 @@ import javafx.scene.input.KeyEvent
 import javafx.stage.Stage
 import net.objecthunter.exp4j.ExpressionBuilder
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.extension.toRounded
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.CalculationEntry
 import org.moinex.service.CalculatorService
 import org.moinex.service.PreferencesService
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
+
+private const val RESULT_SCALE = 8
 
 @Controller
 class CalculatorController(
@@ -119,7 +122,11 @@ class CalculatorController(
             if (missing > 0) expression.append(")".repeat(missing))
 
             val result = evaluateExpression(expression.toString())
-            val resultText = BigDecimal(result).stripTrailingZeros().toPlainString()
+            val resultText =
+                BigDecimal(result)
+                    .toRounded(RESULT_SCALE)
+                    .stripTrailingZeros()
+                    .toPlainString()
             val formattedExpression = formatExpression(expression.toString()) + " = " + resultText
 
             if (!justCalculated) calculatorService.addToHistory(expression.toString(), resultText)
