@@ -28,6 +28,12 @@ buildNumber.properties
 *.md
 !.claude/commands/*.md
 
+# AI-DLC: versioned knowledge and plans, local logs
+!.aidlc/**/*.md
+.aidlc/**/state.md
+.aidlc/**/audit.md
+.aidlc/**/archive/
+
 # VSCode
 .vscode/
 
