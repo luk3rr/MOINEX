@@ -11,7 +11,6 @@ plugins {
 	id("org.springframework.boot") version "3.5.11"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.openjfx.javafxplugin") version "0.1.0"
-	id("org.beryx.jlink") version "3.0.1"
 	id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 	id("com.diffplug.spotless") version "6.25.0"
 	jacoco
@@ -56,8 +55,6 @@ dependencies {
 	// Utilities
 	implementation(libs.com.opencsv.opencsv)
 	implementation(libs.org.apache.commons.commons.lang3)
-	implementation(libs.commons.beanutils.commons.beanutils)
-	implementation(libs.org.reflections.reflections)
 	implementation(libs.net.objecthunter.exp4j)
 	implementation(libs.org.json.json)
 	implementation(libs.net.minidev.json.smart)
@@ -72,20 +69,11 @@ dependencies {
 	// Flyway
 	implementation(libs.org.flywaydb.flyway.core)
 
-	// Code Quality
-	implementation(libs.com.google.googlejavaformat.google.java.format)
-
-	// Lombok
-	compileOnly(libs.org.projectlombok.lombok)
-	annotationProcessor(libs.org.projectlombok.lombok)
-
 	// Testing
 	testImplementation(libs.com.h2database.h2)
 	testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
 	testImplementation(libs.org.junit.jupiter.junit.jupiter.api)
 	testImplementation(libs.org.junit.jupiter.junit.jupiter.engine)
-	testImplementation(libs.org.mockito.mockito.core)
-	testImplementation(libs.org.mockito.mockito.junit.jupiter)
 	testImplementation(kotlin("test"))
 	testImplementation(libs.io.kotest.kotest.runner.junit5)
 	testImplementation(libs.io.kotest.kotest.assertions.core)
