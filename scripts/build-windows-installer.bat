@@ -35,8 +35,8 @@ if "!JAVA_MAJOR!"=="1" (
     for /f "tokens=2 delims=." %%a in ("!JAVA_VERSION_STRING!") do set JAVA_MAJOR=%%a
 )
 
-if !JAVA_MAJOR! LSS 21 (
-    echo [ERROR] Java 21 ou superior e necessario. Versao atual: !JAVA_MAJOR!
+if !JAVA_MAJOR! LSS 25 (
+    echo [ERROR] Java 25 ou superior e necessario. Versao atual: !JAVA_MAJOR!
     exit /b 1
 )
 
@@ -51,7 +51,7 @@ if defined JAVA_HOME (
 ) else (
     where jpackage >nul 2>&1
     if !ERRORLEVEL! NEQ 0 (
-        echo [ERROR] jpackage nao encontrado. Certifique-se de que esta usando Java 21+.
+        echo [ERROR] jpackage nao encontrado. Certifique-se de que esta usando Java 25+.
         exit /b 1
     )
 )

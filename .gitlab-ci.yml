@@ -19,7 +19,7 @@ stages:
 
 unit_test:
   stage: test
-  image: eclipse-temurin:21-jdk
+  image: eclipse-temurin:25-jdk
   script:
     - chmod +x ./gradlew
     - ./gradlew clean build jacocoTestReport

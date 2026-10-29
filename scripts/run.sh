@@ -5,7 +5,7 @@
 # Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
 
 MOINEX_JAVA_HOME=""
-DEFAULT_JAVA_21_PATH="/usr/lib/jvm/java-21-openjdk"
+DEFAULT_JAVA_25_PATH="/usr/lib/jvm/java-25-openjdk"
 
 JAR_PATH="$HOME/.moinex/bin/moinex.jar"
 
@@ -20,24 +20,24 @@ fi
 
 JAVA_VERSION=$("$JAVA_HOME/bin/java" -version 2>&1 | awk -F '"' '/version/ {print $2}' | cut -d. -f1)
 
-# Check if the Java version is compatible with Moinex, which requires Java 21
+# Check if the Java version is compatible with Moinex, which requires Java 25
 # If the version is compatible, set MOINEX_JAVA_HOME to JAVA_HOME
-# Otherwise, try to find Java 21 in the default path
-if [ "$JAVA_VERSION" -ge 21 ]; then
+# Otherwise, try to find Java 25 in the default path
+if [ "$JAVA_VERSION" -ge 25 ]; then
     MOINEX_JAVA_HOME="$JAVA_HOME"
 else
-    # Se JAVA_HOME não é compatível, tenta encontrar o Java 21 no caminho padrão
-    if [ -d "$DEFAULT_JAVA_21_PATH" ]; then
-        MOINEX_JAVA_HOME="$DEFAULT_JAVA_21_PATH"
+    # Se JAVA_HOME não é compatível, tenta encontrar o Java 25 no caminho padrão
+    if [ -d "$DEFAULT_JAVA_25_PATH" ]; then
+        MOINEX_JAVA_HOME="$DEFAULT_JAVA_25_PATH"
     else
         # Exibe erro se nenhuma instalação compatível foi encontrada
-        print_error "Erro: Não foi encontrada uma versão compatível com Java 21. Verifique se o Java 21 está instalado."
+        print_error "Erro: Não foi encontrada uma versão compatível com Java 25. Verifique se o Java 25 está instalado."
         exit 1
     fi
 fi
 
 if [ ! -d "$MOINEX_JAVA_HOME" ]; then
-    print_error "Erro: O diretório $MOINEX_JAVA_HOME não foi encontrado. Verifique se o Java 21 está instalado."
+    print_error "Erro: O diretório $MOINEX_JAVA_HOME não foi encontrado. Verifique se o Java 25 está instalado."
   exit 1
 fi
 

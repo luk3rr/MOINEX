@@ -29,7 +29,7 @@ Tests use **Kotest BehaviorSpec** (Given/When/Then DSL), **MockK** for mocking, 
 ./gradlew spotlessApply   # Apply all formatters
 ```
 
-> OBS.: `Export JAVA_HOME before running gradlew commands (export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64)`
+> OBS.: `Export JAVA_HOME before running gradlew commands (export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64)`
 
 ## Architecture
 
