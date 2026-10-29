@@ -56,9 +56,9 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 
 ## Tecnologias Utilizadas
 
-- **Linguagem:** Kotlin 2.1.0
-- **Backend:** Spring Boot 3.5, Spring Data JPA
-- **Interface Gráfica:** JavaFX 21
+- **Linguagem:** Kotlin 2.4.21
+- **Backend:** Spring Boot 4.1, Spring Data JPA
+- **Interface Gráfica:** JavaFX 27
 - **Base de Dados:** SQLite com Flyway para migrações
 - **Build:** Gradle com Kotlin DSL
 - **Testes:** Kotest
@@ -88,7 +88,7 @@ O Moinex está disponível para **Linux** e **Windows**.
 
 Certifique-se de ter instalado:
 - **Git**
-- **Java 21** ou superior
+- **JDK 25** (o pacote completo, com `javac`, não apenas o runtime)
 - **Gradle** (ou use o wrapper incluído `./gradlew`)
 - **Python 3** com pip (para scripts de APIs financeiras)
 
