@@ -1,9 +1,11 @@
 # Quality and risks — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: medium-high
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium-high
 
 ## Baseline de testes
-`./gradlew test` em 2026-10-29, commit d38e3ee1, `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`: BUILD SUCCESSFUL em 1m01s. 1374 testes, 0 falhas, 0 erros, 0 ignorados. Sem falhas pré-existentes. [src: build/test-results/test/*.xml] Rodado com autorização do usuário. [user]
+Atualização pós v2.19.0 (HEAD 08bbf24f): `./gradlew clean build jacocoTestReport` com JDK 25 → BUILD SUCCESSFUL em 50s, 1374 testes, 0 falhas; cobertura de instruções 25,7%. Smoke manual feito pelo usuário; CI do GitHub passou (informado pelo usuário). [user] [src: .aidlc/261029-java-25-upgrade/construction/build-and-test.md]
+
+Baseline original: `./gradlew test` em 2026-10-29, commit d38e3ee1, `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`: BUILD SUCCESSFUL em 1m01s. 1374 testes, 0 falhas, 0 erros, 0 ignorados. Sem falhas pré-existentes. [src: build/test-results/test/*.xml] Rodado com autorização do usuário. [user]
 
 ## Pontos quentes (12 meses)
 Mais alterados: arquivos i18n (`messages_*.properties`), `TranslationKeys.kt`, `HomeController.kt`, `WalletController.kt`, `SavingsController`. [src: git log --since 12 months]
@@ -20,7 +22,7 @@ Mais alterados: arquivos i18n (`messages_*.properties`), `TranslationKeys.kt`, `
 9. **Folhas de estilo repetidas por nó em FXML** (ex.: `combo-box.css` 51+25+22+19 vezes): mudança de caminho exige editar muitos FXML. [src: grep stylesheets=]
 
 ## Dívida e legado
-Dependências Mockito/Lombok/google-java-format sem uso aparente em Kotlin. [inferred] `.gitlab-ci.yml` legado. [src: CLAUDE.md]
+Dependências sem uso (Lombok, Mockito, google-java-format, reflections, commons-beanutils) foram removidas em v2.19.0. `.gitlab-ci.yml` legado, atualizado para Temurin 25. [src: git show d50e86e6] [src: CLAUDE.md]
 
 ## Segurança
 Sem superfície de rede de entrada. Credenciais de IA em store local. Scripts Python executados como subprocesso com argumentos do app. [src: common/util/APIUtils.kt]

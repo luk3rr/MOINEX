@@ -1,6 +1,6 @@
 # Overview — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: medium
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium
 
 ## Propósito
 App desktop de finanças pessoais (carteiras, transações, cartões de crédito, metas e planejamento, investimentos, patrimônio líquido, lista de desejos) feito com Spring Boot + JavaFX, dados locais em SQLite. [src: CLAUDE.md]
@@ -49,7 +49,7 @@ flowchart LR
 Caption: o app é local; só sai para a rede em cotações/indicadores e no chat de IA. [src: CLAUDE.md] [src: src/main/kotlin/org/moinex/ai/provider/]
 
 ## Maturidade
-- Versão 2.18.1, 611 commits, tags de release `vX.Y.Z`. [src: build.gradle.kts:62]
+- Versão 2.19.0 (tag `v2.19.0`), mais de 611 commits, tags de release `vX.Y.Z`; v2.19.0 exige Java 25. [src: build.gradle.kts:86]
 - Código migrado de Java para Kotlin em 2026 (cabeçalhos "Migrated to Kotlin"); ainda aparecem arquivos Java no histórico. [src: src/main/kotlin/org/moinex/app/App.kt:1-8]
 
 ## Identidade visual a preservar

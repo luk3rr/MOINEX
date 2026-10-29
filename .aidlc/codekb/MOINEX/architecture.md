@@ -1,6 +1,6 @@
 # Architecture — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: medium-high
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium-high
 
 ## Estilo
 Monólito em camadas, processo único: JavaFX na frente, Spring (injeção + JPA) por baixo, SQLite local. [src: CLAUDE.md]
@@ -40,6 +40,7 @@ Caption: a UI só fala com services; services falam com repositórios e Python. 
 - **Tema:** `ThemeService` troca uma folha de tokens (`tokens.light.css`/`tokens.dark.css`) no `rootPane` e em cada Scene/janela aberta, e aplica `ColorAdjust` nos `ImageView` para ícones no escuro. [src: service/ThemeService.kt:20-80] [src: common/extension/JavaFxUtils.kt:8-10]
 - **Diálogos modais:** `WindowUtils.openModalWindow/openPopupWindow` criam `Stage` + `Scene`, aplicam tokens e `common-styles.css`. [src: common/util/WindowUtils.kt:140-230]
 - **Alertas nativos** (`Alert`) em `WindowUtils.show*Dialog` não passam por `ThemeService`: ficam com o estilo padrão do JavaFX. [src: common/util/WindowUtils.kt:60-130]
+- **Ordem de inicialização do banco:** Flyway (bean manual) → `data.sql` → Hibernate valida o schema; no Spring Boot 4 isso é garantido por uma dependência explícita do `entityManagerFactory` no bean `flyway`. [src: config/FlywayConfig.kt]
 - **i18n:** `ResourceBundle` via `PreferencesService.bundle`; chaves em `TranslationKeys.kt`. [src: common/constant/TranslationKeys.kt]
 - **Assíncrono:** `FxUtils.launchOnBackground/launchBackgroundThenUI`, `AppDispatchers`. [src: common/util/FxUtils.kt] [src: config/AppDispatchers.kt]
 

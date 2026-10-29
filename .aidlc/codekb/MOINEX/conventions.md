@@ -1,9 +1,9 @@
 # Conventions — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: medium-high
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium-high
 
 ## Estilo e lint
-- ktlint 14.0.1 + Spotless; 4 espaços, linha ≤120, final de arquivo com newline. [src: .editorconfig:1-20] [src: build.gradle.kts:16-17]
+- ktlint (plugin 14.2.0, engine 1.4.1, compilador embutido fixado em 2.0.21) + Spotless (plugin aplicado sem bloco de configuração); 4 espaços, linha ≤120, final de arquivo com newline. [src: .editorconfig:1-20] [src: build.gradle.kts:16-17]
 - `./gradlew ktlintFormat` / `spotlessApply` corrigem. [src: CLAUDE.md]
 - Sem comentários `//` explicativos no código Kotlin; KDoc em classes/funções é aceito. [user] (regra do dono do projeto, registrada em memória do Claude)
 

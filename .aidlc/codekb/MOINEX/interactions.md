@@ -1,6 +1,6 @@
 # Interactions — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: medium-high
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: medium-high
 
 ## 1. Inicialização
 ```mermaid
@@ -11,7 +11,7 @@ sequenceDiagram
   participant FX as FXMLLoader
   M->>J: Application.launch
   J->>S: init() → start(args)
-  S-->>J: ApplicationContext (Flyway, JPA)
+  S-->>J: ApplicationContext (Flyway migra e semeia, depois JPA valida)
   J->>J: start(): splash (UNDECORATED)
   J->>FX: carrega main.fxml (background, controllerFactory = getBean)
   FX-->>J: mainRoot

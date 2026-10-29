@@ -4,7 +4,7 @@
 
 Resumo da codekb validada pelo usuário em 2026-10-29 (commit d38e3ee1). Detalhes em `.aidlc/codekb/MOINEX/`. [user]
 
-MOINEX é um app desktop de finanças pessoais: JavaFX 23.0.1 + Spring Boot 3.5.11 + Kotlin 2.1.0, SQLite local, scripts Python para cotações, chat de IA com 4 provedores. Monólito em camadas `ui → service → repository`; os controllers FXML são beans Spring. [src: .aidlc/codekb/MOINEX/architecture.md]
+MOINEX é um app desktop de finanças pessoais: JavaFX 27.0.1 + Spring Boot 4.1.2 + Kotlin 2.4.21 (JDK 25, release v2.19.0), SQLite local, scripts Python para cotações, chat de IA com 4 provedores. Monólito em camadas `ui → service → repository`; os controllers FXML são beans Spring. [src: .aidlc/codekb/MOINEX/architecture.md]
 
 ```mermaid
 flowchart TB
@@ -35,12 +35,12 @@ Caption: o estilo vem de tokens CSS aplicados por `ThemeService` no root e em ca
 
 **Identidade a preservar** `[user]`: paleta Dracula no escuro, botões em pílula, verde da sidebar (#0a614e). [mem: M-001]
 
-**Baseline**: `./gradlew test` com 1374 testes, 0 falhas, 0 erros; não há testes de UI, e a verificação visual é manual. [src: .aidlc/codekb/MOINEX/quality-and-risks.md]
+**Baseline**: `./gradlew clean build jacocoTestReport` com JDK 25 (HEAD 08bbf24f): 1374 testes, 0 falhas, 0 erros; não há testes de UI, e a verificação visual é manual. [src: .aidlc/codekb/MOINEX/quality-and-risks.md]
 
 ### Assumptions & open questions
-- A1 (state.md): "substituir JavaFX por AtlantaFX" significa adotar o AtlantaFX como tema e remover o JFoenix; JavaFX continua como toolkit. Confirmação em 2.3.
-- Aberta para 2.3: o tema claro continua sendo mantido com a mesma prioridade do escuro?
-- Aberta para 2.3: manter o verde da sidebar também no tema claro?
+- A1 (state.md): "substituir JavaFX por AtlantaFX" = adotar o AtlantaFX 3.0.0 como tema e remover o JFoenix; o JavaFX continua como toolkit. Confirmada no 2.3.
+- Resolvida no 2.3: o verde da sidebar vale nos dois temas (A2).
+- Atualização 2026-10-29: o pré-requisito (Java 25, JavaFX 27, Kotlin 2.4, Spring Boot 4) está na `main` desde v2.19.0; a codekb foi refrescada para o HEAD 08bbf24f.
 ## 2.2 Team practices
 
 Projeto de um mantenedor, prática afirmada pelo usuário em 2026-10-29. [user]

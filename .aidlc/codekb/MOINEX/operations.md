@@ -1,9 +1,10 @@
 # Operations — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: high
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: high
 
 ## Comandos
-Requer `export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`. [src: CLAUDE.md]
+Requer um **JDK 25 completo** (`openjdk-25-jdk`; só o JRE não tem `javac`): `export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64`. [src: CLAUDE.md] [src: Makefile:4]
+
 | Ação | Comando | Fonte |
 |---|---|---|
 | Rodar | `./gradlew bootRun` ou `make run` | CLAUDE.md, Makefile |
