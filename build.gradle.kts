@@ -83,7 +83,7 @@ dependencies {
 }
 
 group = "org.moinex.app"
-version = "2.18.1"
+version = "2.19.0"
 description = "Moinex"
 
 java {
