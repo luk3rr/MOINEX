@@ -31,6 +31,10 @@ Tests use **Kotest BehaviorSpec** (Given/When/Then DSL), **MockK** for mocking, 
 
 > OBS.: `Export JAVA_HOME before running gradlew commands (export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64)`
 
+The build needs a full **JDK 25** (the `openjdk-25-jre` package alone has no `javac`; install `openjdk-25-jdk`). The toolchain is Gradle 9.x, Kotlin 2.4, Spring Boot 4.x and JavaFX 27.
+
+The ktlint engine is kept on 1.4.1 and the `kotlin-compiler-embeddable` of the `ktlint` configuration is pinned in `build.gradle.kts` (`org-jetbrains-kotlin-compiler-ktlint` in the version catalog). Without the pin the Kotlin Gradle plugin forces its own compiler version there and ktlint fails with `Extensions storage is not registered`. Newer ktlint engines add rules that the current code does not follow.
+
 ## Architecture
 
 MOINEX is a personal finance desktop app built with **Spring Boot + JavaFX**. The stack: Kotlin, Spring Data JPA, SQLite (WAL, single connection via HikariCP), Flyway migrations, JavaFX + JFoenix UI, and kotlinx-coroutines for async work.
@@ -68,6 +72,7 @@ Python dependencies: `requirements.txt` (yfinance, requests, pandas, numpy). On 
 - **Location:** `~/.moinex/data/moinex.db`
 - **Migrations:** Flyway, `src/main/resources/db/migration/` (34 migrations, prefix `V0xx__`)
 - **Hibernate:** `ddl-auto: validate` — schema must exist before startup; never let Hibernate manage schema
+- **Startup order:** `FlywayConfig` is a manual bean that migrates and then runs `data.sql`, and the `entityManagerFactory` bean definition is made to depend on `flyway` so Hibernate validates an existing schema. `spring.sql.init.mode` is `never` on purpose; do not turn it back on, since Spring would run `data.sql` before the tables exist.
 - **Connection pool:** HikariCP, max 1 connection (SQLite constraint)
 
 ## Configuration Profiles
