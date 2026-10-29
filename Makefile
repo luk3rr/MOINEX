@@ -1,7 +1,7 @@
 # Makefile for MOINEX
 # Thin wrapper around the Gradle tasks documented in CLAUDE.md.
 
-JAVA_HOME ?= /usr/lib/jvm/java-21-openjdk-amd64
+JAVA_HOME ?= /usr/lib/jvm/java-25-openjdk-amd64
 
 # XDG_DATA_HOME must be a single directory (default: $HOME/.local/share). If it is
 # a colon-separated list, the Kotlin compiler daemon fails to spawn. Force a sane

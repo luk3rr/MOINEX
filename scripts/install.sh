@@ -168,7 +168,7 @@ print_success ">> Permissões de execução concedidas ao arquivo .desktop"
 if ./gradlew clean build -x test; then
     print_success ">> JAR criado com sucesso"
 else
-    print_error "Erro ao criar o JAR. Verifique se o gradle e o java 21 estão instalados"
+    print_error "Erro ao criar o JAR. Verifique se o gradle e o java 25 estão instalados"
     exit 1
 fi
 

@@ -4,15 +4,14 @@
 
 plugins {
 	java
-	kotlin("jvm") version "2.1.0"
-	kotlin("plugin.spring") version "2.1.0"
-	kotlin("plugin.jpa") version "2.1.0"
-	kotlin("plugin.allopen") version "2.1.0"
-	id("org.springframework.boot") version "3.5.11"
+	kotlin("jvm") version "2.4.21"
+	kotlin("plugin.spring") version "2.4.21"
+	kotlin("plugin.jpa") version "2.4.21"
+	kotlin("plugin.allopen") version "2.4.21"
+	id("org.springframework.boot") version "4.1.2"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.openjfx.javafxplugin") version "0.1.0"
-	id("org.beryx.jlink") version "3.0.1"
-	id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+	id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 	id("com.diffplug.spotless") version "6.25.0"
 	jacoco
 	`maven-publish`
@@ -56,8 +55,6 @@ dependencies {
 	// Utilities
 	implementation(libs.com.opencsv.opencsv)
 	implementation(libs.org.apache.commons.commons.lang3)
-	implementation(libs.commons.beanutils.commons.beanutils)
-	implementation(libs.org.reflections.reflections)
 	implementation(libs.net.objecthunter.exp4j)
 	implementation(libs.org.json.json)
 	implementation(libs.net.minidev.json.smart)
@@ -72,20 +69,11 @@ dependencies {
 	// Flyway
 	implementation(libs.org.flywaydb.flyway.core)
 
-	// Code Quality
-	implementation(libs.com.google.googlejavaformat.google.java.format)
-
-	// Lombok
-	compileOnly(libs.org.projectlombok.lombok)
-	annotationProcessor(libs.org.projectlombok.lombok)
-
 	// Testing
 	testImplementation(libs.com.h2database.h2)
 	testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
 	testImplementation(libs.org.junit.jupiter.junit.jupiter.api)
 	testImplementation(libs.org.junit.jupiter.junit.jupiter.engine)
-	testImplementation(libs.org.mockito.mockito.core)
-	testImplementation(libs.org.mockito.mockito.junit.jupiter)
 	testImplementation(kotlin("test"))
 	testImplementation(libs.io.kotest.kotest.runner.junit5)
 	testImplementation(libs.io.kotest.kotest.assertions.core)
@@ -99,8 +87,8 @@ version = "2.18.1"
 description = "Moinex"
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 javafx {
@@ -122,7 +110,7 @@ publishing {
 
 tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
-	options.release.set(21)
+	options.release.set(25)
 }
 
 tasks.withType<Javadoc> {
@@ -178,9 +166,20 @@ ktlint {
 	}
 }
 
+configurations.matching { it.name == "ktlint" }.configureEach {
+	resolutionStrategy.eachDependency {
+		if (requested.group == "org.jetbrains.kotlin") {
+			useVersion(
+				libs.versions.org.jetbrains.kotlin.compiler.ktlint
+					.get(),
+			)
+		}
+	}
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 	compilerOptions {
-		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25)
 		freeCompilerArgs.set(
 			listOf(
 				"-Xjsr305=strict",
