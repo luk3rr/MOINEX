@@ -4,14 +4,14 @@
 
 plugins {
 	java
-	kotlin("jvm") version "2.1.0"
-	kotlin("plugin.spring") version "2.1.0"
-	kotlin("plugin.jpa") version "2.1.0"
-	kotlin("plugin.allopen") version "2.1.0"
+	kotlin("jvm") version "2.4.21"
+	kotlin("plugin.spring") version "2.4.21"
+	kotlin("plugin.jpa") version "2.4.21"
+	kotlin("plugin.allopen") version "2.4.21"
 	id("org.springframework.boot") version "3.5.11"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.openjfx.javafxplugin") version "0.1.0"
-	id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+	id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 	id("com.diffplug.spotless") version "6.25.0"
 	jacoco
 	`maven-publish`
@@ -87,8 +87,8 @@ version = "2.18.1"
 description = "Moinex"
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 javafx {
@@ -110,7 +110,7 @@ publishing {
 
 tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
-	options.release.set(21)
+	options.release.set(25)
 }
 
 tasks.withType<Javadoc> {
@@ -166,9 +166,20 @@ ktlint {
 	}
 }
 
+configurations.matching { it.name == "ktlint" }.configureEach {
+	resolutionStrategy.eachDependency {
+		if (requested.group == "org.jetbrains.kotlin") {
+			useVersion(
+				libs.versions.org.jetbrains.kotlin.compiler.ktlint
+					.get(),
+			)
+		}
+	}
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 	compilerOptions {
-		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+		jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25)
 		freeCompilerArgs.set(
 			listOf(
 				"-Xjsr305=strict",
