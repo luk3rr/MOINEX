@@ -146,16 +146,20 @@ Covers: US-5; FR-8. Depende de: UNIT-3.
 
 **Desvios:** (1) `applyIconTheme`/`colored-icon` ficam no `ThemeService`, porque os logos de bandeira de cartão e a foto da splash continuam PNG; a splash ganhou `colored-icon`. (2) Nome de ícone de tipo de carteira desconhecido cai no glifo padrão, não em PNG. (3) `common/default.png` foi mantido. (4) T-4.13: aprovações dos ícones aproximados ficam para o teste do usuário; recusados voltam a PNG.
 
-### UNIT-5 Gráficos e chat no tema   Status: not started
+### UNIT-5 Gráficos e chat no tema   Status: verified
 Covers: US-6; FR-12. Depende de: UNIT-3.
-- [ ] T-5.1 Definir as cores de série `chart-color-1..20` para os dois temas dentro de NFR-2 — covers FR-12, US-6 — files: css/component/charts.css, css/theme/tokens.*.css — test: `ThemeContrastTest` estendido
-- [ ] T-5.2 `charts.css` e `timeline-chart.css` ligados aos tokens — covers FR-12, US-6 — files: css/component/ — test: captura dos gráficos
-- [ ] T-5.3 `DoughnutChart` e `CircularProgressBar` no tema novo — covers FR-12, US-6 — files: common/chart/ — test: captura nos dois temas
-- [ ] T-5.4 `SankeyChart` no tema novo — covers FR-12, US-6 — files: common/chart/SankeyChart.kt — test: captura nos dois temas
-- [ ] T-5.5 `BudgetGroupTimelineChart`, `BudgetGroupGroupedBarChart` e `NetWorthLineChart` no tema novo — covers FR-12, US-6 — files: common/chart/ — test: captura nos dois temas
-- [ ] T-5.6 CSS do `WebView` do chat de IA com as cores dos tokens — covers FR-12, US-6 — files: ui/main/AiChatController.kt, ai/chat/MarkdownRenderer.kt — test: captura de uma conversa nos dois temas
-- [ ] T-5.7 Capturas antes/depois dos gráficos e do chat para aprovação — covers NFR-3 — files: (saída local) — test: aprovação do usuário
-- [ ] T-5.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-5.1 Definir as cores de série `chart-color-1..20` para os dois temas dentro de NFR-2 — covers FR-12, US-6 — files: css/component/charts.css, css/theme/tokens.*.css — test: `ThemeContrastTest` estendido
+- [x] T-5.2 `charts.css` e `timeline-chart.css` ligados aos tokens — covers FR-12, US-6 — files: css/component/ — test: captura dos gráficos
+- [x] T-5.3 `DoughnutChart` e `CircularProgressBar` no tema novo — covers FR-12, US-6 — files: common/chart/ — test: captura nos dois temas
+- [x] T-5.4 `SankeyChart` no tema novo — covers FR-12, US-6 — files: common/chart/SankeyChart.kt — test: captura nos dois temas
+- [x] T-5.5 `BudgetGroupTimelineChart`, `BudgetGroupGroupedBarChart` e `NetWorthLineChart` no tema novo — covers FR-12, US-6 — files: common/chart/ — test: captura nos dois temas
+- [x] T-5.6 CSS do `WebView` do chat de IA com as cores dos tokens — covers FR-12, US-6 — files: ui/main/AiChatController.kt, ai/chat/MarkdownRenderer.kt — test: captura de uma conversa nos dois temas
+- [x] T-5.7 Capturas antes/depois dos gráficos e do chat para aprovação — covers NFR-3 — files: (saída local) — test: aprovação do usuário
+- [x] T-5.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+
+**Resumo (2026-10-29, exit 0, 1398 testes, 0 falhas):** 109 cores fixas de `charts.css` e `timeline-chart.css` viraram `theme-chart-series-00..39` e `theme-chart-projection` nos dois temas (≥3:1 contra o card, checado no `ThemeContrastTest`). Cores desenhadas em código (Sankey, `CircularProgressBar`, bolhas do chat) ficam em `common/ui/ThemeColors.kt`, com `ThemeColorsTest` comparando com os tokens. Sankey ganhou paleta para tema claro.
+
+**Desvios:** o chat usa bolhas em `WebView` coloridas por Kotlin, não CSS do WebView; ficam em `ThemeColors`. A aprovação visual das capturas (T-5.7) fica para o seu teste da interface.
 
 ### UNIT-6 Formulários e diálogos   Status: not started
 Covers: US-15; FR-10; NFR-7. Depende de: UNIT-3, UNIT-4.

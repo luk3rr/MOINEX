@@ -30,7 +30,7 @@ class ChartFactory(
     fun createCircularProgressBar(
         radius: Double,
         width: Double,
-    ): CircularProgressBar = CircularProgressBar(radius, width)
+    ): CircularProgressBar = CircularProgressBar(radius, width, preferencesService.isDarkMode())
 
     fun createNetWorthLineChart(): NetWorthLineChart =
         NetWorthLineChart().apply {

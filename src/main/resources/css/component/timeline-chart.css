@@ -36,69 +36,69 @@
 
 /* Solid line symbols for actual/real series (even numbers) - using charts.css palette */
 .chart-legend-item-symbol.series0 {
-    -fx-background-color: #2563eb;
+    -fx-background-color: theme-chart-series-03;
 }
 
 .chart-legend-item-symbol.series2 {
-    -fx-background-color: #22c55e;
+    -fx-background-color: theme-chart-series-01;
 }
 
 .chart-legend-item-symbol.series4 {
-    -fx-background-color: #eab308;
+    -fx-background-color: theme-chart-series-07;
 }
 
 .chart-legend-item-symbol.series6 {
-    -fx-background-color: #ef4444;
+    -fx-background-color: theme-chart-series-17;
 }
 
 .chart-legend-item-symbol.series8 {
-    -fx-background-color: #a855f7;
+    -fx-background-color: theme-chart-series-23;
 }
 
 .chart-legend-item-symbol.series10 {
-    -fx-background-color: #0ea5e9;
+    -fx-background-color: theme-chart-series-32;
 }
 
 /* Dashed line symbols for target/meta series (odd numbers) */
 /* Using border-style for dashed effect */
 .chart-legend-item-symbol.series1 {
     -fx-background-color: transparent;
-    -fx-border-color: #2563eb;
+    -fx-border-color: theme-chart-series-03;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 .chart-legend-item-symbol.series3 {
     -fx-background-color: transparent;
-    -fx-border-color: #22c55e;
+    -fx-border-color: theme-chart-series-01;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 .chart-legend-item-symbol.series5 {
     -fx-background-color: transparent;
-    -fx-border-color: #eab308;
+    -fx-border-color: theme-chart-series-07;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 .chart-legend-item-symbol.series7 {
     -fx-background-color: transparent;
-    -fx-border-color: #ef4444;
+    -fx-border-color: theme-chart-series-17;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 .chart-legend-item-symbol.series9 {
     -fx-background-color: transparent;
-    -fx-border-color: #a855f7;
+    -fx-border-color: theme-chart-series-23;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 .chart-legend-item-symbol.series11 {
     -fx-background-color: transparent;
-    -fx-border-color: #0ea5e9;
+    -fx-border-color: theme-chart-series-32;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
@@ -130,68 +130,68 @@
 /* Series line styling with color pairing - using charts.css palette */
 /* Actual series (solid lines) */
 .chart-series-line.series0 {
-    -fx-stroke: #2563eb;
+    -fx-stroke: theme-chart-series-03;
     -fx-stroke-width: 3;
 }
 
 .chart-series-line.series2 {
-    -fx-stroke: #22c55e;
+    -fx-stroke: theme-chart-series-01;
     -fx-stroke-width: 3;
 }
 
 .chart-series-line.series4 {
-    -fx-stroke: #eab308;
+    -fx-stroke: theme-chart-series-07;
     -fx-stroke-width: 3;
 }
 
 .chart-series-line.series6 {
-    -fx-stroke: #ef4444;
+    -fx-stroke: theme-chart-series-17;
     -fx-stroke-width: 3;
 }
 
 .chart-series-line.series8 {
-    -fx-stroke: #a855f7;
+    -fx-stroke: theme-chart-series-23;
     -fx-stroke-width: 3;
 }
 
 .chart-series-line.series10 {
-    -fx-stroke: #0ea5e9;
+    -fx-stroke: theme-chart-series-32;
     -fx-stroke-width: 3;
 }
 
 /* Target series (dashed lines) */
 .chart-series-line.series1 {
-    -fx-stroke: #2563eb;
+    -fx-stroke: theme-chart-series-03;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 .chart-series-line.series3 {
-    -fx-stroke: #22c55e;
+    -fx-stroke: theme-chart-series-01;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 .chart-series-line.series5 {
-    -fx-stroke: #eab308;
+    -fx-stroke: theme-chart-series-07;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 .chart-series-line.series7 {
-    -fx-stroke: #ef4444;
+    -fx-stroke: theme-chart-series-17;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 .chart-series-line.series9 {
-    -fx-stroke: #a855f7;
+    -fx-stroke: theme-chart-series-23;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 .chart-series-line.series11 {
-    -fx-stroke: #0ea5e9;
+    -fx-stroke: theme-chart-series-32;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
@@ -214,7 +214,7 @@
 
 /* Net Worth Chart - Current date vertical line */
 .current-date-line {
-    -fx-stroke: #9ca3af;
+    -fx-stroke: theme-chart-series-36;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
     -fx-opacity: 0.7;
@@ -223,21 +223,21 @@
 /* Net Worth Chart - Series styling */
 /* Series 0 = Assets (Ativos) - Blue dashed */
 .chart-series-line.series0 {
-    -fx-stroke: #2563eb;
+    -fx-stroke: theme-chart-series-03;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 /* Series 1 = Liabilities (Passivos) - Red dashed */
 .chart-series-line.series1 {
-    -fx-stroke: #ef4444;
+    -fx-stroke: theme-chart-series-17;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 /* Series 2 = Net Worth (PL) - Green solid */
 .chart-series-line.series2 {
-    -fx-stroke: #22c55e;
+    -fx-stroke: theme-chart-series-01;
     -fx-stroke-width: 3;
 }
 
@@ -245,7 +245,7 @@
 /* Series 0 = Assets (Ativos) - Blue dashed */
 .chart-legend-item-symbol.default-color0.series0 {
     -fx-background-color: transparent;
-    -fx-border-color: #2563eb;
+    -fx-border-color: theme-chart-series-03;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
@@ -253,33 +253,33 @@
 /* Series 1 = Liabilities (Passivos) - Red dashed */
 .chart-legend-item-symbol.default-color1.series1 {
     -fx-background-color: transparent;
-    -fx-border-color: #ef4444;
+    -fx-border-color: theme-chart-series-17;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 /* Series 2 = Net Worth (PL) - Green solid */
 .chart-legend-item-symbol.default-color2.series2 {
-    -fx-background-color: #22c55e;
+    -fx-background-color: theme-chart-series-01;
 }
 
 /* Net Worth Chart - Data point symbols */
 .chart-line-symbol.series0 {
-    -fx-background-color: #2563eb, theme-chart-bg;
+    -fx-background-color: theme-chart-series-03, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;
 }
 
 .chart-line-symbol.series1 {
-    -fx-background-color: #ef4444, theme-chart-bg;
+    -fx-background-color: theme-chart-series-17, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;
 }
 
 .chart-line-symbol.series2 {
-    -fx-background-color: #22c55e, theme-chart-bg;
+    -fx-background-color: theme-chart-series-01, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;

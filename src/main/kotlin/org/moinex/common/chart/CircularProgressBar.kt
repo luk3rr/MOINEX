@@ -13,21 +13,17 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 import javafx.scene.shape.ArcType
 import javafx.scene.text.TextAlignment
+import org.moinex.common.ui.ThemeColors
 import org.moinex.common.util.UIUtils
 
 class CircularProgressBar(
     radius: Double,
     private val progressWidth: Double,
+    isDarkMode: Boolean,
 ) : Canvas(radius, radius) {
-    private val progressColor: Color = Color.web(BELIZE_BLUE)
-    private val backgroundColor: Color = Color.web(LIGHT_GRAY)
-    private val fontColor: Color = Color.web(BLACK)
-
-    companion object {
-        private const val BELIZE_BLUE = "#3498db"
-        private const val LIGHT_GRAY = "#D3D3D3"
-        private const val BLACK = "#000000"
-    }
+    private val progressColor: Color = ThemeColors.progress(isDarkMode)
+    private val backgroundColor: Color = ThemeColors.allocTrack(isDarkMode)
+    private val fontColor: Color = ThemeColors.textPrimary(isDarkMode)
 
     init {
         graphicsContext2D.apply {

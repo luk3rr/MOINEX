@@ -35,6 +35,7 @@ import org.moinex.ai.chat.MarkdownRenderer
 import org.moinex.ai.ingest.StatementIngestService
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.ThemeColors
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
@@ -124,20 +125,6 @@ class AiChatController(
         private const val NANOS_PER_MILLI = 1_000_000L
         private const val MILLIS_PER_SECOND = 1000L
         private const val SECONDS_PER_MINUTE = 60L
-
-        private const val LIGHT_SIDEBAR_BG = "#1abc9c"
-        private const val LIGHT_TEXT_ON_DARK = "#ffffff"
-        private const val LIGHT_CARD_ALT_BG = "#f5f5f5"
-        private const val LIGHT_TEXT_PRIMARY = "#333333"
-        private const val LIGHT_WARNING_BG = "#fff3cd"
-        private const val LIGHT_WARNING_TEXT = "#856404"
-
-        private const val DARK_SIDEBAR_BG = "#0a614e"
-        private const val DARK_TEXT_ON_DARK = "#F8F8F2"
-        private const val DARK_CARD_ALT_BG = "#21222c"
-        private const val DARK_TEXT_PRIMARY = "#F8F8F2"
-        private const val DARK_WARNING_BG = "#282A36"
-        private const val DARK_WARNING_TEXT = "#FFB86C"
     }
 
     @FXML
@@ -550,19 +537,22 @@ class AiChatController(
         return when (styleClass) {
             STYLE_BUBBLE_USER ->
                 if (isDark) {
-                    DARK_SIDEBAR_BG to DARK_TEXT_ON_DARK
+                    ThemeColors.DARK_BG_SIDEBAR to ThemeColors.DARK_ON_SIDEBAR
                 } else {
-                    LIGHT_SIDEBAR_BG to
-                        LIGHT_TEXT_ON_DARK
+                    ThemeColors.LIGHT_BG_SIDEBAR to ThemeColors.LIGHT_ON_SIDEBAR
                 }
             STYLE_BUBBLE_NOTICE ->
                 if (isDark) {
-                    DARK_WARNING_BG to DARK_WARNING_TEXT
+                    ThemeColors.DARK_BG_CARD to ThemeColors.DARK_WARNING
                 } else {
-                    LIGHT_WARNING_BG to
-                        LIGHT_WARNING_TEXT
+                    ThemeColors.LIGHT_BG_CARD_ALT to ThemeColors.LIGHT_WARNING
                 }
-            else -> if (isDark) DARK_CARD_ALT_BG to DARK_TEXT_PRIMARY else LIGHT_CARD_ALT_BG to LIGHT_TEXT_PRIMARY
+            else ->
+                if (isDark) {
+                    ThemeColors.DARK_BG_CARD_ALT to ThemeColors.DARK_TEXT_PRIMARY
+                } else {
+                    ThemeColors.LIGHT_BG_CARD_ALT to ThemeColors.LIGHT_TEXT_PRIMARY
+                }
         }
     }
 

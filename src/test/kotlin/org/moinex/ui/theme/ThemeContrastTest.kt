@@ -32,7 +32,9 @@ class ThemeContrastTest :
                     Pair("theme-on-sidebar", "theme-bg-sidebar-hover", textMinimum),
                     Pair("theme-border-field", "theme-bg-card", componentMinimum),
                     Pair("theme-accent-text", "theme-bg-card", componentMinimum),
-                )
+                    Pair("theme-chart-projection", "theme-bg-card", componentMinimum),
+                ) +
+                (0..39).map { Pair("theme-chart-series-%02d".format(it), "theme-bg-card", componentMinimum) }
 
         Given("the color tokens of each theme") {
             listOf("light", "dark").forEach { theme ->

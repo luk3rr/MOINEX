@@ -51,6 +51,49 @@
     theme-chart-legend:     #555555;
     theme-chart-axis-label: #333333;
 
+    /* ── Chart series (>= 3:1 against the card) ──────────── */
+    theme-chart-series-00: #16A34A;
+    theme-chart-series-01: #1CA24D;
+    theme-chart-series-02: #3B82F6;
+    theme-chart-series-03: #2563EB;
+    theme-chart-series-04: #14532D;
+    theme-chart-series-05: #1EA44F;
+    theme-chart-series-06: #669E11;
+    theme-chart-series-07: #AF8606;
+    theme-chart-series-08: #C08304;
+    theme-chart-series-09: #713F12;
+    theme-chart-series-10: #A98E02;
+    theme-chart-series-11: #AF8D04;
+    theme-chart-series-12: #EB6C05;
+    theme-chart-series-13: #EA580C;
+    theme-chart-series-14: #7C2D12;
+    theme-chart-series-15: #FC5252;
+    theme-chart-series-16: #F75E5E;
+    theme-chart-series-17: #EF4444;
+    theme-chart-series-18: #B91C1C;
+    theme-chart-series-19: #7F1D1D;
+    theme-chart-series-20: #F352AA;
+    theme-chart-series-21: #EC4899;
+    theme-chart-series-22: #D946EF;
+    theme-chart-series-23: #A855F7;
+    theme-chart-series-24: #581C87;
+    theme-chart-series-25: #9479FB;
+    theme-chart-series-26: #7783F7;
+    theme-chart-series-27: #6366F1;
+    theme-chart-series-28: #4338CA;
+    theme-chart-series-29: #1E1B4B;
+    theme-chart-series-30: #0799AC;
+    theme-chart-series-31: #0E9BB1;
+    theme-chart-series-32: #0D97D6;
+    theme-chart-series-33: #0369A1;
+    theme-chart-series-34: #082F49;
+    theme-chart-series-35: #8992A4;
+    theme-chart-series-36: #858E9D;
+    theme-chart-series-37: #6B7280;
+    theme-chart-series-38: #374151;
+    theme-chart-series-39: #111827;
+    theme-chart-projection: #C57F08;
+
     /* ── Semantic ────────────────────────────────────────── */
     theme-positive: #1A7F37;
     theme-negative: #C62F3E;

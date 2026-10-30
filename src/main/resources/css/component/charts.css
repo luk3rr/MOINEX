@@ -43,95 +43,95 @@
 }
 
 /* GRUPO 1 – Azul → Verde (frio, base) */
-.chart-bar.series0  { -fx-bar-fill: #16a34a; }
-.chart-bar.series1  { -fx-bar-fill: #22c55e; }
-.chart-bar.series2  { -fx-bar-fill: #3b82f6; }
-.chart-bar.series3  { -fx-bar-fill: #2563eb; }
-.chart-bar.series4  { -fx-bar-fill: #14532d; }
+.chart-bar.series0  { -fx-bar-fill: theme-chart-series-00; }
+.chart-bar.series1  { -fx-bar-fill: theme-chart-series-01; }
+.chart-bar.series2  { -fx-bar-fill: theme-chart-series-02; }
+.chart-bar.series3  { -fx-bar-fill: theme-chart-series-03; }
+.chart-bar.series4  { -fx-bar-fill: theme-chart-series-04; }
 
 /* GRUPO 2 – Verde → Amarelo */
-.chart-bar.series5  { -fx-bar-fill: #4ade80; }
-.chart-bar.series6  { -fx-bar-fill: #84cc16; }
-.chart-bar.series7  { -fx-bar-fill: #eab308; }
-.chart-bar.series8  { -fx-bar-fill: #ca8a04; }
-.chart-bar.series9  { -fx-bar-fill: #713f12; }
+.chart-bar.series5  { -fx-bar-fill: theme-chart-series-05; }
+.chart-bar.series6  { -fx-bar-fill: theme-chart-series-06; }
+.chart-bar.series7  { -fx-bar-fill: theme-chart-series-07; }
+.chart-bar.series8  { -fx-bar-fill: theme-chart-series-08; }
+.chart-bar.series9  { -fx-bar-fill: theme-chart-series-09; }
 
 /* GRUPO 3 – Amarelo → Laranja */
-.chart-bar.series10 { -fx-bar-fill: #fde047; }
-.chart-bar.series11 { -fx-bar-fill: #facc15; }
-.chart-bar.series12 { -fx-bar-fill: #fb923c; }
-.chart-bar.series13 { -fx-bar-fill: #ea580c; }
-.chart-bar.series14 { -fx-bar-fill: #7c2d12; }
+.chart-bar.series10 { -fx-bar-fill: theme-chart-series-10; }
+.chart-bar.series11 { -fx-bar-fill: theme-chart-series-11; }
+.chart-bar.series12 { -fx-bar-fill: theme-chart-series-12; }
+.chart-bar.series13 { -fx-bar-fill: theme-chart-series-13; }
+.chart-bar.series14 { -fx-bar-fill: theme-chart-series-14; }
 
 /* GRUPO 4 – Vermelho */
-.chart-bar.series15 { -fx-bar-fill: #fecaca; }
-.chart-bar.series16 { -fx-bar-fill: #f87171; }
-.chart-bar.series17 { -fx-bar-fill: #ef4444; }
-.chart-bar.series18 { -fx-bar-fill: #b91c1c; }
-.chart-bar.series19 { -fx-bar-fill: #7f1d1d; }
+.chart-bar.series15 { -fx-bar-fill: theme-chart-series-15; }
+.chart-bar.series16 { -fx-bar-fill: theme-chart-series-16; }
+.chart-bar.series17 { -fx-bar-fill: theme-chart-series-17; }
+.chart-bar.series18 { -fx-bar-fill: theme-chart-series-18; }
+.chart-bar.series19 { -fx-bar-fill: theme-chart-series-19; }
 
 /* GRUPO 5 – Rosa → Roxo */
-.chart-bar.series20 { -fx-bar-fill: #f9a8d4; }
-.chart-bar.series21 { -fx-bar-fill: #ec4899; }
-.chart-bar.series22 { -fx-bar-fill: #d946ef; }
-.chart-bar.series23 { -fx-bar-fill: #a855f7; }
-.chart-bar.series24 { -fx-bar-fill: #581c87; }
+.chart-bar.series20 { -fx-bar-fill: theme-chart-series-20; }
+.chart-bar.series21 { -fx-bar-fill: theme-chart-series-21; }
+.chart-bar.series22 { -fx-bar-fill: theme-chart-series-22; }
+.chart-bar.series23 { -fx-bar-fill: theme-chart-series-23; }
+.chart-bar.series24 { -fx-bar-fill: theme-chart-series-24; }
 
 /* GRUPO 6 – Roxo → Índigo */
-.chart-bar.series25 { -fx-bar-fill: #c4b5fd; }
-.chart-bar.series26 { -fx-bar-fill: #818cf8; }
-.chart-bar.series27 { -fx-bar-fill: #6366f1; }
-.chart-bar.series28 { -fx-bar-fill: #4338ca; }
-.chart-bar.series29 { -fx-bar-fill: #1e1b4b; }
+.chart-bar.series25 { -fx-bar-fill: theme-chart-series-25; }
+.chart-bar.series26 { -fx-bar-fill: theme-chart-series-26; }
+.chart-bar.series27 { -fx-bar-fill: theme-chart-series-27; }
+.chart-bar.series28 { -fx-bar-fill: theme-chart-series-28; }
+.chart-bar.series29 { -fx-bar-fill: theme-chart-series-29; }
 
 /* GRUPO 7 – Ciano → Azul */
-.chart-bar.series30 { -fx-bar-fill: #67e8f9; }
-.chart-bar.series31 { -fx-bar-fill: #22d3ee; }
-.chart-bar.series32 { -fx-bar-fill: #0ea5e9; }
-.chart-bar.series33 { -fx-bar-fill: #0369a1; }
-.chart-bar.series34 { -fx-bar-fill: #082f49; }
+.chart-bar.series30 { -fx-bar-fill: theme-chart-series-30; }
+.chart-bar.series31 { -fx-bar-fill: theme-chart-series-31; }
+.chart-bar.series32 { -fx-bar-fill: theme-chart-series-32; }
+.chart-bar.series33 { -fx-bar-fill: theme-chart-series-33; }
+.chart-bar.series34 { -fx-bar-fill: theme-chart-series-34; }
 
 /* GRUPO 8 – Neutros contrastantes */
-.chart-bar.series35 { -fx-bar-fill: #e5e7eb; }
-.chart-bar.series36 { -fx-bar-fill: #9ca3af; }
-.chart-bar.series37 { -fx-bar-fill: #6b7280; }
-.chart-bar.series38 { -fx-bar-fill: #374151; }
-.chart-bar.series39 { -fx-bar-fill: #111827; }
+.chart-bar.series35 { -fx-bar-fill: theme-chart-series-35; }
+.chart-bar.series36 { -fx-bar-fill: theme-chart-series-36; }
+.chart-bar.series37 { -fx-bar-fill: theme-chart-series-37; }
+.chart-bar.series38 { -fx-bar-fill: theme-chart-series-38; }
+.chart-bar.series39 { -fx-bar-fill: theme-chart-series-39; }
 
 /* ============================================================
    Wishlist Timeline Chart
    ============================================================ */
 
 /* series0 = Pending, series1 = Purchased */
-.wishlist-timeline-chart .chart-bar.series0 { -fx-bar-fill: #22c55e; }
-.wishlist-timeline-chart .chart-bar.series1 { -fx-bar-fill: #3b82f6; }
+.wishlist-timeline-chart .chart-bar.series0 { -fx-bar-fill: theme-chart-series-01; }
+.wishlist-timeline-chart .chart-bar.series1 { -fx-bar-fill: theme-chart-series-02; }
 
 /* ============================================================
    Pie Chart (pie, doughnut)
    ============================================================ */
 
 /* Pie chart colors matching timeline chart actual series */
-.chart-pie.data0  { -fx-pie-color: #2563eb; }
-.chart-pie.data1  { -fx-pie-color: #22c55e; }
-.chart-pie.data2  { -fx-pie-color: #eab308; }
-.chart-pie.data3  { -fx-pie-color: #ef4444; }
-.chart-pie.data4  { -fx-pie-color: #a855f7; }
-.chart-pie.data5  { -fx-pie-color: #0ea5e9; }
-.chart-pie.data6  { -fx-pie-color: #3b82f6; }
-.chart-pie.data7  { -fx-pie-color: #16a34a; }
-.chart-pie.data8  { -fx-pie-color: #ca8a04; }
-.chart-pie.data9  { -fx-pie-color: #b91c1c; }
+.chart-pie.data0  { -fx-pie-color: theme-chart-series-03; }
+.chart-pie.data1  { -fx-pie-color: theme-chart-series-01; }
+.chart-pie.data2  { -fx-pie-color: theme-chart-series-07; }
+.chart-pie.data3  { -fx-pie-color: theme-chart-series-17; }
+.chart-pie.data4  { -fx-pie-color: theme-chart-series-23; }
+.chart-pie.data5  { -fx-pie-color: theme-chart-series-32; }
+.chart-pie.data6  { -fx-pie-color: theme-chart-series-02; }
+.chart-pie.data7  { -fx-pie-color: theme-chart-series-00; }
+.chart-pie.data8  { -fx-pie-color: theme-chart-series-08; }
+.chart-pie.data9  { -fx-pie-color: theme-chart-series-18; }
 
-.legend-color.data0  { -fx-fill: #2563eb; }
-.legend-color.data1  { -fx-fill: #22c55e; }
-.legend-color.data2  { -fx-fill: #eab308; }
-.legend-color.data3  { -fx-fill: #ef4444; }
-.legend-color.data4  { -fx-fill: #a855f7; }
-.legend-color.data5  { -fx-fill: #0ea5e9; }
-.legend-color.data6  { -fx-fill: #3b82f6; }
-.legend-color.data7  { -fx-fill: #16a34a; }
-.legend-color.data8  { -fx-fill: #ca8a04; }
-.legend-color.data9  { -fx-fill: #b91c1c; }
+.legend-color.data0  { -fx-fill: theme-chart-series-03; }
+.legend-color.data1  { -fx-fill: theme-chart-series-01; }
+.legend-color.data2  { -fx-fill: theme-chart-series-07; }
+.legend-color.data3  { -fx-fill: theme-chart-series-17; }
+.legend-color.data4  { -fx-fill: theme-chart-series-23; }
+.legend-color.data5  { -fx-fill: theme-chart-series-32; }
+.legend-color.data6  { -fx-fill: theme-chart-series-02; }
+.legend-color.data7  { -fx-fill: theme-chart-series-00; }
+.legend-color.data8  { -fx-fill: theme-chart-series-08; }
+.legend-color.data9  { -fx-fill: theme-chart-series-18; }
 
 /* ============================================================
    Doughnut Chart — inner circle hole
@@ -148,20 +148,20 @@
 
 /* Seletor específico para o gráfico de Money Flow */
 .money-flow-chart .series0.chart-bar {
-    -fx-bar-fill: #ef4444;
+    -fx-bar-fill: theme-chart-series-17;
 }
 
 .money-flow-chart .series1.chart-bar {
-    -fx-bar-fill: #22c55e;
+    -fx-bar-fill: theme-chart-series-01;
 }
 
-.money-flow-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #ef4444; }
-.money-flow-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #22c55e; }
+.money-flow-chart .default-color0.chart-legend-item-symbol { -fx-background-color: theme-chart-series-17; }
+.money-flow-chart .default-color1.chart-legend-item-symbol { -fx-background-color: theme-chart-series-01; }
 
 /* Current month bars - still in progress, not final */
 .money-flow-chart .chart-bar.current-month-bar {
     -fx-opacity: 0.55;
-    -fx-border-color: #6b7280;
+    -fx-border-color: theme-chart-series-37;
     -fx-border-width: 2;
     -fx-border-style: segments(4, 3);
 }
@@ -172,18 +172,18 @@
 
 /* series0 = actual savings rate, series1 = target */
 .savings-rate-chart .chart-series-line.series0 {
-    -fx-stroke: #3b82f6;
+    -fx-stroke: theme-chart-series-02;
     -fx-stroke-width: 2;
 }
 
 .savings-rate-chart .chart-series-line.series1 {
-    -fx-stroke: #9ca3af;
+    -fx-stroke: theme-chart-series-36;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }
 
 .savings-rate-chart .chart-line-symbol.series0 {
-    -fx-background-color: #3b82f6, theme-chart-bg;
+    -fx-background-color: theme-chart-series-02, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;
@@ -202,8 +202,8 @@
     -fx-pref-height: 0;
 }
 
-.savings-rate-chart .default-color0.chart-legend-item-symbol { -fx-background-color: #3b82f6; }
-.savings-rate-chart .default-color1.chart-legend-item-symbol { -fx-background-color: #9ca3af; }
+.savings-rate-chart .default-color0.chart-legend-item-symbol { -fx-background-color: theme-chart-series-02; }
+.savings-rate-chart .default-color1.chart-legend-item-symbol { -fx-background-color: theme-chart-series-36; }
 
 /* series2 = current-month projection (single point, no connecting line) */
 .savings-rate-chart .chart-series-line.series2 {
@@ -211,20 +211,20 @@
 }
 
 .savings-rate-chart .chart-line-symbol.series2 {
-    -fx-background-color: #f59e0b, theme-chart-bg;
+    -fx-background-color: theme-chart-projection, theme-chart-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 5px;
     -fx-padding: 5px;
 }
 
-.savings-rate-chart .default-color2.chart-legend-item-symbol { -fx-background-color: #f59e0b; }
+.savings-rate-chart .default-color2.chart-legend-item-symbol { -fx-background-color: theme-chart-projection; }
 
 /* Current month's actual point - still in progress, not final */
 .savings-rate-chart .chart-line-symbol.current-month-point {
     -fx-background-color: theme-chart-bg;
     -fx-background-insets: 0;
     -fx-background-radius: 5px;
-    -fx-border-color: #3b82f6;
+    -fx-border-color: theme-chart-series-02;
     -fx-border-width: 2;
     -fx-border-style: segments(2, 2);
     -fx-border-radius: 5px;

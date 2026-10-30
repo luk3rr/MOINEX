@@ -22,6 +22,7 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
 import javafx.scene.text.Text
 import org.moinex.common.constant.Styles
+import org.moinex.common.ui.ThemeColors
 import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
@@ -61,27 +62,14 @@ class SankeyChart : Pane() {
         private const val FLOW_OPACITY = 0.45
         private const val HIGHLIGHT_OPACITY = 0.75
         private const val FONT_SIZE = 11.0
-        private val TEXT_COLOR_LIGHT = Color.BLACK
-        private val TEXT_COLOR_DARK = Color.web("#F8F8F2")
         private const val RIGHT_ARROW = "\u2794"
         private const val LEFT_CONTROL_PROPORTION = 0.4
         private const val RIGHT_CONTROL_PROPORTION = 0.6
         private const val LABEL_PADDING = 5.0
     }
 
-    private val colorPalette =
-        listOf(
-            Color.web("#FF6B6B"),
-            Color.web("#4ECDC4"),
-            Color.web("#45B7D1"),
-            Color.web("#FFA07A"),
-            Color.web("#98D8C8"),
-            Color.web("#F7DC6F"),
-            Color.web("#BB8FCE"),
-            Color.web("#85C1E2"),
-            Color.web("#F06292"),
-            Color.web("#AED581"),
-        )
+    private val colorPalette: List<Color>
+        get() = ThemeColors.sankeyPalette(preferencesService?.isDarkMode() == true)
 
     private var currentNodes: List<SankeyNodeData> = emptyList()
     private var currentLinks: List<SankeyLinkData> = emptyList()
@@ -297,8 +285,7 @@ class SankeyChart : Pane() {
     ) {
         for ((_, layout) in layouts) {
             val level = levels[layout.id] ?: 0
-            val labelColor =
-                if (preferencesService?.isDarkMode() == true) TEXT_COLOR_DARK else TEXT_COLOR_LIGHT
+            val labelColor = ThemeColors.textPrimary(preferencesService?.isDarkMode() == true)
             val text =
                 Text(layout.name).apply {
                     this.font = font
