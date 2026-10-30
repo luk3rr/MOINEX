@@ -14,6 +14,7 @@ import java.nio.file.Paths
 enum class CaptureKind {
     SCREEN,
     NOTIFICATIONS,
+    SEARCH,
     DIALOG,
     ALERT,
 }
@@ -74,6 +75,7 @@ object CapturePlan {
             screen(14, "settings", Files.SETTINGS_FXML, Files.SETTINGS_STYLE_SHEET),
             CaptureTarget(15, "notifications", CaptureKind.NOTIFICATIONS, Files.HOME_FXML, Files.HOME_STYLE_SHEET),
             CaptureTarget(16, "dialog-add-expense-error", CaptureKind.DIALOG, Files.ADD_EXPENSE_FXML),
+            CaptureTarget(17, "search", CaptureKind.SEARCH, Files.HOME_FXML, Files.HOME_STYLE_SHEET),
             CaptureTarget(18, "alert-confirm", CaptureKind.ALERT, ""),
         )
 

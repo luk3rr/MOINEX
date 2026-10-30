@@ -2129,4 +2129,11 @@ object TranslationKeys {
     const val DIALOG_VALIDATION_INVALID_NUMBER: String = "dialog.validation.invalidNumber"
     const val DIALOG_VALIDATION_POSITIVE: String = "dialog.validation.positive"
     const val DIALOG_VALIDATION_INVALID_DATE: String = "dialog.validation.invalidDate"
+
+    const val SEARCH_PLACEHOLDER: String = "search.placeholder"
+    const val SEARCH_EMPTY: String = "search.empty"
+    const val SEARCH_HINT_NAVIGATE: String = "search.hint.navigate"
+    const val SEARCH_HINT_EXECUTE: String = "search.hint.execute"
+    const val SEARCH_HINT_CLOSE: String = "search.hint.close"
+    const val MAIN_SEARCH_HINT: String = "main.search.hint"
 }

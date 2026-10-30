@@ -155,6 +155,21 @@ class ScreenshotRunner(
                 delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
             }
 
+            CaptureKind.SEARCH -> {
+                mainController.loadContent(target.fxml, target.styleSheet!!)
+                delay(target.settleMillis.milliseconds)
+                Event.fireEvent(
+                    stage.scene.root,
+                    KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.S, false, true, false, false),
+                )
+                delay(NOTIFICATIONS_SETTLE_MILLIS.milliseconds)
+                writePng(snapshot(stage), file)
+                Event.fireEvent(
+                    stage.scene.root,
+                    KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.S, false, true, false, false),
+                )
+            }
+
             CaptureKind.DIALOG -> captureAddExpenseDialog(stage, target, file)
 
             CaptureKind.ALERT -> captureConfirmationAlert(stage, target, file)

@@ -79,3 +79,55 @@
   -fx-font-size: 11px;
   -fx-font-weight: bold;
 }
+
+.search-scrim {
+  -fx-background-color: rgba(0, 0, 0, 0.45);
+}
+
+.search-overlay {
+  -fx-background-color: theme-bg-card;
+  -fx-border-color: theme-border;
+  -fx-border-radius: 12px;
+  -fx-background-radius: 12px;
+  -fx-padding: 12px;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 24, 0.1, 0, 6);
+}
+
+.search-input {
+  -fx-font-size: 15px;
+}
+
+.search-results {
+  -fx-background-color: transparent;
+  -fx-background-insets: 0;
+  -fx-padding: 0;
+}
+
+.search-item {
+  -fx-padding: 8px 10px;
+  -fx-background-radius: 8px;
+  -fx-text-fill: theme-text-primary;
+}
+
+.search-item:filled:selected,
+.search-item:filled:hover {
+  -fx-background-color: theme-bg-sidebar;
+}
+
+.search-item:filled:selected .label,
+.search-item:filled:hover .label,
+.search-item:filled:selected .app-icon,
+.search-item:filled:hover .app-icon {
+  -fx-text-fill: theme-on-sidebar;
+  -fx-icon-color: theme-on-sidebar;
+}
+
+.search-group {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-text-secondary;
+}
+
+.search-hint {
+  -fx-font-size: 11px;
+  -fx-text-fill: theme-text-secondary;
+}

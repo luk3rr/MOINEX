@@ -192,16 +192,20 @@ Covers: US-15; FR-10; NFR-7. Depende de: UNIT-3, UNIT-4.
 
 **Desvios:** (1) o `Alert` de grupos vazios de `BasePlanManagement` fica, pois não é validação de campo. (2) Diálogos de cartão, wishlist e plano migrados via bases não receberam `DialogForm.install` (Enter/Esc de formulário), só o Esc geral da janela. (3) A conferência dialog a dialog (T-6.19) e o ADR-5 ficam para o seu teste da interface; apenas o `AddExpense` foi capturado com erros.
 
-### UNIT-7 Busca global por Ctrl+S   Status: not started
+### UNIT-7 Busca global por Ctrl+S   Status: verified
 Covers: US-16; FR-11; NFR-7. Depende de: UNIT-2, UNIT-4.
-- [ ] T-7.1 `SearchGroup`, `SearchAction` e `SearchMatcher` com testes (acentos, sinônimos, ordenação) — covers FR-11, US-16 — files: ui/common/search/, src/test/.../SearchMatcherTest.kt — test: `./gradlew test --tests "*SearchMatcherTest"`
-- [ ] T-7.2 `SearchActionCatalog` com as 23 ações ligadas a `MainController.loadContent` e aos diálogos de despesa, receita e transferência — covers FR-11, US-16 — files: ui/common/search/SearchActionCatalog.kt — test: teste de que o catálogo tem 23 ações com ids únicos
-- [ ] T-7.3 Chaves `search.*` e `main.search.hint`, títulos e sinônimos das 23 ações, por acréscimo nas duas `.properties` — covers NFR-7, US-16 — files: i18n/messages_*.properties, TranslationKeys.kt — test: revisão do diff das `.properties`
-- [ ] T-7.4 Overlay `GlobalSearch` no `rootPane` (scrim, painel, lista, setas, Enter, Esc) reaproveitando o padrão da central de notificações — covers FR-11, US-16 — files: ui/common/GlobalSearch.kt, ui/main/MainController.kt — test: abrir e filtrar manualmente
-- [ ] T-7.5 Filtro de teclado Ctrl+S na `Scene` principal e sem efeito nas janelas modais — covers FR-11, US-16 — files: ui/main/MainController.kt — test: Ctrl+S abre na principal e não faz nada num diálogo
-- [ ] T-7.6 Indicador "Buscar telas e ações  Ctrl S" na barra superior da janela principal — covers FR-11, US-16 — files: ui/main/main.fxml, css/scene/main.css — test: captura nos dois temas
-- [ ] T-7.7 Capturas da busca e checklist manual (abrir, filtrar, executar cada grupo, Esc) — covers NFR-3, US-16 — files: (saída local) — test: aprovação do usuário
-- [ ] T-7.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-7.1 `SearchGroup`, `SearchAction` e `SearchMatcher` com testes (acentos, sinônimos, ordenação) — covers FR-11, US-16 — files: ui/common/search/, src/test/.../SearchMatcherTest.kt — test: `./gradlew test --tests "*SearchMatcherTest"`
+- [x] T-7.2 `SearchActionCatalog` com as 23 ações ligadas a `MainController.loadContent` e aos diálogos de despesa, receita e transferência — covers FR-11, US-16 — files: ui/common/search/SearchActionCatalog.kt — test: teste de que o catálogo tem 23 ações com ids únicos
+- [x] T-7.3 Chaves `search.*` e `main.search.hint`, títulos e sinônimos das 23 ações, por acréscimo nas duas `.properties` — covers NFR-7, US-16 — files: i18n/messages_*.properties, TranslationKeys.kt — test: revisão do diff das `.properties`
+- [x] T-7.4 Overlay `GlobalSearch` no `rootPane` (scrim, painel, lista, setas, Enter, Esc) reaproveitando o padrão da central de notificações — covers FR-11, US-16 — files: ui/common/GlobalSearch.kt, ui/main/MainController.kt — test: abrir e filtrar manualmente
+- [x] T-7.5 Filtro de teclado Ctrl+S na `Scene` principal e sem efeito nas janelas modais — covers FR-11, US-16 — files: ui/main/MainController.kt — test: Ctrl+S abre na principal e não faz nada num diálogo
+- [x] T-7.6 Indicador "Buscar telas e ações  Ctrl S" na barra superior da janela principal — covers FR-11, US-16 — files: ui/main/main.fxml, css/scene/main.css — test: captura nos dois temas
+- [x] T-7.7 Capturas da busca e checklist manual (abrir, filtrar, executar cada grupo, Esc) — covers NFR-3, US-16 — files: (saída local) — test: aprovação do usuário
+- [x] T-7.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+
+**Resumo (2026-10-30, exit 0, 1411 testes, 0 falhas):** `SearchModel`, `SearchMatcher` (sem acento/caixa, título antes de sinônimo), `SearchActionCatalog` (23 ações) e `GlobalSearch` (overlay no `rootPane`: setas, Enter, Esc, clique fora). Ctrl+S é filtro de eventos só na `Scene` principal, então não age em janelas modais. Botão "Buscar telas e ações  Ctrl S" no rodapé. 112 linhas de i18n acrescentadas por escapes `\u`; teste confere que todas as ações têm título e sinônimos nos dois idiomas. Captura `search` (slot 17) no runner.
+
+**Desvios:** o indicador fica no rodapé (a janela principal não tem barra superior). As abas são selecionadas por índice após carregar a tela. O checklist manual (executar cada grupo) fica para o seu teste.
 
 ### UNIT-8 Redesenho: Início e Resumo anual   Status: not started
 Covers: US-7; FR-9. Depende de: UNIT-4, UNIT-5.

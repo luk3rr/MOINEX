@@ -14,12 +14,16 @@ import javafx.animation.KeyValue
 import javafx.animation.ParallelTransition
 import javafx.animation.Timeline
 import javafx.animation.TranslateTransition
+import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.ContentDisplay
 import javafx.scene.control.Label
+import javafx.scene.control.TabPane
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
@@ -40,6 +44,11 @@ import org.moinex.service.ThemeService
 import org.moinex.ui.common.CalculatorController
 import org.moinex.ui.common.CalendarController
 import org.moinex.ui.common.NotificationToastOverlay
+import org.moinex.ui.common.search.GlobalSearch
+import org.moinex.ui.common.search.SearchActionCatalog
+import org.moinex.ui.common.search.SearchEntry
+import org.moinex.ui.common.search.SearchHost
+import org.moinex.ui.common.search.SearchScreen
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Controller
@@ -112,6 +121,7 @@ class MainController(
     private lateinit var notificationPanel: VBox
     private lateinit var notificationCenterController: NotificationCenterController
     private lateinit var toastOverlay: NotificationToastOverlay
+    private lateinit var globalSearch: GlobalSearch
 
     companion object {
         private val logger = LoggerFactory.getLogger(MainController::class.java)
@@ -196,6 +206,7 @@ class MainController(
         }
 
         setupNotificationDrawer()
+        setupGlobalSearch()
 
         // Toast overlay must be added last to stay on top of everything (highest Z-order)
         toastOverlay = NotificationToastOverlay(rootPane)
@@ -250,6 +261,95 @@ class MainController(
 
         currentContent?.let { loadContent(it.key, it.value) }
     }
+
+    @FXML
+    private fun handleOpenSearch() {
+        globalSearch.open()
+    }
+
+    private fun setupGlobalSearch() {
+        globalSearch =
+            GlobalSearch(
+                rootPane,
+                { SearchActionCatalog(searchHost).actions() },
+                preferencesService::translate,
+            )
+        rootPane.sceneProperty().addListener { _, _, scene ->
+            scene?.addEventFilter(KeyEvent.KEY_PRESSED) { event ->
+                if (event.code == KeyCode.S && event.isControlDown && !event.isAltDown && !event.isShiftDown) {
+                    event.consume()
+                    globalSearch.toggle()
+                }
+            }
+        }
+    }
+
+    private val searchHost =
+        object : SearchHost {
+            override fun showScreen(
+                screen: SearchScreen,
+                tabIndex: Int?,
+            ) {
+                val (fxml, css, button) = screenTarget(screen)
+                loadContent(fxml, css)
+                updateSelectedButton(button)
+                tabIndex?.let { index ->
+                    Platform.runLater {
+                        (contentArea.lookup(".tab-pane") as? TabPane)?.selectionModel?.select(index)
+                    }
+                }
+            }
+
+            override fun openEntry(entry: SearchEntry) {
+                val (fxml, titleKey) =
+                    when (entry) {
+                        SearchEntry.EXPENSE ->
+                            Files.ADD_EXPENSE_FXML to
+                                TranslationKeys.TRANSACTION_DIALOG_ADD_EXPENSE_TITLE
+                        SearchEntry.INCOME ->
+                            Files.ADD_INCOME_FXML to
+                                TranslationKeys.TRANSACTION_DIALOG_ADD_INCOME_TITLE
+                        SearchEntry.TRANSFER ->
+                            Files.ADD_TRANSFER_FXML to
+                                TranslationKeys.WALLET_DIALOG_ADD_TRANSFER_TITLE
+                    }
+                WindowUtils.openModalWindow(
+                    fxml,
+                    preferencesService.translate(titleKey),
+                    springContext,
+                    { _: Any -> },
+                    listOf(Runnable { currentContent?.let { loadContent(it.key, it.value) } }),
+                )
+            }
+
+            override fun toggleTheme() = themeService.toggleAndApply()
+
+            override fun openCalendar() = handleOpenCalendar()
+
+            override fun openCalculator() = handleOpenCalculator()
+
+            override fun toggleNotifications() = handleToggleNotifications()
+        }
+
+    private fun screenTarget(screen: SearchScreen): Triple<String, String, Button> =
+        when (screen) {
+            SearchScreen.HOME -> Triple(Files.HOME_FXML, Files.HOME_STYLE_SHEET, homeButton)
+            SearchScreen.WALLETS -> Triple(Files.WALLET_FXML, Files.WALLET_STYLE_SHEET, walletButton)
+            SearchScreen.CREDIT_CARDS -> Triple(Files.CREDIT_CARD_FXML, Files.CREDIT_CARD_STYLE_SHEET, creditCardButton)
+            SearchScreen.TRANSACTIONS ->
+                Triple(
+                    Files.TRANSACTION_FXML,
+                    Files.TRANSACTION_STYLE_SHEET,
+                    transactionButton,
+                )
+            SearchScreen.GOALS_PLANS ->
+                Triple(Files.GOALS_AND_PLANS_FXML, Files.GOALS_AND_PLANS_STYLE_SHEET, goalsAndPlanButton)
+            SearchScreen.SAVINGS -> Triple(Files.SAVINGS_FXML, Files.SAVINGS_STYLE_SHEET, savingsButton)
+            SearchScreen.ANNUAL_SUMMARY ->
+                Triple(Files.ANNUAL_SUMMARY_FXML, Files.ANNUAL_SUMMARY_STYLE_SHEET, annualSummaryButton)
+            SearchScreen.AI_CHAT -> Triple(Files.AI_CHAT_FXML, Files.AI_CHAT_STYLE_SHEET, aiChatButton)
+            SearchScreen.SETTINGS -> Triple(Files.SETTINGS_FXML, Files.SETTINGS_STYLE_SHEET, settingsButton)
+        }
 
     @FXML
     private fun handleToggleNotifications() {

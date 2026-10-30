@@ -137,6 +137,14 @@
                      <AnchorPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
                   <HBox fx:id="footbarArea" alignment="CENTER_RIGHT" maxHeight="10.0" prefHeight="10.0" spacing="10.0">
                      <children>
+                        <Button onAction="#handleOpenSearch" styleClass="search-hint-button" text="%main.search.hint">
+                           <font>
+                              <Font size="9.0" />
+                           </font>
+                           <graphic>
+                              <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-15" />
+                           </graphic>
+                        </Button>
                         <Button onAction="#handleOpenCalendar" text="%main.calendar">
                            <font>
                               <Font size="9.0" />

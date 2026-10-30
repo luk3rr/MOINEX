@@ -29,12 +29,13 @@ class CapturePlanTest :
                             "settings",
                             "notifications",
                             "dialog-add-expense-error",
+                            "search",
                             "alert-confirm",
                         )
                 }
 
-                Then("the indexes are the fixed ones, with the slot 17 left for the search") {
-                    targets.map { it.index } shouldContainExactly ((1..16).toList() + 18)
+                Then("the indexes are the fixed ones, with all 18 slots filled") {
+                    targets.map { it.index } shouldContainExactly (1..18).toList()
                 }
 
                 Then("every screen has a stylesheet and every dialog or alert has none") {
