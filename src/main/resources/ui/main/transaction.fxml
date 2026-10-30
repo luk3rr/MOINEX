@@ -18,6 +18,35 @@
    <children>
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
+            <AnchorPane minHeight="45.0" prefHeight="45.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
+               <children>
+                  <HBox alignment="CENTER" fillHeight="false" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button onAction="#handleAddIncome" text="%transaction.button.addIncome">
+                           <graphic>
+                              <FontIcon iconLiteral="mdal-arrow_upward" styleClass="app-icon, icon-size-16" />
+                           </graphic>
+                        </Button>
+                        <Button onAction="#handleAddExpense" text="%transaction.button.addExpense">
+                           <graphic>
+                              <FontIcon iconLiteral="mdal-arrow_downward" styleClass="app-icon, icon-size-16" />
+                           </graphic>
+                        </Button>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button onAction="#handleRecurringTransactions" text="%transaction.button.periodicTransaction">
+                           <graphic>
+                              <FontIcon iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-16" />
+                           </graphic>
+                        </Button>
+                        <Button onAction="#handleManageCategories" text="%transaction.button.manageCategories">
+                           <graphic>
+                              <FontIcon iconLiteral="mdal-category" styleClass="app-icon, icon-size-16" />
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
             <AnchorPane minHeight="300.0">
                <children>
                   <HBox layoutX="89.0" layoutY="40.0" minHeight="300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -92,35 +121,6 @@
                               </VBox>
                            </children>
                         </AnchorPane>
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
-            <AnchorPane minHeight="45.0" prefHeight="45.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css">
-               <children>
-                  <HBox alignment="CENTER" fillHeight="false" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button onAction="#handleAddIncome" text="%transaction.button.addIncome">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-arrow_upward" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Button onAction="#handleAddExpense" text="%transaction.button.addExpense">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-arrow_downward" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleRecurringTransactions" text="%transaction.button.periodicTransaction">
-                           <graphic>
-                              <FontIcon iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Button onAction="#handleManageCategories" text="%transaction.button.manageCategories">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-category" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
                      </children>
                   </HBox>
                </children>
