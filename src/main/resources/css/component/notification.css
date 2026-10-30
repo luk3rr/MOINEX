@@ -9,7 +9,7 @@
    ============================================================ */
 
 .notification-toast {
-    -fx-background-color: #44475A;
+    -fx-background-color: theme-toast-bg;
     -fx-background-radius: 8;
     -fx-padding: 12 14 12 0;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 12, 0, 0, 4);
@@ -23,44 +23,44 @@
 }
 
 .notification-toast-title {
-    -fx-text-fill: #f0f0f0;
+    -fx-text-fill: theme-toast-title;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
 
 .notification-toast-message {
-    -fx-text-fill: #b0b0c0;
+    -fx-text-fill: theme-toast-message;
     -fx-font-size: 11px;
     -fx-wrap-text: true;
 }
 
 .notification-toast-close {
     -fx-background-color: transparent;
-    -fx-text-fill: #888;
+    -fx-text-fill: theme-toast-close;
     -fx-font-size: 11px;
     -fx-cursor: hand;
     -fx-padding: 0 4 0 8;
 }
 
 .notification-toast-close:hover {
-    -fx-text-fill: #f0f0f0;
+    -fx-text-fill: theme-toast-title;
 }
 
 /* Accent colors by type — semantic, theme-independent */
 .notification-accent-info {
-    -fx-background-color: #89b4fa;
+    -fx-background-color: theme-toast-info;
 }
 
 .notification-accent-success {
-    -fx-background-color: #a6e3a1;
+    -fx-background-color: theme-toast-success;
 }
 
 .notification-accent-warning {
-    -fx-background-color: #f9c74f;
+    -fx-background-color: theme-toast-warning;
 }
 
 .notification-accent-error {
-    -fx-background-color: #f38ba8;
+    -fx-background-color: theme-toast-error;
 }
 
 /* ============================================================
@@ -79,14 +79,14 @@
 }
 
 .notification-panel-title {
-    -fx-text-fill: white;
+    -fx-text-fill: theme-on-sidebar;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
 .notification-action-btn {
-    -fx-background-color: rgba(255,255,255,0.2);
-    -fx-text-fill: white;
+    -fx-background-color: theme-notif-action-bg;
+    -fx-text-fill: theme-on-sidebar;
     -fx-font-size: 10px;
     -fx-background-radius: 4;
     -fx-padding: 4 8;
@@ -94,7 +94,7 @@
 }
 
 .notification-action-btn:hover {
-    -fx-background-color: rgba(255,255,255,0.35);
+    -fx-background-color: theme-notif-action-hover;
 }
 
 .notification-list {
@@ -178,8 +178,8 @@
    ============================================================ */
 
 .notification-badge {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
+    -fx-background-color: theme-badge-bg;
+    -fx-text-fill: theme-on-badge;
     -fx-font-size: 7px;
     -fx-font-weight: bold;
     -fx-background-radius: 6;

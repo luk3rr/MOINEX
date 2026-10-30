@@ -10,18 +10,18 @@
 }
 
 .insight-positive {
-    -fx-background-color: rgba(76, 175, 80, 0.12);
-    -fx-border-color: rgba(76, 175, 80, 0.5);
+    -fx-background-color: theme-positive-soft;
+    -fx-border-color: theme-positive-border;
 }
 
 .insight-warning {
-    -fx-background-color: rgba(244, 67, 54, 0.12);
-    -fx-border-color: rgba(244, 67, 54, 0.5);
+    -fx-background-color: theme-negative-soft;
+    -fx-border-color: theme-negative-border;
 }
 
 .insight-neutral {
-    -fx-background-color: rgba(158, 158, 158, 0.12);
-    -fx-border-color: rgba(158, 158, 158, 0.5);
+    -fx-background-color: theme-neutral-soft;
+    -fx-border-color: theme-neutral-border;
 }
 
 .insights-scroll {

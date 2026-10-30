@@ -94,6 +94,26 @@
     theme-chart-series-39: #111827;
     theme-chart-projection: #C57F08;
 
+    /* ── Status tints, toasts and badges ─────────────────── */
+    theme-positive-soft:     rgba(26, 127, 55, 0.10);
+    theme-positive-border:   rgba(26, 127, 55, 0.5);
+    theme-negative-soft:     rgba(198, 47, 62, 0.10);
+    theme-negative-border:   rgba(198, 47, 62, 0.5);
+    theme-neutral-soft:      rgba(89, 99, 110, 0.10);
+    theme-neutral-border:    rgba(89, 99, 110, 0.4);
+    theme-toast-bg:          #44475A;
+    theme-toast-title:       #F8F8F2;
+    theme-toast-message:     #D0D0DC;
+    theme-toast-close:       #B0B0BE;
+    theme-toast-info:        #89B4FA;
+    theme-toast-success:     #A6E3A1;
+    theme-toast-warning:     #F9C74F;
+    theme-toast-error:       #F38BA8;
+    theme-notif-action-bg:   rgba(31, 35, 40, 0.15);
+    theme-notif-action-hover: rgba(31, 35, 40, 0.3);
+    theme-badge-bg:          #D32F2F;
+    theme-on-badge:          #FFFFFF;
+
     /* ── Semantic ────────────────────────────────────────── */
     theme-positive: #1A7F37;
     theme-negative: #C62F3E;

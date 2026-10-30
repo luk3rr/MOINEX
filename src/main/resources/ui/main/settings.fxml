@@ -35,13 +35,13 @@
                         <Button text="%settings.database.change" onAction="#handleChangeDbPath" />
                      </children>
                   </HBox>
-                  <Label fx:id="restartRequiredLabel" text="%settings.database.restartRequired" visible="false" managed="false" style="-fx-text-fill: #e67e22;" />
+                  <Label fx:id="restartRequiredLabel" text="%settings.database.restartRequired" visible="false" managed="false" style="-fx-text-fill: theme-warning;" />
                   <Separator prefWidth="520.0" />
                   <Label text="%settings.savingsRateTarget" />
                   <HBox spacing="10.0" alignment="CENTER_LEFT">
                      <children>
                         <TextField fx:id="savingsRateTargetField" prefWidth="120.0" />
-                        <Label text="%settings.savingsRateTarget.hint" style="-fx-text-fill: #888888;" />
+                        <Label text="%settings.savingsRateTarget.hint" style="-fx-text-fill: theme-text-secondary;" />
                      </children>
                   </HBox>
                   <Separator prefWidth="520.0" />
@@ -60,7 +60,7 @@
                   <HBox spacing="10.0" alignment="CENTER_LEFT">
                      <children>
                         <TextField fx:id="aiModelField" prefWidth="240.0" />
-                        <Label text="%settings.ai.model.hint" wrapText="true" maxWidth="280.0" style="-fx-text-fill: #888888;" />
+                        <Label text="%settings.ai.model.hint" wrapText="true" maxWidth="280.0" style="-fx-text-fill: theme-text-secondary;" />
                      </children>
                   </HBox>
                   <HBox spacing="10.0" alignment="CENTER_LEFT">

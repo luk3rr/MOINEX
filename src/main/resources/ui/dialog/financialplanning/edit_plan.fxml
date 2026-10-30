@@ -84,7 +84,7 @@
             </HBox>
          </children>
       </VBox>
-        <Button onAction="#handleAddBudgetGroup" style="-fx-text-fill: #0d9488; -fx-font-weight: bold;" text="%financialplanning.label.addNewGroup">
+        <Button onAction="#handleAddBudgetGroup" style="-fx-text-fill: theme-accent-text; -fx-font-weight: bold;" text="%financialplanning.label.addNewGroup">
             <graphic>
                 <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
             </graphic>

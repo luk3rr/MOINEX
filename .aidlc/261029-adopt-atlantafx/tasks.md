@@ -207,7 +207,7 @@ Covers: US-16; FR-11; NFR-7. Depende de: UNIT-2, UNIT-4.
 
 **Desvios:** o indicador fica no rodapé (a janela principal não tem barra superior). As abas são selecionadas por índice após carregar a tela. O checklist manual (executar cada grupo) fica para o seu teste.
 
-### UNIT-8 Redesenho: Início e Resumo anual   Status: not started
+### UNIT-8 Redesenho: Início e Resumo anual   Status: partial
 Covers: US-7; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-8.1 Início: grade fluida sem larguras mínimas fixas, os três blocos superiores como `card` e os cartões de carteira e de crédito lisos, sem gradiente — covers FR-9, US-7 — files: ui/main/home.fxml, css/scene/home.css — test: captura nos dois temas
 - [ ] T-8.2 Início: Fluxo de dinheiro e Últimas transações em cards; "recalcular patrimônio" como ação secundária no cabeçalho — covers FR-9, US-7 — files: ui/main/home.fxml, HomeController.kt — test: captura e botão funcionando
@@ -217,7 +217,9 @@ Covers: US-7; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-8.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-7 — files: (saída local) — test: aprovação do usuário
 - [ ] T-8.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-### UNIT-9 Redesenho: Carteiras e Cartões   Status: not started
+**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+
+### UNIT-9 Redesenho: Carteiras e Cartões   Status: partial
 Covers: US-8, US-9; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-9.1 Carteiras: saldo total em destaque e lista de carteiras em cards lisos, sem gradiente — covers FR-9, US-8 — files: ui/main/wallet.fxml, css/scene/wallet.css — test: captura
 - [ ] T-9.2 Carteiras: gráficos em dois cards e botões (adicionar carteira, transferência, transferências, arquivadas) no cabeçalho — covers FR-9, US-8 — files: ui/main/wallet.fxml — test: captura e botões funcionando
@@ -227,7 +229,9 @@ Covers: US-8, US-9; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-9.6 Checklist de ações das duas telas e capturas antes/depois para aprovação — covers NFR-3, US-8, US-9 — files: (saída local) — test: aprovação do usuário
 - [ ] T-9.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-### UNIT-10 Redesenho: Transações   Status: not started
+**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+
+### UNIT-10 Redesenho: Transações   Status: partial
 Covers: US-10; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-10.1 Resumo mensal e gráfico por categoria em cards — covers FR-9, US-10 — files: ui/main/transaction.fxml, css/scene/transaction.css — test: captura
 - [ ] T-10.2 Lista de transações em card com filtros (período e busca) no topo — covers FR-9, US-10 — files: ui/main/transaction.fxml — test: captura e filtros funcionando
@@ -235,7 +239,9 @@ Covers: US-10; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-10.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-10 — files: (saída local) — test: aprovação do usuário
 - [ ] T-10.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-### UNIT-11 Redesenho: Metas, Planos, FIRE e Wishlist   Status: not started
+**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+
+### UNIT-11 Redesenho: Metas, Planos, FIRE e Wishlist   Status: partial
 Covers: US-11, US-12; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-11.1 Abas (Metas, Planos, FIRE, Wishlist) no padrão do tema — covers FR-9, US-11 — files: ui/main/goals_and_plans.fxml, css/scene/goals_and_plans.css — test: captura das quatro abas
 - [ ] T-11.2 Metas: em andamento e concluídas em cards com barra de progresso e filtros — covers FR-9, US-11 — files: ui/main/goals.fxml, css/scene/goals.css — test: captura
@@ -246,7 +252,9 @@ Covers: US-11, US-12; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-11.7 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-11, US-12 — files: (saída local) — test: aprovação do usuário
 - [ ] T-11.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-### UNIT-12 Redesenho: Poupança   Status: not started
+**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+
+### UNIT-12 Redesenho: Poupança   Status: partial
 Covers: US-13; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-12.1 Abas da Poupança (Visão geral, Ações e fundos, Bonds) no padrão do tema — covers FR-9, US-13 — files: ui/main/savings.fxml, css/scene/savings.css — test: captura das três abas
 - [ ] T-12.2 Visão geral: indicadores do Brasil e commodities em cards — covers FR-9, US-13 — files: ui/main/savings_overview.fxml — test: captura
@@ -256,13 +264,17 @@ Covers: US-13; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-12.6 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-13 — files: (saída local) — test: aprovação do usuário
 - [ ] T-12.7 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-### UNIT-13 Redesenho: Chat de IA, Configurações e Notificações   Status: not started
+**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+
+### UNIT-13 Redesenho: Chat de IA, Configurações e Notificações   Status: partial
 Covers: US-14; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-13.1 Chat de IA: bolhas no tema, campo fixo no rodapé e aviso como `Message` — covers FR-9, US-14 — files: ui/main/ai_chat.fxml, css/scene/ai_chat.css — test: captura e envio funcionando
 - [ ] T-13.2 Configurações: cards por seção (IA, banco de dados, idioma, meta de poupança) com ações no rodapé — covers FR-9, US-14 — files: ui/main/settings.fxml, css/scene/settings.css — test: captura e salvar funcionando
 - [ ] T-13.3 Central de notificações: painel no tema novo, estado vazio com `Message`, ações no cabeçalho — covers FR-9, US-14 — files: ui/main/notification_center.fxml, css/component/notification.css — test: captura e ações funcionando
 - [ ] T-13.4 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-14 — files: (saída local) — test: aprovação do usuário
 - [ ] T-13.5 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+
+**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
 
 ### UNIT-14 Fechamento   Status: not started
 Covers: NFR-1 (final), NFR-3 (consolidado), NFR-4 (final), NFR-5 (depois), NFR-6. Depende de: UNIT-6, UNIT-7, UNIT-8 a UNIT-13.

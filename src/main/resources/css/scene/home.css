@@ -4,73 +4,47 @@
  * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
  */
 
-.wallet-item {
-  -fx-background-color: linear-gradient(to bottom right, #34c759, #138d75);
+.wallet-item,
+.credit-card-item {
+  -fx-background-color: theme-border, theme-bg-card-alt;
+  -fx-background-insets: 0, 1px;
+  -fx-background-radius: 12px, 11px;
   -fx-padding: 15px;
-  -fx-border-radius: 10px;
-  -fx-background-radius: 10px;
-  -fx-border-color: #000;
-  -fx-border-width: 1px;
-  -fx-border-style: solid;
-  -fx-margin-bottom: 20px;
-  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
 }
 
-.wallet-item-name {
-  -fx-text-fill: white;
-  -fx-font-size: 12px;
-  -fx-font-weight: bold;
-}
-
-.wallet-item-type {
-  -fx-text-fill: white;
-  -fx-font-size: 9px;
-  -fx-font-weight: normal;
-}
-
-.wallet-item-balance {
-  -fx-font-size: 12px;
-  -fx-text-fill: white;
-}
-
-.virtual-wallet-info {
-  -fx-font-size: 9px;
-  -fx-text-fill: white;
-  -fx-font-style: italic;
+.wallet-item {
+  -fx-background-color: theme-positive, theme-bg-card-alt;
+  -fx-background-insets: 0, 0 0 0 4px;
 }
 
 .credit-card-item {
-  -fx-background-color: linear-gradient(to bottom right, #3498db, #9013fe);
-  -fx-padding: 15px;
-  -fx-border-color: #000;
-  -fx-border-radius: 10px;
-  -fx-background-radius: 10px;
-  -fx-border-width: 1px;
-  -fx-border-style: solid;
-  -fx-margin-bottom: 20px;
-  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 1);
+  -fx-background-color: theme-accent, theme-bg-card-alt;
+  -fx-background-insets: 0, 0 0 0 4px;
 }
 
+.wallet-item-name,
 .credit-card-item-name {
-  -fx-text-fill: white;
-  -fx-font-size: 12px;
+  -fx-text-fill: theme-text-primary;
+  -fx-font-size: 13px;
   -fx-font-weight: bold;
 }
 
-.credit-card-item-operator {
-  -fx-text-fill: white;
-  -fx-font-size: 9px;
-  -fx-font-weight: normal;
+.wallet-item-type,
+.credit-card-item-operator,
+.credit-card-item-digits,
+.virtual-wallet-info {
+  -fx-text-fill: theme-text-secondary;
+  -fx-font-size: 10px;
 }
 
+.virtual-wallet-info {
+  -fx-font-style: italic;
+}
+
+.wallet-item-balance,
 .credit-card-item-balance {
-  -fx-font-size: 12px;
-  -fx-text-fill: white;
-}
-
-.credit-card-item-digits {
-  -fx-font-size: 9px;
-  -fx-text-fill: white;
+  -fx-font-size: 13px;
+  -fx-text-fill: theme-text-primary;
 }
 
 .income-item {
@@ -82,7 +56,7 @@
 }
 
 .last-transaction-label {
-  -fx-text-fill: white;
+  -fx-text-fill: theme-text-primary;
   -fx-font-size: 12px;
   -fx-font-weight: bold;
 }
@@ -101,11 +75,11 @@
 }
 
 .default-color0.chart-bar {
-  -fx-bar-fill: #ef4444;
+  -fx-bar-fill: theme-negative;
 }
 
 .default-color1.chart-bar {
-  -fx-bar-fill: #22c55e;
+  -fx-bar-fill: theme-positive;
 }
 
 .chart-plot-background {

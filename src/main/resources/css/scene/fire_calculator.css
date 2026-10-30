@@ -46,25 +46,25 @@
 
 /* Series 0 - Projected Net Worth - solid blue */
 .chart-legend-item-symbol.series0 {
-    -fx-background-color: #2563eb;
+    -fx-background-color: theme-chart-series-03;
 }
 
 /* Series 1 - FIRE Target - dashed red */
 .chart-legend-item-symbol.series1 {
     -fx-background-color: transparent;
-    -fx-border-color: #ef4444;
+    -fx-border-color: theme-chart-series-17;
     -fx-border-width: 0 0 3px 0;
     -fx-border-style: segments(5, 3);
 }
 
 /* Chart series lines */
 .chart-series-line.series0 {
-    -fx-stroke: #2563eb;
+    -fx-stroke: theme-chart-series-03;
     -fx-stroke-width: 3;
 }
 
 .chart-series-line.series1 {
-    -fx-stroke: #ef4444;
+    -fx-stroke: theme-chart-series-17;
     -fx-stroke-width: 2;
     -fx-stroke-dash-array: 5 5;
 }

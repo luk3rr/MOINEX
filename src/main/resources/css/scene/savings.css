@@ -15,27 +15,27 @@
 }
 
 .allocation-filled-bar-critical-low {
-  -fx-background-color: #dc3545;
+  -fx-background-color: theme-negative;
   -fx-background-radius: 5;
 }
 
 .allocation-filled-bar-warning-low {
-  -fx-background-color: #F5B427;
+  -fx-background-color: theme-warning;
   -fx-background-radius: 5;
 }
 
 .allocation-filled-bar-on-target {
-  -fx-background-color: #28a745;
+  -fx-background-color: theme-positive;
   -fx-background-radius: 5;
 }
 
 .allocation-filled-bar-warning-high {
-  -fx-background-color: #F5B427;
+  -fx-background-color: theme-warning;
   -fx-background-radius: 5;
 }
 
 .allocation-filled-bar-critical-high {
-  -fx-background-color: #dc3545;
+  -fx-background-color: theme-negative;
   -fx-background-radius: 5;
 }
 
@@ -49,23 +49,23 @@
 }
 
 .allocation-diff-critical-low {
-  -fx-text-fill: #dc3545;
+  -fx-text-fill: theme-negative;
 }
 
 .allocation-diff-warning-low {
-  -fx-text-fill: #F5B427;
+  -fx-text-fill: theme-warning;
 }
 
 .allocation-diff-on-target {
-  -fx-text-fill: #28a745;
+  -fx-text-fill: theme-positive;
 }
 
 .allocation-diff-warning-high {
-  -fx-text-fill: #F5B427;
+  -fx-text-fill: theme-warning;
 }
 
 .allocation-diff-critical-high {
-  -fx-text-fill: #dc3545;
+  -fx-text-fill: theme-negative;
 }
 
 .chart-legend {

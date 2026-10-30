@@ -27,7 +27,7 @@
                   <Label styleClass="title" text="%fire.title">
                      <font><Font name="System Bold" size="18.0" /></font>
                   </Label>
-                  <Label style="-fx-font-style: italic; -fx-font-size: 12; -fx-text-fill: #6b7280; -fx-padding: 0 0 0 8;" text="%fire.subtitle" />
+                  <Label style="-fx-font-style: italic; -fx-font-size: 12; -fx-text-fill: theme-text-secondary; -fx-padding: 0 0 0 8;" text="%fire.subtitle" />
                </children>
             </HBox>
 
