@@ -7,9 +7,12 @@
 package org.moinex.app
 
 import javafx.application.Platform
+import javafx.scene.Scene
 import javafx.scene.SnapshotParameters
+import javafx.scene.control.Label
 import javafx.scene.image.Image
 import javafx.scene.image.PixelFormat
+import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import javafx.stage.Window
 import kotlinx.coroutines.delay
@@ -93,6 +96,35 @@ class ScreenshotRunner(
                     .onFailure { logger.error("Could not capture '{}' in theme '{}'", target.id, theme, it) }
             }
         }
+
+        verifyToggleOnOpenWindow()
+    }
+
+    private suspend fun verifyToggleOnOpenWindow() {
+        preferencesService.theme = PreferencesService.THEME_LIGHT
+        themeService.applyCurrentTheme()
+
+        val probe =
+            Stage().apply {
+                scene = Scene(StackPane(Label("probe")))
+                show()
+            }
+        delay(WINDOW_SETTLE_MILLIS)
+        val lightApplied = probe.scene.stylesheets.any { it.endsWith("tokens.light.css") }
+
+        themeService.toggleAndApply()
+        delay(WINDOW_SETTLE_MILLIS)
+        val darkApplied =
+            probe.scene.stylesheets.any { it.endsWith("tokens.dark.css") } &&
+                probe.scene.stylesheets.none { it.endsWith("tokens.light.css") }
+        probe.close()
+
+        logger.info(
+            "Theme toggle on an open window: light={} dark={} -> {}",
+            lightApplied,
+            darkApplied,
+            if (lightApplied && darkApplied) "OK" else "FAILED",
+        )
     }
 
     private suspend fun capture(
@@ -119,6 +151,8 @@ class ScreenshotRunner(
             }
 
             CaptureKind.DIALOG -> captureAddExpenseDialog(stage, target, file)
+
+            CaptureKind.ALERT -> captureConfirmationAlert(stage, target, file)
         }
         if (file.exists()) logger.info("Saved {}", file.name) else logger.warn("Not saved: {}", file.name)
     }
@@ -152,6 +186,32 @@ class ScreenshotRunner(
             springContext,
             { _: AddExpenseController -> },
         )
+    }
+
+    private suspend fun captureConfirmationAlert(
+        mainStage: Stage,
+        target: CaptureTarget,
+        file: File,
+    ) {
+        FxUtils.launchOnFxThread {
+            delay(target.settleMillis)
+            val alert =
+                Window
+                    .getWindows()
+                    .filterIsInstance<Stage>()
+                    .lastOrNull { it.isShowing && it !== mainStage }
+
+            if (alert == null) {
+                logger.error("The alert '{}' did not open; nothing captured", target.id)
+            } else {
+                writePng(snapshot(alert), file)
+                alert.close()
+            }
+        }
+
+        yield()
+
+        WindowUtils.showConfirmationDialog("Delete this item?", "This action cannot be undone.")
     }
 
     private fun snapshot(stage: Stage): Image = stage.scene.root.snapshot(SnapshotParameters(), null)

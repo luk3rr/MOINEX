@@ -77,7 +77,8 @@ Projeto de um mantenedor, prática afirmada pelo usuário em 2026-10-29. [user]
 | Cards | Borda fina e cantos arredondados (`Styles.BORDERED` + `Styles.ROUNDED`), sem sombra | [user] |
 | Formulários | Uma coluna, rótulo acima do campo, erro logo abaixo, Cancelar e Salvar no rodapé | [user] |
 | Atalho | Só **Ctrl+S (search)**; digita-se o que procura e a lista mostra as ações | [user] |
-| Identidade | Dracula no escuro, botões em pílula, sidebar verde nos dois temas | [user] [mem: M-001] |
+| Identidade | Dracula no escuro, botões em pílula e sidebar verde: `#0A614E` no escuro e o teal atual `#1ABC9C` no claro (revisado em 2026-10-29 depois das capturas "antes") | [user] [mem: M-001] |
+| Cartões de carteira e de crédito | Cards lisos de borda fina, sem o gradiente colorido de hoje (decisão de 2026-10-29, contra a recomendação de manter) | [user] |
 
 ### 1. Estrutura da janela
 
@@ -95,7 +96,7 @@ flowchart LR
 ```
 Caption: a sidebar continua com os mesmos 9 destinos e 3 atalhos de rodapé do `main.fxml`; muda o cabeçalho, que ganha o indicador da busca, e a grade, que deixa de ter larguras mínimas fixas (hoje a Home usa `minWidth` de 400 a 800). [src: src/main/resources/ui/main/main.fxml] [src: src/main/resources/ui/main/home.fxml]
 
-- Sidebar: item ativo com fundo `#106E5B`, barra à esquerda na cor do texto da sidebar (não roxa, para passar 3:1) e emblema roxo nas notificações. Texto `#F8F8F2` sobre `#0A614E` dá 6,95:1.
+- Sidebar: no escuro fundo `#0A614E`, hover e item ativo `#106E5B`, texto e ícones `#F8F8F2` (6,95:1); no claro fundo `#1ABC9C`, hover e item ativo `#48C9B0`, texto e ícones `#1F2328` (6,56:1 e 7,72:1). Barra do item ativo na cor do texto da sidebar (não roxa, para passar 3:1) e emblema roxo com texto `#282A36` (5,90:1) nas notificações. Hoje ela fica recolhida só com ícones e expande pelo botão de menu; o mockup mostra a versão expandida.
 - Se a sidebar usa o controle `Sidebar` do AtlantaFX ou o `VBox` atual restilizado é decisão de arquitetura do 2.6.
 
 ### 2. Cores e tokens
@@ -129,7 +130,7 @@ Medi o contraste dos tokens atuais e dos propostos contra as superfícies reais 
 | Positivo | `#50FA7B` (10,4:1) | `#1A7F37` (5,1:1) | também sinalizado por texto e sinal |
 | Negativo | `#FF5555` (4,5:1) | `#C62F3E` (5,4:1) | idem |
 | Aviso | `#FFB86C` (8,4:1) | `#9A6700` (4,9:1) | idem |
-| Sidebar (`theme-bg-sidebar`) | `#0A614E` | `#0A614E` | hover e ativo `#106E5B`; texto `#F8F8F2` |
+| Sidebar (`theme-bg-sidebar`) | `#0A614E` | `#1ABC9C` | hover e ativo `#106E5B` / `#48C9B0`; texto e ícones `#F8F8F2` / `#1F2328` |
 
 O mapeamento destes tokens para as variáveis `-color-*` do AtlantaFX (por exemplo `-color-bg-default`, `-color-fg-default`, `-color-accent-*`) e a sobreposição do roxo do Dracula nativo (`#9580FF`, que difere do `#BD93F9` do MOINEX) são verificados no spike da primeira Unit (A3). O script de NFR-2 repete estas medições a cada mudança de token.
 
@@ -168,7 +169,7 @@ Os blocos de hoje vêm dos FXML e das chaves de tradução de cada tela. [src: s
 
 | História | Tela | Blocos de hoje | Desenho proposto |
 |---|---|---|---|
-| US-7 | Início | Carteiras, Cartões, Resumo do mês, Fluxo de dinheiro (Sankey), Últimas transações, botão de recalcular patrimônio | Estrutura mantida (mockup 1): três cards em cima, dois embaixo; largura fluida; botão de recalcular vira ação secundária no cabeçalho |
+| US-7 | Início | Carteiras, Cartões, Resumo do mês, Fluxo de dinheiro (Sankey), Últimas transações, botão de recalcular patrimônio | Estrutura mantida (mockup 1): três cards em cima, dois embaixo; largura fluida; os cartões de carteira e de crédito viram cards lisos, sem gradiente; botão de recalcular vira ação secundária no cabeçalho |
 | US-7 | Resumo anual | Título e período, receita, despesa, saldo e taxa de poupança, fluxo mensal, receita e despesa por categoria, maiores despesas, insights | Faixa de quatro indicadores no topo, depois fluxo mensal, duas tabelas por categoria lado a lado, maiores despesas e insights |
 | US-8 | Carteiras | Saldo total, saldo por tipo, fluxo de dinheiro, lista de carteiras; botões de adicionar carteira, transferência, transferências e arquivadas | Saldo total em destaque, lista de carteiras em cards, gráficos em dois cards; botões no cabeçalho |
 | US-9 | Cartões | Cartões, total de dívidas, fluxo de dívidas, lista de dívidas com busca; botões de adicionar cartão, dívida, arquivados e periódicas | Cards de cartão com barra de limite e vencimento, total em destaque, tabela de dívidas num card com busca no topo |
@@ -301,11 +302,12 @@ Caption: tema, ícones, busca global e formulários viram peças compartilhadas;
 
 ### Decisions
 
-#### ADR-1 Tema: AtlantaFX como base global e tokens como camada por janela — Status: proposed
+#### ADR-1 Tema: AtlantaFX como base global e tokens como camada por janela — Status: accepted (UNIT-2, 2026-10-29)
 - **Contexto:** hoje o `ThemeService` troca uma folha de tokens só no `rootPane` registrado, e cada janela nova recebe os tokens por chamadas espalhadas (`MainController`, `WindowUtils`); os `Alert` ficam sem tema (FR-3, FR-7).
 - **Decisão:** definir o tema base com `ThemeManager.instance().setTheme(...)` (ou `Application.setUserAgentStylesheet`), que vale para todas as janelas de uma vez; manter os tokens como folha de autor por `Scene`, aplicada por um único listener em `Window.getWindows()` que cobre janelas existentes, novas e `Alert`; a troca de tema reaplica os tokens em todas as janelas abertas.
 - **Alternativas:** (a) criar um tema próprio copiando o CSS do Dracula e embutindo os tokens, descartada por duplicar ~165 KB de CSS do AtlantaFX e dificultar atualizações; (b) usar `ThemeOption` do AtlantaFX para injetar os tokens, adiada ao spike porque a API não foi exercitada.
 - **Consequências:** remove as chamadas manuais de tokens; `Alert` e diálogos passam a seguir o tema; depende de o AtlantaFX 3.0.0 aceitar a sobreposição de `-color-accent-*` (A3, A11).
+- **Resultado da UNIT-2:** confirmado com ajustes. O tema base usa `Application.setUserAgentStylesheet` (o `ThemeManager` não foi necessário). Sobrepor só as variáveis semânticas `-color-accent-fg` e `-color-accent-emphasis` não bastou, porque o botão em foco usa o degrau `-color-accent-6`; foi preciso sobrepor a rampa `-color-accent-0` a `-color-accent-9`. A identidade dos botões vai em uma folha `base.css` aplicada pelo `ThemeService`, porque o `Alert` não carrega o `buttons.css`.
 - **Relacionado:** FR-1, FR-2, FR-3, FR-7, US-1, US-4.
 
 #### ADR-2 Estilizar os controles atuais em vez de adotar `Sidebar`, `Card` e `Tile` do AtlantaFX — Status: proposed
@@ -625,13 +627,15 @@ Os dois arquivos, `tokens.light.css` e `tokens.dark.css`, definem **exatamente o
 | `theme-border-field` (novo) | borda de campo e foco inativo | `#6272A4` / `#818B98` |
 | `theme-text-primary` | texto principal | `#F8F8F2` / `#1F2328` |
 | `theme-text-secondary` | texto de apoio | `#BFBFC3` / `#59636E` |
-| `theme-text-muted` | só texto grande ou desabilitado | `#7E7F86` / `#6E7781` |
+| `theme-text-subtle` (novo) | só texto grande ou desabilitado | `#7E7F86` / `#6E7781` |
+| `theme-text-muted`, `theme-text-dim`, `theme-text-faint` | legados, sinônimos de `theme-text-secondary` até a UNIT-14 | igual ao secundário |
 | `theme-accent` | preenchimento de destaque | `#BD93F9` / `#BD93F9` |
 | `theme-on-accent` (novo) | texto sobre o destaque | `#282A36` / `#282A36` |
+| `theme-accent-focus` (novo) | fundo do botão primário em foco (degrau 4 da rampa) | `#C7A3FA` / `#C7A3FA` |
 | `theme-accent-text` (novo) | texto, link e anel de foco | `#BD93F9` / `#6D4FC2` |
 | `theme-positive`, `theme-negative`, `theme-warning` | semântica | `#50FA7B`, `#FF5555`, `#FFB86C` / `#1A7F37`, `#C62F3E`, `#9A6700` |
-| `theme-bg-sidebar`, `theme-bg-sidebar-hover` | sidebar | `#0A614E`, `#106E5B` nos dois temas |
-| `theme-on-sidebar` (novo) | texto e indicador na sidebar | `#F8F8F2` nos dois temas |
+| `theme-bg-sidebar`, `theme-bg-sidebar-hover` | sidebar | `#0A614E`, `#106E5B` / `#1ABC9C`, `#48C9B0` |
+| `theme-on-sidebar` (novo) | texto, ícone e indicador na sidebar | `#F8F8F2` / `#1F2328` |
 | `theme-icon` (novo) | cor padrão dos ícones | igual a `theme-text-primary` |
 
 Os tokens atuais não listados acima continuam existindo até a UNIT-14, que remove os sem uso. A tabela de pares que o teste de contraste confere (texto sobre superfície, mínimo):
@@ -655,7 +659,7 @@ class ThemeService(private val preferencesService: PreferencesService) {
 }
 ```
 
-- `install()` é chamado uma vez na inicialização do JavaFX: define o tema base (`Dracula` se escuro, `PrimerLight` se claro) e registra o listener em `Window.getWindows()` que aplica os tokens a toda `Scene` existente ou futura, inclusive a dos `Alert`.
+- `install()` é chamado uma vez na inicialização do JavaFX: define o tema base (`Dracula` se escuro, `PrimerLight` se claro) com `Application.setUserAgentStylesheet` e registra o listener em `Window.getWindows()` que aplica a toda `Scene` existente ou futura, inclusive a dos `Alert`, a folha de tokens e a folha `base.css` (identidade: botão em pílula e botão primário).
 - `toggleAndApply()` alterna a preferência (`ui.theme` no `PreferencesService`, claro por padrão), troca o tema base e reaplica os tokens a todas as janelas abertas.
 - `applyTo(scene)` e `applyTo(parent)` continuam por compatibilidade, mas passam a ser idempotentes e deixam de ser necessários nos chamadores; a UNIT-3 remove as chamadas redundantes.
 - Não muda: a chave `ui.theme` e seus valores `light` e `dark`.
@@ -746,4 +750,126 @@ Constantes em `Styles.kt` e regras no CSS comum: `card` (borda fina, cantos 12 p
 
 - A18 — confirmed: no: o `atlantafx-validation` consegue registrar regras sobre `ComboBox` e `DatePicker`, além de `TextField` (verificar na UNIT-6; a reserva é validar na mão no `FieldValidation`).
 - A19 — confirmed: no: o runner de captura consegue abrir as telas e os diálogos sem interação humana; telas com `WebView` podem precisar de um pequeno atraso antes do snapshot (verificar na UNIT-1, junto com A16).
+
+## 3.1 Functional design
+
+### UNIT-1 — Functional design
+
+**Architect** — ferramenta de desenvolvimento que gera as capturas "antes/depois" (NFR-3) e a medição de base (NFR-5). Não altera comportamento do app quando a propriedade `moinex.capture.dir` está ausente. Fatos do código usados: as telas entram por `MainController.loadContent(fxml, estilo)`; as subtelas de Metas/Planos/FIRE/Wishlist e da Poupança têm FXML próprio e carregam direto; os diálogos abrem em `showAndWait`, então o snapshot precisa ser agendado dentro do laço de eventos aninhado; o tema vem de `PreferencesService.theme` (`light` ou `dark`) e `ThemeService.applyCurrentTheme()`. [src: src/main/kotlin/org/moinex/ui/main/MainController.kt] [src: src/main/kotlin/org/moinex/common/util/WindowUtils.kt]
+
+```mermaid
+sequenceDiagram
+  participant App as JavaFXApp (onUI)
+  participant R as ScreenshotRunner
+  participant M as MainController
+  participant T as ThemeService
+  App->>R: runIfEnabled(primaryStage)
+  R->>R: propriedade moinex.capture.dir? user.home diferente de HOME?
+  loop para cada tema (light, dark)
+    R->>T: define o tema e applyCurrentTheme()
+    loop para cada alvo do CapturePlan
+      R->>M: loadContent(fxml, estilo) ou abre o diálogo
+      R->>R: espera a tela assentar (dados, gráficos, WebView)
+      R->>R: snapshot da raiz da cena e grava NN-id.png
+    end
+  end
+  R->>App: Platform.exit() com código 0
+```
+Caption: o runner é acionado depois que a janela principal aparece e só existe nesse fluxo; nada roda sem a propriedade.
+
+**Componentes**
+
+| Componente | Estado | Responsabilidade |
+|---|---|---|
+| `CapturePlan` | novo | Lista pura e ordenada dos alvos de captura e o nome do arquivo; testável sem JavaFX |
+| `ScreenshotRunner` | novo (`@Component`) | Percorre o plano nos dois temas, assenta, tira o snapshot e grava o PNG |
+| `JavaFXApp` | muda 1 linha | Chama `runIfEnabled` depois de mostrar a janela principal |
+| `MainController` | muda visibilidade | `openNotificationPanel` e `closeNotificationPanel` passam de `private` a públicas (sem mudar comportamento) para a captura da central de notificações |
+| `scripts/capture-screens.sh` | novo | Prepara o banco fictício num `user.home` descartável e executa o jar com a propriedade |
+
+**Regras e decisões**
+
+- **Alvos da UNIT-1 (16):** `home`, `annual-summary`, `wallets`, `credit-cards`, `transactions`, `goals`, `plans`, `fire`, `wishlist`, `savings-overview`, `savings-stocks-funds`, `savings-bonds`, `ai-chat`, `settings`, `notifications`, `dialog-add-expense-error`. `alert-confirm` entra na UNIT-2 e `search` na UNIT-7. O índice `NN` de cada id é fixo (01 a 18) para o "antes" e o "depois" terem o mesmo nome. Na captura "antes", `dialog-add-expense-error` mostra o diálogo vazio, porque o erro inline só existe depois da UNIT-6.
+- **Janela:** o runner fixa a janela principal em 1440 × 900 e sai de modo maximizado, para comparar as capturas no mesmo tamanho.
+- **Assentamento:** espera de 2,5 s por tela e 4 s para telas com `WebView` ou gráficos pesados (A16 e A19); valores ficam em constantes e podem subir se algum PNG sair vazio.
+- **Snapshot:** da raiz da cena (`scene.root.snapshot`), incluindo a sidebar, em escala 1x.
+- **Diálogo:** o runner agenda o snapshot e o fechamento com `Platform.runLater` antes de chamar `WindowUtils.openModalWindow`, porque o `showAndWait` roda um laço aninhado.
+- **Segurança:** o runner **recusa executar** se `user.home` for igual ao `HOME` do ambiente (ou seja, o banco e as preferências reais do usuário), e mostra o erro. O tema escolhido pelo runner é gravado nas preferências do `user.home` descartável, nunca nas reais.
+- **Pipeline de inicialização:** em modo captura o `AppStartupRunner` não executa a atualização de mercado nem os processamentos recorrentes (usa a mesma propriedade), para a captura não depender de rede nem mudar os dados durante a espera. Acréscimo feito na implementação, depois do gate do desenho.
+- **Falhas:** se uma tela não carregar, o runner registra o erro, segue para a próxima e termina com código 0; o script conta os PNGs gerados.
+- **Banco fictício:** a aplicação migra o banco ao subir; o script sobe o jar uma vez no `user.home` descartável até aparecer "Successfully applied" no log, encerra, roda `scripts/generate_dummy_data.py --db_path` e só então roda a captura.
+
+**Testes (lógica pura, sem JavaFX):** ordem e índice dos alvos; nome do arquivo (`before/dark/03-wallets.png`); recusa quando `user.home` é igual a `HOME`; a captura mapeia exatamente os ids do § 2.8.
+
+**Fora desta Unit:** qualquer mudança visual, a busca e o `Alert` (entram nas UNIT-7 e UNIT-2).
+
+### UNIT-1 — NFR requirements, NFR design e Infrastructure design
+
+Não se aplicam: é uma ferramenta de desenvolvimento, desligada por padrão, sem impacto de desempenho, segurança de rede ou infraestrutura. A única restrição de segurança (não tocar o banco e as preferências reais) está na regra de segurança acima.
+
+### UNIT-2 — Functional design (walking skeleton)
+
+**Architect** — a menor fatia ponta a ponta do tema: AtlantaFX como base, tokens do MOINEX por cima, e troca claro/escuro valendo para a janela principal, para janelas abertas e para `Alert`. Fatos verificados em 2026-10-29: o Dracula do AtlantaFX define as variáveis semânticas direto no `.root` (`-color-bg-*`, `-color-fg-*`, `-color-border-*`, `-color-accent-*`, `-color-success|warning|danger-*`), então um `.root` de autor consegue sobrepô-las; o tema escolhido é aplicado por `Application.setUserAgentStylesheet(theme.userAgentStylesheet)`; as variáveis `-fx-base`, `-fx-accent` e afins **não existem** no Dracula, portanto as do `.root` atual ficam inertes. [src: atlantafx-base 3.0.0, dracula.css]
+
+```mermaid
+sequenceDiagram
+  participant App as JavaFXApp.start
+  participant T as ThemeService
+  participant W as Window.getWindows()
+  participant S as Settings
+  App->>T: install()
+  T->>T: Application.setUserAgentStylesheet(Dracula ou PrimerLight)
+  T->>W: listener: toda Window nova ou existente
+  W-->>T: janela mostrada (principal, diálogo, popup, Alert)
+  T->>T: applyTo(scene): tokens + tema de ícones
+  S->>T: toggleAndApply()
+  T->>T: troca o tema base e reaplica em todas as janelas abertas
+```
+Caption: um único ponto (o listener) cobre toda janela, inclusive a do `Alert`, e a troca reaplica em tudo que está aberto.
+
+**Mudanças por componente**
+
+| Componente | Mudança |
+|---|---|
+| `build.gradle.kts`, `libs.versions.toml` | dependência `io.github.mkpaz:atlantafx-base:3.0.0` |
+| `ThemeService` | `install()` (tema base e listener); `toggleAndApply()` e `applyCurrentTheme()` trocam o tema base e reaplicam em todas as janelas; `applyTo(scene)` e `applyTo(parent)` continuam, idempotentes; enum `BaseTheme` pura (`DRACULA` no escuro, `PRIMER_LIGHT` no claro) para teste |
+| `JavaFXApp.start` | chama `ThemeService.install()` antes de abrir a splash |
+| `tokens.dark.css`, `tokens.light.css` | acrescentam `theme-border-field`, `theme-on-accent`, `theme-accent-text`, `theme-on-sidebar`, `theme-icon`, ajustam `theme-bg-base`, `theme-bg-card`, `theme-bg-inset`, `theme-text-*` e semânticas à paleta do § 2.8, e mapeiam para `-color-*` (tabela abaixo); os tokens antigos continuam |
+| `WindowUtils` | remove as duas chamadas manuais `themeService.applyTo(this)` (o listener cobre) |
+| `buttons.css`, `main.css` | regra de pílula para `.button` e `.jfx-button`; sidebar com os valores por tema |
+| `CapturePlan`, `ScreenshotRunner` | novo alvo `alert-confirm` (18) |
+
+**Mapeamento dos tokens para as variáveis do AtlantaFX** (no `.root` de cada arquivo de tokens)
+
+| Variável do AtlantaFX | Valor |
+|---|---|
+| `-color-bg-default` | `theme-bg-base` |
+| `-color-bg-overlay`, `-color-bg-subtle` | `theme-bg-card` |
+| `-color-bg-inset` | `theme-bg-inset` |
+| `-color-fg-default`, `-color-fg-muted`, `-color-fg-subtle` | `theme-text-primary`, `theme-text-secondary`, `theme-text-muted` |
+| `-color-border-default` | `theme-border-field` |
+| `-color-border-muted`, `-color-border-subtle` | `theme-border` |
+| `-color-accent-fg` | `theme-accent-text` |
+| `-color-accent-emphasis` | `theme-accent` |
+| `-color-accent-muted`, `-color-accent-subtle` | `#BD93F9` com opacidade 0,4 e 0,1 |
+| `-color-success-fg`, `-color-success-emphasis` | `theme-positive` |
+| `-color-warning-fg`, `-color-warning-emphasis` | `theme-warning` |
+| `-color-danger-fg`, `-color-danger-emphasis` | `theme-negative` |
+
+**Pontos conhecidos e suposições a verificar nesta Unit**
+
+- A3: o Dracula e o Primer Light carregam com JavaFX 27 e Java 25 sem ajuste além do mapeamento acima.
+- A11: sobrepor `-color-accent-*` troca o roxo do Dracula (`#9580FF`) por `#BD93F9`.
+- A13: a camada de tokens por `Scene` convive com o tema base sem conflito (um `.root` de autor vence o do agente de usuário).
+- A15: o listener alcança a janela do `Alert`.
+- Risco conhecido: no tema claro um botão `accent` usa texto de ênfase claro sobre `#BD93F9` (2,26:1); botões `accent` só existem a partir da UNIT-6 e lá recebem texto `theme-on-accent`.
+- Uma troca de tema com janela **modal** aberta não é possível (a modal bloqueia as Configurações); a verificação usa janelas não modais já abertas.
+
+**Testes (sem JavaFX):** `ThemeTokensTest` (mesmo conjunto de nomes nos dois arquivos de tokens, e os nomes do § 2.8 presentes); `ThemeContrastTest` (pares do § 2.8 acima do mínimo, lendo os CSS reais); `BaseThemeTest` (escuro vira `DRACULA`, claro vira `PRIMER_LIGHT`).
+
+**Desenho das UNIT-3 a UNIT-14:** o desenho funcional dessas Units é o já aprovado nos §§ 2.5 a 2.8 (telas, componentes, ADRs e contratos); cada Unit só registra aqui um desvio, se houver. Sem desvio, os estágios 3.1 a 3.4 delas ficam cobertos por esses parágrafos.
+
+### UNIT-2 — NFR requirements, NFR design e Infrastructure design
+
+NFR-2 (contraste) é validado pelo `ThemeContrastTest`; desempenho (NFR-5) é medido só na UNIT-14. Não há infraestrutura nova.
 

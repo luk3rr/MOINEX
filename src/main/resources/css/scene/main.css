@@ -38,7 +38,7 @@
 
 #sidebar JFXButton {
   -fx-background-color: transparent;
-  -fx-text-fill: theme-text-on-dark;
+  -fx-text-fill: theme-on-sidebar;
   -fx-font-size: 14px;
   -fx-font-weight: bold;
   -fx-padding: 10px 15px;
@@ -63,7 +63,7 @@
 
 #sidebar .sidebar-button-selected {
   -fx-background-color: theme-bg-sidebar-hover;
-  -fx-text-fill: theme-text-on-dark;
+  -fx-text-fill: theme-on-sidebar;
 }
 
 #sidebar JFXButton .VBox {

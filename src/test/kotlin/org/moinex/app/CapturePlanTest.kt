@@ -10,7 +10,7 @@ class CapturePlanTest :
             val targets = CapturePlan.targets
 
             When("listing the screens") {
-                Then("it has the 16 screens of the before capture, in the agreed order") {
+                Then("it has the 16 screens of the before capture plus the alert, in the agreed order") {
                     targets.map { it.id } shouldContainExactly
                         listOf(
                             "home",
@@ -29,18 +29,21 @@ class CapturePlanTest :
                             "settings",
                             "notifications",
                             "dialog-add-expense-error",
+                            "alert-confirm",
                         )
                 }
 
-                Then("the indexes are the fixed ones, starting at 1 without gaps or repeats") {
-                    targets.map { it.index } shouldContainExactly (1..16).toList()
+                Then("the indexes are the fixed ones, with the slot 17 left for the search") {
+                    targets.map { it.index } shouldContainExactly ((1..16).toList() + 18)
                 }
 
-                Then("every screen has a stylesheet and every dialog has none") {
+                Then("every screen has a stylesheet and every dialog or alert has none") {
                     targets
                         .filter { it.kind == CaptureKind.SCREEN }
                         .all { it.styleSheet != null } shouldBe true
-                    targets.filter { it.kind == CaptureKind.DIALOG }.all { it.styleSheet == null } shouldBe true
+                    targets
+                        .filter { it.kind == CaptureKind.DIALOG || it.kind == CaptureKind.ALERT }
+                        .all { it.styleSheet == null } shouldBe true
                 }
             }
         }

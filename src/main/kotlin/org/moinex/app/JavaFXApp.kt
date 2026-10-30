@@ -25,6 +25,7 @@ import org.moinex.common.util.APIUtils
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.PreferencesService
+import org.moinex.service.ThemeService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
@@ -53,6 +54,8 @@ class JavaFXApp : Application() {
         hostServicesInstance = hostServices
 
         runCatching {
+            springContext.getBean<ThemeService>().install()
+
             val splashLoader = FXMLLoader(javaClass.getResource(Files.SPLASH_SCREEN_FXML))
             val splashRoot = splashLoader.load<Parent>()
             val splashStage =

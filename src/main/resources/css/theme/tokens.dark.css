@@ -15,7 +15,7 @@
     -fx-faint-focus-color:        rgba(189, 147, 249, 0.2);
 
     /* ── Backgrounds ─────────────────────────────────────── */
-    theme-bg-base:          #363948;
+    theme-bg-base:          #21222C;
     theme-bg-card:          #282A36;
     theme-bg-card-alt:      #21222c;
     theme-bg-input:         #282A36;
@@ -31,12 +31,12 @@
 
     /* ── Text ────────────────────────────────────────────── */
     theme-text-primary:   #F8F8F2;
-    theme-text-secondary: #6272A4;
-    theme-text-muted:     #6272A4;
-    theme-text-dim:       #6272A4;
-    theme-text-faint:     #6272A4;
+    theme-text-secondary: #BFBFC3;
+    theme-text-muted:     #BFBFC3;
+    theme-text-dim:       #BFBFC3;
+    theme-text-faint:     #BFBFC3;
     theme-text-on-dark:   #F8F8F2;
-    theme-text-disabled:  #ABABAB;
+    theme-text-disabled:  #7E7F86;
     theme-text-title:     #F8F8F2;
 
     /* ── Borders ─────────────────────────────────────────── */
@@ -87,4 +87,49 @@
 
     /* ── Fire calculator ─────────────────────────────────── */
     theme-fire-value: #F8F8F2;
+
+    /* ── MOINEX palette (contract: design.md § 2.8) ──────── */
+    theme-bg-inset:        #181920;
+    theme-border-field:    #6272A4;
+    theme-text-subtle:     #7E7F86;
+    theme-accent:          #BD93F9;
+    theme-on-accent:       #282A36;
+    theme-accent-focus:    #C7A3FA;
+    theme-accent-text:     #BD93F9;
+    theme-on-sidebar:      #F8F8F2;
+    theme-icon:            theme-text-primary;
+
+    /* ── AtlantaFX semantic colors fed by the tokens above ── */
+    -color-bg-default:      theme-bg-base;
+    -color-bg-overlay:      theme-bg-card;
+    -color-bg-subtle:       theme-bg-card;
+    -color-bg-inset:        theme-bg-inset;
+    -color-fg-default:      theme-text-primary;
+    -color-fg-muted:        theme-text-secondary;
+    -color-fg-subtle:       theme-text-subtle;
+    -color-border-default:  theme-border-field;
+    -color-border-muted:    theme-border;
+    -color-border-subtle:   theme-border;
+    -color-accent-fg:       theme-accent-text;
+    -color-accent-emphasis: theme-accent;
+    -color-accent-muted:    rgba(189, 147, 249, 0.4);
+    -color-accent-subtle:   rgba(189, 147, 249, 0.1);
+    /* ── Accent ramp around the MOINEX purple (same method as the AtlantaFX themes) ── */
+    -color-accent-0: #eee4fe;
+    -color-accent-1: #e5d4fd;
+    -color-accent-2: #dbc4fc;
+    -color-accent-3: #d1b3fb;
+    -color-accent-4: theme-accent-focus;
+    -color-accent-5: #bd93f9;
+    -color-accent-6: #a17dd4;
+    -color-accent-7: #8467ae;
+    -color-accent-8: #685189;
+    -color-accent-9: #4c3b64;
+
+    -color-success-fg:       theme-positive;
+    -color-success-emphasis: theme-positive;
+    -color-warning-fg:       theme-warning;
+    -color-warning-emphasis: theme-warning;
+    -color-danger-fg:        theme-negative;
+    -color-danger-emphasis:  theme-negative;
 }

@@ -1,0 +1,27 @@
+/*
+ * Filename: base.css
+ * Created on: October 29, 2026
+ * Author: Lucas Araújo <araujolucas@dcc.ufmg.br>
+ *
+ * MOINEX identity layer applied by ThemeService to every window, including native alerts:
+ * pill buttons with a 2px border and the primary button colors. Colors come from the tokens.
+ */
+
+.button {
+    -color-button-bg-hover: theme-bg-hover;
+    -fx-background-insets: 0, 2px;
+    -fx-background-radius: 20px, 18px;
+    -fx-padding: 5px 15px;
+    -fx-cursor: hand;
+}
+
+.button:default,
+.button.accent {
+    -color-button-bg-hover: theme-accent;
+    -color-button-bg-focused: theme-accent-focus;
+    -color-button-border-focused: theme-accent-text;
+    -color-button-fg: theme-on-accent;
+    -color-button-fg-hover: theme-on-accent;
+    -color-button-fg-focused: theme-on-accent;
+    -color-button-fg-pressed: theme-on-accent;
+}

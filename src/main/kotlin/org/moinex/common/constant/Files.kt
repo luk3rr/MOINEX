@@ -185,6 +185,7 @@ object Files {
     // CSS – theme tokens
     const val LIGHT_TOKENS_CSS: String = CSS_THEME_PATH + "tokens.light.css"
     const val DARK_TOKENS_CSS: String = CSS_THEME_PATH + "tokens.dark.css"
+    const val THEME_BASE_CSS: String = CSS_THEME_PATH + "base.css"
 
     // CSS
     const val MAIN_STYLE_SHEET: String = CSS_SCENE_PATH + "main.css"
