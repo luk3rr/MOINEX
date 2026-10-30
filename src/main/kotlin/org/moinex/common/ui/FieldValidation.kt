@@ -40,6 +40,16 @@ class FieldValidation(
         rules += Rule(control) { numberError(control.text, positive = true) }
     }
 
+    /**
+     * Registers the rules of [block] in place of the previous ones and validates them, for forms whose
+     * rules depend on the moment of the save.
+     */
+    fun check(block: FieldValidation.() -> Unit): Boolean {
+        rules.clear()
+        block()
+        return validate()
+    }
+
     fun validate(): Boolean {
         clearErrors()
         var firstInvalid: Control? = null

@@ -14,6 +14,7 @@ import javafx.scene.control.CheckBox
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Ticker
 import org.moinex.service.PreferencesService
@@ -27,6 +28,8 @@ class EditTickerController(
     tickerService: TickerService,
     preferencesService: PreferencesService,
 ) : BaseTickerManagement(tickerService, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var archivedCheckBox: CheckBox
 
@@ -53,11 +56,14 @@ class EditTickerController(
         val quantityStr = quantityField.text
         val avgUnitPriceStr = avgUnitPriceField.text
 
-        if (currentPriceStr.isNullOrBlank() || type == null || name.isBlank() || symbol.isBlank()) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(currentPriceField)
+                required(typeComboBox)
+                required(nameField)
+                required(symbolField)
+                number(currentPriceField)
+            }
+        ) {
             return
         }
 

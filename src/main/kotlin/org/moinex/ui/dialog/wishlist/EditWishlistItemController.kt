@@ -9,6 +9,7 @@ package org.moinex.ui.dialog.wishlist
 import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wishlist.WishlistItem
 import org.moinex.service.CategoryService
@@ -23,6 +24,8 @@ class EditWishlistItemController(
     preferencesService: PreferencesService,
     private val wishlistService: WishlistService,
 ) : BaseWishlistManagement(categoryService, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     private var itemToEdit: WishlistItem? = null
 
     @FXML
@@ -54,11 +57,14 @@ class EditWishlistItemController(
 
         val formData = getFieldsFromInterface()
 
-        if (!formData.isValid()) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(titleField)
+                required(estimatedPriceField)
+                number(estimatedPriceField)
+                required(categoryComboBox)
+                required(priorityComboBox)
+            }
+        ) {
             return
         }
 

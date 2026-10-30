@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.investment.CryptoExchange
@@ -28,6 +29,8 @@ class AddCryptoExchangeController(
     calculatorService: CalculatorService,
     preferencesService: PreferencesService,
 ) : BaseCryptoExchangeManagement(tickerService, calculatorService, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     override fun handleSave() {
         val cryptoSold = cryptoSoldComboBox.value
@@ -37,17 +40,15 @@ class AddCryptoExchangeController(
         val description = descriptionField.text
         val exchangeDate = exchangeDatePicker.value
 
-        if (cryptoSold == null ||
-            cryptoReceived == null ||
-            cryptoSoldQuantityStr.isNullOrBlank() ||
-            cryptoReceivedQuantityStr.isNullOrBlank() ||
-            description.isNullOrBlank() ||
-            exchangeDate == null
+        if (!validation.check {
+                required(cryptoSoldComboBox)
+                required(cryptoReceivedComboBox)
+                required(cryptoSoldQuantityField)
+                required(cryptoReceivedQuantityField)
+                required(descriptionField)
+                required(exchangeDatePicker)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

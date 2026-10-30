@@ -14,6 +14,7 @@ import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
@@ -41,6 +42,8 @@ class AddRecurringCreditCardDebtController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
 ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var crcComboBox: ComboBox<CreditCard>
 
@@ -92,21 +95,16 @@ class AddRecurringCreditCardDebtController(
         val dayStr = dayOfMonthField.text
         val startDate = startDatePicker.value
 
-        if (creditCard == null ||
-            category == null ||
-            frequency == null ||
-            valueStr.isEmpty() ||
-            dayStr.isEmpty() ||
-            startDate == null
+        if (!validation.check {
+                required(crcComboBox)
+                required(categoryComboBox)
+                required(frequencyComboBox)
+                required(valueField)
+                number(valueField)
+                required(dayOfMonthField)
+                required(startDatePicker)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_EMPTY_FIELDS_TITLE,
-                ),
-                preferencesService.translate(
-                    TranslationKeys.CREDIT_CARD_RECURRING_DIALOG_EMPTY_FIELDS_MESSAGE,
-                ),
-            )
             return
         }
 

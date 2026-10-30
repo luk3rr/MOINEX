@@ -11,6 +11,7 @@ package org.moinex.ui.dialog.creditcard
 import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.Category
 import org.moinex.model.creditcard.CreditCardDebt
@@ -39,6 +40,8 @@ class AddCreditCardDebtController(
         springContext,
         preferencesService,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     private var onDebtCreatedCallback: ((Int) -> Unit)? = null
 
     fun setOnDebtCreatedCallback(callback: (Int) -> Unit) {
@@ -63,11 +66,17 @@ class AddCreditCardDebtController(
     override fun handleSave() {
         val formData = getFieldsFromInterface()
 
-        if (!formData.isValid()) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(crcComboBox)
+                required(categoryComboBox)
+                required(descriptionField)
+                required(valueField)
+                number(valueField)
+                required(invoiceMonthComboBox)
+                required(invoiceYearComboBox)
+                required(purchaseDatePicker)
+            }
+        ) {
             return
         }
 

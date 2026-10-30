@@ -15,6 +15,8 @@ import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.wallettransaction.Wallet
@@ -28,6 +30,8 @@ class AddWalletController(
     private val walletService: WalletService,
     private val preferencesService: PreferencesService,
 ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var walletNameField: TextField
 
@@ -55,6 +59,8 @@ class AddWalletController(
                 walletBalanceField.text = oldValue
             }
         }
+
+        DialogForm.install(walletNameField, walletNameField, ::handleSave, ::handleCancel)
     }
 
     @FXML
@@ -69,11 +75,11 @@ class AddWalletController(
         val walletBalanceStr = walletBalanceField.text
         val walletType = walletTypeComboBox.value
 
-        if (walletName.isEmpty() || walletType == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(walletNameField)
+                required(walletTypeComboBox)
+            }
+        ) {
             return
         }
 

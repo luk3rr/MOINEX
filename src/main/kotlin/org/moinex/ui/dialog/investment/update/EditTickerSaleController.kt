@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.WalletTransactionType
@@ -37,6 +38,8 @@ class EditTickerSaleController(
         tickerService,
         preferencesService,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     private lateinit var sale: TickerSale
 
     init {
@@ -71,18 +74,17 @@ class EditTickerSaleController(
         val quantityStr = quantityField.text
         val saleDate = transactionDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            unitPriceStr.isNullOrBlank() ||
-            quantityStr.isNullOrBlank() ||
-            saleDate == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(descriptionField)
+                required(statusComboBox)
+                required(categoryComboBox)
+                required(unitPriceField)
+                required(quantityField)
+                required(transactionDatePicker)
+                number(unitPriceField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

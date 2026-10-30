@@ -17,6 +17,7 @@ import javafx.scene.control.ToggleGroup
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.enums.GoalFundingStrategy
@@ -33,6 +34,8 @@ class AddGoalController(
     walletService: WalletService,
     preferencesService: PreferencesService,
 ) : BaseGoalManagement(goalService, walletService, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var goalFundingStrategyPane: TitledPane
 
@@ -59,11 +62,13 @@ class AddGoalController(
         val motivation = motivationTextArea.text
         val masterWallet = masterWalletComboBox.value
 
-        if (goalName.isEmpty() || targetBalanceStr.isEmpty() || targetDate == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.GOAL_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(nameField)
+                required(targetBalanceField)
+                required(targetDatePicker)
+                number(targetBalanceField)
+            }
+        ) {
             return
         }
 

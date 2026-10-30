@@ -15,6 +15,8 @@ import javafx.scene.Scene
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.ButtonType
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.moinex.app.JavaFXApp
@@ -170,6 +172,12 @@ object WindowUtils {
                 initModality(Modality.APPLICATION_MODAL)
                 scene =
                     Scene(root).apply {
+                        addEventHandler(KeyEvent.KEY_PRESSED) { event ->
+                            if (event.code == KeyCode.ESCAPE) {
+                                event.consume()
+                                window?.hide()
+                            }
+                        }
                         stylesheets.add(
                             WindowUtils::class.java
                                 .getResource(Files.COMMON_STYLE_SHEET)

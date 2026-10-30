@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.RecurringTransactionStatus
 import org.moinex.model.wallettransaction.RecurringTransaction
@@ -35,6 +36,8 @@ class AddRecurringTransactionController(
         categoryService,
         preferencesService,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     override fun handleSave() {
         val wallet = walletComboBox.value
@@ -46,18 +49,17 @@ class AddRecurringTransactionController(
         var endDate = endDatePicker.value
         val frequency = frequencyComboBox.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            valueString.isNullOrBlank() ||
-            type == null ||
-            category == null ||
-            startDate == null ||
-            frequency == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(descriptionField)
+                required(valueField)
+                required(typeComboBox)
+                required(categoryComboBox)
+                required(startDatePicker)
+                required(frequencyComboBox)
+                number(valueField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

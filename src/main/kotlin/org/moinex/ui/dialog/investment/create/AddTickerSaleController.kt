@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.dto.WalletTransactionContextDTO
@@ -37,6 +38,8 @@ class AddTickerSaleController(
         tickerService,
         preferencesService,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     init {
         walletTransactionType = WalletTransactionType.INCOME
     }
@@ -51,18 +54,17 @@ class AddTickerSaleController(
         val quantityStr = quantityField.text
         val buyDate = transactionDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            unitPriceStr.isNullOrBlank() ||
-            quantityStr.isNullOrBlank() ||
-            buyDate == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(descriptionField)
+                required(statusComboBox)
+                required(categoryComboBox)
+                required(unitPriceField)
+                required(quantityField)
+                required(transactionDatePicker)
+                number(unitPriceField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

@@ -91,16 +91,15 @@ class EditTransferController(
         val transferDate = transferDatePicker.value
         val category = categoryComboBox.value
 
-        if (senderWt == null ||
-            receiverWt == null ||
-            transferValueString.isNullOrBlank() ||
-            description.isNullOrBlank() ||
-            transferDate == null
+        if (!validation.check {
+                required(senderWalletComboBox)
+                required(receiverWalletComboBox)
+                required(transferValueField)
+                required(descriptionField)
+                required(transferDatePicker)
+                number(transferValueField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

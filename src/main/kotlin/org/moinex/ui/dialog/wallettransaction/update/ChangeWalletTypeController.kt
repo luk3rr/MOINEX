@@ -15,6 +15,8 @@ import javafx.scene.control.Label
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
@@ -29,6 +31,8 @@ class ChangeWalletTypeController(
     private val walletService: WalletService,
     private val preferencesService: PreferencesService,
 ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var walletComboBox: ComboBox<Wallet>
 
@@ -64,6 +68,8 @@ class ChangeWalletTypeController(
             val wt = walletComboBox.value
             updateCurrentTypeLabel(wt)
         }
+
+        DialogForm.install(walletComboBox, walletComboBox, ::handleSave, ::handleCancel)
     }
 
     @FXML
@@ -71,11 +77,11 @@ class ChangeWalletTypeController(
         val wt = walletComboBox.value
         val walletNewType = newTypeComboBox.value
 
-        if (wt == null || walletNewType == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(walletComboBox)
+                required(newTypeComboBox)
+            }
+        ) {
             return
         }
 

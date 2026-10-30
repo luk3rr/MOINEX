@@ -14,6 +14,7 @@ import javafx.scene.control.Button
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Ticker
@@ -29,6 +30,8 @@ class AddTickerController(
     tickerService: TickerService,
     preferencesService: PreferencesService,
 ) : BaseTickerManagement(tickerService, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var yahooLookupButton: Button
 
@@ -51,11 +54,14 @@ class AddTickerController(
         val quantityStr = quantityField.text
         val avgUnitPriceStr = avgUnitPriceField.text
 
-        if (name.isNullOrBlank() || symbol.isNullOrBlank() || currentPriceStr.isNullOrBlank() || type == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(nameField)
+                required(symbolField)
+                required(currentPriceField)
+                required(typeComboBox)
+                number(currentPriceField)
+            }
+        ) {
             return
         }
 

@@ -17,6 +17,8 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.helper.SuggestionsHandlerHelper
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCard
@@ -38,6 +40,8 @@ class AddCreditCardCreditController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
 ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var crcComboBox: ComboBox<CreditCard>
 
@@ -77,6 +81,8 @@ class AddCreditCardCreditController(
         populateCreditCardCombobox()
 
         UIUtils.setDatePickerFormat(datePicker)
+
+        DialogForm.install(descriptionField, descriptionField, ::handleSave, ::handleCancel)
     }
 
     @FXML
@@ -87,16 +93,15 @@ class AddCreditCardCreditController(
         val creditType = creditTypeComboBox.value
         val date = datePicker.value
 
-        if (crc == null ||
-            creditType == null ||
-            date == null ||
-            description.isEmpty() ||
-            valueStr.isEmpty()
+        if (!validation.check {
+                required(crcComboBox)
+                required(creditTypeComboBox)
+                required(datePicker)
+                required(descriptionField)
+                required(valueField)
+                number(valueField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

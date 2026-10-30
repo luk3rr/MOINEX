@@ -18,6 +18,8 @@ import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BondType
@@ -33,6 +35,8 @@ class EditBondController(
     private val bondService: BondService,
     private val preferencesService: PreferencesService,
 ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var nameField: TextField
 
@@ -75,6 +79,8 @@ class EditBondController(
         configureListeners()
 
         UIUtils.setDatePickerFormat(maturityDatePicker)
+
+        DialogForm.install(nameField, nameField, ::handleSave, ::handleCancel)
     }
 
     fun setBond(bond: Bond) {
@@ -110,11 +116,12 @@ class EditBondController(
         val interestRateStr = interestRateField.text
         val archived = archivedCheckBox.isSelected
 
-        if (name.isNullOrBlank() || bondType == null || maturityDate == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(nameField)
+                required(bondTypeComboBox)
+                required(maturityDatePicker)
+            }
+        ) {
             return
         }
 

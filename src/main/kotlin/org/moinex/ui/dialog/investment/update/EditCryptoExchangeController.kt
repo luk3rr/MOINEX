@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.exception.MoinexException
 import org.moinex.model.investment.CryptoExchange
@@ -29,6 +30,8 @@ class EditCryptoExchangeController(
     calculatorService: CalculatorService,
     preferencesService: PreferencesService,
 ) : BaseCryptoExchangeManagement(tickerService, calculatorService, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     private lateinit var cryptoExchange: CryptoExchange
 
     fun setCryptoExchange(cryptoExchange: CryptoExchange) {
@@ -57,17 +60,15 @@ class EditCryptoExchangeController(
         val description = descriptionField.text.trim()
         val exchangeDate = exchangeDatePicker.value
 
-        if (soldCrypto == null ||
-            receivedCrypto == null ||
-            cryptoSoldQuantityStr.isNullOrBlank() ||
-            cryptoReceivedQuantityStr.isNullOrBlank() ||
-            description.isBlank() ||
-            exchangeDate == null
+        if (!validation.check {
+                required(cryptoSoldComboBox)
+                required(cryptoReceivedComboBox)
+                required(cryptoSoldQuantityField)
+                required(cryptoReceivedQuantityField)
+                required(descriptionField)
+                required(exchangeDatePicker)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

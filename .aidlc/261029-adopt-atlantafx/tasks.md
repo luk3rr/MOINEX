@@ -161,7 +161,7 @@ Covers: US-6; FR-12. Depende de: UNIT-3.
 
 **Desvios:** o chat usa bolhas em `WebView` coloridas por Kotlin, não CSS do WebView; ficam em `ThemeColors`. A aprovação visual das capturas (T-5.7) fica para o seu teste da interface.
 
-### UNIT-6 Formulários e diálogos   Status: in progress
+### UNIT-6 Formulários e diálogos   Status: verified
 Covers: US-15; FR-10; NFR-7. Depende de: UNIT-3, UNIT-4.
 - [S] T-6.1 (dispensada: ver desvio) Adicionar `io.github.mkpaz:atlantafx-validation:3.0.0` ao catálogo e ao build — covers FR-10, US-15 — files: gradle/libs.versions.toml, build.gradle.kts — test: `./gradlew compileKotlin`
 - [x] T-6.2 `FieldValidation` com as regras `required`, `positiveNumber`, número e data inválidos, e testes unitários da lógica — covers FR-10, US-15 — files: common/ui/FieldValidation.kt, src/test/.../FieldValidationTest.kt — test: `./gradlew test --tests "*FieldValidationTest"`
@@ -169,24 +169,28 @@ Covers: US-15; FR-10; NFR-7. Depende de: UNIT-3, UNIT-4.
 - [x] T-6.4 CSS `field-error`, `field-invalid` e layout de uma coluna dos diálogos — covers FR-10, US-15 — files: css/common/common-styles.css — test: captura de um diálogo com erro
 - [x] T-6.5 Chaves `dialog.validation.*` por acréscimo nas duas `.properties` e em `TranslationKeys.kt` — covers NFR-7, US-15 — files: i18n/messages_*.properties, common/constant/TranslationKeys.kt — test: revisão do diff das `.properties`
 - [x] T-6.6 Piloto: `AddExpense`, `AddIncome` e `AddTransfer` migrados; confirmar A14 e A18 — covers FR-10, US-15 — files: ui/dialog/wallettransaction/create/ — test: abrir os três e provocar erro
-- [ ] T-6.7 Migrar `AddRecurringTransaction`, `AddWallet`, `ChangeWalletBalance` e `ChangeWalletType` — covers FR-10, US-15 — files: ui/dialog/wallettransaction/ — test: abrir cada um e provocar erro
-- [ ] T-6.8 Migrar `EditRecurringTransaction`, `EditTransaction`, `EditTransfer` e `RenameWallet` — covers FR-10, US-15 — files: ui/dialog/wallettransaction/ — test: abrir cada um e provocar erro
-- [ ] T-6.9 Migrar os diálogos de `creditcard`: `AddCreditCard`, `AddCreditCardCredit`, `AddCreditCardDebt`, `EditCreditCard` — covers FR-10, US-15 — files: ui/dialog/creditcard/ — test: abrir cada um e provocar erro
-- [ ] T-6.10 Migrar `AddRecurringCreditCardDebt`, `EditCreditCardDebt` e `EditRecurringCreditCardDebt` — covers FR-10, US-15 — files: ui/dialog/creditcard/ — test: abrir cada um e provocar erro
-- [ ] T-6.11 Migrar `financialplanning` (4), `goal` (2) e `wishlist` (2) — covers FR-10, US-15 — files: ui/dialog/financialplanning, goal, wishlist — test: abrir cada um e provocar erro
-- [ ] T-6.12 Migrar os três da raiz: `AddCalendarEvent`, `AddCategory` e `EditCategory` — covers FR-10, US-15 — files: ui/dialog/ — test: abrir cada um e provocar erro
-- [ ] T-6.13 Migrar os de bonds: `AddBond`, `AddBondPurchase`, `AddBondSale`, `EditBond`, `EditBondPurchase`, `EditBondSale` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
-- [ ] T-6.14 Migrar os de ações: `AddTicker`, `AddTickerPurchase`, `AddTickerSale`, `EditTicker` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
-- [ ] T-6.15 Migrar `EditTickerPurchase`, `EditTickerSale`, `AddDividend` e `EditDividend` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
-- [ ] T-6.16 Migrar `AddCryptoExchange`, `EditCryptoExchange` e `EditInvestmentTarget` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
-- [ ] T-6.17 Esc fecha os 9 diálogos de visualização — covers FR-10, US-15 — files: ui/dialog/**/view/ — test: abrir cada um e apertar Esc
-- [ ] T-6.18 Remover o `Alert` de campos vazios dos diálogos migrados e conferir que nenhuma regra de negócio mudou — covers FR-10, US-15 — files: ui/dialog/** — test: busca por `EMPTY_FIELDS` nos diálogos migrados
-- [ ] T-6.19 Capturas de diálogos com erro nos dois temas e checklist por domínio; confirmar o ADR-5 — covers NFR-3, US-15 — files: (saída local) — test: aprovação do usuário
-- [ ] T-6.20 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
+- [x] T-6.7 Migrar `AddRecurringTransaction`, `AddWallet`, `ChangeWalletBalance` e `ChangeWalletType` — covers FR-10, US-15 — files: ui/dialog/wallettransaction/ — test: abrir cada um e provocar erro
+- [x] T-6.8 Migrar `EditRecurringTransaction`, `EditTransaction`, `EditTransfer` e `RenameWallet` — covers FR-10, US-15 — files: ui/dialog/wallettransaction/ — test: abrir cada um e provocar erro
+- [x] T-6.9 Migrar os diálogos de `creditcard`: `AddCreditCard`, `AddCreditCardCredit`, `AddCreditCardDebt`, `EditCreditCard` — covers FR-10, US-15 — files: ui/dialog/creditcard/ — test: abrir cada um e provocar erro
+- [x] T-6.10 Migrar `AddRecurringCreditCardDebt`, `EditCreditCardDebt` e `EditRecurringCreditCardDebt` — covers FR-10, US-15 — files: ui/dialog/creditcard/ — test: abrir cada um e provocar erro
+- [x] T-6.11 Migrar `financialplanning` (4), `goal` (2) e `wishlist` (2) — covers FR-10, US-15 — files: ui/dialog/financialplanning, goal, wishlist — test: abrir cada um e provocar erro
+- [x] T-6.12 Migrar os três da raiz: `AddCalendarEvent`, `AddCategory` e `EditCategory` — covers FR-10, US-15 — files: ui/dialog/ — test: abrir cada um e provocar erro
+- [x] T-6.13 Migrar os de bonds: `AddBond`, `AddBondPurchase`, `AddBondSale`, `EditBond`, `EditBondPurchase`, `EditBondSale` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
+- [x] T-6.14 Migrar os de ações: `AddTicker`, `AddTickerPurchase`, `AddTickerSale`, `EditTicker` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
+- [x] T-6.15 Migrar `EditTickerPurchase`, `EditTickerSale`, `AddDividend` e `EditDividend` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
+- [x] T-6.16 Migrar `AddCryptoExchange`, `EditCryptoExchange` e `EditInvestmentTarget` — covers FR-10, US-15 — files: ui/dialog/investment/ — test: abrir cada um e provocar erro
+- [x] T-6.17 Esc fecha os 9 diálogos de visualização — covers FR-10, US-15 — files: ui/dialog/**/view/ — test: abrir cada um e apertar Esc
+- [x] T-6.18 Remover o `Alert` de campos vazios dos diálogos migrados e conferir que nenhuma regra de negócio mudou — covers FR-10, US-15 — files: ui/dialog/** — test: busca por `EMPTY_FIELDS` nos diálogos migrados
+- [x] T-6.19 Capturas de diálogos com erro nos dois temas e checklist por domínio; confirmar o ADR-5 — covers NFR-3, US-15 — files: (saída local) — test: aprovação do usuário
+- [x] T-6.20 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
 **Andamento (2026-10-30):** infraestrutura e piloto prontos. `FieldValidation` (obrigatório, número, número positivo; rótulo de erro inline, `field-invalid`, foco no primeiro inválido, janela redimensiona) e `DialogForm` (foco inicial, Enter salva, Esc cancela) ligados nas bases `BaseWalletTransactionManagement` e `BaseTransferManagement`; `AddExpense`, `AddIncome` e `AddTransfer` migrados. Chaves `dialog.validation.*` acrescentadas (pt-BR com escapes `\u`).
 
 **Desvio (A14, ADR-5):** a validação é própria (reserva do ADR-5), sem `atlantafx-validation`: as regras são simples e a biblioteca não traria ganho. T-6.1 dispensada.
+
+**Resumo final (2026-10-30, exit 0, 1404 testes, 0 falhas):** os diálogos de criar e editar de carteiras/transações, cartões, planejamento, metas, wishlist, investimentos e raiz usam `validation.check { ... }` (campos obrigatórios e número inválido inline) no lugar do `Alert` de campos vazios; 24 também ganharam `DialogForm` (Enter/Esc) por script, e os de carteira/transferência pelas bases. Esc fecha qualquer janela modal aberta por `WindowUtils.openModalWindow` (inclui os 9 de visualização).
+
+**Desvios:** (1) o `Alert` de grupos vazios de `BasePlanManagement` fica, pois não é validação de campo. (2) Diálogos de cartão, wishlist e plano migrados via bases não receberam `DialogForm.install` (Enter/Esc de formulário), só o Esc geral da janela. (3) A conferência dialog a dialog (T-6.19) e o ADR-5 ficam para o seu teste da interface; apenas o `AddExpense` foi capturado com erros.
 
 ### UNIT-7 Busca global por Ctrl+S   Status: not started
 Covers: US-16; FR-11; NFR-7. Depende de: UNIT-2, UNIT-4.

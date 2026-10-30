@@ -102,17 +102,16 @@ class EditTransactionController(
         val category = categoryComboBox.value
         val transactionDate = transactionDatePicker.value
 
-        if (wallet == null ||
-            type == null ||
-            transactionValueString == null ||
-            status == null ||
-            category == null ||
-            transactionDate == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(typeComboBox)
+                required(transactionValueField)
+                required(statusComboBox)
+                required(categoryComboBox)
+                required(transactionDatePicker)
+                number(transactionValueField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

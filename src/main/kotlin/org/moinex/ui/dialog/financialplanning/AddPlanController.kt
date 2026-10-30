@@ -16,6 +16,7 @@ import javafx.scene.control.ToggleGroup
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BudgetGroupTransactionFilter
 import org.moinex.model.financialplanning.BudgetGroup
@@ -33,6 +34,8 @@ class AddPlanController(
     springContext: ConfigurableApplicationContext,
     preferencesService: PreferencesService,
 ) : BasePlanManagement(financialPlanningService, springContext, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var templateToggleGroup: ToggleGroup
 
@@ -91,11 +94,13 @@ class AddPlanController(
     override fun handleSave() {
         val formData = getFieldsFromInterface()
 
-        if (!formData.isValid()) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(planNameField)
+                required(baseIncomeField)
+                number(baseIncomeField)
+                required(startDatePicker)
+            }
+        ) {
             return
         }
 

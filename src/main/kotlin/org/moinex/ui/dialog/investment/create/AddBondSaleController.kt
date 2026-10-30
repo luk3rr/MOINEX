@@ -16,6 +16,7 @@ import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.toRounded
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
@@ -42,6 +43,8 @@ class AddBondSaleController(
         bondService,
         preferencesService,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var netProfitField: TextField
 
@@ -113,18 +116,18 @@ class AddBondSaleController(
         val taxesStr = taxesField.text
         val saleDate = transactionDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            unitPriceStr.isNullOrBlank() ||
-            quantityStr.isNullOrBlank() ||
-            saleDate == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(descriptionField)
+                required(statusComboBox)
+                required(categoryComboBox)
+                required(unitPriceField)
+                number(unitPriceField)
+                required(quantityField)
+                number(quantityField)
+                required(transactionDatePicker)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.BOND_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

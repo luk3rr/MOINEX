@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.dto.WalletTransactionContextDTO
 import org.moinex.model.investment.Dividend
@@ -41,6 +42,8 @@ class AddDividendController(
         preferencesService,
         springContext,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     override fun handleSave() {
         val wallet = walletComboBox.value
@@ -50,17 +53,16 @@ class AddDividendController(
         val category = categoryComboBox.value
         val dividendDate = dividendDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            dividendValueString.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            dividendDate == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(descriptionField)
+                required(dividendValueField)
+                required(statusComboBox)
+                required(categoryComboBox)
+                required(dividendDatePicker)
+                number(dividendValueField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 

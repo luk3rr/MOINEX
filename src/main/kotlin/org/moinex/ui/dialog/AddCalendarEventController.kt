@@ -15,6 +15,8 @@ import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.DialogForm
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.CalendarEvent
@@ -28,6 +30,8 @@ class AddCalendarEventController(
     private val calendarService: CalendarService,
     private val preferencesService: PreferencesService,
 ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     private lateinit var titleField: TextField
 
@@ -45,6 +49,8 @@ class AddCalendarEventController(
         configureComboBoxes()
         UIUtils.setDatePickerFormat(datePicker)
         populateComboBoxes()
+
+        DialogForm.install(titleField, titleField, ::handleSave, ::handleCancel)
     }
 
     @FXML
@@ -59,11 +65,12 @@ class AddCalendarEventController(
         val eventDate = datePicker.value
         val description = descriptionTextArea.text
 
-        if (eventTitle.isEmpty() || eventDate == null || eventType == null) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.WALLETTRANSACTION_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(titleField)
+                required(datePicker)
+                required(typeComboBox)
+            }
+        ) {
             return
         }
 

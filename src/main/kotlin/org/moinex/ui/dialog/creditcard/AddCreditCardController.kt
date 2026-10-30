@@ -11,6 +11,7 @@ package org.moinex.ui.dialog.creditcard
 import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.creditcard.CreditCard
 import org.moinex.service.PreferencesService
@@ -26,15 +27,22 @@ class AddCreditCardController(
     walletService: WalletService,
     private val preferencesService: PreferencesService,
 ) : BaseCreditCardManagement(creditCardService, walletService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     @FXML
     override fun handleSave() {
         val formData = getFieldsFromInterface()
 
-        if (!formData.isValid()) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.CREDITCARD_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(nameField)
+                required(limitField)
+                number(limitField)
+                required(lastFourDigitsField)
+                required(operatorComboBox)
+                required(closingDayComboBox)
+                required(dueDayComboBox)
+            }
+        ) {
             return
         }
 

@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException
 import javafx.fxml.FXML
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.financialplanning.BudgetGroup
 import org.moinex.model.financialplanning.FinancialPlan
@@ -27,6 +28,8 @@ class EditPlanController(
     applicationContext: ConfigurableApplicationContext,
     preferencesService: PreferencesService,
 ) : BasePlanManagement(financialPlanningService, applicationContext, preferencesService) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     private lateinit var financialPlan: FinancialPlan
 
     fun setPlan(plan: FinancialPlan) {
@@ -44,11 +47,13 @@ class EditPlanController(
     override fun handleSave() {
         val formData = getFieldsFromInterface()
 
-        if (!formData.isValid()) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.FINANCIALPLANNING_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
+        if (!validation.check {
+                required(planNameField)
+                required(baseIncomeField)
+                number(baseIncomeField)
+                required(startDatePicker)
+            }
+        ) {
             return
         }
 

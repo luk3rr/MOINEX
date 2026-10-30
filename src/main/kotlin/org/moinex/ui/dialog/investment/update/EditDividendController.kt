@@ -13,6 +13,7 @@ import javafx.fxml.FXML
 import javafx.stage.Stage
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isEqual
+import org.moinex.common.ui.FieldValidation
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.investment.Dividend
 import org.moinex.service.CalculatorService
@@ -41,6 +42,8 @@ class EditDividendController(
         preferencesService,
         springContext,
     ) {
+    private val validation = FieldValidation(preferencesService::translate)
+
     private lateinit var dividend: Dividend
 
     fun setDividend(d: Dividend) {
@@ -66,17 +69,16 @@ class EditDividendController(
         val category = categoryComboBox.value
         val dividendDate = dividendDatePicker.value
 
-        if (wallet == null ||
-            description.isNullOrBlank() ||
-            dividendValueString.isNullOrBlank() ||
-            status == null ||
-            category == null ||
-            dividendDate == null
+        if (!validation.check {
+                required(walletComboBox)
+                required(descriptionField)
+                required(dividendValueField)
+                required(statusComboBox)
+                required(categoryComboBox)
+                required(dividendDatePicker)
+                number(dividendValueField)
+            }
         ) {
-            WindowUtils.showInformationDialog(
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_TITLE),
-                preferencesService.translate(TranslationKeys.INVESTMENT_DIALOG_EMPTY_FIELDS_MESSAGE),
-            )
             return
         }
 
