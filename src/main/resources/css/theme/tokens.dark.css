@@ -22,9 +22,6 @@
     theme-bg-hover:         #44475A;
     theme-bg-pressed:       #6272A4;
     theme-bg-disabled:      #44475A;
-    theme-bg-header:        #44475A;
-    theme-bg-row-alt:       #373945;
-    theme-bg-table:         #282A36;
     theme-bg-sidebar:       #0a614e;
     theme-bg-sidebar-hover: #106e5b;
     theme-bg-pane:          #383a52;   /* pane cards — visually distinct from base  */
@@ -42,16 +39,12 @@
     /* ── Borders ─────────────────────────────────────────── */
     theme-border:          #44475A;
     theme-border-disabled: #7A82A0;
-    theme-border-light:    #44475A;
 
     /* ── Grid / Separators ───────────────────────────────── */
-    theme-separator: #44475A;
 
     /* ── Controls ────────────────────────────────────────── */
-    theme-arrow:           #6272A4;
     theme-check-box-hover: #44475A;
     theme-tooltip-bg:      #44475A;
-    theme-table-selection: #6272A4;
 
     /* ── Charts ──────────────────────────────────────────── */
     theme-chart-bg:         #282A36;

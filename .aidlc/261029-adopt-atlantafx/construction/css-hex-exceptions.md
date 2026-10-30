@@ -16,3 +16,7 @@ Contagem por arquivo de ocorrências de hexadecimal, `rgb(a)` ou cor nomeada for
 **Convertidos na UNIT-3:** `css/scene/wallet.css` (duas cores de barra, agora `theme-negative` e `theme-positive`) e `css/component/progress-bar.css` (hexadecimais e gradientes fixos, agora tokens).
 
 **Exceção aprovada:** sombras neutras `dropshadow(..., rgba(0, 0, 0, α), ...)`, que não pertencem a uma paleta de tema.
+
+**Exceção aprovada (UNIT-14):** o véu do overlay de busca, `rgba(0, 0, 0, 0.45)` em `scene/main.css`, é uma sobreposição neutra, como as sombras.
+
+**Estado final (UNIT-14):** a busca por hexadecimal, `rgba()` e `white`/`black` em `css/` e `ui/` deixa apenas as duas exceções acima, e `timeline-chart.css` usa `theme-tooltip-bg`.

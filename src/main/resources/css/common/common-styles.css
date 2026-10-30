@@ -138,3 +138,7 @@
 .chart-legend .label {
   -fx-text-fill: theme-chart-legend;
 }
+
+.metric-accent {
+  -fx-text-fill: theme-accent-text;
+}

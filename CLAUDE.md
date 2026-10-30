@@ -37,7 +37,7 @@ The ktlint engine is kept on 1.4.1 and the `kotlin-compiler-embeddable` of the `
 
 ## Architecture
 
-MOINEX is a personal finance desktop app built with **Spring Boot + JavaFX**. The stack: Kotlin, Spring Data JPA, SQLite (WAL, single connection via HikariCP), Flyway migrations, JavaFX + JFoenix UI, and kotlinx-coroutines for async work.
+MOINEX is a personal finance desktop app built with **Spring Boot + JavaFX**. The stack: Kotlin, Spring Data JPA, SQLite (WAL, single connection via HikariCP), Flyway migrations, JavaFX UI themed with AtlantaFX (Dracula dark, PrimerLight light) plus Ikonli icons, and kotlinx-coroutines for async work.
 
 **Layers:**
 
@@ -52,6 +52,7 @@ UI (JavaFX controllers/FXML)  →  Service (@Service beans)  →  Repository (Sp
 - **`org.moinex.model`** — JPA entities, enums (27 types), DTOs for computed values
 - **`org.moinex.ui`** — JavaFX controllers and dialogs (~105 files + 89 FXML resources)
 - **`org.moinex.common`** — cross-cutting utilities: `APIUtils` (Python process runner), `FxUtils`, `RetryPolicy`, custom chart components
+- **Theme** — `service/ThemeService` sets the AtlantaFX base theme and applies `css/theme/base.css` plus `tokens.{dark,light}.css` to every window. Colors in CSS and FXML come only from the `theme-*` tokens (the palette lives in the token files); code-drawn colors live in `common/ui/ThemeColors.kt`. Icons are `FontIcon` literals from `common/ui/Icons.kt` (`app-icon` + `icon-size-N` classes). Only shadows and overlay scrims may use `rgba(0,0,0,α)`.
 
 ## Python Script Integration
 

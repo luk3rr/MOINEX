@@ -28,3 +28,7 @@ Medido por `scripts/measure-startup.sh 5`: o script sobe o jar com um `user.home
 - A sidebar fica **recolhida só com ícones** por padrão (o botão de menu expande); o mockup mostra a versão expandida com rótulos.
 - No tema claro a sidebar é um teal claro (`#1ABC9C`, hover `#48C9B0`) com ícones escuros; no escuro é `#0A614E`. O contraste de texto branco sobre `#1ABC9C` seria 2,26:1 (reprova); com texto `#1F2328` é 6,56:1.
 - O chat de IA aparece sem mensagens (conversa vazia).
+
+## Medição final (UNIT-14, 2026-10-30)
+
+Cinco execuções com `scripts/measure-startup.sh 5`: 8,38 · 8,31 · 8,14 · 8,00 · 8,02 s. **Média: 8,17 s**, abaixo do limite de 9,31 s (+20% sobre a base de 7,76 s). Medido com banco novo, como na base.

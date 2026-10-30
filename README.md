@@ -58,7 +58,7 @@ mensais e a exibição de gráficos, proporcionando uma visão clara da saúde f
 
 - **Linguagem:** Kotlin 2.4.21
 - **Backend:** Spring Boot 4.1, Spring Data JPA
-- **Interface Gráfica:** JavaFX 27
+- **Interface Gráfica:** JavaFX 27 com tema AtlantaFX 3 (Dracula e PrimerLight) e ícones Ikonli (Material)
 - **Base de Dados:** SQLite com Flyway para migrações
 - **Build:** Gradle com Kotlin DSL
 - **Testes:** Kotest

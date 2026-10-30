@@ -205,8 +205,8 @@
 }
 
 .chart-tooltip {
-    -fx-background-color: rgba(0, 0, 0, 0.8);
-    -fx-text-fill: white;
+    -fx-background-color: theme-tooltip-bg;
+    -fx-text-fill: theme-toast-title;
     -fx-padding: 5px 10px;
     -fx-background-radius: 5px;
     -fx-font-size: 11px;

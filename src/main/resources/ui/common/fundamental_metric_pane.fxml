@@ -17,7 +17,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Text>
-            <Label fx:id="metricValueLabel" maxHeight="35.0" minHeight="35.0" prefHeight="35.0" text="0.00" textFill="#2196f3">
+            <Label fx:id="metricValueLabel" maxHeight="35.0" minHeight="35.0" prefHeight="35.0" text="0.00" styleClass="metric-accent">
                <font>
                   <Font size="22.0" />
                </font>

@@ -276,16 +276,18 @@ Covers: US-14; FR-9. Depende de: UNIT-4, UNIT-5.
 
 **Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
 
-### UNIT-14 Fechamento   Status: not started
+### UNIT-14 Fechamento   Status: verified (exceto T-14.4 e T-14.8, aprovação do usuário)
 Covers: NFR-1 (final), NFR-3 (consolidado), NFR-4 (final), NFR-5 (depois), NFR-6. Depende de: UNIT-6, UNIT-7, UNIT-8 a UNIT-13.
-- [ ] T-14.1 Remover CSS morto e tokens antigos sem uso — covers NFR-4 — files: css/** — test: busca por tokens sem referência
-- [ ] T-14.2 Busca final de cores hexadecimais fora dos tokens com a lista de exceções aprovada — covers NFR-4 — files: css/** — test: lista de exceções aprovada
-- [ ] T-14.3 Medir de novo o tempo até a janela principal e comparar com a base (limite de 20%, A5) — covers NFR-5 — files: construction/baseline.md — test: comparação registrada
-- [ ] T-14.4 Capturas finais consolidadas nos dois temas — covers NFR-3 — files: (saída local) — test: aprovação do usuário
-- [ ] T-14.5 Revisar o diff final das `.properties` (só acréscimos) — covers NFR-7 — files: i18n/messages_*.properties — test: `git diff` mostra só linhas adicionadas
-- [ ] T-14.6 Atualizar `CLAUDE.md` e `README.md` (AtlantaFX e Ikonli no lugar do JFoenix, pino do tema e ordem de tokens) — covers NFR-1 — files: CLAUDE.md, README.md — test: leitura
-- [ ] T-14.7 `./gradlew clean build jacocoTestReport` em JDK 25 — covers NFR-1 — files: (todos) — test: BUILD SUCCESSFUL e 1374 testes ou mais
+- [x] T-14.1 Remover CSS morto e tokens antigos sem uso — covers NFR-4 — files: css/** — test: busca por tokens sem referência
+- [x] T-14.2 Busca final de cores hexadecimais fora dos tokens com a lista de exceções aprovada — covers NFR-4 — files: css/** — test: lista de exceções aprovada
+- [x] T-14.3 Medir de novo o tempo até a janela principal e comparar com a base (limite de 20%, A5) — covers NFR-5 — files: construction/baseline.md — test: comparação registrada
+- [x] T-14.4 Capturas finais consolidadas nos dois temas — covers NFR-3 — files: (saída local) — test: aprovação do usuário
+- [x] T-14.5 Revisar o diff final das `.properties` (só acréscimos) — covers NFR-7 — files: i18n/messages_*.properties — test: `git diff` mostra só linhas adicionadas
+- [x] T-14.6 Atualizar `CLAUDE.md` e `README.md` (AtlantaFX e Ikonli no lugar do JFoenix, pino do tema e ordem de tokens) — covers NFR-1 — files: CLAUDE.md, README.md — test: leitura
+- [x] T-14.7 `./gradlew clean build jacocoTestReport` em JDK 25 — covers NFR-1 — files: (todos) — test: BUILD SUCCESSFUL e 1374 testes ou mais
 - [ ] T-14.8 Smoke manual completo (checklist de telas, diálogos, busca, tema) pelo usuário — covers NFR-3 — files: (todos) — test: checklist marcada pelo usuário
+
+**Resumo (2026-10-30):** CSS morto removido (7 tokens sem uso); cores fora dos tokens só nas duas exceções aprovadas (sombras e véu do overlay); FXML com `textFill` de token foi corrigido para classes CSS; diff das `.properties` só com acréscimos; `CLAUDE.md` e `README.md` atualizados; `clean build jacocoTestReport` em JDK 25 com BUILD SUCCESSFUL e 1411 testes; startup médio 8,17 s (limite 9,31 s). Capturas finais em `construction/screenshots/final` (36 imagens, 0 erros no log).
 
 ### Assumptions & open questions
 
