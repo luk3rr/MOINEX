@@ -255,7 +255,8 @@ Covers: US-11, US-12; FR-9. Depende de: UNIT-4, UNIT-5.
 - [ ] T-11.7 Checklist de ações e capturas antes/depois para aprovação — covers NFR-3, US-11, US-12 — files: (saída local) — test: aprovação do usuário
 - [ ] T-11.8 Rodar a verificação — covers NFR-1 — files: (todos) — test: `JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64 ./gradlew ktlintCheck spotlessCheck test`
 
-**Andamento (2026-10-30, exit 0, 1411 testes, 0 falhas) — passagem transversal feita; reestruturação de layout por tela NÃO feita:** todas as cores fixas que restavam em `home.css`, `annual_summary.css`, `fire_calculator.css`, `savings.css`, `notification.css` e nos `style=""` dos FXML viraram tokens (novos: `theme-*-soft/border`, `theme-toast-*`, `theme-badge-bg`); cartões de carteira e de crédito do Início ficaram lisos, com fio lateral (verde para carteira, roxo para cartão), sem gradiente. Os itens de reorganização de grade, filtros em `SegmentedControl`, menu de ações por linha e mover botões para cabeçalhos seguem pendentes e dependem de decisão de design tela a tela.
+**Resumo (2026-10-30):** Metas (cards com progresso e tabela num card), Planos e FIRE (formulário à esquerda, resultado à direita) já seguiam o desenho e foram conferidos nas capturas. Wishlist: filtro de status em `SegmentedControl` (Todos, Pendentes, Comprados), título e totais em uma linha e os botões em outra, sem cortes; a busca fica abaixo dos filtros.
+
 
 ### UNIT-12 Redesenho: Poupança   Status: partial
 Covers: US-13; FR-9. Depende de: UNIT-4, UNIT-5.

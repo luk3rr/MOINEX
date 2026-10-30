@@ -6,6 +6,9 @@
 
 package org.moinex.ui.main
 
+import atlantafx.base.controls.SegmentedControl
+import atlantafx.base.controls.ToggleLabel
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
@@ -72,7 +75,8 @@ class WishlistController(
     private lateinit var wishlistTableView: TableView<WishlistItem>
 
     @FXML
-    private lateinit var statusFilterComboBox: ComboBox<String>
+    private lateinit var statusFilterControl: SegmentedControl
+    private val statusLabels = mutableListOf<ToggleLabel>()
 
     @FXML
     private lateinit var categoryFilterComboBox: ComboBox<Category>
@@ -98,6 +102,7 @@ class WishlistController(
 
     companion object {
         const val WISHLIST_TIMELINE_CHART_STYLE_CLASS: String = "wishlist-timeline-chart"
+        private const val STATUS_PENDING_INDEX = 1
     }
 
     @FXML
@@ -540,7 +545,7 @@ class WishlistController(
         }
 
     private fun configureFilters() {
-        statusFilterComboBox.setOnAction {
+        statusFilterControl.toggleGroup.selectedToggleProperty().addListener { _, _, _ ->
             applyFilters()
             updateSummary()
             updateTableView()
@@ -562,12 +567,17 @@ class WishlistController(
     }
 
     private fun populateFilterComboBoxes() {
-        statusFilterComboBox.items.setAll(
-            preferencesService.translate(TranslationKeys.WISHLIST_FILTER_ALL),
-            preferencesService.translate(TranslationKeys.WISHLIST_FILTER_PENDING),
-            preferencesService.translate(TranslationKeys.WISHLIST_FILTER_PURCHASED),
-        )
-        statusFilterComboBox.value = preferencesService.translate(TranslationKeys.WISHLIST_FILTER_PENDING)
+        statusLabels.clear()
+        statusLabels +=
+            listOf(
+                TranslationKeys.WISHLIST_FILTER_ALL,
+                TranslationKeys.WISHLIST_FILTER_PENDING,
+                TranslationKeys.WISHLIST_FILTER_PURCHASED,
+            ).map { ToggleLabel(preferencesService.translate(it)) }
+        statusLabels.forEach { it.toggleGroup = statusFilterControl.toggleGroup }
+        statusFilterControl.segments.setAll(statusLabels)
+        statusFilterControl.toggleGroup.selectToggle(statusLabels[STATUS_PENDING_INDEX])
+        Platform.runLater { statusFilterControl.toggleGroup.selectToggle(statusLabels[STATUS_PENDING_INDEX]) }
 
         categoryFilterComboBox.items.add(null)
         categoryFilterComboBox.items.addAll(categories)
@@ -575,13 +585,15 @@ class WishlistController(
         categoryFilterComboBox.value = null
     }
 
+    private fun selectedStatusLabel(): String? = (statusFilterControl.toggleGroup.selectedToggle as? ToggleLabel)?.text
+
     private fun loadItemsFromDatabase() {
         allItems.setAll(wishlistService.getAllItems())
         applyFilters()
     }
 
     private fun applyFilters() {
-        val statusFilter = statusFilterComboBox.value
+        val statusFilter = selectedStatusLabel()
         val categoryFilter = categoryFilterComboBox.value
         val searchText = searchField.text?.trim()?.lowercase() ?: ""
 
