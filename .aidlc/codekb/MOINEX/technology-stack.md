@@ -16,8 +16,8 @@ Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: high
 | PDFBox, OpenCSV | | importação de extratos [src: ai/ingest/] |
 | exp4j | | calculadora [src: build.gradle.kts] |
 | Python 3 + yfinance, requests, pandas, numpy | /usr/bin/python3 no Linux | cotações e indicadores [src: CLAUDE.md] |
-| Testes | Kotest BehaviorSpec, MockK, AssertJ, H2, JUnit5 (Mockito só transitivo via spring-boot-starter-test), MockK 1.14.11 | [src: build.gradle.kts] |
-| Qualidade | ktlint 14.0.1, Spotless 6.25.0, Jacoco, SonarCloud | [src: build.gradle.kts, sonar-project.properties] |
+| Testes | Kotest BehaviorSpec 6.1.4, MockK 1.14.11, AssertJ, H2, JUnit5 (Mockito só transitivo via spring-boot-starter-test) | [src: build.gradle.kts] |
+| Qualidade | ktlint (plugin 14.2.0, engine 1.4.1), Spotless 6.25.0 (sem bloco de configuração), JaCoCo 0.8.16, SonarCloud | [src: build.gradle.kts, sonar-project.properties] |
 | Empacote | scripts de instalador Windows (`jpackage`) | [src: build.gradle.kts:15, .github/workflows/build-windows-installer.yml] |
 
 Observações:

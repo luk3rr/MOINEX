@@ -1,6 +1,6 @@
 # Code structure — MOINEX
 
-Status: human-reviewed (2026-10-29) · Confidence: high
+Status: human-reviewed (2026-10-29, delta pós v2.19.0) · Confidence: high
 
 ## Mapa (profundidade ≤3)
 ```
