@@ -26,6 +26,7 @@ import javafx.scene.control.TableRow
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
@@ -34,6 +35,9 @@ import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isAfterOrEqual
 import org.moinex.common.extension.isBeforeOrEqual
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -70,9 +74,12 @@ class CreditCardController(
     private val categoryService: CategoryService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var totalDebtsInfoVBox: VBox
+
+    @FXML
+    private lateinit var debtsFilterGroup: HBox
 
     @FXML
     private lateinit var totalDebtsYearFilterComboBox: ComboBox<Year>
@@ -108,13 +115,49 @@ class CreditCardController(
     private var crcPaneCurrentPage = 0
 
     companion object {
+        private const val SEARCH_ICON_SPACE = 25.0
         private val logger = LoggerFactory.getLogger(CreditCardController::class.java)
         private const val PROJECTED_DEBT_STYLE = "-fx-opacity: 0.75; -fx-font-style: italic;"
     }
 
     @FXML
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(preferencesService.translate(TranslationKeys.CREDIT_CARD_BUTTON_ADD_DEBT)) { handleAddDebt() },
+            RowAction(
+                preferencesService.translate(TranslationKeys.CREDIT_CARD_BUTTON_ADD_CREDIT_CARD),
+            ) { handleAddCreditCard() },
+            RowAction(preferencesService.translate(TranslationKeys.CREDIT_CARD_BUTTON_RECURRING_DEBTS)) {
+                handleRecurringTransactions()
+            },
+            RowAction(preferencesService.translate(TranslationKeys.CREDIT_CARD_BUTTON_CREDIT_CARD_ARCHIVE)) {
+                handleViewArchivedCreditCards()
+            },
+        )
+
     fun initialize() {
         loadCreditCardsFromDatabase()
+        RowContextMenu.install(
+            debtsTableView,
+            listOf(
+                RowAction(
+                    preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_BUTTON_EDIT),
+                ) { handleEditDebt() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_BUTTON_REFUND),
+                ) { handleRefundDebt() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_BUTTON_DELETE),
+                ) { handleDeleteDebt() },
+                RowAction(preferencesService.translate(TranslationKeys.CREDIT_CARD_DEBTS_LIST_BUTTON_MATERIALIZE)) {
+                    handleMaterializeDebt()
+                },
+            ),
+        )
+        val searchWidth = debtsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        debtSearchField.prefWidthProperty().bind(searchWidth)
+        debtSearchField.minWidthProperty().bind(searchWidth)
+        debtSearchField.maxWidthProperty().bind(searchWidth)
 
         populateDebtsListMonthFilterComboBox()
         populateYearFilterComboBox()

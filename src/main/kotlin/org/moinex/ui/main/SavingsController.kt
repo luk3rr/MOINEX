@@ -12,6 +12,8 @@ import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import org.moinex.common.constant.Files
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
@@ -22,7 +24,7 @@ import org.springframework.stereotype.Controller
 class SavingsController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var tabPane: TabPane
 
@@ -39,6 +41,19 @@ class SavingsController(
         private val logger = LoggerFactory.getLogger(SavingsController::class.java)
     }
 
+    private var stocksFundsController: Any? = null
+    private var bondsController: Any? = null
+
+    override fun screenActions(): List<RowAction> {
+        val provider =
+            when {
+                stocksFundsTab.isSelected -> stocksFundsController
+                bondsTab.isSelected -> bondsController
+                else -> null
+            } as? ScreenActionProvider
+        return provider?.screenActions().orEmpty()
+    }
+
     @FXML
     fun initialize() {
         runCatching {
@@ -51,23 +66,25 @@ class SavingsController(
                 preferencesService.bundle,
             )
 
-            UIUtils.loadContentIntoTab(
-                stocksFundsTab,
-                Files.SAVINGS_STOCKS_FUNDS_FXML,
-                Files.SAVINGS_STOCKS_FUNDS_STYLE_SHEET,
-                springContext,
-                javaClass,
-                preferencesService.bundle,
-            )
+            stocksFundsController =
+                UIUtils.loadContentIntoTab(
+                    stocksFundsTab,
+                    Files.SAVINGS_STOCKS_FUNDS_FXML,
+                    Files.SAVINGS_STOCKS_FUNDS_STYLE_SHEET,
+                    springContext,
+                    javaClass,
+                    preferencesService.bundle,
+                )
 
-            UIUtils.loadContentIntoTab(
-                bondsTab,
-                Files.SAVINGS_BONDS_FXML,
-                Files.SAVINGS_BONDS_STYLE_SHEET,
-                springContext,
-                javaClass,
-                preferencesService.bundle,
-            )
+            bondsController =
+                UIUtils.loadContentIntoTab(
+                    bondsTab,
+                    Files.SAVINGS_BONDS_FXML,
+                    Files.SAVINGS_BONDS_STYLE_SHEET,
+                    springContext,
+                    javaClass,
+                    preferencesService.bundle,
+                )
         }.onFailure { e ->
             logger.error("Error loading content: '{}' - Cause: {}", e.message, e.cause, e)
         }

@@ -50,35 +50,6 @@
                   </HBox>
                </children>
             </AnchorPane>
-            <AnchorPane minHeight="45.0" prefHeight="45.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="NEVER">
-               <children>
-                  <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button fx:id="AddDebtButton" onAction="#handleAddDebt" text="%creditCard.button.addDebt">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Button fx:id="AddCreditCardButton" onAction="#handleAddCreditCard" text="%creditCard.button.addCreditCard">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-credit_card" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleRecurringTransactions" text="%transaction.button.periodicTransaction">
-                           <graphic>
-                              <FontIcon iconLiteral="mdmz-refresh" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Button onAction="#handleViewArchivedCreditCards" text="%creditCard.button.creditCardArchive">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-archive" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
             <AnchorPane minHeight="350.0" VBox.vgrow="ALWAYS">
                <children>
                   <HBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -93,38 +64,18 @@
                                              <children>
                                                 <Label fx:id="expensesTitle" styleClass="title" text="%creditCard.debtsList.title" />
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <ComboBox fx:id="debtsListMonthFilterComboBox" minWidth="150.0" />
-                                                <ComboBox fx:id="debtsListYearFilterComboBox" minWidth="150.0" />
+                                                <HBox fx:id="debtsFilterGroup" alignment="CENTER_RIGHT" spacing="10.0">
+                                                   <children>
+                                                      <ComboBox fx:id="debtsListMonthFilterComboBox" minWidth="150.0" />
+                                                      <ComboBox fx:id="debtsListYearFilterComboBox" minWidth="150.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                             <children>
-                                                <Button onAction="#handleEditDebt" text="%creditCard.debtsList.button.edit">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
-                                                               </graphic>
-                                                            </Button>
-                                                <Button onAction="#handleRefundDebt" text="%creditCard.debtsList.button.refund">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdmz-undo" styleClass="app-icon, icon-size-20" />
-                                                               </graphic>
-                                                            </Button>
-                                                <Button onAction="#handleDeleteDebt" text="%creditCard.debtsList.button.delete">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
-                                                               </graphic>
-                                                            </Button>
-                                                <Button onAction="#handleMaterializeDebt" text="%creditCard.debtsList.button.materialize">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-check" styleClass="app-icon, icon-size-20" />
-                                                               </graphic>
-                                                            </Button>
-                                             </children>
-                                          </HBox>
-                                          <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                          <HBox alignment="CENTER_RIGHT" spacing="5.0">
                                              <children>
                                                 <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
-                                                <TextField fx:id="debtSearchField" promptText="%creditCard.debtsList.searchPlaceholder" HBox.hgrow="ALWAYS" />
+                                                <TextField fx:id="debtSearchField" promptText="%creditCard.debtsList.searchPlaceholder" />
                                              </children>
                                           </HBox>
                                        </children>

@@ -25,6 +25,7 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.HBox
 import javafx.util.StringConverter
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
@@ -34,6 +35,9 @@ import org.moinex.common.extension.isBeforeOrEqual
 import org.moinex.common.extension.isConfirmed
 import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -71,7 +75,7 @@ class TransactionController(
     private val categoryService: CategoryService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var monthYearResumeView: AnchorPane
 
@@ -108,14 +112,49 @@ class TransactionController(
     @FXML
     private lateinit var transactionsSearchField: TextField
 
+    @FXML
+    private lateinit var transactionsFilterGroup: HBox
+
     companion object {
         private val logger = LoggerFactory.getLogger(TransactionController::class.java)
+        private const val SEARCH_ICON_SPACE = 25.0
         private const val DAYS_BEFORE_OFFSET = 30
     }
 
     @FXML
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(
+                preferencesService.translate(TranslationKeys.TRANSACTION_BUTTON_ADD_INCOME),
+            ) { handleAddIncome() },
+            RowAction(
+                preferencesService.translate(TranslationKeys.TRANSACTION_BUTTON_ADD_EXPENSE),
+            ) { handleAddExpense() },
+            RowAction(preferencesService.translate(TranslationKeys.TRANSACTION_BUTTON_PERIODIC_TRANSACTION)) {
+                handleRecurringTransactions()
+            },
+            RowAction(preferencesService.translate(TranslationKeys.TRANSACTION_BUTTON_MANAGE_CATEGORIES)) {
+                handleManageCategories()
+            },
+        )
+
     fun initialize() {
         configureTableView()
+        RowContextMenu.install(
+            transactionsTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.TRANSACTION_TRANSACTION_LIST_BUTTON_EDIT)) {
+                    handleEditTransaction()
+                },
+                RowAction(preferencesService.translate(TranslationKeys.TRANSACTION_TRANSACTION_LIST_BUTTON_DELETE)) {
+                    handleDeleteTransaction()
+                },
+            ),
+        )
+        val searchWidth = transactionsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        transactionsSearchField.prefWidthProperty().bind(searchWidth)
+        transactionsSearchField.minWidthProperty().bind(searchWidth)
+        transactionsSearchField.maxWidthProperty().bind(searchWidth)
 
         populateMonthYearResumeComboBoxes()
         populateYearComboBox()
@@ -157,7 +196,7 @@ class TransactionController(
     }
 
     @FXML
-    private fun handleAddIncome() {
+    fun handleAddIncome() {
         WindowUtils.openModalWindow(
             Files.ADD_INCOME_FXML,
             preferencesService.translate(
@@ -177,7 +216,7 @@ class TransactionController(
     }
 
     @FXML
-    private fun handleAddExpense() {
+    fun handleAddExpense() {
         WindowUtils.openModalWindow(
             Files.ADD_EXPENSE_FXML,
             preferencesService.translate(
@@ -346,7 +385,7 @@ class TransactionController(
     }
 
     @FXML
-    private fun handleRecurringTransactions() {
+    fun handleRecurringTransactions() {
         WindowUtils.openModalWindow(
             Files.RECURRING_TRANSACTIONS_FXML,
             preferencesService.translate(
@@ -366,7 +405,7 @@ class TransactionController(
     }
 
     @FXML
-    private fun handleManageCategories() {
+    fun handleManageCategories() {
         WindowUtils.openModalWindow(
             Files.MANAGE_CATEGORY_FXML,
             preferencesService.translate(

@@ -44,6 +44,7 @@ import org.moinex.common.extension.isPurchased
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -73,7 +74,7 @@ class WishlistController(
     private val chartFactory: ChartFactory,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var wishlistTableView: TableView<WishlistItem>
 
@@ -113,6 +114,11 @@ class WishlistController(
     }
 
     @FXML
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_ADD)) { handleAdd() },
+        )
+
     fun initialize() {
         configureTableView()
         RowContextMenu.install(
@@ -135,7 +141,7 @@ class WishlistController(
     }
 
     @FXML
-    private fun handleAdd() {
+    fun handleAdd() {
         WindowUtils.openModalWindow(
             Files.ADD_WISHLIST_ITEM_FXML,
             preferencesService.translate(TranslationKeys.WISHLIST_DIALOG_ADD_TITLE),

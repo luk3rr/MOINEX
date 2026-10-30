@@ -12,6 +12,8 @@ import javafx.fxml.FXML
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import org.moinex.common.constant.Files
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.UIUtils
 import org.moinex.service.PreferencesService
 import org.slf4j.LoggerFactory
@@ -22,9 +24,22 @@ import org.springframework.stereotype.Controller
 class GoalsPlansController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var tabPane: TabPane
+
+    private var goalController: Any? = null
+    private var wishlistController: Any? = null
+
+    override fun screenActions(): List<RowAction> {
+        val provider =
+            when {
+                goalsTab.isSelected -> goalController
+                wishlistTab.isSelected -> wishlistController
+                else -> null
+            } as? ScreenActionProvider
+        return provider?.screenActions().orEmpty()
+    }
 
     @FXML
     private lateinit var goalsTab: Tab
@@ -45,14 +60,15 @@ class GoalsPlansController(
     @FXML
     fun initialize() {
         runCatching {
-            UIUtils.loadContentIntoTab(
-                goalsTab,
-                Files.GOALS_FXML,
-                Files.GOALS_STYLE_SHEET,
-                springContext,
-                javaClass,
-                preferencesService.bundle,
-            )
+            goalController =
+                UIUtils.loadContentIntoTab(
+                    goalsTab,
+                    Files.GOALS_FXML,
+                    Files.GOALS_STYLE_SHEET,
+                    springContext,
+                    javaClass,
+                    preferencesService.bundle,
+                )
 
             UIUtils.loadContentIntoTab(
                 plansTab,
@@ -63,14 +79,15 @@ class GoalsPlansController(
                 preferencesService.bundle,
             )
 
-            UIUtils.loadContentIntoTab(
-                wishlistTab,
-                Files.WISHLIST_FXML,
-                Files.WISHLIST_STYLE_SHEET,
-                springContext,
-                javaClass,
-                preferencesService.bundle,
-            )
+            wishlistController =
+                UIUtils.loadContentIntoTab(
+                    wishlistTab,
+                    Files.WISHLIST_FXML,
+                    Files.WISHLIST_STYLE_SHEET,
+                    springContext,
+                    javaClass,
+                    preferencesService.bundle,
+                )
 
             UIUtils.loadContentIntoTab(
                 fireTab,

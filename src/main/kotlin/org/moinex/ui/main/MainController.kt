@@ -40,7 +40,6 @@ import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.Icons
-import org.moinex.common.ui.RowAction
 import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.NotificationService
@@ -131,7 +130,7 @@ class MainController(
     @FXML
     private lateinit var screenActionsButton: Button
 
-    private var currentScreenActions: List<RowAction> = emptyList()
+    private var currentScreenProvider: ScreenActionProvider? = null
 
     companion object {
         private val logger = LoggerFactory.getLogger(MainController::class.java)
@@ -274,9 +273,11 @@ class MainController(
 
     @FXML
     private fun handleOpenScreenActions() {
+        val actions = currentScreenProvider?.screenActions().orEmpty()
+        if (actions.isEmpty()) return
         val menu =
             ContextMenu(
-                *currentScreenActions
+                *actions
                     .map { action -> MenuItem(action.label).apply { setOnAction { action.run() } } }
                     .toTypedArray(),
             )
@@ -389,8 +390,8 @@ class MainController(
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
-            currentScreenActions = (loader.getController<Any>() as? ScreenActionProvider)?.screenActions().orEmpty()
-            screenActionsButton.isDisable = currentScreenActions.isEmpty()
+            currentScreenProvider = loader.getController<Any>() as? ScreenActionProvider
+            screenActionsButton.isDisable = currentScreenProvider == null
 
             newContent.stylesheets.add(
                 javaClass.getResource(styleSheet)!!.toExternalForm(),

@@ -14,11 +14,15 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
+import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.util.StringConverter
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.enums.BondType
@@ -42,7 +46,7 @@ class SavingsBondsController(
     private val bondService: BondService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var bondsTotalInvestedLabel: Text
 
@@ -74,13 +78,51 @@ class SavingsBondsController(
     private lateinit var bondsTabBondSearchField: TextField
 
     @FXML
+    private lateinit var bondsFilterGroup: HBox
+
+    @FXML
     private lateinit var bondsTabBondTypeComboBox: ComboBox<BondType>
 
     private val currentMonthInterestCache = mutableMapOf<Int, BigDecimal>()
     private val totalAccumulatedInterestCache = mutableMapOf<Int, BigDecimal>()
 
     @FXML
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_REGISTER_BOND),
+            ) { handleRegisterBond() },
+            RowAction(
+                preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_BOND_ARCHIVE),
+            ) { handleOpenBondArchive() },
+            RowAction(preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_SHOW_TRANSACTIONS)) {
+                handleShowBondTransactions()
+            },
+        )
+
     fun initialize() {
+        RowContextMenu.install(
+            bondsTabBondTable,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_EDIT)) { handleEditBond() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_DELETE),
+                ) { handleDeleteBond() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_BUY_BOND),
+                ) { handleBuyBond() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_SELL_BOND),
+                ) { handleSellBond() },
+                RowAction(preferencesService.translate(TranslationKeys.SAVINGS_BONDS_BUTTON_INTEREST_HISTORY)) {
+                    handleShowInterestHistory()
+                },
+            ),
+        )
+        val searchWidth = bondsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        bondsTabBondSearchField.prefWidthProperty().bind(searchWidth)
+        bondsTabBondSearchField.minWidthProperty().bind(searchWidth)
+        bondsTabBondSearchField.maxWidthProperty().bind(searchWidth)
         configureBondTableView()
         updateBondTableView()
         updateBondTabFields()
@@ -445,5 +487,9 @@ class SavingsBondsController(
 
         bondsTabBondTypeComboBox.valueProperty().addListener { _, _, _ -> updateBondTableView() }
         bondsTabBondSearchField.textProperty().addListener { _, _, _ -> updateBondTableView() }
+    }
+
+    companion object {
+        private const val SEARCH_ICON_SPACE = 25.0
     }
 }

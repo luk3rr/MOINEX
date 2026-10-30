@@ -22,11 +22,15 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.HBox
 import org.moinex.common.constant.Constants
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isZero
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
 import org.moinex.model.goal.Goal
@@ -53,7 +57,7 @@ class GoalController(
     private val walletService: WalletService,
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var inProgressPane1: AnchorPane
 
@@ -87,18 +91,39 @@ class GoalController(
     @FXML
     private lateinit var goalSearchField: TextField
 
+    @FXML
+    private lateinit var goalsFilterGroup: HBox
+
     private var goals: List<Goal> = emptyList()
     private var inProgressCurrentPage = 0
     private var accomplishedCurrentPage = 0
 
     companion object {
+        private const val SEARCH_ICON_SPACE = 25.0
         private val logger = LoggerFactory.getLogger(GoalController::class.java)
         private const val IN_PROGRESS_ITEMS_PER_PAGE = 2
         private const val ACCOMPLISHED_ITEMS_PER_PAGE = 2
     }
 
     @FXML
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_ADD_GOAL)) { handleAddGoal() },
+        )
+
     fun initialize() {
+        RowContextMenu.install(
+            goalTableView,
+            listOf(
+                RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_ADD_DEPOSIT)) { handleAddDeposit() },
+                RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_EDIT_GOAL)) { handleEditGoal() },
+                RowAction(preferencesService.translate(TranslationKeys.GOAL_BUTTON_DELETE_GOAL)) { handleDeleteGoal() },
+            ),
+        )
+        val searchWidth = goalsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        goalSearchField.prefWidthProperty().bind(searchWidth)
+        goalSearchField.minWidthProperty().bind(searchWidth)
+        goalSearchField.maxWidthProperty().bind(searchWidth)
         populateStatusComboBox()
         configureTableView()
         loadGoalsFromDatabase()
@@ -114,7 +139,7 @@ class GoalController(
     }
 
     @FXML
-    private fun handleAddGoal() {
+    fun handleAddGoal() {
         WindowUtils.openModalWindow(
             Files.ADD_GOAL_FXML,
             preferencesService.translate(TranslationKeys.GOAL_DIALOG_ADD_GOAL_TITLE),
@@ -132,7 +157,7 @@ class GoalController(
     }
 
     @FXML
-    private fun handleAddDeposit() {
+    fun handleAddDeposit() {
         val goal = goalTableView.selectionModel.selectedItem
 
         if (goal == null) {
@@ -178,7 +203,7 @@ class GoalController(
     }
 
     @FXML
-    private fun handleEditGoal() {
+    fun handleEditGoal() {
         val goal = goalTableView.selectionModel.selectedItem
 
         if (goal == null) {
@@ -210,7 +235,7 @@ class GoalController(
     }
 
     @FXML
-    private fun handleDeleteGoal() {
+    fun handleDeleteGoal() {
         val goal = goalTableView.selectionModel.selectedItem
 
         if (goal == null) {

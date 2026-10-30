@@ -22,6 +22,7 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextField
 import javafx.scene.image.ImageView
+import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.util.Duration
@@ -30,6 +31,9 @@ import org.kordamp.ikonli.javafx.FontIcon
 import org.moinex.common.constant.Files
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isValidForFundamentalAnalysis
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.FxUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -60,7 +64,7 @@ class SavingsStocksFundsController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
     private val notificationService: NotificationService,
-) {
+) : ScreenActionProvider {
     @FXML
     private lateinit var stocksFundsNetCapitalLabel: Text
 
@@ -92,6 +96,9 @@ class SavingsStocksFundsController(
     private lateinit var stocksFundsTabTickerSearchField: TextField
 
     @FXML
+    private lateinit var stocksFundsFilterGroup: HBox
+
+    @FXML
     private lateinit var stocksFundsTabTickerTypeComboBox: ComboBox<AssetType>
 
     @FXML
@@ -106,7 +113,52 @@ class SavingsStocksFundsController(
     private var updatePricesRotation: RotateTransition? = null
 
     @FXML
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_REGISTER_TICKER)) {
+                handleRegisterTicker()
+            },
+            RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_TICKER_ARCHIVE)) {
+                handleOpenTickerArchive()
+            },
+            RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_EXCHANGE_CRYPTOS)) {
+                handleAddCryptoExchange()
+            },
+            RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_SHOW_TRANSACTIONS)) {
+                handleShowTransactions()
+            },
+        )
+
     fun initialize() {
+        RowContextMenu.install(
+            stocksFundsTabTickerTable,
+            listOf(
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_EDIT),
+                ) { handleEditTicker() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_DELETE),
+                ) { handleDeleteTicker() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_BUY_TICKER),
+                ) { handleBuyTicker() },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_SELL_TICKER),
+                ) { handleSellTicker() },
+                RowAction(preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_ADD_DIVIDEND)) {
+                    handleAddDividend()
+                },
+                RowAction(
+                    preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_FUNDAMENTAL_ANALYSIS),
+                ) {
+                    handleViewFundamentalAnalysis()
+                },
+            ),
+        )
+        val searchWidth = stocksFundsFilterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        stocksFundsTabTickerSearchField.prefWidthProperty().bind(searchWidth)
+        stocksFundsTabTickerSearchField.minWidthProperty().bind(searchWidth)
+        stocksFundsTabTickerSearchField.maxWidthProperty().bind(searchWidth)
         configureTableView()
         populateTickerTypeComboBox()
 
@@ -635,5 +687,9 @@ class SavingsStocksFundsController(
             preferencesService.translate(TranslationKeys.SAVINGS_STOCKS_FUNDS_BUTTON_UPDATE_PRICES)
 
         isUpdatingPortfolioPrices = false
+    }
+
+    companion object {
+        private const val SEARCH_ICON_SPACE = 25.0
     }
 }

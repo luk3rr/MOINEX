@@ -2136,4 +2136,13 @@ object TranslationKeys {
     const val SEARCH_HINT_EXECUTE: String = "search.hint.execute"
     const val SEARCH_HINT_CLOSE: String = "search.hint.close"
     const val MAIN_SEARCH_HINT: String = "main.search.hint"
+    const val SAVINGS_STOCKS_FUNDS_BUTTON_FUNDAMENTAL_ANALYSIS: String =
+        "savings.stocksFunds.button.fundamentalAnalysis"
+    const val SAVINGS_BONDS_BUTTON_REGISTER_BOND: String = "savings.bonds.button.registerBond"
+    const val SAVINGS_BONDS_BUTTON_BOND_ARCHIVE: String = "savings.bonds.button.bondArchive"
+    const val SAVINGS_BONDS_BUTTON_SHOW_TRANSACTIONS: String = "savings.bonds.button.showTransactions"
+    const val SAVINGS_BONDS_BUTTON_EDIT: String = "savings.bonds.button.edit"
+    const val SAVINGS_BONDS_BUTTON_DELETE: String = "savings.bonds.button.delete"
+    const val SAVINGS_BONDS_BUTTON_BUY_BOND: String = "savings.bonds.button.buyBond"
+    const val SAVINGS_BONDS_BUTTON_SELL_BOND: String = "savings.bonds.button.sellBond"
 }

@@ -100,41 +100,13 @@
                                           <VBox prefWidth="100.0" HBox.hgrow="ALWAYS">
                                              <children>
                                                 <Label styleClass="title" text="%goal.title" />
-                                                <AnchorPane VBox.vgrow="ALWAYS">
-                                                   <children>
-                                                      <HBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                                                         <children>
-                                                            <Button onAction="#handleAddGoal" text="%goal.button.addGoal">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-flag" styleClass="app-icon, icon-size-16" />
-                                                               </graphic>
-                                                            </Button>
-                                                            <Button onAction="#handleAddDeposit" text="%goal.button.addDeposit">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
-                                                               </graphic>
-                                                            </Button>
-                                                            <Button onAction="#handleEditGoal" text="%goal.button.editGoal">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
-                                                               </graphic>
-                                                            </Button>
-                                                            <Button onAction="#handleDeleteGoal" text="%goal.button.deleteGoal">
-                                                               <graphic>
-                                                                  <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
-                                                               </graphic>
-                                                            </Button>
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </AnchorPane>
                                              </children>
                                           </VBox>
                                           <AnchorPane HBox.hgrow="ALWAYS">
                                              <children>
                                                 <VBox alignment="BOTTOM_RIGHT" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
-                                                      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                      <HBox fx:id="goalsFilterGroup" alignment="CENTER_RIGHT" maxWidth="200.0" spacing="10.0">
                                                          <children>
                                                             <VBox alignment="CENTER">
                                                                <children>
@@ -143,7 +115,7 @@
                                                                         <Font size="10.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <ComboBox fx:id="statusComboBox" minWidth="150.0" />
+                                                                  <ComboBox fx:id="statusComboBox" minWidth="200.0" prefWidth="200.0" maxWidth="200.0" />
                                                                </children>
                                                             </VBox>
                                                          </children>
@@ -151,7 +123,7 @@
                                                       <HBox alignment="CENTER_RIGHT" spacing="5.0">
                                                          <children>
                                                             <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
-                                                            <TextField fx:id="goalSearchField" maxWidth="400.0" promptText="%goal.searchPlaceholder" HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="goalSearchField" promptText="%goal.searchPlaceholder" />
                                                          </children>
                                                       </HBox>
                                                    </children>

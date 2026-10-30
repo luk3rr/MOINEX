@@ -473,7 +473,7 @@ class UIUtils(
             springContext: ConfigurableApplicationContext,
             resourceClass: Class<*>,
             resources: ResourceBundle? = null,
-        ) {
+        ): Any? {
             val loader = FXMLLoader(resourceClass.getResource(fxmlPath), resources)
             loader.setControllerFactory { springContext.getBean(it) }
             val content = loader.load<Parent>()
@@ -485,6 +485,7 @@ class UIUtils(
 
             springContext.getBean<ThemeService>().applyIconsTo(content)
             tab.content = content
+            return loader.getController<Any>()
         }
 
         fun <S, T> alignTableColumn(
