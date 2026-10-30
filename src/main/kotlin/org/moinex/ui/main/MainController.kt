@@ -17,10 +17,13 @@ import javafx.animation.TranslateTransition
 import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
+import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.ContentDisplay
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.Label
+import javafx.scene.control.MenuItem
 import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
@@ -37,6 +40,8 @@ import org.moinex.common.constant.Styles
 import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.setAnchorPaneConstraints
 import org.moinex.common.ui.Icons
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.WindowUtils
 import org.moinex.service.NotificationService
 import org.moinex.service.PreferencesService
@@ -122,6 +127,11 @@ class MainController(
     private lateinit var notificationCenterController: NotificationCenterController
     private lateinit var toastOverlay: NotificationToastOverlay
     private lateinit var globalSearch: GlobalSearch
+
+    @FXML
+    private lateinit var screenActionsButton: Button
+
+    private var currentScreenActions: List<RowAction> = emptyList()
 
     companion object {
         private val logger = LoggerFactory.getLogger(MainController::class.java)
@@ -263,6 +273,17 @@ class MainController(
     }
 
     @FXML
+    private fun handleOpenScreenActions() {
+        val menu =
+            ContextMenu(
+                *currentScreenActions
+                    .map { action -> MenuItem(action.label).apply { setOnAction { action.run() } } }
+                    .toTypedArray(),
+            )
+        menu.show(screenActionsButton, Side.TOP, 0.0, 0.0)
+    }
+
+    @FXML
     private fun handleOpenSearch() {
         globalSearch.open()
     }
@@ -368,6 +389,8 @@ class MainController(
                 )
             loader.setControllerFactory { springContext.getBean(it) }
             val newContent = loader.load<Parent>()
+            currentScreenActions = (loader.getController<Any>() as? ScreenActionProvider)?.screenActions().orEmpty()
+            screenActionsButton.isDisable = currentScreenActions.isEmpty()
 
             newContent.stylesheets.add(
                 javaClass.getResource(styleSheet)!!.toExternalForm(),

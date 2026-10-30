@@ -106,3 +106,16 @@
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
 }
+
+/* ── Filter bar: segmented filter and combo boxes share one height ─────────── */
+.filter-segment > .root-container > .labels {
+  -fx-padding: 2px;
+}
+
+.filter-segment > .root-container > .labels > .toggle-label {
+  -fx-padding: 6px 12px;
+}
+
+.filter-control {
+  -fx-pref-height: 34px;
+}

@@ -297,3 +297,9 @@ Covers: NFR-1 (final), NFR-3 (consolidado), NFR-4 (final), NFR-5 (depois), NFR-6
 
 - A3, A4, A11, A13, A14, A15, A16, A18 e A19 são respondidas nas tarefas indicadas (UNIT-1, UNIT-2, UNIT-4 e UNIT-6); as respostas atualizam o `state.md` e os ADRs.
 - Total: 133 tarefas em 14 Units.
+
+## Ajustes de decisão (2026-10-30)
+- Ações por linha: clique direito na linha, não coluna com botão (ADR-7). Aplicado à Wishlist; T-11.5 e T-12.4/T-12.5 seguem esta decisão.
+- Faixa central de botões: removida nas telas; ações gerais num botão "+" no rodapé, à esquerda (ADR-7). Piloto em Carteiras antes das demais.
+- Filtros acima da barra de busca, títulos acima dos filtros, busca com a largura do conjunto de filtros, botões de ação na linha da busca.
+

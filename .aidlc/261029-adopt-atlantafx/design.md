@@ -873,3 +873,11 @@ Caption: um único ponto (o listener) cobre toda janela, inclusive a do `Alert`,
 
 NFR-2 (contraste) é validado pelo `ThemeContrastTest`; desempenho (NFR-5) é medido só na UNIT-14. Não há infraestrutura nova.
 
+
+#### ADR-7 Ações por linha: clique direito na linha, e ações de tela num botão "+" no rodapé — Status: accepted (2026-10-30, decisão do usuário)
+- **Contexto:** as tabelas tinham uma fileira de botões de ação acima da busca, e a faixa central de botões ocupava espaço vertical (Carteiras, Transações, Cartões, Ações e fundos). Os botões ficavam cortados ou desalinhados da busca.
+- **Decisão:** (a) ações específicas de uma linha ficam num menu aberto com clique direito sobre a linha, que mostra só as opções disponíveis; a tabela não tem mais coluna de botão. (b) As ações gerais da tela saem da faixa central e ficam num botão "+" no rodapé, à esquerda dos demais botões do rodapé, que abre um menu com as ações da tela. (c) As mesmas ações entram na busca Ctrl+S.
+- **Escopo:** Wishlist (linhas) já aplicada; Carteiras (faixa central → "+") como piloto; demais telas depois da aprovação do piloto.
+- **Consequências:** A12 fica substituído por esta decisão para Poupança (menu de linha agora é clique direito, não coluna). O Ctrl+S passa a listar ações específicas das telas além das já existentes.
+- **Relacionado:** FR-9, US-8, US-11, US-12, US-13, A12.
+

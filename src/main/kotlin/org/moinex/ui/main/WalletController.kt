@@ -34,6 +34,8 @@ import org.moinex.common.extension.isExpense
 import org.moinex.common.extension.isIncome
 import org.moinex.common.extension.isPending
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.ScreenActionProvider
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -72,7 +74,17 @@ class WalletController(
     private val springContext: ConfigurableApplicationContext,
     private val preferencesService: PreferencesService,
     private val chartFactory: ChartFactory,
-) {
+) : ScreenActionProvider {
+    override fun screenActions(): List<RowAction> =
+        listOf(
+            RowAction(preferencesService.translate(TranslationKeys.WALLET_BUTTON_ADD_WALLET)) { handleAddWallet() },
+            RowAction(preferencesService.translate(TranslationKeys.WALLET_BUTTON_ADD_TRANSFER)) { handleAddTransfer() },
+            RowAction(preferencesService.translate(TranslationKeys.WALLET_BUTTON_TRANSFERS)) { handleViewTransfers() },
+            RowAction(preferencesService.translate(TranslationKeys.WALLET_BUTTON_WALLET_ARCHIVE)) {
+                handleViewArchivedWallets()
+            },
+        )
+
     @FXML
     private lateinit var walletPane1: AnchorPane
 
@@ -156,7 +168,7 @@ class WalletController(
     }
 
     @FXML
-    private fun handleAddTransfer() {
+    fun handleAddTransfer() {
         WindowUtils.openModalWindow(
             Files.ADD_TRANSFER_FXML,
             preferencesService.translate(
@@ -178,7 +190,7 @@ class WalletController(
     }
 
     @FXML
-    private fun handleAddWallet() {
+    fun handleAddWallet() {
         WindowUtils.openModalWindow(
             Files.ADD_WALLET_FXML,
             preferencesService.translate(
@@ -200,7 +212,7 @@ class WalletController(
     }
 
     @FXML
-    private fun handleViewArchivedWallets() {
+    fun handleViewArchivedWallets() {
         WindowUtils.openModalWindow(
             Files.ARCHIVED_WALLETS_FXML,
             preferencesService.translate(
@@ -222,7 +234,7 @@ class WalletController(
     }
 
     @FXML
-    private fun handleViewTransfers() {
+    fun handleViewTransfers() {
         WindowUtils.openModalWindow(
             Files.TRANSFERS_FXML,
             preferencesService.translate(

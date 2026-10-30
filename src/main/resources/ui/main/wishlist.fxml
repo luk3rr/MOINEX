@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -39,101 +40,72 @@
                      <children>
                         <VBox spacing="10.0">
                            <children>
-                              <VBox prefWidth="100.0" HBox.hgrow="ALWAYS">
+                              <HBox alignment="BOTTOM_LEFT" spacing="20.0">
                                  <children>
                                     <Label styleClass="title" text="%wishlist.title" />
-                                    <AnchorPane minHeight="70.0" VBox.vgrow="ALWAYS">
+                                    <Label fx:id="itemCountLabel" text="0 items">
+                                       <font>
+                                          <Font size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="totalValueLabel" text="Total: $ 0.00">
+                                       <font>
+                                          <Font size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <HBox fx:id="filterGroup" alignment="BOTTOM_LEFT" spacing="10.0">
                                        <children>
-                                          <HBox alignment="BOTTOM_LEFT" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                          <VBox spacing="4.0">
                                              <children>
-                                                <HBox alignment="BOTTOM_LEFT" spacing="10.0">
-                                                   <children>
-                                                      <Button minWidth="100.0" onAction="#handleAdd" text="%wishlist.button.add">
-                                                         <graphic>
-                                                            <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
-                                                         </graphic>
-                                                      </Button>
-                                                      <Button minWidth="100.0" onAction="#handleViewDetails" text="%wishlist.button.viewDetails">
-                                                         <graphic>
-                                                            <FontIcon iconLiteral="mdal-info" styleClass="app-icon, icon-size-20" />
-                                                         </graphic>
-                                                      </Button>
-                                                      <Button minWidth="120.0" onAction="#handleMarkAsPurchased" text="%wishlist.button.markPurchased">
-                                                         <graphic>
-                                                            <FontIcon iconLiteral="mdmz-shopping_cart" styleClass="app-icon, icon-size-20" />
-                                                         </graphic>
-                                                      </Button>
-                                                      <Button minWidth="120.0" onAction="#handleMarkAsPending" text="%wishlist.button.markPending">
-                                                         <graphic>
-                                                            <FontIcon iconLiteral="mdal-hourglass_empty" styleClass="app-icon, icon-size-20" />
-                                                         </graphic>
-                                                      </Button>
-                                                      <Button minWidth="80.0" onAction="#handleEdit" text="%wishlist.button.edit">
-                                                         <graphic>
-                                                            <FontIcon iconLiteral="mdal-edit" styleClass="app-icon, icon-size-20" />
-                                                         </graphic>
-                                                      </Button>
-                                                      <Button minWidth="80.0" onAction="#handleDelete" text="%wishlist.button.delete">
-                                                         <graphic>
-                                                            <FontIcon iconLiteral="mdal-close" styleClass="app-icon, icon-size-20" />
-                                                         </graphic>
-                                                      </Button>
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox alignment="CENTER_LEFT" spacing="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <children>
-                                                <Label fx:id="itemCountLabel" text="0 items">
-                                                   <font>
-                                                      <Font size="12.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label fx:id="totalValueLabel" text="Total: $ 0.00">
-                                                   <font>
-                                                      <Font size="12.0" />
-                                                   </font>
-                                                </Label>
-                                             </children>
-                                          </HBox>
-                                       </children>
-                                    </AnchorPane>
-                                 </children>
-                              </VBox>
-                              <VBox alignment="BOTTOM_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <HBox alignment="BOTTOM_RIGHT" spacing="10.0">
-                                       <children>
-                                          <VBox alignment="CENTER">
-                                             <children>
-                                                <Label text="%wishlist.filter.status">
-                                                   <font>
-                                                      <Font size="10.0" />
-                                                   </font>
-                                                </Label>
-                                                <SegmentedControl fx:id="statusFilterControl" />
+                                           <Label text="%wishlist.filter.status">
+                                              <font>
+                                                 <Font size="10.0" />
+                                              </font>
+                                           </Label>
+                                                <SegmentedControl fx:id="statusFilterControl" styleClass="filter-segment" />
                                              </children>
                                           </VBox>
-                                          <VBox alignment="CENTER">
+                                          <VBox spacing="4.0">
                                              <children>
-                                                <Label text="%wishlist.filter.category">
-                                                   <font>
-                                                      <Font size="10.0" />
-                                                   </font>
-                                                </Label>
-                                                <ComboBox fx:id="categoryFilterComboBox" minWidth="150.0" />
+                                           <Label text="%wishlist.filter.category">
+                                              <font>
+                                                 <Font size="10.0" />
+                                              </font>
+                                           </Label>
+                                                <ComboBox fx:id="categoryFilterComboBox" minWidth="140.0" prefHeight="34.0" styleClass="filter-control" />
                                              </children>
                                           </VBox>
                                        </children>
                                     </HBox>
-                                    <HBox alignment="CENTER_RIGHT" spacing="5.0">
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                 <Button minWidth="100.0" onAction="#handleAdd" text="%wishlist.button.add">
+                                    <graphic>
+                                       <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
+                                    </graphic>
+                                 </Button>
+                                 <Button minWidth="120.0" onAction="#handleMarkAsPurchased" text="%wishlist.button.markPurchased">
+                                    <graphic>
+                                       <FontIcon iconLiteral="mdmz-shopping_cart" styleClass="app-icon, icon-size-20" />
+                                    </graphic>
+                                 </Button>
+                                 <Button minWidth="120.0" onAction="#handleMarkAsPending" text="%wishlist.button.markPending">
+                                    <graphic>
+                                       <FontIcon iconLiteral="mdal-hourglass_empty" styleClass="app-icon, icon-size-20" />
+                                    </graphic>
+                                 </Button>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <HBox alignment="CENTER_LEFT" spacing="5.0">
                                        <children>
                                           <FontIcon iconLiteral="mdmz-search" styleClass="app-icon, icon-size-20" />
-                                          <TextField fx:id="searchField" maxWidth="400.0" minWidth="200.0" promptText="%wishlist.search.placeholder" HBox.hgrow="ALWAYS" />
+                                          <TextField fx:id="searchField" prefHeight="34.0" promptText="%wishlist.search.placeholder" />
                                        </children>
                                     </HBox>
                                  </children>
-                              </VBox>
+                              </HBox>
                            </children>
                         </VBox>
                         <TableView fx:id="wishlistTableView" VBox.vgrow="ALWAYS">

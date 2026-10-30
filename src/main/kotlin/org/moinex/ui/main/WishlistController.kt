@@ -32,6 +32,7 @@ import javafx.scene.control.TextField
 import javafx.scene.input.Clipboard
 import javafx.scene.input.ClipboardContent
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import org.moinex.common.chart.ChartFactory
@@ -41,6 +42,8 @@ import org.moinex.common.constant.TranslationKeys
 import org.moinex.common.extension.isPending
 import org.moinex.common.extension.isPurchased
 import org.moinex.common.extension.setAnchorPaneConstraints
+import org.moinex.common.ui.RowAction
+import org.moinex.common.ui.RowContextMenu
 import org.moinex.common.util.AnimationUtils
 import org.moinex.common.util.UIUtils
 import org.moinex.common.util.WindowUtils
@@ -85,6 +88,9 @@ class WishlistController(
     private lateinit var searchField: TextField
 
     @FXML
+    private lateinit var filterGroup: HBox
+
+    @FXML
     private lateinit var itemCountLabel: Label
 
     @FXML
@@ -103,11 +109,22 @@ class WishlistController(
     companion object {
         const val WISHLIST_TIMELINE_CHART_STYLE_CLASS: String = "wishlist-timeline-chart"
         private const val STATUS_PENDING_INDEX = 1
+        private const val SEARCH_ICON_SPACE = 25.0
     }
 
     @FXML
     fun initialize() {
         configureTableView()
+        RowContextMenu.install(
+            wishlistTableView,
+            listOf(
+                RowAction(
+                    preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_VIEW_DETAILS),
+                ) { handleViewDetails() },
+                RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_EDIT)) { handleEdit() },
+                RowAction(preferencesService.translate(TranslationKeys.WISHLIST_BUTTON_DELETE)) { handleDelete() },
+            ),
+        )
         configureFilters()
         loadCategoriesFromDatabase()
         populateFilterComboBoxes()
@@ -545,6 +562,10 @@ class WishlistController(
         }
 
     private fun configureFilters() {
+        val searchWidth = filterGroup.widthProperty().subtract(SEARCH_ICON_SPACE)
+        searchField.prefWidthProperty().bind(searchWidth)
+        searchField.minWidthProperty().bind(searchWidth)
+        searchField.maxWidthProperty().bind(searchWidth)
         statusFilterControl.toggleGroup.selectedToggleProperty().addListener { _, _, _ ->
             applyFilters()
             updateSummary()

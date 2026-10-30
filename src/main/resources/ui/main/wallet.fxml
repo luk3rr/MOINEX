@@ -14,35 +14,6 @@
    <children>
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane fx:id="buttonsPane" minHeight="45.0" prefHeight="45.0" styleClass="anchor-pane" stylesheets="@../../css/component/anchor-pane.css" VBox.vgrow="NEVER">
-               <children>
-                  <HBox alignment="CENTER" layoutX="-21.0" layoutY="25.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button fx:id="totalBalancePaneAddWalletButton" onAction="#handleAddWallet" text="%wallet.button.addWallet">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Button fx:id="totalBalancePaneTransferButton" onAction="#handleAddTransfer" text="%wallet.button.addTransfer">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-add" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#handleViewTransfers" text="%wallet.button.transfers">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-compare_arrows" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                        <Button fx:id="totalBalancePaneViewArchivedWalletsButton" onAction="#handleViewArchivedWallets" text="%wallet.button.walletArchive">
-                           <graphic>
-                              <FontIcon iconLiteral="mdal-archive" styleClass="app-icon, icon-size-16" />
-                           </graphic>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
             <AnchorPane minHeight="300.0" prefHeight="300.0" VBox.vgrow="NEVER">
                <children>
                   <HBox layoutX="89.0" layoutY="40.0" minHeight="300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

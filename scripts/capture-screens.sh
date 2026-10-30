@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generates one PNG per screen and theme with the development screenshot runner.
-# Usage: scripts/capture-screens.sh <output-dir>   (CAPTURE_ONLY=home,wallets limits the screens)
+# Usage: scripts/capture-screens.sh <output-dir>   (CAPTURE_ONLY=home,wallets limits the screens; CAPTURE_LANGUAGE=pt CAPTURE_COUNTRY=BR for Portuguese)
 # The app runs with a throwaway user.home and a dummy database, never with the real data.
 set -euo pipefail
 
@@ -18,7 +18,7 @@ JAR="$ROOT/build/libs/moinex.jar"
 FAKE_HOME="$(mktemp -d -t moinex-capture-XXXXXX)"
 DB_PATH="$FAKE_HOME/.moinex/data/moinex.db"
 BOOTSTRAP_LOG="$FAKE_HOME/bootstrap.log"
-JAVA_OPTS=(--enable-native-access=ALL-UNNAMED "-Duser.home=$FAKE_HOME")
+JAVA_OPTS=(--enable-native-access=ALL-UNNAMED "-Duser.home=$FAKE_HOME" "-Duser.language=${CAPTURE_LANGUAGE:-en}" "-Duser.country=${CAPTURE_COUNTRY:-US}")
 
 cleanup() {
     if [ -n "${BOOTSTRAP_PID:-}" ] && kill -0 "$BOOTSTRAP_PID" 2>/dev/null; then
